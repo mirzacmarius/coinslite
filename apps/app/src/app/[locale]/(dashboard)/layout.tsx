@@ -12,8 +12,9 @@ export default async function Layout({
     {},
     { token: await convexAuthNextjsToken() },
   );
-  if (!user?.username) {
-    return redirect("/onboarding");
+  // A valid session whose account has since been deleted.
+  if (!user) {
+    return redirect("/login");
   }
   return <AppShell>{children}</AppShell>;
 }

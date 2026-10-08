@@ -51,8 +51,9 @@ function codeEmail(kind: CodeEmailKind) {
       ctx: GenericActionCtxWithAuthConfig<DataModel>,
     ) {
       const language =
-        (await ctx.runQuery(internal.accounts.emails.languageFor, { email: to })) ??
-        defaultLocale;
+        (await ctx.runQuery(internal.accounts.emails.languageFor, {
+          email: to,
+        })) ?? defaultLocale;
       const message = codeEmailMessages[language][kind];
       const link = codeLink(kind, to, code);
       const email = {
@@ -61,7 +62,10 @@ function codeEmail(kind: CodeEmailKind) {
         text: `${message.body(code)}\n\n${message.linkLabel}: ${link}`,
       };
       if (env.EMAIL_DELIVERY === "outbox") {
-        await ctx.runMutation(internal.accounts.emails.recordInOutbox, { ...email, code });
+        await ctx.runMutation(internal.accounts.emails.recordInOutbox, {
+          ...email,
+          code,
+        });
         return;
       }
       await sendEmail({

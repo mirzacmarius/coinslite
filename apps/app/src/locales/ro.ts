@@ -29,10 +29,82 @@ export default {
     title: "Nimic aici încă",
     description: "Această parte din CoinsLite vine în curând.",
   },
-  login: {
-    title: "Conectare",
-    tagline: "Conectează-te la colecția ta",
+  auth: {
+    signIn: {
+      pageTitle: "Conectare",
+      title: "Conectează-te la colecția ta",
+      submit: "Conectează-te",
+      forgotPassword: "Ai uitat parola?",
+      noAccount: "Nou pe CoinsLite?",
+      createAccount: "Creează un cont",
+      failed:
+        "Adresa de e-mail și parola nu se potrivesc. Verifică-le sau resetează parola.",
+      verifyToContinue: "Confirmă adresa de e-mail ca să termini conectarea.",
+    },
+    signUp: {
+      pageTitle: "Creează cont",
+      title: "Creează-ți contul",
+      description:
+        "Înregistrează monedele, bancnotele și timbrele pe care le ai.",
+      submit: "Creează contul",
+      homeCurrencyHint:
+        "Valorile din colecția ta sunt afișate în această monedă.",
+      acceptTerms: "Accept {privacy} și {terms}",
+      privacyPolicy: "politica de confidențialitate",
+      termsOfUse: "termenii de utilizare",
+      termsRequired:
+        "Acceptă politica de confidențialitate și termenii de utilizare ca să continui.",
+      haveAccount: "Ai deja un cont?",
+      failed:
+        "Nu am putut crea contul. Dacă ai deja unul, conectează-te sau resetează parola.",
+    },
+    fields: {
+      email: "E-mail",
+      password: "Parolă",
+      newPassword: "Parolă nouă",
+      homeCurrency: "Moneda de bază",
+      passwordHint: "Cel puțin 8 caractere.",
+      code: "Cod",
+      emailInvalid: "Introdu o adresă de e-mail, de exemplu nume@exemplu.ro.",
+      passwordTooShort: "Folosește cel puțin 8 caractere.",
+      passwordRequired: "Introdu parola.",
+      codeInvalid: "Introdu cele 8 cifre din e-mail.",
+    },
+    code: {
+      title: "Verifică-ți e-mailul",
+      description:
+        "Am trimis un cod de 8 cifre la {email}. Expiră în 15 minute.",
+      submit: "Confirmă e-mailul",
+      resend: "Trimite un cod nou",
+      resent: "Am trimis un cod nou la {email}.",
+      differentEmail: "Folosește alt e-mail",
+      failed: "Codul nu a funcționat. Verifică-l sau cere unul nou.",
+    },
+    verify: {
+      pageTitle: "Confirmă e-mailul",
+      title: "Confirmăm adresa ta de e-mail",
+      working: "O clipă…",
+      failed:
+        "Linkul a expirat sau a fost deja folosit. Conectează-te ca să primești un cod nou.",
+      noLink:
+        "Deschide linkul din e-mailul de confirmare sau conectează-te ca să primești un cod nou.",
+    },
+    reset: {
+      pageTitle: "Resetează parola",
+      title: "Resetează-ți parola",
+      description: "Îți trimitem un cod pe e-mail ca să alegi o parolă nouă.",
+      sendCode: "Trimite codul",
+      codeSent:
+        "Dacă {email} are un cont CoinsLite, i-am trimis un cod. Expiră în 15 minute.",
+      newPasswordTitle: "Alege o parolă nouă",
+      submit: "Salvează parola",
+      failed: "Codul nu a funcționat sau a expirat. Cere unul nou.",
+    },
+    backToSignIn: "Înapoi la conectare",
+    or: "sau",
     continueWithGoogle: "Continuă cu Google",
+    noMatches: "Niciun rezultat",
+    failedGeneric: "Ceva nu a mers. Încearcă din nou.",
   },
   dashboard: {
     headerTitle: "Prezentare generală",

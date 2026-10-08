@@ -26,7 +26,7 @@ test("signed-out callers can't change account data", async () => {
   await expect(
     t.mutation(api.users.updateUsername, { username: "ada" }),
   ).rejects.toThrow("NOT_SIGNED_IN");
-  await expect(t.action(api.users.deleteCurrentUserAccount, {})).rejects.toThrow(
-    "NOT_SIGNED_IN",
-  );
+  await expect(
+    t.action(api.users.deleteCurrentUserAccount, {}),
+  ).rejects.toThrow("NOT_SIGNED_IN");
 });

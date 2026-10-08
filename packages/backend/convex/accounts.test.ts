@@ -86,7 +86,11 @@ test("emails are only accepted trimmed and in lower case, as the forms send them
     "INVALID_EMAIL",
   );
   await expect(
-    signIn(t, { flow: "signIn", email: "ADA@example.com", password: "correct horse" }),
+    signIn(t, {
+      flow: "signIn",
+      email: "ADA@example.com",
+      password: "correct horse",
+    }),
   ).rejects.toThrow("INVALID_EMAIL");
   expect(await users(t)).toEqual([]);
 });
@@ -154,7 +158,11 @@ test("a wrong code is rejected", async () => {
   const wrongCode = code === "00000000" ? "11111111" : "00000000";
 
   await expect(
-    signIn(t, { flow: "email-verification", email: "ada@example.com", code: wrongCode }),
+    signIn(t, {
+      flow: "email-verification",
+      email: "ada@example.com",
+      code: wrongCode,
+    }),
   ).rejects.toThrow();
   const [user] = await users(t);
   expect(user.emailVerificationTime).toBeUndefined();
@@ -167,9 +175,15 @@ test("a code only works for the address it was sent to", async () => {
   const adasCode = await latestCode(t, "ada@example.com");
 
   await expect(
-    signIn(t, { flow: "email-verification", email: "bob@example.com", code: adasCode }),
+    signIn(t, {
+      flow: "email-verification",
+      email: "bob@example.com",
+      code: adasCode,
+    }),
   ).rejects.toThrow("INVALID_CODE");
-  expect((await users(t)).every((user) => !user.emailVerificationTime)).toBe(true);
+  expect((await users(t)).every((user) => !user.emailVerificationTime)).toBe(
+    true,
+  );
 });
 
 test("a forgotten password is replaced using the emailed code", async () => {
@@ -202,7 +216,11 @@ test("a forgotten password is replaced using the emailed code", async () => {
   expect(reset.tokens?.token).toEqual(expect.any(String));
 
   await expect(
-    signIn(t, { flow: "signIn", email: "ada@example.com", password: "correct horse" }),
+    signIn(t, {
+      flow: "signIn",
+      email: "ada@example.com",
+      password: "correct horse",
+    }),
   ).rejects.toThrow();
   const signedIn = await signIn(t, {
     flow: "signIn",

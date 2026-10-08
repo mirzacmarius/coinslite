@@ -1,8 +1,4 @@
-import {
-  defaultLocale,
-  isHomeCurrency,
-  isLocale,
-} from "@coinslite/i18n";
+import { defaultLocale, isHomeCurrency, isLocale } from "@coinslite/i18n";
 import { ConvexError, type Value } from "convex/values";
 import { requireNormalizedEmail } from "./email";
 
@@ -31,9 +27,10 @@ export function validatePassword(password: string) {
  * The profile stored for a new email/password account. Convex Auth calls this
  * for every password flow; only sign-up stores anything beyond the email.
  */
-export function passwordProfile(
-  params: Record<string, Value | undefined>,
-): { email: string; [field: string]: Value } {
+export function passwordProfile(params: Record<string, Value | undefined>): {
+  email: string;
+  [field: string]: Value;
+} {
   const email = requireNormalizedEmail(params.email);
   if (params.flow !== "signUp") return { email };
 
@@ -45,7 +42,7 @@ export function passwordProfile(
   }
   return {
     email,
-    displayName: email.split("@")[0],
+    displayName: email.slice(0, email.indexOf("@")),
     language: isLocale(params.language) ? params.language : defaultLocale,
     homeCurrency: params.homeCurrency,
     termsAcceptedAt: Date.now(),

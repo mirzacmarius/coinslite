@@ -29,10 +29,84 @@ export default {
     title: "Rien ici pour l’instant",
     description: "Cette partie de CoinsLite arrive bientôt.",
   },
-  login: {
-    title: "Connexion",
-    tagline: "Connectez-vous à votre collection",
+  auth: {
+    signIn: {
+      pageTitle: "Connexion",
+      title: "Connectez-vous à votre collection",
+      submit: "Se connecter",
+      forgotPassword: "Mot de passe oublié ?",
+      noAccount: "Nouveau sur CoinsLite ?",
+      createAccount: "Créer un compte",
+      failed:
+        "L’adresse e-mail et le mot de passe ne correspondent pas. Vérifiez-les ou réinitialisez votre mot de passe.",
+      verifyToContinue:
+        "Vérifiez votre adresse e-mail pour terminer la connexion.",
+    },
+    signUp: {
+      pageTitle: "Créer un compte",
+      title: "Créez votre compte",
+      description: "Recensez les pièces, billets et timbres que vous possédez.",
+      submit: "Créer le compte",
+      homeCurrencyHint:
+        "Les valeurs de votre collection sont affichées dans cette devise.",
+      acceptTerms: "J’accepte la {privacy} et les {terms}",
+      privacyPolicy: "politique de confidentialité",
+      termsOfUse: "conditions d’utilisation",
+      termsRequired:
+        "Acceptez la politique de confidentialité et les conditions d’utilisation pour continuer.",
+      haveAccount: "Vous avez déjà un compte ?",
+      failed:
+        "Impossible de créer le compte. Si vous en avez déjà un, connectez-vous ou réinitialisez votre mot de passe.",
+    },
+    fields: {
+      email: "E-mail",
+      password: "Mot de passe",
+      newPassword: "Nouveau mot de passe",
+      homeCurrency: "Devise de référence",
+      passwordHint: "Au moins 8 caractères.",
+      code: "Code",
+      emailInvalid: "Saisissez une adresse e-mail, par exemple nom@exemple.fr.",
+      passwordTooShort: "Utilisez au moins 8 caractères.",
+      passwordRequired: "Saisissez votre mot de passe.",
+      codeInvalid: "Saisissez les 8 chiffres reçus par e-mail.",
+    },
+    code: {
+      title: "Consultez vos e-mails",
+      description:
+        "Nous avons envoyé un code à 8 chiffres à {email}. Il expire dans 15 minutes.",
+      submit: "Vérifier l’e-mail",
+      resend: "Envoyer un nouveau code",
+      resent: "Nous avons envoyé un nouveau code à {email}.",
+      differentEmail: "Utiliser une autre adresse e-mail",
+      failed:
+        "Ce code n’a pas fonctionné. Vérifiez-le ou demandez-en un nouveau.",
+    },
+    verify: {
+      pageTitle: "Vérifier l’e-mail",
+      title: "Vérification de votre adresse e-mail",
+      working: "Un instant…",
+      failed:
+        "Ce lien a expiré ou a déjà été utilisé. Connectez-vous pour recevoir un nouveau code.",
+      noLink:
+        "Ouvrez le lien de l’e-mail de vérification, ou connectez-vous pour recevoir un nouveau code.",
+    },
+    reset: {
+      pageTitle: "Réinitialiser le mot de passe",
+      title: "Réinitialisez votre mot de passe",
+      description:
+        "Nous vous enverrons un code par e-mail pour choisir un nouveau mot de passe.",
+      sendCode: "Envoyer le code",
+      codeSent:
+        "Si {email} correspond à un compte CoinsLite, nous y avons envoyé un code. Il expire dans 15 minutes.",
+      newPasswordTitle: "Choisissez un nouveau mot de passe",
+      submit: "Enregistrer le mot de passe",
+      failed: "Ce code n’a pas fonctionné ou a expiré. Demandez-en un nouveau.",
+    },
+    backToSignIn: "Retour à la connexion",
+    or: "ou",
     continueWithGoogle: "Continuer avec Google",
+    noMatches: "Aucun résultat",
+    failedGeneric: "Une erreur s’est produite. Réessayez.",
   },
   dashboard: {
     headerTitle: "Aperçu",
