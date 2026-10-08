@@ -6,9 +6,9 @@ import { normalizeEmail } from "@coinslite/backend/convex/accounts/email";
 import { Button } from "@coinslite/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { takeLinkFragment } from "./link-fragment";
 import { authSchemas } from "./schemas";
@@ -30,14 +30,20 @@ export function ResetFlow({ next }: { next: string }) {
   );
 
   // The emailed link carries the email and code; go straight to the new password.
+  // It may also be pasted into this tab, which only changes the fragment.
   useEffect(() => {
-    const link = takeLinkFragment();
-    if (link) setStep(link);
+    const openLink = () => {
+      const link = takeLinkFragment();
+      if (link) setStep(link);
+    };
+    openLink();
+    window.addEventListener("hashchange", openLink);
+    return () => window.removeEventListener("hashchange", openLink);
   }, []);
 
   return step ? (
     <NewPasswordStep
-      key={step.email}
+      key={`${step.email} ${step.code}`}
       email={step.email}
       code={step.code}
       schemas={schemas}
@@ -92,14 +98,7 @@ function RequestStep({
         </Link>
       }
     >
-      <form
-        noValidate
-        className="flex flex-col gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <AuthForm form={form}>
         <form.Field name="email" validators={{ onChange: schemas.email }}>
           {(field) => (
             <TextField
@@ -111,13 +110,10 @@ function RequestStep({
             />
           )}
         </form.Field>
-        <Button type="submit" disabled={submitting} className="w-full">
-          {submitting && (
-            <Loader2 className="animate-spin" aria-hidden="true" />
-          )}
+        <SubmitButton submitting={submitting}>
           {t("auth.reset.sendCode")}
-        </Button>
-      </form>
+        </SubmitButton>
+      </AuthForm>
     </AuthPanel>
   );
 }
@@ -168,14 +164,7 @@ function NewPasswordStep({
         </Link>
       }
     >
-      <form
-        noValidate
-        className="flex flex-col gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <AuthForm form={form}>
         <form.Field name="code" validators={{ onChange: schemas.code }}>
           {(field) => (
             <TextField
@@ -208,12 +197,9 @@ function NewPasswordStep({
           <FormMessage tone={message.tone}>{message.text}</FormMessage>
         )}
         <div className="flex flex-col gap-2">
-          <Button type="submit" disabled={submitting} className="w-full">
-            {submitting && (
-              <Loader2 className="animate-spin" aria-hidden="true" />
-            )}
+          <SubmitButton submitting={submitting}>
             {t("auth.reset.submit")}
-          </Button>
+          </SubmitButton>
           <Button
             type="button"
             variant="ghost"
@@ -229,7 +215,7 @@ function NewPasswordStep({
             {t("auth.code.resend")}
           </Button>
         </div>
-      </form>
+      </AuthForm>
     </AuthPanel>
   );
 }

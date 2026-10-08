@@ -4,8 +4,8 @@ import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage } from "./auth-panel";
 import { authSchemas } from "./schemas";
 import { TextField } from "./text-field";
@@ -74,14 +74,7 @@ export function CodeStep({
         </button>
       }
     >
-      <form
-        noValidate
-        className="flex flex-col gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <AuthForm form={form}>
         <form.Field name="code" validators={{ onChange: schemas.code }}>
           {(field) => (
             <TextField
@@ -100,12 +93,9 @@ export function CodeStep({
           <FormMessage tone={message.tone}>{message.text}</FormMessage>
         )}
         <div className="flex flex-col gap-2">
-          <Button type="submit" disabled={submitting} className="w-full">
-            {submitting && (
-              <Loader2 className="animate-spin" aria-hidden="true" />
-            )}
+          <SubmitButton submitting={submitting}>
             {t("auth.code.submit")}
-          </Button>
+          </SubmitButton>
           <Button
             type="button"
             variant="ghost"
@@ -121,7 +111,7 @@ export function CodeStep({
             {t("auth.code.resend")}
           </Button>
         </div>
-      </form>
+      </AuthForm>
     </AuthPanel>
   );
 }

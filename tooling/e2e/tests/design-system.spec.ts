@@ -1,19 +1,8 @@
-import AxeBuilder from "@axe-core/playwright";
 import { type Page, expect, test } from "@playwright/test";
+import { expectNoAccessibilityViolations } from "../support/accessibility";
 import { appUrl } from "../urls";
 
 const galleryUrl = `${appUrl}/design`;
-
-async function expectNoAccessibilityViolations(page: Page) {
-  const { violations } = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
-  expect(
-    violations.map(
-      ({ id, nodes }) => `${id}: ${nodes.map((n) => n.target).join(", ")}`,
-    ),
-  ).toEqual([]);
-}
 
 /** The sidebar and the phone tabs share a label; only one is shown at a time. */
 const visibleNavigation = (page: Page) =>

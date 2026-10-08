@@ -24,11 +24,15 @@ jobs:
       - name: Install Playwright browser
         working-directory: tooling/e2e
         run: bunx playwright install --with-deps chromium
+      - name: Local test backend
+        # An anonymous local Convex deployment that keeps emails in an outbox,
+        # so the account journeys can read their codes. Needs no account or secrets.
+        run: bash packages/backend/scripts/setup-e2e-backend.sh
       - name: Smoke tests
         run: bun run test:e2e
         env:
-          # The smoke journeys don't call the backend; the app only needs a URL to boot.
           NEXT_PUBLIC_CONVEX_URL: http://127.0.0.1:3210
+          E2E_LOCAL_BACKEND: "1"
       - name: Upload Playwright traces
         if: failure()
         uses: actions/upload-artifact@v4

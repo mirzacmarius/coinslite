@@ -67,7 +67,7 @@ export function PropertyPicker<T extends string>({
           variant={selected ? "subtle" : "ghost"}
           size="xs"
           aria-label={`${label}: ${shown}`}
-          className={cn("max-w-full justify-start", className)}
+          className={cn("max-w-full self-start justify-start", className)}
         >
           {selected?.icon ?? (
             <Icon

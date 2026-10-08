@@ -10,10 +10,11 @@ import { Field } from "@coinslite/ui/field";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Loader2, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
+import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { CodeStep } from "./code-step";
 import { authSchemas } from "./schemas";
@@ -114,14 +115,7 @@ export function SignUpFlow({
         </p>
       }
     >
-      <form
-        noValidate
-        className="flex flex-col gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <AuthForm form={form}>
         <form.Field name="email" validators={{ onChange: schemas.email }}>
           {(field) => (
             <TextField
@@ -232,13 +226,10 @@ export function SignUpFlow({
           }}
         </form.Field>
         {failed && <FormMessage>{t("auth.signUp.failed")}</FormMessage>}
-        <Button type="submit" disabled={submitting} className="w-full">
-          {submitting && (
-            <Loader2 className="animate-spin" aria-hidden="true" />
-          )}
+        <SubmitButton submitting={submitting}>
           {t("auth.signUp.submit")}
-        </Button>
-      </form>
+        </SubmitButton>
+      </AuthForm>
     </AuthPanel>
   );
 }

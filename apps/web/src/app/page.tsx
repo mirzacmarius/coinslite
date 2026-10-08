@@ -3,7 +3,7 @@ import { buttonVariants } from "@coinslite/ui/button";
 
 export default function Page() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
+    <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 text-center">
       <h1 className="text-4xl md:text-6xl font-medium">CoinsLite</h1>
       <p className="max-w-xl text-muted-foreground md:text-lg">
         Record the coins, banknotes and stamps you own, organise them, and know

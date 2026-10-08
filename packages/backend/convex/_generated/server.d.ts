@@ -31,7 +31,7 @@ type Env = {
   readonly CONVEX_CLOUD_URL: string;
   readonly CONVEX_SITE_URL: string;
   readonly EMAIL_DELIVERY: "outbox" | undefined;
-  readonly SITE_URL: string;
+  readonly SITE_URL: string | undefined;
 };
 
 /**

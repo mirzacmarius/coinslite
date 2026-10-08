@@ -19,6 +19,7 @@ const landingPage: Record<CodeEmailKind, string> = {
 };
 
 export function codeLink(kind: CodeEmailKind, email: string, code: string) {
+  if (!env.SITE_URL) throw new Error("SITE_URL is not set on this deployment");
   const fragment = new URLSearchParams({ email, code });
   return `${env.SITE_URL}${landingPage[kind]}#${fragment}`;
 }
