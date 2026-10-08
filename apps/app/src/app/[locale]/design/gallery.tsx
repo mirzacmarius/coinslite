@@ -4,15 +4,10 @@ import { AppShell } from "@/components/shell/app-shell";
 import { useFormatters } from "@/locales/use-formatters";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@coinslite/ui/card";
+import { Card } from "@coinslite/ui/card";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -20,12 +15,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@coinslite/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@coinslite/ui/dropdown-menu";
 import { EmptyState } from "@coinslite/ui/empty-state";
+import { HeaderBar } from "@coinslite/ui/header-bar";
 import { Input } from "@coinslite/ui/input";
-import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
+import { type ItemType, ItemTypeIcon } from "@coinslite/ui/item-type-icon";
+import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Label } from "@coinslite/ui/label";
-import { PageHeader } from "@coinslite/ui/page-header";
 import { Progress } from "@coinslite/ui/progress";
+import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
 import { Switch } from "@coinslite/ui/switch";
 import {
@@ -37,8 +42,24 @@ import {
   TableRow,
 } from "@coinslite/ui/table";
 import { toast } from "@coinslite/ui/toaster";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
-import { Coins, Plus } from "lucide-react";
+import {
+  Award,
+  Banknote,
+  ChevronRight,
+  Coins,
+  Copy,
+  Folder,
+  ListFilter,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Stamp,
+  Trash2,
+  Wallet,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 
 // Sample data only; amounts are in euro cents.
@@ -86,6 +107,39 @@ const tokens = [
   "destructive",
   "border",
 ] as const;
+const typeOptions = [
+  { value: "coin", label: "Coin", icon: <Coins strokeWidth={1.75} /> },
+  {
+    value: "banknote",
+    label: "Banknote",
+    icon: <Banknote strokeWidth={1.75} />,
+  },
+  { value: "stamp", label: "Stamp", icon: <Stamp strokeWidth={1.75} /> },
+] satisfies { value: ItemType; label: string; icon: React.ReactNode }[];
+const albumDot = (colour: string) => (
+  <span
+    className="size-1.5 rounded-full"
+    style={{ background: colour }}
+    aria-hidden="true"
+  />
+);
+const albumOptions = [
+  { value: "travel", label: "Travel", icon: albumDot("#0ea5e9"), count: 12 },
+  { value: "morgans", label: "Morgans", icon: albumDot("#f59e0b"), count: 4 },
+  { value: "bullion", label: "Bullion", icon: albumDot("#a855f7"), count: 7 },
+];
+const gradeOptions = ["MS-66", "MS-63", "AU-58", "XF-45", "VF-20"].map(
+  (grade) => ({
+    value: grade,
+    label: grade,
+    hint: "Sheldon",
+  }),
+);
+const currencyOptions = [
+  { value: "NOK", label: "NOK", hint: "Norwegian krone" },
+  { value: "EUR", label: "EUR", hint: "Euro" },
+  { value: "RON", label: "RON", hint: "Romanian leu" },
+];
 
 const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
@@ -96,7 +150,7 @@ function Section({
   const id = `design-${slug(title)}`;
   return (
     <section className="flex flex-col gap-3" aria-labelledby={id}>
-      <h2 id={id} className="text-sm font-semibold text-muted-foreground">
+      <h2 id={id} className="text-xs font-medium text-muted-foreground">
         {title}
       </h2>
       {children}
@@ -104,11 +158,187 @@ function Section({
   );
 }
 
+function PropertyRow({
+  label,
+  children,
+}: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid h-7 grid-cols-[96px_1fr] items-center gap-2">
+      <span className="truncate text-xs text-muted-foreground">{label}</span>
+      <div className="min-w-0 justify-self-start">{children}</div>
+    </div>
+  );
+}
+
+const titleInput =
+  "w-full bg-transparent px-0 text-base font-medium placeholder:text-muted-foreground focus:outline-none";
+const notesInput =
+  "w-full resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
+
+function NewItemDialog() {
+  const mod = useModifierKey();
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState<ItemType>("coin");
+  const [album, setAlbum] = useState<string>();
+  const [grade, setGrade] = useState<string>();
+  const add = () => {
+    setOpen(false);
+    toast.success("Item added to your Collection");
+  };
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">New Item dialog</Button>
+      </DialogTrigger>
+      <DialogContent
+        className="sm:max-w-[600px]"
+        onKeyDown={(event) => {
+          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") add();
+        }}
+      >
+        <DialogHeader>
+          <div className="flex items-center gap-1 text-[13px] text-muted-foreground">
+            <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
+            <span>Collection</span>
+            <ChevronRight className="size-3.5" aria-hidden="true" />
+            <DialogTitle className="text-foreground">New Item</DialogTitle>
+          </div>
+          <DialogClose asChild>
+            <Button variant="ghost" size="icon-xs" aria-label="Close">
+              <X />
+            </Button>
+          </DialogClose>
+        </DialogHeader>
+        <DialogDescription className="sr-only">
+          Record an Item in your Collection.
+        </DialogDescription>
+        <div className="flex flex-col gap-2 px-4 pb-3 pt-1">
+          <input
+            aria-label="Title"
+            className={titleInput}
+            placeholder="Title"
+          />
+          <textarea
+            aria-label="Notes"
+            rows={2}
+            className={notesInput}
+            placeholder="Add notes…"
+          />
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            <PropertyPicker
+              icon={Coins}
+              label="Item type"
+              value={type}
+              options={typeOptions}
+              onChange={setType}
+              noResults="No matches"
+            />
+            <PropertyPicker
+              icon={Folder}
+              label="Album"
+              placeholder="Add to Album"
+              value={album}
+              options={albumOptions}
+              onChange={setAlbum}
+              noResults="No matches"
+            />
+            <PropertyPicker
+              icon={Award}
+              label="Grade"
+              placeholder="Set Grade"
+              value={grade}
+              options={gradeOptions}
+              onChange={setGrade}
+              noResults="No matches"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
+            <Switch /> Create more
+          </label>
+          <div className="flex items-center gap-2">
+            <DialogClose asChild>
+              <Button variant="ghost">Cancel</Button>
+            </DialogClose>
+            <Button onClick={add}>
+              Add Item
+              {mod && (
+                <Kbd className="ml-1 border-0 bg-primary-foreground/15 text-primary-foreground">
+                  {mod}↵
+                </Kbd>
+              )}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DeleteAlbumDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Confirm dialog</Button>
+      </DialogTrigger>
+      <DialogContent className="gap-3 p-4 sm:max-w-[400px]">
+        <DialogTitle>Delete “Morgans”?</DialogTitle>
+        <DialogDescription>
+          The 4 Items in it stay in your Collection, without an Album.
+        </DialogDescription>
+        <div className="flex justify-end gap-2 pt-1">
+          <DialogClose asChild>
+            <Button variant="ghost">Cancel</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button variant="destructive">Delete Album</Button>
+          </DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ItemMenu() {
+  const mod = useModifierKey();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon-xs" aria-label="Item actions">
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuItem>
+          <Pencil strokeWidth={1.75} /> Edit
+          <DropdownMenuShortcut>
+            <Kbd>E</Kbd>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Copy strokeWidth={1.75} /> Duplicate
+          {mod && (
+            <DropdownMenuShortcut>
+              <Kbd>{mod}D</Kbd>
+            </DropdownMenuShortcut>
+          )}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-destructive focus:text-destructive [&_svg]:text-destructive">
+          <Trash2 strokeWidth={1.75} /> Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function DesignGallery() {
   const { money } = useFormatters();
-  const [itemType, setItemType] = useState<"coin" | "banknote" | "stamp">(
-    "coin",
-  );
+  const [itemType, setItemType] = useState<ItemType>("coin");
+  const [album, setAlbum] = useState<string | undefined>("travel");
+  const [grade, setGrade] = useState<string>();
+  const [currency, setCurrency] = useState("NOK");
   const totals = [
     { label: "Purchase price", value: money(436650, "EUR") },
     { label: "Market value", value: money(512000, "EUR") },
@@ -123,200 +353,318 @@ export function DesignGallery() {
   return (
     <AppShell
       sidebarFooter={
-        <Card className="flex flex-col gap-2 p-3 shadow-none">
+        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Free plan</span>
-            <span className="font-semibold">18 / 50 Items</span>
+            <span className="font-medium">18 / 50 Items</span>
           </div>
           <Progress value={18} max={50} label="Items used on the Free plan" />
-        </Card>
+        </div>
       }
     >
       {/* The samples are English only, whatever the interface language. */}
       <div lang="en" className="contents">
-        <PageHeader
+        <HeaderBar
           title="Design system"
-          description="Ledger: tokens and components used across CoinsLite."
           actions={
             <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon-xs" aria-label="Filter">
+                    <ListFilter strokeWidth={1.75} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="flex items-center gap-2">
+                  Filter{" "}
+                  <Kbd className="border-background/20 bg-background/10 text-background">
+                    F
+                  </Kbd>
+                </TooltipContent>
+              </Tooltip>
               <Button
-                variant="outline"
-                size="sm"
-                className="hidden sm:inline-flex"
-              >
-                Export
-              </Button>
-              <Button
-                size="sm"
-                className="gap-1.5"
+                size="xs"
                 onClick={() => toast.success("Item added to your Collection")}
               >
-                <Plus className="size-4" aria-hidden="true" />
-                Add
+                <Plus /> Add Item
               </Button>
             </>
           }
         />
 
-        <Section title="Value summary">
-          <Card className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4 sm:p-5">
-            {totals.map(({ label, value, tone }) => (
-              <div key={label} className="flex flex-col gap-0.5">
-                <span className="text-xs text-muted-foreground">{label}</span>
-                <span className={cn("text-lg font-semibold sm:text-xl", tone)}>
-                  {value}
-                </span>
-              </div>
-            ))}
-          </Card>
-        </Section>
+        <div className="flex flex-col gap-8 p-4">
+          <Section title="Value summary">
+            <Card className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4">
+              {totals.map(({ label, value, tone }) => (
+                <div key={label} className="flex flex-col gap-0.5">
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                  <span className={cn("text-xl font-semibold", tone)}>
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </Card>
+          </Section>
 
-        <Section title="Colour tokens">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {tokens.map((token) => (
-              <div
-                key={token}
-                className="flex items-center gap-2 rounded-md border bg-card p-2 text-sm"
-              >
-                <span
-                  className="size-6 rounded border"
-                  style={{ background: `hsl(var(--${token}))` }}
-                  aria-hidden="true"
+          <Section title="Colour tokens">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {tokens.map((token) => (
+                <div
+                  key={token}
+                  className="flex h-9 items-center gap-2 rounded-md border bg-card px-2 text-[13px]"
+                >
+                  <span
+                    className="size-5 rounded border"
+                    style={{ background: `hsl(var(--${token}))` }}
+                    aria-hidden="true"
+                  />
+                  {token}
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <Section title="Buttons">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button>Save Item</Button>
+              <Button variant="subtle">Duplicate</Button>
+              <Button variant="outline">Export</Button>
+              <Button variant="ghost">Cancel</Button>
+              <Button variant="destructive">Delete</Button>
+              <Button variant="link">View Collection</Button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button size="xs" variant="subtle">
+                <Plus /> Toolbar button
+              </Button>
+              <Button size="xs" variant="ghost">
+                <ListFilter strokeWidth={1.75} /> Filter
+              </Button>
+              <ItemMenu />
+            </div>
+          </Section>
+
+          <Section title="Property pills">
+            <div className="flex flex-wrap gap-1.5">
+              <PropertyPicker
+                icon={Coins}
+                label="Item type"
+                value={itemType}
+                options={typeOptions}
+                onChange={setItemType}
+                noResults="No matches"
+              />
+              <PropertyPicker
+                icon={Folder}
+                label="Album"
+                placeholder="Add to Album"
+                value={album}
+                options={albumOptions}
+                onChange={setAlbum}
+                noResults="No matches"
+              />
+              <PropertyPicker
+                icon={Award}
+                label="Grade"
+                placeholder="Set Grade"
+                value={grade}
+                options={gradeOptions}
+                onChange={setGrade}
+                noResults="No matches"
+              />
+            </div>
+            <Card className="flex w-full max-w-[280px] flex-col gap-1 p-4">
+              <h3 className="mb-1 text-xs font-medium text-muted-foreground">
+                Properties
+              </h3>
+              <PropertyRow label="Album">
+                <PropertyPicker
+                  icon={Folder}
+                  label="Album"
+                  placeholder="Add to Album"
+                  value={album}
+                  options={albumOptions}
+                  onChange={setAlbum}
+                  noResults="No matches"
                 />
-                {token}
-              </div>
-            ))}
-          </div>
-        </Section>
+              </PropertyRow>
+              <PropertyRow label="Grade">
+                <PropertyPicker
+                  icon={Award}
+                  label="Grade"
+                  placeholder="Set Grade"
+                  value={grade}
+                  options={gradeOptions}
+                  onChange={setGrade}
+                  noResults="No matches"
+                />
+              </PropertyRow>
+              <PropertyRow label="Metal value">
+                <span className="text-[13px]">{money(249559, "EUR")}</span>
+              </PropertyRow>
+            </Card>
+          </Section>
 
-        <Section title="Buttons and badges">
-          <div className="flex flex-wrap items-center gap-2">
-            <Button>Save item</Button>
-            <Button variant="secondary">Duplicate</Button>
-            <Button variant="outline">Cancel</Button>
-            <Button variant="ghost">More details</Button>
-            <Button variant="destructive">Delete</Button>
-            <Button variant="link">View Collection</Button>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge>MS-63</Badge>
-            <Badge variant="outline">Strike: Proof</Badge>
-            <Badge variant="success">+12.4%</Badge>
-            <Badge variant="destructive">Over limit</Badge>
-          </div>
-        </Section>
+          <Section title="Badges and shortcuts">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge>MS-63</Badge>
+              <Badge variant="outline">Strike: Proof</Badge>
+              <Badge variant="success">+12.4%</Badge>
+              <Badge variant="destructive">Over limit</Badge>
+              <Kbd>C</Kbd>
+              <Kbd>/</Kbd>
+            </div>
+          </Section>
 
-        <Section title="Item form">
-          <Card>
-            <CardHeader>
-              <CardTitle>New item</CardTitle>
-              <CardDescription>
-                Pick the type, then fill in what you know.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
+          <Section title="Full form">
+            <Card className="flex max-w-2xl flex-col gap-4 p-4">
               <SegmentedControl
                 label="Item type"
                 value={itemType}
                 onChange={setItemType}
-                options={[
-                  { value: "coin", label: "Coin" },
-                  { value: "banknote", label: "Banknote" },
-                  { value: "stamp", label: "Stamp" },
-                ]}
+                options={typeOptions.map(({ value, label }) => ({
+                  value,
+                  label,
+                }))}
               />
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Label htmlFor="design-title">Title</Label>
+                  <Label
+                    htmlFor="design-title"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Title
+                  </Label>
                   <Input
                     id="design-title"
                     defaultValue="Morgan dollar 1881-S"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="design-quantity">Quantity</Label>
+                  <Label
+                    htmlFor="design-price"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Purchase price
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="design-price"
+                      inputMode="decimal"
+                      defaultValue="75,00"
+                      className="pr-12 text-right"
+                    />
+                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                      EUR
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label
+                    htmlFor="design-quantity"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Quantity
+                  </Label>
                   <Input
                     id="design-quantity"
                     type="number"
                     defaultValue={1}
                     min={1}
+                    aria-invalid="true"
+                    aria-describedby="design-quantity-error"
+                  />
+                  <p
+                    id="design-quantity-error"
+                    className="text-xs text-destructive"
+                  >
+                    Use a whole number of 1 or more.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label
+                    htmlFor="design-currency"
+                    className="text-xs text-muted-foreground"
+                  >
+                    Home currency
+                  </Label>
+                  <PropertyPicker
+                    id="design-currency"
+                    icon={Wallet}
+                    label="Home currency"
+                    value={currency}
+                    options={currencyOptions}
+                    onChange={setCurrency}
+                    noResults="No matches"
                   />
                 </div>
+                <div className="flex items-center gap-2 self-end">
+                  <Switch id="design-bullion" />
+                  <Label htmlFor="design-bullion">Bullion</Label>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Switch id="design-bullion" />
-                <Label htmlFor="design-bullion">Bullion</Label>
-              </div>
-            </CardContent>
-          </Card>
-        </Section>
+            </Card>
+          </Section>
 
-        <Section title="Collection table">
-          <Card className="p-1">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead>Grade</TableHead>
-                  <TableHead className="text-right">Qty</TableHead>
-                  <TableHead className="text-right">Market value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.title}>
-                    <TableCell>
-                      <div className="flex items-center gap-2.5">
-                        <ItemTypeIcon type={item.type} />
-                        <div className="flex flex-col">
-                          <span className="font-medium">{item.title}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {item.detail}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge>{item.grade}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">{item.qty}</TableCell>
-                    <TableCell className="text-right">
-                      {money(item.market * item.qty, "EUR")}
-                    </TableCell>
+          <Section title="Collection list">
+            <div className="rounded-lg border bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Item</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead className="text-right">Qty</TableHead>
+                    <TableHead className="text-right">Market value</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-        </Section>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => (
+                    <TableRow key={item.title}>
+                      <TableCell className="py-1.5">
+                        <div className="flex items-center gap-2.5">
+                          <ItemTypeIcon type={item.type} />
+                          <div className="flex min-w-0 flex-col">
+                            <span className="truncate font-medium">
+                              {item.title}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {item.detail}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {item.grade}
+                      </TableCell>
+                      <TableCell className="text-right">{item.qty}</TableCell>
+                      <TableCell className="text-right">
+                        {money(item.market * item.qty, "EUR")}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </Section>
 
-        <Section title="Dialog and empty state">
-          <div className="flex flex-wrap gap-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline">Delete Album…</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete “Morgans”?</DialogTitle>
-                  <DialogDescription>
-                    Items you don’t tick stay in your Collection without an
-                    Album.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="destructive">Delete Album</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <EmptyState
-            icon={<Coins className="size-5" aria-hidden="true" />}
-            title="Your Collection is empty"
-            description="Add your first coin, banknote or stamp to see it here."
-            action={<Button size="sm">Add an Item</Button>}
-          />
-        </Section>
+          <Section title="Dialogs and empty state">
+            <div className="flex flex-wrap gap-2">
+              <NewItemDialog />
+              <DeleteAlbumDialog />
+            </div>
+            <EmptyState
+              icon={
+                <Coins
+                  className="size-4"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+              }
+              title="Your Collection is empty"
+              description="Add your first coin, banknote or stamp to see it here."
+              action={<Button>Add Item</Button>}
+            />
+          </Section>
+        </div>
       </div>
     </AppShell>
   );

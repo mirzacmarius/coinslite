@@ -1,5 +1,4 @@
 import { AppShell } from "@/components/shell/app-shell";
-import { SignOut } from "@/components/sign-out";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
@@ -16,5 +15,5 @@ export default async function Layout({
   if (!user?.username) {
     return redirect("/onboarding");
   }
-  return <AppShell sidebarFooter={<SignOut />}>{children}</AppShell>;
+  return <AppShell>{children}</AppShell>;
 }

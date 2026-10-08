@@ -22,14 +22,14 @@ export function EmptyState({
       )}
     >
       {icon && (
-        <div className="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
+        <div className="flex size-9 items-center justify-center rounded-lg border bg-card text-muted-foreground">
           {icon}
         </div>
       )}
       <div className="flex max-w-sm flex-col gap-1">
-        <p className="font-semibold">{title}</p>
+        <p className="text-sm font-medium">{title}</p>
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-[13px] text-muted-foreground">{description}</p>
         )}
       </div>
       {action}

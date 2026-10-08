@@ -16,6 +16,8 @@ export default {
     skipToContent: "Hopp til innhold",
     primaryNavigation: "Hovedmeny",
     signOut: "Logg ut",
+    workspaceMenu: "Konto og innstillinger",
+    plans: "Abonnement",
     appearance: "Utseende",
     appearanceLight: "Lyst",
     appearanceDark: "Mørkt",

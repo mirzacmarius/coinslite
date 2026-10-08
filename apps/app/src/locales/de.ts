@@ -17,6 +17,8 @@ export default {
     skipToContent: "Zum Inhalt springen",
     primaryNavigation: "Hauptmenü",
     signOut: "Abmelden",
+    workspaceMenu: "Konto und Einstellungen",
+    plans: "Tarife",
     appearance: "Darstellung",
     appearanceLight: "Hell",
     appearanceDark: "Dunkel",

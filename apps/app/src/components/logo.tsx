@@ -12,7 +12,7 @@ export function Logo({ className }: { className?: string }) {
       <svg
         viewBox="0 0 24 24"
         aria-hidden="true"
-        className="size-6 text-primary"
+        className="size-5 shrink-0 text-primary"
       >
         <circle cx="12" cy="12" r="10" fill="currentColor" />
         <circle

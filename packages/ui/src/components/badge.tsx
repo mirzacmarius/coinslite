@@ -3,14 +3,16 @@ import type * as React from "react";
 import { cn } from "../utils";
 
 export const badgeVariants = cva(
-  "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
+  "inline-flex items-center gap-1 rounded-md border px-1.5 py-0 text-xs font-medium",
   {
     variants: {
       variant: {
-        default: "bg-accent text-accent-foreground",
-        outline: "border text-foreground",
-        success: "bg-success text-success-foreground",
-        destructive: "bg-destructive text-destructive-foreground",
+        /** Quiet by default; prefer a dot and text in lists. */
+        default: "bg-transparent text-muted-foreground",
+        outline: "bg-transparent text-foreground",
+        success: "border-transparent bg-success text-success-foreground",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground",
       },
     },
     defaultVariants: { variant: "default" },

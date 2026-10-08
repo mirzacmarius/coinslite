@@ -24,7 +24,7 @@ export function SegmentedControl<T extends string>({
   return (
     <fieldset
       className={cn(
-        "inline-flex rounded-md border bg-muted p-0.5 text-sm",
+        "inline-flex self-start rounded-md border bg-muted p-0.5 text-[13px]",
         className,
       )}
     >
@@ -32,7 +32,7 @@ export function SegmentedControl<T extends string>({
       {options.map((option) => (
         <label
           key={option.value}
-          className="relative cursor-pointer rounded-[calc(var(--radius)-3px)] px-3 py-1.5 font-medium text-muted-foreground has-[:checked]:bg-card has-[:checked]:text-foreground has-[:checked]:shadow-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+          className="relative cursor-pointer rounded-[calc(var(--radius)-3px)] flex h-6 items-center px-2.5 font-medium text-muted-foreground has-[:checked]:bg-card has-[:checked]:text-foreground has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
         >
           <input
             type="radio"

@@ -62,12 +62,10 @@ export default function DashboardSettings() {
       <PhoneAccountLinks />
       {/* Avatar */}
       <div className="flex w-full flex-col items-start rounded-lg border border-border bg-card">
-        <div className="flex w-full items-start justify-between rounded-lg p-6">
+        <div className="flex w-full items-start justify-between rounded-lg p-4">
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-medium text-primary">
-              {t("avatar.title")}
-            </h2>
-            <p className="text-sm font-normal text-primary/60">
+            <h2 className="text-sm font-medium">{t("avatar.title")}</h2>
+            <p className="text-sm font-normal text-muted-foreground">
               {t("avatar.description")}
             </p>
           </div>
@@ -99,8 +97,8 @@ export default function DashboardSettings() {
             onUploadComplete={handleUpdateUserImage}
           />
         </div>
-        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-6 dark:bg-card">
-          <p className="text-sm font-normal text-primary/60">
+        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-4 dark:bg-card">
+          <p className="text-sm font-normal text-muted-foreground">
             {t("avatar.uploadHint")}
           </p>
           {user.avatarUrl && (
@@ -127,10 +125,10 @@ export default function DashboardSettings() {
           usernameForm.handleSubmit();
         }}
       >
-        <div className="flex w-full flex-col gap-4 rounded-lg p-6">
+        <div className="flex w-full flex-col gap-4 rounded-lg p-4">
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-medium text-primary">Your Username</h2>
-            <p className="text-sm font-normal text-primary/60">
+            <h2 className="text-sm font-medium">Your Username</h2>
+            <p className="text-sm font-normal text-muted-foreground">
               This is your username. It will be displayed on your profile.
             </p>
           </div>
@@ -161,8 +159,8 @@ export default function DashboardSettings() {
             </p>
           )}
         </div>
-        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-6 dark:bg-card">
-          <p className="text-sm font-normal text-primary/60">
+        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-4 dark:bg-card">
+          <p className="text-sm font-normal text-muted-foreground">
             Please use 32 characters at maximum.
           </p>
           <Button type="submit" size="sm">
@@ -173,16 +171,14 @@ export default function DashboardSettings() {
 
       {/* Delete Account */}
       <div className="flex w-full flex-col items-start rounded-lg border border-destructive bg-card">
-        <div className="flex flex-col gap-2 p-6">
-          <h2 className="text-xl font-medium text-primary">
-            {t("deleteAccount.title")}
-          </h2>
-          <p className="text-sm font-normal text-primary/60">
+        <div className="flex flex-col gap-2 p-4">
+          <h2 className="text-sm font-medium">{t("deleteAccount.title")}</h2>
+          <p className="text-sm font-normal text-muted-foreground">
             {t("deleteAccount.description")}
           </p>
         </div>
-        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-red-500/10 px-6 dark:bg-red-500/10">
-          <p className="text-sm font-normal text-primary/60">
+        <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-red-500/10 px-4 dark:bg-red-500/10">
+          <p className="text-sm font-normal text-muted-foreground">
             {t("deleteAccount.warning")}
           </p>
           <Button

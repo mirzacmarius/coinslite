@@ -1,8 +1,5 @@
 "use client";
 
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { Logo } from "@/components/logo";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { useI18n } from "@/locales/client";
 import { SkipLink } from "@coinslite/ui/skip-link";
 import { cn } from "@coinslite/ui/utils";
@@ -10,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
 import { type NavItem, isCurrent, navItems } from "./navigation";
+import { WorkspaceMenu } from "./workspace-menu";
 
 function NavLinks({
   items,
@@ -36,20 +34,20 @@ function NavLinks({
               className={
                 layout === "sidebar"
                   ? cn(
-                      "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                      current &&
-                        "bg-accent font-semibold text-accent-foreground hover:bg-accent",
+                      "flex h-7 items-center gap-2 rounded-md px-2 text-[13px] font-medium text-muted-foreground transition-colors duration-100 hover:bg-muted hover:text-foreground",
+                      current && "bg-muted text-foreground",
                     )
                   : cn(
                       // The current tab gets a bar and bold text, not just a colour.
                       "relative flex flex-col items-center gap-1 px-1 py-2 text-[11px] font-medium text-muted-foreground",
                       current &&
-                        "font-semibold text-foreground before:absolute before:inset-x-5 before:top-0 before:h-0.5 before:rounded-full before:bg-primary",
+                        "font-semibold text-foreground before:absolute before:inset-x-5 before:top-0 before:h-0.5 before:rounded-full before:bg-foreground",
                     )
               }
             >
               <Icon
                 className={layout === "sidebar" ? "size-4" : "size-5"}
+                strokeWidth={1.75}
                 aria-hidden="true"
               />
               {t(`nav.${key}`)}
@@ -63,15 +61,15 @@ function NavLinks({
 
 /**
  * The frame around every signed-in screen: a sidebar on tablets and desktops,
- * and on phones a compact top bar plus four tabs. Pages render their own
- * PageHeader, which holds actions such as Add.
+ * and on phones a compact top bar plus four tabs. Each page starts with its own
+ * HeaderBar, which holds the title and actions such as Add.
  */
 export function AppShell({
   children,
   sidebarFooter,
 }: {
   children: React.ReactNode;
-  /** Extra content at the bottom of the sidebar, e.g. plan usage or sign-out. */
+  /** The bottom of the sidebar: plan usage, nothing else. */
   sidebarFooter?: React.ReactNode;
 }) {
   const t = useI18n();
@@ -80,38 +78,24 @@ export function AppShell({
     <div className="min-h-dvh bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:grid md:grid-cols-[232px_1fr]">
       <SkipLink label={t("shell.skipToContent")} />
 
-      <div className="sticky top-0 hidden h-dvh flex-col justify-between border-r bg-sidebar p-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:flex">
-        <div className="flex flex-col gap-5">
-          <Link href="/" className="rounded-md px-2 py-1">
-            <Logo />
-          </Link>
+      <div className="sticky top-0 hidden h-dvh flex-col justify-between gap-2 border-r bg-sidebar p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
+        <div className="flex flex-col gap-3">
+          <WorkspaceMenu className="h-8 w-full" />
           <nav aria-label={t("shell.primaryNavigation")}>
             <NavLinks items={navItems} layout="sidebar" />
           </nav>
         </div>
-        <div className="flex flex-col gap-3">
-          {sidebarFooter}
-          <div className="flex flex-wrap items-center gap-2 px-1">
-            <LanguageSwitcher />
-            <ThemeSwitcher />
-          </div>
-        </div>
+        {sidebarFooter}
       </div>
 
       <div className="flex min-h-dvh min-w-0 flex-col">
-        <header className="flex items-center justify-between border-b bg-card px-4 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] md:hidden">
-          <Link href="/" className="rounded-md">
-            <Logo className="text-sm" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <ThemeSwitcher />
-          </div>
-        </header>
+        <div className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
+          <WorkspaceMenu className="h-8" />
+        </div>
         <main
           id="main"
           tabIndex={-1}
-          className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 pb-28 pt-5 outline-none md:px-8 md:pb-10 md:pt-7"
+          className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:pb-0"
         >
           {children}
         </main>

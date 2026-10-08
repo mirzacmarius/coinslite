@@ -1,23 +1,13 @@
 "use client";
 
-import { useI18n } from "@/locales/client";
-import { Button } from "@coinslite/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { LogOut } from "lucide-react";
+import { useCallback } from "react";
 
-export function SignOut() {
-  const t = useI18n();
+/** Signs out and opens sign-in, so no signed-in page stays on screen. */
+export function useSignOut() {
   const { signOut } = useAuthActions();
-
-  return (
-    <Button
-      onClick={() => void signOut()}
-      variant="ghost"
-      size="sm"
-      className="w-full justify-start gap-2 text-muted-foreground"
-    >
-      <LogOut className="size-4" aria-hidden="true" />
-      {t("shell.signOut")}
-    </Button>
-  );
+  return useCallback(async () => {
+    await signOut();
+    window.location.assign("/login");
+  }, [signOut]);
 }

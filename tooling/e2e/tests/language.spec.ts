@@ -32,8 +32,8 @@ test.describe("with an English browser", () => {
     await page.goto(appUrl);
     await expect(page.getByText("Sign in to your collection")).toBeVisible();
 
-    await page.getByRole("combobox", { name: "Language" }).click();
-    await page.getByRole("option", { name: "Română" }).click();
+    await page.getByRole("button", { name: /^Language/ }).click();
+    await page.getByRole("menuitemradio", { name: "Română" }).click();
 
     await expect(page.getByText("Conectează-te la colecția ta")).toBeVisible();
     const cookie = await languageCookie(context);

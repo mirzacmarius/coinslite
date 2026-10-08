@@ -14,6 +14,8 @@ export default {
     skipToContent: "Skip to content",
     primaryNavigation: "Main",
     signOut: "Sign out",
+    workspaceMenu: "Account and preferences",
+    plans: "Plans",
     appearance: "Appearance",
     appearanceLight: "Light",
     appearanceDark: "Dark",

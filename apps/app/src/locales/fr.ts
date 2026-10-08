@@ -17,6 +17,8 @@ export default {
     skipToContent: "Aller au contenu",
     primaryNavigation: "Menu principal",
     signOut: "Se déconnecter",
+    workspaceMenu: "Compte et préférences",
+    plans: "Formules",
     appearance: "Apparence",
     appearanceLight: "Clair",
     appearanceDark: "Sombre",

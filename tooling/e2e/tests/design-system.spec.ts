@@ -48,6 +48,59 @@ test.describe("on a desktop screen", () => {
     await expectNoAccessibilityViolations(page);
   });
 
+  test("the workspace menu holds the account, language, appearance and sign-out", async ({
+    page,
+  }) => {
+    await page.goto(galleryUrl);
+    await page.getByRole("button", { name: "Account and preferences" }).click();
+    for (const name of [
+      "Account",
+      "Plans",
+      "Language",
+      "Appearance",
+      "Sign out",
+    ]) {
+      await expect(page.getByRole("menuitem", { name })).toBeVisible();
+    }
+    await page.getByRole("menuitem", { name: "Appearance" }).hover();
+    await page.getByRole("menuitemradio", { name: "Dark" }).click();
+    await expect(page.locator("html")).toHaveClass(/dark/);
+  });
+
+  test("a property pill opens a searchable list and keeps the pick", async ({
+    page,
+  }) => {
+    await page.goto(galleryUrl);
+    await page.getByRole("button", { name: "Album: Travel" }).first().click();
+    await page.getByPlaceholder("Album").fill("mor");
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("button", { name: "Album: Morgans" }).first(),
+    ).toBeVisible();
+  });
+
+  test("a dialog traps focus, passes WCAG AA and gives focus back on Esc", async ({
+    page,
+  }) => {
+    await page.goto(galleryUrl);
+    const trigger = page.getByRole("button", { name: "New Item dialog" });
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "New Item" });
+    await expect(dialog).toBeVisible();
+    // Scan once the opening fade has finished, not mid-animation.
+    await dialog.evaluate((element) =>
+      Promise.all(
+        element
+          .getAnimations({ subtree: true })
+          .map(({ finished }) => finished),
+      ),
+    );
+    await expectNoAccessibilityViolations(page);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
   test("keyboard users can skip straight to the content", async ({ page }) => {
     await page.goto(galleryUrl);
     await page.keyboard.press("Tab");

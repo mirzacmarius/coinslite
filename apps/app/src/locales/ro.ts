@@ -17,6 +17,8 @@ export default {
     skipToContent: "Sari la conținut",
     primaryNavigation: "Meniu principal",
     signOut: "Deconectare",
+    workspaceMenu: "Cont și preferințe",
+    plans: "Planuri",
     appearance: "Aspect",
     appearanceLight: "Luminos",
     appearanceDark: "Întunecat",
