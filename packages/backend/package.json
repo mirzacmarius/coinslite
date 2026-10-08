@@ -1,0 +1,32 @@
+{
+  "name": "@coinslite/backend",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "convex dev --tail-logs",
+    "setup": "convex dev --once && bun scripts/link-app-env.ts",
+    "seed": "convex dev --once && convex run init",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p convex",
+    "lint": "biome lint"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@auth/core": "0.37.0",
+    "@convex-dev/auth": "^0.0.80",
+    "@convex-dev/polar": "npm:@erquhart/convex-polar@0.2.0-alpha.5",
+    "@polar-sh/sdk": "^0.26.1",
+    "convex": "^1.46.0",
+    "convex-helpers": "^0.1.63",
+    "standardwebhooks": "^1.0.0"
+  },
+  "devDependencies": {
+    "@edge-runtime/vm": "^5.0.0",
+    "convex-test": "^0.0.60",
+    "typescript": "^5.5.4",
+    "vitest": "^3.2.4"
+  }
+}

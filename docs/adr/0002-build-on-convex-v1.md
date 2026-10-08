@@ -5,4 +5,4 @@ CoinsLite is built from the Convex v1 template: a Bun/Turborepo monorepo with Ne
 ## Consequences
 
 - Billing, the customer portal and subscription webhooks are built against Polar.
-- Sentry and OpenPanel, which ship with v1, are left disabled for now.
+- Sentry and OpenPanel, which ship with v1, were removed rather than left unconfigured; add them back when monitoring and analytics are needed.
