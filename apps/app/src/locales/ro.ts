@@ -16,12 +16,12 @@ export default {
   shell: {
     skipToContent: "Sari la conținut",
     primaryNavigation: "Meniu principal",
-    add: "Adaugă",
     signOut: "Deconectare",
-    theme: "Temă",
-    themeLight: "Luminos",
-    themeDark: "Întunecat",
-    themeSystem: "Sistem",
+    appearance: "Aspect",
+    appearanceLight: "Luminos",
+    appearanceDark: "Întunecat",
+    appearanceSystem: "Sistem",
+    more: "Mai mult",
   },
   placeholder: {
     title: "Nimic aici încă",

@@ -30,6 +30,7 @@
     "./globals.css": "./src/globals.css",
     "./icons": "./src/components/icons.tsx",
     "./input": "./src/components/input.tsx",
+    "./item-type-icon": "./src/components/item-type-icon.tsx",
     "./label": "./src/components/label.tsx",
     "./page-header": "./src/components/page-header.tsx",
     "./postcss": "./postcss.config.js",

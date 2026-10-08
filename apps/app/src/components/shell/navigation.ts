@@ -1,3 +1,4 @@
+import { locales } from "@coinslite/i18n";
 import {
   BookOpen,
   FolderOpen,
@@ -31,8 +32,10 @@ export const navItems: NavItem[] = [
 ];
 
 /** A nav item is current when the path is its href or a page below it. */
+const localePrefix = new RegExp(`^/(${locales.join("|")})(?=/|$)`);
+
 export function isCurrent(pathname: string, href: string): boolean {
-  const path = pathname.replace(/^\/(en|nb|de|fr|ro)(?=\/|$)/, "") || "/";
+  const path = pathname.replace(localePrefix, "") || "/";
   return href === "/"
     ? path === "/"
     : path === href || path.startsWith(`${href}/`);

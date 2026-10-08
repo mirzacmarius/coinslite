@@ -1,10 +1,10 @@
 "use client";
 
-import { CheckoutLink, CustomerPortalLink } from "@convex-dev/polar/react";
+import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { Switch } from "@coinslite/ui/switch";
-import { useFormatters } from "@/locales/use-formatters";
+import { CheckoutLink, CustomerPortalLink } from "@convex-dev/polar/react";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 

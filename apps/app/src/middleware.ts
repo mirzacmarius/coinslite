@@ -77,11 +77,11 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
 });
 
 export const config = {
-  // Everything except Next internals, files with an extension and the
-  // generated app icons and manifest, plus /api, where Convex Auth handles
+  // Everything except Next internals, files with an extension (such as the
+  // manifest) and the generated app icons, plus /api, where Convex Auth handles
   // sign-in requests.
   matcher: [
-    "/((?!_next/static|_next/image|api|icon|apple-icon|manifest.webmanifest|.*\\..*).*)",
+    "/((?!_next/static|_next/image|api|icon|apple-icon|.*\\..*).*)",
     "/",
     "/(api|trpc)(.*)",
   ],

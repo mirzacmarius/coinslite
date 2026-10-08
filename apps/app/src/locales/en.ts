@@ -13,12 +13,12 @@ export default {
   shell: {
     skipToContent: "Skip to content",
     primaryNavigation: "Main",
-    add: "Add",
     signOut: "Sign out",
-    theme: "Theme",
-    themeLight: "Light",
-    themeDark: "Dark",
-    themeSystem: "System",
+    appearance: "Appearance",
+    appearanceLight: "Light",
+    appearanceDark: "Dark",
+    appearanceSystem: "System",
+    more: "More",
   },
   placeholder: {
     title: "Nothing here yet",

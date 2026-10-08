@@ -15,12 +15,12 @@ export default {
   shell: {
     skipToContent: "Hopp til innhold",
     primaryNavigation: "Hovedmeny",
-    add: "Legg til",
     signOut: "Logg ut",
-    theme: "Tema",
-    themeLight: "Lyst",
-    themeDark: "Mørkt",
-    themeSystem: "System",
+    appearance: "Utseende",
+    appearanceLight: "Lyst",
+    appearanceDark: "Mørkt",
+    appearanceSystem: "System",
+    more: "Mer",
   },
   placeholder: {
     title: "Ingenting her ennå",

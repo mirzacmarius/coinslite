@@ -16,12 +16,12 @@ export default {
   shell: {
     skipToContent: "Zum Inhalt springen",
     primaryNavigation: "Hauptmenü",
-    add: "Hinzufügen",
     signOut: "Abmelden",
-    theme: "Design",
-    themeLight: "Hell",
-    themeDark: "Dunkel",
-    themeSystem: "System",
+    appearance: "Darstellung",
+    appearanceLight: "Hell",
+    appearanceDark: "Dunkel",
+    appearanceSystem: "System",
+    more: "Mehr",
   },
   placeholder: {
     title: "Noch nichts hier",

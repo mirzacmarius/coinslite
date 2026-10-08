@@ -16,12 +16,12 @@ export default {
   shell: {
     skipToContent: "Aller au contenu",
     primaryNavigation: "Menu principal",
-    add: "Ajouter",
     signOut: "Se déconnecter",
-    theme: "Thème",
-    themeLight: "Clair",
-    themeDark: "Sombre",
-    themeSystem: "Système",
+    appearance: "Apparence",
+    appearanceLight: "Clair",
+    appearanceDark: "Sombre",
+    appearanceSystem: "Système",
+    more: "Plus",
   },
   placeholder: {
     title: "Rien ici pour l’instant",

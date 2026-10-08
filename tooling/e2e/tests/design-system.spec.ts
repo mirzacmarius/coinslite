@@ -9,19 +9,29 @@ async function expectNoAccessibilityViolations(page: Page) {
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
   expect(
-    violations.map(({ id, nodes }) => `${id}: ${nodes.map((n) => n.target).join(", ")}`),
+    violations.map(
+      ({ id, nodes }) => `${id}: ${nodes.map((n) => n.target).join(", ")}`,
+    ),
   ).toEqual([]);
 }
+
+/** The sidebar and the phone tabs share a label; only one is shown at a time. */
+const visibleNavigation = (page: Page) =>
+  page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
 
 test.describe("on a desktop screen", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   test("the shell shows the sidebar navigation", async ({ page }) => {
     await page.goto(galleryUrl);
-    const sidebar = page.getByRole("complementary");
-    await expect(sidebar.getByRole("link", { name: "Collection" })).toBeVisible();
+    const sidebar = visibleNavigation(page);
+    await expect(
+      sidebar.getByRole("link", { name: "Collection" }),
+    ).toBeVisible();
     await expect(sidebar.getByRole("link", { name: "Albums" })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 1, name: "Design system" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Design system" }),
+    ).toBeVisible();
   });
 
   test("meets WCAG AA in the light theme", async ({ page }) => {
@@ -52,10 +62,12 @@ test.describe("on a desktop screen", () => {
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
 
-  test("the shell shows the four tabs instead of the sidebar", async ({ page }) => {
+  test("the shell shows the four tabs instead of the sidebar", async ({
+    page,
+  }) => {
     await page.goto(galleryUrl);
-    await expect(page.getByRole("complementary")).toBeHidden();
-    const tabs = page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
+    const tabs = visibleNavigation(page);
+    await expect(tabs).toHaveCount(1);
     for (const name of ["Overview", "Collection", "Catalog", "Account"]) {
       await expect(tabs.getByRole("link", { name })).toBeVisible();
     }
@@ -63,10 +75,26 @@ test.describe("on a phone", () => {
   });
 });
 
-test("the app can be installed: manifest and icons are served", async ({ request }) => {
+test.describe("on a tablet", () => {
+  test.use({ viewport: { width: 820, height: 1180 }, hasTouch: true });
+
+  test("the shell shows the sidebar, Albums included", async ({ page }) => {
+    await page.goto(galleryUrl);
+    const sidebar = visibleNavigation(page);
+    await expect(sidebar).toHaveCount(1);
+    await expect(sidebar.getByRole("link", { name: "Albums" })).toBeVisible();
+  });
+});
+
+test("the app can be installed: manifest and icons are served", async ({
+  request,
+}) => {
   const manifest = await request.get(`${appUrl}/manifest.webmanifest`);
   expect(manifest.ok()).toBe(true);
-  expect(await manifest.json()).toMatchObject({ name: "CoinsLite", display: "standalone" });
+  expect(await manifest.json()).toMatchObject({
+    name: "CoinsLite",
+    display: "standalone",
+  });
   for (const path of ["/icon/192", "/icon/512", "/apple-icon"]) {
     const icon = await request.get(`${appUrl}${path}`);
     expect(icon.ok(), path).toBe(true);

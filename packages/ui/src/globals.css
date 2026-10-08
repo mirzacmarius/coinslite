@@ -4,7 +4,8 @@
 
 /*
  * CoinsLite design tokens ("Ledger"): calm slate neutrals, one teal accent,
- * tabular numbers. Every text/background pairing meets WCAG AA (4.5:1).
+ * tabular numbers. Every text/background pairing meets WCAG AA (4.5:1), and
+ * control borders (--input) reach 3:1 against their surface.
  */
 @layer base {
   :root {
@@ -27,7 +28,7 @@
     --success: 142 72% 29%; /* #15803d */
     --success-foreground: 0 0% 100%;
     --border: 214 32% 91%; /* #e2e8f0 */
-    --input: 214 25% 80%;
+    --input: 214 15% 55%;
     --ring: 175 77% 26%;
     --sidebar: 0 0% 100%;
     --radius: 0.5rem;
@@ -58,7 +59,7 @@
     --success: 142 69% 58%; /* #4ade80 */
     --success-foreground: 142 80% 8%;
     --border: 211 27% 17%;
-    --input: 211 22% 28%;
+    --input: 211 16% 44%;
     --ring: 173 66% 50%;
     --sidebar: 214 32% 8%;
     --chart-1: 173 66% 50%;

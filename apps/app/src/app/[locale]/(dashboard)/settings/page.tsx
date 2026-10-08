@@ -1,9 +1,8 @@
 "use client";
 
+import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
+
 import { useScopedI18n } from "@/locales/client";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import * as validators from "@coinslite/backend/convex/utils/validators";
@@ -11,6 +10,9 @@ import { Button } from "@coinslite/ui/button";
 import { Input } from "@coinslite/ui/input";
 import { UploadInput } from "@coinslite/ui/upload-input";
 import { useDoubleCheck } from "@coinslite/ui/utils";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useForm } from "@tanstack/react-form";
+import { zodValidator } from "@tanstack/zod-form-adapter";
 import type { UploadFileResponse } from "@xixixao/uploadstuff/react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { Upload } from "lucide-react";
@@ -57,6 +59,7 @@ export default function DashboardSettings() {
 
   return (
     <div className="flex h-full w-full flex-col gap-6">
+      <PhoneAccountLinks />
       {/* Avatar */}
       <div className="flex w-full flex-col items-start rounded-lg border border-border bg-card">
         <div className="flex w-full items-start justify-between rounded-lg p-6">

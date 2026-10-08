@@ -1,5 +1,6 @@
 "use client";
 
+import { compactSelectTrigger } from "@/components/compact-select";
 import { useChangeLocale, useCurrentLocale, useI18n } from "@/locales/client";
 import { isLocale, localeNames, locales } from "@coinslite/i18n";
 import {
@@ -24,7 +25,7 @@ export function LanguageSwitcher() {
     >
       <SelectTrigger
         aria-label={t("common.language")}
-        className="h-6 rounded border-primary/20 bg-secondary !px-2 hover:border-primary/40"
+        className={compactSelectTrigger}
       >
         <div className="flex items-start gap-2">
           <Languages className="h-[14px] w-[14px]" />
