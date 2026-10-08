@@ -136,7 +136,13 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - an image
   - a sort order
 - **Every Catalog image and note records** its source, author, licence and link. Attribution is shown wherever the licence requires it.
-- **The seed Catalog** brings over factual fields only. Images and notes come from sources whose licence allows commercial use.
+- **Sourcing (ADR 0003):** CoinsLite builds its own Catalog from sources whose licence allows storing the data:
+  - public-domain data, such as US Mint issues
+  - official lists that can be reused with attribution, such as the ECB's 2-euro commemoratives
+  - official central-bank material, plus our own editing
+  - Every stored group of facts records its source. Catalog data of unknown origin is never imported.
+- **Images** are shown only where they're clearly permitted: public-domain designs, money that is excluded from copyright, designs whose copyright has expired, and Creative Commons photos of those. Every other entry shows a neutral placeholder until a licence is held.
+- **Numista:** an entry may keep its Numista ID as a cross-reference, shown as an attributed link to Numista. No Numista data is stored.
 
 ### 6.2 Catalog picker (used when adding Items)
 - **Search:**
