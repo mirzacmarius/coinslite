@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CoinsLite — design directions</title>
+<style>
+  /* ---------- Page chrome (sits on the host background) ---------- */
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--foreground, #111);
+  }
+  .page { display: flex; flex-direction: column; gap: 40px; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    font-size: 13px; color: var(--muted-foreground, #666);
+  }
+  .controls button {
+    font: inherit; padding: 4px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border, #ccc); background: transparent; color: var(--foreground, #111);
+  }
+  .controls button[aria-pressed="true"] { background: var(--foreground, #111); color: var(--background, #fff); }
+  .direction h2 { margin: 0; font-size: 20px; }
+  .direction .idea { margin: 4px 0 12px; color: var(--muted-foreground, #666); max-width: 640px; }
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .swatch { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground, #666); }
+  .swatch i { width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(127,127,127,.35); display: inline-block; }
+  .label { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-foreground, #666); margin: 14px 0 6px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .scaler { position: relative; overflow: hidden; border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.08); }
+  .scaler > .frame { transform-origin: 0 0; position: absolute; top: 0; left: 0; }
+
+  /* ---------- Shared frame basics ---------- */
+  .frame { background: var(--bg); color: var(--fg); overflow: hidden; font-variant-numeric: tabular-nums; }
+  .frame * { font-variant-numeric: inherit; }
+  .muted { color: var(--muted); }
+  .pos { color: var(--pos); } .neg { color: var(--neg); }
+  .fr { display: flex; } .col { display: flex; flex-direction: column; }
+  .between { justify-content: space-between; } .center { align-items: center; }
+  .g4 { gap: 4px; } .g8 { gap: 8px; } .g12 { gap: 12px; } .g16 { gap: 16px; } .g20 { gap: 20px; }
+  .grow { flex: 1; min-width: 0; }
+  .ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .coin { flex: none; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--coin-hi), var(--coin-lo)); box-shadow: inset 0 0 0 2px rgba(0,0,0,.12); }
+  .note { flex: none; border-radius: 4px; background: linear-gradient(135deg, var(--note-hi), var(--note-lo)); }
+  .stamp { flex: none; border-radius: 3px; background: var(--stamp); outline: 2px dashed rgba(255,255,255,.6); outline-offset: -4px; }
+
+  /* ======================= A · LEDGER ======================= */
+  .ledger { --radius: 8px; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .ledger[data-theme="light"] {
+    --bg:#f7f8fa; --surface:#ffffff; --fg:#0f172a; --muted:#64748b; --line:#e2e8f0; --accent:#0f766e; --accent-fg:#ffffff;
+    --accent-soft:#ccfbf1; --pos:#15803d; --neg:#b91c1c; --side:#ffffff;
+    --coin-hi:#e5e7eb; --coin-lo:#9ca3af; --note-hi:#d1fae5; --note-lo:#6ee7b7; --stamp:#fca5a5;
+  }
+  .ledger[data-theme="dark"] {
+    --bg:#0b1016; --surface:#111821; --fg:#e6edf3; --muted:#8b98a8; --line:#1f2a36; --accent:#2dd4bf; --accent-fg:#04201d;
+    --accent-soft:#0f2e2b; --pos:#4ade80; --neg:#f87171; --side:#0e141c;
+    --coin-hi:#cbd5e1; --coin-lo:#64748b; --note-hi:#99f6e4; --note-lo:#0f766e; --stamp:#f87171;
+  }
+  .ledger .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  .ledger .btn { border-radius: 6px; padding: 7px 12px; font-weight: 600; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+  .ledger .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .ledger .side { width: 220px; background: var(--side); border-right: 1px solid var(--line); padding: 18px 12px; }
+  .ledger .nav a { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; color: var(--muted); font-weight: 500; text-decoration: none; }
+  .ledger .nav a.on { background: var(--accent-soft); color: var(--fg); }
+  .ledger .nav i { width: 14px; height: 14px; border: 1.6px solid currentColor; border-radius: 4px; display: inline-block; }
+  .ledger .metric .k { font-size: 12px; color: var(--muted); }
+  .ledger .metric .v { font-size: 22px; font-weight: 650; letter-spacing: -.01em; }
+  .ledger table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ledger th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .ledger td { padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  .ledger td.num, .ledger th.num { text-align: right; }
+  .ledger .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--fg); font-size: 11px; font-weight: 600; }
+  .ledger .bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .ledger .bar > span { display: block; height: 100%; background: var(--accent); }
+  .ledger .field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  .ledger .field span.in { border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; color: var(--fg); background: var(--surface); font-size: 13px; }
+  .ledger .tabbar { border-top: 1px solid var(--line); background: var(--surface); display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 6px 18px; font-size: 11px; color: var(--muted); text-align: center; }
+  .ledger .tabbar .on { color: var(--accent); font-weight: 600; }
+  .ledger .tabbar i { display: block; margin: 0 auto 3px; width: 18px; height: 18px; border: 1.8px solid currentColor; border-radius: 5px; }
+
+  /* ======================= B · CABINET ======================= */
+  .cabinet { --radius: 18px; font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", system-ui, sans-serif; }
+  .cabinet[data-theme="light"] {
+    --bg:#f3f1ec; --surface:#fffdf8; --fg:#1d2a24; --muted:#6b7a72; --line:#e3ded2; --accent:#1f5a46; --accent-fg:#f5fbf8;
+    --accent-soft:#dcebe3; --copper:#b5652e; --pos:#1f7a4d; --neg:#b4452f; --hero:#1f5a46; --hero-fg:#f3f8f5;
+    --coin-hi:#f2d3b3; --coin-lo:#b5652e; --note-hi:#cfe6da; --note-lo:#5f9c80; --stamp:#d98a6a;
+  }
+  .cabinet[data-theme="dark"] {
+    --bg:#101613; --surface:#18201c; --fg:#ebf0ec; --muted:#93a39a; --line:#26312b; --accent:#7cc4a4; --accent-fg:#0b1a13;
+    --accent-soft:#1f3229; --copper:#e0995f; --pos:#7cd3a3; --neg:#f19a82; --hero:#1d3b2f; --hero-fg:#ebf5ef;
+    --coin-hi:#f0c9a0; --coin-lo:#8c4a1d; --note-hi:#a8d8c2; --note-lo:#2c5f49; --stamp:#c07055;
+  }
+  .cabinet .card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); }
+  .cabinet .btn { border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 13px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); }
+  .cabinet .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
+  .cabinet .topbar { background: var(--surface); border-bottom: 1px solid var(--line); padding: 12px 28px; }
+  .cabinet .tabs a { padding: 6px 2px; margin-right: 22px; color: var(--muted); font-weight: 600; text-decoration: none; border-bottom: 2px solid transparent; }
+  .cabinet .tabs a.on { color: var(--fg); border-color: var(--copper); }
+  .cabinet .search { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; color: var(--muted); font-size: 13px; background: var(--bg); }
+  .cabinet .hero { background: var(--hero); color: var(--hero-fg); border-radius: var(--radius); padding: 22px 24px; }
+  .cabinet .hero .big { font-size: 40px; font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+  .cabinet .pill { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,.14); }
+  .cabinet .tile { padding: 14px 16px; }
+  .cabinet .tile .k { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .cabinet .tile .v { font-size: 20px; font-weight: 700; }
+  .cabinet .itemcard { padding: 12px; }
+  .cabinet .itemcard .ph { height: 92px; border-radius: 12px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .cabinet .field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .cabinet .field span.in { border: 1px solid var(--line); border-radius: 12px; padding: 9px 12px; color: var(--fg); background: var(--bg); font-weight: 500; font-size: 13px; }
+  .cabinet .seg { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; font-size: 12px; font-weight: 600; }
+  .cabinet .seg span { padding: 4px 12px; border-radius: 999px; color: var(--muted); }
+  .cabinet .seg span.on { background: var(--surface); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .cabinet .fab { position: absolute; right: 18px; bottom: 22px; width: 52px; height: 52px; border-radius: 16px; background: var(--copper); color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+
+  /* ======================= C · ATLAS ======================= */
+  .atlas { --radius: 4px; font-family: "Helvetica Neue", Arial, system-ui, sans-serif; }
+  .atlas[data-theme="light"] {
+    --bg:#fbfbf9; --surface:#ffffff; --fg:#0a0a0a; --muted:#6e6e6e; --line:#0a0a0a; --soft:#ececea; --accent:#2f5bff; --accent-fg:#ffffff;
+    --mark:#ffd84d; --pos:#0a7d32; --neg:#c41d1d;
+    --coin-hi:#f1f1f1; --coin-lo:#9a9a9a; --note-hi:#dfe6ff; --note-lo:#7a95ff; --stamp:#ff8a65;
+  }
+  .atlas[data-theme="dark"] {
+    --bg:#0a0a0a; --surface:#121212; --fg:#f4f4f2; --muted:#9a9a96; --line:#f4f4f2; --soft:#1f1f1f; --accent:#7c97ff; --accent-fg:#06102e;
+    --mark:#ffd84d; --pos:#5ee38a; --neg:#ff7a7a;
+    --coin-hi:#d9d9d9; --coin-lo:#5a5a5a; --note-hi:#9fb2ff; --note-lo:#2f4bd0; --stamp:#ff8a65;
+  }
+  .atlas .box { border: 1.5px solid var(--line); background: var(--surface); }
+  .atlas .btn { padding: 7px 14px; font-weight: 700; font-size: 13px; border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); text-transform: uppercase; letter-spacing: .04em; }
+  .atlas .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .atlas .rail { width: 64px; border-right: 1.5px solid var(--line); padding: 16px 0; align-items: center; }
+  .atlas .rail i { width: 36px; height: 36px; border: 1.5px solid var(--line); display: block; margin: 0 auto 10px; }
+  .atlas .rail i.on { background: var(--accent); border-color: var(--accent); }
+  .atlas .cmd { border: 1.5px solid var(--line); padding: 8px 12px; color: var(--muted); font-size: 13px; background: var(--surface); }
+  .atlas kbd { border: 1px solid var(--muted); padding: 0 5px; font: 11px ui-monospace, monospace; color: var(--muted); }
+  .atlas .huge { font-size: 56px; font-weight: 800; letter-spacing: -.035em; line-height: .95; }
+  .atlas .k { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .atlas .v { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .atlas .mark { background: var(--mark); color: #111; padding: 0 4px; }
+  .atlas .chip { display: inline-block; border: 1.5px solid var(--line); padding: 1px 8px; font-size: 11px; font-weight: 700; }
+  .atlas .bento { display: grid; gap: 10px; }
+  .atlas .tile { padding: 14px; }
+  .atlas .row { border-bottom: 1.5px solid var(--soft); padding: 10px 0; }
+  .atlas .field { display: flex; flex-direction: column; gap: 4px; }
+  .atlas .field span.in { border-bottom: 1.5px solid var(--line); padding: 6px 0; font-size: 15px; font-weight: 600; }
+  .atlas .floatnav { position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; background: var(--fg); color: var(--bg); padding: 6px; display: flex; gap: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .atlas .floatnav span { padding: 6px 12px; }
+  .atlas .floatnav span.on { background: var(--accent); color: var(--accent-fg); }
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="controls">
+    <span>Screens:</span>
+    <button data-theme-btn="light" aria-pressed="true">Light</button>
+    <button data-theme-btn="dark" aria-pressed="false">Dark</button>
+    <span style="margin-left:8px">Sample collection, Home currency EUR, English.</span>
+  </div>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ data */
+const spot = { gold: 78.4, silver: 0.92 }; // EUR per gram
+const items = [
+  { title: "Krugerrand 1 oz", sub: "2022 · South Africa", type: "coin", qty: 2, grade: "BU", paid: 214000, market: 265000, metal: { kind: "gold", g: 33.93, purity: 0.9167 } },
+  { title: "Morgan dollar 1881-S", sub: "1881 · USA · 1 dollar", type: "coin", qty: 1, grade: "MS-63", paid: 6200, market: 7500, metal: { kind: "silver", g: 26.73, purity: 0.9 } },
+  { title: "10 lei 2008", sub: "2008 · Romania", type: "note", qty: 1, grade: "UNC", paid: 900, market: 1400 },
+  { title: "2 euro 2006 Holstentor", sub: "2006 · Germany · commemorative", type: "coin", qty: 3, grade: "UNC", paid: 250, market: 400 },
+  { title: "Europa 2019 · Birds", sub: "2019 · Norway", type: "stamp", qty: 1, grade: "MNH", paid: 600, market: 550 },
+  { title: "1 krone 1999", sub: "1999 · Norway", type: "coin", qty: 5, grade: "VF", paid: 40, market: 30 },
+];
+const eur = (minor) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" }).format(minor / 100);
+const metalValue = (it) => it.metal ? Math.round(it.metal.g * it.metal.purity * spot[it.metal.kind] * it.qty * 100) : 0;
+const totals = items.reduce((t, it) => ({
+  pieces: t.pieces + it.qty,
+  paid: t.paid + it.paid * it.qty,
+  market: t.market + it.market * it.qty,
+  metal: t.metal + metalValue(it),
+}), { pieces: 0, paid: 0, market: 0, metal: 0 });
+totals.gain = totals.market - totals.paid;
+const sign = (minor) => (minor >= 0 ? "+" : "−") + eur(Math.abs(minor)).replace("-", "");
+const pct = ((totals.gain / totals.paid) * 100).toFixed(1);
+const thumb = (it, size) => it.type === "note"
+  ? `<span class="note" style="width:${size * 1.4}px;height:${size * .75}px"></span>`
+  : it.type === "stamp"
+    ? `<span class="stamp" style="width:${size * .8}px;height:${size}px"></span>`
+    : `<span class="coin" style="width:${size}px;height:${size}px"></span>`;
+const valueSummary = [
+  ["Purchase price", eur(totals.paid)],
+  ["Market value", eur(totals.market)],
+  ["Gain/loss", sign(totals.gain), totals.gain >= 0 ? "pos" : "neg"],
+  ["Metal value", eur(totals.metal)],
+];
+
+/* ============================================================ A · LEDGER */
+const ledger = {
+  name: "A · Ledger",
+  idea: "Calm and exact, like a well-kept register. Light first, slate neutrals, one teal accent, tabular numbers everywhere. Desktop has a left sidebar; phones have a plain four-tab bar and the Add action lives in the page header.",
+  swatches: [["#f7f8fa","Paper"],["#0f172a","Ink"],["#0f766e","Teal"],["#e2e8f0","Rule"],["#15803d","Gain"],["#b91c1c","Loss"]],
+  side() {
+    const nav = ["Overview","Collection","Catalog","Albums","Account"];
+    return `<aside class="side col between">
+      <div class="col g16">
+        <div style="font-weight:750;font-size:16px;padding:0 10px">CoinsLite</div>
+        <nav class="nav col g4">${nav.map((n, i) => `<a class="${i === 0 ? "on" : ""}"><i></i>${n}</a>`).join("")}</nav>
+      </div>
+      <div class="card col g8" style="padding:12px">
+        <div class="fr between" style="font-size:12px"><span class="muted">Free plan</span><b>18 / 50 Items</b></div>
+        <div class="bar"><span style="width:36%"></span></div>
+        <span style="font-size:12px;color:var(--accent);font-weight:600">Upgrade to Premium</span>
+      </div>
+    </aside>`;
+  },
+  metrics(compact) {
+    return valueSummary.map(([k, v, c]) => `<div class="metric col" style="${compact ? "min-width:120px" : ""}"><span class="k">${k}</span><span class="v ${c || ""}">${v}</span></div>`).join("");
+  },
+  table(rows, compact) {
+    return `<table><thead><tr><th>Item</th>${compact ? "" : "<th>Grade</th><th class=num>Qty</th>"}<th class=num>Market value</th></tr></thead><tbody>
+      ${rows.map((it) => `<tr><td><div class="fr center g8">${thumb(it, 22)}<div class="col"><span style="font-weight:600">${it.title}</span><span class="muted" style="font-size:12px">${it.sub}</span></div></div></td>
+      ${compact ? "" : `<td><span class="chip">${it.grade}</span></td><td class=num>${it.qty}</td>`}<td class=num>${eur(it.market * it.qty)}</td></tr>`).join("")}
+    </tbody></table>`;
+  },
+  desktop() {
+    return `<div class="frame ledger fr" style="width:1200px;height:740px">${this.side()}
+      <main class="grow col g20" style="padding:24px 32px">
+        <div class="fr between center"><div><div style="font-size:22px;font-weight:700">Overview</div><div class="muted">Spot · gold ${eur(spot.gold * 100)}/g · silver ${eur(spot.silver * 100)}/g</div></div>
+          <div class="fr g8"><span class="btn">Import</span><span class="btn primary">+ Add item ▾</span></div></div>
+        <div class="card fr between" style="padding:18px 22px">${this.metrics()}</div>
+        <div class="fr g16" style="align-items:stretch">
+          <div class="card grow" style="padding:4px 0">
+            <div class="fr between center" style="padding:10px 12px"><b>Latest items</b><span class="muted" style="font-size:12px">View Collection →</span></div>
+            ${this.table(items.slice(0, 5))}
+          </div>
+          <div class="col g16" style="width:300px">
+            <div class="card col g8" style="padding:16px"><b>By type</b>
+              ${[["Coins", 11, 92],["Banknotes", 1, 3],["Stamps", 1, 5]].map(([n, q, w]) => `<div class="col g4"><div class="fr between" style="font-size:12px"><span>${n}</span><span class="muted">${q} pieces</span></div><div class="bar"><span style="width:${w}%"></span></div></div>`).join("")}
+            </div>
+            <div class="card col g4" style="padding:16px"><b>Fine metal</b><span class="muted" style="font-size:12px">Gold 62.2 g · Silver 24.1 g</span><span style="font-size:20px;font-weight:650">${eur(totals.metal)}</span></div>
+          </div>
+        </div>
+      </main></div>`;
+  },
+  mobileOverview() {
+    return `<div class="frame ledger col" style="width:375px;height:740px">
+      <header class="fr between center" style="padding:16px 16px 8px"><b style="font-size:18px">Overview</b><span class="btn primary">+ Add</span></header>
+      <div class="col g12 grow" style="padding:8px 16px">
+        <div class="card col g12" style="padding:14px">
+          <div class="col"><span class="muted" style="font-size:12px">Market value</span><span style="font-size:28px;font-weight:700">${eur(totals.market)}</span><span class="${totals.gain >= 0 ? "pos" : "neg"}" style="font-size:13px;font-weight:600">${sign(totals.gain)} (${pct}%) vs purchase</span></div>
+          <div class="fr between" style="font-size:12px"><div class="col"><span class="muted">Purchase price</span><b>${eur(totals.paid)}</b></div><div class="col"><span class="muted">Metal value</span><b>${eur(totals.metal)}</b></div></div>
+        </div>
+        <div class="card col g8" style="padding:12px"><div class="fr between" style="font-size:12px"><span class="muted">Free plan</span><b>18 / 50 Items</b></div><div class="bar"><span style="width:36%"></span></div></div>
+        <div class="card" style="padding:2px 0"><div style="padding:10px 12px"><b>Latest items</b></div>${this.table(items.slice(0, 3), true)}</div>
+      </div>
+      <nav class="tabbar">${["Overview","Collection","Catalog","Account"].map((n, i) => `<span class="${i === 0 ? "on" : ""}"><i></i>${n}</span>`).join("")}</nav>
+    </div>`;
+  },
+  mobileCollection() {
+    return `<div class="frame ledger col" style="width:375px;height:740px">
+      <header class="fr between center" style="padding:16px 16px 8px"><b style="font-size:18px">Collection</b><span class="btn primary">+ Add</span></header>
+      <div class="col g8" style="padding:0 16px 8px">
+        <div class="field"><span class="in muted">Search title, denomination, country</span></div>
+        <div class="fr g4" style="flex-wrap:wrap">${["Coins","Bullion","Norway","Grade ≥ XF"].map((c) => `<span class="chip">${c} ×</span>`).join("")}</div>
+        <div class="fr between muted" style="font-size:12px"><span>13 pieces · 6 Items</span><span>Sort: Year ▾</span></div>
+      </div>
+      <div class="card grow" style="margin:0 16px 12px;overflow:hidden">${this.table(items, true)}</div>
+      <nav class="tabbar">${["Overview","Collection","Catalog","Account"].map((n, i) => `<span class="${i === 1 ? "on" : ""}"><i></i>${n}</span>`).join("")}</nav>
+    </div>`;
+  },
+  form() {
+    const f = (l, v, w) => `<label class="field" style="${w ? `flex:${w}` : "flex:1"}">${l}<span class="in">${v}</span></label>`;
+    return `<div class="frame ledger col g12" style="width:560px;padding:20px">
+      <div class="fr between center"><b style="font-size:16px">New item</b><span class="muted" style="font-size:12px">Coin · from Catalog</span></div>
+      <div class="card fr g12 center" style="padding:10px">${thumb(items[1], 34)}<div class="col grow"><b>Morgan dollar 1881-S</b><span class="muted" style="font-size:12px">USA · 1 dollar · silver .900 · 26.73 g</span></div><span style="font-size:12px;color:var(--accent);font-weight:600">Change</span></div>
+      <div class="fr g8">${f("Grading scale", "Sheldon 1–70 ▾")}${f("Grade", "MS-63 ▾")}${f("Strike", "Circulation ▾")}</div>
+      <div class="fr g8">${f("Quantity", "1", .6)}${f("Purchase price", "€62.00")}${f("Market value", "€75.00")}</div>
+      <div class="fr g8">${f("Purchase date", "12 Mar 2026")}${f("Source", "Coin fair, Oslo", 1.4)}</div>
+      <div class="fr between center"><span class="muted" style="font-size:12px">More details ▸</span><div class="fr g8"><span class="btn">Cancel</span><span class="btn primary">Save item</span></div></div>
+    </div>`;
+  },
+  summary() {
+    return `<div class="frame ledger" style="width:560px;padding:16px"><div class="card fr between" style="padding:16px 18px">${this.metrics(true)}</div></div>`;
+  },
+};
+
+/* ============================================================ B · CABINET */
+const cabinet = {
+  name: "B · Cabinet",
+  idea: "Warm and tactile, like opening a collector's cabinet. Ivory and deep green with a copper highlight, soft rounded cards and photo-led lists. Desktop uses a top bar with tabs and search; phones get a drawer menu and a corner Add button.",
+  swatches: [["#f3f1ec","Ivory"],["#1d2a24","Forest ink"],["#1f5a46","Green"],["#b5652e","Copper"],["#dcebe3","Mint"],["#b4452f","Loss"]],
+  top() {
+    return `<header class="topbar fr between center">
+      <div class="fr center g20"><b style="font-size:18px;letter-spacing:-.01em">CoinsLite</b>
+        <nav class="tabs fr">${["Overview","Collection","Catalog","Albums"].map((n, i) => `<a class="${i === 0 ? "on" : ""}">${n}</a>`).join("")}</nav></div>
+      <div class="fr center g12"><span class="search">Search your Collection…</span><span class="btn primary">+ Add</span><span class="coin" style="width:30px;height:30px;background:var(--accent-soft)"></span></div>
+    </header>`;
+  },
+  hero(mobile) {
+    return `<div class="hero col g8">
+      <span style="font-size:13px;opacity:.85;font-weight:600">Your Collection is worth</span>
+      <span class="big" style="${mobile ? "font-size:32px" : ""}">${eur(totals.market)}</span>
+      <div class="fr g8 center" style="flex-wrap:wrap"><span class="pill">${sign(totals.gain)} · ${pct}%</span><span style="font-size:12px;opacity:.85">${totals.pieces} pieces · paid ${eur(totals.paid)}</span></div>
+      <svg viewBox="0 0 300 48" style="width:100%;height:${mobile ? 36 : 48}px;margin-top:4px"><polyline fill="none" stroke="currentColor" stroke-opacity=".7" stroke-width="2" points="0,40 30,38 60,34 90,36 120,28 150,26 180,20 210,22 240,14 270,10 300,8"/></svg>
+    </div>`;
+  },
+  itemCards(list, cols) {
+    return `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:12px">${list.map((it) => `<div class="card itemcard col g8"><div class="ph">${thumb(it, 54)}</div><div class="col"><b class="ellipsis">${it.title}</b><span class="muted ellipsis" style="font-size:12px">${it.sub}</span></div><div class="fr between" style="font-size:12px"><span class="muted">${it.grade} · ×${it.qty}</span><b>${eur(it.market * it.qty)}</b></div></div>`).join("")}</div>`;
+  },
+  desktop() {
+    return `<div class="frame cabinet col" style="width:1200px;height:740px">${this.top()}
+      <main class="col g20" style="padding:24px 28px">
+        <div class="fr g20" style="align-items:stretch">
+          <div style="flex:1.4">${this.hero()}</div>
+          <div class="col g12" style="flex:1">
+            <div class="fr g12">${[["Metal value", eur(totals.metal)],["Spot gold", eur(spot.gold * 100) + "/g"]].map(([k, v]) => `<div class="card tile grow col"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>
+            <div class="card tile col g8"><span class="k">Albums</span><div class="fr g8">${[["Bullion","#1f5a46"],["Morgans","#b5652e"],["Euro commems","#5f7f9c"]].map(([n, c]) => `<span class="fr center g4" style="font-size:13px;font-weight:600"><i style="width:10px;height:10px;border-radius:3px;background:${c};display:inline-block"></i>${n}</span>`).join("")}</div></div>
+            <div class="card tile fr between center"><div class="col"><span class="k">Free plan</span><span style="font-weight:700">18 of 50 Items</span></div><span class="btn">Go Premium</span></div>
+          </div>
+        </div>
+        <div class="fr between center"><b style="font-size:16px">Recently added</b><span class="seg"><span class="on">All</span><span>Coins</span><span>Banknotes</span><span>Stamps</span></span></div>
+        ${this.itemCards(items.slice(0, 5), 5)}
+      </main></div>`;
+  },
+  mobileOverview() {
+    return `<div class="frame cabinet col" style="width:375px;height:740px;position:relative">
+      <header class="fr between center" style="padding:16px 18px"><span style="font-size:22px">☰</span><b style="font-size:17px">CoinsLite</b><span class="coin" style="width:28px;height:28px;background:var(--accent-soft)"></span></header>
+      <div class="col g12" style="padding:0 16px">${this.hero(true)}
+        <div class="fr g8">${[["Metal value", eur(totals.metal)],["Free plan","18 / 50"]].map(([k, v]) => `<div class="card tile grow col"><span class="k">${k}</span><span class="v" style="font-size:17px">${v}</span></div>`).join("")}</div>
+        <b>Recently added</b>${this.itemCards(items.slice(0, 2), 2)}
+      </div>
+      <span class="fab">+</span>
+    </div>`;
+  },
+  mobileCollection() {
+    return `<div class="frame cabinet col" style="width:375px;height:740px;position:relative">
+      <header class="fr between center" style="padding:16px 18px"><span style="font-size:22px">☰</span><b style="font-size:17px">Collection</b><span style="font-size:13px;font-weight:600;color:var(--accent)">Filter</span></header>
+      <div class="col g12" style="padding:0 16px">
+        <span class="search" style="background:var(--surface)">Search your Collection…</span>
+        <span class="seg" style="align-self:flex-start"><span class="on">All</span><span>Coins</span><span>Notes</span><span>Stamps</span></span>
+        ${this.itemCards(items.slice(0, 4), 2)}
+      </div>
+      <span class="fab">+</span>
+    </div>`;
+  },
+  form() {
+    const f = (l, v) => `<label class="field grow">${l}<span class="in">${v}</span></label>`;
+    return `<div class="frame cabinet col g12" style="width:560px;padding:20px">
+      <div class="fr between center"><b style="font-size:17px">Add to your Collection</b><span class="seg"><span class="on">Coin</span><span>Banknote</span><span>Stamp</span></span></div>
+      <div class="fr g12"><div class="card col center g4" style="width:110px;padding:12px">${thumb(items[1], 56)}<span style="font-size:11px;font-weight:600" class="muted">Front · Back</span></div>
+        <div class="col g8 grow"><div class="card fr between center" style="padding:10px 12px"><div class="col"><b>Morgan dollar 1881-S</b><span class="muted" style="font-size:12px">Linked to Catalog entry</span></div><span style="color:var(--copper);font-weight:700;font-size:12px">Change</span></div>
+          <div class="fr g8">${f("Grade", "MS-63 · Sheldon")}${f("Strike", "Circulation")}</div></div></div>
+      <div class="fr g8">${f("Quantity", "1")}${f("Purchase price", "€62.00")}${f("Market value", "€75.00")}</div>
+      <div class="fr g8">${f("Album", "Morgans")}${f("Purchase date", "12 Mar 2026")}</div>
+      <div class="fr between center"><span class="muted" style="font-size:12px;font-weight:600">More details</span><span class="btn primary">Add to Collection</span></div>
+    </div>`;
+  },
+  summary() {
+    return `<div class="frame cabinet" style="width:560px;padding:16px"><div class="fr g8">${valueSummary.map(([k, v, c]) => `<div class="card tile grow col"><span class="k">${k}</span><span class="v ${c || ""}" style="font-size:16px">${v}</span></div>`).join("")}</div></div>`;
+  },
+};
+
+/* ============================================================ C · ATLAS */
+const atlas = {
+  name: "C · Atlas",
+  idea: "Bold and editorial, like a printed reference. Black rules on off-white, a cobalt accent and a yellow highlight, oversized numbers and a bento grid. Desktop has an icon rail plus a ⌘K command bar for adding and finding; phones get a floating segmented nav.",
+  swatches: [["#fbfbf9","Off-white"],["#0a0a0a","Black"],["#2f5bff","Cobalt"],["#ffd84d","Marker"],["#0a7d32","Gain"],["#c41d1d","Loss"]],
+  desktop() {
+    return `<div class="frame atlas fr" style="width:1200px;height:740px">
+      <aside class="rail col">${["on","","","",""].map((c) => `<i class="${c}"></i>`).join("")}</aside>
+      <main class="grow col g16" style="padding:22px 28px">
+        <div class="fr between center g16"><div class="cmd grow">Add, find or jump to…  <kbd>⌘K</kbd></div><span class="btn primary">+ Add item</span></div>
+        <div class="bento" style="grid-template-columns:1.6fr 1fr 1fr;grid-template-rows:auto auto">
+          <div class="box tile col g8" style="grid-row:span 2"><span class="k">Market value</span><span class="huge">${eur(totals.market)}</span>
+            <span style="font-weight:700"><span class="mark">${sign(totals.gain)}</span> &nbsp;${pct}% over purchase price</span>
+            <div class="fr g16" style="margin-top:auto">${valueSummary.filter(([k]) => k !== "Market value").map(([k, v, c]) => `<div class="col"><span class="k">${k}</span><span class="v ${c || ""}">${v}</span></div>`).join("")}</div></div>
+          <div class="box tile col g8"><span class="k">Spot</span><span class="v">Au ${eur(spot.gold * 100)}/g</span><span class="v">Ag ${eur(spot.silver * 100)}/g</span></div>
+          <div class="box tile col g8"><span class="k">Free plan</span><span class="v">18<span class="muted" style="font-size:14px"> / 50 Items</span></span><div style="height:8px;background:var(--soft)"><div style="width:36%;height:100%;background:var(--accent)"></div></div></div>
+          <div class="box tile col g8" style="grid-column:span 2"><span class="k">Where it's from</span><div class="fr g8" style="flex-wrap:wrap">${[["NO",6],["US",1],["ZA",2],["DE",3],["RO",1]].map(([c, n]) => `<span class="chip">${c} · ${n}</span>`).join("")}</div></div>
+        </div>
+        <div class="box tile col"><div class="fr between"><span class="k">Latest items</span><span class="k" style="color:var(--accent)">Collection →</span></div>
+          ${items.slice(0, 4).map((it) => `<div class="row fr center g12">${thumb(it, 26)}<b class="grow">${it.title}</b><span class="muted" style="width:220px">${it.sub}</span><span class="chip">${it.grade}</span><b style="width:110px;text-align:right">${eur(it.market * it.qty)}</b></div>`).join("")}
+        </div>
+      </main></div>`;
+  },
+  mobileOverview() {
+    return `<div class="frame atlas col" style="width:375px;height:740px;position:relative">
+      <div class="col g12" style="padding:16px">
+        <div class="cmd">Add, find or jump to…</div>
+        <div class="box tile col g4"><span class="k">Market value</span><span class="huge" style="font-size:40px">${eur(totals.market)}</span><span style="font-weight:700"><span class="mark">${sign(totals.gain)}</span> ${pct}%</span></div>
+        <div class="bento" style="grid-template-columns:1fr 1fr">${valueSummary.filter(([k]) => k !== "Market value").map(([k, v, c]) => `<div class="box tile col"><span class="k">${k}</span><span class="v ${c || ""}" style="font-size:17px">${v}</span></div>`).join("")}
+          <div class="box tile col"><span class="k">Free plan</span><span class="v" style="font-size:17px">18 / 50</span></div></div>
+        <div class="box tile col"><span class="k">Latest</span>${items.slice(0, 2).map((it) => `<div class="row fr center g8">${thumb(it, 22)}<b class="grow ellipsis">${it.title}</b><b>${eur(it.market * it.qty)}</b></div>`).join("")}</div>
+      </div>
+      <div class="floatnav">${["Home","Items","Catalog","Me"].map((n, i) => `<span class="${i === 0 ? "on" : ""}">${n}</span>`).join("")}</div>
+    </div>`;
+  },
+  mobileCollection() {
+    return `<div class="frame atlas col" style="width:375px;height:740px;position:relative">
+      <div class="col g12" style="padding:16px">
+        <div class="fr between center"><span class="v">Collection</span><span class="btn primary">+ Add</span></div>
+        <div class="cmd">Search 6 Items…</div>
+        <div class="fr g4" style="flex-wrap:wrap">${["Coins","NO","≥ XF","Bullion"].map((c, i) => `<span class="chip" style="${i === 0 ? "background:var(--fg);color:var(--bg)" : ""}">${c}</span>`).join("")}</div>
+        <div class="col">${items.map((it) => `<div class="row fr center g8">${thumb(it, 24)}<div class="col grow"><b class="ellipsis">${it.title}</b><span class="muted" style="font-size:12px">${it.grade} · ×${it.qty}</span></div><b>${eur(it.market * it.qty)}</b></div>`).join("")}</div>
+      </div>
+      <div class="floatnav">${["Home","Items","Catalog","Me"].map((n, i) => `<span class="${i === 1 ? "on" : ""}">${n}</span>`).join("")}</div>
+    </div>`;
+  },
+  form() {
+    const f = (l, v) => `<label class="field grow"><span class="k">${l}</span><span class="in">${v}</span></label>`;
+    return `<div class="frame atlas col g16" style="width:560px;padding:20px">
+      <div class="fr between center"><span class="v">New item</span><span class="chip" style="background:var(--mark);color:#111;border-color:#111">Coin</span></div>
+      <div class="box tile fr center g12">${thumb(items[1], 36)}<div class="col grow"><b>Morgan dollar 1881-S</b><span class="muted" style="font-size:12px">From the Catalog · facts stay in sync</span></div><span class="k" style="color:var(--accent)">Change</span></div>
+      <div class="fr g16">${f("Grade", "MS-63")}${f("Scale", "Sheldon")}${f("Strike", "Circulation")}</div>
+      <div class="fr g16">${f("Qty", "1")}${f("Purchase price", "€62.00")}${f("Market value", "€75.00")}</div>
+      <div class="fr between center"><span class="k">+ More details</span><span class="btn primary">Save item</span></div>
+    </div>`;
+  },
+  summary() {
+    return `<div class="frame atlas" style="width:560px;padding:16px"><div class="box tile fr between">${valueSummary.map(([k, v, c]) => `<div class="col"><span class="k">${k}</span><span class="v ${c || ""}" style="font-size:18px">${v}</span></div>`).join("")}</div></div>`;
+  },
+};
+
+/* ------------------------------------------------------------ render */
+const directions = [ledger, cabinet, atlas];
+const page = document.getElementById("page");
+let theme = "light";
+
+function scaled(html, scale) {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html.trim();
+  const frame = tmp.firstElementChild;
+  const w = parseFloat(frame.style.width) || 560;
+  const wrap = document.createElement("div");
+  wrap.className = "scaler";
+  wrap.dataset.scale = scale;
+  wrap.dataset.width = w;
+  wrap.appendChild(frame);
+  return wrap;
+}
+
+function render() {
+  page.querySelectorAll(".direction").forEach((n) => n.remove());
+  for (const d of directions) {
+    const sec = document.createElement("section");
+    sec.className = "direction";
+    sec.innerHTML = `<h2>${d.name}</h2><p class="idea">${d.idea}</p>
+      <div class="swatches">${d.swatches.map(([c, n]) => `<span class="swatch"><i style="background:${c}"></i>${n}</span>`).join("")}</div>
+      <div class="label">Desktop · Overview</div><div class="row desk"></div>
+      <div class="label">Phone · Overview and Collection</div><div class="row phones"></div>
+      <div class="label">Item form and value summary</div><div class="row comps"></div>`;
+    const set = (sel, nodes) => nodes.forEach((n) => sec.querySelector(sel).appendChild(n));
+    set(".desk", [scaled(d.desktop(), "fill")]);
+    set(".phones", [scaled(d.mobileOverview(), "phone"), scaled(d.mobileCollection(), "phone")]);
+    set(".comps", [scaled(d.form(), "half"), scaled(d.summary(), "half")]);
+    sec.querySelectorAll(".frame").forEach((f) => f.setAttribute("data-theme", theme));
+    page.appendChild(sec);
+  }
+  layout();
+}
+
+function layout() {
+  const width = page.clientWidth;
+  page.querySelectorAll(".scaler").forEach((wrap) => {
+    const frame = wrap.firstElementChild;
+    const w = Number(wrap.dataset.width);
+    const target = wrap.dataset.scale === "fill" ? width
+      : wrap.dataset.scale === "phone" ? Math.min(300, (width - 16) / 2)
+      : Math.min(560, width >= 760 ? (width - 16) / 2 : width);
+    const s = Math.min(1, target / w);
+    frame.style.transform = `scale(${s})`;
+    wrap.style.width = `${w * s}px`;
+    wrap.style.height = `${frame.offsetHeight * s}px`;
+  });
+}
+
+document.querySelectorAll("[data-theme-btn]").forEach((b) => b.addEventListener("click", () => {
+  theme = b.dataset.themeBtn;
+  document.querySelectorAll("[data-theme-btn]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  document.querySelectorAll(".frame").forEach((f) => f.setAttribute("data-theme", theme));
+}));
+window.addEventListener("resize", layout);
+render();
+console.log("directions", directions.length, "totals", JSON.stringify({ market: eur(totals.market), paid: eur(totals.paid), gain: sign(totals.gain), metal: eur(totals.metal) }));
+</script>
+</body>
+</html>
