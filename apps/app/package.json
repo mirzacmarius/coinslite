@@ -14,6 +14,7 @@
   "dependencies": {
     "@auth/core": "0.37.0",
     "@coinslite/backend": "workspace:*",
+    "@coinslite/i18n": "workspace:*",
     "@coinslite/ui": "workspace:*",
     "@convex-dev/auth": "^0.0.80",
     "@convex-dev/polar": "npm:@erquhart/convex-polar@0.2.0-alpha.5",

@@ -1,5 +1,5 @@
 "use client";
-import { I18nProviderClient, useScopedI18n } from "@/locales/client";
+import { useScopedI18n } from "@/locales/client";
 import { buttonVariants } from "@coinslite/ui/button";
 import { cn } from "@coinslite/ui/utils";
 import Link from "next/link";
@@ -50,13 +50,6 @@ const LayoutContainer = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default function Layout({
-  children,
-  params,
-}: { children: React.ReactNode; params: { locale: string } }) {
-  return (
-    <I18nProviderClient locale={params.locale}>
-      <LayoutContainer>{children}</LayoutContainer>
-    </I18nProviderClient>
-  );
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <LayoutContainer>{children}</LayoutContainer>;
 }

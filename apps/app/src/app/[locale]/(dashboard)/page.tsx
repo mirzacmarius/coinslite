@@ -1,9 +1,10 @@
 import { Header } from "@/app/[locale]/(dashboard)/_components/header";
 import { getScopedI18n } from "@/locales/server";
 
-export const metadata = {
-  title: "Overview",
-};
+export async function generateMetadata() {
+  const t = await getScopedI18n("dashboard");
+  return { title: t("headerTitle") };
+}
 
 export default async function Page() {
   const t = await getScopedI18n("dashboard");

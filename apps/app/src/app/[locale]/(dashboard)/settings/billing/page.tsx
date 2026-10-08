@@ -4,6 +4,7 @@ import { CheckoutLink, CustomerPortalLink } from "@convex-dev/polar/react";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { Switch } from "@coinslite/ui/switch";
+import { useFormatters } from "@/locales/use-formatters";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 
@@ -22,6 +23,7 @@ const Plan = ({
   interval?: "month" | "year";
   onChangeInterval?: () => void;
 }) => {
+  const { money } = useFormatters();
   return (
     <div
       className={`flex w-full select-none items-center rounded-md border border-border ${
@@ -33,7 +35,7 @@ const Plan = ({
           <span className="text-base font-medium text-primary">{name}</span>
           {Boolean(amount) && (
             <span className="flex items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
-              ${amount / 100} / {interval === "month" ? "month" : "year"}
+              {money(amount, "USD")} / {interval === "month" ? "month" : "year"}
             </span>
           )}
         </div>
@@ -64,6 +66,7 @@ const Plan = ({
 
 export default function BillingSettings() {
   const user = useQuery(api.users.getUser);
+  const { date } = useFormatters();
   const products = useQuery(api.subscriptions.listAllProducts);
 
   const [selectedPlanInterval, setSelectedPlanInterval] = useState<
@@ -175,10 +178,7 @@ export default function BillingSettings() {
                         </span>
                       )}
                       on:{" "}
-                      {new Date(
-                        user.subscription.currentPeriodEnd ?? 0 * 1000,
-                      ).toLocaleDateString("en-US")}
-                      .
+                      {date(new Date(user.subscription.currentPeriodEnd ?? 0))}.
                     </p>
                   </div>
                   <p className="text-start text-sm font-normal text-primary/60">

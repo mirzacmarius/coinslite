@@ -1,15 +1,24 @@
 import { GoogleSignin } from "@/components/google-signin";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { getScopedI18n } from "@/locales/server";
 
-export const metadata = {
-  title: "Login",
-};
+export async function generateMetadata() {
+  const t = await getScopedI18n("login");
+  return { title: t("title") };
+}
 
-export default function Page() {
+export default async function Page() {
+  const t = await getScopedI18n("login");
+
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center">
-      <div className="flex flex-col items-center justify-center size-96">
-        <h1 className="mb-8 text-3xl font-medium">CoinsLite</h1>
-        <GoogleSignin />
+    <div className="relative h-screen w-screen flex flex-col items-center justify-center">
+      <div className="absolute right-4 top-4">
+        <LanguageSwitcher />
+      </div>
+      <div className="flex flex-col items-center justify-center gap-6 size-96">
+        <h1 className="text-3xl font-medium">CoinsLite</h1>
+        <p className="text-sm text-muted-foreground">{t("tagline")}</p>
+        <GoogleSignin label={t("continueWithGoogle")} />
       </div>
     </div>
   );
