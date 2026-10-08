@@ -12,14 +12,18 @@ export async function generateMetadata() {
 
 export default async function Page({
   searchParams,
-}: { searchParams: { next?: string } }) {
+}: { searchParams: Promise<{ next?: string }> }) {
+  const [{ next }, requestHeaders] = await Promise.all([
+    searchParams,
+    headers(),
+  ]);
   const suggestedCurrency = suggestHomeCurrency({
-    acceptLanguage: headers().get("accept-language"),
+    acceptLanguage: requestHeaders.get("accept-language"),
     locale: await getCurrentLocale(),
   });
   return (
     <SignUpFlow
-      next={safeNextPath(searchParams.next)}
+      next={safeNextPath(next)}
       suggestedCurrency={suggestedCurrency}
       privacyUrl={`${env.NEXT_PUBLIC_WEB_URL}/privacy`}
       termsUrl={`${env.NEXT_PUBLIC_WEB_URL}/terms`}

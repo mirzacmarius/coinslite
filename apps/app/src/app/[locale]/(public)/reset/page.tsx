@@ -7,8 +7,9 @@ export async function generateMetadata() {
   return { title: t("auth.reset.pageTitle") };
 }
 
-export default function Page({
+export default async function Page({
   searchParams,
-}: { searchParams: { next?: string } }) {
-  return <ResetFlow next={safeNextPath(searchParams.next)} />;
+}: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
+  return <ResetFlow next={safeNextPath(next)} />;
 }

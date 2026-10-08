@@ -127,17 +127,20 @@ function route(request: NextRequest, isAuthenticated: boolean) {
   return withLanguage(request);
 }
 
-export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
-  if (designGalleryIsPublic && isDesignGallery(request)) {
-    return withLanguage(request);
-  }
-  const isAuthenticated = await convexAuth.isAuthenticated();
-  return withSignedInHint(
-    request,
-    route(request, isAuthenticated),
-    isAuthenticated,
-  );
-});
+export const proxy = convexAuthNextjsMiddleware(
+  async (request, { convexAuth }) => {
+    if (designGalleryIsPublic && isDesignGallery(request)) {
+      return withLanguage(request);
+    }
+    const isAuthenticated = await convexAuth.isAuthenticated();
+    return withSignedInHint(
+      request,
+      route(request, isAuthenticated),
+      isAuthenticated,
+    );
+  },
+  { convexUrl: process.env.NEXT_PUBLIC_CONVEX_URL },
+);
 
 export const config = {
   // Everything except Next internals, files with an extension (such as the

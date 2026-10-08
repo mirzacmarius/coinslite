@@ -16,7 +16,10 @@ test.describe("with a German browser", () => {
 
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
     await expect(
-      page.getByText("Melde dich an, um deine Sammlung zu sehen"),
+      page.getByRole("heading", {
+        level: 1,
+        name: "Melde dich an, um deine Sammlung zu sehen",
+      }),
     ).toBeVisible();
     expect(await languageCookie(context)).toBeUndefined();
   });
@@ -30,12 +33,22 @@ test.describe("with an English browser", () => {
     context,
   }) => {
     await page.goto(appUrl);
-    await expect(page.getByText("Sign in to your collection")).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Sign in to your collection",
+      }),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: /^Language/ }).click();
     await page.getByRole("menuitemradio", { name: "Română" }).click();
 
-    await expect(page.getByText("Conectează-te la colecția ta")).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Conectează-te la colecția ta",
+      }),
+    ).toBeVisible();
     const cookie = await languageCookie(context);
     expect(cookie?.value).toBe("ro");
     const oneMonthFromNow = Date.now() / 1000 + 30 * 24 * 60 * 60;
@@ -43,6 +56,11 @@ test.describe("with an English browser", () => {
 
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("lang", "ro");
-    await expect(page.getByText("Conectează-te la colecția ta")).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Conectează-te la colecția ta",
+      }),
+    ).toBeVisible();
   });
 });

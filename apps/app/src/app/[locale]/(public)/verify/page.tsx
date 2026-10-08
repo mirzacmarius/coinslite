@@ -7,8 +7,9 @@ export async function generateMetadata() {
   return { title: t("auth.verify.pageTitle") };
 }
 
-export default function Page({
+export default async function Page({
   searchParams,
-}: { searchParams: { next?: string } }) {
-  return <VerifyFromLink next={safeNextPath(searchParams.next)} />;
+}: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
+  return <VerifyFromLink next={safeNextPath(next)} />;
 }

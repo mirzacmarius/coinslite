@@ -7,8 +7,9 @@ export async function generateMetadata() {
   return { title: t("auth.signIn.pageTitle") };
 }
 
-export default function Page({
+export default async function Page({
   searchParams,
-}: { searchParams: { next?: string } }) {
-  return <SignInFlow next={safeNextPath(searchParams.next)} />;
+}: { searchParams: Promise<{ next?: string }> }) {
+  const { next } = await searchParams;
+  return <SignInFlow next={safeNextPath(next)} />;
 }
