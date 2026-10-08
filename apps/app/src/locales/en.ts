@@ -1,4 +1,11 @@
 export default {
+  common: {
+    language: "Language",
+  },
+  login: {
+    tagline: "Sign in to your collection",
+    continueWithGoogle: "Continue with Google",
+  },
   dashboard: {
     headerTitle: "Overview",
     headerDescription: "Your collection at a glance.",
@@ -10,17 +17,17 @@ export default {
     headerTitle: "Settings",
     headerDescription: "Manage your account settings.",
     avatar: {
-      title: "Your Avatar",
-      description: "This is your avatar. It will be displayed on your profile.",
-      uploadHint: "Click on the avatar to upload a custom one from your files.",
+      title: "Your avatar",
+      description: "This is your avatar. It's shown on your profile.",
+      uploadHint: "Click the avatar to upload your own picture.",
       resetButton: "Reset",
     },
     deleteAccount: {
-      title: "Delete Account",
+      title: "Delete account",
       description:
         "Permanently delete your CoinsLite account and everything in it.",
-      warning: "This action cannot be undone, proceed with caution.",
-      deleteButton: "Delete Account",
+      warning: "This can't be undone. Proceed with care.",
+      deleteButton: "Delete account",
       confirmButton: "Are you sure?",
     },
     sidebar: {

@@ -1,41 +1,36 @@
+import { defaultLocale, locales, resolveLocale } from "@coinslite/i18n";
 import {
   convexAuthNextjsMiddleware,
   createRouteMatcher,
-  isAuthenticatedNextjs,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
 import { createI18nMiddleware } from "next-international/middleware";
 
+// The library keeps the chosen language in its `Next-Locale` cookie and only
+// asks us when there's none yet: then the browser's languages decide.
 const I18nMiddleware = createI18nMiddleware({
-  locales: ["en", "fr", "es"],
-  defaultLocale: "en",
+  locales: [...locales],
+  defaultLocale,
   urlMappingStrategy: "rewrite",
+  resolveLocaleFromRequest: (request) =>
+    resolveLocale({ acceptLanguage: request.headers.get("accept-language") }),
 });
 
-const isSignInPage = createRouteMatcher(["/login"]);
+// Switching language navigates to e.g. /ro/login before the choice is stored.
+const isSignInPage = createRouteMatcher([
+  "/login",
+  ...locales.map((locale) => `/${locale}/login`),
+]);
 
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   const isAuthenticated = await convexAuth.isAuthenticated();
   const isSignIn = isSignInPage(request);
   if (isSignIn && isAuthenticated) {
-    console.log("redirecting to /", {
-      isSignIn,
-      isAuthenticated,
-    });
     return nextjsMiddlewareRedirect(request, "/");
   }
   if (!isSignIn && !isAuthenticated) {
-    console.log("redirecting to /login", {
-      isSignIn,
-      isAuthenticated,
-    });
     return nextjsMiddlewareRedirect(request, "/login");
   }
-  console.log("no redirect", {
-    isSignIn,
-    isAuthenticated,
-  });
-
   return I18nMiddleware(request);
 });
 
