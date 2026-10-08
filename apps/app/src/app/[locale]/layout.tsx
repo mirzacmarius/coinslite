@@ -4,14 +4,15 @@ import { TooltipProvider } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
-import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+import { I18nProviderClient } from "@/locales/client";
+import { getI18n } from "@/locales/server";
 import { ConvexClientProvider } from "../convex-client-provider";
 
-export const metadata: Metadata = {
-  title: "CoinsLite",
-  description: "Your coin, banknote and stamp collection.",
-};
+export async function generateMetadata() {
+  const t = await getI18n();
+  return { title: "CoinsLite", description: t("common.appDescription") };
+}
 
 export const viewport = {
   themeColor: [
@@ -22,12 +23,14 @@ export const viewport = {
 
 export default function RootLayout({
   children,
+  params: { locale },
 }: Readonly<{
   children: React.ReactNode;
+  params: { locale: string };
 }>) {
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang="en" suppressHydrationWarning>
+      <html lang={locale} suppressHydrationWarning>
         <body
           className={cn(
             `${GeistSans.variable} ${GeistMono.variable}`,
@@ -41,7 +44,11 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TooltipProvider delayDuration={0}>
-              <ConvexClientProvider>{children}</ConvexClientProvider>
+              <ConvexClientProvider>
+                <I18nProviderClient locale={locale}>
+                  {children}
+                </I18nProviderClient>
+              </ConvexClientProvider>
             </TooltipProvider>
           </ThemeProvider>
         </body>

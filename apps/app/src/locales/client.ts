@@ -1,6 +1,7 @@
 "use client";
 
 import { createI18nClient } from "next-international/client";
+import { loaders } from "./loaders";
 
 export const {
   useI18n,
@@ -8,8 +9,4 @@ export const {
   I18nProviderClient,
   useChangeLocale,
   useCurrentLocale,
-} = createI18nClient({
-  en: () => import("./en"),
-  fr: () => import("./fr"),
-  es: () => import("./es"),
-});
+} = createI18nClient(loaders);

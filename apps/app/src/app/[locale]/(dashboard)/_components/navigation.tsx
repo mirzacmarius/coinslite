@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LanguageSwitcher } from "./language-switcher";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeSwitcher } from "./theme-switcher";
 
 export function Navigation({
