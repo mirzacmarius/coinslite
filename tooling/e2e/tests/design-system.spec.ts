@@ -82,6 +82,12 @@ test.describe("on a desktop screen", () => {
   test("a dialog traps focus, passes WCAG AA and gives focus back on Esc", async ({
     page,
   }) => {
+    // Shortcut hints read "Ctrl" outside Apple devices; check that longer text everywhere.
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "platform", {
+        get: () => "Linux x86_64",
+      });
+    });
     await page.goto(galleryUrl);
     const trigger = page.getByRole("button", { name: "New Item dialog" });
     await trigger.click();

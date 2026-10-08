@@ -264,7 +264,7 @@ function NewItemDialog() {
             <Button onClick={add}>
               Add Item
               {mod && (
-                <Kbd className="ml-1 border-0 bg-primary-foreground/15 text-primary-foreground">
+                <Kbd className="ml-1 border-primary-foreground/40 bg-transparent text-primary-foreground">
                   {mod}↵
                 </Kbd>
               )}
