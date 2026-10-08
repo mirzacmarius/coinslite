@@ -1,20 +1,13 @@
 "use client";
 
 import { useAuthActions } from "@convex-dev/auth/react";
-import { Button } from "@coinslite/ui/button";
-import { Icons } from "@coinslite/ui/icons";
+import { useCallback } from "react";
 
-export function SignOut() {
+/** Signs out and opens sign-in, so no signed-in page stays on screen. */
+export function useSignOut() {
   const { signOut } = useAuthActions();
-
-  return (
-    <Button
-      onClick={signOut}
-      variant="outline"
-      className="font-mono gap-2 flex items-center"
-    >
-      <Icons.SignOut className="size-4" />
-      <span>Sign out</span>
-    </Button>
-  );
+  return useCallback(async () => {
+    await signOut();
+    window.location.assign("/login");
+  }, [signOut]);
 }

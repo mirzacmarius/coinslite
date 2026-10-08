@@ -1,10 +1,10 @@
 "use client";
 
-import { CheckoutLink, CustomerPortalLink } from "@convex-dev/polar/react";
+import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { Switch } from "@coinslite/ui/switch";
-import { useFormatters } from "@/locales/use-formatters";
+import { CheckoutLink, CustomerPortalLink } from "@convex-dev/polar/react";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 
@@ -34,12 +34,12 @@ const Plan = ({
         <div className="flex items-center gap-2">
           <span className="text-base font-medium text-primary">{name}</span>
           {Boolean(amount) && (
-            <span className="flex items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
+            <span className="flex items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-muted-foreground">
               {money(amount, "USD")} / {interval === "month" ? "month" : "year"}
             </span>
           )}
         </div>
-        <p className="text-start text-sm font-normal text-primary/60">
+        <p className="text-start text-sm font-normal text-muted-foreground">
           {description}
         </p>
       </div>
@@ -49,7 +49,7 @@ const Plan = ({
         <div className="flex items-center gap-2 px-4">
           <label
             htmlFor="interval-switch"
-            className="text-start text-sm text-primary/60"
+            className="text-start text-sm text-muted-foreground"
           >
             {interval === "month" ? "Monthly" : "Yearly"}
           </label>
@@ -86,18 +86,16 @@ export default function BillingSettings() {
 
   return (
     <div className="flex h-full w-full flex-col gap-6">
-      <div className="flex w-full flex-col gap-2 p-6 py-2">
-        <h2 className="text-xl font-medium text-primary">
-          Billing is in test mode.
-        </h2>
-        <p className="text-sm font-normal text-primary/60">
+      <div className="flex w-full flex-col gap-2 p-4 py-2">
+        <h2 className="text-sm font-medium">Billing is in test mode.</h2>
+        <p className="text-sm font-normal text-muted-foreground">
           Payments run in the Polar sandbox until launch. Use a test card number
           from this{" "}
           <a
             href="https://stripe.com/docs/testing#cards"
             target="_blank"
             rel="noreferrer"
-            className="font-medium text-primary/80 underline"
+            className="font-medium text-muted-foreground underline"
           >
             resource from Stripe
           </a>
@@ -107,11 +105,11 @@ export default function BillingSettings() {
 
       {/* Plans */}
       <div className="flex w-full flex-col items-start rounded-lg border border-border bg-card">
-        <div className="flex flex-col gap-2 p-6">
-          <h2 className="text-xl font-medium text-primary">Plan</h2>
-          <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
+        <div className="flex flex-col gap-2 p-4">
+          <h2 className="text-sm font-medium">Plan</h2>
+          <p className="flex items-start gap-1 text-sm font-normal text-muted-foreground">
             You are currently on the{" "}
-            <span className="flex h-[18px] items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
+            <span className="flex h-[18px] items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-muted-foreground">
               {user.subscription ? user.subscription.product.name : "Free"}
             </span>
             plan.
@@ -119,7 +117,7 @@ export default function BillingSettings() {
         </div>
 
         {!user.subscription && (
-          <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
+          <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-4 pt-0">
             <Plan
               name="Free"
               description="Some of the things, free forever."
@@ -160,14 +158,14 @@ export default function BillingSettings() {
         {user.subscription &&
           (user.subscription?.productId === monthlyProProduct?.id ||
             user.subscription?.productId === yearlyProProduct?.id) && (
-            <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
+            <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-4 pt-0">
               <div className="flex w-full items-center overflow-hidden rounded-md border border-primary/60">
                 <div className="flex w-full flex-col items-start p-4">
                   <div className="flex items-end gap-2">
                     <span className="text-base font-medium text-primary">
                       {user.subscription?.product.name}
                     </span>
-                    <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
+                    <p className="flex items-start gap-1 text-sm font-normal text-muted-foreground">
                       {user.subscription.cancelAtPeriodEnd === true ? (
                         <span className="flex h-[18px] items-center text-sm font-medium text-red-500">
                           Expires
@@ -181,7 +179,7 @@ export default function BillingSettings() {
                       {date(new Date(user.subscription.currentPeriodEnd ?? 0))}.
                     </p>
                   </div>
-                  <p className="text-start text-sm font-normal text-primary/60">
+                  <p className="text-start text-sm font-normal text-muted-foreground">
                     {user.subscription?.product.description}
                   </p>
                 </div>
@@ -190,8 +188,8 @@ export default function BillingSettings() {
           )}
 
         {!user.subscription && (
-          <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-6 py-3 dark:bg-card">
-            <p className="text-sm font-normal text-primary/60">
+          <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-4 py-3 dark:bg-card">
+            <p className="text-sm font-normal text-muted-foreground">
               You will not be charged for testing the subscription upgrade.
             </p>
             {monthlyProProduct && yearlyProProduct && (
@@ -215,17 +213,15 @@ export default function BillingSettings() {
       {/* Manage Subscription */}
       {user.subscription && (
         <div className="flex w-full flex-col items-start rounded-lg border border-border bg-card">
-          <div className="flex flex-col gap-2 p-6">
-            <h2 className="text-xl font-medium text-primary">
-              Manage Subscription
-            </h2>
-            <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
+          <div className="flex flex-col gap-2 p-4">
+            <h2 className="text-sm font-medium">Manage Subscription</h2>
+            <p className="flex items-start gap-1 text-sm font-normal text-muted-foreground">
               Update your payment method, billing address, and more.
             </p>
           </div>
 
-          <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-6 py-3 dark:bg-card">
-            <p className="text-sm font-normal text-primary/60">
+          <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-4 py-3 dark:bg-card">
+            <p className="text-sm font-normal text-muted-foreground">
               You will be redirected to the Polar Customer Portal.
             </p>
 

@@ -1,5 +1,5 @@
 import { GoogleSignin } from "@/components/google-signin";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { LanguageMenu } from "@/components/preferences";
 import { getScopedI18n } from "@/locales/server";
 
 export async function generateMetadata() {
@@ -13,7 +13,7 @@ export default async function Page() {
   return (
     <div className="relative h-screen w-screen flex flex-col items-center justify-center">
       <div className="absolute right-4 top-4">
-        <LanguageSwitcher />
+        <LanguageMenu />
       </div>
       <div className="flex flex-col items-center justify-center gap-6 size-96">
         <h1 className="text-3xl font-medium">CoinsLite</h1>

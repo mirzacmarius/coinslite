@@ -6,6 +6,29 @@ export default {
     appDescription:
       "Enregistrez les pièces, billets et timbres que vous possédez.",
   },
+  nav: {
+    overview: "Aperçu",
+    collection: "Collection",
+    catalog: "Catalogue",
+    albums: "Albums",
+    account: "Compte",
+  },
+  shell: {
+    skipToContent: "Aller au contenu",
+    primaryNavigation: "Menu principal",
+    signOut: "Se déconnecter",
+    workspaceMenu: "Compte et préférences",
+    plans: "Formules",
+    appearance: "Apparence",
+    appearanceLight: "Clair",
+    appearanceDark: "Sombre",
+    appearanceSystem: "Système",
+    more: "Plus",
+  },
+  placeholder: {
+    title: "Rien ici pour l’instant",
+    description: "Cette partie de CoinsLite arrive bientôt.",
+  },
   login: {
     title: "Connexion",
     tagline: "Connectez-vous à votre collection",

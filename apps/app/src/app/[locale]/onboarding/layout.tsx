@@ -1,4 +1,4 @@
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { LanguageMenu } from "@/components/preferences";
 
 export default async function Layout({
   children,
@@ -9,7 +9,7 @@ export default async function Layout({
         <span className="text-xl font-medium">CoinsLite</span>
       </div>
       <div className="absolute right-4 top-4 z-20">
-        <LanguageSwitcher />
+        <LanguageMenu />
       </div>
       <div className="z-10 h-screen w-screen">{children}</div>
       <div className="base-grid fixed h-screen w-screen opacity-40" />

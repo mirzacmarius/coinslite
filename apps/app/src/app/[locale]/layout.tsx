@@ -1,12 +1,14 @@
 import "@coinslite/ui/globals.css";
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { brand } from "@/lib/brand";
+import { I18nProviderClient } from "@/locales/client";
+import { getI18n } from "@/locales/server";
+import { Toaster } from "@coinslite/ui/toaster";
 import { TooltipProvider } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-import { I18nProviderClient } from "@/locales/client";
-import { getI18n } from "@/locales/server";
 import { ConvexClientProvider } from "../convex-client-provider";
 
 export async function generateMetadata() {
@@ -15,9 +17,10 @@ export async function generateMetadata() {
 }
 
 export const viewport = {
+  viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)" },
-    { media: "(prefers-color-scheme: dark)" },
+    { media: "(prefers-color-scheme: light)", color: brand.lightBackground },
+    { media: "(prefers-color-scheme: dark)", color: brand.darkBackground },
   ],
 };
 
@@ -34,7 +37,7 @@ export default function RootLayout({
         <body
           className={cn(
             `${GeistSans.variable} ${GeistMono.variable}`,
-            "antialiased",
+            "font-sans antialiased",
           )}
         >
           <ThemeProvider
@@ -50,6 +53,7 @@ export default function RootLayout({
                 </I18nProviderClient>
               </ConvexClientProvider>
             </TooltipProvider>
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>
