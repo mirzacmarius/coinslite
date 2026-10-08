@@ -4,6 +4,8 @@ Issues and specs for CoinsLite live in Linear: workspace **MuseumLite**, team **
 
 The team is shared with other products, so **every CoinsLite issue belongs to the CoinsLite project**, and every query filters by `project: "CoinsLite"`. Never apply the `module/*` or `phase/*` labels; they belong to other products.
 
+Linear syncs CoinsLite issues to this repo's GitHub Issues automatically, so the same issue also appears on GitHub. Linear is the source of truth: create and update issues there only, and never create GitHub issues directly.
+
 ## Conventions
 
 - **Create an issue**: `save_issue` with `team: "MUS"`, `project: "CoinsLite"`, `title`, and a Markdown `description`. New issues start in `Backlog`. Add a type label (`Feature`, `Bug`, `Improvement`, `Task`, `Chore`, `Docs`) and, when known, a `milestone`.
