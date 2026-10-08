@@ -1,5 +1,7 @@
-import { Header } from "@/app/[locale]/(dashboard)/_components/header";
 import { getScopedI18n } from "@/locales/server";
+import { EmptyState } from "@coinslite/ui/empty-state";
+import { PageHeader } from "@coinslite/ui/page-header";
+import { LayoutDashboard } from "lucide-react";
 
 export async function generateMetadata() {
   const t = await getScopedI18n("dashboard");
@@ -11,15 +13,15 @@ export default async function Page() {
 
   return (
     <>
-      <Header title={t("headerTitle")} description={t("headerDescription")} />
-      <div className="flex h-full w-full bg-secondary px-6 py-8 dark:bg-black">
-        <div className="mx-auto flex w-full max-w-screen-xl flex-col gap-2 rounded-lg border border-border bg-card p-6 dark:bg-black">
-          <h2 className="text-xl font-medium text-primary">{t("bodyTitle")}</h2>
-          <p className="text-sm font-normal text-primary/60">
-            {t("bodyDescription")}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={t("headerTitle")}
+        description={t("headerDescription")}
+      />
+      <EmptyState
+        icon={<LayoutDashboard className="size-5" aria-hidden="true" />}
+        title={t("bodyTitle")}
+        description={t("bodyDescription")}
+      />
     </>
   );
 }

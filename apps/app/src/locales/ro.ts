@@ -6,6 +6,27 @@ export default {
     appDescription:
       "Înregistrează monedele, bancnotele și timbrele pe care le deții.",
   },
+  nav: {
+    overview: "Prezentare",
+    collection: "Colecție",
+    catalog: "Catalog",
+    albums: "Albume",
+    account: "Cont",
+  },
+  shell: {
+    skipToContent: "Sari la conținut",
+    primaryNavigation: "Meniu principal",
+    add: "Adaugă",
+    signOut: "Deconectare",
+    theme: "Temă",
+    themeLight: "Luminos",
+    themeDark: "Întunecat",
+    themeSystem: "Sistem",
+  },
+  placeholder: {
+    title: "Nimic aici încă",
+    description: "Această parte din CoinsLite vine în curând.",
+  },
   login: {
     title: "Conectare",
     tagline: "Conectează-te la colecția ta",

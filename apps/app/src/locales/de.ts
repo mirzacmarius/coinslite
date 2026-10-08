@@ -6,6 +6,27 @@ export default {
     appDescription:
       "Erfasse die Münzen, Banknoten und Briefmarken, die du besitzt.",
   },
+  nav: {
+    overview: "Übersicht",
+    collection: "Sammlung",
+    catalog: "Katalog",
+    albums: "Alben",
+    account: "Konto",
+  },
+  shell: {
+    skipToContent: "Zum Inhalt springen",
+    primaryNavigation: "Hauptmenü",
+    add: "Hinzufügen",
+    signOut: "Abmelden",
+    theme: "Design",
+    themeLight: "Hell",
+    themeDark: "Dunkel",
+    themeSystem: "System",
+  },
+  placeholder: {
+    title: "Noch nichts hier",
+    description: "Dieser Teil von CoinsLite ist bald da.",
+  },
   login: {
     title: "Anmelden",
     tagline: "Melde dich an, um deine Sammlung zu sehen",

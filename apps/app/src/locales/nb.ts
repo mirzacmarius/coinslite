@@ -5,6 +5,27 @@ export default {
     language: "Språk",
     appDescription: "Registrer myntene, sedlene og frimerkene du eier.",
   },
+  nav: {
+    overview: "Oversikt",
+    collection: "Samling",
+    catalog: "Katalog",
+    albums: "Album",
+    account: "Konto",
+  },
+  shell: {
+    skipToContent: "Hopp til innhold",
+    primaryNavigation: "Hovedmeny",
+    add: "Legg til",
+    signOut: "Logg ut",
+    theme: "Tema",
+    themeLight: "Lyst",
+    themeDark: "Mørkt",
+    themeSystem: "System",
+  },
+  placeholder: {
+    title: "Ingenting her ennå",
+    description: "Denne delen av CoinsLite kommer snart.",
+  },
   login: {
     title: "Logg inn",
     tagline: "Logg inn på samlingen din",

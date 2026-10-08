@@ -48,6 +48,13 @@ function withLanguage(request: NextRequest) {
   return response;
 }
 
+// The /design gallery shows the design system; it's public everywhere except production.
+const isDesignGallery = createRouteMatcher([
+  "/design",
+  ...locales.map((locale) => `/${locale}/design`),
+]);
+const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
+
 // Switching language navigates to e.g. /ro/login before the choice is stored.
 const isSignInPage = createRouteMatcher([
   "/login",
@@ -55,6 +62,9 @@ const isSignInPage = createRouteMatcher([
 ]);
 
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
+  if (designGalleryIsPublic && isDesignGallery(request)) {
+    return withLanguage(request);
+  }
   const isAuthenticated = await convexAuth.isAuthenticated();
   const isSignIn = isSignInPage(request);
   if (isSignIn && isAuthenticated) {
@@ -67,11 +77,11 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
 });
 
 export const config = {
+  // Everything except Next internals, files with an extension and the
+  // generated app icons and manifest, plus /api, where Convex Auth handles
+  // sign-in requests.
   matcher: [
-    "/((?!_next/static|api|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-
-    // all routes except static assets
-    "/((?!.*\\..*|_next).*)",
+    "/((?!_next/static|_next/image|api|icon|apple-icon|manifest.webmanifest|.*\\..*).*)",
     "/",
     "/(api|trpc)(.*)",
   ],

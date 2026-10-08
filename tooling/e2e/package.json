@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@coinslite/typescript": "workspace:*",
     "@playwright/test": "^1.64.0",
     "@types/node": "^22",

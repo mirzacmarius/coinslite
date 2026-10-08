@@ -11,7 +11,7 @@ const LayoutContainer = ({ children }: { children: React.ReactNode }) => {
   const isSettingsPath = pathname === "/settings";
   const isBillingPath = pathname === "/settings/billing";
   return (
-    <div className="flex h-full w-full px-6 py-8">
+    <div className="flex h-full w-full">
       <div className="mx-auto flex h-full w-full max-w-screen-xl gap-12">
         <div className="hidden w-full max-w-64 flex-col gap-0.5 lg:flex">
           <Link

@@ -1,5 +1,6 @@
 import "@coinslite/ui/globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { Toaster } from "@coinslite/ui/toaster";
 import { TooltipProvider } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import { GeistMono } from "geist/font/mono";
@@ -15,9 +16,10 @@ export async function generateMetadata() {
 }
 
 export const viewport = {
+  viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)" },
-    { media: "(prefers-color-scheme: dark)" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f8fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1016" },
   ],
 };
 
@@ -34,7 +36,7 @@ export default function RootLayout({
         <body
           className={cn(
             `${GeistSans.variable} ${GeistMono.variable}`,
-            "antialiased",
+            "font-sans antialiased",
           )}
         >
           <ThemeProvider
@@ -50,6 +52,7 @@ export default function RootLayout({
                 </I18nProviderClient>
               </ConvexClientProvider>
             </TooltipProvider>
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

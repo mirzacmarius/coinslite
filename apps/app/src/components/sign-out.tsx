@@ -1,20 +1,23 @@
 "use client";
 
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
-import { Icons } from "@coinslite/ui/icons";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { LogOut } from "lucide-react";
 
 export function SignOut() {
+  const t = useI18n();
   const { signOut } = useAuthActions();
 
   return (
     <Button
-      onClick={signOut}
-      variant="outline"
-      className="font-mono gap-2 flex items-center"
+      onClick={() => void signOut()}
+      variant="ghost"
+      size="sm"
+      className="w-full justify-start gap-2 text-muted-foreground"
     >
-      <Icons.SignOut className="size-4" />
-      <span>Sign out</span>
+      <LogOut className="size-4" aria-hidden="true" />
+      {t("shell.signOut")}
     </Button>
   );
 }

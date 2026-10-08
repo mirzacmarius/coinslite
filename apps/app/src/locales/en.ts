@@ -3,6 +3,27 @@ export default {
     language: "Language",
     appDescription: "Record the coins, banknotes and stamps you own.",
   },
+  nav: {
+    overview: "Overview",
+    collection: "Collection",
+    catalog: "Catalog",
+    albums: "Albums",
+    account: "Account",
+  },
+  shell: {
+    skipToContent: "Skip to content",
+    primaryNavigation: "Main",
+    add: "Add",
+    signOut: "Sign out",
+    theme: "Theme",
+    themeLight: "Light",
+    themeDark: "Dark",
+    themeSystem: "System",
+  },
+  placeholder: {
+    title: "Nothing here yet",
+    description: "This part of CoinsLite is on its way.",
+  },
   login: {
     title: "Sign in",
     tagline: "Sign in to your collection",
