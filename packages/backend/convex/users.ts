@@ -4,9 +4,11 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import { polar } from "./subscriptions";
+import { requireUserId } from "./utils/auth";
 import { username } from "./utils/validators";
 
 export const getUser = query({
+  args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
@@ -21,7 +23,7 @@ export const getUser = query({
     });
     return {
       ...user,
-      name: user.username || user.name,
+      name: user.displayName ?? user.username ?? user.name,
       subscription,
       avatarUrl: user.imageId
         ? await ctx.storage.getUrl(user.imageId)
@@ -35,10 +37,7 @@ export const updateUsername = mutation({
     username: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
+    const userId = await requireUserId(ctx);
     const validatedUsername = username.safeParse(args.username);
 
     if (!validatedUsername.success) {
@@ -51,10 +50,7 @@ export const updateUsername = mutation({
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("User not found");
-    }
+    await requireUserId(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -64,22 +60,16 @@ export const updateUserImage = mutation({
     imageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
-    ctx.db.patch(userId, { imageId: args.imageId });
+    const userId = await requireUserId(ctx);
+    await ctx.db.patch(userId, { imageId: args.imageId });
   },
 });
 
 export const removeUserImage = mutation({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
-    ctx.db.patch(userId, { imageId: undefined, image: undefined });
+    const userId = await requireUserId(ctx);
+    await ctx.db.patch(userId, { imageId: undefined, image: undefined });
   },
 });
 
@@ -110,10 +100,7 @@ export const deleteUserAccount = internalMutation({
 export const deleteCurrentUserAccount = action({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
+    const userId = await requireUserId(ctx);
     // The alpha Polar component predates Convex 1.46's action context type.
     // Runtime is compatible; drop this when billing moves to @convex-dev/polar.
     const polarCtx = ctx as unknown as Parameters<

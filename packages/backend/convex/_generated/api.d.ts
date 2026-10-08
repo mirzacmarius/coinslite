@@ -8,6 +8,11 @@
  * @module
  */
 
+import type * as accounts_codeEmailMessages from "../accounts/codeEmailMessages.js";
+import type * as accounts_codeEmails from "../accounts/codeEmails.js";
+import type * as accounts_email from "../accounts/email.js";
+import type * as accounts_emails from "../accounts/emails.js";
+import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as auth from "../auth.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
@@ -15,6 +20,7 @@ import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
+import type * as utils_auth from "../utils/auth.js";
 import type * as utils_validators from "../utils/validators.js";
 
 import type {
@@ -24,6 +30,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "accounts/codeEmailMessages": typeof accounts_codeEmailMessages;
+  "accounts/codeEmails": typeof accounts_codeEmails;
+  "accounts/email": typeof accounts_email;
+  "accounts/emails": typeof accounts_emails;
+  "accounts/signUpProfile": typeof accounts_signUpProfile;
   auth: typeof auth;
   "email/index": typeof email_index;
   env: typeof env;
@@ -31,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   init: typeof init;
   subscriptions: typeof subscriptions;
   users: typeof users;
+  "utils/auth": typeof utils_auth;
   "utils/validators": typeof utils_validators;
 }>;
 

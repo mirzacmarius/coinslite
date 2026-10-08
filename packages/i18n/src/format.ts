@@ -12,6 +12,13 @@ export const homeCurrencies = [
 ] as const;
 export type HomeCurrency = (typeof homeCurrencies)[number];
 
+export function isHomeCurrency(value: unknown): value is HomeCurrency {
+  return (
+    typeof value === "string" &&
+    (homeCurrencies as readonly string[]).includes(value)
+  );
+}
+
 /** Every Home currency divides into 100 minor units (øre, cents, bani, pence, rappen). */
 const MINOR_UNITS_PER_MAJOR = 100;
 

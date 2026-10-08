@@ -13,5 +13,7 @@ export {
   formatNumber,
   formattersFor,
   homeCurrencies,
+  isHomeCurrency,
   type HomeCurrency,
 } from "./format";
+export { suggestHomeCurrency } from "./home-currency";
