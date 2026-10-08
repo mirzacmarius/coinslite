@@ -39,23 +39,33 @@ export function formatNumber(
   return new Intl.NumberFormat(locale, options).format(value);
 }
 
+const CALENDAR_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
 /**
- * Formats a calendar date ("YYYY-MM-DD") or a timestamp. Calendar dates are read
- * in UTC so they never shift by a day; pass the viewer's time zone for timestamps.
+ * Formats a calendar date ("YYYY-MM-DD", e.g. a purchase date) or a moment in
+ * time. Calendar dates are read in UTC so they never shift by a day; moments are
+ * shown in `timeZone`, which should be the viewer's (default: the runtime's own).
  */
 export function formatDate(
   value: string | number | Date,
   locale: Locale,
-  { timeZone = "UTC" }: { timeZone?: string } = {},
+  { timeZone }: { timeZone?: string } = {},
 ): string {
-  const date =
-    typeof value === "string"
-      ? new Date(`${value}T00:00:00Z`)
-      : new Date(value);
+  if (typeof value === "string") {
+    if (!CALENDAR_DATE.test(value)) {
+      throw new RangeError(
+        `Expected a calendar date "YYYY-MM-DD", got "${value}"`,
+      );
+    }
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    }).format(new Date(`${value}T00:00:00Z`));
+  }
   return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeZone,
-  }).format(date);
+  }).format(new Date(value));
 }
 
 /** Shows an ISO 3166 alpha-2 country code as its name in the given language. */
@@ -66,4 +76,20 @@ export function formatCountry(code: string, locale: Locale): string {
       code.toUpperCase(),
     ) ?? code
   );
+}
+
+/** The formatters bound to one language (and the viewer's time zone, if known). */
+export function formattersFor(
+  locale: Locale,
+  { timeZone }: { timeZone?: string } = {},
+) {
+  return {
+    money: (amountMinor: number, currency: HomeCurrency) =>
+      formatMoney(amountMinor, currency, locale),
+    number: (value: number, options?: Intl.NumberFormatOptions) =>
+      formatNumber(value, locale, options),
+    date: (value: string | number | Date) =>
+      formatDate(value, locale, { timeZone }),
+    country: (code: string) => formatCountry(code, locale),
+  };
 }

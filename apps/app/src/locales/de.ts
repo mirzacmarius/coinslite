@@ -3,9 +3,12 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Sprache",
+    appDescription:
+      "Erfasse die Münzen, Banknoten und Briefmarken, die du besitzt.",
   },
   login: {
-    tagline: "Melde dich bei deiner Sammlung an",
+    title: "Anmelden",
+    tagline: "Melde dich an, um deine Sammlung zu sehen",
     continueWithGoogle: "Weiter mit Google",
   },
   dashboard: {
@@ -28,7 +31,7 @@ export default {
       title: "Konto löschen",
       description: "Lösche dein CoinsLite-Konto mit allen Inhalten dauerhaft.",
       warning:
-        "Das kann nicht rückgängig gemacht werden. Bitte vorsichtig sein.",
+        "Das kann nicht rückgängig gemacht werden. Sei bitte vorsichtig.",
       deleteButton: "Konto löschen",
       confirmButton: "Bist du sicher?",
     },

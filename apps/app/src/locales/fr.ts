@@ -3,8 +3,11 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Langue",
+    appDescription:
+      "Enregistrez les pièces, billets et timbres que vous possédez.",
   },
   login: {
+    title: "Connexion",
     tagline: "Connectez-vous à votre collection",
     continueWithGoogle: "Continuer avec Google",
   },

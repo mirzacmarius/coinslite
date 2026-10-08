@@ -1,12 +1,14 @@
 import { describe, expect, test } from "vitest";
 import { defaultLocale, locales, resolveLocale } from "./index";
 
-describe("resolveLocale", () => {
-  test("offers exactly the five launch languages, English first", () => {
+describe("supported languages", () => {
+  test("are the five launch languages, with English as the default", () => {
     expect(locales).toEqual(["en", "nb", "de", "fr", "ro"]);
     expect(defaultLocale).toBe("en");
   });
+});
 
+describe("resolveLocale", () => {
   test("a supported stored preference wins over the browser", () => {
     expect(
       resolveLocale({ stored: "de", acceptLanguage: "fr-FR,fr;q=0.9" }),

@@ -1,7 +1,7 @@
 "use client";
 
 import { useChangeLocale, useCurrentLocale, useI18n } from "@/locales/client";
-import { type Locale, localeNames, locales } from "@coinslite/i18n";
+import { isLocale, localeNames, locales } from "@coinslite/i18n";
 import {
   Select,
   SelectContent,
@@ -18,7 +18,9 @@ export function LanguageSwitcher() {
   return (
     <Select
       value={locale}
-      onValueChange={(value) => changeLocale(value as Locale)}
+      onValueChange={(value) => {
+        if (isLocale(value)) changeLocale(value);
+      }}
     >
       <SelectTrigger
         aria-label={t("common.language")}

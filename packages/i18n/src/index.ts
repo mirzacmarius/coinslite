@@ -3,7 +3,6 @@ export {
   isLocale,
   localeNames,
   locales,
-  matchLocale,
   resolveLocale,
   type Locale,
 } from "./locale";
@@ -12,6 +11,7 @@ export {
   formatDate,
   formatMoney,
   formatNumber,
+  formattersFor,
   homeCurrencies,
   type HomeCurrency,
 } from "./format";

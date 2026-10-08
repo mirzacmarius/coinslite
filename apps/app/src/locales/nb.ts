@@ -3,14 +3,16 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Språk",
+    appDescription: "Registrer myntene, sedlene og frimerkene du eier.",
   },
   login: {
-    tagline: "Logg inn i samlingen din",
+    title: "Logg inn",
+    tagline: "Logg inn på samlingen din",
     continueWithGoogle: "Fortsett med Google",
   },
   dashboard: {
     headerTitle: "Oversikt",
-    headerDescription: "Samlingen din på et øyeblikk.",
+    headerDescription: "Oversikt over samlingen din.",
     bodyTitle: "Velkommen til CoinsLite",
     bodyDescription: "Samlingen din vises her.",
   },

@@ -1,8 +1,10 @@
 export default {
   common: {
     language: "Language",
+    appDescription: "Record the coins, banknotes and stamps you own.",
   },
   login: {
+    title: "Sign in",
     tagline: "Sign in to your collection",
     continueWithGoogle: "Continue with Google",
   },

@@ -3,8 +3,11 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Limbă",
+    appDescription:
+      "Înregistrează monedele, bancnotele și timbrele pe care le deții.",
   },
   login: {
+    title: "Conectare",
     tagline: "Conectează-te la colecția ta",
     continueWithGoogle: "Continuă cu Google",
   },

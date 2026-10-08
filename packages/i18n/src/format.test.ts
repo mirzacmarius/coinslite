@@ -4,14 +4,15 @@ import {
   formatDate,
   formatMoney,
   formatNumber,
+  formattersFor,
   homeCurrencies,
 } from "./index";
 
 // Intl uses non-breaking (and narrow non-breaking) spaces as group separators.
 const plain = (value: string) => value.replace(/[  ]/g, " ");
 
-describe("formatMoney", () => {
-  test("covers the eight Home currencies", () => {
+describe("Home currencies", () => {
+  test("are the eight launch currencies", () => {
     expect(homeCurrencies).toEqual([
       "NOK",
       "SEK",
@@ -23,7 +24,9 @@ describe("formatMoney", () => {
       "CHF",
     ]);
   });
+});
 
+describe("formatMoney", () => {
   test("formats minor units in the active language's conventions", () => {
     expect(plain(formatMoney(123456, "NOK", "nb"))).toBe("1 234,56 kr");
     expect(plain(formatMoney(123456, "EUR", "de"))).toBe("1.234,56 €");
@@ -56,8 +59,19 @@ describe("formatDate", () => {
     expect(formatDate("2026-10-08", "nb")).toBe("8. okt. 2026");
   });
 
-  test("accepts timestamps", () => {
-    expect(formatDate(Date.UTC(2026, 9, 8, 23, 30), "fr")).toBe("8 oct. 2026");
+  test("shows a moment in the viewer's time zone", () => {
+    const lateEveningUtc = Date.UTC(2026, 9, 8, 23, 30);
+    expect(formatDate(lateEveningUtc, "fr", { timeZone: "UTC" })).toBe(
+      "8 oct. 2026",
+    );
+    expect(formatDate(lateEveningUtc, "fr", { timeZone: "Europe/Paris" })).toBe(
+      "9 oct. 2026",
+    );
+  });
+
+  test("rejects strings that aren't calendar dates", () => {
+    expect(() => formatDate("2026-10-08T12:00:00Z", "en")).toThrow(RangeError);
+    expect(() => formatDate("8 Oct 2026", "en")).toThrow(RangeError);
   });
 });
 
@@ -72,5 +86,15 @@ describe("formatCountry", () => {
   test("falls back to the code itself for anything that isn't a country", () => {
     expect(formatCountry("XX", "en")).toBe("XX");
     expect(formatCountry("norway", "en")).toBe("norway");
+  });
+});
+
+describe("formattersFor", () => {
+  test("binds every formatter to one language", () => {
+    const de = formattersFor("de", { timeZone: "UTC" });
+    expect(plain(de.money(123456, "EUR"))).toBe("1.234,56 €");
+    expect(plain(de.number(1234.5))).toBe("1.234,5");
+    expect(de.date("2026-10-08")).toBe("08.10.2026");
+    expect(de.country("NO")).toBe("Norwegen");
   });
 });

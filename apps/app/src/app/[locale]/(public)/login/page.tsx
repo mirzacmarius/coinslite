@@ -2,9 +2,10 @@ import { GoogleSignin } from "@/components/google-signin";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getScopedI18n } from "@/locales/server";
 
-export const metadata = {
-  title: "Login",
-};
+export async function generateMetadata() {
+  const t = await getScopedI18n("login");
+  return { title: t("title") };
+}
 
 export default async function Page() {
   const t = await getScopedI18n("login");
