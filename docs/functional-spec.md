@@ -1,0 +1,329 @@
+# CoinsLite functional specification
+
+What CoinsLite must do for its first release. It covers behaviour only. Screen structure, navigation, visual design and all wording are decided by the design system (milestone M1) and written fresh. Terms follow [`CONTEXT.md`](../CONTEXT.md).
+
+---
+
+## 1. Platform
+
+- Fully responsive web app for phone, tablet and desktop. Installable to the home screen.
+- When a new version is deployed, open sessions pick it up automatically (on focus, on returning to the tab, and periodically).
+- Signed-out visitors see the marketing site. Signed-in users go straight to the app.
+- Opening a protected page while signed out leads to sign-in and then back to that page.
+
+## 2. Accounts
+
+- **Sign-up methods:** email + password (min 8 characters), magic link, or Google.
+- **Sign-up:**
+  - Accepting the privacy policy and terms is required.
+  - Email/password accounts must verify their email before the account is active.
+  - The display name defaults to the local part of the email.
+  - The Home currency is preselected from the browser locale and can be changed.
+- **Sign-in:** password, magic link or Google.
+- **Password reset:** request a link by email, then set a new password.
+- **Change email:** a confirmation link goes to the new address. The change applies once it's confirmed.
+- **Sign out.**
+- **Delete account:** requires an explicit confirmation. It permanently removes the user, their Items, Albums, photos and subscription link.
+
+## 3. Languages and regional settings
+
+- **Launch languages:** English (default), Norwegian Bokmål, German, French, Romanian. Every screen, email, PDF and CSV header is translated. No mixed-language screens.
+- **Language choice:** the user's stored choice, else the browser language, else English. It can be switched from anywhere in the app.
+- **Translated:** UI text, country names, Item types, metals, Grading scale labels, Strike labels.
+- **Kept in the issuing country's language:** Catalog entry titles and series names.
+- **Numbers and dates:** formatted for the active language.
+- **Countries are stored as ISO codes** and shown translated.
+
+## 4. Home currency and money
+
+- Each user has exactly one Home currency: NOK, SEK, DKK, EUR, RON, GBP, USD or CHF.
+- All Purchase prices and Market values are entered and shown in the Home currency. Spot prices are converted into it.
+- **Changing the Home currency:**
+  - The user sees how many stored amounts will be converted, and at which exchange rate, and must confirm.
+  - Every stored amount is then converted at that day's rate.
+- Money is shown with the currency's symbol and conventional rounding for the active language.
+
+## 5. Items
+
+### 5.1 What an Item records
+- **Item type:** coin, banknote or stamp.
+- **Title:** required.
+- **Descriptive facts:** country, year, denomination, series, category, material, Strike (coins and banknotes), mint mark, ruler, mintage, diameter, thickness, Numista number.
+  - For an Item created from a Catalog entry, these come from the entry. The user may override any of them per Item, and overrides are kept when the entry changes.
+- **Grade:**
+  - A value picked from a Grading scale. The scale defaults to the country's default scale, and the user can switch to another scale for that Item type.
+  - An optional free-text grade note.
+- **Quantity:** whole number ≥ 1, default 1.
+- **Purchase:** Purchase price per piece, purchase date, and source (where it was acquired).
+- **Market value** per piece. Optional, entered by the user.
+- **Notes.**
+- **Album:** optional, at most one.
+- **Photos:** one per side, front and back (obverse and reverse for coins).
+- **Precious metal (coins):**
+  - a bullion flag
+  - metal (gold or silver)
+  - weight in grams
+  - purity (0–1)
+  - Weight and purity can only be set once a metal is chosen.
+
+### 5.2 Grading scales
+| Item type | Scales | Default |
+|---|---|---|
+| Coin | Sheldon 1–70; Norwegian (0, 0/01, 01, 1+, 1, 1−, 2, 3); European (UNC, XF, VF, F, VG, G) | Norway → Norwegian; USA → Sheldon; elsewhere → European |
+| Banknote | International (UNC, AU, XF, VF, F, VG, G, FR, PR); Norwegian 0–3 | Norway → Norwegian; elsewhere → International |
+| Stamp | Mint never hinged, mint hinged, used | — |
+
+Grades within a scale are ordered, so Items can be sorted and filtered by Grade.
+
+### 5.3 Strike
+Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grade, both on Catalog entries and on Items.
+
+### 5.4 Adding an Item
+- Pick the Item type first. Shortcuts elsewhere in the app can open the form with a type already chosen.
+- **Two ways to add:**
+  - **From the Catalog** (default for coins and banknotes): pick a Catalog entry with the picker (§6.2). The descriptive facts come from the entry.
+  - **Manually:** the user types the descriptive facts. Stamps are always added manually.
+- **Bullion presets** fill metal, weight, purity, country and title (title only if it's empty):
+
+| Preset | Metal | Weight g | Purity | Country |
+|---|---|---|---|---|
+| Krugerrand 1 oz / ½ / ¼ / 1⁄10 | gold | 33.93 / 16.965 / 8.482 / 3.393 | 0.9167 | ZA |
+| Maple Leaf 1 oz | gold | 31.103 | 0.9999 | CA |
+| Britannia 1 oz | gold | 31.103 | 0.9999 | GB |
+| Vienna Philharmonic 1 oz | gold | 31.103 | 0.9999 | AT |
+| American Eagle 1 oz | gold | 33.93 | 0.9167 | US |
+| American Buffalo 1 oz | gold | 31.103 | 0.9999 | US |
+| Panda 30 g | gold | 30 | 0.9999 | CN |
+| Maple Leaf 1 oz | silver | 31.103 | 0.9999 | CA |
+| American Eagle 1 oz | silver | 31.103 | 0.999 | US |
+| Britannia 1 oz | silver | 31.103 | 0.999 | GB |
+| Vienna Philharmonic 1 oz | silver | 31.103 | 0.999 | AT |
+| Krugerrand 1 oz | silver | 31.107 | 0.999 | ZA |
+| Panda 30 g | silver | 30 | 0.999 | CN |
+
+- **Albums in the form:** the user can pick an Album or create one inline. If they have exactly one Album, it is preselected.
+- **Optional fields** are grouped so the basic form stays short. The group opens automatically when it already holds values.
+- **Free plan limit:** with 50 Items, adding or duplicating is blocked with an upgrade path. A warning appears from 40 Items. The limit is enforced on the server.
+
+### 5.5 Editing, duplicating, deleting
+- **Edit** changes any field, photos included.
+- **Duplicate** opens the form prefilled from an existing Item and saves it as a new Item. Photos are not copied unless the user adds them.
+- **Delete** requires a confirmation and removes the Item **and its stored photos**.
+
+### 5.6 Photos
+- Accepted: JPEG, PNG, WebP or GIF, up to 10 MB. The type is checked from the file's content, not only its name.
+- Stored privately and only visible to the owner.
+- Each side can be added, replaced or removed independently. A photo opens in a full-screen viewer.
+- The list thumbnail is the front photo, else the back photo, else a placeholder for the Item type.
+
+### 5.7 Item detail
+- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Purchase price, Market value, purchase date and source, notes and Album.
+- For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity**.
+- Actions: edit, duplicate, delete.
+
+## 6. Catalog
+
+### 6.1 Structure
+- The Catalog is a tree.
+  - **Roots** are countries or **Themes**: groups spanning several countries, such as 2-euro commemoratives.
+  - **Grouping nodes** sit below them (category, denomination, series, and so on).
+  - **Leaves** are Catalog entries, which are the only nodes an Item can be created from.
+- **A Catalog entry holds:**
+  - Item type, title, country, denomination, series, material, Strike
+  - metal, weight, fineness, diameter
+  - year from and year to
+  - technical details, historical notes
+  - an image
+  - a sort order
+- **Every Catalog image and note records** its source, author, licence and link. Attribution is shown wherever the licence requires it.
+- **The seed Catalog** brings over factual fields only. Images and notes come from sources whose licence allows commercial use.
+
+### 6.2 Catalog picker (used when adding Items)
+- **Search:**
+  - Starts at 2 characters. Matches the chosen Item type's Catalog entries by title, denomination, series or country.
+  - Several words match in any order. Results are grouped by country and series, capped at 50, with a prompt to refine.
+- **Recently picked:** up to 6 entries per Item type, remembered on the device.
+- **Browse:**
+  1. Countries and Themes, each with its entry count, sorted by count.
+  2. For a Theme: its countries.
+  3. Within a country, one of two paths:
+     - Walk its grouping nodes, used when the country's entries are organised that way.
+     - Or **denomination → series → entries**. Denominations sort by face value, treating minor units (øre, cent, penny…) as hundredths. Series sort by first year. Entries without a series or denomination are grouped explicitly.
+  4. **Entry list:** sorted by year, then sort order. Shows years, denomination, metal, weight and fineness, and loads more in pages of 50.
+- **Picking an entry** links the new Item to it and fills the descriptive facts.
+- **Multi-select (Set mode):**
+  - Select several entries, or all the user is missing.
+  - Entries already in the Collection are marked with how many the user holds, and stay unselectable unless the user deliberately allows a duplicate.
+  - Up to **200** entries per operation.
+  - Before adding, the user chooses a target Album and sees their remaining Free plan quota. If the selection exceeds the quota, an upgrade path is offered.
+  - Each selected entry becomes **one Item**.
+
+### 6.3 Catalog browsing
+- **Browse** the tree with a breadcrumb and back navigation. Every level has its own URL so it can be linked and bookmarked.
+- **Search:** across all nodes.
+- **Each row shows:** image, title, key facts or child count, country (when it differs from the user's), and how many the user holds.
+- **Entry detail:**
+  - Image (with attribution), country, denomination, years, series, Strike, material, metal facts, historical notes and technical details.
+  - How many the user holds.
+  - **Quick add:** choose a Quantity and a Grade, then create **one** Item with that Quantity. It respects the Free plan limit and lets the user pick an Album.
+- **Admins** can edit an entry directly from its detail view.
+
+### 6.4 Sets
+- Any grouping node with more than one Catalog entry below it can be viewed as a **Set**.
+- **The Set view:**
+  - Lists every entry below the node, grouped by sub-group and sorted by year.
+  - Shows completion (held / total and %).
+  - Can show everything or only what's missing. Missing-only is the default for large Sets (> 40 entries).
+- **Adding from a Set** follows the multi-select rules in §6.2.
+
+## 7. Collection
+
+- **Spot price:** gold and silver, per gram and per troy ounce (31.1034768 g), in the Home currency, with the time of the last update. Refreshes at least every 15 minutes.
+- **Totals over the whole Collection** (not the filtered view), each clearly labelled as counting Items or pieces:
+  - number of Items; number of pieces per Item type
+  - total Purchase price, total Market value, Gain/loss
+  - gold and silver Metal value with the total fine weight, shown only when non-zero
+- **Charts:**
+  - **Value by date added:** cumulative Purchase price and Market value by the month Items were added.
+  - **Value distribution:** by Item type, plus gold and silver Metal value.
+- **Search:** title, denomination, country.
+- **Filters:**
+  - Item type, plus bullion-only for coins
+  - origin: all, the user's own country, or foreign
+  - a specific country
+  - denomination
+  - Grade
+  - Album: all, one Album, or without an Album, each with counts
+- **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
+- **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, denomination, Grade.
+- **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device.
+- **Export (Premium), covering the current filtered view:**
+  - **PDF, A4 landscape:**
+    - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
+    - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
+    - A totals row and page numbers.
+  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source.
+
+## 8. Albums
+
+- **Create:** name (required, ≤ 80 characters), optional description (≤ 300), and a colour from a fixed palette.
+- **Edit:** name, description and colour.
+- **List:** each Album with its description and number of Items. Opening an Album shows the Collection filtered to it.
+- **Delete:** the user sees the Album's Items and ticks any that should be deleted too, e.g. Items they have sold.
+  - Unticked Items stay in the Collection without an Album.
+  - The Album itself is always removed.
+  - The confirmation states how many Items will be permanently deleted.
+
+## 9. Overview (home)
+
+- **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss.
+- **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
+- **Shortcuts:** add a coin, a banknote or a stamp, each opening the form with that type chosen.
+- **Latest Items:** the three most recently added, each with thumbnail, year and denomination. When the Collection is empty, a first-run prompt to add an Item.
+
+## 10. Insurance report (Premium)
+
+- **Scope:** the whole Collection, chosen Albums, and/or Items without an Album.
+- **Value columns:** Purchase price, Market value, Metal value, Insured value.
+  - Defaults: Purchase price off, the others on.
+  - At least one of Purchase price, Market value or Metal value must stay selected.
+- **Preview:** piece count, a total for each selected column, and the total Insured value.
+- **Per Item:**
+  - `qty = Quantity`
+  - `purchase = Purchase price × qty`
+  - `market = Market value × qty`
+  - `metal = weight × purity × Spot price × qty` (gold/silver Items with a weight)
+  - `insured = max(selected values)`
+- **PDF, A4 landscape, in the active language:**
+  - Header: generation time, piece and Item counts, chosen scope, and the owner's name, email, phone and address from their Account.
+  - The Spot prices used, when Metal value or Insured value is included.
+  - A summary of totals, then one row per Item: type, title, year, denomination, Grade, Quantity and the selected values.
+  - A totals row and page numbers.
+  - A closing note: values are stated by the owner, Metal value is weight × purity × Spot price, and Insured value is the highest selected value per Item.
+
+## 11. Plans and billing
+
+- **Free plan:** up to **50 Items**, counted as Items, not pieces. After leaving Premium, every Item stays visible and editable, but none can be added while over 50.
+- **Premium:** unlimited Items, the Insurance report, and PDF/CSV export.
+- **Prices (monthly / yearly):**
+
+| Currency | Monthly | Yearly |
+|---|---|---|
+| NOK | 39 | 349 |
+| EUR (fallback) | 3.49 | 29.99 |
+| USD | 3.99 | 34.99 |
+| RON | 17.99 | 149.99 |
+
+- **Billing:** through Polar, which picks the currency from the buyer's location and falls back to EUR. Sandbox until launch.
+- **Checkout** returns to a confirmation page. Premium activates when the payment provider confirms the subscription.
+- **Premium is active** while the subscription is active, trialing or past due and its period hasn't ended. A cancelled subscription stays Premium until the end of the paid period.
+- **Manage subscription:** from Account, opening the provider's portal. Shows the plan (monthly/yearly) and the renewal or end date.
+- **No ads anywhere.**
+
+## 12. Account
+
+- **Header:** name or email, plan, and renewal or end date.
+- **Contact and address:** display name, full name, address, postal code, city, country, phone. Used on the Insurance report.
+- **Settings and links:**
+  - Home currency (§4)
+  - language
+  - change email
+  - manage subscription, or upgrade
+  - Albums
+  - Updates, marked when there's an unseen release
+  - Insurance report, locked with an upgrade path on the Free plan
+- **Send feedback:** a free-text message that reaches the team by email.
+- **Sign out, delete account.**
+
+## 13. Updates
+
+- A versioned list of releases, grouped into new Catalog content, features, improvements and fixes.
+- The app stores the last release each user has seen. After a new release, the user is shown its highlights once, with a link to the full list.
+- Opening the list marks the latest release as seen.
+- New accounts don't see a prompt until the next release.
+
+## 14. Spot prices and exchange rates
+
+- One provider supplies gold and silver spot prices and currency exchange rates, under a licence that allows commercial use.
+- A scheduled job stores the latest values every 15 minutes, so the cost doesn't grow with the number of users. All conversions use the stored values.
+
+## 15. Administration
+
+- **Access:** admins are users with the admin role. Admin areas are unavailable to everyone else.
+- **Catalog editor:**
+  - A collapsible tree of every node. Add a root (country or Theme), add a child, edit, delete. Deletion states how many nodes below will go with it.
+  - **Editable fields:** every Catalog field, including Item type (coin or banknote), country, metal, weight, fineness, diameter, Strike, the addable flag, sort order, and the image with its attribution.
+  - **Images** are converted to WebP: full size (longest side ≤ 800 px) and a thumbnail (≤ 128 px), never upscaled.
+- **Catalog CSV export/import:**
+  - **Columns:** `id, parent_id, item_type, title, country, denomination, series, material, strike, metal, weight_g, fineness, diameter_mm, year_from, year_to, technical_details, historical_notes, image_url, image_source, image_author, image_licence, sort_order, is_addable`.
+  - **Import:**
+    - Shows how many rows will be inserted or updated before confirming.
+    - Updates existing ids, inserts new ones, and allows parent references to other rows in the same file.
+    - Rejects rows without a title, reporting the row numbers.
+- **Stats:**
+  - users: total, new in the last 30 days, Premium, Free
+  - subscriptions: active, ending within 30 days, ended
+  - Collection: Items, coins, banknotes, stamps, Albums
+  - activity: Items added in the last 24 h and 7 days, Albums created in the last 30 days
+- **Users:**
+  - Search by name or email, filter by plan.
+  - Sort by name, email, created, plan, plan end, Items, Albums or last sign-in.
+  - A detail view shows profile, account dates, role, subscription and Collection counts.
+  - Read-only.
+- **Feature flags:**
+  - Catalog visibility in navigation.
+  - Scanner availability: off, admins only, or Premium beta.
+
+## 16. Scanner (last milestone, behind a flag)
+
+- The user photographs both sides of a coin with on-screen guidance.
+- The server suggests the matching Catalog entry, or the descriptive facts if there's no match, using an AI vision model and coin reference data.
+- Suggestions open in the add form, clearly marked as suggestions. The user must review them before saving, and the photos come along.
+- Starts as a Premium beta. The AI provider is chosen when the milestone starts.
+
+## 17. Open items
+
+- Spot price and exchange-rate provider: MetalpriceAPI paid plan preferred, metalcharts.org fallback. The licence must be confirmed before launch.
+- Legal operator for privacy policy, terms and billing: before launch.
+- AI provider for the scanner: when that milestone starts.
+- Marketing site and guides: written after the app reaches feature completeness.
