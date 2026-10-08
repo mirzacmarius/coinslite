@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { appUrl, webUrl } from "./urls";
+import { appUrl, isRemote, webUrl } from "./urls";
 
 const isCI = !!process.env.CI;
 
@@ -13,22 +13,31 @@ export default defineConfig({
   reporter: isCI ? [["github"], ["list"]] : "list",
   use: {
     trace: "retain-on-failure",
+    // Lets the suite through Vercel's deployment protection on previews.
+    extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? {
+          "x-vercel-protection-bypass":
+            process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+        }
+      : undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: [
-    {
-      command: "bun run dev",
-      cwd: "../../apps/app",
-      url: appUrl,
-      reuseExistingServer: !isCI,
-      timeout: 120_000,
-    },
-    {
-      command: "bun run dev",
-      cwd: "../../apps/web",
-      url: webUrl,
-      reuseExistingServer: !isCI,
-      timeout: 120_000,
-    },
-  ],
+  webServer: isRemote
+    ? undefined
+    : [
+        {
+          command: "bun run dev",
+          cwd: "../../apps/app",
+          url: appUrl,
+          reuseExistingServer: !isCI,
+          timeout: 120_000,
+        },
+        {
+          command: "bun run dev",
+          cwd: "../../apps/web",
+          url: webUrl,
+          reuseExistingServer: !isCI,
+          timeout: 120_000,
+        },
+      ],
 });

@@ -43,3 +43,13 @@ bun run test:e2e    # Playwright smoke tests; starts both apps if they aren't ru
 The first Playwright run needs a browser: `bunx playwright install chromium`.
 
 CI runs all four on every push and pull request.
+
+## Deployments
+
+- **Hosting:** Vercel, team orvibo. `coinslite-app` builds `apps/app` and `coinslite-web` builds `apps/web`. Every push gets a preview, and `main` deploys to production.
+- **Backend:** Convex project `coinslite` (team museumlite).
+  - Production deploys use the production deploy key.
+  - Each preview branch gets its own preview deployment, through the preview deploy key. Both keys are stored as `CONVEX_DEPLOY_KEY` in Vercel.
+- **Preview settings:** previews take their sign-in keys from the Convex project's default preview variables. The build sets each preview's `SITE_URL` to its branch URL (`packages/backend/scripts/vercel-build-app.sh`).
+- **New deployment's sign-in keys:** `bun scripts/set-auth-keys.ts <app-url> [--prod]` in `packages/backend`.
+- **Smoke tests against a deployment:** set `E2E_APP_URL` and `E2E_WEB_URL`, plus `VERCEL_AUTOMATION_BYPASS_SECRET` if deployment protection is on, then run `bun run test:e2e`.
