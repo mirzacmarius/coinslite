@@ -427,3 +427,89 @@ test("nobody edits or duplicates someone else's Item", async () => {
     "Morgan dollar 1881-S",
   );
 });
+
+/** A JPEG put in storage the way the browser uploads one, then attached. */
+async function addPhoto(
+  t: Test,
+  who: Awaited<ReturnType<typeof person>>,
+  itemId: Id<"items">,
+  side: "front" | "back",
+) {
+  const jpeg = new Uint8Array(64);
+  jpeg.set([0xff, 0xd8, 0xff, 0xe0, side === "front" ? 1 : 2]);
+  const storageId = await t.run((ctx) => ctx.storage.store(new Blob([jpeg])));
+  await who.as.action(api.photos.attach, { itemId, side, storageId });
+}
+const storedFiles = (t: Test) =>
+  t.run(
+    async (ctx) => (await ctx.db.system.query("_storage").collect()).length,
+  );
+
+test("deleting an Item removes it and its stored photos, and nothing else", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, morgan);
+  const kept = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  await addPhoto(t, ada, itemId, "front");
+  await addPhoto(t, ada, itemId, "back");
+  await addPhoto(t, ada, kept, "front");
+
+  await ada.as.mutation(api.items.remove, { itemId });
+
+  expect(await ada.as.query(api.items.get, { itemId })).toBeNull();
+  const { page } = await ada.as.query(api.items.list, {
+    paginationOpts: firstPage,
+  });
+  expect(page.map(({ title }) => title)).toEqual(["Krone"]);
+  expect(await storedFiles(t)).toBe(1);
+  expect(await ada.as.query(api.photos.ofItem, { itemId: kept })).toEqual({
+    front: expect.any(String),
+    back: null,
+  });
+  await expect(ada.as.mutation(api.items.remove, { itemId })).rejects.toThrow(
+    "ITEM_NOT_FOUND",
+  );
+});
+
+test("nobody deletes someone else's Item", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  const itemId = await ada.as.mutation(api.items.add, morgan);
+  await addPhoto(t, ada, itemId, "front");
+
+  await expect(bob.as.mutation(api.items.remove, { itemId })).rejects.toThrow(
+    "ITEM_NOT_FOUND",
+  );
+  await expect(t.mutation(api.items.remove, { itemId })).rejects.toThrow(
+    "NOT_SIGNED_IN",
+  );
+  expect(await ada.as.query(api.items.get, { itemId })).not.toBeNull();
+  expect(await storedFiles(t)).toBe(1);
+});
+
+test("duplicating leaves the photos behind, and editing keeps them", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, morgan);
+  await addPhoto(t, ada, itemId, "front");
+  await addPhoto(t, ada, itemId, "back");
+  const photos = await ada.as.query(api.photos.ofItem, { itemId });
+
+  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
+  await ada.as.mutation(api.items.update, {
+    itemId,
+    ...morgan,
+    title: "Morgan dollar 1881-O",
+  });
+
+  expect(await ada.as.query(api.photos.ofItem, { itemId: copyId })).toEqual({
+    front: null,
+    back: null,
+  });
+  expect(await ada.as.query(api.photos.ofItem, { itemId })).toEqual(photos);
+  expect(await storedFiles(t)).toBe(2);
+});

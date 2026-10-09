@@ -338,4 +338,51 @@ export default {
       tryAgain: "Couldn't confirm just now. Try again.",
     },
   },
+  photos: {
+    title: "Photos",
+    sides: {
+      front: "Front",
+      back: "Back",
+      obverse: "Obverse",
+      reverse: "Reverse",
+    },
+    add: "Add photo",
+    formats: "JPEG, PNG, WebP or GIF, up to 10 MB",
+    uploading: "Uploading photo",
+    view: "View full screen",
+    actions: "Photo actions",
+    replace: "Replace photo",
+    remove: "Remove photo",
+    removeTitles: {
+      front: "Remove the front photo?",
+      back: "Remove the back photo?",
+      obverse: "Remove the obverse photo?",
+      reverse: "Remove the reverse photo?",
+    },
+    removeBody:
+      "The photo is deleted for good. You can add a new one any time.",
+    cancel: "Cancel",
+    close: "Close",
+    previous: "Previous photo",
+    next: "Next photo",
+    errors: {
+      tooLarge: "That file is larger than 10 MB. Pick a smaller photo.",
+      notAnImage: "That file isn't a JPEG, PNG, WebP or GIF image.",
+      failed: "The photo couldn't be saved. Try again.",
+      removeFailed: "The photo couldn't be removed. Try again.",
+    },
+  },
+  deleteItem: {
+    delete: "Delete",
+    title: "Delete “{title}”?",
+    body: "The Item is deleted for good. This can't be undone.",
+    bodyOnePhoto:
+      "The Item and its photo are deleted for good. This can't be undone.",
+    bodyTwoPhotos:
+      "The Item and its 2 photos are deleted for good. This can't be undone.",
+    confirm: "Delete Item",
+    cancel: "Cancel",
+    deleted: "Item deleted",
+    failed: "The Item couldn't be deleted. Try again.",
+  },
 } as const;

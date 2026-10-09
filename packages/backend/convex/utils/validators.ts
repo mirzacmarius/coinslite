@@ -2,6 +2,7 @@ import { homeCurrencies, locales } from "@coinslite/i18n";
 import { v } from "convex/values";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
+import { photoSides } from "../photos/rules";
 
 /** A validator accepting exactly the given strings, e.g. the supported locales. */
 function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
@@ -31,3 +32,5 @@ export const gradingScale = literalUnion(
 export const strike = literalUnion(strikes);
 /** One of the coin materials in items/rules.ts. */
 export const material = literalUnion(materials);
+/** Which side of an Item a photo shows: front or back. */
+export const photoSide = literalUnion(photoSides);

@@ -356,4 +356,52 @@ export default {
         "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
+  photos: {
+    title: "Fotos",
+    sides: {
+      front: "Vorderseite",
+      back: "Rückseite",
+      obverse: "Avers",
+      reverse: "Revers",
+    },
+    add: "Foto hinzufügen",
+    formats: "JPEG, PNG, WebP oder GIF, bis 10 MB",
+    uploading: "Foto wird hochgeladen",
+    view: "Im Vollbild ansehen",
+    actions: "Fotoaktionen",
+    replace: "Foto ersetzen",
+    remove: "Foto entfernen",
+    removeTitles: {
+      front: "Foto der Vorderseite entfernen?",
+      back: "Foto der Rückseite entfernen?",
+      obverse: "Foto des Avers entfernen?",
+      reverse: "Foto des Revers entfernen?",
+    },
+    removeBody:
+      "Das Foto wird endgültig gelöscht. Du kannst jederzeit ein neues hinzufügen.",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    previous: "Vorheriges Foto",
+    next: "Nächstes Foto",
+    errors: {
+      tooLarge: "Die Datei ist größer als 10 MB. Wähle ein kleineres Foto.",
+      notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
+      failed: "Das Foto konnte nicht gespeichert werden. Versuche es erneut.",
+      removeFailed:
+        "Das Foto konnte nicht entfernt werden. Versuche es erneut.",
+    },
+  },
+  deleteItem: {
+    delete: "Löschen",
+    title: "„{title}“ löschen?",
+    body: "Das Objekt wird endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    bodyOnePhoto:
+      "Das Objekt und sein Foto werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    bodyTwoPhotos:
+      "Das Objekt und seine 2 Fotos werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    confirm: "Objekt löschen",
+    cancel: "Abbrechen",
+    deleted: "Objekt gelöscht",
+    failed: "Das Objekt konnte nicht gelöscht werden. Versuche es erneut.",
+  },
 } as const satisfies Dictionary;
