@@ -22,20 +22,53 @@ export function isHomeCurrency(value: unknown): value is HomeCurrency {
 /** Every Home currency divides into 100 minor units (øre, cents, bani, pence, rappen). */
 const MINOR_UNITS_PER_MAJOR = 100;
 
+/**
+ * Money shows the currency's symbol (spec §4). Intl's plain "symbol" keeps the
+ * ISO code wherever a symbol could be confused with another currency's
+ * ("NOK 1,234.56" in English), so the narrow symbol is used. That turns NOK,
+ * SEK and DKK all into "kr", which is fine: a person sees one Home currency
+ * only, and every export that leaves the app states its ISO code in words.
+ */
+const currencyDisplay = "narrowSymbol";
+
+/**
+ * The narrow symbol for the leu is "L" outside Romanian and English; "lei" is
+ * what Romanians write, and "L" alone could be any of several currencies.
+ */
+const symbolOverrides: Partial<Record<HomeCurrency, string>> = { RON: "lei" };
+
+export type MoneyFormatOptions = {
+  /** Shows a "+" on gains and a minus on losses, as Gain/loss does. */
+  signed?: boolean;
+  /** Abbreviates large amounts to one decimal, e.g. for chart axes: "kr 150K". */
+  compact?: boolean;
+};
+
 /** Formats an amount stored in whole minor units, e.g. 123456 NOK øre → "1 234,56 kr". */
 export function formatMoney(
   amountMinor: number,
   currency: HomeCurrency,
   locale: Locale,
+  { signed = false, compact = false }: MoneyFormatOptions = {},
 ): string {
   if (!Number.isInteger(amountMinor)) {
     throw new RangeError(
       `Money amounts are whole minor units, got ${amountMinor}`,
     );
   }
-  return new Intl.NumberFormat(locale, { style: "currency", currency }).format(
-    amountMinor / MINOR_UNITS_PER_MAJOR,
-  );
+  const parts = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    currencyDisplay,
+    ...(signed && { signDisplay: "exceptZero" }),
+    ...(compact && { notation: "compact", maximumFractionDigits: 1 }),
+  }).formatToParts(amountMinor / MINOR_UNITS_PER_MAJOR);
+  const symbol = symbolOverrides[currency];
+  return parts
+    .map((part) =>
+      symbol !== undefined && part.type === "currency" ? symbol : part.value,
+    )
+    .join("");
 }
 
 export function formatNumber(
@@ -104,8 +137,11 @@ export function formattersFor(
   { timeZone }: { timeZone?: string } = {},
 ) {
   return {
-    money: (amountMinor: number, currency: HomeCurrency) =>
-      formatMoney(amountMinor, currency, locale),
+    money: (
+      amountMinor: number,
+      currency: HomeCurrency,
+      options?: MoneyFormatOptions,
+    ) => formatMoney(amountMinor, currency, locale, options),
     number: (value: number, options?: Intl.NumberFormatOptions) =>
       formatNumber(value, locale, options),
     date: (value: string | number | Date) =>

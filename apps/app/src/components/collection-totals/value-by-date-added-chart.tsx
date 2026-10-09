@@ -106,11 +106,8 @@ export function ValueByDateAddedChart({
             names={names}
             money={money}
             compactMoney={(amount) =>
-              format.number(amount / 100, {
-                style: "currency",
-                currency: totals.currency,
-                notation: "compact",
-                maximumFractionDigits: 1,
+              format.money(Math.round(amount), totals.currency, {
+                compact: true,
               })
             }
             monthLabel={monthLabel}

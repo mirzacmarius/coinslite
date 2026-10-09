@@ -84,15 +84,11 @@ export async function collectionPdf(
   const format = formattersFor(locale, { timeZone });
   const money = (amount: number | undefined) =>
     amount === undefined ? "" : format.money(amount, currency);
-  /** A Gain/loss with its sign, as the Collection page shows it: "+NOK 150.00". */
+  /** A Gain/loss with its sign, as the Collection page shows it: "+kr 150.00". */
   const signed = (amount: number | undefined) =>
     amount === undefined
       ? ""
-      : format.number(amount / 100, {
-          style: "currency",
-          currency,
-          signDisplay: "exceptZero",
-        });
+      : format.money(amount, currency, { signed: true });
   const totalGainLoss =
     totals.gainLoss.items > 0 ? signed(totals.gainLoss.amount) : undefined;
   const ownerName = owner.name ?? owner.email;
