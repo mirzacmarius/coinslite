@@ -14,7 +14,7 @@ import {
   useAuthSchemas,
   useSubmitState,
 } from "./use-auth-form";
-import { type AuthStepResult, usePasswordAuth } from "./use-password-auth";
+import { type AuthStepResult, useAuthStep } from "./use-auth-step";
 
 /**
  * "Check your email": verifies an address with the emailed code, then signs in
@@ -32,7 +32,7 @@ export function CodeStep({
   onBack: () => void;
 }) {
   const t = useI18n();
-  const attempt = usePasswordAuth();
+  const attempt = useAuthStep("password");
   const schemas = useAuthSchemas();
   const [message, setMessage] = useState<FormMessageState>();
   const codeInput = useRef<HTMLInputElement>(null);

@@ -1,6 +1,6 @@
 import type { Locale } from "@coinslite/i18n";
 
-export type CodeEmailKind = "verify-email" | "reset-password";
+export type CodeEmailKind = "verify-email" | "reset-password" | "magic-link";
 
 type Message = {
   subject: string;
@@ -26,6 +26,12 @@ export const codeEmailMessages: Record<
         `Use ${code} to reset your CoinsLite password. It expires in 15 minutes. If you didn't ask for this, you can ignore this email.`,
       linkLabel: "Choose a new password",
     },
+    "magic-link": {
+      subject: "Your CoinsLite sign-in link",
+      body: () =>
+        "Use this link to sign in to CoinsLite. It works once and expires in 15 minutes. If you didn't ask for it, you can ignore this email.",
+      linkLabel: "Sign in to CoinsLite",
+    },
   },
   nb: {
     "verify-email": {
@@ -39,6 +45,12 @@ export const codeEmailMessages: Record<
       body: (code) =>
         `Bruk ${code} for å tilbakestille passordet ditt for CoinsLite. Koden utløper om 15 minutter. Hvis du ikke ba om dette, kan du se bort fra e-posten.`,
       linkLabel: "Velg et nytt passord",
+    },
+    "magic-link": {
+      subject: "Innloggingslenken din for CoinsLite",
+      body: () =>
+        "Bruk denne lenken for å logge inn på CoinsLite. Den virker én gang og utløper om 15 minutter. Hvis du ikke ba om den, kan du se bort fra e-posten.",
+      linkLabel: "Logg inn på CoinsLite",
     },
   },
   de: {
@@ -54,6 +66,12 @@ export const codeEmailMessages: Record<
         `Mit ${code} setzt du dein CoinsLite-Passwort zurück. Der Code läuft in 15 Minuten ab. Wenn du das nicht angefordert hast, ignoriere diese E-Mail einfach.`,
       linkLabel: "Neues Passwort wählen",
     },
+    "magic-link": {
+      subject: "Dein Anmeldelink für CoinsLite",
+      body: () =>
+        "Mit diesem Link meldest du dich bei CoinsLite an. Er funktioniert einmal und läuft in 15 Minuten ab. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail einfach.",
+      linkLabel: "Bei CoinsLite anmelden",
+    },
   },
   fr: {
     "verify-email": {
@@ -68,6 +86,12 @@ export const codeEmailMessages: Record<
         `Utilisez ${code} pour réinitialiser votre mot de passe CoinsLite. Il expire dans 15 minutes. Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail.`,
       linkLabel: "Choisir un nouveau mot de passe",
     },
+    "magic-link": {
+      subject: "Votre lien de connexion CoinsLite",
+      body: () =>
+        "Utilisez ce lien pour vous connecter à CoinsLite. Il ne fonctionne qu’une fois et expire dans 15 minutes. Si vous ne l’avez pas demandé, ignorez cet e-mail.",
+      linkLabel: "Se connecter à CoinsLite",
+    },
   },
   ro: {
     "verify-email": {
@@ -81,6 +105,12 @@ export const codeEmailMessages: Record<
       body: (code) =>
         `Folosește ${code} pentru a-ți reseta parola CoinsLite. Codul expiră în 15 minute. Dacă nu ai cerut asta, ignoră acest e-mail.`,
       linkLabel: "Alege o parolă nouă",
+    },
+    "magic-link": {
+      subject: "Linkul tău de conectare CoinsLite",
+      body: () =>
+        "Folosește acest link ca să te conectezi la CoinsLite. Funcționează o singură dată și expiră în 15 minute. Dacă nu l-ai cerut, ignoră acest e-mail.",
+      linkLabel: "Conectează-te la CoinsLite",
     },
   },
 };

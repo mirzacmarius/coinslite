@@ -50,7 +50,7 @@ export default {
       termsRequired: "Accept the privacy policy and terms of use to continue.",
       haveAccount: "Already have an account?",
       failed:
-        "We couldn't create the account. If you already have one, sign in or reset your password.",
+        "We couldn't create the account. If you already have one, sign in with your password, a sign-in link or Google.",
     },
     fields: {
       email: "Email",
@@ -76,8 +76,9 @@ export default {
     },
     verify: {
       pageTitle: "Verify email",
-      title: "Verifying your email",
-      working: "One moment…",
+      title: "Verify your email",
+      description: "Confirm that {email} is yours to finish signing up.",
+      confirm: "Verify my email",
       failed:
         "This link has expired or was already used. Sign in to get a new code.",
       noLink:
@@ -93,6 +94,33 @@ export default {
       newPasswordTitle: "Choose a new password",
       submit: "Save password",
       failed: "That code didn't work or has expired. Ask for a new one.",
+    },
+    methods: {
+      or: "or",
+      google: "Continue with Google",
+      link: "Email me a sign-in link",
+    },
+    link: {
+      pageTitle: "Sign in with a link",
+      title: "Sign in with a link",
+      description:
+        "We'll email you a link that signs you in. New to CoinsLite? The same link creates your account.",
+      submit: "Email me a link",
+      sentTitle: "Check your email",
+      sent: "We sent a sign-in link to {email}. It works once and expires in 15 minutes.",
+      usePassword: "Use a password instead",
+      failed:
+        "This sign-in link has expired or was already used. Ask for a new one.",
+      confirmTitle: "Sign in to CoinsLite",
+      confirmDescription: "Continue as {email}.",
+      confirm: "Sign in",
+    },
+    welcome: {
+      pageTitle: "Finish setting up",
+      title: "Finish setting up your account",
+      description:
+        "Signed in as {email}. Choose your Home currency and accept the terms to start.",
+      submit: "Start using CoinsLite",
     },
     backToSignIn: "Back to sign in",
     noMatches: "No matches",

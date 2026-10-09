@@ -22,7 +22,7 @@ import {
   useAuthSchemas,
   useSubmitState,
 } from "./use-auth-form";
-import { usePasswordAuth } from "./use-password-auth";
+import { useAuthStep } from "./use-auth-step";
 
 /** Forgot password: email a code, then choose a new password with it. */
 export function ResetFlow({ next }: { next: string }) {
@@ -61,7 +61,7 @@ function RequestStep({
   onSent,
 }: { next: string; onSent: (email: string) => void }) {
   const t = useI18n();
-  const attempt = usePasswordAuth();
+  const attempt = useAuthStep("password");
   const schemas = useAuthSchemas();
   const form = useForm({
     defaultValues: { email: "" },
@@ -110,7 +110,7 @@ function NewPasswordStep({
   next,
 }: { email: string; code: string; next: string }) {
   const t = useI18n();
-  const attempt = usePasswordAuth();
+  const attempt = useAuthStep("password");
   const schemas = useAuthSchemas();
   const [message, setMessage] = useState<FormMessageState | undefined>(
     code

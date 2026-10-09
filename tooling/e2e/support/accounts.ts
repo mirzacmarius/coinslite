@@ -6,23 +6,34 @@ export const password = "correct horse battery";
 export const newEmail = () =>
   `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
 
-/** The newest code emailed to an address, read from the test backend's outbox. */
-export function latestCode(email: string): string {
+function runInBackend(functionName: string, args: object) {
   const output = execFileSync(
     "npx",
-    [
-      "convex",
-      "run",
-      "accounts/emails:latestCodeFor",
-      JSON.stringify({ email }),
-    ],
+    ["convex", "run", functionName, JSON.stringify(args)],
     {
       cwd: backendDir,
       env: { ...process.env, CONVEX_AGENT_MODE: "anonymous" },
       encoding: "utf8",
     },
   );
-  const code = JSON.parse(output.trim());
+  return JSON.parse(output.trim()) as unknown;
+}
+
+/**
+ * The link in the newest email to an address, pointed at the app under test
+ * (the backend may know the app by another origin).
+ */
+export function latestLink(email: string): string {
+  const link = runInBackend("accounts/emails:latestLinkFor", { email });
+  if (typeof link !== "string")
+    throw new Error(`No link was emailed to ${email}`);
+  const { pathname, search, hash } = new URL(link);
+  return `${appUrl}${pathname}${search}${hash}`;
+}
+
+/** The newest code emailed to an address, read from the test backend's outbox. */
+export function latestCode(email: string): string {
+  const code = runInBackend("accounts/emails:latestCodeFor", { email });
   if (typeof code !== "string")
     throw new Error(`No code was emailed to ${email}`);
   return code;

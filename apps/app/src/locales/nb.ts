@@ -53,7 +53,7 @@ export default {
         "Godta personvernerklæringen og vilkårene for bruk for å fortsette.",
       haveAccount: "Har du allerede en konto?",
       failed:
-        "Vi kunne ikke opprette kontoen. Har du allerede en, kan du logge inn eller tilbakestille passordet.",
+        "Vi kunne ikke opprette kontoen. Har du allerede en, kan du logge inn med passord, innloggingslenke eller Google.",
     },
     fields: {
       email: "E-post",
@@ -80,8 +80,9 @@ export default {
     },
     verify: {
       pageTitle: "Bekreft e-post",
-      title: "Bekrefter e-postadressen din",
-      working: "Et øyeblikk …",
+      title: "Bekreft e-postadressen",
+      description: "Bekreft at {email} er din for å fullføre registreringen.",
+      confirm: "Bekreft e-postadressen",
       failed:
         "Lenken er utløpt eller allerede brukt. Logg inn for å få en ny kode.",
       noLink:
@@ -98,6 +99,32 @@ export default {
       newPasswordTitle: "Velg et nytt passord",
       submit: "Lagre passordet",
       failed: "Koden fungerte ikke eller er utløpt. Be om en ny.",
+    },
+    methods: {
+      or: "eller",
+      google: "Fortsett med Google",
+      link: "Send meg en innloggingslenke",
+    },
+    link: {
+      pageTitle: "Logg inn med lenke",
+      title: "Logg inn med lenke",
+      description:
+        "Vi sender deg en lenke på e-post som logger deg inn. Ny i CoinsLite? Den samme lenken oppretter kontoen din.",
+      submit: "Send meg en lenke",
+      sentTitle: "Sjekk e-posten din",
+      sent: "Vi har sendt en innloggingslenke til {email}. Den virker én gang og utløper om 15 minutter.",
+      usePassword: "Bruk passord i stedet",
+      failed: "Innloggingslenken er utløpt eller allerede brukt. Be om en ny.",
+      confirmTitle: "Logg inn på CoinsLite",
+      confirmDescription: "Fortsett som {email}.",
+      confirm: "Logg inn",
+    },
+    welcome: {
+      pageTitle: "Fullfør oppsettet",
+      title: "Fullfør oppsettet av kontoen",
+      description:
+        "Logget inn som {email}. Velg hjemmevaluta og godta vilkårene for å begynne.",
+      submit: "Begynn å bruke CoinsLite",
     },
     backToSignIn: "Tilbake til innlogging",
     noMatches: "Ingen treff",

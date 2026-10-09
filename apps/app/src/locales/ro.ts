@@ -56,7 +56,7 @@ export default {
         "Acceptă politica de confidențialitate și termenii de utilizare ca să continui.",
       haveAccount: "Ai deja un cont?",
       failed:
-        "Nu am putut crea contul. Dacă ai deja unul, conectează-te sau resetează parola.",
+        "Nu am putut crea contul. Dacă ai deja unul, conectează-te cu parola, un link de conectare sau Google.",
     },
     fields: {
       email: "E-mail",
@@ -82,8 +82,10 @@ export default {
     },
     verify: {
       pageTitle: "Confirmă e-mailul",
-      title: "Confirmăm adresa ta de e-mail",
-      working: "O clipă…",
+      title: "Confirmă adresa de e-mail",
+      description:
+        "Confirmă că {email} îți aparține ca să termini înregistrarea.",
+      confirm: "Confirmă adresa de e-mail",
       failed:
         "Linkul a expirat sau a fost deja folosit. Conectează-te ca să primești un cod nou.",
       noLink:
@@ -99,6 +101,33 @@ export default {
       newPasswordTitle: "Alege o parolă nouă",
       submit: "Salvează parola",
       failed: "Codul nu a funcționat sau a expirat. Cere unul nou.",
+    },
+    methods: {
+      or: "sau",
+      google: "Continuă cu Google",
+      link: "Trimite-mi un link de conectare",
+    },
+    link: {
+      pageTitle: "Conectare cu link",
+      title: "Conectează-te cu un link",
+      description:
+        "Îți trimitem pe e-mail un link care te conectează. Nou pe CoinsLite? Același link îți creează contul.",
+      submit: "Trimite-mi un link",
+      sentTitle: "Verifică-ți e-mailul",
+      sent: "Am trimis un link de conectare la {email}. Funcționează o singură dată și expiră în 15 minute.",
+      usePassword: "Folosește o parolă",
+      failed:
+        "Linkul de conectare a expirat sau a fost deja folosit. Cere unul nou.",
+      confirmTitle: "Conectează-te la CoinsLite",
+      confirmDescription: "Continuă ca {email}.",
+      confirm: "Conectează-te",
+    },
+    welcome: {
+      pageTitle: "Finalizează configurarea",
+      title: "Finalizează configurarea contului",
+      description:
+        "Conectat ca {email}. Alege moneda de bază și acceptă termenii ca să începi.",
+      submit: "Începe să folosești CoinsLite",
     },
     backToSignIn: "Înapoi la conectare",
     noMatches: "Niciun rezultat",

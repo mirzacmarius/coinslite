@@ -2,6 +2,7 @@ import { getAuthUserId, invalidateSessions } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, mutation, query } from "./_generated/server";
+import { deleteUserAndSignInMethods } from "./accounts/linking";
 import { polar } from "./subscriptions";
 import { requireUserId } from "./utils/auth";
 import { username } from "./utils/validators";
@@ -77,20 +78,7 @@ export const deleteUserAccount = internalMutation({
     userId: v.id("users"),
   },
   handler: async (ctx, { userId }) => {
-    // Every sign-in method and its pending codes, so the email can be used again.
-    const accounts = await ctx.db
-      .query("authAccounts")
-      .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
-      .take(20);
-    for (const account of accounts) {
-      const codes = await ctx.db
-        .query("authVerificationCodes")
-        .withIndex("accountId", (q) => q.eq("accountId", account._id))
-        .take(20);
-      for (const code of codes) await ctx.db.delete(code._id);
-      await ctx.db.delete(account._id);
-    }
-    await ctx.db.delete(userId);
+    await deleteUserAndSignInMethods(ctx, userId);
   },
 });
 

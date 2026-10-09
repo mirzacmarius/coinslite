@@ -5,6 +5,7 @@ import type { Value } from "convex/values";
 import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
 import { beforeAll, expect, test } from "vitest";
 import { api, internal } from "./_generated/api";
+import { createOrUpdateUser, googleProfile } from "./accounts/linking";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -301,4 +302,321 @@ test("a deleted account's email can sign up again", async () => {
   const again = await signUp(t);
   expect(again.tokens ?? null).toBeNull();
   expect(await users(t)).toHaveLength(1);
+});
+
+// Sign-in links and Google, and how they share one account per email
+// (docs/adr/0005-one-account-per-email.md).
+
+const requestLink = (t: Test, email: string) =>
+  t.action(api.auth.signIn, { provider: "magic-link", params: { email } });
+
+const signInWithLink = async (t: Test, email: string) => {
+  await requestLink(t, email);
+  const code = await latestCode(t, email);
+  return t.action(api.auth.signIn, {
+    provider: "magic-link",
+    params: { email, code },
+  });
+};
+
+type GoogleClaims = Parameters<typeof googleProfile>[0];
+
+/** What Convex Auth does with a first Google sign-in, minus the OAuth round trip. */
+const googleSignIn = (t: Test, claims: Partial<GoogleClaims> = {}) =>
+  t.run((ctx) =>
+    createOrUpdateUser(ctx, {
+      existingUserId: null,
+      type: "oauth",
+      provider: { id: "google" },
+      profile: googleProfile({
+        sub: "google-ada",
+        email: "ada@gmail.com",
+        email_verified: true,
+        name: "Ada Lovelace",
+        picture: "https://example.com/ada.png",
+        ...claims,
+      }),
+    }),
+  );
+
+const signInMethods = (t: Test) =>
+  t.run(async (ctx) =>
+    (await ctx.db.query("authAccounts").collect())
+      .map((account) => account.provider)
+      .sort(),
+  );
+
+const setUp = (t: Test, userId: string, homeCurrency: "EUR" | "USD") =>
+  t
+    .withIdentity({ subject: `${userId}|session` })
+    .mutation(api.accounts.profile.completeSignUp, {
+      homeCurrency,
+      language: "de",
+      acceptTerms: true,
+    });
+
+test("a sign-in link signs up a new email, which then finishes setting up", async () => {
+  const t = newTest();
+
+  const result = await signInWithLink(t, "ada@example.com");
+
+  expect(result.tokens?.token).toEqual(expect.any(String));
+  const [user] = await users(t);
+  expect(user).toMatchObject({ email: "ada@example.com", displayName: "ada" });
+  expect(user.emailVerificationTime).toEqual(expect.any(Number));
+  expect(user.termsAcceptedAt).toBeUndefined();
+  const [email] = await outbox(t);
+  expect(email.text).toContain("method=link");
+
+  await setUp(t, user._id, "EUR");
+  const [done] = await users(t);
+  expect(done).toMatchObject({ homeCurrency: "EUR", language: "de" });
+  expect(done.termsAcceptedAt).toEqual(expect.any(Number));
+});
+
+test("finishing sign-up a second time changes nothing", async () => {
+  const t = newTest();
+  await signInWithLink(t, "ada@example.com");
+  const [user] = await users(t);
+  await setUp(t, user._id, "EUR");
+
+  await setUp(t, user._id, "USD");
+
+  const [after] = await users(t);
+  expect(after.homeCurrency).toBe("EUR");
+});
+
+test("a sign-in link for a password account's email signs into that account", async () => {
+  const t = newTest();
+  await signUpAndVerify(t);
+
+  const result = await signInWithLink(t, "ada@example.com");
+
+  expect(result.tokens?.token).toEqual(expect.any(String));
+  expect(await users(t)).toHaveLength(1);
+  expect(await signInMethods(t)).toEqual(["magic-link", "password"]);
+  const [user] = await users(t);
+  expect(user).toMatchObject({ homeCurrency: "NOK", language: "nb" });
+});
+
+test("a password sign-up for an email that already has an account is refused", async () => {
+  const t = newTest();
+  await signInWithLink(t, "ada@example.com");
+
+  await expect(signUp(t)).rejects.toThrow("ACCOUNT_EXISTS");
+  expect(await users(t)).toHaveLength(1);
+});
+
+test("asking for a sign-in link doesn't disturb a sign-up in progress", async () => {
+  const t = newTest();
+  await signUp(t);
+  const [pending] = await users(t);
+
+  await requestLink(t, "ada@example.com");
+
+  const [user] = await users(t);
+  expect(user._id).toBe(pending._id);
+  expect(user.homeCurrency).toBe("NOK");
+  expect(await signInMethods(t)).toEqual(["magic-link", "password"]);
+});
+
+test("a password sign-up verified by its own code keeps its choices and drops an unopened link", async () => {
+  const t = newTest();
+  await signUp(t);
+  const code = await latestCode(t, "ada@example.com");
+  await requestLink(t, "ada@example.com");
+
+  await signIn(t, {
+    flow: "email-verification",
+    email: "ada@example.com",
+    code,
+  });
+
+  const [user] = await users(t);
+  expect(user).toMatchObject({ homeCurrency: "NOK", language: "nb" });
+  expect(user.termsAcceptedAt).toEqual(expect.any(Number));
+  expect(await signInMethods(t)).toEqual(["password"]);
+});
+
+test("opening a sign-in link proves the email: an unproven password and its choices go", async () => {
+  const t = newTest();
+  await signUp(t);
+  const [pending] = await users(t);
+
+  await signInWithLink(t, "ada@example.com");
+
+  const [user] = await users(t);
+  expect(user._id).toBe(pending._id);
+  expect(user.emailVerificationTime).toEqual(expect.any(Number));
+  expect(user.termsAcceptedAt).toBeUndefined();
+  expect(user.homeCurrency).toBeUndefined();
+  expect(await signInMethods(t)).toEqual(["magic-link"]);
+  await expect(
+    signIn(t, {
+      flow: "signIn",
+      email: "ada@example.com",
+      password: "correct horse",
+    }),
+  ).rejects.toThrow();
+});
+
+test("a lookalike address can't reach someone else's account", async () => {
+  const t = newTest();
+  await signInWithLink(t, "kate@example.com");
+
+  // "\u212A" is the Kelvin sign, which lower-cases to "k".
+  await expect(requestLink(t, "\u212Aate@example.com")).rejects.toThrow(
+    "INVALID_EMAIL",
+  );
+  await expect(requestLink(t, "Kate@example.com")).rejects.toThrow(
+    "INVALID_EMAIL",
+  );
+  expect(await outbox(t)).toHaveLength(1);
+});
+
+test("a first Google sign-in starts a proven account, which then finishes setting up", async () => {
+  const t = newTest();
+
+  await googleSignIn(t);
+
+  const [user] = await users(t);
+  expect(user).toMatchObject({
+    email: "ada@gmail.com",
+    displayName: "ada",
+    name: "Ada Lovelace",
+    image: "https://example.com/ada.png",
+  });
+  expect(user.emailVerificationTime).toEqual(expect.any(Number));
+  expect(user.termsAcceptedAt).toBeUndefined();
+});
+
+test("Google joins the account that proved the same email, and leaves its profile alone", async () => {
+  const t = newTest();
+  await signUpAndVerify(t, "ada@gmail.com");
+  const [before] = await users(t);
+
+  const userId = await googleSignIn(t);
+
+  expect(userId).toBe(before._id);
+  const [after] = await users(t);
+  expect(after).toEqual(before);
+});
+
+test("a returning Google sign-in keeps the account as it is", async () => {
+  const t = newTest();
+  const userId = await googleSignIn(t);
+  const [before] = await users(t);
+
+  const again = await t.run((ctx) =>
+    createOrUpdateUser(ctx, {
+      existingUserId: userId,
+      type: "oauth",
+      provider: { id: "google" },
+      profile: {
+        email: "ada@gmail.com",
+        emailVerified: true,
+        name: "Someone Else",
+      },
+    }),
+  );
+
+  expect(again).toBe(userId);
+  expect(await users(t)).toEqual([before]);
+});
+
+test("Google proves an unfinished sign-up's email: its password and choices go", async () => {
+  const t = newTest();
+  await signUp(t, { email: "ada@gmail.com" });
+  const [pending] = await users(t);
+
+  const userId = await googleSignIn(t);
+
+  expect(userId).toBe(pending._id);
+  const [user] = await users(t);
+  expect(user.emailVerificationTime).toEqual(expect.any(Number));
+  expect(user.termsAcceptedAt).toBeUndefined();
+  expect(user.homeCurrency).toBeUndefined();
+  expect(await signInMethods(t)).toEqual([]);
+});
+
+test("after Google, a sign-in link reaches the same account and a password sign-up is refused", async () => {
+  const t = newTest();
+  await googleSignIn(t);
+
+  await signInWithLink(t, "ada@gmail.com");
+  await expect(signUp(t, { email: "ada@gmail.com" })).rejects.toThrow(
+    "ACCOUNT_EXISTS",
+  );
+
+  expect(await users(t)).toHaveLength(1);
+});
+
+test("Google vouches only for addresses it hosts", async () => {
+  expect(
+    googleProfile({ sub: "1", email: "ada@gmail.com", email_verified: true })
+      .emailVerified,
+  ).toBe(true);
+  expect(
+    googleProfile({
+      sub: "1",
+      email: "ada@example.com",
+      email_verified: true,
+      hd: "example.com",
+    }).emailVerified,
+  ).toBe(true);
+  expect(
+    googleProfile({ sub: "1", email: "ada@example.com", email_verified: true })
+      .emailVerified,
+  ).toBe(false);
+  expect(
+    googleProfile({ sub: "1", email: " Ada@Gmail.com ", email_verified: true })
+      .email,
+  ).toBe("ada@gmail.com");
+
+  const t = newTest();
+  await expect(googleSignIn(t, { email: "ada@example.com" })).rejects.toThrow(
+    "EMAIL_NOT_VERIFIED",
+  );
+  expect(await users(t)).toEqual([]);
+});
+
+test("finishing sign-up needs a signed-in person and a supported Home currency", async () => {
+  const t = newTest();
+  await signInWithLink(t, "ada@example.com");
+  const [user] = await users(t);
+
+  await expect(
+    t.mutation(api.accounts.profile.completeSignUp, {
+      homeCurrency: "EUR",
+      language: "de",
+      acceptTerms: true,
+    }),
+  ).rejects.toThrow("NOT_SIGNED_IN");
+  await expect(
+    t
+      .withIdentity({ subject: `${user._id}|session` })
+      .mutation(api.accounts.profile.completeSignUp, {
+        // @ts-expect-error Not a Home currency.
+        homeCurrency: "JPY",
+        language: "de",
+        acceptTerms: true,
+      }),
+  ).rejects.toThrow();
+});
+
+test("a sign-in link email is in the language on screen, and its link leaves the language to the app", async () => {
+  const t = newTest();
+
+  await t.action(api.auth.signIn, {
+    provider: "magic-link",
+    params: {
+      email: "ada@example.com",
+      redirectTo: "/ro/welcome?next=%2Fcatalog",
+    },
+  });
+
+  const [email] = await outbox(t);
+  expect(email.subject).toBe("Linkul tău de conectare CoinsLite");
+  const fragment = new URLSearchParams(email.text.split("#")[1]);
+  expect(fragment.get("next")).toBe("/welcome?next=%2Fcatalog");
 });

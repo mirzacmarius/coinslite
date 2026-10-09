@@ -46,9 +46,9 @@ const inEveryLanguage = (paths: string[]) =>
 const isDesignGallery = createRouteMatcher(inEveryLanguage(["/design"]));
 const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
 
-// Signing in, signing up and the verify link; signed-in visitors are sent on.
+// Signing in, signing up and the emailed links; signed-in visitors are sent on.
 const isSignInPage = createRouteMatcher(
-  inEveryLanguage(["/login", "/signup", "/verify"]),
+  inEveryLanguage(["/login", "/signup", "/verify", "/link"]),
 );
 // The reset link works whether or not someone is signed in.
 const isPasswordResetPage = createRouteMatcher(inEveryLanguage(["/reset"]));

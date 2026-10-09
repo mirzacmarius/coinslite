@@ -56,7 +56,7 @@ export default {
         "Acceptez la politique de confidentialité et les conditions d’utilisation pour continuer.",
       haveAccount: "Vous avez déjà un compte ?",
       failed:
-        "Impossible de créer le compte. Si vous en avez déjà un, connectez-vous ou réinitialisez votre mot de passe.",
+        "Impossible de créer le compte. Si vous en avez déjà un, connectez-vous avec votre mot de passe, un lien de connexion ou Google.",
     },
     fields: {
       email: "E-mail",
@@ -83,8 +83,10 @@ export default {
     },
     verify: {
       pageTitle: "Vérifier l’e-mail",
-      title: "Vérification de votre adresse e-mail",
-      working: "Un instant…",
+      title: "Vérifiez votre adresse e-mail",
+      description:
+        "Confirmez que {email} est bien à vous pour terminer l’inscription.",
+      confirm: "Vérifier mon adresse e-mail",
       failed:
         "Ce lien a expiré ou a déjà été utilisé. Connectez-vous pour recevoir un nouveau code.",
       noLink:
@@ -101,6 +103,33 @@ export default {
       newPasswordTitle: "Choisissez un nouveau mot de passe",
       submit: "Enregistrer le mot de passe",
       failed: "Ce code n’a pas fonctionné ou a expiré. Demandez-en un nouveau.",
+    },
+    methods: {
+      or: "ou",
+      google: "Continuer avec Google",
+      link: "Recevoir un lien de connexion",
+    },
+    link: {
+      pageTitle: "Connexion par lien",
+      title: "Se connecter avec un lien",
+      description:
+        "Nous vous envoyons par e-mail un lien qui vous connecte. Nouveau sur CoinsLite ? Le même lien crée votre compte.",
+      submit: "M’envoyer un lien",
+      sentTitle: "Consultez vos e-mails",
+      sent: "Nous avons envoyé un lien de connexion à {email}. Il ne fonctionne qu’une fois et expire dans 15 minutes.",
+      usePassword: "Utiliser un mot de passe",
+      failed:
+        "Ce lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+      confirmTitle: "Se connecter à CoinsLite",
+      confirmDescription: "Continuer en tant que {email}.",
+      confirm: "Se connecter",
+    },
+    welcome: {
+      pageTitle: "Terminer la configuration",
+      title: "Terminez la configuration de votre compte",
+      description:
+        "Connecté en tant que {email}. Choisissez votre devise de référence et acceptez les conditions pour commencer.",
+      submit: "Commencer à utiliser CoinsLite",
     },
     backToSignIn: "Retour à la connexion",
     noMatches: "Aucun résultat",
