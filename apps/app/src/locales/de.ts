@@ -279,8 +279,6 @@ export default {
   dashboard: {
     headerTitle: "Übersicht",
     headerDescription: "Deine Sammlung auf einen Blick.",
-    bodyTitle: "Willkommen bei CoinsLite",
-    bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
   account: {
     pageTitle: "Konto",
@@ -906,5 +904,18 @@ export default {
     valueDistributionDescription:
       "Nach Objektart, dazu der Metallwert von Gold und Silber",
     part: "Objektart oder Metall",
+  },
+  overview: {
+    addShortcuts: "Zur Sammlung hinzufügen",
+    add: {
+      coin: "Münze hinzufügen",
+      banknote: "Banknote hinzufügen",
+      stamp: "Briefmarke hinzufügen",
+    },
+    latestItems: "Neueste Objekte",
+    viewCollection: "Sammlung ansehen",
+    firstRunTitle: "Beginne deine Sammlung",
+    firstRunDescription:
+      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
   },
 } as const satisfies Dictionary;

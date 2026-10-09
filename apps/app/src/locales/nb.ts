@@ -268,8 +268,6 @@ export default {
   dashboard: {
     headerTitle: "Oversikt",
     headerDescription: "Oversikt over samlingen din.",
-    bodyTitle: "Velkommen til CoinsLite",
-    bodyDescription: "Samlingen din vises her.",
   },
   account: {
     pageTitle: "Konto",
@@ -877,5 +875,18 @@ export default {
     valueDistributionDescription:
       "Etter objekttype, pluss metallverdien av gull og sølv",
     part: "Objekttype eller metall",
+  },
+  overview: {
+    addShortcuts: "Legg til i samlingen",
+    add: {
+      coin: "Legg til mynt",
+      banknote: "Legg til seddel",
+      stamp: "Legg til frimerke",
+    },
+    latestItems: "Nyeste objekter",
+    viewCollection: "Vis samlingen",
+    firstRunTitle: "Start samlingen din",
+    firstRunDescription:
+      "Legg til en mynt, en seddel eller et frimerke du eier. Da vises totalene og de nyeste objektene her.",
   },
 } as const satisfies Dictionary;

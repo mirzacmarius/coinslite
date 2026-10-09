@@ -263,8 +263,6 @@ export default {
   dashboard: {
     headerTitle: "Overview",
     headerDescription: "Your collection at a glance.",
-    bodyTitle: "Welcome to CoinsLite",
-    bodyDescription: "Your collection will appear here.",
   },
   account: {
     pageTitle: "Account",
@@ -868,5 +866,18 @@ export default {
     valueDistributionDescription:
       "By Item type, plus the Metal value of gold and silver",
     part: "Item type or metal",
+  },
+  overview: {
+    addShortcuts: "Add to your Collection",
+    add: {
+      coin: "Add coin",
+      banknote: "Add banknote",
+      stamp: "Add stamp",
+    },
+    latestItems: "Latest Items",
+    viewCollection: "View Collection",
+    firstRunTitle: "Start your Collection",
+    firstRunDescription:
+      "Add a coin, banknote or stamp you own. Your totals and latest Items then show here.",
   },
 } as const;

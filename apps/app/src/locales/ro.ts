@@ -271,8 +271,6 @@ export default {
   dashboard: {
     headerTitle: "Prezentare generală",
     headerDescription: "Colecția ta dintr-o privire.",
-    bodyTitle: "Bun venit la CoinsLite",
-    bodyDescription: "Colecția ta va apărea aici.",
   },
   account: {
     pageTitle: "Cont",
@@ -886,5 +884,18 @@ export default {
     valueDistributionDescription:
       "După tipul obiectului, plus valoarea metalului pentru aur și argint",
     part: "Tip de obiect sau metal",
+  },
+  overview: {
+    addShortcuts: "Adaugă în colecție",
+    add: {
+      coin: "Adaugă monedă",
+      banknote: "Adaugă bancnotă",
+      stamp: "Adaugă timbru",
+    },
+    latestItems: "Cele mai noi obiecte",
+    viewCollection: "Vezi colecția",
+    firstRunTitle: "Începe-ți colecția",
+    firstRunDescription:
+      "Adaugă o monedă, o bancnotă sau un timbru pe care îl deții. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
   },
 } as const satisfies Dictionary;

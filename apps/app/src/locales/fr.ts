@@ -274,8 +274,6 @@ export default {
   dashboard: {
     headerTitle: "Aperçu",
     headerDescription: "Votre collection en un coup d’œil.",
-    bodyTitle: "Bienvenue sur CoinsLite",
-    bodyDescription: "Votre collection apparaîtra ici.",
   },
   account: {
     pageTitle: "Compte",
@@ -892,5 +890,18 @@ export default {
     valueDistributionDescription:
       "Par type d’objet, plus la valeur du métal pour l’or et l’argent",
     part: "Type d’objet ou métal",
+  },
+  overview: {
+    addShortcuts: "Ajouter à votre collection",
+    add: {
+      coin: "Ajouter une pièce",
+      banknote: "Ajouter un billet",
+      stamp: "Ajouter un timbre",
+    },
+    latestItems: "Derniers objets ajoutés",
+    viewCollection: "Voir la collection",
+    firstRunTitle: "Commencez votre collection",
+    firstRunDescription:
+      "Ajoutez une pièce, un billet ou un timbre que vous possédez. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
   },
 } as const satisfies Dictionary;
