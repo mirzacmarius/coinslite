@@ -759,6 +759,9 @@ export default {
     unavailable:
       "Premium nu poate fi cumpărat aici încă: facturarea nu este configurată în acest mediu.",
     alreadyPremium: "Ai deja Premium.",
+    checkoutPending:
+      "O plată pentru celălalt abonament este încă deschisă. Finalizeaz-o acolo sau încearcă din nou peste o oră.",
+    accountClosing: "Contul tău este în curs de ștergere.",
     checkoutFailed: "Pagina de plată nu s-a putut deschide. Încearcă din nou.",
     price: "Preț",
     renews: "Se reînnoiește",

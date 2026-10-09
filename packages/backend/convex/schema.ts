@@ -376,6 +376,29 @@ export default defineSchema({
   }).index("by_finishedAt", ["finishedAt"]),
 
   /**
+   * A Polar checkout someone has open (billing.ts): at most one per person, so
+   * asking again sends them back to it instead of opening a second one that
+   * could be paid as well. Without a `url` it is still being opened.
+   */
+  pendingCheckouts: defineTable({
+    userId: v.id("users"),
+    interval: v.union(v.literal("month"), v.literal("year")),
+    url: v.optional(v.string()),
+    expiresAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  /**
+   * Accounts being deleted, then deleted (account/deletion.ts). While
+   * `closedAt` is unset the deletion is under way and no checkout opens; after
+   * it, the record stays, naming no one but the old account id, so a Polar
+   * subscription reported for the deleted account later is ended at Polar.
+   */
+  accountClosures: defineTable({
+    userId: v.id("users"),
+    closedAt: v.optional(v.number()),
+  }).index("by_userId", ["userId"]),
+
+  /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox
    * (local and CI test runs). Never used in production.
    */

@@ -1,5 +1,5 @@
 import { env } from "../_generated/server";
-import type { BillingInterval } from "./rules";
+import { type BillingInterval, chargesAgain } from "./rules";
 
 /**
  * Polar's REST API, the few calls CoinsLite makes. Plain fetch rather than an
@@ -14,6 +14,24 @@ export function premiumProducts(): Record<BillingInterval, string> | null {
   const month = env.POLAR_PREMIUM_MONTHLY_PRODUCT_ID;
   const year = env.POLAR_PREMIUM_YEARLY_PRODUCT_ID;
   return month && year ? { month, year } : null;
+}
+
+/** What test backends record for the smoke tests' Premium (testing/premium.ts). */
+export const testPremiumProduct = "test_premium_monthly";
+
+/**
+ * Whether a subscription to this Polar product is Premium: only the
+ * configured monthly and yearly Premium products are, whatever else the
+ * organization sells. Test backends also count the smoke tests' product.
+ */
+export function isPremiumProduct(productId: string) {
+  if (env.EMAIL_DELIVERY === "outbox" && productId === testPremiumProduct)
+    return true;
+  return (
+    productId !== "" &&
+    (productId === env.POLAR_PREMIUM_MONTHLY_PRODUCT_ID ||
+      productId === env.POLAR_PREMIUM_YEARLY_PRODUCT_ID)
+  );
 }
 
 export class PolarError extends Error {
@@ -79,11 +97,19 @@ export function polarApi() {
         success_url: checkout.successUrl,
         return_url: checkout.returnUrl,
       });
-      const url = (created as { url?: unknown } | null)?.url;
+      const { url, expires_at } = (created ?? {}) as {
+        url?: unknown;
+        expires_at?: unknown;
+      };
       if (typeof url !== "string") {
         throw new PolarError(200, "no checkout url", "POST /checkouts/");
       }
-      return url;
+      const expiresAt =
+        typeof expires_at === "string" ? Date.parse(expires_at) : Number.NaN;
+      return {
+        url,
+        expiresAt: Number.isNaN(expiresAt) ? undefined : expiresAt,
+      };
     },
 
     /**
@@ -109,6 +135,38 @@ export function polarApi() {
         );
       }
       return url;
+    },
+
+    /**
+     * The ids of the subscriptions Polar would charge again for the customer
+     * checkout created for this CoinsLite user (its external id), whether or
+     * not their events have reached CoinsLite yet.
+     */
+    async subscriptionsThatCharge(userId: string) {
+      const query = new URLSearchParams({
+        external_customer_id: userId,
+        limit: "100",
+      });
+      const page = await call("GET", `/subscriptions/?${query}`);
+      const items = (page as { items?: unknown } | null)?.items;
+      if (!Array.isArray(items)) {
+        throw new PolarError(
+          200,
+          "no subscription list",
+          "GET /subscriptions/",
+        );
+      }
+      return (items as Record<string, unknown>[])
+        .filter(
+          (listed) =>
+            typeof listed.id === "string" &&
+            chargesAgain({
+              status: String(listed.status),
+              cancelAtPeriodEnd: listed.cancel_at_period_end === true,
+              endedAt: listed.ended_at ? 0 : undefined,
+            }),
+        )
+        .map((listed) => listed.id as string);
     },
 
     /** Ends a subscription now, without charging again. */

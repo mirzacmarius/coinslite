@@ -767,6 +767,9 @@ export default {
     unavailable:
       "Premium ne peut pas encore être acheté ici\u00a0: la facturation n’est pas configurée sur cet environnement.",
     alreadyPremium: "Vous avez déjà Premium.",
+    checkoutPending:
+      "Un paiement pour l’autre formule est encore ouvert. Terminez-le, ou réessayez dans une heure.",
+    accountClosing: "Votre compte est en cours de suppression.",
     checkoutFailed: "Impossible d’ouvrir la page de paiement. Réessayez.",
     price: "Prix",
     renews: "Renouvellement le",

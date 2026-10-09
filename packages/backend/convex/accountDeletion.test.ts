@@ -353,7 +353,18 @@ test("nothing of the person remains afterwards, and nobody else's data changes",
       docs.filter((doc) => !adas.has(doc._id)),
     ]),
   );
-  expect(await everything(t)).toEqual(expected);
+  const after = await everything(t);
+  // Kept: only that Ada's account id was deleted, for Polar's late events.
+  expect(after.accountClosures).toEqual([
+    {
+      _id: expect.any(String),
+      _creationTime: expect.any(Number),
+      userId: ada.userId,
+      closedAt: expect.any(Number),
+    },
+  ]);
+  after.accountClosures = expected.accountClosures;
+  expect(after).toEqual(expected);
   // Each table that held something of Ada's was really looked at.
   const emptied = Object.entries(before)
     .filter(([table, docs]) => docs.length > expected[table].length)

@@ -754,6 +754,9 @@ export default {
     unavailable:
       "Premium kan ikke kjøpes her ennå: betaling er ikke satt opp i dette miljøet.",
     alreadyPremium: "Du har allerede Premium.",
+    checkoutPending:
+      "En betaling for den andre planen er fortsatt åpen. Fullfør den der, eller prøv igjen om en time.",
+    accountClosing: "Kontoen din blir slettet.",
     checkoutFailed: "Kunne ikke åpne kassen. Prøv igjen.",
     price: "Pris",
     renews: "Fornyes",

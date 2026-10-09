@@ -8,11 +8,17 @@ import {
   type QueryCtx,
   action,
   env,
+  internalAction,
   internalMutation,
   internalQuery,
   query,
 } from "./_generated/server";
-import { isPolarSandbox, polarApi, premiumProducts } from "./billing/polar";
+import {
+  isPolarSandbox,
+  isPremiumProduct,
+  polarApi,
+  premiumProducts,
+} from "./billing/polar";
 import {
   type SubscriptionState,
   billingErrors,
@@ -119,18 +125,32 @@ export const status = query({
   },
 });
 
+const billingInterval = v.union(v.literal("month"), v.literal("year"));
+
+/** How long a checkout being opened holds the place of the person's one checkout. */
+const checkoutOpeningMs = 2 * 60 * 1000;
+/** How long an open checkout stays the person's one checkout when Polar doesn't say. */
+const checkoutLifetimeMs = 60 * 60 * 1000;
+
 /**
  * Opens a Polar checkout for Premium, monthly or yearly, and returns the page
  * to send the buyer to. Polar charges in the currency of the buyer's location,
  * read from the IP their request came from. After paying they come back to
  * the confirmation page; Premium starts when Polar's webhook confirms.
+ *
+ * A person has one checkout open at a time, so they can't pay twice: asking
+ * again for the same plan returns the one that's open, and one for the other
+ * plan is refused (CHECKOUT_PENDING) until it expires.
  */
 export const checkout = action({
-  args: { interval: v.union(v.literal("month"), v.literal("year")) },
+  args: { interval: billingInterval },
   returns: v.object({ url: v.string() }),
-  handler: async (ctx, { interval }) => {
-    const buyer = await ctx.runQuery(internal.billing.buyer, {});
-    if (buyer.premium) throw new ConvexError(billingErrors.alreadyPremium);
+  handler: async (ctx, { interval }): Promise<{ url: string }> => {
+    const reserved: Reservation = await ctx.runMutation(
+      internal.billing.reserveCheckout,
+      { interval },
+    );
+    if (reserved.kind === "open") return { url: reserved.url };
     const polar = polarApi();
     const products = premiumProducts();
     const siteUrl = env.SITE_URL;
@@ -139,21 +159,136 @@ export const checkout = action({
     }
     const { ip } = await ctx.meta.getRequestMetadata();
     try {
-      const url = await polar.createCheckout({
+      const { url, expiresAt } = await polar.createCheckout({
         productId: products[interval],
-        userId: buyer.userId,
-        email: buyer.email,
+        userId: reserved.userId,
+        email: reserved.email,
         customerIp: ip ?? undefined,
         successUrl: `${siteUrl}/settings/billing/confirmation?checkout_id={CHECKOUT_ID}`,
         returnUrl: `${siteUrl}/settings/billing`,
       });
+      await ctx.runMutation(internal.billing.checkoutOpened, {
+        checkoutId: reserved.checkoutId,
+        url,
+        expiresAt: expiresAt ?? Date.now() + checkoutLifetimeMs,
+      });
       return { url };
     } catch (error) {
       console.error("Polar didn't open a checkout", error);
+      await ctx.runMutation(internal.billing.releaseCheckout, {
+        checkoutId: reserved.checkoutId,
+      });
       throw new ConvexError(billingErrors.checkoutFailed);
     }
   },
 });
+
+type Reservation =
+  | { kind: "open"; url: string }
+  | {
+      kind: "new";
+      checkoutId: Id<"pendingCheckouts">;
+      userId: Id<"users">;
+      email?: string;
+    };
+
+/**
+ * Holds the signed-in, set-up person's one checkout for `interval`, or
+ * returns the one they have open. Refuses someone on Premium, an account
+ * being deleted, a deployment that can't sell Premium, and a checkout while
+ * another (for the other plan, or still opening) is open.
+ */
+export const reserveCheckout = internalMutation({
+  args: { interval: billingInterval },
+  returns: v.union(
+    v.object({ kind: v.literal("open"), url: v.string() }),
+    v.object({
+      kind: v.literal("new"),
+      checkoutId: v.id("pendingCheckouts"),
+      userId: v.id("users"),
+      email: v.optional(v.string()),
+    }),
+  ),
+  handler: async (ctx, { interval }) => {
+    const user = await requireSetUpUser(ctx);
+    if (await premiumSubscriptionOf(ctx, user._id))
+      throw new ConvexError(billingErrors.alreadyPremium);
+    if (await isClosing(ctx, user._id))
+      throw new ConvexError(billingErrors.accountClosing);
+    if (!canSellPremium()) throw new ConvexError(billingErrors.unavailable);
+    const now = Date.now();
+    const pending = await pendingCheckoutOf(ctx, user._id);
+    if (pending && pending.expiresAt > now) {
+      if (pending.interval === interval && pending.url)
+        return { kind: "open" as const, url: pending.url };
+      throw new ConvexError(billingErrors.checkoutPending);
+    }
+    if (pending) await ctx.db.delete(pending._id);
+    const checkoutId = await ctx.db.insert("pendingCheckouts", {
+      userId: user._id,
+      interval,
+      expiresAt: now + checkoutOpeningMs,
+    });
+    return {
+      kind: "new" as const,
+      checkoutId,
+      userId: user._id,
+      email: user.email,
+    };
+  },
+});
+
+/** Keeps the checkout Polar opened as the person's one open checkout. */
+export const checkoutOpened = internalMutation({
+  args: {
+    checkoutId: v.id("pendingCheckouts"),
+    url: v.string(),
+    expiresAt: v.number(),
+  },
+  returns: v.null(),
+  handler: async (ctx, { checkoutId, url, expiresAt }) => {
+    if (await ctx.db.get(checkoutId))
+      await ctx.db.patch(checkoutId, { url, expiresAt });
+    return null;
+  },
+});
+
+/** Lets go of a checkout Polar didn't open, so the next try isn't held up. */
+export const releaseCheckout = internalMutation({
+  args: { checkoutId: v.id("pendingCheckouts") },
+  returns: v.null(),
+  handler: async (ctx, { checkoutId }) => {
+    if (await ctx.db.get(checkoutId)) await ctx.db.delete(checkoutId);
+    return null;
+  },
+});
+
+const pendingCheckoutOf = (ctx: QueryCtx, userId: Id<"users">) =>
+  ctx.db
+    .query("pendingCheckouts")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+
+/** Deletes a person's open checkout, if any. */
+export async function deletePendingCheckoutOf(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+) {
+  const pending = await pendingCheckoutOf(ctx, userId);
+  if (pending) await ctx.db.delete(pending._id);
+}
+
+const closureOf = (ctx: QueryCtx, userId: Id<"users">) =>
+  ctx.db
+    .query("accountClosures")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+
+/** Whether this account is being deleted. */
+async function isClosing(ctx: QueryCtx, userId: Id<"users">) {
+  const closure = await closureOf(ctx, userId);
+  return closure !== null && closure.closedAt === undefined;
+}
 
 /**
  * Opens Polar's customer portal, where a member switches between monthly and
@@ -198,29 +333,13 @@ export const customer = internalQuery({
   },
 });
 
-/** Who is buying: the signed-in, set-up person, and whether they're Premium already. */
-export const buyer = internalQuery({
-  args: {},
-  returns: v.object({
-    userId: v.id("users"),
-    email: v.optional(v.string()),
-    premium: v.boolean(),
-  }),
-  handler: async (ctx) => {
-    const user = await requireSetUpUser(ctx);
-    return {
-      userId: user._id,
-      email: user.email,
-      premium: (await premiumSubscriptionOf(ctx, user._id)) !== null,
-    };
-  },
-});
-
 /**
  * Keeps a subscription's state as Polar reports it. Events can arrive late or
  * twice: one older than what's stored is ignored. A subscription stays with
  * the person it was first recorded for; a new one is matched to its buyer
- * through the ids checkout gave Polar, and one naming nobody is ignored.
+ * through the ids checkout gave Polar, and one naming nobody is ignored. One
+ * that names a deleted account (paid in a checkout left open, or reported
+ * late) is ended at Polar if it would charge again.
  */
 export const recordSubscription = internalMutation({
   args: {
@@ -246,6 +365,10 @@ export const recordSubscription = internalMutation({
     if (stored && stored.modifiedAt > reported.modifiedAt) return null;
     const userId = stored?.userId ?? (await buyerOf(ctx, buyer));
     if (!userId) {
+      if ((await closedAccountAmong(ctx, buyer)) && chargesAgain(reported)) {
+        await scheduleRevoke(ctx, reported.polarId);
+        return null;
+      }
       console.warn(
         `Polar subscription ${reported.polarId} names no CoinsLite account; ignored`,
       );
@@ -259,13 +382,74 @@ export const recordSubscription = internalMutation({
     const subscriptionId =
       stored?._id ?? (await ctx.db.insert("subscriptions", subscription));
     await bookPremiumCheck(ctx, subscriptionId, subscription.premiumUntil);
+    if (subscription.premium) await deletePendingCheckoutOf(ctx, userId);
     await updatePlanCopies(ctx, userId);
     return null;
   },
 });
 
-/** The Premium status rule (billing/rules.ts) applied as of now. */
-function premiumState(subscription: SubscriptionState) {
+/** Whether any of `ids` is a deleted CoinsLite account. */
+async function closedAccountAmong(ctx: QueryCtx, ids: string[]) {
+  for (const id of ids) {
+    const userId = ctx.db.normalizeId("users", id);
+    const closure = userId && (await closureOf(ctx, userId));
+    if (closure) return true;
+  }
+  return false;
+}
+
+/** Ends a subscription at Polar in the background, trying again a few times. */
+export async function scheduleRevoke(ctx: MutationCtx, polarId: string) {
+  await ctx.scheduler.runAfter(0, internal.billing.revokeAtPolar, {
+    polarId,
+    attempt: 0,
+  });
+}
+
+const revokeAttempts = 6;
+
+/**
+ * Ends at Polar a subscription of a deleted account. Polar being out of
+ * reach is retried, waiting longer each time.
+ */
+export const revokeAtPolar = internalAction({
+  args: { polarId: v.string(), attempt: v.number() },
+  returns: v.null(),
+  handler: async (ctx, { polarId, attempt }) => {
+    const polar = polarApi();
+    if (!polar) {
+      console.error(
+        `Polar isn't configured, so subscription ${polarId} of a deleted account can't be ended`,
+      );
+      return null;
+    }
+    try {
+      await polar.revokeSubscription(polarId);
+    } catch (error) {
+      if (attempt + 1 >= revokeAttempts) {
+        console.error(
+          `Polar didn't end subscription ${polarId} of a deleted account`,
+          error,
+        );
+        return null;
+      }
+      await ctx.scheduler.runAfter(
+        60_000 * 2 ** attempt,
+        internal.billing.revokeAtPolar,
+        { polarId, attempt: attempt + 1 },
+      );
+    }
+    return null;
+  },
+});
+
+/**
+ * The Premium status rule (billing/rules.ts) applied as of now. Only the
+ * Premium products count.
+ */
+function premiumState(subscription: SubscriptionState & { productId: string }) {
+  if (!isPremiumProduct(subscription.productId))
+    return { premium: false, premiumUntil: undefined };
   const until = premiumUntil(subscription);
   const premium = isPremiumAt(until, Date.now());
   return {
@@ -311,7 +495,7 @@ async function buyerOf(ctx: MutationCtx, ids: string[]) {
 }
 
 /**
- * Runs when a subscription's paid period (and any renewal grace) is over:
+ * Runs when a subscription's paid period is over:
  * unless Polar has reported a renewal since, the person is no longer Premium.
  * Run early, it books itself again for the end.
  */
@@ -368,7 +552,7 @@ const subscriptionsOf = (ctx: QueryCtx, userId: Id<"users">) =>
     .withIndex("by_userId_and_premium", (q) => q.eq("userId", userId))
     .take(100);
 
-/** The Polar ids of a person's subscriptions that would charge again. */
+/** The Polar ids of the subscriptions recorded for a person that would charge again. */
 export const subscriptionsThatCharge = internalQuery({
   args: { userId: v.id("users") },
   returns: v.array(v.string()),
@@ -380,33 +564,65 @@ export const subscriptionsThatCharge = internalQuery({
 
 /**
  * Before an account is deleted: revokes at Polar every subscription that
- * would charge again. Throws when that isn't possible, so no account is
- * deleted while it's still being billed.
+ * would charge again, both those recorded here and those Polar has for the
+ * person whose events haven't arrived yet. Throws when that isn't possible,
+ * so no account is deleted while it's still being billed.
  */
 export async function stopBilling(ctx: ActionCtx, userId: Id<"users">) {
-  const charging = await ctx.runQuery(
+  const recorded = await ctx.runQuery(
     internal.billing.subscriptionsThatCharge,
-    {
-      userId,
-    },
+    { userId },
   );
-  if (charging.length === 0) return;
   const polar = polarApi();
   if (!polar) {
+    if (recorded.length === 0) return;
     throw new Error(
       "Polar isn't configured, so the subscription can't be ended",
     );
   }
-  for (const polarId of charging) await polar.revokeSubscription(polarId);
+  const atPolar = await polar.subscriptionsThatCharge(userId);
+  for (const polarId of new Set([...recorded, ...atPolar]))
+    await polar.revokeSubscription(polarId);
 }
 
-/** Deletes a person's subscription records: their link to Polar. */
+/**
+ * Deletes a person's subscription records, their link to Polar, and their
+ * open checkout. One that would still charge again (reported after billing
+ * stopped) is ended at Polar in the background.
+ */
 export async function deleteSubscriptionsOf(
   ctx: MutationCtx,
   userId: Id<"users">,
 ) {
   for (const subscription of await subscriptionsOf(ctx, userId)) {
     await cancelPremiumCheck(ctx, subscription.premiumCheck);
+    if (chargesAgain(subscription))
+      await scheduleRevoke(ctx, subscription.polarId);
     await ctx.db.delete(subscription._id);
   }
+  await deletePendingCheckoutOf(ctx, userId);
+}
+
+/**
+ * Marks an account as being deleted, so no checkout opens meanwhile. Returns
+ * false when it was already being deleted.
+ */
+export async function beginClosing(ctx: MutationCtx, userId: Id<"users">) {
+  if (await closureOf(ctx, userId)) return false;
+  await ctx.db.insert("accountClosures", { userId });
+  return true;
+}
+
+/** Undoes `beginClosing` when the deletion didn't go ahead. */
+export async function cancelClosing(ctx: MutationCtx, userId: Id<"users">) {
+  const closure = await closureOf(ctx, userId);
+  if (closure && closure.closedAt === undefined)
+    await ctx.db.delete(closure._id);
+}
+
+/** Records that the account is deleted, for Polar's events still to come. */
+export async function markClosed(ctx: MutationCtx, userId: Id<"users">) {
+  const closure = await closureOf(ctx, userId);
+  if (closure) await ctx.db.patch(closure._id, { closedAt: Date.now() });
+  else await ctx.db.insert("accountClosures", { userId, closedAt: Date.now() });
 }

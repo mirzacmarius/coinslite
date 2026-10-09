@@ -779,6 +779,9 @@ export default {
     unavailable:
       "Premium kann hier noch nicht gekauft werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
     alreadyPremium: "Du hast bereits Premium.",
+    checkoutPending:
+      "Eine Bezahlseite für den anderen Tarif ist noch offen. Schließe sie dort ab oder versuche es in einer Stunde erneut.",
+    accountClosing: "Dein Konto wird gerade gelöscht.",
     checkoutFailed:
       "Die Bezahlseite konnte nicht geöffnet werden. Versuche es noch einmal.",
     price: "Preis",

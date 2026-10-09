@@ -742,6 +742,9 @@ export default {
     unavailable:
       "Premium can't be bought here yet: billing isn't set up on this deployment.",
     alreadyPremium: "You're on Premium already.",
+    checkoutPending:
+      "A checkout for the other plan is still open. Finish it there, or try again in an hour.",
+    accountClosing: "Your account is being deleted.",
     checkoutFailed: "Couldn't open checkout. Try again.",
     price: "Price",
     renews: "Renews",
