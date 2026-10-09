@@ -11,6 +11,7 @@ import {
   query,
 } from "./_generated/server";
 import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
+import { setErrors, setLimits } from "./catalog/setRules";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
 import { overridesOnly } from "./items/catalogFacts";
@@ -202,6 +203,74 @@ export const quickAdd = mutation({
     return await insertItem(ctx, owner._id, fields, entry, albumId);
   },
 });
+
+/**
+ * Adds several Catalog entries at once (spec 6.2's multi-select, and Sets):
+ * ONE Item of each, linked to it with a Quantity of 1, in the Album chosen.
+ * All or nothing: at most `setLimits.bulkAdd` entries, which must all fit
+ * the person's plan, and none of which they already hold unless they allow
+ * a duplicate. An entry chosen twice is added once.
+ *
+ * At the most entries this writes, per entry, the Item, its Album's count and
+ * the Collection's counts (600 documents of the 16,000 a mutation may write)
+ * and reads about five index ranges (1,000 of 4,096).
+ */
+export const addCatalogEntries = mutation({
+  args: {
+    catalogEntryKeys: v.array(v.string()),
+    albumId: v.optional(v.id("albums")),
+    allowDuplicates: v.optional(v.boolean()),
+  },
+  returns: v.array(v.id("items")),
+  handler: async (ctx, { catalogEntryKeys, albumId, allowDuplicates }) => {
+    const owner = await requireSetUpUser(ctx);
+    if (catalogEntryKeys.length > setLimits.bulkAdd) {
+      throw new ConvexError(setErrors.tooManyEntries);
+    }
+    const keys = [...new Set(catalogEntryKeys)];
+    await requireRoomForItems(ctx, owner._id, keys.length);
+    if (keys.length > 0 && !(await catalogVisibleTo(ctx, owner))) {
+      throw new ConvexError(catalogEntryNotFound);
+    }
+    const entries = await Promise.all(
+      keys.map(async (key) => {
+        const entry = await catalogEntryByKey(ctx, key);
+        if (!entry) throw new ConvexError(catalogEntryNotFound);
+        return entry;
+      }),
+    );
+    if (!allowDuplicates) {
+      const held = await Promise.all(
+        entries.map((entry) => holdsAny(ctx, owner._id, entry._id)),
+      );
+      if (held.some(Boolean)) throw new ConvexError(setErrors.alreadyHeld);
+    }
+    const itemIds = [];
+    for (const entry of entries) {
+      const fields = checkFields(
+        { type: entry.itemType, title: entry.title },
+        entry,
+      );
+      itemIds.push(await insertItem(ctx, owner._id, fields, entry, albumId));
+    }
+    return itemIds;
+  },
+});
+
+/** Whether a person has any Item made from a Catalog entry. */
+async function holdsAny(
+  ctx: QueryCtx,
+  ownerId: Id<"users">,
+  entryId: Id<"catalogNodes">,
+) {
+  const item = await ctx.db
+    .query("items")
+    .withIndex("by_ownerId_and_catalogEntryId", (q) =>
+      q.eq("ownerId", ownerId).eq("catalogEntryId", entryId),
+    )
+    .first();
+  return item !== null;
+}
 
 /**
  * Saves the whole Item form: a field left empty is cleared. On an Item

@@ -1141,4 +1141,75 @@ export default {
       ALBUM_NOT_FOUND: "L’un des albums choisis n’existe plus.",
     },
   },
+  sets: {
+    title: "Ensemble",
+    viewAsSet: "Voir comme ensemble",
+    completion: "Vous en possédez {held} sur {total}",
+    completionLabel: "Progression de l’ensemble",
+    groupCompletion: "{held} / {total}",
+    show: "Afficher",
+    missing: "Manquantes ({count})",
+    all: "Toutes ({count})",
+    selectAllMissing: "Sélectionner les manquantes",
+    allowDuplicates: "Autoriser les doublons",
+    nothingMissing:
+      "Vous possédez toutes les entrées du catalogue de cet ensemble.",
+    showAll: "Tout afficher",
+    openEntry: "Ouvrir {title}",
+    openEntryHint: "Ouvrir l’entrée du catalogue",
+    selectedFirst:
+      "Les {limit} premières entrées manquantes sont sélectionnées. Ajoutez-les, puis sélectionnez le reste.",
+    notASetTitle: "Pas un ensemble",
+    notASet:
+      "Un ensemble est un regroupement qui compte plus d’une entrée du catalogue. Ce n’est pas le cas ici, ou il a été déplacé.",
+    tooLargeTitle: "Trop grand pour un seul ensemble",
+    tooLarge:
+      "Un ensemble compte au plus {limit} entrées du catalogue. Ouvrez l’un des regroupements en dessous et affichez-le comme ensemble.",
+    browse: "Parcourir {title}",
+    addBar: "Ajouter les entrées du catalogue sélectionnées",
+    "selected#one": "{count} sélectionnée",
+    "selected#few": "{count} sélectionnées",
+    "selected#other": "{count} sélectionnées",
+    clearSelection: "Effacer la sélection",
+    isSelected: "Sélectionnée",
+    tooMany: "Vous pouvez ajouter au plus {limit} entrées à la fois.",
+    "itemsLeft#zero": "Plus aucun objet disponible dans la formule gratuite",
+    "itemsLeft#one": "Encore {count} objet disponible dans la formule gratuite",
+    "itemsLeft#few":
+      "Encore {count} objets disponibles dans la formule gratuite",
+    "itemsLeft#other":
+      "Encore {count} objets disponibles dans la formule gratuite",
+    "overQuota#zero":
+      "La formule gratuite n’a plus de place pour d’autres objets.",
+    "overQuota#one":
+      "La formule gratuite n’a de place que pour {count} objet de plus.",
+    "overQuota#few":
+      "La formule gratuite n’a de place que pour {count} objets de plus.",
+    "overQuota#other":
+      "La formule gratuite n’a de place que pour {count} objets de plus.",
+    "add#one": "Ajouter {count} objet",
+    "add#few": "Ajouter {count} objets",
+    "add#other": "Ajouter {count} objets",
+    addNone: "Ajouter des objets",
+    "added#one": "{count} objet ajouté à votre collection",
+    "added#few": "{count} objets ajoutés à votre collection",
+    "added#other": "{count} objets ajoutés à votre collection",
+    openCollection: "Ouvrir la collection",
+    selectSeveral: "Sélection multiple",
+    pickOne: "Choisir une seule",
+    selectHint: "pour sélectionner",
+    selectMissingIn: "Sélectionner les manquantes dans {title}",
+    "missingCount#one": "{count} manquante",
+    "missingCount#few": "{count} manquantes",
+    "missingCount#other": "{count} manquantes",
+    errors: {
+      alreadyHeld:
+        "Vous possédez déjà certaines de ces entrées du catalogue. Autorisez les doublons pour les ajouter à nouveau.",
+      tooMany: "Vous pouvez ajouter au plus {limit} entrées à la fois.",
+      entryGone:
+        "L’une de ces entrées n’est plus dans le catalogue. Sélectionnez à nouveau.",
+      albumGone: "Cet album n’existe plus. Choisissez-en un autre.",
+      failed: "Impossible d’ajouter les objets. Réessayez.",
+    },
+  },
 } as const satisfies Dictionary;

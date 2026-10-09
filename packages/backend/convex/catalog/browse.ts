@@ -66,7 +66,7 @@ const byEntryCount = (
  * (the Catalog visibility flag, featureFlags.ts): then every level reads as
  * empty, as if there were no Catalog.
  */
-async function browsingUser(ctx: QueryCtx) {
+export async function browsingUser(ctx: QueryCtx) {
   const user = await requireSetUpUser(ctx);
   return (await catalogVisibleTo(ctx, user)) ? user : null;
 }
@@ -106,7 +106,7 @@ export async function heldCount(
   return held;
 }
 
-async function nodeByKey(ctx: QueryCtx, key: string) {
+export async function nodeByKey(ctx: QueryCtx, key: string) {
   return await ctx.db
     .query("catalogNodes")
     .withIndex("by_key", (q) => q.eq("key", key))
@@ -114,7 +114,7 @@ async function nodeByKey(ctx: QueryCtx, key: string) {
 }
 
 /** The nodes above one, root first, for the breadcrumb. */
-async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
+export async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
   const keys = node.path.split("/").slice(0, -1);
   const ancestors = [];
   for (const key of keys) {
@@ -124,7 +124,7 @@ async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
   return ancestors;
 }
 
-const ancestor = v.object({ key: v.string(), title: v.string() });
+export const ancestor = v.object({ key: v.string(), title: v.string() });
 
 /** A Catalog entry with everything its detail view shows. */
 const entryFields = {
@@ -287,12 +287,25 @@ export const node = query({
   },
 });
 
-const entryRow = v.object({
+export const entryRow = v.object({
   ...entryFields,
   /** Who to credit beside the thumbnail, when the image's licence asks for it. */
   imageCredit: v.optional(provenance),
 });
 type EntryRow = typeof entryRow.type;
+
+/** An entry as a row of a list, with its image's credit when the licence asks for one. */
+export async function creditedEntryRow(
+  ctx: QueryCtx,
+  node: Doc<"catalogNodes">,
+  held: number,
+): Promise<EntryRow> {
+  const row = await entryRowOf(ctx, node, held);
+  const credit = node.imageProvenance;
+  return row.thumbnailUrl && credit && creditRequired(credit.licence)
+    ? { ...row, imageCredit: credit }
+    : row;
+}
 
 /** A page of Catalog entries as rows, with how many of each the person holds. */
 async function entryRows(
@@ -301,17 +314,9 @@ async function entryRows(
   page: PaginationResult<Doc<"catalogNodes">>,
 ): Promise<PaginationResult<EntryRow>> {
   const rows = await Promise.all(
-    page.page.map(async (node) => {
-      const row = await entryRowOf(
-        ctx,
-        node,
-        await heldCount(ctx, ownerId, node._id),
-      );
-      const credit = node.imageProvenance;
-      return row.thumbnailUrl && credit && creditRequired(credit.licence)
-        ? { ...row, imageCredit: credit }
-        : row;
-    }),
+    page.page.map(async (node) =>
+      creditedEntryRow(ctx, node, await heldCount(ctx, ownerId, node._id)),
+    ),
   );
   return { ...page, page: rows };
 }
@@ -347,12 +352,12 @@ export const entries = query({
  * are grouped as null. Both levels read one entry per distinct value from the
  * index, so they cost as many reads as there are groups, not entries.
  */
-const byDenomination =
+export const byDenomination =
   "by_kind_countryNodeKey_denomination_series_yearFrom_sortOrder";
 
 /** "No denomination" and "no series" travel as null; stored, they are absent. */
-const nullable = v.union(v.string(), v.null());
-const stored = (value: string | null) => value ?? undefined;
+export const nullable = v.union(v.string(), v.null());
+export const stored = (value: string | null) => value ?? undefined;
 
 /** The distinct denominations among a country's entries, in index order. */
 async function denominationsIn(ctx: QueryCtx, countryNodeKey: string) {
