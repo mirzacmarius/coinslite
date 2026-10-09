@@ -1,5 +1,6 @@
 "use client";
 
+import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
@@ -18,6 +19,8 @@ import { ItemFormDialog } from "./item-form-dialog";
 export type NewItemPreset = {
   /** The Item type already chosen, as the Overview's "Add banknote" does. */
   type?: ItemType;
+  /** A coin scan's photos and suggestion, for the person to review (scanner/scan-coin.tsx). */
+  scan?: ScanPreset;
 };
 
 const AddItemContext = createContext<(preset?: NewItemPreset) => void>(
@@ -69,6 +72,7 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
         open={open}
         onOpenChange={setOpen}
         newItemType={preset.type}
+        scan={preset.scan}
       />
     </AddItemContext.Provider>
   );

@@ -1413,4 +1413,52 @@ export default {
       "Nu există nimic la această adresă. Poate a fost mutată sau linkul este greșit.",
     home: "Mergi la prezentare",
   },
+  scanner: {
+    scan: "Scanează moneda",
+    title: "Scanează moneda",
+    beta: "Beta",
+    description:
+      "Fotografiază ambele fețe ale unei monede, iar CoinsLite sugerează ce este. Verifici sugestia înainte ca obiectul să fie adăugat.",
+    tips: "Așază moneda pe o suprafață uniformă, umple cadrul și evită reflexiile.",
+    steps: {
+      front: "Avers",
+      back: "Revers",
+    },
+    next: {
+      front: "Începe cu aversul monedei.",
+      back: "Acum întoarce moneda și fotografiază reversul.",
+      done: "Ambele fețe sunt gata. Identifică moneda când ești pregătit.",
+    },
+    takePhoto: "Fă o fotografie",
+    choosePhoto: "Alege o fotografie",
+    chooseFile: "Alege un fișier",
+    retake: "Refă",
+    identify: "Identifică moneda",
+    identifying: "Se identifică moneda…",
+    addByHand: "Adaugă manual",
+    cancel: "Anulează",
+    close: "Închide",
+    unidentified:
+      "Moneda nu a putut fi identificată. Încearcă fotografii noi, cu lumină mai bună, sau adaug-o manual cu aceste fotografii.",
+    notConfigured:
+      "Scannerul nu este încă disponibil în acest mediu. Poți adăuga totuși moneda manual.",
+    errors: {
+      notAvailable: "Scannerul nu îți este disponibil.",
+      tooMany:
+        "Ai scanat multe monede într-un timp scurt. Încearcă mai târziu sau adaugă moneda aceasta manual.",
+      tooLarge: "Fotografia este prea mare pentru scanare. Încearcă alta.",
+      notAnImage: "Fișierul nu este o imagine JPEG, PNG, WebP sau GIF.",
+      uploadsTooMany:
+        "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
+      failed:
+        "Scanarea nu a reușit. Încearcă din nou sau adaugă moneda manual.",
+    },
+    suggested: "Sugerat de scanner",
+    reviewHint:
+      "Verifică fiecare detaliu pe moneda ta înainte să adaugi obiectul. Fotografiile sunt adăugate odată cu el.",
+    photosFromScan: "Fotografii din scanare",
+    photosHint: "Aceste fotografii sunt adăugate obiectului.",
+    photosFailed:
+      "Obiectul a fost adăugat, dar fotografiile nu au putut fi salvate. Adaugă-le pe pagina obiectului.",
+  },
 } as const satisfies Dictionary;

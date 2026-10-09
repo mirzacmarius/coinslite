@@ -3,6 +3,7 @@
 import { CollectionTotalsSection } from "@/components/collection-totals/collection-totals";
 import { CollectionBrowser } from "@/components/collection/collection-browser";
 import { ResultsSkeleton } from "@/components/collection/collection-results";
+import { ScanCoinButton } from "@/components/scanner/scan-coin";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { HeaderBar } from "@coinslite/ui/header-bar";
@@ -23,10 +24,13 @@ export function CollectionPage() {
       <HeaderBar
         title={t("nav.collection")}
         actions={
-          <Button size="xs" onClick={() => addItem()}>
-            <Plus aria-hidden="true" />
-            {t("items.add")}
-          </Button>
+          <>
+            <ScanCoinButton />
+            <Button size="xs" onClick={() => addItem()}>
+              <Plus aria-hidden="true" />
+              {t("items.add")}
+            </Button>
+          </>
         }
       />
       <CollectionTotalsSection />

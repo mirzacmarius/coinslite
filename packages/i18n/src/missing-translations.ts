@@ -29,6 +29,7 @@ const everyLanguage = [
 const ownWords: Record<Exclude<Locale, "en">, string[]> = {
   nb: [
     "Aluminium",
+    "Beta",
     "Diameter",
     "Filter",
     "ID",
@@ -46,6 +47,7 @@ const ownWords: Record<Exclude<Locale, "en">, string[]> = {
     "Admin",
     "Aluminium",
     "Banknote",
+    "Beta",
     "Bronze",
     "Code",
     "Export",
@@ -101,6 +103,7 @@ const ownWords: Record<Exclude<Locale, "en">, string[]> = {
   ],
   ro: [
     "Active",
+    "Beta",
     "Catalog",
     "Credit",
     "Export",

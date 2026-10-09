@@ -1451,4 +1451,52 @@ export default {
       "Unter dieser Adresse gibt es nichts. Vielleicht wurde die Seite verschoben, oder der Link ist falsch.",
     home: "Zur Übersicht",
   },
+  scanner: {
+    scan: "Münze scannen",
+    title: "Münze scannen",
+    beta: "Beta",
+    description:
+      "Fotografiere beide Seiten einer Münze, und CoinsLite schlägt vor, was sie ist. Du prüfst den Vorschlag, bevor das Objekt hinzugefügt wird.",
+    tips: "Lege die Münze flach auf einen einfarbigen Hintergrund, fülle das Bild aus und vermeide Spiegelungen.",
+    steps: {
+      front: "Vorderseite",
+      back: "Rückseite",
+    },
+    next: {
+      front: "Beginne mit der Vorderseite der Münze.",
+      back: "Dreh die Münze jetzt um und fotografiere die Rückseite.",
+      done: "Beide Seiten sind da. Lass die Münze bestimmen, wenn du so weit bist.",
+    },
+    takePhoto: "Foto aufnehmen",
+    choosePhoto: "Foto auswählen",
+    chooseFile: "Datei auswählen",
+    retake: "Neu aufnehmen",
+    identify: "Münze bestimmen",
+    identifying: "Münze wird bestimmt…",
+    addByHand: "Von Hand hinzufügen",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    unidentified:
+      "Die Münze konnte nicht bestimmt werden. Versuch es mit neuen Fotos bei besserem Licht, oder füge sie mit diesen Fotos von Hand hinzu.",
+    notConfigured:
+      "Der Scanner ist in dieser Umgebung noch nicht verfügbar. Du kannst die Münze trotzdem von Hand hinzufügen.",
+    errors: {
+      notAvailable: "Der Scanner ist für dich nicht verfügbar.",
+      tooMany:
+        "Du hast in kurzer Zeit viele Münzen gescannt. Versuch es später noch einmal, oder füge diese von Hand hinzu.",
+      tooLarge: "Das Foto ist zu groß zum Scannen. Versuch ein anderes.",
+      notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
+      uploadsTooMany:
+        "Zu viele Uploads in kurzer Zeit. Versuch es in ein paar Minuten noch einmal.",
+      failed:
+        "Der Scan hat nicht geklappt. Versuch es noch einmal, oder füge die Münze von Hand hinzu.",
+    },
+    suggested: "Vom Scanner vorgeschlagen",
+    reviewHint:
+      "Prüfe jedes Detail an deiner Münze, bevor du das Objekt hinzufügst. Die Fotos werden mit hinzugefügt.",
+    photosFromScan: "Fotos aus dem Scan",
+    photosHint: "Diese Fotos werden dem Objekt hinzugefügt.",
+    photosFailed:
+      "Das Objekt wurde hinzugefügt, aber seine Fotos konnten nicht gespeichert werden. Füge sie auf der Seite des Objekts hinzu.",
+  },
 } as const satisfies Dictionary;
