@@ -1007,4 +1007,53 @@ export default {
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
     fileName: "coinslite-sammlung-{date}.csv",
   },
+  insuranceReport: {
+    title: "Versicherungsbericht",
+    lockedTitle: "Der Versicherungsbericht gehört zu Premium",
+    lockedDescription:
+      "Ein PDF für deine Versicherung mit den Objekten deiner Wahl, ihren Werten, deinen Kontaktdaten und den Summen.",
+    scopeTitle: "Objekte",
+    scopeDescription: "Wähle, welche Objekte der Bericht umfasst.",
+    scope: "Umfang",
+    wholeCollection: "Gesamte Sammlung",
+    albums: "Alben",
+    withoutAlbum: "Objekte ohne Album",
+    noAlbums: "Du hast noch keine Alben.",
+    chooseScope: "Wähle mindestens ein Album oder die Objekte ohne Album.",
+    valuesTitle: "Werte",
+    valuesDescription:
+      "Der Versicherungswert ist der höchste der gewählten Werte je Objekt.",
+    keepOne:
+      "Behalte mindestens einen von Kaufpreis, Marktwert oder Metallwert.",
+    columns: {
+      purchasePrice: "Kaufpreis",
+      marketValue: "Marktwert",
+      metalValue: "Metallwert",
+      insuredValue: "Versicherungswert",
+    },
+    previewTitle: "Vorschau",
+    previewDescription: "Jede Summe umfasst alle Stücke jedes Objekts.",
+    items: "Objekte",
+    pieces: "Stück",
+    noSpotPrices:
+      "Noch keine Spotpreise, daher hat kein Objekt einen Metallwert.",
+    staleSpotPrices: "Die Spotpreise sind möglicherweise veraltet.",
+    tooLarge:
+      "Ein Bericht umfasst höchstens {limit} Objekte. Wähle weniger Alben.",
+    nothingToReport: "Hier gibt es keine Objekte für den Bericht.",
+    ownerTitle: "Eigentümer",
+    ownerDescription: "Steht im Bericht, aus deinem Konto.",
+    editContact: "Im Konto bearbeiten",
+    missingContact:
+      "Trage im Konto deinen vollständigen Namen, deine Telefonnummer und Adresse ein, damit deine Versicherung dich erreicht.",
+    download: "PDF herunterladen",
+    downloaded: "Versicherungsbericht heruntergeladen",
+    failed: "Der Bericht konnte nicht erstellt werden. Versuche es erneut.",
+    errors: {
+      PREMIUM_REQUIRED: "Der Versicherungsbericht gehört zu Premium.",
+      REPORT_TOO_LARGE:
+        "Dieser Bericht hat zu viele Objekte. Wähle weniger Alben.",
+      ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
+    },
+  },
 } as const satisfies Dictionary;

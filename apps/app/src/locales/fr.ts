@@ -991,4 +991,54 @@ export default {
     failed: "Impossible d’exporter la collection. Réessayez.",
     fileName: "coinslite-collection-{date}.csv",
   },
+  insuranceReport: {
+    title: "Rapport d’assurance",
+    lockedTitle: "Le rapport d’assurance fait partie de Premium",
+    lockedDescription:
+      "Un PDF pour votre assureur avec les objets de votre choix, leurs valeurs, vos coordonnées et les totaux.",
+    scopeTitle: "Objets",
+    scopeDescription: "Choisissez les objets couverts par le rapport.",
+    scope: "Périmètre",
+    wholeCollection: "Toute la collection",
+    albums: "Albums",
+    withoutAlbum: "Objets sans album",
+    noAlbums: "Vous n’avez pas encore d’album.",
+    chooseScope: "Choisissez au moins un album, ou les objets sans album.",
+    valuesTitle: "Valeurs",
+    valuesDescription:
+      "La valeur assurée est la plus élevée des valeurs choisies pour chaque objet.",
+    keepOne:
+      "Gardez au moins le prix d’achat, la valeur de marché ou la valeur du métal.",
+    columns: {
+      purchasePrice: "Prix d’achat",
+      marketValue: "Valeur de marché",
+      metalValue: "Valeur du métal",
+      insuredValue: "Valeur assurée",
+    },
+    previewTitle: "Aperçu",
+    previewDescription:
+      "Chaque total couvre tous les exemplaires de chaque objet.",
+    items: "Objets",
+    pieces: "Exemplaires",
+    noSpotPrices:
+      "Pas encore de cours spot : aucun objet n’a donc de valeur du métal.",
+    staleSpotPrices: "Les cours spot sont peut-être dépassés.",
+    tooLarge:
+      "Un rapport compte au plus {limit} objets. Choisissez moins d’albums.",
+    nothingToReport: "Il n’y a aucun objet à inclure ici.",
+    ownerTitle: "Propriétaire",
+    ownerDescription: "Figure sur le rapport, depuis votre compte.",
+    editContact: "Modifier dans le compte",
+    missingContact:
+      "Ajoutez votre nom complet, votre téléphone et votre adresse dans le compte pour que votre assureur puisse vous joindre.",
+    download: "Télécharger le PDF",
+    downloaded: "Rapport d’assurance téléchargé",
+    failed: "Impossible de créer le rapport. Réessayez.",
+    errors: {
+      PREMIUM_REQUIRED: "Le rapport d’assurance fait partie de Premium.",
+      REPORT_TOO_LARGE:
+        "Ce rapport compte trop d’objets. Choisissez moins d’albums.",
+      ALBUM_NOT_FOUND: "L’un des albums choisis n’existe plus.",
+    },
+  },
 } as const satisfies Dictionary;
