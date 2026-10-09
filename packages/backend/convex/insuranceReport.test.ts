@@ -409,28 +409,26 @@ test("the PDF has the report's header, the owner, the Spot prices used, a summar
   expect(text).toContain("Phone +47 22 12 34 56");
   expect(text).toContain("Address Storgata 1 0155 Oslo Norway");
   // The Spot prices behind the Metal values: 2400 and 30 dollars a troy ounce at 10 kroner
-  expect(text).toContain(
-    "Gold NOK 771.62 per gram NOK 24,000.00 per troy ounce",
-  );
-  expect(text).toContain("Silver NOK 9.65 per gram NOK 300.00 per troy ounce");
+  expect(text).toContain("Gold kr 771.62 per gram kr 24,000.00 per troy ounce");
+  expect(text).toContain("Silver kr 9.65 per gram kr 300.00 per troy ounce");
   expect(text).toContain("As of Oct 9, 2026, 2:00 PM");
   // The totals, then the table
   expect(text).toContain(
-    "Summary Market value NOK 12,600.00 Metal value NOK 13,889.12 Insured value NOK 14,489.12",
+    "Summary Market value kr 12,600.00 Metal value kr 13,889.12 Insured value kr 14,489.12",
   );
   expect(text).toContain(
     "Type Title Year Denomination Grade Quantity Market value Metal value Insured value",
   );
   expect(text).toContain(
-    "Coin 2 kroner 1914 1914 2 kroner 3 NOK 600.00 NOK 600.00",
+    "Coin 2 kroner 1914 1914 2 kroner 3 kr 600.00 kr 600.00",
   );
   expect(text).toContain(
-    "Coin 20 kroner 1910 gold 1910 2 NOK 12,000.00 NOK 13,889.12 NOK 13,889.12",
+    "Coin 20 kroner 1910 gold 1910 2 kr 12,000.00 kr 13,889.12 kr 13,889.12",
   );
   expect(text).toContain("Stamp Posthorn 1 øre 1");
-  expect(text).toContain("Total 6 NOK 12,600.00 NOK 13,889.12 NOK 14,489.12");
+  expect(text).toContain("Total 6 kr 12,600.00 kr 13,889.12 kr 14,489.12");
   // Purchase prices weren't chosen: 3 × 150 kr appears nowhere.
-  expect(text).not.toContain("NOK 450.00");
+  expect(text).not.toContain("kr 450.00");
   expect(text).toContain("Page 1 of 1");
   expect(text).toContain(
     "About these values Amounts are in NOK and cover all of an Item's pieces: the amount per piece × Quantity.",
@@ -472,10 +470,10 @@ test("the PDF is in the language asked for, every character included", async () 
     "Tip Titlu An Valoare nominală Stare Cantitate Valoare de piață Valoarea metalului Valoare asigurată",
   );
   expect(text).toContain(
-    "Monedă Ducat Ștefan cel Mare 1910 PF-65 2 12.000,00 NOK 13.889,12 NOK 13.889,12 NOK",
+    "Monedă Ducat Ștefan cel Mare 1910 PF-65 2 12.000,00 kr 13.889,12 kr 13.889,12 kr",
   );
   expect(text).toContain("Timbru Posthorn 1 øre Neștampilat, fără șarnieră 1");
-  expect(text).toContain("Total 3 12.000,00 NOK 13.889,12 NOK 13.889,12 NOK");
+  expect(text).toContain("Total 3 12.000,00 kr 13.889,12 kr 13.889,12 kr");
   expect(text).toContain("Pagina 1 din 1");
   expect(text).toContain(
     "Valoarea asigurată este cea mai mare dintre valorile alese pentru fiecare obiect.",
@@ -507,9 +505,9 @@ test("a long report runs over several pages, each with the column headings and a
     expect(page).toContain(`Page ${index + 1} of ${report.pages.length}`);
   });
   for (let n = 1; n <= 90; n++) {
-    expect(report.all).toContain(`Banknote Seddel ${n} 1 NOK 100.00`);
+    expect(report.all).toContain(`Banknote Seddel ${n} 1 kr 100.00`);
   }
-  expect(report.pages.at(-1)).toContain("Total 90 NOK 9,000.00");
+  expect(report.pages.at(-1)).toContain("Total 90 kr 9,000.00");
   // Sorted the way people read numbers: Seddel 2 comes before Seddel 10.
   expect(report.all.indexOf("Seddel 2 ")).toBeLessThan(
     report.all.indexOf("Seddel 10 "),
@@ -537,9 +535,9 @@ test("the PDF names the chosen Albums, shows only the chosen values, and leaves 
     "Type Title Year Denomination Grade Quantity Purchase price Market value Coin 2 kroner",
   );
   expect(text).toContain(
-    "Coin 2 kroner 1914 1914 2 kroner 3 NOK 450.00 NOK 600.00",
+    "Coin 2 kroner 1914 1914 2 kroner 3 kr 450.00 kr 600.00",
   );
-  expect(text).toContain("Total 6 NOK 10,450.00 NOK 12,600.00");
+  expect(text).toContain("Total 6 kr 10,450.00 kr 12,600.00");
   expect(text).not.toContain("Spot prices");
   expect(text).not.toContain("Metal value");
   expect(text).not.toContain("Insured value");
@@ -555,7 +553,7 @@ test("before the first Spot prices, the PDF says so", async () => {
   expect(all).toContain(
     "Spot prices No Spot prices yet, so no Item has a Metal value.",
   );
-  expect(all).toContain("Total 2 NOK 12,000.00 NOK 0.00 NOK 12,000.00");
+  expect(all).toContain("Total 2 kr 12,000.00 kr 0.00 kr 12,000.00");
 });
 
 test("the PDF is made for Premium members only, on the server", async () => {

@@ -151,17 +151,17 @@ test("the PDF has a header with the scope, generation time, owner and totals, on
   // 3 × 150 kr + 2 × 5 000 kr paid; 3 × 200 kr + 2 × 4 500 kr + 50 kr now;
   // Gain/loss over the two Items with both: +150 kr − 1 000 kr.
   expect(text).toContain(
-    "Totals Items 3 Pieces 6 Purchase price NOK 10,450.00 Market value NOK 9,650.00 Gain/loss -NOK 850.00",
+    "Totals Items 3 Pieces 6 Purchase price kr 10,450.00 Market value kr 9,650.00 Gain/loss -kr 850.00",
   );
   expect(text).toContain(
     "Item type Title Year Denomination Grade Quantity Purchase date Purchase price Market value Gain/loss",
   );
   // In the view's order: by year, oldest first, Items without one last.
   expect(text).toContain(
-    "Coin 20 kroner 1910 1910 20 kroner 2 NOK 10,000.00 NOK 9,000.00 -NOK 1,000.00 " +
-      "Coin 2 kroner 1914 1914 2 kroner 1+ 3 Mar 5, 2024 NOK 450.00 NOK 600.00 +NOK 150.00 " +
-      "Stamp Posthorn 1 øre Mint never hinged 1 NOK 50.00 " +
-      "Total 6 NOK 10,450.00 NOK 9,650.00 -NOK 850.00",
+    "Coin 20 kroner 1910 1910 20 kroner 2 kr 10,000.00 kr 9,000.00 -kr 1,000.00 " +
+      "Coin 2 kroner 1914 1914 2 kroner 1+ 3 Mar 5, 2024 kr 450.00 kr 600.00 +kr 150.00 " +
+      "Stamp Posthorn 1 øre Mint never hinged 1 kr 50.00 " +
+      "Total 6 kr 10,450.00 kr 9,650.00 -kr 850.00",
   );
   expect(text).toContain("Page 1 of 1");
   expect(text).toContain(
@@ -197,12 +197,12 @@ test("the PDF covers exactly the view on screen: its search, filters and sort, n
     "Scope Search: “kroner” Item type: Coin Sorted by Highest Purchase price",
   );
   expect(searched.all).toContain(
-    "Totals Items 2 Pieces 5 Purchase price NOK 10,450.00 Market value NOK 9,600.00 Gain/loss -NOK 850.00",
+    "Totals Items 2 Pieces 5 Purchase price kr 10,450.00 Market value kr 9,600.00 Gain/loss -kr 850.00",
   );
   expect(searched.all).toContain(
-    "Coin 20 kroner 1910 1910 20 kroner 2 NOK 10,000.00 NOK 9,000.00 -NOK 1,000.00 " +
-      "Coin 2 kroner 1914 1914 2 kroner 1+ 3 Mar 5, 2024 NOK 450.00 NOK 600.00 +NOK 150.00 " +
-      "Total 5 NOK 10,450.00 NOK 9,600.00 -NOK 850.00",
+    "Coin 20 kroner 1910 1910 20 kroner 2 kr 10,000.00 kr 9,000.00 -kr 1,000.00 " +
+      "Coin 2 kroner 1914 1914 2 kroner 1+ 3 Mar 5, 2024 kr 450.00 kr 600.00 +kr 150.00 " +
+      "Total 5 kr 10,450.00 kr 9,600.00 -kr 850.00",
   );
   expect(searched.all).not.toContain("Morgan");
   expect(searched.all).not.toContain("Posthorn");
@@ -317,10 +317,10 @@ test("a long view runs over several pages, each with the column headings and a p
   });
   for (let n = 1; n <= 90; n++) {
     expect(pdf.all).toContain(
-      `Banknote Seddel ${n} ${1900 + n} 1 NOK 80.00 NOK 100.00 +NOK 20.00`,
+      `Banknote Seddel ${n} ${1900 + n} 1 kr 80.00 kr 100.00 +kr 20.00`,
     );
   }
-  const totals = "Total 90 NOK 7,200.00 NOK 9,000.00 +NOK 1,800.00";
+  const totals = "Total 90 kr 7,200.00 kr 9,000.00 +kr 1,800.00";
   expect(pdf.all).toContain(totals);
   expect(pdf.all.indexOf(totals)).toBeGreaterThan(
     pdf.all.indexOf("Seddel 90 "),

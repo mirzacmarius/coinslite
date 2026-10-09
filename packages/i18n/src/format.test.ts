@@ -7,6 +7,7 @@ import {
   formatNumber,
   formattersFor,
   homeCurrencies,
+  locales,
 } from "./index";
 
 // Intl uses non-breaking (and narrow non-breaking) spaces as group separators.
@@ -32,8 +33,49 @@ describe("formatMoney", () => {
     expect(plain(formatMoney(123456, "NOK", "nb"))).toBe("1 234,56 kr");
     expect(plain(formatMoney(123456, "EUR", "de"))).toBe("1.234,56 €");
     expect(plain(formatMoney(123456, "USD", "en"))).toBe("$1,234.56");
-    expect(plain(formatMoney(123456, "RON", "ro"))).toBe("1.234,56 RON");
+    expect(plain(formatMoney(123456, "RON", "ro"))).toBe("1.234,56 lei");
     expect(plain(formatMoney(123456, "CHF", "fr"))).toBe("1 234,56 CHF");
+  });
+
+  test("shows the currency's symbol, not its ISO code, in every language", () => {
+    expect(plain(formatMoney(123456, "NOK", "en"))).toBe("kr 1,234.56");
+    expect(plain(formatMoney(123456, "SEK", "de"))).toBe("1.234,56 kr");
+    expect(plain(formatMoney(123456, "DKK", "fr"))).toBe("1 234,56 kr");
+    expect(plain(formatMoney(123456, "USD", "nb"))).toBe("1 234,56 $");
+    expect(plain(formatMoney(123456, "USD", "fr"))).toBe("1 234,56 $");
+    expect(plain(formatMoney(123456, "GBP", "ro"))).toBe("1.234,56 £");
+    expect(plain(formatMoney(123456, "EUR", "ro"))).toBe("1.234,56 €");
+    expect(plain(formatMoney(123456, "RON", "en"))).toBe("lei 1,234.56");
+    for (const locale of locales) {
+      expect(plain(formatMoney(123456, "RON", locale))).toContain("lei");
+      for (const currency of homeCurrencies) {
+        // The Swiss franc's symbol is "CHF" itself.
+        if (currency === "CHF") continue;
+        expect(formatMoney(123456, currency, locale)).not.toContain(currency);
+      }
+    }
+  });
+
+  test("can show the sign of a gain or a loss", () => {
+    expect(formatMoney(15000, "NOK", "en", { signed: true })).toBe(
+      "+kr\u00a0150.00",
+    );
+    expect(plain(formatMoney(-85000, "NOK", "en", { signed: true }))).toBe(
+      "-kr 850.00",
+    );
+    expect(plain(formatMoney(-85000, "NOK", "nb", { signed: true }))).toBe(
+      "−850,00 kr",
+    );
+    expect(formatMoney(0, "EUR", "en", { signed: true })).toBe("€0.00");
+  });
+
+  test("can abbreviate large amounts", () => {
+    expect(formatMoney(15000000, "NOK", "en", { compact: true })).toBe(
+      "kr\u00a0150K",
+    );
+    expect(plain(formatMoney(125000000, "EUR", "de", { compact: true }))).toBe(
+      "1,3 Mio. €",
+    );
   });
 
   test("keeps cents exact for small amounts", () => {
