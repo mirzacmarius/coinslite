@@ -139,15 +139,22 @@ export async function nodeByKey(ctx: QueryCtx, key: string) {
     .unique();
 }
 
-/** The nodes above one, root first, for the breadcrumb. */
-export async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
-  const keys = node.path.split("/").slice(0, -1);
-  const ancestors = [];
-  for (const key of keys) {
+/** The nodes above one, root first. */
+export async function ancestorNodesOf(
+  ctx: QueryCtx,
+  node: Doc<"catalogNodes">,
+) {
+  const ancestors: Doc<"catalogNodes">[] = [];
+  for (const key of node.path.split("/").slice(0, -1)) {
     const ancestor = await nodeByKey(ctx, key);
-    if (ancestor) ancestors.push(ancestorOf(ancestor));
+    if (ancestor) ancestors.push(ancestor);
   }
   return ancestors;
+}
+
+/** The nodes above one, root first, for the breadcrumb. */
+export async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
+  return (await ancestorNodesOf(ctx, node)).map(ancestorOf);
 }
 
 /** A node on the way down to another, for the breadcrumb; a country comes with its code. */

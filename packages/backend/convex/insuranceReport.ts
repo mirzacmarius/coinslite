@@ -19,7 +19,7 @@ import { metalValue } from "./items/preciousMetal";
 import { resolveItems } from "./items/resolve";
 import { requirePremium } from "./plans";
 import { latestRates } from "./spotPrices";
-import { type Metal, TROY_OUNCE_GRAMS } from "./spotPrices/rates";
+import { type Metal, spotPriceOf } from "./spotPrices/rates";
 import { homeCurrency, reportValues } from "./utils/validators";
 
 /**
@@ -169,13 +169,8 @@ export const contents = internalQuery({
     const report = await valueReport(ctx, scope, columns);
     const { owner, rates } = report;
     const currency = owner.homeCurrency;
-    const priceOf = (metal: Metal) => {
-      const perGram = rates?.spotPricePerGram(metal, currency) ?? 0;
-      return {
-        perGram: Math.round(perGram),
-        perOunce: Math.round(perGram * TROY_OUNCE_GRAMS),
-      };
-    };
+    const priceOf = (metal: Metal) =>
+      spotPriceOf(rates?.spotPricePerGram(metal, currency) ?? 0);
     return {
       owner: {
         name: owner.fullName ?? owner.displayName,

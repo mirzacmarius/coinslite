@@ -3,6 +3,12 @@ import { type HomeCurrency, homeCurrencies } from "@coinslite/i18n";
 /** Grams in one troy ounce, the unit metal markets quote in. */
 export const TROY_OUNCE_GRAMS = 31.1034768;
 
+/** A Spot price as it's shown: per gram and per troy ounce, in whole minor units. */
+export const spotPriceOf = (perGram: number) => ({
+  perGram: Math.round(perGram),
+  perOunce: Math.round(perGram * TROY_OUNCE_GRAMS),
+});
+
 /** The metals with a Spot price. */
 export const metals = ["gold", "silver"] as const;
 export type Metal = (typeof metals)[number];

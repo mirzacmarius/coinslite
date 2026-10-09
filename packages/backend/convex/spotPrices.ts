@@ -11,8 +11,8 @@ import { type Quote, fetchQuote } from "./spotPrices/metalPriceApi";
 import {
   type MarketRates,
   type Metal,
-  TROY_OUNCE_GRAMS,
   marketRates,
+  spotPriceOf,
 } from "./spotPrices/rates";
 import { requireSetUpUser } from "./utils/auth";
 import { homeCurrency, perDollar } from "./utils/validators";
@@ -55,13 +55,8 @@ export const current = query({
     const { homeCurrency: currency } = await requireSetUpUser(ctx);
     const rates = await latestRates(ctx);
     if (!rates) return null;
-    const priceOf = (metal: Metal) => {
-      const perGram = rates.spotPricePerGram(metal, currency);
-      return {
-        perGram: Math.round(perGram),
-        perOunce: Math.round(perGram * TROY_OUNCE_GRAMS),
-      };
-    };
+    const priceOf = (metal: Metal) =>
+      spotPriceOf(rates.spotPricePerGram(metal, currency));
     return {
       currency,
       quotedAt: rates.quotedAt,
