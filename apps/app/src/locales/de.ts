@@ -57,7 +57,7 @@ export default {
         "Akzeptiere die Datenschutzerklärung und die Nutzungsbedingungen, um fortzufahren.",
       haveAccount: "Du hast schon ein Konto?",
       failed:
-        "Wir konnten das Konto nicht erstellen. Wenn du schon eines hast, melde dich an oder setze dein Passwort zurück.",
+        "Wir konnten das Konto nicht erstellen. Wenn du schon eines hast, melde dich an: mit Passwort, Anmeldelink oder Google.",
     },
     fields: {
       email: "E-Mail",
@@ -103,6 +103,30 @@ export default {
       submit: "Passwort speichern",
       failed:
         "Der Code hat nicht funktioniert oder ist abgelaufen. Fordere einen neuen an.",
+    },
+    methods: {
+      or: "oder",
+      google: "Weiter mit Google",
+      link: "Anmeldelink per E-Mail senden",
+    },
+    link: {
+      pageTitle: "Mit Link anmelden",
+      title: "Mit Link anmelden",
+      description:
+        "Wir senden dir einen Link per E-Mail, der dich anmeldet. Neu bei CoinsLite? Derselbe Link erstellt dein Konto.",
+      submit: "Link senden",
+      sentTitle: "Prüfe dein Postfach",
+      sent: "Wir haben einen Anmeldelink an {email} gesendet. Er funktioniert einmal und läuft in 15 Minuten ab.",
+      usePassword: "Stattdessen mit Passwort anmelden",
+      failed:
+        "Dieser Anmeldelink ist abgelaufen oder wurde schon verwendet. Fordere einen neuen an.",
+    },
+    welcome: {
+      pageTitle: "Einrichtung abschließen",
+      title: "Schließe die Einrichtung deines Kontos ab",
+      description:
+        "Angemeldet als {email}. Wähle deine Heimatwährung und akzeptiere die Bedingungen, um loszulegen.",
+      submit: "CoinsLite verwenden",
     },
     backToSignIn: "Zurück zur Anmeldung",
     noMatches: "Keine Treffer",

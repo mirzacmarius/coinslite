@@ -40,3 +40,17 @@ export const latestCodeFor = internalQuery({
     return latest?.code ?? null;
   },
 });
+
+/** The link in the newest email sent to an address; used by end-to-end tests via `convex run`. */
+export const latestLinkFor = internalQuery({
+  args: { email: v.string() },
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx, { email }) => {
+    const latest = await ctx.db
+      .query("devOutbox")
+      .withIndex("by_to", (q) => q.eq("to", email))
+      .order("desc")
+      .first();
+    return latest?.text.match(/https?:\/\/\S+/)?.[0] ?? null;
+  },
+});

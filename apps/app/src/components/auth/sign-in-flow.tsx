@@ -10,6 +10,7 @@ import { useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { CodeStep } from "./code-step";
+import { OtherSignInMethods } from "./other-methods";
 import { TextField } from "./text-field";
 import { useAuthSchemas, useSubmitState } from "./use-auth-form";
 import { usePasswordAuth } from "./use-password-auth";
@@ -100,6 +101,7 @@ export function SignInFlow({ next }: { next: string }) {
           {t("auth.signIn.submit")}
         </SubmitButton>
       </AuthForm>
+      <OtherSignInMethods next={next} />
     </AuthPanel>
   );
 }

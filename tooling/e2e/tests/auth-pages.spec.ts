@@ -9,6 +9,7 @@ const pages = [
   { path: "/signup", heading: "Create your account" },
   { path: "/reset", heading: "Reset your password" },
   { path: "/verify", heading: "Verifying your email" },
+  { path: "/link", heading: "Sign in with a link" },
 ];
 
 for (const { path, heading } of pages) {

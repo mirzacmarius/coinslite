@@ -5,6 +5,7 @@ import type { Value } from "convex/values";
 import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
 import { beforeAll, expect, test } from "vitest";
 import { api, internal } from "./_generated/api";
+import { createOrUpdateUser } from "./accounts/linking";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -301,4 +302,170 @@ test("a deleted account's email can sign up again", async () => {
   const again = await signUp(t);
   expect(again.tokens ?? null).toBeNull();
   expect(await users(t)).toHaveLength(1);
+});
+
+// Sign-in links and Google, and how they share one account per email
+// (docs/adr/0005-one-account-per-email.md).
+
+const signInWithLink = async (t: Test, email: string) => {
+  await t.action(api.auth.signIn, {
+    provider: "magic-link",
+    params: { email },
+  });
+  const code = await latestCode(t, email);
+  return t.action(api.auth.signIn, {
+    provider: "magic-link",
+    params: { email, code },
+  });
+};
+
+const googleSignIn = (
+  t: Test,
+  profile: { email: string; emailVerified: boolean },
+) =>
+  t.run((ctx) =>
+    createOrUpdateUser(ctx, {
+      existingUserId: null,
+      type: "oauth",
+      profile: {
+        ...profile,
+        name: "Ada Lovelace",
+        image: "https://example.com/ada.png",
+      },
+    }),
+  );
+
+const signInMethods = (t: Test) =>
+  t.run(async (ctx) =>
+    (await ctx.db.query("authAccounts").collect())
+      .map((account) => account.provider)
+      .sort(),
+  );
+
+test("a sign-in link signs up a new email, which then finishes setting up", async () => {
+  const t = newTest();
+
+  const result = await signInWithLink(t, "ada@example.com");
+
+  expect(result.tokens?.token).toEqual(expect.any(String));
+  const [user] = await users(t);
+  expect(user).toMatchObject({ email: "ada@example.com", displayName: "ada" });
+  expect(user.emailVerificationTime).toEqual(expect.any(Number));
+  expect(user.termsAcceptedAt).toBeUndefined();
+  const [email] = await outbox(t);
+  expect(email.text).toContain("method=link");
+
+  await t
+    .withIdentity({ subject: `${user._id}|session` })
+    .mutation(api.accounts.profile.completeSignUp, {
+      homeCurrency: "EUR",
+      language: "de",
+      acceptTerms: true,
+    });
+  const [done] = await users(t);
+  expect(done).toMatchObject({ homeCurrency: "EUR", language: "de" });
+  expect(done.termsAcceptedAt).toEqual(expect.any(Number));
+});
+
+test("a sign-in link for a password account's email signs into that account", async () => {
+  const t = newTest();
+  await signUpAndVerify(t);
+
+  const result = await signInWithLink(t, "ada@example.com");
+
+  expect(result.tokens?.token).toEqual(expect.any(String));
+  expect(await users(t)).toHaveLength(1);
+  expect(await signInMethods(t)).toEqual(["magic-link", "password"]);
+});
+
+test("a password sign-up for an email that already has an account is refused", async () => {
+  const t = newTest();
+  await signInWithLink(t, "ada@example.com");
+
+  await expect(signUp(t)).rejects.toThrow("ACCOUNT_EXISTS");
+  expect(await users(t)).toHaveLength(1);
+});
+
+test("an unfinished sign-up is replaced when another method starts for its email", async () => {
+  const t = newTest();
+  await signUp(t);
+  const [pending] = await users(t);
+
+  await signInWithLink(t, "ada@example.com");
+
+  const [user] = await users(t);
+  expect(user._id).not.toBe(pending._id);
+  expect(user.termsAcceptedAt).toBeUndefined();
+  expect(await signInMethods(t)).toEqual(["magic-link"]);
+});
+
+test("Google joins the account that has proven the same email", async () => {
+  const t = newTest();
+  await signUpAndVerify(t);
+  const [user] = await users(t);
+
+  const userId = await googleSignIn(t, {
+    email: "ada@example.com",
+    emailVerified: true,
+  });
+
+  expect(userId).toBe(user._id);
+  expect(await users(t)).toHaveLength(1);
+});
+
+test("Google replaces an unfinished sign-up and starts a verified account", async () => {
+  const t = newTest();
+  await signUp(t);
+  const [pending] = await users(t);
+
+  const userId = await googleSignIn(t, {
+    email: "ada@example.com",
+    emailVerified: true,
+  });
+
+  expect(userId).not.toBe(pending._id);
+  const [user] = await users(t);
+  expect(user).toMatchObject({
+    email: "ada@example.com",
+    displayName: "ada",
+    name: "Ada Lovelace",
+    image: "https://example.com/ada.png",
+  });
+  expect(user.emailVerificationTime).toEqual(expect.any(Number));
+  // The person behind the unfinished sign-up never proved the email; their choices don't carry over.
+  expect(user.termsAcceptedAt).toBeUndefined();
+  expect(user.homeCurrency).toBeUndefined();
+});
+
+test("Google sign-in with an unverified email is refused", async () => {
+  const t = newTest();
+
+  await expect(
+    googleSignIn(t, { email: "ada@example.com", emailVerified: false }),
+  ).rejects.toThrow("EMAIL_NOT_VERIFIED");
+  expect(await users(t)).toEqual([]);
+});
+
+test("finishing sign-up needs a signed-in person and a supported Home currency", async () => {
+  const t = newTest();
+  await signInWithLink(t, "ada@example.com");
+  const [user] = await users(t);
+
+  await expect(
+    t.mutation(api.accounts.profile.completeSignUp, {
+      homeCurrency: "EUR",
+      language: "de",
+      acceptTerms: true,
+    }),
+  ).rejects.toThrow("NOT_SIGNED_IN");
+  await expect(
+    t
+      .withIdentity({ subject: `${user._id}|session` })
+      .mutation(api.accounts.profile.completeSignUp, {
+        // @ts-expect-error Not a Home currency.
+        homeCurrency: "JPY",
+        language: "de",
+        acceptTerms: true,
+      }),
+  ).rejects.toThrow();
 });

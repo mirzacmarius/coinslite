@@ -7,18 +7,20 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { takeLinkFragment } from "./link-fragment";
-import { usePasswordAuth } from "./use-password-auth";
+import { useAuthStep } from "./use-password-auth";
+
+type Status = "working" | "failed" | "linkFailed" | "noLink";
 
 /**
- * Opened from the verification email: checks the code in the link, signs in
- * and returns to the page the person was heading to when they signed up.
+ * Opened from an emailed link: a verification (after a password sign-up) or a
+ * sign-in link. Checks the code it carries, signs in and goes on to the page
+ * the person was heading to.
  */
 export function VerifyFromLink({ next }: { next: string }) {
   const t = useI18n();
-  const attempt = usePasswordAuth();
-  const [status, setStatus] = useState<"working" | "failed" | "noLink">(
-    "working",
-  );
+  const verifyEmail = useAuthStep("password");
+  const signInWithLink = useAuthStep("magic-link");
+  const [status, setStatus] = useState<Status>("working");
   const started = useRef(false);
 
   useEffect(() => {
@@ -30,12 +32,16 @@ export function VerifyFromLink({ next }: { next: string }) {
       setStatus("noLink");
       return;
     }
-    const { email, code, next: fromLink } = link;
-    void attempt({ flow: "email-verification", email, code }).then((result) => {
+    const { email, code, next: fromLink, method } = link;
+    const step =
+      method === "link"
+        ? signInWithLink({ email, code })
+        : verifyEmail({ flow: "email-verification", email, code });
+    void step.then((result) => {
       if (result === "signedIn") goTo(fromLink ?? next);
-      else setStatus("failed");
+      else setStatus(method === "link" ? "linkFailed" : "failed");
     });
-  }, [attempt, next]);
+  }, [verifyEmail, signInWithLink, next]);
 
   return (
     <AuthPanel
@@ -59,6 +65,9 @@ export function VerifyFromLink({ next }: { next: string }) {
       )}
       {status === "failed" && (
         <FormMessage>{t("auth.verify.failed")}</FormMessage>
+      )}
+      {status === "linkFailed" && (
+        <FormMessage>{t("auth.link.failed")}</FormMessage>
       )}
       {status === "noLink" && (
         <FormMessage tone="info">{t("auth.verify.noLink")}</FormMessage>

@@ -3,18 +3,20 @@
 import { goTo, nextQuery } from "@/lib/next-path";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
-import { type HomeCurrency, homeCurrencies } from "@coinslite/i18n";
-import { CheckboxField, Field } from "@coinslite/ui/field";
-import { PropertyPicker } from "@coinslite/ui/property-picker";
+import type { HomeCurrency } from "@coinslite/i18n";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Wallet } from "lucide-react";
 import Link from "next/link";
-import { useId, useMemo, useState } from "react";
-import { z } from "zod";
+import { useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { CodeStep } from "./code-step";
+import { OtherSignInMethods } from "./other-methods";
+import {
+  AcceptTermsField,
+  HomeCurrencyField,
+  useAcceptTermsRule,
+} from "./sign-up-fields";
 import { TextField } from "./text-field";
 import { useAuthSchemas, useSubmitState } from "./use-auth-form";
 import { usePasswordAuth } from "./use-password-auth";
@@ -34,15 +36,7 @@ export function SignUpFlow({
   const locale = useCurrentLocale();
   const attempt = usePasswordAuth();
   const schemas = useAuthSchemas();
-  const ids = { currency: useId(), terms: useId() };
-  const currencyOptions = useMemo(() => {
-    const names = new Intl.DisplayNames(locale, { type: "currency" });
-    return homeCurrencies.map((code) => ({
-      value: code,
-      label: code,
-      hint: names.of(code),
-    }));
-  }, [locale]);
+  const acceptTermsRule = useAcceptTermsRule();
   const [pendingEmail, setPendingEmail] = useState<string>();
   const [failed, setFailed] = useState(false);
 
@@ -125,67 +119,18 @@ export function SignUpFlow({
           )}
         </form.Field>
         <form.Field name="homeCurrency">
-          {(field) => (
-            <Field
-              id={ids.currency}
-              label={t("auth.fields.homeCurrency")}
-              hint={t("auth.signUp.homeCurrencyHint")}
-            >
-              {(control) => (
-                <PropertyPicker
-                  id={control.id}
-                  aria-describedby={control["aria-describedby"]}
-                  icon={Wallet}
-                  label={t("auth.fields.homeCurrency")}
-                  value={field.state.value}
-                  options={currencyOptions}
-                  onChange={field.handleChange}
-                  noResults={t("auth.noMatches")}
-                />
-              )}
-            </Field>
-          )}
+          {(field) => <HomeCurrencyField field={field} />}
         </form.Field>
         <form.Field
           name="acceptTerms"
-          validators={{
-            onChange: z.literal(true, {
-              errorMap: () => ({ message: t("auth.signUp.termsRequired") }),
-            }),
-          }}
+          validators={{ onChange: acceptTermsRule }}
         >
           {(field) => (
-            <CheckboxField
-              id={ids.terms}
-              checked={field.state.value}
-              onCheckedChange={field.handleChange}
-              error={
-                submitted && field.state.meta.errors.length > 0
-                  ? t("auth.signUp.termsRequired")
-                  : undefined
-              }
-              label={t("auth.signUp.acceptTerms", {
-                privacy: (
-                  <a
-                    href={privacyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={authLink}
-                  >
-                    {t("auth.signUp.privacyPolicy")}
-                  </a>
-                ),
-                terms: (
-                  <a
-                    href={termsUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={authLink}
-                  >
-                    {t("auth.signUp.termsOfUse")}
-                  </a>
-                ),
-              })}
+            <AcceptTermsField
+              field={field}
+              showErrors={submitted}
+              privacyUrl={privacyUrl}
+              termsUrl={termsUrl}
             />
           )}
         </form.Field>
@@ -194,6 +139,7 @@ export function SignUpFlow({
           {t("auth.signUp.submit")}
         </SubmitButton>
       </AuthForm>
+      <OtherSignInMethods next={next} />
     </AuthPanel>
   );
 }

@@ -1,4 +1,4 @@
-import { defaultLocale } from "@coinslite/i18n";
+import { defaultLocale, isLocale } from "@coinslite/i18n";
 import { Email } from "@convex-dev/auth/providers/Email";
 import type { GenericActionCtxWithAuthConfig } from "@convex-dev/auth/server";
 import { HOUR, RateLimiter } from "@convex-dev/rate-limiter";
@@ -19,7 +19,15 @@ import {
 const landingPage: Record<CodeEmailKind, string> = {
   "verify-email": "/verify",
   "reset-password": "/reset",
+  "magic-link": "/verify",
 };
+
+/** Codes people may type are short; a sign-in link's token is only ever clicked. */
+function newToken(kind: CodeEmailKind) {
+  return kind === "magic-link"
+    ? generateRandomString(32, alphabet("a-z", "A-Z", "0-9"))
+    : generateRandomString(CODE_LENGTH, alphabet("0-9"));
+}
 
 /**
  * The emailed link. The email, the code and the page to return to travel in the
@@ -35,6 +43,8 @@ export function codeLink(
   const fragment = new URLSearchParams({
     email,
     code,
+    // Tells the verify page this is a sign-in link, not an email verification.
+    ...(kind === "magic-link" && { method: "link" }),
     ...(next !== "/" && { next }),
   });
   return `${env.SITE_URL}${landingPage[kind]}#${fragment}`;
@@ -70,7 +80,7 @@ function codeEmail(kind: CodeEmailKind) {
     id: kind,
     maxAge: CODE_LIFETIME_MINUTES * 60,
     async generateVerificationToken() {
-      return generateRandomString(CODE_LENGTH, alphabet("0-9"));
+      return newToken(kind);
     },
     // Codes are looked up on their own, so also check they were sent to this address.
     async authorize(params, account) {
@@ -91,12 +101,16 @@ function codeEmail(kind: CodeEmailKind) {
       const { ok } = await rateLimiter.limit(ctx, "codeEmail", { key: to });
       if (!ok) throw new ConvexError(tooManyCodeEmails);
 
+      const next = returnPathOf(url);
+      // The account's language, else the one the person was browsing in
+      // (a sign-in link for a new email has no account language yet).
+      const browsing = next.split("/")[1];
       const language =
         (await ctx.runQuery(internal.accounts.emails.languageFor, {
           email: to,
-        })) ?? defaultLocale;
+        })) ?? (isLocale(browsing) ? browsing : defaultLocale);
       const message = codeEmailMessages[language][kind];
-      const link = codeLink(kind, to, code, returnPathOf(url));
+      const link = codeLink(kind, to, code, next);
       const email = {
         to,
         subject: message.subject,
@@ -119,3 +133,5 @@ function codeEmail(kind: CodeEmailKind) {
 
 export const verifyEmailCode = codeEmail("verify-email");
 export const resetPasswordCode = codeEmail("reset-password");
+/** Sign-in links: sign in, or sign up, by clicking a link sent to the address. */
+export const magicLink = codeEmail("magic-link");

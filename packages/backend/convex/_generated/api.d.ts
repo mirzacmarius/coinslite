@@ -12,6 +12,8 @@ import type * as accounts_codeEmailMessages from "../accounts/codeEmailMessages.
 import type * as accounts_codeEmails from "../accounts/codeEmails.js";
 import type * as accounts_credentials from "../accounts/credentials.js";
 import type * as accounts_emails from "../accounts/emails.js";
+import type * as accounts_linking from "../accounts/linking.js";
+import type * as accounts_profile from "../accounts/profile.js";
 import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as auth from "../auth.js";
 import type * as email_index from "../email/index.js";
@@ -34,6 +36,8 @@ declare const fullApi: ApiFromModules<{
   "accounts/codeEmails": typeof accounts_codeEmails;
   "accounts/credentials": typeof accounts_credentials;
   "accounts/emails": typeof accounts_emails;
+  "accounts/linking": typeof accounts_linking;
+  "accounts/profile": typeof accounts_profile;
   "accounts/signUpProfile": typeof accounts_signUpProfile;
   auth: typeof auth;
   "email/index": typeof email_index;

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import {
   latestCode,
+  latestLink,
   newEmail,
   password,
   signOut,
@@ -166,4 +167,71 @@ test("signed-in visitors skip sign-in and the marketing site", async ({
   }
   await page.goto(webUrl);
   await expect(page).toHaveURL(`${appUrl}/`);
+});
+
+test("a sign-in link signs up a new email, which finishes setting up and lands on the page asked for", async ({
+  page,
+  browser,
+}) => {
+  const email = newEmail();
+  await page.goto(`${appUrl}/catalog`);
+  await visiblePage(page)
+    .getByRole("link", { name: "Email me a sign-in link" })
+    .click();
+  const main = visiblePage(page);
+  await expect(
+    main.getByRole("heading", { name: "Sign in with a link" }),
+  ).toBeVisible();
+  await main.getByLabel("Email", { exact: true }).fill(email);
+  await main.getByRole("button", { name: "Email me a link" }).click();
+  await expect(
+    main.getByRole("heading", { name: "Check your email" }),
+  ).toBeVisible();
+
+  // The mail app opens the link in its own browser.
+  const mailClient = await browser.newContext({ locale: "en-US" });
+  const fromEmail = await mailClient.newPage();
+  await fromEmail.goto(latestLink(email));
+  const welcome = visiblePage(fromEmail);
+  await expect(
+    welcome.getByRole("heading", { name: "Finish setting up your account" }),
+  ).toBeVisible();
+  await expect(
+    welcome.getByRole("button", { name: "Home currency: USD" }),
+  ).toBeVisible();
+  await welcome.getByRole("button", { name: "Start using CoinsLite" }).click();
+  await expect(
+    welcome.getByText(
+      "Accept the privacy policy and terms of use to continue.",
+    ),
+  ).toBeVisible();
+  await welcome.getByRole("checkbox", { name: /I accept/ }).check();
+  await welcome.getByRole("button", { name: "Start using CoinsLite" }).click();
+
+  await expect(fromEmail).toHaveURL(/\/catalog$/);
+  await expect(
+    visiblePage(fromEmail).getByRole("heading", { level: 1, name: "Catalog" }),
+  ).toBeVisible();
+  await mailClient.close();
+});
+
+test("a sign-in link signs into the existing account for that email", async ({
+  page,
+}) => {
+  const email = newEmail();
+  await signUpAndVerify(page, email);
+  await signOut(page);
+
+  await page.goto(`${appUrl}/link`);
+  const main = visiblePage(page);
+  await main.getByLabel("Email", { exact: true }).fill(email);
+  await main.getByRole("button", { name: "Email me a link" }).click();
+  await expect(
+    main.getByRole("heading", { name: "Check your email" }),
+  ).toBeVisible();
+  await page.goto(latestLink(email));
+
+  await expect(
+    visiblePage(page).getByRole("heading", { level: 1, name: "Overview" }),
+  ).toBeVisible();
 });
