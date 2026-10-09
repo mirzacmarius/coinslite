@@ -893,6 +893,30 @@ export default {
       "Par type d’objet, plus la valeur du métal pour l’or et l’argent",
     part: "Type d’objet ou métal",
   },
+  featureFlags: {
+    menu: "Activation des fonctionnalités",
+    title: "Activation des fonctionnalités",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent activer et désactiver des fonctionnalités.",
+    description: "Les changements s’appliquent immédiatement à tout le monde.",
+    catalog: "Afficher le catalogue",
+    catalogDescription:
+      "Désactivé, le catalogue n’est visible que par les administrateurs. Les autres ne le trouvent plus dans la navigation, en parcourant ni en cherchant.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Qui peut photographier une pièce pour obtenir une entrée du catalogue suggérée. Les administrateurs le peuvent tant qu’il n’est pas désactivé.",
+    scannerOptions: {
+      off: "Désactivé",
+      admins: "Administrateurs uniquement",
+      premiumBeta: "Bêta Premium",
+    },
+    saved: "Réglage mis à jour",
+    saveFailed: "Impossible de mettre à jour le réglage. Réessayez.",
+    catalogHiddenTitle: "Le catalogue n’est pas disponible",
+    catalogHiddenDescription:
+      "Il est désactivé pour le moment. Vos objets ne sont pas concernés.",
+  },
   adminStats: {
     menu: "Statistiques",
     title: "Statistiques",

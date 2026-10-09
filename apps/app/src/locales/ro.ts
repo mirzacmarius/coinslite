@@ -887,6 +887,30 @@ export default {
       "După tipul obiectului, plus valoarea metalului pentru aur și argint",
     part: "Tip de obiect sau metal",
   },
+  featureFlags: {
+    menu: "Activarea funcționalităților",
+    title: "Activarea funcționalităților",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription:
+      "Doar administratorii pot activa și dezactiva funcționalități.",
+    description: "Modificările se aplică imediat tuturor.",
+    catalog: "Afișează catalogul",
+    catalogDescription:
+      "Când este dezactivat, doar administratorii văd catalogul. Ceilalți nu îl mai găsesc în navigare, la răsfoire sau în căutare.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Cine poate fotografia o monedă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
+    scannerOptions: {
+      off: "Dezactivat",
+      admins: "Doar administratori",
+      premiumBeta: "Beta Premium",
+    },
+    saved: "Setare actualizată",
+    saveFailed: "Setarea nu a putut fi actualizată. Încearcă din nou.",
+    catalogHiddenTitle: "Catalogul nu este disponibil",
+    catalogHiddenDescription:
+      "Este dezactivat deocamdată. Obiectele tale nu sunt afectate.",
+  },
   adminStats: {
     menu: "Statistici",
     title: "Statistici",

@@ -878,6 +878,30 @@ export default {
       "Etter objekttype, pluss metallverdien av gull og sølv",
     part: "Objekttype eller metall",
   },
+  featureFlags: {
+    menu: "Funksjonsflagg",
+    title: "Funksjonsflagg",
+    notAvailable: "Denne siden er ikke tilgjengelig",
+    notAvailableDescription:
+      "Bare administratorer kan slå funksjoner av og på.",
+    description: "Endringer gjelder for alle med en gang.",
+    catalog: "Vis katalogen",
+    catalogDescription:
+      "Når den er av, ser bare administratorer katalogen. Alle andre finner den ikke lenger i navigasjonen, ved blaing eller i søk.",
+    scanner: "Skanner",
+    scannerDescription:
+      "Hvem som kan fotografere en mynt og få foreslått en katalogoppføring. Administratorer kan det så lenge den ikke er av.",
+    scannerOptions: {
+      off: "Av",
+      admins: "Bare administratorer",
+      premiumBeta: "Premium-beta",
+    },
+    saved: "Funksjonsflagget er oppdatert",
+    saveFailed: "Funksjonsflagget kunne ikke oppdateres. Prøv igjen.",
+    catalogHiddenTitle: "Katalogen er ikke tilgjengelig",
+    catalogHiddenDescription:
+      "Den er slått av foreløpig. Objektene dine påvirkes ikke.",
+  },
   adminStats: {
     menu: "Statistikk",
     title: "Statistikk",
