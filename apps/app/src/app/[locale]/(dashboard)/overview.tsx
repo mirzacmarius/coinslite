@@ -1,5 +1,6 @@
 "use client";
 
+import { OverviewPlanUsage } from "@/components/plans/plan-usage";
 import { SpotPrices } from "@/components/spot-prices/spot-prices";
 import { useScopedI18n } from "@/locales/client";
 import { EmptyState } from "@coinslite/ui/empty-state";
@@ -13,6 +14,7 @@ export function Overview() {
     <>
       <HeaderBar title={t("headerTitle")} />
       <div className="flex flex-col gap-4 p-4">
+        <OverviewPlanUsage />
         <EmptyState
           icon={
             <LayoutDashboard
