@@ -43,6 +43,8 @@ type CatalogSearchProps = {
   placeholder: string;
   /** Shown until 2 characters are typed, e.g. recently picked entries. */
   idle?: React.ReactNode;
+  /** A button at the end of the footer, e.g. "Add manually". */
+  action?: React.ReactNode;
 };
 
 /**
@@ -57,6 +59,7 @@ export function CatalogSearch({
   pickHint,
   placeholder,
   idle,
+  action,
 }: CatalogSearchProps) {
   const t = useI18n();
   const [text, setText] = useState("");
@@ -106,6 +109,7 @@ export function CatalogSearch({
           <Hint keys="↵" label={pickHint} />
           <Hint keys="esc" label={t("catalogSearch.closeHint")} />
         </span>
+        {action}
       </div>
     </Command>
   );
@@ -212,7 +216,7 @@ function ResultRow({
   );
 }
 
-function Note({ children }: { children: React.ReactNode }) {
+export function Note({ children }: { children: React.ReactNode }) {
   return (
     <p className="px-4 py-6 text-center text-xs text-muted-foreground">
       {children}
@@ -220,7 +224,7 @@ function Note({ children }: { children: React.ReactNode }) {
   );
 }
 
-function LoadingRows() {
+export function LoadingRows() {
   return (
     <div className="flex flex-col gap-1 p-1" aria-hidden="true">
       {[0, 1, 2].map((row) => (

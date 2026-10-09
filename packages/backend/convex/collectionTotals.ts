@@ -4,6 +4,7 @@ import {
 } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { query } from "./_generated/server";
+import { resolveItems } from "./items/resolve";
 import { collectionTotals } from "./items/totals";
 import { latestRates } from "./spotPrices";
 import { requireSetUpUser } from "./utils/auth";
@@ -85,7 +86,8 @@ export const page = query({
       .query("items")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
       .paginate(paginationOpts);
-    const pageTotals = collectionTotals(items.page, {
+    // Linked Items' metal facts come from their Catalog entries.
+    const pageTotals = collectionTotals(await resolveItems(ctx, items.page), {
       currency: owner.homeCurrency,
       rates,
       utcOffsetMinutes,

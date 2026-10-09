@@ -2,6 +2,7 @@
 
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
+import { catalogNodeHref } from "@/components/catalog/catalog-levels";
 import {
   isItemLimitError,
   upgradeHref,
@@ -231,6 +232,16 @@ export function ItemDetail() {
             <PropertyRow label={t("items.type")}>
               {t(`items.types.${item.type}`)}
             </PropertyRow>
+            {item.catalogEntry && (
+              <PropertyRow label={t("catalogPicker.entry")}>
+                <Link
+                  href={catalogNodeHref(item.catalogEntry.key)}
+                  className="hover:underline"
+                >
+                  {item.catalogEntry.title}
+                </Link>
+              </PropertyRow>
+            )}
             <PropertyRow label={t("albums.album")}>
               {album && (
                 <Link

@@ -1079,6 +1079,34 @@ export default {
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
     fileName: "coinslite-sammlung-{date}.csv",
   },
+  catalogPicker: {
+    title: "Aus dem Katalog wählen",
+    placeholder: {
+      coin: "Münzen nach Titel, Nennwert, Serie oder Land suchen…",
+      banknote: "Banknoten nach Titel, Nennwert, Serie oder Land suchen…",
+    },
+    pickHint: "zum Auswählen",
+    manual: "Manuell hinzufügen",
+    recent: "Zuletzt gewählt",
+    browse: "Katalog durchsuchen",
+    back: "Zurück",
+    empty: "Im Katalog gibt es noch nichts zum Auswählen.",
+    failed:
+      "Der Katalogeintrag konnte nicht geladen werden. Wähle ihn noch einmal oder füge das Objekt manuell hinzu.",
+    entry: "Katalogeintrag",
+    pick: "Aus dem Katalog wählen",
+    factsHint:
+      "Diese Angaben stammen aus dem Katalogeintrag und übernehmen seine Korrekturen. Änderst du eine, bleibt dein Wert; leerst du das Feld, gilt wieder der Wert des Eintrags.",
+  },
+  quickAdd: {
+    add: "Zur Sammlung hinzufügen",
+    title: "Zur Sammlung hinzufügen",
+    description:
+      "Füge diesen Katalogeintrag deiner Sammlung als ein Objekt hinzu.",
+    added: "Objekt zur Sammlung hinzugefügt",
+    open: "Öffnen",
+    failed: "Das Objekt konnte nicht hinzugefügt werden. Versuche es erneut.",
+  },
   insuranceReport: {
     title: "Versicherungsbericht",
     lockedTitle: "Der Versicherungsbericht gehört zu Premium",

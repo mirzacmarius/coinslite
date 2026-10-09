@@ -5,6 +5,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
+import { addManually } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -40,6 +41,7 @@ test("changing the Home currency converts the Collection's amounts", async ({
     .getByRole("button", { name: "Add Item" })
     .first()
     .click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("Morgan dollar 1881-S");
   await dialog.getByRole("button", { name: "More details" }).click();

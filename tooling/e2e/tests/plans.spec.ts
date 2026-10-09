@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
+import { addManually, catalogPicker } from "../support/items";
 import { hasLocalBackend } from "../urls";
 
 test.skip(
@@ -18,10 +19,9 @@ test("the Free plan's usage counts Items, not pieces, on the Overview and in the
 
   await expect(async () => {
     await page.keyboard.press("c");
-    await expect(page.getByRole("dialog", { name: "New Item" })).toBeVisible({
-      timeout: 1000,
-    });
+    await expect(catalogPicker(page)).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("2 kroner 1914");
   await dialog.getByLabel("Quantity").fill("3");

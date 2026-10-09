@@ -5,6 +5,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
+import { addManually } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -38,6 +39,7 @@ test("a bullion preset fills a coin's precious metal, and its detail shows the M
   const main = visiblePage(page);
 
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByRole("button", { name: "More details" }).click();
   await expect(dialog.getByLabel("Weight")).toBeDisabled();
