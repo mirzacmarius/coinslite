@@ -40,6 +40,13 @@ const app = defineApp({
      * works as well; set it on production so the secret lives outside the data.
      */
     PHOTO_LINK_SECRET: v.optional(v.string()),
+    /**
+     * The coin scanner's vision model (scanner/claude.ts). Without the key the
+     * scanner says it isn't available on this deployment. SCANNER_MODEL picks
+     * the Claude model; unset, it's claude-opus-5-5.
+     */
+    ANTHROPIC_API_KEY: v.optional(v.string()),
+    SCANNER_MODEL: v.optional(v.string()),
   },
 });
 app.use(rateLimiter);

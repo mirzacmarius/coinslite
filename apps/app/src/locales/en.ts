@@ -1382,4 +1382,51 @@ export default {
       "There's nothing at this address. It may have moved, or the link may be wrong.",
     home: "Go to the Overview",
   },
+  scanner: {
+    scan: "Scan coin",
+    title: "Scan coin",
+    beta: "Beta",
+    description:
+      "Photograph both sides of a coin and CoinsLite suggests what it is. You check the suggestion before the Item is added.",
+    tips: "Lay the coin flat on a plain background, fill the frame and avoid glare.",
+    steps: {
+      front: "Front",
+      back: "Back",
+    },
+    next: {
+      front: "Start with the front of the coin.",
+      back: "Now turn the coin over and photograph the back.",
+      done: "Both sides are in. Identify the coin when you're ready.",
+    },
+    takePhoto: "Take photo",
+    choosePhoto: "Choose photo",
+    chooseFile: "Choose file",
+    retake: "Retake",
+    identify: "Identify coin",
+    identifying: "Identifying the coin…",
+    addByHand: "Add by hand",
+    cancel: "Cancel",
+    close: "Close",
+    unidentified:
+      "The coin couldn't be identified. Try new photos in better light, or add it by hand with these photos.",
+    notConfigured:
+      "The scanner isn't available on this deployment yet. You can still add the coin by hand.",
+    errors: {
+      notAvailable: "The scanner isn't available to you.",
+      tooMany:
+        "You've scanned many coins in a short time. Try again later, or add this one by hand.",
+      tooLarge: "That photo is too large to scan. Try another one.",
+      notAnImage: "That file isn't a JPEG, PNG, WebP or GIF image.",
+      uploadsTooMany:
+        "Too many uploads in a short time. Try again in a few minutes.",
+      failed: "The scan didn't go through. Try again, or add the coin by hand.",
+    },
+    suggested: "Suggested by the scanner",
+    reviewHint:
+      "Check each detail against your coin before you add the Item. The photos are added with it.",
+    photosFromScan: "Photos from the scan",
+    photosHint: "These photos are added to the Item.",
+    photosFailed:
+      "The Item was added, but its photos couldn't be saved. Add them on the Item's page.",
+  },
 } as const;

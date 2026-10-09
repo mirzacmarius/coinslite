@@ -1402,4 +1402,52 @@ export default {
       "Det finnes ingenting på denne adressen. Den kan ha blitt flyttet, eller lenken kan være feil.",
     home: "Gå til oversikten",
   },
+  scanner: {
+    scan: "Skann mynt",
+    title: "Skann mynt",
+    beta: "Beta",
+    description:
+      "Fotografer begge sider av en mynt, så foreslår CoinsLite hva den er. Du sjekker forslaget før objektet legges til.",
+    tips: "Legg mynten flatt på en ensfarget bakgrunn, fyll bildet og unngå gjenskinn.",
+    steps: {
+      front: "Forside",
+      back: "Bakside",
+    },
+    next: {
+      front: "Begynn med forsiden av mynten.",
+      back: "Snu mynten og fotografer baksiden.",
+      done: "Begge sidene er med. Identifiser mynten når du er klar.",
+    },
+    takePhoto: "Ta bilde",
+    choosePhoto: "Velg bilde",
+    chooseFile: "Velg fil",
+    retake: "Ta på nytt",
+    identify: "Identifiser mynt",
+    identifying: "Identifiserer mynten…",
+    addByHand: "Legg til manuelt",
+    cancel: "Avbryt",
+    close: "Lukk",
+    unidentified:
+      "Mynten kunne ikke identifiseres. Prøv nye bilder i bedre lys, eller legg den til manuelt med disse bildene.",
+    notConfigured:
+      "Skanneren er ikke tilgjengelig i dette miljøet ennå. Du kan fortsatt legge til mynten manuelt.",
+    errors: {
+      notAvailable: "Skanneren er ikke tilgjengelig for deg.",
+      tooMany:
+        "Du har skannet mange mynter på kort tid. Prøv igjen senere, eller legg til denne manuelt.",
+      tooLarge: "Bildet er for stort til å skannes. Prøv et annet.",
+      notAnImage: "Filen er ikke et JPEG-, PNG-, WebP- eller GIF-bilde.",
+      uploadsTooMany:
+        "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
+      failed:
+        "Skanningen gikk ikke gjennom. Prøv igjen, eller legg til mynten manuelt.",
+    },
+    suggested: "Foreslått av skanneren",
+    reviewHint:
+      "Sjekk hver detalj mot mynten før du legger til objektet. Bildene legges til sammen med det.",
+    photosFromScan: "Bilder fra skanningen",
+    photosHint: "Disse bildene legges til objektet.",
+    photosFailed:
+      "Objektet ble lagt til, men bildene kunne ikke lagres. Legg dem til på objektets side.",
+  },
 } as const satisfies Dictionary;

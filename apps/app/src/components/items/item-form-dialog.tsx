@@ -12,11 +12,13 @@ import {
   isItemLimitError,
   useItemLimitMessage,
 } from "@/components/plans/plan-usage";
+import { ScanNotice } from "@/components/scanner/scan-notice";
+import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
-import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import type { CatalogItemType } from "@coinslite/backend/convex/catalog/fields";
 import type { CatalogFacts } from "@coinslite/backend/convex/items/catalogFacts";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
@@ -29,6 +31,7 @@ import {
   itemLimits,
   materials,
 } from "@coinslite/backend/convex/items/rules";
+import { photoSides } from "@coinslite/backend/convex/photos/rules";
 import { metals } from "@coinslite/backend/convex/spotPrices/rates";
 import { countryCodes, formatCountry, parseMoney } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
@@ -57,7 +60,7 @@ import { Switch } from "@coinslite/ui/switch";
 import { toast } from "@coinslite/ui/toaster";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useConvex, useMutation, useQuery } from "convex/react";
+import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import {
   Award,
   BookOpen,
@@ -142,12 +145,16 @@ const isCatalogType = (type: ItemType): type is CatalogItemType =>
  * opening starts on the Catalog picker, and Esc or "Add manually" leads to
  * typing the facts in. A picked entry fills the facts; the Item stays linked
  * to it and stores only the facts the person changes (ADR 0001).
+ *
+ * After a coin scan the form opens filled with the scanner's suggestion,
+ * marked as such, and the scan's photos become the new Item's when it's added.
  */
 export function ItemFormDialog({
   open,
   onOpenChange,
   item,
   newItemType,
+  scan,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -155,6 +162,8 @@ export function ItemFormDialog({
   item?: EditedItem;
   /** For a new Item: the Item type already chosen each time the dialog opens. */
   newItemType?: ItemType;
+  /** For a new Item: a coin scan's photos and suggestion, applied each time it changes. */
+  scan?: ScanPreset;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -162,6 +171,7 @@ export function ItemFormDialog({
   const convex = useConvex();
   const addItem = useMutation(api.items.add);
   const updateItem = useMutation(api.items.update);
+  const attachPhoto = useAction(api.photos.attach);
   const user = useQuery(api.users.getUser);
   const currency = user?.homeCurrency ?? "";
   const titleRef = useRef<HTMLInputElement>(null);
@@ -188,6 +198,8 @@ export function ItemFormDialog({
     hasDetails(defaults, fromEntry),
   );
   const [failed, setFailed] = useState<string>();
+  // The scan this new Item comes from, until it's added or the form closes.
+  const [scanned, setScanned] = useState<ScanPreset>();
   const itemLimitMessage = useItemLimitMessage();
 
   const rules = useMemo(() => {
@@ -298,10 +310,11 @@ export function ItemFormDialog({
       // An Album deleted since the form opened can't take the Item.
       if (albums && !albums.some((album) => album._id === args.albumId))
         args.albumId = undefined;
+      let added: Id<"items"> | undefined;
       try {
         if (item) await updateItem({ itemId: item._id, ...args });
         else
-          await addItem({
+          added = await addItem({
             ...args,
             ...(linked && { catalogEntryKey: linked.key }),
           });
@@ -314,6 +327,11 @@ export function ItemFormDialog({
         return;
       }
       toast.success(t(item ? "items.saved" : "items.added"));
+      if (added && scanned) {
+        const photos = scanned.photos;
+        setScanned(undefined);
+        await attachScanPhotos(added, photos);
+      }
       if (item) {
         onOpenChange(false);
         return;
@@ -362,23 +380,28 @@ export function ItemFormDialog({
     if (pickerOffered.current || item || catalogVisible === undefined) return;
     pickerOffered.current = true;
     if (
+      !scan &&
       catalogVisible &&
       !linked &&
       !form.state.isDirty &&
       isCatalogType(newItemType ?? form.getFieldValue("type"))
     )
       setPickerOpen(true);
-  }, [open, item, catalogVisible, linked, newItemType, form]);
+  }, [open, item, catalogVisible, linked, newItemType, form, scan]);
   /** Links the form to a picked Catalog entry and fills the facts from it. */
   const pickEntry = async (picked: PickedCatalogEntry) => {
     setPickerOpen(false);
     setFailed(undefined);
+    await linkEntry(picked.key);
+  };
+  /** Links the form to the Catalog entry with this key and fills the facts from it; false when it can't. */
+  const linkEntry = async (key: string) => {
     const entry = await convex
-      .query(api.items.catalogEntry, { key: picked.key })
+      .query(api.items.catalogEntry, { key })
       .catch(() => null);
     if (!entry) {
       setFailed(t("catalogPicker.failed"));
-      return;
+      return false;
     }
     const title = form.getFieldValue("title").trim();
     if (!title || title === linked?.title)
@@ -397,6 +420,65 @@ export function ItemFormDialog({
     form.setFieldValue("metal", facts.metal);
     form.setFieldValue("weight", facts.weight);
     form.setFieldValue("purity", facts.purity);
+    return true;
+  };
+
+  /** Fills the form with a scan's suggestion: its Catalog entry, else the facts read. */
+  const applySuggestion = async (
+    suggestion: NonNullable<ScanPreset["suggestion"]>,
+  ) => {
+    const { facts } = suggestion;
+    form.setFieldValue("type", "coin");
+    const linkedToEntry =
+      suggestion.entry !== undefined && (await linkEntry(suggestion.entry.key));
+    if (!linkedToEntry) form.setFieldValue("title", suggestion.title);
+    const values = factValues(facts, locale);
+    if (facts.year !== undefined) form.setFieldValue("year", values.year);
+    if (!linkedToEntry) {
+      form.setFieldValue("country", values.country);
+      form.setFieldValue("denomination", values.denomination);
+      form.setFieldValue("series", values.series);
+      form.setFieldValue("material", values.material);
+      form.setFieldValue("diameter", values.diameter);
+      form.setFieldValue("mintMark", facts.mintMark ?? "");
+      form.setFieldValue("ruler", facts.ruler ?? "");
+    }
+    // The suggested details are there to check.
+    setDetailsOpen(true);
+  };
+  // A new scan starts the form afresh with its suggestion.
+  const appliedScan = useRef<ScanPreset | undefined>(undefined);
+  useLayoutEffect(() => {
+    if (!open || item || !scan || appliedScan.current === scan) return;
+    appliedScan.current = scan;
+    form.reset();
+    setLinked(undefined);
+    setFailed(undefined);
+    setDetailsOpen(false);
+    setScanned(scan);
+    if (scan.suggestion) void applySuggestion(scan.suggestion);
+  });
+  // A scan the person closes the form on isn't kept for the next Item.
+  useEffect(() => {
+    if (open || !scanned) return;
+    setScanned(undefined);
+    setLinked(undefined);
+    form.reset();
+  }, [open, scanned, form]);
+  /** Puts a scan's photos on the Item it became; tells the person if that fails. */
+  const attachScanPhotos = async (
+    itemId: Id<"items">,
+    photos: ScanPreset["photos"],
+  ) => {
+    try {
+      for (const side of photoSides) {
+        const photo = photos[side];
+        if (photo)
+          await attachPhoto({ itemId, side, storageId: photo.storageId });
+      }
+    } catch {
+      toast.error(t("scanner.photosFailed"));
+    }
   };
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
@@ -564,6 +646,7 @@ export function ItemFormDialog({
 
           <div className="flex flex-col gap-2 overflow-y-auto px-4 pb-3 pt-1">
             {!item && <ItemLimitNotice />}
+            {!item && scanned && <ScanNotice scan={scanned} />}
             <form.Field name="title" validators={{ onChange: rules.title }}>
               {(field) => {
                 const error = errorOf(field.state.meta.errors);

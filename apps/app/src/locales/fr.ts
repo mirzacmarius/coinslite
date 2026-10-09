@@ -1438,4 +1438,53 @@ export default {
       "Il n’y a rien à cette adresse. La page a peut-être été déplacée, ou le lien est erroné.",
     home: "Aller à l’aperçu",
   },
+  scanner: {
+    scan: "Scanner une pièce",
+    title: "Scanner une pièce",
+    beta: "Bêta",
+    description:
+      "Photographiez les deux faces d’une pièce et CoinsLite propose ce que c’est. Vous vérifiez la suggestion avant d’ajouter l’objet.",
+    tips: "Posez la pièce à plat sur un fond uni, remplissez le cadre et évitez les reflets.",
+    steps: {
+      front: "Avers",
+      back: "Revers",
+    },
+    next: {
+      front: "Commencez par l’avers de la pièce.",
+      back: "Retournez la pièce et photographiez le revers.",
+      done: "Les deux faces sont prêtes. Identifiez la pièce quand vous voulez.",
+    },
+    takePhoto: "Prendre une photo",
+    choosePhoto: "Choisir une photo",
+    chooseFile: "Choisir un fichier",
+    retake: "Reprendre",
+    identify: "Identifier la pièce",
+    identifying: "Identification de la pièce…",
+    addByHand: "Ajouter à la main",
+    cancel: "Annuler",
+    close: "Fermer",
+    unidentified:
+      "La pièce n’a pas pu être identifiée. Essayez de nouvelles photos avec une meilleure lumière, ou ajoutez-la à la main avec ces photos.",
+    notConfigured:
+      "Le scanner n’est pas encore disponible sur ce déploiement. Vous pouvez toujours ajouter la pièce à la main.",
+    errors: {
+      notAvailable: "Le scanner ne vous est pas accessible.",
+      tooMany:
+        "Vous avez scanné beaucoup de pièces en peu de temps. Réessayez plus tard, ou ajoutez celle-ci à la main.",
+      tooLarge:
+        "Cette photo est trop grande pour être scannée. Essayez-en une autre.",
+      notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
+      uploadsTooMany:
+        "Trop d’envois en peu de temps. Réessayez dans quelques minutes.",
+      failed:
+        "Le scan n’a pas abouti. Réessayez, ou ajoutez la pièce à la main.",
+    },
+    suggested: "Suggéré par le scanner",
+    reviewHint:
+      "Vérifiez chaque détail sur votre pièce avant d’ajouter l’objet. Les photos sont ajoutées avec lui.",
+    photosFromScan: "Photos du scan",
+    photosHint: "Ces photos sont ajoutées à l’objet.",
+    photosFailed:
+      "L’objet a été ajouté, mais ses photos n’ont pas pu être enregistrées. Ajoutez-les sur la page de l’objet.",
+  },
 } as const satisfies Dictionary;
