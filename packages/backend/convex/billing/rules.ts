@@ -9,6 +9,10 @@ export const billingErrors = {
   alreadyPremium: "ALREADY_PREMIUM",
   /** Polar didn't open a checkout. */
   checkoutFailed: "CHECKOUT_FAILED",
+  /** The person has no subscription to manage. */
+  noSubscription: "NO_SUBSCRIPTION",
+  /** Polar didn't open its customer portal. */
+  portalFailed: "PORTAL_FAILED",
 } as const;
 
 export const billingIntervals = ["month", "year"] as const;
