@@ -960,6 +960,9 @@ export default {
     "inView#few": "{count} Items in this view",
     "inView#other": "{count} Items in this view",
     csv: "Export as CSV",
+    pdf: "Export as PDF",
+    pdfTooLarge:
+      "A PDF lists up to {limit} Items. Narrow the view to export it.",
     premiumOnly: "Exporting your Collection is part of Premium.",
     failed: "Couldn't export the Collection. Try again.",
     fileName: "coinslite-collection-{date}.csv",

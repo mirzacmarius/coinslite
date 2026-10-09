@@ -1,13 +1,22 @@
 import { type HomeCurrency, type Locale, defaultLocale } from "@coinslite/i18n";
-import { v } from "convex/values";
+import { ConvexError, type Infer, v } from "convex/values";
 import type { Doc } from "../_generated/dataModel";
-import { query } from "../_generated/server";
+import { internalQuery, query } from "../_generated/server";
 import { formatCsvFile } from "../catalog/csvText";
 import { gradeCode, type gradingScales } from "../items/grades";
+import { collectionTotals, itemGainLoss, totalPieces } from "../items/totals";
 import { requirePremium } from "../plans";
-import { language } from "../utils/validators";
+import {
+  gradingScale,
+  homeCurrency,
+  itemType,
+  language,
+  strike,
+} from "../utils/validators";
 import { collectionView, countryName, findItems } from "./browse";
 import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
+import { collectionExportErrors, collectionPdfLimits } from "./exportRules";
+import { withoutAlbum } from "./view";
 
 /**
  * The Collection exports (Premium): a file of exactly the Items a Collection
@@ -83,5 +92,126 @@ export const csv = query({
       csvColumns.map((column) => labels.columns[column]),
       ...items.map((item) => csvRecord(item, owner.homeCurrency, written)),
     ]);
+  },
+});
+
+/** Everything the Collection PDF shows, read in one transaction. */
+export const pdfContents = v.object({
+  /** The language the PDF is written in. */
+  locale: language,
+  owner: v.object({
+    name: v.optional(v.string()),
+    email: v.optional(v.string()),
+  }),
+  /** The Home currency every amount is in. */
+  currency: homeCurrency,
+  /** The view the PDF covers, as asked for. */
+  view: collectionView,
+  /** The name of the Album the view is narrowed to, when it's the person's. */
+  albumName: v.optional(v.string()),
+  /** The country the origin filter compares against; null when there's none. */
+  ownCountry: v.union(v.string(), v.null()),
+  /** False when the Collection was too large to read whole (see browse.ts). */
+  complete: v.boolean(),
+  /** How many Items were read, for saying how far an incomplete view goes. */
+  collectionSize: v.number(),
+  /** One per Item, in the view's order. Amounts are for all of an Item's pieces. */
+  rows: v.array(
+    v.object({
+      type: itemType,
+      title: v.string(),
+      year: v.optional(v.number()),
+      denomination: v.optional(v.string()),
+      gradingScale: v.optional(gradingScale),
+      grade: v.optional(v.string()),
+      strike: v.optional(strike),
+      quantity: v.number(),
+      purchaseDate: v.optional(v.string()),
+      /** Purchase price × Quantity. */
+      purchasePrice: v.optional(v.number()),
+      /** Market value × Quantity. */
+      marketValue: v.optional(v.number()),
+      /** The difference, when the Item has both. */
+      gainLoss: v.optional(v.number()),
+    }),
+  ),
+  totals: v.object({
+    items: v.number(),
+    pieces: v.number(),
+    purchasePrice: v.number(),
+    marketValue: v.number(),
+    /** Over the Items that have both a Purchase price and a Market value. */
+    gainLoss: v.object({ amount: v.number(), items: v.number() }),
+  }),
+});
+export type PdfContents = Infer<typeof pdfContents>;
+
+/**
+ * What the Collection PDF shows, for the signed-in Premium member (the action
+ * that makes the PDF runs this as them): exactly the Items the view shows, in
+ * its order, each with its amounts × Quantity and Gain/loss, and the totals.
+ * A view with more Items than a PDF lists is turned away rather than cut short.
+ */
+export const pdf = internalQuery({
+  args: {
+    view: collectionView,
+    /** The PDF's language, and the one country names are searched in; the person's own by default. */
+    locale: v.optional(language),
+  },
+  returns: pdfContents,
+  handler: async (ctx, { view, locale }) => {
+    const owner = await requirePremium(ctx);
+    const written = locale ?? owner.language ?? defaultLocale;
+    const { items, ownCountry, complete, collectionSize } = await findItems(
+      ctx,
+      owner,
+      view,
+      written,
+    );
+    if (items.length > collectionPdfLimits.items)
+      throw new ConvexError(collectionExportErrors.tooManyItems);
+    const currency = owner.homeCurrency;
+    const totals = collectionTotals(items, { currency, rates: null });
+    const albumId =
+      view.album === undefined || view.album === withoutAlbum
+        ? null
+        : ctx.db.normalizeId("albums", view.album);
+    const album = albumId && (await ctx.db.get(albumId));
+    const times = (amount: number | undefined, quantity: number) =>
+      amount === undefined ? undefined : amount * quantity;
+    return {
+      locale: written,
+      owner: {
+        name: owner.fullName ?? owner.displayName,
+        email: owner.email,
+      },
+      currency,
+      view,
+      albumName: album && album.ownerId === owner._id ? album.name : undefined,
+      ownCountry,
+      complete,
+      collectionSize,
+      rows: items.map((item) => ({
+        type: item.type,
+        title: item.title,
+        year: item.year,
+        denomination: item.denomination,
+        gradingScale: item.gradingScale,
+        grade: item.grade,
+        strike: item.strike,
+        quantity: item.quantity,
+        purchaseDate: item.purchaseDate,
+        purchasePrice: times(item.purchasePrice, item.quantity),
+        marketValue: times(item.marketValue, item.quantity),
+        gainLoss: itemGainLoss(item),
+      })),
+      totals: {
+        items: totals.items,
+        pieces: totalPieces(totals),
+        purchasePrice: totals.purchasePrice,
+        marketValue: totals.marketValue,
+        gainLoss: totals.gainLoss,
+      },
+    };
   },
 });

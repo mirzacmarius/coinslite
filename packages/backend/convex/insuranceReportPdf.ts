@@ -6,18 +6,8 @@ import { internal } from "./_generated/api";
 import { action } from "./_generated/server";
 import { insuranceReportPdf } from "./insuranceReport/pdf";
 import { reportArgs } from "./insuranceReport/validators";
+import { knownTimeZone } from "./pdf/dates";
 import { language } from "./utils/validators";
-
-/** A time zone the runtime knows, or UTC. */
-function knownTimeZone(timeZone: string | undefined) {
-  if (!timeZone) return "UTC";
-  try {
-    new Intl.DateTimeFormat("en", { timeZone });
-    return timeZone;
-  } catch {
-    return "UTC";
-  }
-}
 
 /**
  * Makes the signed-in Premium member's Insurance report as a PDF, in

@@ -97,5 +97,5 @@ The unpaid plan, limited to 50 Items regardless of their Quantity.
 _Avoid_: Basic, trial
 
 **Premium**:
-The paid plan. It unlocks an unlimited number of Items, the insurance report and CSV export.
+The paid plan. It unlocks an unlimited number of Items, the insurance report and the Collection exports (PDF and CSV).
 _Avoid_: Pro, subscription (as the name of the plan)

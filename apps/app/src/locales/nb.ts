@@ -971,6 +971,9 @@ export default {
     "inView#few": "{count} objekter i denne visningen",
     "inView#other": "{count} objekter i denne visningen",
     csv: "Eksporter som CSV",
+    pdf: "Eksporter som PDF",
+    pdfTooLarge:
+      "En PDF viser opptil {limit} objekter. Snevre inn visningen for å eksportere den.",
     premiumOnly: "Eksport av samlingen er en del av Premium.",
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",

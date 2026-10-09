@@ -980,6 +980,9 @@ export default {
     "inView#few": "{count} obiecte în această vizualizare",
     "inView#other": "{count} de obiecte în această vizualizare",
     csv: "Exportă ca CSV",
+    pdf: "Exportă ca PDF",
+    pdfTooLarge:
+      "Un PDF cuprinde cel mult {limit} obiecte. Restrânge vizualizarea pentru a o exporta.",
     premiumOnly: "Exportul colecției face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
