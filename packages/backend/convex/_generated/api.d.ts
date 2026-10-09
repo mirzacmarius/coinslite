@@ -37,6 +37,8 @@ import type * as catalog_datasets_euroCommemorativeCoins from "../catalog/datase
 import type * as catalog_datasets_euroCommemoratives from "../catalog/datasets/euroCommemoratives.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
 import type * as catalog_fields from "../catalog/fields.js";
+import type * as catalog_imageRules from "../catalog/imageRules.js";
+import type * as catalog_images from "../catalog/images.js";
 import type * as catalog_search from "../catalog/search.js";
 import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
@@ -59,6 +61,12 @@ import type * as homeCurrency from "../homeCurrency.js";
 import type * as homeCurrency_rules from "../homeCurrency/rules.js";
 import type * as http from "../http.js";
 import type * as init from "../init.js";
+import type * as insuranceReport from "../insuranceReport.js";
+import type * as insuranceReport_messages from "../insuranceReport/messages.js";
+import type * as insuranceReport_pdf from "../insuranceReport/pdf.js";
+import type * as insuranceReport_rules from "../insuranceReport/rules.js";
+import type * as insuranceReport_validators from "../insuranceReport/validators.js";
+import type * as insuranceReportPdf from "../insuranceReportPdf.js";
 import type * as items from "../items.js";
 import type * as items_deletion from "../items/deletion.js";
 import type * as items_denominations from "../items/denominations.js";
@@ -69,6 +77,8 @@ import type * as items_thumbnail from "../items/thumbnail.js";
 import type * as items_totals from "../items/totals.js";
 import type * as metalValues from "../metalValues.js";
 import type * as overview from "../overview.js";
+import type * as pdf_fonts from "../pdf/fonts.js";
+import type * as pdf_tableDocument from "../pdf/tableDocument.js";
 import type * as photos from "../photos.js";
 import type * as photos_rules from "../photos/rules.js";
 import type * as plans from "../plans.js";
@@ -76,10 +86,12 @@ import type * as plans_rules from "../plans/rules.js";
 import type * as spotPrices from "../spotPrices.js";
 import type * as spotPrices_metalPriceApi from "../spotPrices/metalPriceApi.js";
 import type * as spotPrices_rates from "../spotPrices/rates.js";
+import type * as testing_premium from "../testing/premium.js";
 import type * as updates from "../updates.js";
 import type * as updates_releases from "../updates/releases.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
+import type * as utils_files from "../utils/files.js";
 import type * as utils_validators from "../utils/validators.js";
 
 import type {
@@ -118,6 +130,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/datasets/euroCommemoratives": typeof catalog_datasets_euroCommemoratives;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
   "catalog/fields": typeof catalog_fields;
+  "catalog/imageRules": typeof catalog_imageRules;
+  "catalog/images": typeof catalog_images;
   "catalog/search": typeof catalog_search;
   "catalog/searchWords": typeof catalog_searchWords;
   "catalog/seed": typeof catalog_seed;
@@ -140,6 +154,12 @@ declare const fullApi: ApiFromModules<{
   "homeCurrency/rules": typeof homeCurrency_rules;
   http: typeof http;
   init: typeof init;
+  insuranceReport: typeof insuranceReport;
+  "insuranceReport/messages": typeof insuranceReport_messages;
+  "insuranceReport/pdf": typeof insuranceReport_pdf;
+  "insuranceReport/rules": typeof insuranceReport_rules;
+  "insuranceReport/validators": typeof insuranceReport_validators;
+  insuranceReportPdf: typeof insuranceReportPdf;
   items: typeof items;
   "items/deletion": typeof items_deletion;
   "items/denominations": typeof items_denominations;
@@ -150,6 +170,8 @@ declare const fullApi: ApiFromModules<{
   "items/totals": typeof items_totals;
   metalValues: typeof metalValues;
   overview: typeof overview;
+  "pdf/fonts": typeof pdf_fonts;
+  "pdf/tableDocument": typeof pdf_tableDocument;
   photos: typeof photos;
   "photos/rules": typeof photos_rules;
   plans: typeof plans;
@@ -157,10 +179,12 @@ declare const fullApi: ApiFromModules<{
   spotPrices: typeof spotPrices;
   "spotPrices/metalPriceApi": typeof spotPrices_metalPriceApi;
   "spotPrices/rates": typeof spotPrices_rates;
+  "testing/premium": typeof testing_premium;
   updates: typeof updates;
   "updates/releases": typeof updates_releases;
   users: typeof users;
   "utils/auth": typeof utils_auth;
+  "utils/files": typeof utils_files;
   "utils/validators": typeof utils_validators;
 }>;
 

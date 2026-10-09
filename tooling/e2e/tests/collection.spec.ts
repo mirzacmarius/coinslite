@@ -68,7 +68,10 @@ test("search, filter, sort and switch views, with the view kept in the URL", asy
   await expect(
     reloaded.getByRole("listitem").getByRole("link").first(),
   ).toContainText("Posthorn");
-  await page.getByRole("radio", { name: "Grid" }).check();
+  // The radio itself is visually hidden; people pick the segment's label.
+  const display = page.getByRole("dialog");
+  await display.getByText("Grid", { exact: true }).click();
+  await expect(display.getByRole("radio", { name: "Grid" })).toBeChecked();
   await page.keyboard.press("Escape");
   await page.goto(`${appUrl}/collection`);
   const later = visiblePage(page);

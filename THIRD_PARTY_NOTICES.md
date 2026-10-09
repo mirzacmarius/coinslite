@@ -25,3 +25,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+PDFs CoinsLite generates (the Insurance report) embed the Geist typeface (https://github.com/vercel/geist-font). The font files are in `packages/backend/fonts/`, unmodified, with their licence in `packages/backend/fonts/OFL.txt`.
+
+Copyright (c) 2023 Vercel, in collaboration with basement.studio
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).

@@ -75,6 +75,11 @@ test("changing the Home currency converts the Collection's amounts", async ({
   await visiblePage(page)
     .getByRole("link", { name: /Morgan dollar 1881-S/ })
     .click();
+  // The Collection shows the amount too; check it on the Item once it's open.
+  const detail = visiblePage(page);
+  await expect(
+    detail.getByRole("heading", { level: 1, name: "Morgan dollar 1881-S" }),
+  ).toBeVisible();
   // $75.50 at 0.80 is €60.40.
-  await expect(visiblePage(page).getByText("€60.40")).toBeVisible();
+  await expect(detail.getByText("€60.40")).toBeVisible();
 });

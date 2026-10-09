@@ -677,6 +677,8 @@ export default {
       YEARS_REVERSED: "La dernière année précède la première.",
       SOURCE_REQUIRED:
         "Indiquez la source de ces faits, de ces notes ou de cette image.",
+      CREDIT_REQUIRED:
+        "Une image doit indiquer sa source, son auteur, sa licence et son lien.",
       ROOT_NOT_ADDABLE:
         "Un pays ou un thème ne peut pas être une entrée du catalogue. Donnez un parent_id à la ligne.",
       PARENT_NOT_FOUND: "Aucune ligne du fichier ni du catalogue n’a cet id.",
@@ -891,6 +893,75 @@ export default {
       "Par type d’objet, plus la valeur du métal pour l’or et l’argent",
     part: "Type d’objet ou métal",
   },
+  catalogImages: {
+    add: "Ajouter une image",
+    edit: "Modifier l’image",
+    remove: "Retirer l’image",
+    title: "Image",
+    description:
+      "Téléversez une image pour cette entrée du catalogue et indiquez sa provenance.",
+    choose: "Choisir une image",
+    chooseAnother: "Choisir une autre image",
+    formats: "JPEG, PNG, WebP ou GIF, jusqu’à 25 Mo.",
+    sizes:
+      "Enregistrée en WebP, 800 px au plus sur le côté le plus long, avec une miniature de 128 px. Les images plus petites gardent leur taille.",
+    current: "L’image actuelle. Choisissez-en une autre pour la remplacer.",
+    converting: "Conversion…",
+    converted: "{full} px en WebP, miniature {thumbnail} px",
+    credit: "Crédit",
+    creditHint:
+      "Obligatoire pour chaque image. Les listes l’affichent à côté de la miniature, sauf si l’image est dans le domaine public ou sous CC0 ; l’entrée l’affiche toujours.",
+    source: "Source",
+    sourcePlaceholder: "Wikimedia Commons",
+    author: "Auteur",
+    authorPlaceholder: "Nom du photographe ou de l’auteur",
+    licence: "Licence",
+    licencePlaceholder: "CC BY-SA 4.0",
+    link: "Lien",
+    linkPlaceholder: "https://",
+    cancel: "Annuler",
+    close: "Fermer",
+    save: "Enregistrer",
+    saved: "Image enregistrée",
+    creditSaved: "Crédit enregistré",
+    removeTitle: "Retirer l’image de « {title} » ?",
+    removeBody:
+      "Ses fichiers et son crédit sont supprimés. L’entrée affiche un espace réservé jusqu’à l’ajout d’une autre image.",
+    removed: "Image retirée",
+    errors: {
+      imageRequired: "Choisissez une image.",
+      sourceRequired: "Indiquez la source.",
+      authorRequired: "Indiquez l’auteur.",
+      licenceRequired: "Indiquez la licence.",
+      linkRequired: "Indiquez le lien.",
+      tooLong: "Utilisez {max} caractères au plus.",
+      invalidLink:
+        "Saisissez une adresse web complète commençant par https://.",
+      numista: "Aucune donnée de Numista ne peut être stockée.",
+      failed: "Impossible d’enregistrer l’image. Réessayez.",
+      removeFailed: "Impossible de retirer l’image. Réessayez.",
+      CATALOG_ENTRY_NOT_FOUND: "Cette entrée du catalogue n’existe plus.",
+      IMAGE_NOT_FOUND: "Le téléversement n’est pas arrivé. Réessayez.",
+      IMAGE_NOT_WEBP: "L’image n’a pas été enregistrée en WebP. Réessayez.",
+      IMAGE_TOO_LARGE:
+        "L’image convertie est trop grande. Essayez une image plus petite.",
+      THUMBNAIL_TOO_LARGE: "La miniature convertie est trop grande. Réessayez.",
+      NO_IMAGE:
+        "Cette entrée n’a pas d’image à créditer. Choisissez une image.",
+      CREDIT_REQUIRED: "Indiquez la source, l’auteur, la licence et le lien.",
+      TOO_LONG: "Une partie du crédit est trop longue.",
+      INVALID_URL:
+        "Saisissez une adresse web complète commençant par https://.",
+      NUMISTA_DATA: "Aucune donnée de Numista ne peut être stockée.",
+      IMAGE_UNREADABLE:
+        "Ce fichier ne peut pas être lu comme une image. Choisissez un JPEG, PNG, WebP ou GIF.",
+      ORIGINAL_TOO_LARGE: "Choisissez une image de 25 Mo au plus.",
+      WEBP_UNSUPPORTED:
+        "Ce navigateur ne peut pas enregistrer d’images WebP. Essayez-en un autre, comme Chrome ou Firefox.",
+      NOT_ADMIN:
+        "Seuls les administrateurs peuvent modifier les images du catalogue.",
+    },
+  },
   featureFlags: {
     menu: "Activation des fonctionnalités",
     title: "Activation des fonctionnalités",
@@ -1019,5 +1090,55 @@ export default {
     added: "Objet ajouté à votre collection",
     open: "Ouvrir",
     failed: "L'objet n'a pas pu être ajouté. Réessayez.",
+  },
+  insuranceReport: {
+    title: "Rapport d’assurance",
+    lockedTitle: "Le rapport d’assurance fait partie de Premium",
+    lockedDescription:
+      "Un PDF pour votre assureur avec les objets de votre choix, leurs valeurs, vos coordonnées et les totaux.",
+    scopeTitle: "Objets",
+    scopeDescription: "Choisissez les objets couverts par le rapport.",
+    scope: "Périmètre",
+    wholeCollection: "Toute la collection",
+    albums: "Albums",
+    withoutAlbum: "Objets sans album",
+    noAlbums: "Vous n’avez pas encore d’album.",
+    chooseScope: "Choisissez au moins un album, ou les objets sans album.",
+    valuesTitle: "Valeurs",
+    valuesDescription:
+      "La valeur assurée est la plus élevée des valeurs choisies pour chaque objet.",
+    keepOne:
+      "Gardez au moins le prix d’achat, la valeur de marché ou la valeur du métal.",
+    columns: {
+      purchasePrice: "Prix d’achat",
+      marketValue: "Valeur de marché",
+      metalValue: "Valeur du métal",
+      insuredValue: "Valeur assurée",
+    },
+    previewTitle: "Aperçu",
+    previewDescription:
+      "Chaque total couvre tous les exemplaires de chaque objet.",
+    items: "Objets",
+    pieces: "Exemplaires",
+    noSpotPrices:
+      "Pas encore de cours spot : aucun objet n’a donc de valeur du métal.",
+    staleSpotPrices: "Les cours spot sont peut-être dépassés.",
+    tooLarge:
+      "Un rapport compte au plus {limit} objets. Choisissez moins d’albums.",
+    nothingToReport: "Il n’y a aucun objet à inclure ici.",
+    ownerTitle: "Propriétaire",
+    ownerDescription: "Figure sur le rapport, depuis votre compte.",
+    editContact: "Modifier dans le compte",
+    missingContact:
+      "Ajoutez votre nom complet, votre téléphone et votre adresse dans le compte pour que votre assureur puisse vous joindre.",
+    download: "Télécharger le PDF",
+    downloaded: "Rapport d’assurance téléchargé",
+    failed: "Impossible de créer le rapport. Réessayez.",
+    errors: {
+      PREMIUM_REQUIRED: "Le rapport d’assurance fait partie de Premium.",
+      REPORT_TOO_LARGE:
+        "Ce rapport compte trop d’objets. Choisissez moins d’albums.",
+      ALBUM_NOT_FOUND: "L’un des albums choisis n’existe plus.",
+    },
   },
 } as const satisfies Dictionary;
