@@ -21,6 +21,8 @@ import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as auth from "../auth.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
+import type * as feedback from "../feedback.js";
+import type * as feedback_rules from "../feedback/rules.js";
 import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as items from "../items.js";
@@ -51,6 +53,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "email/index": typeof email_index;
   env: typeof env;
+  feedback: typeof feedback;
+  "feedback/rules": typeof feedback_rules;
   http: typeof http;
   init: typeof init;
   items: typeof items;

@@ -13,6 +13,11 @@ const app = defineApp({
     SITE_URL: v.optional(v.string()),
     /** "outbox" stores emails in the devOutbox table instead of sending them (local and CI runs). */
     EMAIL_DELIVERY: v.optional(v.literal("outbox")),
+    /**
+     * The team's inbox for feedback sent from the Account screen. Unset, the
+     * feedback is written to the deployment log instead of being emailed.
+     */
+    FEEDBACK_EMAIL: v.optional(v.string()),
   },
 });
 app.use(polar);

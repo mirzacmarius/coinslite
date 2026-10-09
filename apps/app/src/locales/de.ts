@@ -356,4 +356,24 @@ export default {
         "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
+  feedback: {
+    title: "Feedback",
+    description:
+      "Eine Idee, ein Problem oder etwas, das dir gefällt? Sag es dem CoinsLite-Team. Wir lesen jede Nachricht.",
+    open: "Feedback senden",
+    dialogTitle: "Feedback senden",
+    message: "Nachricht",
+    placeholder: "Was funktioniert für dich, was nicht, was wünschst du dir…",
+    note: "Wir senden die E-Mail-Adresse deines Kontos mit, damit wir antworten können.",
+    cancel: "Abbrechen",
+    send: "Senden",
+    close: "Schließen",
+    sent: "Danke! Dein Feedback wurde gesendet.",
+    required: "Schreib zuerst eine Nachricht.",
+    tooLong: "Höchstens {limit} Zeichen.",
+    tooMany:
+      "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Versuche es in ein paar Minuten noch einmal.",
+    failed:
+      "Dein Feedback konnte nicht gesendet werden. Versuche es noch einmal.",
+  },
 } as const satisfies Dictionary;

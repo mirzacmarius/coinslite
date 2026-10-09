@@ -338,4 +338,23 @@ export default {
       tryAgain: "Couldn't confirm just now. Try again.",
     },
   },
+  feedback: {
+    title: "Feedback",
+    description:
+      "An idea, a problem or something you like? Tell the CoinsLite team. We read every message.",
+    open: "Send feedback",
+    dialogTitle: "Send feedback",
+    message: "Message",
+    placeholder: "What works for you, what doesn't, what you'd like next…",
+    note: "We include your account email, so we can reply.",
+    cancel: "Cancel",
+    send: "Send",
+    close: "Close",
+    sent: "Thanks! Your feedback was sent.",
+    required: "Write a message first.",
+    tooLong: "Keep it to {limit} characters.",
+    tooMany:
+      "You've sent several messages in a short time. Try again in a few minutes.",
+    failed: "Couldn't send your feedback. Try again.",
+  },
 } as const;

@@ -350,4 +350,24 @@ export default {
       tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
+  feedback: {
+    title: "Votre avis",
+    description:
+      "Une idée, un problème ou quelque chose qui vous plaît ? Dites-le à l’équipe CoinsLite. Nous lisons chaque message.",
+    open: "Donner votre avis",
+    dialogTitle: "Donner votre avis",
+    message: "Message",
+    placeholder:
+      "Ce qui fonctionne pour vous, ce qui ne fonctionne pas, ce que vous aimeriez…",
+    note: "Nous joignons l’adresse e-mail de votre compte pour pouvoir vous répondre.",
+    cancel: "Annuler",
+    send: "Envoyer",
+    close: "Fermer",
+    sent: "Merci ! Votre avis a bien été envoyé.",
+    required: "Écrivez d’abord un message.",
+    tooLong: "{limit} caractères maximum.",
+    tooMany:
+      "Vous avez envoyé plusieurs messages en peu de temps. Réessayez dans quelques minutes.",
+    failed: "Impossible d’envoyer votre avis. Réessayez.",
+  },
 } as const satisfies Dictionary;

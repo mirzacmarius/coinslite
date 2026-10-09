@@ -343,4 +343,23 @@ export default {
       tryAgain: "Kunne ikke bekrefte akkurat nå. Prøv igjen.",
     },
   },
+  feedback: {
+    title: "Tilbakemelding",
+    description:
+      "En idé, et problem eller noe du liker? Si fra til CoinsLite-teamet. Vi leser alle meldinger.",
+    open: "Send tilbakemelding",
+    dialogTitle: "Send tilbakemelding",
+    message: "Melding",
+    placeholder: "Hva fungerer for deg, hva fungerer ikke, hva ønsker du deg…",
+    note: "Vi legger ved e-postadressen til kontoen din, så vi kan svare.",
+    cancel: "Avbryt",
+    send: "Send",
+    close: "Lukk",
+    sent: "Takk! Tilbakemeldingen din er sendt.",
+    required: "Skriv en melding først.",
+    tooLong: "Bruk høyst {limit} tegn.",
+    tooMany:
+      "Du har sendt flere meldinger på kort tid. Prøv igjen om noen minutter.",
+    failed: "Kunne ikke sende tilbakemeldingen. Prøv igjen.",
+  },
 } as const satisfies Dictionary;
