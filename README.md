@@ -29,6 +29,8 @@ bun run setup   # configures a Convex deployment and points the app at it
 bun dev         # marketing site, product app, Convex and email preview
 ```
 
+`bun install` configures the repository's `.githooks` when run locally in a Git checkout. It leaves a different existing `core.hooksPath` untouched. To set up the hooks explicitly, run `bun run hooks:install`.
+
 `bun run setup` asks you to log in to Convex, or to start without an account and run Convex locally. Agents and CI can skip the prompt with `CONVEX_AGENT_MODE=anonymous bun run setup`.
 
 ## Checks
@@ -39,6 +41,8 @@ bun run typecheck
 bun run test        # backend rules, through Convex functions (convex-test + Vitest)
 bun run test:e2e    # Playwright smoke tests; starts both apps if they aren't running
 ```
+
+The pre-commit hook formats and lints the staged files with Biome and stages its fixes. The pre-push hook runs typecheck and tests.
 
 The first Playwright run needs a browser: `bunx playwright install chromium`.
 
