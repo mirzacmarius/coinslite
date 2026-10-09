@@ -11,6 +11,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
+import { waitForAddedToasts } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -150,6 +151,7 @@ async function addStamp(page: Page) {
   await dialog.getByLabel(en.items.title).fill(stampTitle);
   await dialog.getByRole("button", { name: /^Add Item/ }).click();
   await expect(dialog).toBeHidden();
+  await waitForAddedToasts(page);
   const link = main.getByRole("link", { name: new RegExp(stampTitle) });
   const href = await link.getAttribute("href");
   if (!href) throw new Error("The new Item has no link");
