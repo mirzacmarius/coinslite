@@ -1,10 +1,12 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { statsFigures, statsTable } from "./admin/statsFigures";
 import {
   albumColour,
   catalogItemType,
   catalogKind,
+  featureFlag,
   gradingScale,
   homeCurrency,
   itemType,
@@ -19,6 +21,16 @@ import {
 
 export default defineSchema({
   ...authTables,
+  /**
+   * Convex Auth's, plus an index so deleting an account (account/deletion.ts)
+   * finds the Google sign-ins its sessions started.
+   */
+  authVerifiers: defineTable({
+    sessionId: v.optional(v.id("authSessions")),
+    signature: v.optional(v.string()),
+  })
+    .index("signature", ["signature"])
+    .index("by_sessionId", ["sessionId"]),
   users: defineTable({
     // Convex Auth fields
     name: v.optional(v.string()),
@@ -119,11 +131,16 @@ export default defineSchema({
     // Album: at most one. Moving an Item in or out keeps the Album's itemCount
     // right (albums/membership.ts).
     albumId: v.optional(v.id("albums")),
+
+    // The Catalog entry the Item was created from (ADR 0001), if any. The
+    // Catalog shows how many of each entry a person holds from this link.
+    catalogEntryId: v.optional(v.id("catalogNodes")),
   })
     .index("by_ownerId", ["ownerId"])
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
-    .index("by_ownerId_and_albumId", ["ownerId", "albumId"]),
+    .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` is kept by every
@@ -188,11 +205,34 @@ export default defineSchema({
 
     /** Title, denomination, series and country, for the search index. */
     searchText: v.string(),
+
+    // For browsing (catalog/browse.ts), kept by catalog/tree.ts:
+    /** Roots and groupings: how many Catalog entries sit anywhere below. */
+    entryCount: v.optional(v.number()),
+    /**
+     * The key of the country the node is browsed under: its country root, or
+     * below a Theme, the Theme's child. Absent on Theme roots.
+     */
+    countryNodeKey: v.optional(v.string()),
   })
     .index("by_key", ["key"])
     .index("by_parentId_and_sortOrder", ["parentId", "sortOrder"])
     .index("by_path", ["path"])
     .index("by_kind_and_path", ["kind", "path"])
+    .index("by_parentId_and_kind_and_yearFrom_and_sortOrder", [
+      "parentId",
+      "kind",
+      "yearFrom",
+      "sortOrder",
+    ])
+    .index("by_kind_countryNodeKey_denomination_series_yearFrom_sortOrder", [
+      "kind",
+      "countryNodeKey",
+      "denomination",
+      "series",
+      "yearFrom",
+      "sortOrder",
+    ])
     .searchIndex("search_searchText", {
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
@@ -244,6 +284,50 @@ export default defineSchema({
   })
     .index("by_polarId", ["polarId"])
     .index("by_userId_and_premium", ["userId", "premium"]),
+
+  /**
+   * Feature flags admins switch in the app (featureFlags.ts): one document per
+   * flag that has been set; a flag without one holds its default.
+   */
+  featureFlags: defineTable(featureFlag).index("by_key", ["key"]),
+
+  /**
+   * How many Items (in all and of each Item type) and Albums each person has:
+   * one document per person, kept by every write that adds, removes or
+   * retypes their Items or Albums (collectionCounts.ts), so figures across
+   * everyone never count Items one by one. The `items` and `albums` indexes
+   * list people by how much they hold.
+   */
+  collectionCounts: defineTable({
+    userId: v.id("users"),
+    items: v.number(),
+    coins: v.number(),
+    banknotes: v.number(),
+    stamps: v.number(),
+    albums: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_items", ["items"])
+    .index("by_albums", ["albums"]),
+
+  /**
+   * Admin stats (admin/stats.ts): figures across everyone, counted in the
+   * background a batch per transaction. Admins see the newest finished count;
+   * one in progress has no `finishedAt` yet and carries where it has got to.
+   */
+  adminStats: defineTable({
+    /** When the count began; "the last 30 days" and the like count back from here. */
+    startedAt: v.number(),
+    finishedAt: v.optional(v.number()),
+    /** The table being counted and the cursor into it; unset once finished. */
+    progress: v.optional(
+      v.object({
+        table: statsTable,
+        cursor: v.union(v.string(), v.null()),
+      }),
+    ),
+    figures: statsFigures,
+  }).index("by_finishedAt", ["finishedAt"]),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

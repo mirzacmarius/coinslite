@@ -86,6 +86,31 @@ export function polarApi() {
       return url;
     },
 
+    /**
+     * Opens Polar's customer portal for one customer, where they change or
+     * cancel their subscription, and returns its page. With `returnUrl` the
+     * portal shows a way back.
+     */
+    async createCustomerPortal(session: {
+      customerId: string;
+      returnUrl?: string;
+    }) {
+      const created = await call("POST", "/customer-sessions/", {
+        customer_id: session.customerId,
+        return_url: session.returnUrl,
+      });
+      const url = (created as { customer_portal_url?: unknown } | null)
+        ?.customer_portal_url;
+      if (typeof url !== "string") {
+        throw new PolarError(
+          200,
+          "no customer portal url",
+          "POST /customer-sessions/",
+        );
+      }
+      return url;
+    },
+
     /** Ends a subscription now, without charging again. */
     async revokeSubscription(polarId: string) {
       await call("PATCH", `/subscriptions/${encodeURIComponent(polarId)}`, {

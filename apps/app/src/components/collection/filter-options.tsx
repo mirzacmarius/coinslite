@@ -1,0 +1,272 @@
+"use client";
+
+import { AlbumDot } from "@/components/albums/album-colours";
+import { useAlbums } from "@/components/albums/use-albums";
+import { useGradeLabels } from "@/components/items/grade-labels";
+import { itemTypeIcons, itemTypes } from "@/components/items/item-fields";
+import { useCurrentLocale, useI18n } from "@/locales/client";
+import { useFormatters } from "@/locales/use-formatters";
+import type { api } from "@coinslite/backend/convex/_generated/api";
+import {
+  type CollectionView,
+  withoutAlbum,
+} from "@coinslite/backend/convex/collection/view";
+import type { FunctionReturnType } from "convex/server";
+import {
+  Award,
+  CircleDollarSign,
+  FolderOpen,
+  Globe,
+  type LucideIcon,
+  MapPin,
+  Shapes,
+} from "lucide-react";
+import type * as React from "react";
+import { useMemo } from "react";
+
+export type BrowseResult = FunctionReturnType<typeof api.collection.browse>;
+
+export type FilterDimension =
+  | "type"
+  | "origin"
+  | "country"
+  | "denomination"
+  | "grade"
+  | "album";
+
+export type FilterOption = {
+  key: string;
+  label: string;
+  icon?: React.ReactNode;
+  hint?: string;
+  /** How many Items picking it would show. */
+  count: number;
+  selected: boolean;
+  /** What picking it changes in the view. */
+  change: Partial<CollectionView>;
+};
+
+export type Filter = {
+  dimension: FilterDimension;
+  label: string;
+  icon: LucideIcon;
+  options: FilterOption[];
+  /** What removing the filter changes in the view. */
+  clear: Partial<CollectionView>;
+  /** The chosen option, when the filter is on. */
+  active?: { label: string; icon?: React.ReactNode };
+};
+
+const optionIcon = (Icon: LucideIcon) => (
+  <Icon
+    className="text-muted-foreground"
+    strokeWidth={1.75}
+    aria-hidden="true"
+  />
+);
+
+const sameText = (a: string | undefined, b: string) =>
+  a !== undefined &&
+  a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
+
+/**
+ * Every filter the Collection offers, each with its options and their counts
+ * from the latest result, and which option is on. Origin is offered only
+ * when the person has an own country to compare with.
+ */
+export function useFilters(
+  result: BrowseResult | undefined,
+  view: CollectionView,
+): Filter[] {
+  const t = useI18n();
+  const locale = useCurrentLocale();
+  const format = useFormatters();
+  const labels = useGradeLabels();
+  const albums = useAlbums();
+
+  return useMemo(() => {
+    const options = result?.options;
+    const ownCountry = result?.ownCountry ?? null;
+    const filters: Filter[] = [];
+
+    const typeOptions: FilterOption[] = itemTypes.flatMap((type) => {
+      const plain: FilterOption = {
+        key: type,
+        label: t(`items.types.${type}`),
+        icon: optionIcon(itemTypeIcons[type]),
+        count: options?.types[type] ?? 0,
+        selected: view.type === type && !view.bullionOnly,
+        change: { type, bullionOnly: undefined },
+      };
+      if (type !== "coin") return [plain];
+      return [
+        plain,
+        {
+          key: "bullion",
+          label: t("collection.bullionCoins"),
+          icon: optionIcon(itemTypeIcons.coin),
+          count: options?.types.bullion ?? 0,
+          selected: view.bullionOnly === true,
+          change: { type: "coin", bullionOnly: true },
+        },
+      ];
+    });
+    filters.push({
+      dimension: "type",
+      label: t("collection.filters.type"),
+      icon: Shapes,
+      options: typeOptions,
+      clear: { type: undefined, bullionOnly: undefined },
+    });
+
+    if (ownCountry) {
+      filters.push({
+        dimension: "origin",
+        label: t("collection.filters.origin"),
+        icon: MapPin,
+        options: [
+          {
+            key: "own",
+            label: t("collection.origins.own", {
+              country: format.country(ownCountry),
+            }),
+            count: options?.origins.own ?? 0,
+            selected: view.origin === "own",
+            change: { origin: "own" },
+          },
+          {
+            key: "foreign",
+            label: t("collection.origins.foreign"),
+            count: options?.origins.foreign ?? 0,
+            selected: view.origin === "foreign",
+            change: { origin: "foreign" },
+          },
+        ],
+        clear: { origin: undefined },
+      });
+    }
+
+    const countries = options?.countries ?? [];
+    const countryOptions = [
+      ...countries,
+      ...(view.country && !countries.some((c) => c.country === view.country)
+        ? [{ country: view.country, count: 0 }]
+        : []),
+    ]
+      .map(
+        ({ country, count }): FilterOption => ({
+          key: country,
+          label: format.country(country),
+          count,
+          selected: view.country === country,
+          change: { country },
+        }),
+      )
+      .sort((a, b) => a.label.localeCompare(b.label, locale));
+    filters.push({
+      dimension: "country",
+      label: t("collection.filters.country"),
+      icon: Globe,
+      options: countryOptions,
+      clear: { country: undefined },
+    });
+
+    const denominations = options?.denominations ?? [];
+    const denominationOptions = [
+      ...denominations,
+      ...(view.denomination &&
+      !denominations.some((d) => sameText(view.denomination, d.denomination))
+        ? [{ denomination: view.denomination, count: 0 }]
+        : []),
+    ].map(
+      ({ denomination, count }): FilterOption => ({
+        key: denomination,
+        label: denomination,
+        count,
+        selected: sameText(view.denomination, denomination),
+        change: { denomination },
+      }),
+    );
+    filters.push({
+      dimension: "denomination",
+      label: t("collection.filters.denomination"),
+      icon: CircleDollarSign,
+      options: denominationOptions,
+      clear: { denomination: undefined },
+    });
+
+    const grades = options?.grades ?? [];
+    const chosenGrade = view.grade;
+    const gradeOptions = [
+      ...grades,
+      ...(chosenGrade &&
+      !grades.some(
+        (g) =>
+          g.gradingScale === chosenGrade.gradingScale &&
+          g.grade === chosenGrade.grade,
+      )
+        ? [{ ...chosenGrade, count: 0 }]
+        : []),
+    ].map(
+      ({ gradingScale, grade, count }): FilterOption => ({
+        key: `${gradingScale}:${grade}`,
+        label: labels.grade(gradingScale, grade),
+        hint: labels.scale(gradingScale),
+        count,
+        selected:
+          chosenGrade?.gradingScale === gradingScale &&
+          chosenGrade.grade === grade,
+        change: { grade: { gradingScale, grade } },
+      }),
+    );
+    filters.push({
+      dimension: "grade",
+      label: t("collection.filters.grade"),
+      icon: Award,
+      options: gradeOptions,
+      clear: { grade: undefined },
+    });
+
+    const albumCounts = new Map(
+      options?.albums.map(({ albumId, count }) => [albumId as string, count]),
+    );
+    const albumOptions: FilterOption[] = [
+      ...(albums ?? []).map((album) => ({
+        key: album._id,
+        label: album.name,
+        icon: <AlbumDot colour={album.colour} />,
+        count: albumCounts.get(album._id) ?? 0,
+        selected: view.album === album._id,
+        change: { album: album._id },
+      })),
+      {
+        key: withoutAlbum,
+        label: t("collection.withoutAlbum"),
+        count: options?.withoutAlbum ?? 0,
+        selected: view.album === withoutAlbum,
+        change: { album: withoutAlbum },
+      },
+    ];
+    filters.push({
+      dimension: "album",
+      label: t("collection.filters.album"),
+      icon: FolderOpen,
+      options: albumOptions,
+      clear: { album: undefined },
+      // An Album deleted or not this person's still shows as a filter to remove.
+      ...(view.album &&
+        albums &&
+        !albumOptions.some((option) => option.selected) && {
+          active: { label: t("collection.unknownAlbum") },
+        }),
+    });
+
+    return filters.map((filter) => {
+      if (filter.active) return filter;
+      const chosen = filter.options.find((option) => option.selected);
+      return chosen
+        ? { ...filter, active: { label: chosen.label, icon: chosen.icon } }
+        : filter;
+    });
+  }, [result, view, t, locale, format, labels, albums]);
+}

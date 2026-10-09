@@ -40,7 +40,8 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   await expect(dialog).toBeHidden();
 
   const row = main.getByRole("link", { name: /Morgan dollar 1881-S/ });
-  await expect(row).toContainText("1881 · 1 dollar · United States · PF-65");
+  await expect(row).toContainText("1881 · 1 dollar · United States");
+  await expect(row).toContainText("PF-65");
   await expect(row).toContainText("×2");
   await row.click();
 

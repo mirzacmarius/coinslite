@@ -25,6 +25,22 @@ test("the Plans page offers Premium monthly or yearly", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("Account leads someone on the Free plan to Premium on the Plans page", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/settings`);
+
+  await visiblePage(page)
+    .getByRole("link", { name: "Upgrade to Premium" })
+    .click();
+
+  await page.waitForURL((url) => url.pathname === "/settings/billing");
+  await expect(
+    visiblePage(page).getByRole("button", { name: "Upgrade to Premium" }),
+  ).toBeVisible();
+});
+
 /**
  * The real checkout, in Polar's sandbox. Set E2E_POLAR_SANDBOX=1 once the test
  * backend has a sandbox organization's POLAR_ORGANIZATION_TOKEN,
@@ -32,13 +48,13 @@ test("the Plans page offers Premium monthly or yearly", async ({ page }) => {
  * POLAR_PREMIUM_YEARLY_PRODUCT_ID and SITE_URL, and the organization's
  * webhook reaches the backend's /polar/events (a tunnel, for a local one).
  */
-test.describe("Polar sandbox checkout", () => {
+test.describe("Polar sandbox checkout and customer portal", () => {
   test.skip(
     !process.env.E2E_POLAR_SANDBOX,
     "Needs Polar sandbox credentials on the test backend and Polar's webhook reaching it",
   );
 
-  test("buying Premium returns to the confirmation page, on Premium", async ({
+  test("buying Premium returns to the confirmation page, on Premium, and Account opens the portal", async ({
     page,
   }) => {
     test.setTimeout(180_000);
@@ -65,5 +81,14 @@ test.describe("Polar sandbox checkout", () => {
       visiblePage(page).getByRole("heading", { name: "Welcome to Premium" }),
     ).toBeVisible({ timeout: 60_000 });
     await expect(page.getByText(/\/ 50 Items/)).toBeHidden();
+
+    // Account shows the plan and its renewal, and opens Polar's portal to change or cancel it.
+    await page.goto(`${appUrl}/settings`);
+    const account = visiblePage(page);
+    await expect(account.getByText(/^Monthly · Renews on /)).toBeVisible({
+      timeout: 30_000,
+    });
+    await account.getByRole("button", { name: "Manage subscription" }).click();
+    await page.waitForURL(/polar\.sh\/.*portal/, { timeout: 30_000 });
   });
 });

@@ -159,7 +159,22 @@ async function deleteAccount(ctx: MutationCtx, account: Doc<"authAccounts">) {
     .withIndex("accountId", (q) => q.eq("accountId", account._id))
     .take(50);
   for (const code of codes) await ctx.db.delete(code._id);
+  // Failed password attempts are counted per sign-in method.
+  const failedAttempts = await ctx.db
+    .query("authRateLimits")
+    .withIndex("identifier", (q) => q.eq("identifier", account._id))
+    .unique();
+  if (failedAttempts) await ctx.db.delete(failedAttempts._id);
   await ctx.db.delete(account._id);
+}
+
+/** Removes every way to sign in as a user, with the codes pending for each. */
+export async function deleteSignInMethods(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+) {
+  for (const account of await accountsOf(ctx, userId))
+    await deleteAccount(ctx, account);
 }
 
 /** Removes a user with every sign-in method, pending code and email change, so the email is free again. */
@@ -167,8 +182,7 @@ export async function deleteUserAndSignInMethods(
   ctx: MutationCtx,
   userId: Id<"users">,
 ) {
-  for (const account of await accountsOf(ctx, userId))
-    await deleteAccount(ctx, account);
+  await deleteSignInMethods(ctx, userId);
   const changes = await ctx.db
     .query("emailChanges")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
