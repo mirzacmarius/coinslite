@@ -328,7 +328,6 @@ export default {
       title: "Abmelden oder löschen",
       signOut: "Abmelden",
       delete: "Konto löschen",
-      deleteConfirm: "Zum Löschen von allem erneut klicken",
       deleteWarning:
         "Beim Löschen deines Kontos wird es mit allem darin entfernt. Das lässt sich nicht rückgängig machen.",
     },
@@ -742,5 +741,20 @@ export default {
     toCollection: "Zur Sammlung",
     seePlan: "Tarif ansehen",
     backToPlans: "Zurück zu den Tarifen",
+  },
+  deleteAccount: {
+    title: "Konto löschen?",
+    description:
+      "Dein Profil, deine Kontaktdaten und deine Anmeldemethoden werden endgültig gelöscht, zusammen mit allem in deiner Sammlung. Das lässt sich nicht rückgängig machen.",
+    endsSubscription:
+      "Dein Premium-Abo endet sofort und wird nicht mehr abgerechnet.",
+    items: "Objekte",
+    photos: "Fotos",
+    albums: "Alben",
+    atLeast: "{value}+",
+    confirm: "Konto löschen",
+    cancel: "Abbrechen",
+    failed:
+      "Dein Konto konnte nicht gelöscht werden, und es wurde nichts entfernt. Versuch es noch einmal.",
   },
 } as const satisfies Dictionary;

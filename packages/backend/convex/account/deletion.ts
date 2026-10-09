@@ -131,12 +131,13 @@ type Remainder = Infer<typeof remainder>;
 async function forgetPerson(ctx: MutationCtx, user: Doc<"users">) {
   await feedbackLimits.reset(ctx, "feedback", { key: user._id });
   await emailChangeLimits.reset(ctx, "emailChange", { key: user._id });
-  if (user.email === undefined) return;
-  await codeEmailLimits.reset(ctx, "codeEmail", { key: user.email });
+  const { email } = user;
+  if (email === undefined) return;
+  await codeEmailLimits.reset(ctx, "codeEmail", { key: email });
   // Wrong codes are counted per address.
   const failedCodes = await ctx.db
     .query("authRateLimits")
-    .withIndex("identifier", (q) => q.eq("identifier", user.email as string))
+    .withIndex("identifier", (q) => q.eq("identifier", email))
     .unique();
   if (failedCodes) await ctx.db.delete(failedCodes._id);
 }

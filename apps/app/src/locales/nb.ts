@@ -317,7 +317,6 @@ export default {
       title: "Logg ut eller slett",
       signOut: "Logg ut",
       delete: "Slett kontoen",
-      deleteConfirm: "Klikk igjen for å slette alt",
       deleteWarning:
         "Når du sletter kontoen, fjernes den og alt i den. Dette kan ikke angres.",
     },
@@ -716,5 +715,19 @@ export default {
     toCollection: "Gå til samlingen",
     seePlan: "Se planen din",
     backToPlans: "Tilbake til abonnement",
+  },
+  deleteAccount: {
+    title: "Slette kontoen?",
+    description:
+      "Profilen, kontaktopplysningene og innloggingsmåtene dine slettes for godt, sammen med alt i samlingen din. Dette kan ikke angres.",
+    endsSubscription:
+      "Premium-abonnementet ditt avsluttes nå og blir ikke belastet igjen.",
+    items: "Objekter",
+    photos: "Bilder",
+    albums: "Album",
+    atLeast: "{value}+",
+    confirm: "Slett kontoen",
+    cancel: "Avbryt",
+    failed: "Kontoen kunne ikke slettes, og ingenting ble fjernet. Prøv igjen.",
   },
 } as const satisfies Dictionary;

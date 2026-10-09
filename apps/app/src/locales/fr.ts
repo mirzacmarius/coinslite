@@ -323,7 +323,6 @@ export default {
       title: "Se déconnecter ou supprimer",
       signOut: "Se déconnecter",
       delete: "Supprimer le compte",
-      deleteConfirm: "Cliquez à nouveau pour tout supprimer",
       deleteWarning:
         "Supprimer votre compte l’efface avec tout son contenu. Cette action est irréversible.",
     },
@@ -727,5 +726,20 @@ export default {
     toCollection: "Aller à la collection",
     seePlan: "Voir votre formule",
     backToPlans: "Retour aux formules",
+  },
+  deleteAccount: {
+    title: "Supprimer votre compte ?",
+    description:
+      "Votre profil, vos coordonnées et vos moyens de connexion sont supprimés définitivement, avec tout le contenu de votre collection. Cette action est irréversible.",
+    endsSubscription:
+      "Votre abonnement Premium prend fin maintenant et ne sera plus facturé.",
+    items: "Objets",
+    photos: "Photos",
+    albums: "Albums",
+    atLeast: "{value}+",
+    confirm: "Supprimer le compte",
+    cancel: "Annuler",
+    failed:
+      "Votre compte n’a pas pu être supprimé, et rien n’a été effacé. Réessayez.",
   },
 } as const satisfies Dictionary;
