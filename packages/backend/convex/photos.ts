@@ -10,6 +10,7 @@ import {
   query,
 } from "./_generated/server";
 import { requireOwnItem } from "./items";
+import { ensurePhotoLinks, photoLink } from "./photos/links";
 import {
   photoErrors,
   photoLimits,
@@ -29,8 +30,11 @@ import { photoSide } from "./utils/validators";
 /** Where each side's photo is kept on the Item. */
 const photoFields = { front: "frontPhoto", back: "backPhoto" } as const;
 
-const urlOf = async (ctx: QueryCtx, photo: Id<"_storage"> | undefined) =>
-  photo ? await ctx.storage.getUrl(photo) : null;
+const linkOf = async (
+  ctx: QueryCtx,
+  ownerId: Id<"users">,
+  photo: Id<"_storage"> | undefined,
+) => (photo ? await photoLink(ctx, ownerId, photo) : null);
 
 /**
  * One of the caller's Items, and a file they may put on it: a fresh upload
@@ -154,6 +158,7 @@ export const save = internalMutation({
     if (replaced) await ctx.storage.delete(replaced);
     await ctx.db.patch(item._id, { [field]: upload.storageId });
     await settleUpload(ctx, upload.storageId);
+    await ensurePhotoLinks(ctx);
     return null;
   },
 });
@@ -174,7 +179,10 @@ export const remove = mutation({
   },
 });
 
-/** Links to an Item's photos, for its owner only; null for anyone else's Item. */
+/**
+ * Links to an Item's photos, for its owner only; null for anyone else's Item.
+ * Each works for an hour at most; this query hands out fresh ones in time.
+ */
 export const ofItem = query({
   args: { itemId: v.id("items") },
   returns: v.union(
@@ -189,8 +197,8 @@ export const ofItem = query({
     const item = await ctx.db.get(itemId);
     if (!item || item.ownerId !== owner._id) return null;
     return {
-      front: await urlOf(ctx, item.frontPhoto),
-      back: await urlOf(ctx, item.backPhoto),
+      front: await linkOf(ctx, owner._id, item.frontPhoto),
+      back: await linkOf(ctx, owner._id, item.backPhoto),
     };
   },
 });

@@ -376,6 +376,15 @@ export default defineSchema({
   }).index("by_finishedAt", ["finishedAt"]),
 
   /**
+   * When photo links are issued as of, and the secret they're signed with on
+   * a deployment without PHOTO_LINK_SECRET (photos/links.ts): one document.
+   */
+  photoLinkKeys: defineTable({
+    issuedAt: v.number(),
+    fallbackSecret: v.string(),
+  }),
+
+  /**
    * Uploads someone registered but hasn't made a photo or a Catalog image yet
    * (utils/files.ts): only they can put one to that use. The hourly clean-up
    * deletes those older than an hour (uploads.ts); deleting the account

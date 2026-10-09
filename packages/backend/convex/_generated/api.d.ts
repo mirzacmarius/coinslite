@@ -93,6 +93,7 @@ import type * as pdf_dates from "../pdf/dates.js";
 import type * as pdf_fonts from "../pdf/fonts.js";
 import type * as pdf_tableDocument from "../pdf/tableDocument.js";
 import type * as photos from "../photos.js";
+import type * as photos_links from "../photos/links.js";
 import type * as photos_rules from "../photos/rules.js";
 import type * as plans from "../plans.js";
 import type * as plans_rules from "../plans/rules.js";
@@ -200,6 +201,7 @@ declare const fullApi: ApiFromModules<{
   "pdf/fonts": typeof pdf_fonts;
   "pdf/tableDocument": typeof pdf_tableDocument;
   photos: typeof photos;
+  "photos/links": typeof photos_links;
   "photos/rules": typeof photos_rules;
   plans: typeof plans;
   "plans/rules": typeof plans_rules;

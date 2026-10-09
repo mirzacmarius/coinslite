@@ -19,6 +19,14 @@ crons.interval(
   {},
 );
 
+/** Photo links are issued afresh every half hour, so each works for an hour at most (photos/links.ts). */
+crons.interval(
+  "renew photo links",
+  { minutes: 30 },
+  internal.photos.links.renew,
+  {},
+);
+
 /** Uploads that never became a photo or a Catalog image (uploads.ts). */
 crons.interval(
   "delete unused uploads",

@@ -1,11 +1,17 @@
 /// <reference types="vite/client" />
 import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
+
+const SITE = "https://coinslite-test.convex.site";
+beforeEach(() => {
+  vi.stubEnv("CONVEX_SITE_URL", SITE);
+  vi.stubEnv("PHOTO_LINK_SECRET", "a-secret-only-the-backend-knows");
+});
 
 type Test = ReturnType<typeof convexTest>;
 
@@ -414,6 +420,77 @@ test("upload addresses are handed out at a steady pace, not without limit", asyn
   expect(handedOut).toBeLessThan(1000);
   // Someone else's pace is their own.
   await bob.as.mutation(api.photos.generateUploadUrl, {});
+});
+
+/** Opens a photo link the way a browser does: no session, just the link. */
+const open = (t: Test, link: string) => t.fetch(link.slice(SITE.length));
+
+test("photo links lead to CoinsLite, which serves the photo only for a signed, fresh link", async () => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  const photo = file(images.png, 4096);
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "front",
+    storageId: await upload(t, photo),
+  });
+  const link = (await ada.as.query(api.photos.ofItem, { itemId }))!.front!;
+
+  expect(link.startsWith(`${SITE}/photos?`)).toBe(true);
+  const served = await open(t, link);
+  expect(served.status).toBe(200);
+  expect(served.headers.get("content-type")).toBe("image/png");
+  expect(served.headers.get("cache-control")).toMatch(/^private/);
+  expect(new Uint8Array(await served.arrayBuffer())).toEqual(
+    new Uint8Array(await photo.arrayBuffer()),
+  );
+
+  // A link someone changed, or made up, opens nothing.
+  const url = new URL(link);
+  const forged = new URL(link);
+  forged.searchParams.set("signature", "0".repeat(64));
+  const longer = new URL(link);
+  longer.searchParams.set("issued", String(Date.now() + 24 * 60 * 60 * 1000));
+  for (const changed of [forged, longer])
+    expect((await open(t, changed.toString())).status).toBe(403);
+  expect(
+    (await open(t, `${SITE}/photos?file=${url.searchParams.get("file")}`))
+      .status,
+  ).toBe(403);
+
+  // A link is good for an hour at most; the app gets fresh ones before then.
+  vi.setSystemTime(Date.now() + 61 * 60 * 1000);
+  expect((await open(t, link)).status).toBe(403);
+  await t.mutation(internal.photos.links.renew, {});
+  const fresh = (await ada.as.query(api.photos.ofItem, { itemId }))!.front!;
+  expect(fresh).not.toBe(link);
+  expect((await open(t, fresh)).status).toBe(200);
+});
+
+test("without a secret on the deployment, photo links still work, signed with one the backend keeps", async () => {
+  vi.stubEnv("PHOTO_LINK_SECRET", "");
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "back",
+    storageId: await upload(t),
+  });
+  const link = (await ada.as.query(api.photos.ofItem, { itemId }))!.back!;
+
+  expect((await open(t, link)).status).toBe(200);
+  const forged = new URL(link);
+  forged.searchParams.set("signature", "0".repeat(64));
+  expect((await open(t, forged.toString())).status).toBe(403);
 });
 
 afterEach(() => {
