@@ -323,6 +323,31 @@ export function argsFromValues(
   };
 }
 
+/**
+ * What the form sends for its values: everything, or for a form linked to a
+ * Catalog entry (`fromEntry`), only the facts that differ from the entry's.
+ * A linked Item's cleared country or metal is the entry's again.
+ */
+export function formArgs(
+  values: ItemFormValues,
+  fromEntry: FactValues | undefined,
+  locale: Locale,
+): ItemArgs {
+  if (!fromEntry) return argsFromValues(values, locale);
+  return changedFactsOnly(
+    argsFromValues(
+      {
+        ...values,
+        country: values.country ?? fromEntry.country,
+        metal: values.metal ?? fromEntry.metal,
+      },
+      locale,
+    ),
+    values,
+    fromEntry,
+  );
+}
+
 /** A preset's figures as the form shows them, in the person's language. */
 export function presetValues(
   { metal, weight, purity, country }: BullionPreset,

@@ -1044,9 +1044,6 @@ test("after Premium ends, every Item stays visible and editable, and the Free pl
   await expect(ada.as.mutation(api.items.add, krone)).rejects.toThrow(
     "ITEM_LIMIT_REACHED",
   );
-  await expect(
-    ada.as.mutation(api.items.duplicate, { itemId: newest as Id<"items"> }),
-  ).rejects.toThrow("ITEM_LIMIT_REACHED");
   for (const itemId of rest.slice(0, 10)) {
     await ada.as.mutation(api.items.remove, { itemId });
   }

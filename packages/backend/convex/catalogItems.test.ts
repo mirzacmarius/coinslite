@@ -485,9 +485,6 @@ test("the Free plan limit holds however an Item is added from the Catalog", asyn
       catalogEntryKey: "us-morgan-1881-cc",
     }),
   ).rejects.toThrow("ITEM_LIMIT_REACHED");
-  await expect(
-    ada.as.mutation(api.items.duplicate, { itemId: picked }),
-  ).rejects.toThrow("ITEM_LIMIT_REACHED");
 });
 
 test("quick add is for set-up people, into their own Albums only", async () => {
@@ -524,17 +521,19 @@ test("quick add is for set-up people, into their own Albums only", async () => {
   ).rejects.toThrow("CATALOG_ENTRY_NOT_FOUND");
 });
 
-test("a duplicate of a linked Item stays linked, with the same changed facts", async () => {
+test("a duplicate of a linked Item, saved from the form, stays linked with the same changed facts", async () => {
   const t = newTest();
   const { admin, ada } = await withCatalog(t);
-  const itemId = await ada.as.mutation(api.items.add, {
-    type: "coin",
+  const original = {
+    type: "coin" as const,
     title: "Morgan dollar 1881-CC",
     catalogEntryKey: "us-morgan-1881-cc",
     denomination: "One dollar",
-  });
+  };
+  await ada.as.mutation(api.items.add, original);
 
-  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
+  // Spec 5.5: the form, prefilled from the original, adds a new Item.
+  const copyId = await ada.as.mutation(api.items.add, original);
   await importRows(admin.as, [
     { ...morgan1881, denomination: "1 dollar (silver)", weight_g: "26.7" },
   ]);

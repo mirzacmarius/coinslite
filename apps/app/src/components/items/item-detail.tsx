@@ -3,11 +3,6 @@
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
 import { catalogNodeHref } from "@/components/catalog/catalog-levels";
-import {
-  isItemLimitError,
-  upgradeHref,
-  useItemLimitMessage,
-} from "@/components/plans/plan-usage";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -15,9 +10,8 @@ import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
-import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Copy, Pencil, SearchX, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -38,14 +32,12 @@ export function ItemDetail() {
   const labels = useGradeLabels();
   const albums = useAlbums();
   const router = useRouter();
-  const duplicateItem = useMutation(api.items.duplicate);
   // Each opening starts the form afresh from the Item as it is now.
   const [editing, setEditing] = useState({ open: false, key: 0 });
-  const [duplicating, setDuplicating] = useState(false);
+  const [duplicating, setDuplicating] = useState({ open: false, key: 0 });
   const [deleting, setDeleting] = useState(false);
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
-  const itemLimitMessage = useItemLimitMessage();
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
       {t("nav.collection")}
@@ -134,28 +126,6 @@ export function ItemDetail() {
     rows.filter(([, value]) => value !== undefined && value !== false);
   const shownFacts = filled(facts);
   const shownPhysical = filled(physical);
-  const duplicate = async () => {
-    setDuplicating(true);
-    try {
-      const copyId = await duplicateItem({ itemId: item._id });
-      toast.success(t("items.duplicated"));
-      router.push(`/collection/${copyId}`);
-    } catch (failure) {
-      if (isItemLimitError(failure)) {
-        toast.error(itemLimitMessage, {
-          action: {
-            label: t("plans.upgradeToPremium"),
-            onClick: () => router.push(upgradeHref),
-          },
-        });
-      } else {
-        toast.error(t("items.errors.duplicateFailed"));
-      }
-    } finally {
-      setDuplicating(false);
-    }
-  };
-
   return (
     <>
       <HeaderBar
@@ -166,8 +136,9 @@ export function ItemDetail() {
             <Button
               variant="ghost"
               size="xs"
-              disabled={duplicating}
-              onClick={() => void duplicate()}
+              onClick={() =>
+                setDuplicating(({ key }) => ({ open: true, key: key + 1 }))
+              }
             >
               <Copy aria-hidden="true" />
               {t("items.duplicate")}
@@ -194,6 +165,13 @@ export function ItemDetail() {
         item={item}
         open={editing.open}
         onOpenChange={(open) => setEditing(({ key }) => ({ open, key }))}
+      />
+      <ItemFormDialog
+        key={`copy-${duplicating.key}`}
+        copyOf={item}
+        open={duplicating.open}
+        onOpenChange={(open) => setDuplicating(({ key }) => ({ open, key }))}
+        onAdded={(copyId) => router.push(`/collection/${copyId}`)}
       />
       <DeleteItemDialog
         item={item}

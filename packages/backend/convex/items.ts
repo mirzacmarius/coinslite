@@ -305,37 +305,6 @@ export const update = mutation({
   },
 });
 
-/**
- * A new Item with everything the person set on an existing one, to record a
- * similar piece quickly. Only form fields are copied, so photos stay behind;
- * a copy of a linked Item is linked to the same Catalog entry, with the same
- * changed facts.
- */
-export const duplicate = mutation({
-  args: { itemId: v.id("items") },
-  returns: v.id("items"),
-  handler: async (ctx, { itemId }) => {
-    const item = await requireOwnItem(ctx, itemId);
-    await requireRoomForItems(ctx, item.ownerId);
-    const { albumId, ...copy } = Object.fromEntries(
-      fieldNames.flatMap((name) =>
-        item[name] === undefined ? [] : [[name, item[name]]],
-      ),
-    ) as Pick<Doc<"items">, "type" | "title" | "quantity" | "albumId">;
-    // An Album deleted a moment ago may not have let go of the Item yet.
-    const album = albumId && (await ctx.db.get(albumId)) ? albumId : undefined;
-    const copyId = await ctx.db.insert("items", {
-      ownerId: item.ownerId,
-      ...copy,
-      ...(item.catalogEntryId && { catalogEntryId: item.catalogEntryId }),
-      ...(album && { albumId: album }),
-    });
-    await moveBetweenAlbums(ctx, undefined, album);
-    await countItemAdded(ctx, item);
-    return copyId;
-  },
-});
-
 /** Deletes one of the signed-in person's Items, and its photos, for good. */
 export const remove = mutation({
   args: { itemId: v.id("items") },

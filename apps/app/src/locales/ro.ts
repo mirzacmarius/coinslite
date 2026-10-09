@@ -89,7 +89,12 @@ export default {
     save: "Salvează",
     saved: "Obiect salvat",
     duplicate: "Duplică",
-    duplicated: "Copie creată. Schimbă ce diferă.",
+    duplicateTitle: "Duplică obiectul",
+    duplicateDescription:
+      "Un obiect nou completat după „{title}”. Schimbă ce diferă; fotografiile nu se copiază.",
+    newDescription:
+      "Înregistrează o monedă, o bancnotă sau un timbru în colecția ta.",
+    editDescription: "Schimbă oricare dintre detaliile acestui obiect.",
     materials: {
       gold: "Aur",
       silver: "Argint",
@@ -123,7 +128,6 @@ export default {
       number: "Introdu un număr, de ex. 38,1.",
       wholeNumber: "Introdu un număr întreg, de ex. 1200.",
       saveFailed: "Obiectul nu a putut fi salvat. Încearcă din nou.",
-      duplicateFailed: "Obiectul nu a putut fi duplicat. Încearcă din nou.",
       titleRequired: "Dă-i obiectului un titlu.",
       quantity: "Folosește un număr întreg de cel puțin 1.",
       year: "Introdu un an, de ex. 1881.",
@@ -346,6 +350,7 @@ export default {
     album: "Album",
     new: "Album nou",
     editAlbum: "Editează albumul",
+    editDescription: "Schimbă numele, descrierea sau culoarea albumului.",
     edit: "Editează",
     delete: "Șterge",
     name: "Nume",

@@ -289,26 +289,6 @@ test("an Item can't go into someone else's Album", async () => {
   expect(await counts(ada.as)).toEqual({ Travel: 0 });
 });
 
-test("a duplicated Item joins the same Album", async () => {
-  const t = newTest();
-  const ada = await person(t, "ada@example.com");
-  const travel = await ada.as.mutation(api.albums.create, {
-    name: "Travel",
-    colour: "blue",
-  });
-  const itemId = await ada.as.mutation(api.items.add, {
-    ...krone,
-    albumId: travel,
-  });
-
-  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
-
-  expect(await ada.as.query(api.items.get, { itemId: copyId })).toMatchObject({
-    albumId: travel,
-  });
-  expect(await counts(ada.as)).toEqual({ Travel: 2 });
-});
-
 test("deleting an Album deletes the ticked Items and keeps the rest without an Album", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
