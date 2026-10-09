@@ -1,4 +1,4 @@
-import { defaultLocale, isLocale } from "@coinslite/i18n";
+import { type Locale, defaultLocale, isLocale } from "@coinslite/i18n";
 import { Email } from "@convex-dev/auth/providers/Email";
 import type { GenericActionCtxWithAuthConfig } from "@convex-dev/auth/server";
 import { HOUR, RateLimiter } from "@convex-dev/rate-limiter";
@@ -61,6 +61,19 @@ function returnPathOf(url: string) {
   return pathname + (query ? `?${query}` : "");
 }
 
+/**
+ * The sign-in link form passes the language on screen as a path prefix
+ * ("/ro/welcome"), the only thing that reaches this email. It picks the
+ * email's language; the link itself carries the path without it, since the
+ * app takes the language from the session, not the URL (ADR 0004).
+ */
+function splitLanguage(path: string): { language?: Locale; path: string } {
+  const [, first, ...rest] = path.split("/");
+  return isLocale(first)
+    ? { language: first, path: `/${rest.join("/")}` }
+    : { path };
+}
+
 /** No more than five code emails an hour to any one address. */
 const rateLimiter = new RateLimiter(components.rateLimiter, {
   codeEmail: { kind: "token bucket", rate: 5, period: HOUR, capacity: 5 },
@@ -101,14 +114,17 @@ function codeEmail(kind: CodeEmailKind) {
       const { ok } = await rateLimiter.limit(ctx, "codeEmail", { key: to });
       if (!ok) throw new ConvexError(tooManyCodeEmails);
 
-      const next = returnPathOf(url);
+      const { language: browsing, path: next } = splitLanguage(
+        returnPathOf(url),
+      );
       // The account's language, else the one the person was browsing in
       // (a sign-in link for a new email has no account language yet).
-      const browsing = next.split("/")[1];
       const language =
         (await ctx.runQuery(internal.accounts.emails.languageFor, {
           email: to,
-        })) ?? (isLocale(browsing) ? browsing : defaultLocale);
+        })) ??
+        browsing ??
+        defaultLocale;
       const message = codeEmailMessages[language][kind];
       const link = codeLink(kind, to, code, next);
       const email = {

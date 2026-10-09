@@ -8,7 +8,7 @@ const pages = [
   { path: "/login", heading: "Sign in to your collection" },
   { path: "/signup", heading: "Create your account" },
   { path: "/reset", heading: "Reset your password" },
-  { path: "/verify", heading: "Verifying your email" },
+  { path: "/verify", heading: "Verify your email" },
   { path: "/link", heading: "Sign in with a link" },
 ];
 

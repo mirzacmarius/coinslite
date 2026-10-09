@@ -1,6 +1,5 @@
 import { AuthPanelSkeleton } from "@/components/auth/auth-panel";
 import { SignUpFlow } from "@/components/auth/sign-up-flow";
-import { env } from "@/env.mjs";
 import { safeNextPath } from "@/lib/next-path";
 import { suggestedHomeCurrency } from "@/lib/suggested-currency";
 import { getI18n } from "@/locales/server";
@@ -23,8 +22,6 @@ async function SignUp({ searchParams }: { searchParams: SearchParams }) {
     <SignUpFlow
       next={safeNextPath(next)}
       suggestedCurrency={suggestedCurrency}
-      privacyUrl={`${env.NEXT_PUBLIC_WEB_URL}/privacy`}
-      termsUrl={`${env.NEXT_PUBLIC_WEB_URL}/terms`}
     />
   );
 }

@@ -25,13 +25,9 @@ import { useSubmitState } from "./use-auth-form";
 export function WelcomeFlow({
   next,
   suggestedCurrency,
-  privacyUrl,
-  termsUrl,
 }: {
   next: string;
   suggestedCurrency: HomeCurrency;
-  privacyUrl: string;
-  termsUrl: string;
 }) {
   const user = useQuery(api.users.getUser);
   const done = user?.termsAcceptedAt !== undefined;
@@ -49,8 +45,6 @@ export function WelcomeFlow({
           ? user.homeCurrency
           : suggestedCurrency
       }
-      privacyUrl={privacyUrl}
-      termsUrl={termsUrl}
     />
   );
 }
@@ -59,14 +53,10 @@ function WelcomeForm({
   email,
   next,
   homeCurrency,
-  privacyUrl,
-  termsUrl,
 }: {
   email: string;
   next: string;
   homeCurrency: HomeCurrency;
-  privacyUrl: string;
-  termsUrl: string;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -106,14 +96,7 @@ function WelcomeForm({
           name="acceptTerms"
           validators={{ onChange: acceptTermsRule }}
         >
-          {(field) => (
-            <AcceptTermsField
-              field={field}
-              showErrors={submitted}
-              privacyUrl={privacyUrl}
-              termsUrl={termsUrl}
-            />
-          )}
+          {(field) => <AcceptTermsField field={field} showErrors={submitted} />}
         </form.Field>
         {failed && <FormMessage>{t("auth.failedGeneric")}</FormMessage>}
         <SubmitButton submitting={submitting}>

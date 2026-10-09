@@ -17,7 +17,7 @@ import {
 import { ResendCodeButton } from "./code-step";
 import { TextField } from "./text-field";
 import { useAuthSchemas, useSubmitState } from "./use-auth-form";
-import { type AuthStepResult, useAuthStep } from "./use-password-auth";
+import { type AuthStepResult, useAuthStep } from "./use-auth-step";
 
 /**
  * Sign in, or sign up, with a link emailed to the address. The link opens the

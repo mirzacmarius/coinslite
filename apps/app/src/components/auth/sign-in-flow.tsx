@@ -13,11 +13,11 @@ import { CodeStep } from "./code-step";
 import { OtherSignInMethods } from "./other-methods";
 import { TextField } from "./text-field";
 import { useAuthSchemas, useSubmitState } from "./use-auth-form";
-import { usePasswordAuth } from "./use-password-auth";
+import { useAuthStep } from "./use-auth-step";
 
 export function SignInFlow({ next }: { next: string }) {
   const t = useI18n();
-  const attempt = usePasswordAuth();
+  const attempt = useAuthStep("password");
   const schemas = useAuthSchemas();
   // An account whose email isn't verified yet gets a code instead of a session.
   const [unverifiedEmail, setUnverifiedEmail] = useState<string>();

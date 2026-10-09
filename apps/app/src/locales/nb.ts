@@ -80,8 +80,9 @@ export default {
     },
     verify: {
       pageTitle: "Bekreft e-post",
-      title: "Bekrefter e-postadressen din",
-      working: "Et øyeblikk …",
+      title: "Bekreft e-postadressen",
+      description: "Bekreft at {email} er din for å fullføre registreringen.",
+      confirm: "Bekreft e-postadressen",
       failed:
         "Lenken er utløpt eller allerede brukt. Logg inn for å få en ny kode.",
       noLink:
@@ -114,6 +115,9 @@ export default {
       sent: "Vi har sendt en innloggingslenke til {email}. Den virker én gang og utløper om 15 minutter.",
       usePassword: "Bruk passord i stedet",
       failed: "Innloggingslenken er utløpt eller allerede brukt. Be om en ny.",
+      confirmTitle: "Logg inn på CoinsLite",
+      confirmDescription: "Fortsett som {email}.",
+      confirm: "Logg inn",
     },
     welcome: {
       pageTitle: "Fullfør oppsettet",

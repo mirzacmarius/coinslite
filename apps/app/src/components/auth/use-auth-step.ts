@@ -25,6 +25,3 @@ export function useAuthStep(provider: "password" | "magic-link") {
     [signIn, provider],
   );
 }
-
-/** A step of the email-and-password flows. */
-export const usePasswordAuth = () => useAuthStep("password");

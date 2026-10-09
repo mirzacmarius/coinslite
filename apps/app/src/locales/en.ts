@@ -76,8 +76,9 @@ export default {
     },
     verify: {
       pageTitle: "Verify email",
-      title: "Verifying your email",
-      working: "One moment…",
+      title: "Verify your email",
+      description: "Confirm that {email} is yours to finish signing up.",
+      confirm: "Verify my email",
       failed:
         "This link has expired or was already used. Sign in to get a new code.",
       noLink:
@@ -110,6 +111,9 @@ export default {
       usePassword: "Use a password instead",
       failed:
         "This sign-in link has expired or was already used. Ask for a new one.",
+      confirmTitle: "Sign in to CoinsLite",
+      confirmDescription: "Continue as {email}.",
+      confirm: "Sign in",
     },
     welcome: {
       pageTitle: "Finish setting up",

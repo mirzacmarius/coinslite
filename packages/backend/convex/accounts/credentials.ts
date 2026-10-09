@@ -22,6 +22,9 @@ export const CODE_LIFETIME_MINUTES = 15;
 /** Email addresses are kept trimmed and in lower case, so sign-in ignores case. */
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
+/** "ada" for "ada@example.com": the display name a new account starts with. */
+export const localPart = (email: string) => email.slice(0, email.indexOf("@"));
+
 /**
  * The email of a sign-in request. Convex Auth keys accounts and codes on the
  * address exactly as sent, so the forms normalize it and anything else is refused.

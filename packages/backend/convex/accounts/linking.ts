@@ -1,18 +1,23 @@
-import type { GenericMutationCtx } from "convex/server";
 import { ConvexError } from "convex/values";
-import type { DataModel, Doc, Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { normalizeEmail } from "./credentials";
+import {
+  localPart,
+  normalizeEmail,
+  requireNormalizedEmail,
+} from "./credentials";
 
 /**
- * Which user a sign-in belongs to. See docs/adr/0005-one-account-per-email.md.
+ * Which user a sign-in belongs to (docs/adr/0005-one-account-per-email.md).
  *
- * - One user per email. A user is *claimed* once their email is proven: a
- *   clicked link or code, or Google's verified email.
- * - Google and sign-in links join a claimed user, because they prove the email.
- *   A password sign-up for a claimed email is refused.
- * - An unclaimed user (a sign-up nobody completed) is replaced when another
- *   method starts for its email, so a pending sign-up never decides who owns it.
+ * - One user per email. A user is *claimed* once the email is proven: a code or
+ *   link from that inbox was used, or Google vouches for the address.
+ * - Nothing is deleted or replaced before the email is proven, so asking for a
+ *   link or starting a sign-up can't disturb anyone else's account.
+ * - A password sign-up for a claimed email is refused: typing it proves nothing.
+ * - When a method proves the email of an unclaimed user, any other method on it
+ *   that was never proven is removed, and the sign-up choices made through it
+ *   are reset: whoever started that sign-up may not have owned the inbox.
  */
 
 export const linkingErrors = {
@@ -29,36 +34,55 @@ type Profile = Record<string, unknown> & {
 
 /** Convex Auth's createOrUpdateUser callback. */
 export async function createOrUpdateUser(
-  ctx: GenericMutationCtx<DataModel>,
+  ctx: MutationCtx,
   {
     existingUserId,
     type,
+    provider,
     profile: { emailVerified, ...fields },
-  }: { existingUserId: Id<"users"> | null; type: SignInKind; profile: Profile },
+  }: {
+    existingUserId: Id<"users"> | null;
+    type: SignInKind;
+    provider: { id: string };
+    profile: Profile;
+  },
 ): Promise<Id<"users">> {
-  // A method this user already has: a returning sign-in, or a code just verified.
+  // A method this user already has: a returning sign-in, or a code just used.
   if (existingUserId !== null) {
-    if (emailVerified) await claim(ctx, existingUserId);
+    if (emailVerified) await claim(ctx, existingUserId, provider.id);
     return existingUserId;
   }
 
-  const email =
-    typeof fields.email === "string" ? normalizeEmail(fields.email) : undefined;
   if (type === "oauth" && !emailVerified) {
     throw new ConvexError(linkingErrors.emailNotVerified);
   }
+  // Every method keys its account on the email as given, so only accept it
+  // normalized: lookalikes ("K" for "k") must not reach someone else's account.
+  const email =
+    fields.email === undefined
+      ? undefined
+      : requireNormalizedEmail(fields.email);
   const existing = email ? await userByEmail(ctx, email) : null;
-  if (existing?.emailVerificationTime !== undefined) {
-    if (type === "credentials")
+
+  if (existing === null) {
+    return await ctx.db.insert(
+      "users",
+      newUser(type, fields, email, emailVerified === true),
+    );
+  }
+  if (type === "credentials") {
+    if (existing.emailVerificationTime !== undefined) {
       throw new ConvexError(linkingErrors.accountExists);
+    }
+    // Joins an unfinished sign-up (say, a sign-in link nobody opened yet) and
+    // brings the form's choices; it's proven, or not, by its own code.
+    await ctx.db.patch(existing._id, signUpChoices(fields));
     return existing._id;
   }
-  if (existing) await deleteUserAndSignInMethods(ctx, existing._id);
-
-  return await ctx.db.insert(
-    "users",
-    newUser(type, fields, email, emailVerified === true),
-  );
+  // Google, or a sign-in link being sent: join. Google has proven the email;
+  // a link proves it only when opened.
+  if (emailVerified) await claim(ctx, existing._id, provider.id);
+  return existing._id;
 }
 
 /** The first record of a person: the sign-up form's profile, or what the provider tells us. */
@@ -81,38 +105,94 @@ function newUser(
   };
 }
 
-export const localPart = (email: string) => email.slice(0, email.indexOf("@"));
-
-async function claim(ctx: GenericMutationCtx<DataModel>, userId: Id<"users">) {
-  const user = await ctx.db.get(userId);
-  if (user && user.emailVerificationTime === undefined) {
-    await ctx.db.patch(userId, { emailVerificationTime: Date.now() });
-  }
+/** The choices a password sign-up makes on its form (see passwordProfile). */
+function signUpChoices(fields: Record<string, unknown>) {
+  const { email: _email, ...choices } = fields;
+  return choices as Partial<Doc<"users">>;
 }
 
-async function userByEmail(ctx: GenericMutationCtx<DataModel>, email: string) {
+/**
+ * The email of an unclaimed user was just proven through `provenBy`. Other
+ * methods on the user that never proved it go, with the choices made through
+ * them; the person who owns the inbox makes their own on /welcome.
+ */
+async function claim(ctx: MutationCtx, userId: Id<"users">, provenBy: string) {
+  const user = await ctx.db.get(userId);
+  if (!user || user.emailVerificationTime !== undefined) return;
+  // Only a password sign-up records choices (on its form).
+  let choicesWereUnproven = false;
+  for (const account of await accountsOf(ctx, userId)) {
+    if (account.provider !== provenBy && account.emailVerified === undefined) {
+      await deleteAccount(ctx, account);
+      if (account.provider === "password") choicesWereUnproven = true;
+    }
+  }
+  await ctx.db.patch(userId, {
+    emailVerificationTime: Date.now(),
+    ...(choicesWereUnproven && {
+      termsAcceptedAt: undefined,
+      homeCurrency: undefined,
+      language: undefined,
+      ...(user.email && { displayName: localPart(user.email) }),
+    }),
+  });
+}
+
+async function userByEmail(ctx: MutationCtx, email: string) {
   return await ctx.db
     .query("users")
-    .withIndex("email", (q) => q.eq("email", email))
+    .withIndex("email", (q) => q.eq("email", normalizeEmail(email)))
     .first();
+}
+
+/** A user's sign-in methods; a person has a handful at most. */
+async function accountsOf(ctx: MutationCtx, userId: Id<"users">) {
+  return await ctx.db
+    .query("authAccounts")
+    .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
+    .take(50);
+}
+
+async function deleteAccount(ctx: MutationCtx, account: Doc<"authAccounts">) {
+  const codes = await ctx.db
+    .query("authVerificationCodes")
+    .withIndex("accountId", (q) => q.eq("accountId", account._id))
+    .take(50);
+  for (const code of codes) await ctx.db.delete(code._id);
+  await ctx.db.delete(account._id);
 }
 
 /** Removes a user with every sign-in method and pending code, so the email is free again. */
 export async function deleteUserAndSignInMethods(
-  ctx: GenericMutationCtx<DataModel> | MutationCtx,
+  ctx: MutationCtx,
   userId: Id<"users">,
 ) {
-  const accounts = await ctx.db
-    .query("authAccounts")
-    .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
-    .take(20);
-  for (const account of accounts) {
-    const codes = await ctx.db
-      .query("authVerificationCodes")
-      .withIndex("accountId", (q) => q.eq("accountId", account._id))
-      .take(20);
-    for (const code of codes) await ctx.db.delete(code._id);
-    await ctx.db.delete(account._id);
-  }
+  for (const account of await accountsOf(ctx, userId))
+    await deleteAccount(ctx, account);
   await ctx.db.delete(userId);
+}
+
+/**
+ * What a Google sign-in tells us. Google vouches for an address only when it
+ * hosts the mailbox (Gmail, or a Workspace domain, which has `hd`); for other
+ * addresses `email_verified` isn't enough to join an existing account.
+ */
+export function googleProfile(google: {
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  name?: string;
+  picture?: string;
+  hd?: string;
+}) {
+  const email = normalizeEmail(google.email);
+  const hostedByGoogle =
+    Boolean(google.hd) || /@(gmail|googlemail)\.com$/.test(email);
+  return {
+    id: google.sub,
+    email,
+    emailVerified: google.email_verified && hostedByGoogle,
+    name: google.name,
+    image: google.picture,
+  };
 }

@@ -74,6 +74,9 @@ test("the link in the verification email works in another browser", async ({
   const otherBrowser = await browser.newContext({ locale: "en-US" });
   const other = await otherBrowser.newPage();
   await other.goto(`${appUrl}/verify#${fragment}`);
+  await visiblePage(other)
+    .getByRole("button", { name: "Verify my email" })
+    .click();
   await expect(
     other.getByRole("heading", { level: 1, name: "Overview" }),
   ).toBeVisible();
@@ -192,6 +195,10 @@ test("a sign-in link signs up a new email, which finishes setting up and lands o
   const mailClient = await browser.newContext({ locale: "en-US" });
   const fromEmail = await mailClient.newPage();
   await fromEmail.goto(latestLink(email));
+  // The link waits for a click: mail scanners open links too.
+  await visiblePage(fromEmail)
+    .getByRole("button", { name: "Sign in", exact: true })
+    .click();
   const welcome = visiblePage(fromEmail);
   await expect(
     welcome.getByRole("heading", { name: "Finish setting up your account" }),
@@ -230,6 +237,9 @@ test("a sign-in link signs into the existing account for that email", async ({
     main.getByRole("heading", { name: "Check your email" }),
   ).toBeVisible();
   await page.goto(latestLink(email));
+  await visiblePage(page)
+    .getByRole("button", { name: "Sign in", exact: true })
+    .click();
 
   await expect(
     visiblePage(page).getByRole("heading", { level: 1, name: "Overview" }),

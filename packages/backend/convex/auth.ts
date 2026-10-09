@@ -6,8 +6,8 @@ import {
   resetPasswordCode,
   verifyEmailCode,
 } from "./accounts/codeEmails";
-import { normalizeEmail, validatePassword } from "./accounts/credentials";
-import { createOrUpdateUser } from "./accounts/linking";
+import { validatePassword } from "./accounts/credentials";
+import { createOrUpdateUser, googleProfile } from "./accounts/linking";
 import { passwordProfile } from "./accounts/signUpProfile";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
@@ -19,15 +19,8 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       reset: resetPasswordCode,
     }),
     magicLink,
-    Google({
-      profile: (google) => ({
-        id: google.sub,
-        email: normalizeEmail(google.email),
-        emailVerified: google.email_verified,
-        name: google.name,
-        image: google.picture,
-      }),
-    }),
+    // AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET come from the deployment's env.
+    Google({ profile: googleProfile }),
   ],
   // One account per email, whichever way people sign in (accounts/linking.ts).
   callbacks: { createOrUpdateUser },

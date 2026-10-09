@@ -84,8 +84,10 @@ export default {
     },
     verify: {
       pageTitle: "E-Mail bestätigen",
-      title: "Deine E-Mail-Adresse wird bestätigt",
-      working: "Einen Moment …",
+      title: "Bestätige deine E-Mail-Adresse",
+      description:
+        "Bestätige, dass {email} dir gehört, um die Registrierung abzuschließen.",
+      confirm: "E-Mail-Adresse bestätigen",
       failed:
         "Dieser Link ist abgelaufen oder wurde schon verwendet. Melde dich an, um einen neuen Code zu erhalten.",
       noLink:
@@ -120,6 +122,9 @@ export default {
       usePassword: "Stattdessen mit Passwort anmelden",
       failed:
         "Dieser Anmeldelink ist abgelaufen oder wurde schon verwendet. Fordere einen neuen an.",
+      confirmTitle: "Bei CoinsLite anmelden",
+      confirmDescription: "Weiter als {email}.",
+      confirm: "Anmelden",
     },
     welcome: {
       pageTitle: "Einrichtung abschließen",

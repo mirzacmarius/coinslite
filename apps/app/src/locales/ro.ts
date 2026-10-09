@@ -82,8 +82,10 @@ export default {
     },
     verify: {
       pageTitle: "Confirmă e-mailul",
-      title: "Confirmăm adresa ta de e-mail",
-      working: "O clipă…",
+      title: "Confirmă adresa de e-mail",
+      description:
+        "Confirmă că {email} îți aparține ca să termini înregistrarea.",
+      confirm: "Confirmă adresa de e-mail",
       failed:
         "Linkul a expirat sau a fost deja folosit. Conectează-te ca să primești un cod nou.",
       noLink:
@@ -116,6 +118,9 @@ export default {
       usePassword: "Folosește o parolă",
       failed:
         "Linkul de conectare a expirat sau a fost deja folosit. Cere unul nou.",
+      confirmTitle: "Conectează-te la CoinsLite",
+      confirmDescription: "Continuă ca {email}.",
+      confirm: "Conectează-te",
     },
     welcome: {
       pageTitle: "Finalizează configurarea",

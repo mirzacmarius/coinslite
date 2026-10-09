@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "@/env.mjs";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { type HomeCurrency, homeCurrencies } from "@coinslite/i18n";
 import { CheckboxField, Field } from "@coinslite/ui/field";
@@ -64,17 +65,13 @@ export function useAcceptTermsRule() {
   );
 }
 
-/** "I accept the privacy policy and the terms of use", linking both. */
+/** "I accept the privacy policy and the terms of use", linking both on the marketing site. */
 export function AcceptTermsField({
   field,
   showErrors,
-  privacyUrl,
-  termsUrl,
 }: {
   field: FormField<boolean>;
   showErrors: boolean;
-  privacyUrl: string;
-  termsUrl: string;
 }) {
   const t = useI18n();
   const id = useId();
@@ -91,7 +88,7 @@ export function AcceptTermsField({
       label={t("auth.signUp.acceptTerms", {
         privacy: (
           <a
-            href={privacyUrl}
+            href={`${env.NEXT_PUBLIC_WEB_URL}/privacy`}
             target="_blank"
             rel="noreferrer"
             className={authLink}
@@ -101,7 +98,7 @@ export function AcceptTermsField({
         ),
         terms: (
           <a
-            href={termsUrl}
+            href={`${env.NEXT_PUBLIC_WEB_URL}/terms`}
             target="_blank"
             rel="noreferrer"
             className={authLink}

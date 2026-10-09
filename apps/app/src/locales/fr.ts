@@ -83,8 +83,10 @@ export default {
     },
     verify: {
       pageTitle: "Vérifier l’e-mail",
-      title: "Vérification de votre adresse e-mail",
-      working: "Un instant…",
+      title: "Vérifiez votre adresse e-mail",
+      description:
+        "Confirmez que {email} est bien à vous pour terminer l’inscription.",
+      confirm: "Vérifier mon adresse e-mail",
       failed:
         "Ce lien a expiré ou a déjà été utilisé. Connectez-vous pour recevoir un nouveau code.",
       noLink:
@@ -118,6 +120,9 @@ export default {
       usePassword: "Utiliser un mot de passe",
       failed:
         "Ce lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+      confirmTitle: "Se connecter à CoinsLite",
+      confirmDescription: "Continuer en tant que {email}.",
+      confirm: "Se connecter",
     },
     welcome: {
       pageTitle: "Terminer la configuration",

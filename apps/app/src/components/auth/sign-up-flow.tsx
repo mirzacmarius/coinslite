@@ -19,22 +19,18 @@ import {
 } from "./sign-up-fields";
 import { TextField } from "./text-field";
 import { useAuthSchemas, useSubmitState } from "./use-auth-form";
-import { usePasswordAuth } from "./use-password-auth";
+import { useAuthStep } from "./use-auth-step";
 
 export function SignUpFlow({
   next,
   suggestedCurrency,
-  privacyUrl,
-  termsUrl,
 }: {
   next: string;
   suggestedCurrency: HomeCurrency;
-  privacyUrl: string;
-  termsUrl: string;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
-  const attempt = usePasswordAuth();
+  const attempt = useAuthStep("password");
   const schemas = useAuthSchemas();
   const acceptTermsRule = useAcceptTermsRule();
   const [pendingEmail, setPendingEmail] = useState<string>();
@@ -125,14 +121,7 @@ export function SignUpFlow({
           name="acceptTerms"
           validators={{ onChange: acceptTermsRule }}
         >
-          {(field) => (
-            <AcceptTermsField
-              field={field}
-              showErrors={submitted}
-              privacyUrl={privacyUrl}
-              termsUrl={termsUrl}
-            />
-          )}
+          {(field) => <AcceptTermsField field={field} showErrors={submitted} />}
         </form.Field>
         {failed && <FormMessage>{t("auth.signUp.failed")}</FormMessage>}
         <SubmitButton submitting={submitting}>
