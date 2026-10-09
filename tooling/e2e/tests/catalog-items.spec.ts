@@ -5,7 +5,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
-import { catalogPicker } from "../support/items";
+import { catalogPicker, waitForAddedToasts } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -73,7 +73,9 @@ test("add an Item from the Catalog, then more of it from the entry's page", asyn
     (url) => url.pathname === "/catalog/us-morgan-dollar-1881-cc",
   );
 
-  // Quick add: one more Item, with a Quantity of 3.
+  // Quick add: one more Item, with a Quantity of 3. Its toast is the only
+  // one once the first Item's has gone.
+  await waitForAddedToasts(page);
   const entry = visiblePage(page);
   await entry.getByRole("button", { name: "Add to Collection" }).click();
   const quickAdd = page.getByRole("dialog", { name: "Add to Collection" });

@@ -14,3 +14,15 @@ export async function addManually(page: Page) {
   await picker.getByRole("button", { name: "Add manually" }).click();
   await expect(picker).toBeHidden();
 }
+
+/**
+ * Waits for the "Item added" toasts to go. They stack in the bottom-right
+ * corner over whatever is there, and a toast under the pointer stays open,
+ * so the pointer moves away first.
+ */
+export async function waitForAddedToasts(page: Page) {
+  await page.mouse.move(0, 0);
+  await expect(page.getByText("Item added to your Collection")).toHaveCount(0, {
+    timeout: 10_000,
+  });
+}
