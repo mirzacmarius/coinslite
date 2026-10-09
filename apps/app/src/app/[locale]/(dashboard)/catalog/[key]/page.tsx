@@ -1,4 +1,5 @@
 import { CatalogNodePage } from "@/components/catalog/catalog-node-page";
+import { CatalogSearchButton } from "@/components/catalog/catalog-search-button";
 import { getI18n } from "@/locales/server";
 import { Suspense } from "react";
 
@@ -11,7 +12,7 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <Suspense>
-      <CatalogNodePage />
+      <CatalogNodePage actions={<CatalogSearchButton />} />
     </Suspense>
   );
 }

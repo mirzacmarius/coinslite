@@ -1,4 +1,5 @@
 import { CatalogPage } from "@/components/catalog/catalog-page";
+import { CatalogSearchButton } from "@/components/catalog/catalog-search-button";
 import { getI18n } from "@/locales/server";
 
 export async function generateMetadata() {
@@ -7,5 +8,5 @@ export async function generateMetadata() {
 }
 
 export default function Page() {
-  return <CatalogPage />;
+  return <CatalogPage actions={<CatalogSearchButton />} />;
 }

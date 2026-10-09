@@ -437,7 +437,7 @@ test("a country's denominations sort by face value, minor units as hundredths, w
       denomination: "1 krone",
       series: "Oscar II",
     }),
-    entry("no-50-ore-1996", "no-modern", { denomination: "50 øre" }),
+    entry("no-25-ore-1921", "no-modern", { denomination: "25 øre" }),
     entry("no-2-ore-1876", "no", { denomination: "2 øre" }),
     entry("no-half-krone-1876", "no", { denomination: "½ krone" }),
     entry("no-5-kroner-1963", "no", { denomination: "5 kroner" }),
@@ -451,7 +451,7 @@ test("a country's denominations sort by face value, minor units as hundredths, w
     await ada.as.query(api.catalog.browse.denominations, { key: "no" }),
   ).toEqual([
     { denomination: "2 øre", seriesCount: 1 },
-    { denomination: "50 øre", seriesCount: 1 },
+    { denomination: "25 øre", seriesCount: 1 },
     { denomination: "½ krone", seriesCount: 1 },
     { denomination: "1 krone", seriesCount: 2 },
     { denomination: "5 kroner", seriesCount: 1 },

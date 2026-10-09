@@ -9,6 +9,7 @@
  */
 
 import type * as account from "../account.js";
+import type * as account_deletion from "../account/deletion.js";
 import type * as account_emailChangeMessages from "../account/emailChangeMessages.js";
 import type * as account_rules from "../account/rules.js";
 import type * as accounts_codeEmailMessages from "../accounts/codeEmailMessages.js";
@@ -23,13 +24,22 @@ import type * as albums from "../albums.js";
 import type * as albums_membership from "../albums/membership.js";
 import type * as albums_rules from "../albums/rules.js";
 import type * as auth from "../auth.js";
+import type * as billing from "../billing.js";
+import type * as billing_polar from "../billing/polar.js";
+import type * as billing_rules from "../billing/rules.js";
+import type * as billing_webhook from "../billing/webhook.js";
 import type * as catalog_browse from "../catalog/browse.js";
 import type * as catalog_csv from "../catalog/csv.js";
 import type * as catalog_csvText from "../catalog/csvText.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
 import type * as catalog_fields from "../catalog/fields.js";
+import type * as catalog_search from "../catalog/search.js";
+import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_tree from "../catalog/tree.js";
+import type * as collection from "../collection.js";
+import type * as collection_browse from "../collection/browse.js";
+import type * as collection_view from "../collection/view.js";
 import type * as crons from "../crons.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
@@ -54,7 +64,6 @@ import type * as plans_rules from "../plans/rules.js";
 import type * as spotPrices from "../spotPrices.js";
 import type * as spotPrices_metalPriceApi from "../spotPrices/metalPriceApi.js";
 import type * as spotPrices_rates from "../spotPrices/rates.js";
-import type * as subscriptions from "../subscriptions.js";
 import type * as updates from "../updates.js";
 import type * as updates_releases from "../updates/releases.js";
 import type * as users from "../users.js";
@@ -69,6 +78,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   account: typeof account;
+  "account/deletion": typeof account_deletion;
   "account/emailChangeMessages": typeof account_emailChangeMessages;
   "account/rules": typeof account_rules;
   "accounts/codeEmailMessages": typeof accounts_codeEmailMessages;
@@ -83,13 +93,22 @@ declare const fullApi: ApiFromModules<{
   "albums/membership": typeof albums_membership;
   "albums/rules": typeof albums_rules;
   auth: typeof auth;
+  billing: typeof billing;
+  "billing/polar": typeof billing_polar;
+  "billing/rules": typeof billing_rules;
+  "billing/webhook": typeof billing_webhook;
   "catalog/browse": typeof catalog_browse;
   "catalog/csv": typeof catalog_csv;
   "catalog/csvText": typeof catalog_csvText;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
   "catalog/fields": typeof catalog_fields;
+  "catalog/search": typeof catalog_search;
+  "catalog/searchWords": typeof catalog_searchWords;
   "catalog/seed": typeof catalog_seed;
   "catalog/tree": typeof catalog_tree;
+  collection: typeof collection;
+  "collection/browse": typeof collection_browse;
+  "collection/view": typeof collection_view;
   crons: typeof crons;
   "email/index": typeof email_index;
   env: typeof env;
@@ -114,7 +133,6 @@ declare const fullApi: ApiFromModules<{
   spotPrices: typeof spotPrices;
   "spotPrices/metalPriceApi": typeof spotPrices_metalPriceApi;
   "spotPrices/rates": typeof spotPrices_rates;
-  subscriptions: typeof subscriptions;
   updates: typeof updates;
   "updates/releases": typeof updates_releases;
   users: typeof users;
@@ -149,6 +167,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  polar: import("@convex-dev/polar/_generated/component.js").ComponentApi<"polar">;
   rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };
