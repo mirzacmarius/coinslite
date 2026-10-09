@@ -1,5 +1,6 @@
 "use client";
 
+import { rememberLanguage } from "@/lib/language-cookie";
 import { useChangeLocale, useCurrentLocale, useI18n } from "@/locales/client";
 import { isLocale, localeNames, locales } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
@@ -21,7 +22,9 @@ export function LanguageRadioItems() {
     <DropdownMenuRadioGroup
       value={locale}
       onValueChange={(value) => {
-        if (isLocale(value)) changeLocale(value);
+        if (!isLocale(value)) return;
+        rememberLanguage(value);
+        changeLocale(value);
       }}
     >
       {locales.map((value) => (
