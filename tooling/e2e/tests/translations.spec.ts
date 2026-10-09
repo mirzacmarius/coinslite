@@ -125,15 +125,30 @@ const screens: Array<{
   },
 ];
 
-/** The words a screen shows, and none of the English ones they replace. */
+/**
+ * The English text as whole words, so a translation that starts the same way
+ * ("Exportieren", "Exportă" for "Export") doesn't count as English.
+ */
+function wholeWords(text: string) {
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, "u");
+}
+
+/**
+ * The words a screen shows, and none of the English ones they replace. Only
+ * rendered text counts (innerText), so a page kept hidden after moving on
+ * doesn't, and `where` can be all of <main>, header bar included.
+ */
 async function expectTranslated(where: Locator, t: Dictionary, texts: Text[]) {
   for (const text of texts) {
-    await expect(where).toContainText(text(t));
+    await expect(where).toContainText(text(t), { useInnerText: true });
   }
   for (const text of texts) {
     const english = text(en);
     if (english === text(t)) continue;
-    await expect(where).not.toContainText(english, { useInnerText: true });
+    await expect(where).not.toContainText(wholeWords(english), {
+      useInnerText: true,
+    });
   }
 }
 
@@ -201,7 +216,7 @@ for (const { code, name, t, unitedStates } of languages) {
           exact: true,
         }),
       ).toBeVisible();
-      await expectTranslated(main, t, screen.texts);
+      await expectTranslated(page.locator("main"), t, screen.texts);
     }
 
     // An address nothing answers.
