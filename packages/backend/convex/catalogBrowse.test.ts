@@ -130,12 +130,14 @@ test("roots are countries and Themes with their entry counts, most entries first
       kind: "country",
       title: "Norway",
       country: "NO",
+      countryNode: true,
       entryCount: 3,
     },
     {
       key: "euro2",
       kind: "theme",
       title: "2-euro commemoratives",
+      countryNode: false,
       entryCount: 2,
     },
     {
@@ -143,6 +145,7 @@ test("roots are countries and Themes with their entry counts, most entries first
       kind: "country",
       title: "Sweden",
       country: "SE",
+      countryNode: true,
       entryCount: 0,
     },
   ]);
@@ -241,6 +244,62 @@ test("a Theme opens to its countries, most entries first, each browsed by its ow
   });
 });
 
+test("countries say so wherever they show, so the app names them in the reader's language", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const ada = await person(t, "ada@example.com");
+  await importRows(admin.as, [
+    country("us", "United States", "US"),
+    grouping("us-morgan", "us", { title: "Morgan dollar", country: "US" }),
+    entry("us-morgan-1881", "us-morgan", { country: "US" }),
+    entry("us-morgan-1882", "us-morgan", { country: "US" }),
+    { id: "euro2", title: "2-euro commemoratives" },
+    grouping("euro2-de", "euro2", { title: "Germany", country: "DE" }),
+    entry("euro2-de-2006", "euro2-de", { country: "DE" }),
+  ]);
+  const countryNodes = (rows: Array<{ key: string; countryNode: boolean }>) =>
+    rows.filter((row) => row.countryNode).map((row) => row.key);
+
+  // A country at the top, and a Theme's country, are countries…
+  const roots = await ada.as.query(api.catalog.browse.roots, {});
+  expect(countryNodes(roots)).toEqual(["us"]);
+  const theme = await ada.as.query(api.catalog.browse.node, { key: "euro2" });
+  expect(
+    theme && "groupings" in theme && countryNodes(theme.groupings),
+  ).toEqual(["euro2-de"]);
+  // …a grouping of a country's coins isn't, though it has the country too.
+  const usa = await ada.as.query(api.catalog.browse.node, { key: "us" });
+  expect(usa && "groupings" in usa && countryNodes(usa.groupings)).toEqual([]);
+
+  // The way down to an entry names its country by code.
+  const entryDetail = await ada.as.query(api.catalog.browse.node, {
+    key: "euro2-de-2006",
+  });
+  expect(entryDetail?.ancestors).toEqual([
+    {
+      key: "euro2",
+      title: "2-euro commemoratives",
+      countryNode: false,
+    },
+    { key: "euro2-de", title: "Germany", country: "DE", countryNode: true },
+  ]);
+
+  // So does a country viewed as a Set.
+  expect(await ada.as.query(api.catalog.sets.get, { key: "us" })).toMatchObject(
+    { title: "United States", country: "US", countryNode: true },
+  );
+
+  // And a country found by searching, in any language.
+  const found = await ada.as.query(api.catalog.search.find, {
+    text: "Deutschland",
+  });
+  expect(
+    found.groups.flatMap((group) =>
+      group.nodes.map(({ key, countryNode }) => ({ key, countryNode })),
+    ),
+  ).toContainEqual({ key: "euro2-de", countryNode: true });
+});
+
 test("a key that isn't in the Catalog reads as not found", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
@@ -330,8 +389,8 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     numistaId: 1492,
     held: 3,
     ancestors: [
-      { key: "us", title: "United States" },
-      { key: "us-morgan", title: "Morgan dollar" },
+      { key: "us", title: "United States", country: "US", countryNode: true },
+      { key: "us-morgan", title: "Morgan dollar", countryNode: false },
     ],
   });
   expect(

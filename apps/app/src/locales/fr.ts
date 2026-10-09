@@ -170,8 +170,8 @@ export default {
       pageTitle: "Connexion",
       title: "Connectez-vous à votre collection",
       submit: "Se connecter",
-      forgotPassword: "Mot de passe oublié ?",
-      noAccount: "Nouveau sur CoinsLite ?",
+      forgotPassword: "Mot de passe oublié\u00a0?",
+      noAccount: "Nouveau sur CoinsLite\u00a0?",
       createAccount: "Créer un compte",
       failed:
         "L’adresse e-mail et le mot de passe ne correspondent pas. Vérifiez-les ou réinitialisez votre mot de passe.",
@@ -190,7 +190,7 @@ export default {
       termsOfUse: "conditions d’utilisation",
       termsRequired:
         "Acceptez la politique de confidentialité et les conditions d’utilisation pour continuer.",
-      haveAccount: "Vous avez déjà un compte ?",
+      haveAccount: "Vous avez déjà un compte\u00a0?",
       failed:
         "Impossible de créer le compte. Si vous en avez déjà un, connectez-vous avec votre mot de passe, un lien de connexion ou Google.",
     },
@@ -249,7 +249,7 @@ export default {
       pageTitle: "Connexion par lien",
       title: "Se connecter avec un lien",
       description:
-        "Nous vous envoyons par e-mail un lien qui vous connecte. Nouveau sur CoinsLite ? Le même lien crée votre compte.",
+        "Nous vous envoyons par e-mail un lien qui vous connecte. Nouveau sur CoinsLite\u00a0? Le même lien crée votre compte.",
       submit: "M’envoyer un lien",
       sentTitle: "Consultez vos e-mails",
       sent: "Nous avons envoyé un lien de connexion à {email}. Il ne fonctionne qu’une fois et expire dans 15 minutes.",
@@ -301,7 +301,7 @@ export default {
       language: "Langue",
       homeCurrency: "Devise de référence",
       languageNotSaved:
-        "Impossible d’enregistrer la langue dans votre compte : elle n’a changé que sur cet appareil.",
+        "Impossible d’enregistrer la langue dans votre compte\u00a0: elle n’a changé que sur cet appareil.",
     },
     email: {
       title: "E-mail",
@@ -387,12 +387,12 @@ export default {
       "Choisissez cet album dans le formulaire d’un objet pour l’y ranger.",
     addToAlbum: "Ajouter à un album",
     noAlbum: "Sans album",
-    createNamed: "Créer l’album « {name} »",
-    deleteTitle: "Supprimer « {name} » ?",
+    createNamed: "Créer l’album «\u00a0{name}\u00a0»",
+    deleteTitle: "Supprimer «\u00a0{name}\u00a0»\u00a0?",
     deleteDescription:
       "Cochez les objets à supprimer avec l’album, par exemple ceux que vous avez vendus. Les autres restent dans votre collection, sans album.",
     deleteDescriptionEmpty:
-      "L’album ne contient aucun objet : aucun ne sera supprimé.",
+      "L’album ne contient aucun objet\u00a0: aucun ne sera supprimé.",
     selectAll: "Tout sélectionner",
     "deleteCount#zero": "Aucun objet ne sera supprimé.",
     "deleteCount#one": "1 objet sera définitivement supprimé.",
@@ -429,10 +429,10 @@ export default {
     replace: "Remplacer la photo",
     remove: "Retirer la photo",
     removeTitles: {
-      front: "Retirer la photo du recto ?",
-      back: "Retirer la photo du verso ?",
-      obverse: "Retirer la photo de l’avers ?",
-      reverse: "Retirer la photo du revers ?",
+      front: "Retirer la photo du recto\u00a0?",
+      back: "Retirer la photo du verso\u00a0?",
+      obverse: "Retirer la photo de l’avers\u00a0?",
+      reverse: "Retirer la photo du revers\u00a0?",
     },
     removeBody:
       "La photo est supprimée définitivement. Vous pouvez en ajouter une nouvelle à tout moment.",
@@ -449,7 +449,7 @@ export default {
   },
   deleteItem: {
     delete: "Supprimer",
-    title: "Supprimer « {title} » ?",
+    title: "Supprimer «\u00a0{title}\u00a0»\u00a0?",
     body: "L’objet est supprimé définitivement. Cette action est irréversible.",
     bodyOnePhoto:
       "L’objet et sa photo sont supprimés définitivement. Cette action est irréversible.",
@@ -463,7 +463,7 @@ export default {
   feedback: {
     title: "Votre avis",
     description:
-      "Une idée, un problème ou quelque chose qui vous plaît ? Dites-le à l’équipe CoinsLite. Nous lisons chaque message.",
+      "Une idée, un problème ou quelque chose qui vous plaît\u00a0? Dites-le à l’équipe CoinsLite. Nous lisons chaque message.",
     open: "Donner votre avis",
     dialogTitle: "Donner votre avis",
     message: "Message",
@@ -473,7 +473,7 @@ export default {
     cancel: "Annuler",
     send: "Envoyer",
     close: "Fermer",
-    sent: "Merci ! Votre avis a bien été envoyé.",
+    sent: "Merci\u00a0! Votre avis a bien été envoyé.",
     required: "Écrivez d’abord un message.",
     tooLong: "{limit} caractères maximum.",
     tooMany:
@@ -514,14 +514,14 @@ export default {
   },
   homeCurrency: {
     hint: "La changer convertit tous les prix d’achat et valeurs de marché de votre collection.",
-    confirmTitle: "Passer la devise de référence en {currency} ?",
+    confirmTitle: "Passer la devise de référence en {currency}\u00a0?",
     confirm: "Passer en {currency}",
     cancel: "Annuler",
     checking: "Décompte des montants à convertir…",
     willConvert:
       "Tous les prix d’achat et valeurs de marché de votre collection seront convertis de {from} en {to} à ce taux de change.",
     nothingToConvert:
-      "Aucun de vos objets n’a de prix d’achat ni de valeur de marché : il n’y a rien à convertir.",
+      "Aucun de vos objets n’a de prix d’achat ni de valeur de marché\u00a0: il n’y a rien à convertir.",
     noRate:
       "Nous n’avons pas encore de taux de change pour convertir vos montants. Réessayez dans quelques minutes.",
     tooLarge:
@@ -536,10 +536,10 @@ export default {
     rateChanged:
       "Le taux de change vient d’être mis à jour. Vérifiez le nouveau taux et confirmez à nouveau.",
     amountTooLarge:
-      "L’un de vos montants serait trop élevé dans la nouvelle devise : rien n’a été modifié.",
+      "L’un de vos montants serait trop élevé dans la nouvelle devise\u00a0: rien n’a été modifié.",
     sameCurrency: "C’est déjà votre devise de référence.",
     failed:
-      "Impossible de changer la devise de référence ; aucun montant n’a été converti. Réessayez.",
+      "Impossible de changer la devise de référence\u00a0; aucun montant n’a été converti. Réessayez.",
   },
   preciousMetal: {
     title: "Métal précieux",
@@ -637,11 +637,12 @@ export default {
     column: "Colonne",
     problem: "Erreur",
     importAction: "Importer",
-    confirmTitle: "Importer « {file} » ?",
+    confirmTitle: "Importer «\u00a0{file}\u00a0»\u00a0?",
     confirmDescription:
       "Les modifications s’appliquent tout de suite au catalogue que tout le monde consulte. Les lignes déjà à jour restent telles quelles.",
     cancel: "Annuler",
-    imported: "Catalogue mis à jour : {inserts} ajoutés, {updates} mis à jour.",
+    imported:
+      "Catalogue mis à jour\u00a0: {inserts} ajoutés, {updates} mis à jour.",
     importBlocked:
       "Le catalogue a changé depuis la vérification et le fichier contient maintenant des erreurs. Rien n’a été importé.",
     importFailed: "Impossible d’importer le fichier. Réessayez.",
@@ -672,7 +673,7 @@ export default {
       NUMISTA_DATA:
         "Aucune donnée de Numista ne peut être stockée. Gardez seulement le numéro Numista, dans numista_id.",
       ITEM_TYPE_REQUIRED:
-        "Une entrée du catalogue doit avoir un type d’objet : pièce ou billet.",
+        "Une entrée du catalogue doit avoir un type d’objet\u00a0: pièce ou billet.",
       FIELD_NOT_FOR_TYPE: "Les billets n’ont ni métal ni dimensions.",
       YEARS_REVERSED: "La dernière année précède la première.",
       SOURCE_REQUIRED:
@@ -683,13 +684,13 @@ export default {
         "Un pays ou un thème ne peut pas être une entrée du catalogue. Donnez un parent_id à la ligne.",
       PARENT_NOT_FOUND: "Aucune ligne du fichier ni du catalogue n’a cet id.",
       PARENT_IS_ENTRY:
-        "Ce parent est une entrée du catalogue : rien ne peut se trouver en dessous.",
+        "Ce parent est une entrée du catalogue\u00a0: rien ne peut se trouver en dessous.",
       PARENT_CYCLE: "Les parents ramènent à cette ligne.",
       TOO_DEEP: "Le catalogue compte au plus 8 niveaux.",
       ENTRY_HAS_CHILDREN:
-        "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
+        "D’autres nœuds se trouvent sous celui-ci\u00a0: il ne peut pas devenir une entrée du catalogue.",
       ENTRY_HAS_ITEMS:
-        "Des objets sont liés à cette entrée du catalogue : elle le reste. Gardez is_addable à true.",
+        "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste. Gardez is_addable à true.",
       TOO_MANY_LINKED_ITEMS:
         "Plus de 1 000 objets sont liés aux entrées dont le type d’objet change. Modifiez-en moins à la fois.",
     },
@@ -718,7 +719,7 @@ export default {
     withoutAlbum: "Sans album",
     unknownAlbum: "Album inconnu",
     activeFilters: "Filtres actifs",
-    removeFilter: "Retirer le filtre : {name}",
+    removeFilter: "Retirer le filtre\u00a0: {name}",
     clear: "Effacer",
     clearFilters: "Effacer les filtres",
     noMatchesTitle: "Aucun objet ne correspond à ces filtres",
@@ -744,7 +745,7 @@ export default {
     previousPage: "Page précédente",
     nextPage: "Page suivante",
     incomplete:
-      "Votre collection est trop grande pour être parcourue en une fois : cette vue porte sur les {count} premiers objets que vous avez ajoutés.",
+      "Votre collection est trop grande pour être parcourue en une fois\u00a0: cette vue porte sur les {count} premiers objets que vous avez ajoutés.",
     showInCollection: "Afficher dans la collection",
   },
   billing: {
@@ -762,9 +763,9 @@ export default {
     currencyHint:
       "Prix en {currency}. Le paiement se fait dans la devise de votre lieu de résidence, sinon en euros, et affiche le prix final.",
     testMode:
-      "Mode test : aucun paiement réel n’est prélevé. Payez avec la carte de test 4242 4242 4242 4242.",
+      "Mode test\u00a0: aucun paiement réel n’est prélevé. Payez avec la carte de test 4242 4242 4242 4242.",
     unavailable:
-      "Premium ne peut pas encore être acheté ici : la facturation n’est pas configurée sur cet environnement.",
+      "Premium ne peut pas encore être acheté ici\u00a0: la facturation n’est pas configurée sur cet environnement.",
     alreadyPremium: "Vous avez déjà Premium.",
     checkoutFailed: "Impossible d’ouvrir la page de paiement. Réessayez.",
     price: "Prix",
@@ -777,7 +778,7 @@ export default {
     confirmingDescription:
       "Cela prend généralement quelques secondes. Premium démarre dès que le paiement est confirmé.",
     slowDescription:
-      "Cela prend plus de temps que d’habitude. Premium démarrera tout seul une fois le paiement confirmé ; vous pouvez continuer en attendant.",
+      "Cela prend plus de temps que d’habitude. Premium démarrera tout seul une fois le paiement confirmé\u00a0; vous pouvez continuer en attendant.",
     welcomeTitle: "Bienvenue dans Premium",
     welcomeDescription: "Votre collection n’a plus de limite d’objets.",
     toCollection: "Aller à la collection",
@@ -787,7 +788,7 @@ export default {
     manageHint:
       "Sur Polar, vous pouvez passer du mensuel à l’annuel, mettre à jour votre carte ou résilier. Après une résiliation, Premium reste actif jusqu’à la fin de la période payée.",
     portalUnavailable:
-      "L’abonnement ne peut pas être géré ici : la facturation n’est pas configurée sur cet environnement.",
+      "L’abonnement ne peut pas être géré ici\u00a0: la facturation n’est pas configurée sur cet environnement.",
     portalUnavailableShort: "Facturation non configurée ici",
     portalFailed: "Impossible d’ouvrir la page d’abonnement. Réessayez.",
     noSubscription: "Aucun abonnement Premium à gérer.",
@@ -799,7 +800,7 @@ export default {
     title: "Rechercher dans le catalogue",
     placeholder: "Rechercher par titre, valeur faciale, série ou pays…",
     minLength: "Saisissez au moins 2 caractères pour rechercher.",
-    noResults: "Rien dans le catalogue ne correspond à « {text} ».",
+    noResults: "Rien dans le catalogue ne correspond à «\u00a0{text}\u00a0».",
     capped:
       "Affichage des {count} premiers. Ajoutez un mot pour affiner la recherche.",
     themes: "Thèmes",
@@ -808,7 +809,7 @@ export default {
     closeHint: "pour fermer",
   },
   deleteAccount: {
-    title: "Supprimer votre compte ?",
+    title: "Supprimer votre compte\u00a0?",
     description:
       "Votre profil, vos coordonnées et vos moyens de connexion sont supprimés définitivement, avec tout le contenu de votre collection. Cette action est irréversible.",
     endsSubscription:
@@ -875,7 +876,7 @@ export default {
     marketValue: "Valeur de marché totale",
     gainLoss: "Gain/perte",
     gainLossPartial:
-      "Objets avec un prix d’achat et une valeur de marché : {count} sur {total}",
+      "Objets avec un prix d’achat et une valeur de marché\u00a0: {count} sur {total}",
     gainLossNone:
       "S’affiche dès qu’un objet a un prix d’achat et une valeur de marché",
     metalValue: {
@@ -914,7 +915,7 @@ export default {
     converted: "{full} px en WebP, miniature {thumbnail} px",
     credit: "Crédit",
     creditHint:
-      "Obligatoire pour chaque image. Les listes l’affichent à côté de la miniature, sauf si l’image est dans le domaine public ou sous CC0 ; l’entrée l’affiche toujours.",
+      "Obligatoire pour chaque image. Les listes l’affichent à côté de la miniature, sauf si l’image est dans le domaine public ou sous CC0\u00a0; l’entrée l’affiche toujours.",
     source: "Source",
     sourcePlaceholder: "Wikimedia Commons",
     author: "Auteur",
@@ -928,7 +929,7 @@ export default {
     save: "Enregistrer",
     saved: "Image enregistrée",
     creditSaved: "Crédit enregistré",
-    removeTitle: "Retirer l’image de « {title} » ?",
+    removeTitle: "Retirer l’image de «\u00a0{title}\u00a0»\u00a0?",
     removeBody:
       "Ses fichiers et son crédit sont supprimés. L’entrée affiche un espace réservé jusqu’à l’ajout d’une autre image.",
     removed: "Image retirée",
@@ -1081,22 +1082,22 @@ export default {
     recent: "Choisis récemment",
     browse: "Parcourir le catalogue",
     back: "Retour",
-    empty: "Le catalogue n'a encore rien à proposer.",
+    empty: "Le catalogue n’a encore rien à proposer.",
     failed:
-      "Cette entrée du catalogue n'a pas pu être chargée. Choisissez-la de nouveau ou ajoutez l'objet manuellement.",
+      "Cette entrée du catalogue n’a pas pu être chargée. Choisissez-la de nouveau ou ajoutez l’objet manuellement.",
     entry: "Entrée du catalogue",
     pick: "Choisir dans le catalogue",
     factsHint:
-      "Ces informations viennent de l'entrée du catalogue et suivent ses corrections. Modifiez-en une pour garder votre valeur ; videz le champ pour reprendre celle de l'entrée.",
+      "Ces informations viennent de l’entrée du catalogue et suivent ses corrections. Modifiez-en une pour garder votre valeur\u00a0; videz le champ pour reprendre celle de l’entrée.",
   },
   quickAdd: {
     add: "Ajouter à la collection",
     title: "Ajouter à la collection",
     description:
-      "Ajoutez cette entrée du catalogue à votre collection sous la forme d'un objet.",
+      "Ajoutez cette entrée du catalogue à votre collection sous la forme d’un objet.",
     added: "Objet ajouté à votre collection",
     open: "Ouvrir",
-    failed: "L'objet n'a pas pu être ajouté. Réessayez.",
+    failed: "L’objet n’a pas pu être ajouté. Réessayez.",
   },
   insuranceReport: {
     title: "Rapport d’assurance",
@@ -1128,7 +1129,7 @@ export default {
     items: "Objets",
     pieces: "Exemplaires",
     noSpotPrices:
-      "Pas encore de cours spot : aucun objet n’a donc de valeur du métal.",
+      "Pas encore de cours spot\u00a0: aucun objet n’a donc de valeur du métal.",
     staleSpotPrices: "Les cours spot sont peut-être dépassés.",
     tooLarge:
       "Un rapport compte au plus {limit} objets. Choisissez moins d’albums.",
@@ -1290,13 +1291,14 @@ export default {
     sourcesHint:
       "Les données et les notes doivent indiquer leur source. Aucune donnée d’origine inconnue n’est enregistrée dans le catalogue.",
     numistaId: "Numéro Numista",
-    numistaHint: "Simple renvoi : aucune donnée de Numista n’est enregistrée.",
+    numistaHint:
+      "Simple renvoi\u00a0: aucune donnée de Numista n’est enregistrée.",
     image: "Image",
     imageHint: "Pas encore d’image. Ajoutez-en une avec son crédit.",
     add: "Ajouter le nœud",
-    added: "« {title} » ajouté au catalogue",
-    saved: "« {title} » enregistré",
-    deleteTitle: "Supprimer « {title} » ?",
+    added: "«\u00a0{title}\u00a0» ajouté au catalogue",
+    saved: "«\u00a0{title}\u00a0» enregistré",
+    deleteTitle: "Supprimer «\u00a0{title}\u00a0»\u00a0?",
     deleteCounting: "Calcul de ce qui sera supprimé avec…",
     deleteTooLarge:
       "Cela emporterait plus de {nodes} nœuds ou {items} objets liés. Supprimez d’abord les nœuds en dessous.",
@@ -1311,7 +1313,7 @@ export default {
       "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
     "deleteItems#other":
       "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
-    deleted: "« {title} » supprimé",
+    deleted: "«\u00a0{title}\u00a0» supprimé",
     deleteFailed: "Impossible de supprimer. Réessayez.",
     errors: {
       TITLE_REQUIRED: "Donnez-lui un titre.",
@@ -1338,9 +1340,9 @@ export default {
       PARENT_IS_ENTRY: "Rien ne peut se trouver sous une entrée du catalogue.",
       TOO_DEEP: "Le catalogue compte au plus 8 niveaux.",
       ENTRY_HAS_CHILDREN:
-        "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
+        "D’autres nœuds se trouvent sous celui-ci\u00a0: il ne peut pas devenir une entrée du catalogue.",
       ENTRY_HAS_ITEMS:
-        "Des objets sont liés à cette entrée du catalogue : elle le reste.",
+        "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste.",
       TOO_MANY_LINKED_ITEMS:
         "Plus de 1 000 objets sont liés à cette entrée, trop pour changer leur type d’objet d’un coup.",
       ID_REQUIRED: "Donnez-lui un identifiant.",
@@ -1416,5 +1418,11 @@ export default {
     started: "Début",
     ended: "Terminé le",
     collection: "Collection",
+  },
+  notFound: {
+    title: "Page introuvable",
+    description:
+      "Il n’y a rien à cette adresse. La page a peut-être été déplacée, ou le lien est erroné.",
+    home: "Aller à l’aperçu",
   },
 } as const satisfies Dictionary;

@@ -292,6 +292,7 @@ test("collectors browse the Theme to its countries and each country's coins by y
     key: "eur2-commemoratives",
     kind: "theme",
     title: "2-euro commemoratives",
+    countryNode: false,
     entryCount: 584,
   });
   const theme = await as.query(api.catalog.browse.node, {

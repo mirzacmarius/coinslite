@@ -460,6 +460,7 @@ function MoreOption({
 function Roots({ onOpen }: { onOpen: (level: Level) => void }) {
   const t = useI18n();
   const format = useFormatters();
+  const { nodeTitle } = useCatalogFormat();
   const roots = useQuery(api.catalog.browse.roots);
   if (roots === undefined) return <LoadingRows />;
   if (roots.length === 0) return <Note>{t("catalogPicker.empty")}</Note>;
@@ -468,10 +469,10 @@ function Roots({ onOpen }: { onOpen: (level: Level) => void }) {
       key={root.key}
       value={`node:${root.key}`}
       icon={root.kind === "theme" ? Layers : Flag}
-      title={root.title}
+      title={nodeTitle(root)}
       detail={format.number(root.entryCount)}
       onSelect={() =>
-        onOpen({ view: "node", key: root.key, title: root.title })
+        onOpen({ view: "node", key: root.key, title: nodeTitle(root) })
       }
     />
   ));
@@ -492,13 +493,14 @@ function NodeLevel({
 }) {
   const t = useI18n();
   const format = useFormatters();
+  const { nodeTitle } = useCatalogFormat();
   const node = useQuery(api.catalog.browse.node, { key: level.key });
   if (node === undefined) return <LoadingRows />;
   if (node === null || node.kind === "entry") {
     return <Note>{t("catalog.notFound")}</Note>;
   }
   const selectMissing = isSet(node.entryCount) && (
-    <SelectMissingOption scope={{ key: node.key }} title={node.title} />
+    <SelectMissingOption scope={{ key: node.key }} title={nodeTitle(node)} />
   );
   if (node.countryNode && node.groupings.length === 0) {
     return (
@@ -516,10 +518,14 @@ function NodeLevel({
           key={grouping.key}
           value={`node:${grouping.key}`}
           icon={node.kind === "theme" ? Flag : ListTree}
-          title={grouping.title}
+          title={nodeTitle(grouping)}
           detail={format.number(grouping.entryCount)}
           onSelect={() =>
-            onOpen({ view: "node", key: grouping.key, title: grouping.title })
+            onOpen({
+              view: "node",
+              key: grouping.key,
+              title: nodeTitle(grouping),
+            })
           }
         />
       ))}

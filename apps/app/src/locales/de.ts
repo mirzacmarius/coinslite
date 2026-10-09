@@ -452,9 +452,10 @@ export default {
     errors: {
       tooLarge: "Die Datei ist größer als 10 MB. Wähle ein kleineres Foto.",
       notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
-      failed: "Das Foto konnte nicht gespeichert werden. Versuche es erneut.",
+      failed:
+        "Das Foto konnte nicht gespeichert werden. Versuche es noch einmal.",
       removeFailed:
-        "Das Foto konnte nicht entfernt werden. Versuche es erneut.",
+        "Das Foto konnte nicht entfernt werden. Versuche es noch einmal.",
     },
   },
   deleteItem: {
@@ -468,7 +469,7 @@ export default {
     confirm: "Objekt löschen",
     cancel: "Abbrechen",
     deleted: "Objekt gelöscht",
-    failed: "Das Objekt konnte nicht gelöscht werden. Versuche es erneut.",
+    failed: "Das Objekt konnte nicht gelöscht werden. Versuche es noch einmal.",
   },
   feedback: {
     title: "Feedback",
@@ -634,7 +635,7 @@ export default {
     chooseAnother: "Andere Datei auswählen",
     clearFile: "Datei entfernen",
     readFailed: "Die Datei konnte nicht gelesen werden. Wähle eine CSV-Datei.",
-    checking: "Datei wird geprüft …",
+    checking: "Datei wird geprüft…",
     inserts: "Neu",
     updates: "Geändert",
     unchanged: "Unverändert",
@@ -835,7 +836,7 @@ export default {
     confirm: "Konto löschen",
     cancel: "Abbrechen",
     failed:
-      "Dein Konto konnte nicht gelöscht werden, und es wurde nichts entfernt. Versuch es noch einmal.",
+      "Dein Konto konnte nicht gelöscht werden, und es wurde nichts entfernt. Versuche es noch einmal.",
   },
   catalog: {
     emptyTitle: "Der Katalog ist leer",
@@ -923,7 +924,7 @@ export default {
     sizes:
       "Wird als WebP gespeichert, höchstens 800 px an der längsten Seite, mit einem Vorschaubild von 128 px. Kleinere Bilder behalten ihre Größe.",
     current: "Das aktuelle Bild. Wähle ein anderes, um es zu ersetzen.",
-    converting: "Wird umgewandelt …",
+    converting: "Wird umgewandelt…",
     converted: "{full} px WebP, Vorschaubild {thumbnail} px",
     credit: "Bildnachweis",
     creditHint:
@@ -955,17 +956,19 @@ export default {
       invalidLink:
         "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
       numista: "Daten von Numista dürfen nicht gespeichert werden.",
-      failed: "Das Bild konnte nicht gespeichert werden. Versuche es erneut.",
+      failed:
+        "Das Bild konnte nicht gespeichert werden. Versuche es noch einmal.",
       removeFailed:
-        "Das Bild konnte nicht entfernt werden. Versuche es erneut.",
+        "Das Bild konnte nicht entfernt werden. Versuche es noch einmal.",
       CATALOG_ENTRY_NOT_FOUND: "Diesen Katalogeintrag gibt es nicht mehr.",
-      IMAGE_NOT_FOUND: "Der Upload ist nicht angekommen. Versuche es erneut.",
+      IMAGE_NOT_FOUND:
+        "Der Upload ist nicht angekommen. Versuche es noch einmal.",
       IMAGE_NOT_WEBP:
-        "Das Bild wurde nicht als WebP gespeichert. Versuche es erneut.",
+        "Das Bild wurde nicht als WebP gespeichert. Versuche es noch einmal.",
       IMAGE_TOO_LARGE:
         "Das umgewandelte Bild ist zu groß. Versuche es mit einem kleineren Bild.",
       THUMBNAIL_TOO_LARGE:
-        "Das umgewandelte Vorschaubild ist zu groß. Versuche es erneut.",
+        "Das umgewandelte Vorschaubild ist zu groß. Versuche es noch einmal.",
       NO_IMAGE:
         "Dieser Eintrag hat kein Bild, das nachgewiesen werden kann. Wähle ein Bild aus.",
       CREDIT_REQUIRED: "Gib Quelle, Urheber, Lizenz und Link an.",
@@ -1029,7 +1032,7 @@ export default {
     countedAt: "Gezählt am {time}",
     hourly: "Wird jede Stunde neu gezählt.",
     refreshFailed:
-      "Die Zählung konnte nicht gestartet werden. Versuch es noch einmal.",
+      "Die Zählung konnte nicht gestartet werden. Versuche es noch einmal.",
     emptyTitle: "Noch nicht gezählt",
     emptyDescription:
       "Die Statistik wird jede Stunde gezählt. Zähl jetzt, um sie sofort zu sehen.",
@@ -1112,7 +1115,8 @@ export default {
       "Füge diesen Katalogeintrag deiner Sammlung als ein Objekt hinzu.",
     added: "Objekt zur Sammlung hinzugefügt",
     open: "Öffnen",
-    failed: "Das Objekt konnte nicht hinzugefügt werden. Versuche es erneut.",
+    failed:
+      "Das Objekt konnte nicht hinzugefügt werden. Versuche es noch einmal.",
   },
   insuranceReport: {
     title: "Versicherungsbericht",
@@ -1155,7 +1159,8 @@ export default {
       "Trage im Konto deinen vollständigen Namen, deine Telefonnummer und Adresse ein, damit deine Versicherung dich erreicht.",
     download: "PDF herunterladen",
     downloaded: "Versicherungsbericht heruntergeladen",
-    failed: "Der Bericht konnte nicht erstellt werden. Versuche es erneut.",
+    failed:
+      "Der Bericht konnte nicht erstellt werden. Versuche es noch einmal.",
     errors: {
       PREMIUM_REQUIRED: "Der Versicherungsbericht gehört zu Premium.",
       REPORT_TOO_LARGE:
@@ -1228,7 +1233,7 @@ export default {
         "Einer dieser Katalogeinträge ist nicht mehr im Katalog. Wähle erneut aus.",
       albumGone: "Dieses Album gibt es nicht mehr. Wähle ein anderes.",
       failed:
-        "Die Objekte konnten nicht hinzugefügt werden. Versuche es erneut.",
+        "Die Objekte konnten nicht hinzugefügt werden. Versuche es noch einmal.",
     },
   },
   catalogEditor: {
@@ -1308,7 +1313,7 @@ export default {
     added: "„{title}“ zum Katalog hinzugefügt",
     saved: "„{title}“ gespeichert",
     deleteTitle: "„{title}“ löschen?",
-    deleteCounting: "Zählt, was mitgelöscht wird …",
+    deleteCounting: "Zählt, was mitgelöscht wird…",
     deleteTooLarge:
       "Damit würden mehr als {nodes} Knoten oder {items} verknüpfte Objekte mitgelöscht. Lösche zuerst die Knoten darunter.",
     "deleteBelow#zero": "Darunter wird nichts mitgelöscht.",
@@ -1424,5 +1429,11 @@ export default {
     started: "Begonnen",
     ended: "Beendet",
     collection: "Sammlung",
+  },
+  notFound: {
+    title: "Seite nicht gefunden",
+    description:
+      "Unter dieser Adresse gibt es nichts. Vielleicht wurde die Seite verschoben, oder der Link ist falsch.",
+    home: "Zur Übersicht",
   },
 } as const satisfies Dictionary;

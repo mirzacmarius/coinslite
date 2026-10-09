@@ -53,6 +53,7 @@ type GroupNode = Exclude<CatalogNode, { kind: "entry" }>;
  */
 export function CatalogNodePage({ actions }: { actions?: React.ReactNode }) {
   const t = useI18n();
+  const { nodeTitle } = useCatalogFormat();
   const { key } = useParams<{ key: string }>();
   const node = useQuery(api.catalog.browse.node, { key });
 
@@ -99,7 +100,7 @@ export function CatalogNodePage({ actions }: { actions?: React.ReactNode }) {
 
   const crumbs = node.ancestors.map((ancestor) => ({
     href: catalogNodeHref(ancestor.key),
-    label: ancestor.title,
+    label: nodeTitle(ancestor),
   }));
   if (node.kind === "entry") {
     return (
@@ -120,12 +121,13 @@ function CatalogGroup({
   actions?: React.ReactNode;
 }) {
   const t = useI18n();
+  const { nodeTitle } = useCatalogFormat();
   const level = levelFrom(useSearchParams(), node);
   const denominationLabel = (denomination: string | null) =>
     denomination ?? t("catalog.noDenomination");
   const nodeCrumb = {
     href: levelHref(node.key, { view: "denominations" }),
-    label: node.title,
+    label: nodeTitle(node),
   };
 
   if (level.view === "series") {
@@ -187,7 +189,7 @@ function CatalogGroup({
     <>
       <CatalogHeader
         crumbs={crumbs}
-        title={node.title}
+        title={nodeTitle(node)}
         actions={
           <>
             {isSet(node.entryCount) && <ViewAsSet scope={{ key: node.key }} />}
@@ -307,6 +309,7 @@ function ShowMore({ onClick }: { onClick: () => void }) {
 /** The groupings right below a node (a Theme's countries), then its own entries. */
 function GroupContents({ node }: { node: GroupNode }) {
   const t = useI18n();
+  const { nodeTitle } = useCatalogFormat();
   const { results, status, loadMore } = usePaginatedQuery(
     api.catalog.browse.entries,
     { key: node.key },
@@ -329,7 +332,7 @@ function GroupContents({ node }: { node: GroupNode }) {
             key={grouping.key}
             href={catalogNodeHref(grouping.key)}
             tile={<IconTile icon={node.kind === "theme" ? Flag : ListTree} />}
-            title={grouping.title}
+            title={nodeTitle(grouping)}
             end={
               <RowCount
                 label={t("catalog.entryCount")}

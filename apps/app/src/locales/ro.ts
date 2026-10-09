@@ -159,9 +159,9 @@ export default {
       poor: "Slab",
     },
     stamp: {
-      mnh: "Nestampilat, fără sarnieră",
-      mh: "Nestampilat, cu sarnieră",
-      used: "Stampilat",
+      mnh: "Neștampilat, fără șarnieră",
+      mh: "Neștampilat, cu șarnieră",
+      used: "Ștampilat",
     },
   },
   auth: {
@@ -477,23 +477,23 @@ export default {
   },
   plans: {
     freePlan: "Plan gratuit",
-    itemsUsed: "{used} / {limit} obiecte",
-    overLimit: "Peste {limit} obiecte",
+    itemsUsed: "{used} / {limit} de obiecte",
+    overLimit: "Peste {limit} de obiecte",
     usageLabel: "Obiecte folosite în planul gratuit",
     nearLimit: "Aproape de limită",
     full: "Limită atinsă",
     upgrade: "Treci la Premium",
     upgradeToPremium: "Treci la Premium",
-    usedOf: "{used} din {limit} obiecte folosite",
+    usedOf: "{used} din {limit} de obiecte folosite",
     premiumPitch: "Premium nu are limită de obiecte.",
     nearLimitNotice:
-      "Ai folosit {used} din cele {limit} obiecte ale planului gratuit.",
+      "Ai folosit {used} din cele {limit} de obiecte ale planului gratuit.",
     fullNotice:
-      "Colecția ta a atins cele {limit} obiecte ale planului gratuit.",
+      "Colecția ta a atins cele {limit} de obiecte ale planului gratuit.",
     keepItems:
       "Toate obiectele tale rămân vizibile și editabile. Treci la Premium ca să adaugi mai multe.",
     limitError:
-      "Planul gratuit are cel mult {limit} obiecte, așa că nu s-a adăugat nimic. Treci la Premium ca să adaugi mai multe.",
+      "Planul gratuit are cel mult {limit} de obiecte, așa că nu s-a adăugat nimic. Treci la Premium ca să adaugi mai multe.",
   },
   spotPrices: {
     title: "Prețuri spot",
@@ -520,7 +520,7 @@ export default {
     noRate:
       "Încă nu avem un curs de schimb cu care să convertim sumele. Încearcă din nou peste câteva minute.",
     tooLarge:
-      "Colecția ta are peste {limit} obiecte, prea multe pentru a fi convertite într-o singură schimbare. Trimite-ne feedback și te ajutăm.",
+      "Colecția ta are peste {limit} de obiecte, prea multe pentru a fi convertite într-o singură schimbare. Trimite-ne feedback și te ajutăm.",
     amounts: "Sume de convertit",
     rate: "Curs de schimb",
     rateValue: "1 {from} = {rate} {to}",
@@ -737,12 +737,12 @@ export default {
     previousPage: "Pagina anterioară",
     nextPage: "Pagina următoare",
     incomplete:
-      "Colecția ta e prea mare pentru a fi căutată dintr-odată, așa că această vizualizare cuprinde primele {count} obiecte pe care le-ai adăugat.",
+      "Colecția ta e prea mare pentru a fi căutată dintr-odată, așa că această vizualizare cuprinde primele {count} de obiecte pe care le-ai adăugat.",
     showInCollection: "Arată în colecție",
   },
   billing: {
     currentPlan: "Planul tău",
-    freeDescription: "Până la {limit} obiecte, indiferent de cantitate.",
+    freeDescription: "Până la {limit} de obiecte, indiferent de cantitate.",
     premium: "Premium",
     premiumDescription:
       "Obiecte nelimitate, raportul de asigurare și export CSV și PDF.",
@@ -931,7 +931,7 @@ export default {
       authorRequired: "Precizează autorul.",
       licenceRequired: "Precizează licența.",
       linkRequired: "Precizează linkul.",
-      tooLong: "Folosește cel mult {max} caractere.",
+      tooLong: "Folosește cel mult {max} de caractere.",
       invalidLink: "Introdu o adresă web completă care începe cu https://.",
       numista: "Nu se pot stoca date de la Numista.",
       failed: "Imaginea nu a putut fi salvată. Încearcă din nou.",
@@ -967,7 +967,7 @@ export default {
     catalog: "Afișează catalogul",
     catalogDescription:
       "Când este dezactivat, doar administratorii văd catalogul. Ceilalți nu îl mai găsesc în navigare, la răsfoire sau în căutare.",
-    scanner: "Scanner",
+    scanner: "Scaner",
     scannerDescription:
       "Cine poate fotografia o monedă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
     scannerOptions: {
@@ -1054,7 +1054,7 @@ export default {
     csv: "Exportă ca CSV",
     pdf: "Exportă ca PDF",
     pdfTooLarge:
-      "Un PDF cuprinde cel mult {limit} obiecte. Restrânge vizualizarea pentru a o exporta.",
+      "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o exporta.",
     premiumOnly: "Exportul colecției face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
@@ -1119,7 +1119,7 @@ export default {
       "Încă nu există prețuri spot, așa că niciun obiect nu are valoarea metalului.",
     staleSpotPrices: "Prețurile spot pot fi depășite.",
     tooLarge:
-      "Un raport cuprinde cel mult {limit} obiecte. Alege mai puține albume.",
+      "Un raport cuprinde cel mult {limit} de obiecte. Alege mai puține albume.",
     nothingToReport: "Aici nu există obiecte de raportat.",
     ownerTitle: "Proprietar",
     ownerDescription: "Apare în raport, din contul tău.",
@@ -1278,7 +1278,7 @@ export default {
     deleteTitle: "Ștergi „{title}”?",
     deleteCounting: "Se numără ce se șterge odată cu el…",
     deleteTooLarge:
-      "Odată cu el s-ar șterge peste {nodes} noduri sau {items} obiecte legate. Șterge mai întâi nodurile de dedesubt.",
+      "Odată cu el s-ar șterge peste {nodes} de noduri sau {items} de obiecte legate. Șterge mai întâi nodurile de dedesubt.",
     "deleteBelow#zero": "Nimic de dedesubt nu se șterge odată cu el.",
     "deleteBelow#one": "1 nod de dedesubt se șterge odată cu el.",
     "deleteBelow#few": "{count} noduri de dedesubt se șterg odată cu el.",
@@ -1358,7 +1358,7 @@ export default {
     clearFilters: "Șterge filtrele",
     showMore: "Arată mai multe",
     moreMatches:
-      "Se arată cele mai bune {count} rezultate. Scrie mai mult din nume sau din e-mail ca să găsești alții.",
+      "Se arată cele mai bune {count} de rezultate. Scrie mai mult din nume sau din e-mail ca să găsești alții.",
     notFoundTitle: "Utilizatorul nu a fost găsit",
     notFound:
       "Nu există niciun utilizator la acest link. Poate și-a șters contul.",
@@ -1391,5 +1391,11 @@ export default {
     started: "Început",
     ended: "Încheiat",
     collection: "Colecție",
+  },
+  notFound: {
+    title: "Pagina nu a fost găsită",
+    description:
+      "Nu există nimic la această adresă. Poate a fost mutată sau linkul este greșit.",
+    home: "Mergi la prezentare",
   },
 } as const satisfies Dictionary;

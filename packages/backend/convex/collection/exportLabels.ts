@@ -147,7 +147,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
     },
     strikes: {
       circulation: "Omløp",
-      bu: "Brilliant uncirculated (BU)",
+      bu: "Usirkulert kvalitet (BU)",
       proof: "Proof",
     },
     stampGrades: {

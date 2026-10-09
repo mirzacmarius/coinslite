@@ -19,6 +19,19 @@ export function useCatalogFormat() {
   const format = useFormatters();
   const labels = useGradeLabels();
   return useMemo(() => {
+    /**
+     * What a Catalog node is called: a country by its name in the reader's
+     * language, anything else by its title, which stays as the Catalog has
+     * it (titles and series are kept in the issuing country's language).
+     */
+    const nodeTitle = (node: {
+      title: string;
+      country?: string;
+      countryNode?: boolean;
+    }) =>
+      node.countryNode && node.country
+        ? format.country(node.country)
+        : node.title;
     /** "1881", or "1878–1904" for an issue over several years. */
     const years = (from?: number, to?: number) => {
       if (from === undefined) return to === undefined ? undefined : `–${to}`;
@@ -73,6 +86,7 @@ export function useCatalogFormat() {
         .filter(Boolean)
         .join(" · ");
     return {
+      nodeTitle,
       years,
       weight,
       fineness,

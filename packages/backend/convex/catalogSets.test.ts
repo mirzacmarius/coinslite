@@ -279,6 +279,12 @@ test("a Theme is a Set of its countries' entries: the bundled 2-euro commemorati
     ["Austria"],
     ["Belgium"],
   ]);
+  // Each sub-group is a country, which the app names in the reader's language.
+  expect(set?.groups.slice(0, 3).map(({ country }) => country)).toEqual([
+    "AD",
+    "AT",
+    "BE",
+  ]);
   const years = set?.groups[1]?.entries.map(({ yearFrom }) => yearFrom) ?? [];
   expect(years).toEqual([...years].sort((a = 0, b = 0) => a - b));
 });
@@ -297,7 +303,10 @@ test("a grouping with more entries than a Set may have says so instead", async (
   expect(await ada.as.query(api.catalog.sets.get, { key: "no-many" })).toEqual({
     key: "no-many",
     title: "Many",
-    ancestors: [{ key: "no", title: "Norway" }],
+    countryNode: false,
+    ancestors: [
+      { key: "no", title: "Norway", country: "NO", countryNode: true },
+    ],
     tooLarge: true,
   });
 });

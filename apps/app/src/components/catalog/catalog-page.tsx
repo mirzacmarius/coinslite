@@ -9,11 +9,13 @@ import type * as React from "react";
 import { CatalogHeader } from "./catalog-header";
 import { catalogNodeHref } from "./catalog-levels";
 import { CatalogRow, IconTile, RowCount, RowsSkeleton } from "./catalog-rows";
+import { useCatalogFormat } from "./use-catalog-format";
 
 /** The top of the Catalog: its countries and Themes, most entries first. */
 export function CatalogPage({ actions }: { actions?: React.ReactNode }) {
   const t = useI18n();
   const roots = useQuery(api.catalog.browse.roots);
+  const { nodeTitle } = useCatalogFormat();
 
   return (
     <>
@@ -41,7 +43,7 @@ export function CatalogPage({ actions }: { actions?: React.ReactNode }) {
               key={root.key}
               href={catalogNodeHref(root.key)}
               tile={<IconTile icon={root.kind === "theme" ? Layers : Flag} />}
-              title={root.title}
+              title={nodeTitle(root)}
               facts={root.kind === "theme" ? t("catalog.theme") : undefined}
               end={
                 <RowCount

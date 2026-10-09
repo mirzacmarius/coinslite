@@ -40,6 +40,12 @@ const groupRow = v.object({
   ),
   title: v.string(),
   country: v.optional(v.string()),
+  /**
+   * Whether it is a country (a country root, or a Theme's country): it can be
+   * browsed by denomination, and the app names it by `country`, in the
+   * reader's language, rather than by its title.
+   */
+  countryNode: v.boolean(),
   entryCount: v.number(),
 });
 
@@ -47,11 +53,16 @@ type GroupNode = Doc<"catalogNodes"> & {
   kind: "country" | "theme" | "grouping";
 };
 
+/** Whether a node is a country: a country root, or a Theme's country. */
+export const isCountryNode = (node: Doc<"catalogNodes">) =>
+  node.countryNodeKey === node.key;
+
 const groupRowOf = (node: GroupNode) => ({
   key: node.key,
   kind: node.kind,
   title: node.title,
   ...(node.country !== undefined && { country: node.country }),
+  countryNode: isCountryNode(node),
   entryCount: node.entryCount ?? 0,
 });
 
@@ -119,12 +130,26 @@ export async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
   const ancestors = [];
   for (const key of keys) {
     const ancestor = await nodeByKey(ctx, key);
-    if (ancestor) ancestors.push({ key: ancestor.key, title: ancestor.title });
+    if (ancestor) ancestors.push(ancestorOf(ancestor));
   }
   return ancestors;
 }
 
-export const ancestor = v.object({ key: v.string(), title: v.string() });
+/** A node on the way down to another, for the breadcrumb; a country comes with its code. */
+const ancestorOf = (node: Doc<"catalogNodes">) => ({
+  key: node.key,
+  title: node.title,
+  ...(isCountryNode(node) &&
+    node.country !== undefined && { country: node.country }),
+  countryNode: isCountryNode(node),
+});
+
+export const ancestor = v.object({
+  key: v.string(),
+  title: v.string(),
+  country: v.optional(v.string()),
+  countryNode: v.boolean(),
+});
 
 /** A Catalog entry with everything its detail view shows. */
 const entryFields = {
@@ -167,8 +192,6 @@ const groupDetail = v.object({
   ancestors: v.array(ancestor),
   /** The grouping nodes right below: a Theme's countries, most entries first; elsewhere in sort order. */
   groupings: v.array(groupRow),
-  /** Whether it is a country (a country root, or a Theme's country), so it can be browsed by denomination. */
-  countryNode: v.boolean(),
 });
 
 /** The facts an entry row shows. */
@@ -282,7 +305,6 @@ export const node = query({
       ancestors,
       groupings:
         node.kind === "theme" ? groupings.sort(byEntryCount) : groupings,
-      countryNode: node.countryNodeKey === node.key,
     };
   },
 });
