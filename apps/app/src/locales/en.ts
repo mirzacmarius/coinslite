@@ -311,7 +311,6 @@ export default {
       title: "Sign out or delete",
       signOut: "Sign out",
       delete: "Delete account",
-      deleteConfirm: "Click again to delete everything",
       deleteWarning:
         "Deleting your account removes it and everything in it. This can't be undone.",
     },
@@ -716,5 +715,20 @@ export default {
     moveHint: "to move",
     openHint: "to open",
     closeHint: "to close",
+  },
+  deleteAccount: {
+    title: "Delete your account?",
+    description:
+      "Your profile, contact details and sign-in methods are deleted for good, with everything in your Collection. This can't be undone.",
+    endsSubscription:
+      "Your Premium subscription ends now and won't be charged again.",
+    items: "Items",
+    photos: "Photos",
+    albums: "Albums",
+    atLeast: "{value}+",
+    confirm: "Delete account",
+    cancel: "Cancel",
+    failed:
+      "Your account couldn't be deleted, and nothing was removed. Try again.",
   },
 } as const;

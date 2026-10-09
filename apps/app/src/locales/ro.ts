@@ -320,7 +320,6 @@ export default {
       title: "Deconectare sau ștergere",
       signOut: "Deconectează-te",
       delete: "Șterge contul",
-      deleteConfirm: "Apasă din nou ca să ștergi tot",
       deleteWarning:
         "Ștergerea contului îl elimină împreună cu tot conținutul. Acțiunea nu poate fi anulată.",
     },
@@ -734,5 +733,20 @@ export default {
     moveHint: "pentru a te deplasa",
     openHint: "pentru a deschide",
     closeHint: "pentru a închide",
+  },
+  deleteAccount: {
+    title: "Ștergi contul?",
+    description:
+      "Profilul, datele de contact și metodele de conectare se șterg definitiv, împreună cu tot ce este în colecția ta. Acțiunea nu poate fi anulată.",
+    endsSubscription:
+      "Abonamentul Premium se încheie acum și nu va mai fi facturat.",
+    items: "Obiecte",
+    photos: "Fotografii",
+    albums: "Albume",
+    atLeast: "{value}+",
+    confirm: "Șterge contul",
+    cancel: "Anulează",
+    failed:
+      "Contul nu a putut fi șters și nu s-a eliminat nimic. Încearcă din nou.",
   },
 } as const satisfies Dictionary;
