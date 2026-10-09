@@ -15,6 +15,7 @@ import { emailChangeMessages } from "./account/emailChangeMessages";
 import { checkContact } from "./account/rules";
 import { requireNormalizedEmail } from "./accounts/credentials";
 import { deleteUserAndSignInMethods } from "./accounts/linking";
+import { nameKey } from "./admin/userList";
 import { planOf } from "./plans";
 import { requireSetUpUser, requireUserId } from "./utils/auth";
 import { language } from "./utils/validators";
@@ -82,7 +83,11 @@ export const updateContact = mutation({
   returns: v.null(),
   handler: async (ctx, contact) => {
     const user = await requireSetUpUser(ctx);
-    await ctx.db.patch(user._id, checkContact(contact));
+    const checked = checkContact(contact);
+    await ctx.db.patch(user._id, {
+      ...checked,
+      nameKey: nameKey(checked.displayName),
+    });
     return null;
   },
 });

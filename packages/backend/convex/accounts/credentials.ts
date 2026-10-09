@@ -1,4 +1,5 @@
 import { ConvexError, type Value } from "convex/values";
+import { nameKey } from "../admin/userList";
 
 /**
  * The rules for what people type to sign in: email, password and the emailed
@@ -24,6 +25,12 @@ export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 /** "ada" for "ada@example.com": the display name a new account starts with. */
 export const localPart = (email: string) => email.slice(0, email.indexOf("@"));
+
+/** A new account's display name, with the key the admin user list sorts it by. */
+export function startingName(email: string) {
+  const displayName = localPart(email);
+  return { displayName, nameKey: nameKey(displayName) };
+}
 
 /**
  * The email of a sign-in request. Convex Auth keys accounts and codes on the

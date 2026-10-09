@@ -35,6 +35,7 @@ import {
   SunMoon,
   ToggleRight,
   UserRound,
+  UsersRound,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -119,6 +120,14 @@ export function WorkspaceMenu({
             <Link href="/admin/flags">
               <ToggleRight strokeWidth={1.75} />
               {t("featureFlags.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/users">
+              <UsersRound strokeWidth={1.75} />
+              {t("adminUsers.menu")}
             </Link>
           </DropdownMenuItem>
         )}
