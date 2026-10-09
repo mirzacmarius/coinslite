@@ -35,6 +35,8 @@ import type * as spotPrices from "../spotPrices.js";
 import type * as spotPrices_metalPriceApi from "../spotPrices/metalPriceApi.js";
 import type * as spotPrices_rates from "../spotPrices/rates.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as updates from "../updates.js";
+import type * as updates_releases from "../updates/releases.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_validators from "../utils/validators.js";
@@ -73,6 +75,8 @@ declare const fullApi: ApiFromModules<{
   "spotPrices/metalPriceApi": typeof spotPrices_metalPriceApi;
   "spotPrices/rates": typeof spotPrices_rates;
   subscriptions: typeof subscriptions;
+  updates: typeof updates;
+  "updates/releases": typeof updates_releases;
   users: typeof users;
   "utils/auth": typeof utils_auth;
   "utils/validators": typeof utils_validators;

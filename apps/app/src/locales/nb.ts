@@ -392,4 +392,22 @@ export default {
     emptyDescription:
       "Gull- og sølvprisene vises her når de er hentet. De oppdateres hvert 15. minutt.",
   },
+  updates: {
+    title: "Nyheter",
+    unseen: "Ny versjon",
+    new: "Ny",
+    version: "Versjon {version}",
+    latest: "Nyeste",
+    groups: {
+      catalog: "Nytt i katalogen",
+      features: "Nye funksjoner",
+      improvements: "Forbedringer",
+      fixes: "Rettelser",
+    },
+    highlightsTitle: "Nytt i CoinsLite {version}",
+    seeAll: "Se alle nyheter",
+    gotIt: "Greit",
+    close: "Lukk",
+    workspaceMenuUnseen: "Konto og innstillinger, ny versjon",
+  },
 } as const satisfies Dictionary;

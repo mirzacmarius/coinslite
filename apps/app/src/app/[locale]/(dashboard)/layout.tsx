@@ -6,6 +6,7 @@ import {
 } from "@/components/items/add-item";
 import { SidebarPlanUsage } from "@/components/plans/plan-usage";
 import { AppShell } from "@/components/shell/app-shell";
+import { ReleaseHighlights } from "@/components/updates/release-highlights";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
@@ -46,6 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <AccountCheck />
         </Suspense>
         <ProfileLanguage />
+        <ReleaseHighlights />
         {children}
       </AppShell>
     </AddItemProvider>

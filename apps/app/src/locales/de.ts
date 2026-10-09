@@ -408,4 +408,22 @@ export default {
     emptyDescription:
       "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
   },
+  updates: {
+    title: "Neuigkeiten",
+    unseen: "Neue Version",
+    new: "Neu",
+    version: "Version {version}",
+    latest: "Aktuell",
+    groups: {
+      catalog: "Neu im Katalog",
+      features: "Neue Funktionen",
+      improvements: "Verbesserungen",
+      fixes: "Fehlerbehebungen",
+    },
+    highlightsTitle: "Neu in CoinsLite {version}",
+    seeAll: "Alle Neuigkeiten ansehen",
+    gotIt: "Verstanden",
+    close: "Schließen",
+    workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
+  },
 } as const satisfies Dictionary;

@@ -386,4 +386,22 @@ export default {
     emptyDescription:
       "Gold and silver prices show here once they've been fetched. They're refreshed every 15 minutes.",
   },
+  updates: {
+    title: "Updates",
+    unseen: "New release",
+    new: "New",
+    version: "Version {version}",
+    latest: "Latest",
+    groups: {
+      catalog: "New in the Catalog",
+      features: "New features",
+      improvements: "Improvements",
+      fixes: "Fixes",
+    },
+    highlightsTitle: "What's new in CoinsLite {version}",
+    seeAll: "See all updates",
+    gotIt: "Got it",
+    close: "Close",
+    workspaceMenuUnseen: "Account and preferences, new release",
+  },
 } as const;

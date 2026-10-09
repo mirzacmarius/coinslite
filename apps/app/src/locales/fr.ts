@@ -402,4 +402,22 @@ export default {
     emptyDescription:
       "Les cours de l’or et de l’argent s’afficheront ici dès qu’ils auront été récupérés. Ils sont actualisés toutes les 15 minutes.",
   },
+  updates: {
+    title: "Nouveautés",
+    unseen: "Nouvelle version",
+    new: "Nouveau",
+    version: "Version {version}",
+    latest: "Actuelle",
+    groups: {
+      catalog: "Nouveau dans le catalogue",
+      features: "Nouvelles fonctionnalités",
+      improvements: "Améliorations",
+      fixes: "Corrections",
+    },
+    highlightsTitle: "Nouveautés de CoinsLite {version}",
+    seeAll: "Voir toutes les nouveautés",
+    gotIt: "J’ai compris",
+    close: "Fermer",
+    workspaceMenuUnseen: "Compte et préférences, nouvelle version",
+  },
 } as const satisfies Dictionary;

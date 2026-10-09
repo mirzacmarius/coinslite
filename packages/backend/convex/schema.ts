@@ -38,6 +38,12 @@ export default defineSchema({
     // Not `phone`: Convex Auth keeps that one for phone sign-in.
     contactPhone: v.optional(v.string()),
 
+    // Updates (updates/releases.ts): the version of the newest release they've
+    // seen in the list (new accounts start at the current one), and of the
+    // newest whose highlights they've been shown.
+    lastSeenRelease: v.optional(v.string()),
+    lastShownHighlights: v.optional(v.string()),
+
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
