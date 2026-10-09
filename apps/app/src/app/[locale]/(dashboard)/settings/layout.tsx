@@ -8,14 +8,20 @@ import { useSelectedLayoutSegment } from "next/navigation";
 /** Account is a reading page: a narrow column under the header bar. */
 export default function Layout({ children }: { children: React.ReactNode }) {
   const t = useI18n();
-  // Updates sits below Account, so its header leads back there.
-  const updates = useSelectedLayoutSegment() === "updates";
+  // Updates and Plans sit below Account, so their headers lead back there.
+  const segment = useSelectedLayoutSegment();
+  const below =
+    segment === "updates"
+      ? t("updates.title")
+      : segment === "billing"
+        ? t("shell.plans")
+        : undefined;
   return (
     <>
       <HeaderBar
-        title={updates ? t("updates.title") : t("nav.account")}
+        title={below ?? t("nav.account")}
         parent={
-          updates && (
+          below && (
             <Link href="/settings" className="hover:text-foreground">
               {t("nav.account")}
             </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useHydrated } from "@/lib/use-hydrated";
 import { useCurrentLocale } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -11,5 +12,7 @@ import { useQuery } from "convex/react";
  */
 export function useUpdatesStatus() {
   const language = useCurrentLocale();
-  return useQuery(api.updates.status, { language });
+  const status = useQuery(api.updates.status, { language });
+  // The shell and the Account page share this query; see useHydrated.
+  return useHydrated() ? status : undefined;
 }

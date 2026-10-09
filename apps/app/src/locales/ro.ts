@@ -299,8 +299,6 @@ export default {
       title: "Preferințe",
       language: "Limbă",
       homeCurrency: "Moneda de bază",
-      homeCurrencyNote:
-        "În curând o vei putea schimba, iar toate sumele vor fi convertite.",
       languageNotSaved:
         "Limba nu a putut fi salvată în cont, așa că s-a schimbat doar pe acest dispozitiv.",
     },
@@ -512,6 +510,35 @@ export default {
     emptyDescription:
       "Prețurile aurului și argintului apar aici după ce sunt preluate. Se actualizează la fiecare 15 minute.",
   },
+  homeCurrency: {
+    hint: "Dacă o schimbi, toate prețurile de achiziție și valorile de piață din colecție sunt convertite.",
+    confirmTitle: "Schimbi moneda de bază în {currency}?",
+    confirm: "Schimbă în {currency}",
+    cancel: "Anulează",
+    checking: "Se numără sumele de convertit…",
+    willConvert:
+      "Toate prețurile de achiziție și valorile de piață din colecția ta vor fi convertite din {from} în {to} la acest curs de schimb.",
+    nothingToConvert:
+      "Niciunul dintre obiectele tale nu are preț de achiziție sau valoare de piață, deci nu e nimic de convertit.",
+    noRate:
+      "Încă nu avem un curs de schimb cu care să convertim sumele. Încearcă din nou peste câteva minute.",
+    tooLarge:
+      "Colecția ta are peste {limit} obiecte, prea multe pentru a fi convertite într-o singură schimbare. Trimite-ne feedback și te ajutăm.",
+    amounts: "Sume de convertit",
+    rate: "Curs de schimb",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Curs la",
+    stale:
+      "Acest curs nu a mai fost actualizat de peste o oră și poate fi depășit.",
+    changed: "Moneda ta de bază este acum {currency}.",
+    rateChanged:
+      "Cursul de schimb tocmai a fost actualizat. Verifică noul curs și confirmă din nou.",
+    amountTooLarge:
+      "Una dintre sume ar fi prea mare în noua monedă, așa că nu s-a schimbat nimic.",
+    sameCurrency: "Aceasta este deja moneda ta de bază.",
+    failed:
+      "Moneda de bază nu a putut fi schimbată și nu s-a convertit nimic. Încearcă din nou.",
+  },
   preciousMetal: {
     title: "Metal prețios",
     metal: "Metal",
@@ -710,5 +737,55 @@ export default {
     incomplete:
       "Colecția ta e prea mare pentru a fi căutată dintr-odată, așa că această vizualizare cuprinde primele {count} obiecte pe care le-ai adăugat.",
     showInCollection: "Arată în colecție",
+  },
+  billing: {
+    currentPlan: "Planul tău",
+    freeDescription: "Până la {limit} obiecte, indiferent de cantitate.",
+    premium: "Premium",
+    premiumDescription:
+      "Obiecte nelimitate, raportul de asigurare și export CSV și PDF.",
+    billingPeriod: "Perioada de facturare",
+    monthly: "Lunar",
+    yearly: "Anual",
+    perMonth: "{price} / lună",
+    perYear: "{price} / an",
+    save: "Economisești {percent}%",
+    currencyHint:
+      "Prețuri în {currency}. La plată se încasează în moneda țării în care locuiești, altfel în euro, iar prețul final apare acolo.",
+    testMode:
+      "Mod de test: nu se fac plăți reale. Plătește cu cardul de test 4242 4242 4242 4242.",
+    unavailable:
+      "Premium nu poate fi cumpărat aici încă: facturarea nu este configurată în acest mediu.",
+    alreadyPremium: "Ai deja Premium.",
+    checkoutFailed: "Pagina de plată nu s-a putut deschide. Încearcă din nou.",
+    price: "Preț",
+    renews: "Se reînnoiește",
+    ends: "Se încheie",
+    endingNotice:
+      "Premium rămâne activ până la {date}. După aceea treci la planul gratuit, iar toate obiectele tale rămân vizibile și editabile.",
+    confirmationTitle: "Plată",
+    confirmingTitle: "Se confirmă plata",
+    confirmingDescription:
+      "De obicei durează câteva secunde. Premium pornește imediat ce plata este confirmată.",
+    slowDescription:
+      "Durează mai mult decât de obicei. Premium pornește singur după confirmarea plății, așa că poți continua între timp.",
+    welcomeTitle: "Bun venit în Premium",
+    welcomeDescription: "Colecția ta nu mai are limită de obiecte.",
+    toCollection: "Mergi la colecție",
+    seePlan: "Vezi planul",
+    backToPlans: "Înapoi la planuri",
+  },
+  catalogSearch: {
+    open: "Caută",
+    title: "Caută în catalog",
+    placeholder: "Caută după titlu, valoare nominală, serie sau țară…",
+    minLength: "Scrie cel puțin 2 caractere pentru a căuta.",
+    noResults: "Nimic din catalog nu se potrivește cu „{text}”.",
+    capped:
+      "Se afișează primele {count}. Adaugă un cuvânt pentru a restrânge căutarea.",
+    themes: "Teme",
+    moveHint: "pentru a te deplasa",
+    openHint: "pentru a deschide",
+    closeHint: "pentru a închide",
   },
 } as const satisfies Dictionary;

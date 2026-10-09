@@ -20,6 +20,8 @@ export type ConfirmDialogProps = {
   confirmLabel: string;
   cancelLabel: string;
   destructive?: boolean;
+  /** Keeps the confirm button off, e.g. while the numbers it states are loading. */
+  confirmDisabled?: boolean;
   /** Extra content between the description and the buttons, e.g. a checklist. */
   children?: React.ReactNode;
   /** May be async: the dialog shows a spinner and closes when it resolves. */
@@ -39,6 +41,7 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel,
   destructive,
+  confirmDisabled,
   children,
   onConfirm,
 }: ConfirmDialogProps) {
@@ -62,7 +65,7 @@ export function ConfirmDialog({
           </Button>
           <Button
             variant={destructive ? "destructive" : "default"}
-            disabled={pending}
+            disabled={pending || confirmDisabled}
             onClick={async () => {
               setPending(true);
               try {
