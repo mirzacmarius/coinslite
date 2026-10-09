@@ -4,6 +4,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { compareDenominations } from "../items/denominations";
 import { type GradingScale, gradeRank, gradingScaleIds } from "../items/grades";
+import { itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
 import { gradingScale, itemType } from "../utils/validators";
 import {
@@ -317,27 +318,30 @@ function countOptions(
 /**
  * How often reading a Collection checks what's left of the query's read
  * allowance, and how much it leaves for the rest of the query (the person,
- * thumbnails), in documents and bytes. An Item is at most a few kilobytes.
+ * thumbnails), in documents and bytes. An Item is at most a few kilobytes,
+ * and so is the Catalog entry it may be linked to.
  */
 const readCheckEvery = 100;
 const documentsKept = 500;
 const bytesKept = 2 * 1024 * 1024;
 
 /**
- * Every Item in a person's Collection, as added. A view needs them all to
- * search, filter, sort, count and number its pages, so this reads the
- * owner's whole index range once rather than page by page. A Free plan
- * Collection is at most 50 Items; a Premium one of many thousands still fits
- * in what one query may read (32,000 documents, 16 MiB). Beyond that it
+ * Every Item in a person's Collection, as added, with its facts resolved
+ * (items/resolve.ts). A view needs them all to search, filter, sort, count
+ * and number its pages, so this reads the owner's whole index range once
+ * rather than page by page. A Free plan Collection is at most 50 Items; a
+ * Premium one of many thousands still fits in what one query may read
+ * (32,000 documents, 16 MiB), each Catalog entry read once. Beyond that it
  * stops before the limit and reports the Collection as incomplete, rather
  * than failing.
  */
 async function readCollection(ctx: QueryCtx, ownerId: Id<"users">) {
   const items: Item[] = [];
+  const resolver = itemResolver(ctx);
   for await (const item of ctx.db
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
-    items.push(item);
+    items.push(await resolver.resolve(item));
     if (items.length % readCheckEvery === 0) {
       const { documentsRead, bytesRead } =
         await ctx.meta.getTransactionMetrics();

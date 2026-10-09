@@ -17,6 +17,7 @@ import {
 import { countAlbumCreated, countAlbumDeleted } from "./collectionCounts";
 import { itemNotFound } from "./items";
 import { deleteItem } from "./items/deletion";
+import { resolveItems } from "./items/resolve";
 import { withThumbnail } from "./items/thumbnail";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
@@ -108,7 +109,8 @@ export const get = query({
 
 /**
  * The Items in one of the signed-in person's Albums, newest first, a page at
- * a time, each with its list thumbnail as in the Collection.
+ * a time, their facts resolved and each with its list thumbnail as in the
+ * Collection.
  */
 export const items = query({
   args: { albumId: v.id("albums"), paginationOpts: paginationOptsValidator },
@@ -124,7 +126,9 @@ export const items = query({
     return {
       ...items,
       page: await Promise.all(
-        items.page.map((item) => withThumbnail(ctx, item)),
+        (await resolveItems(ctx, items.page)).map((item) =>
+          withThumbnail(ctx, item),
+        ),
       ),
     };
   },
