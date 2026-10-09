@@ -8,7 +8,6 @@ export default defineConfig({
       deps: {
         inline: [
           "convex-test",
-          "@convex-dev/polar",
           "@convex-dev/rate-limiter",
           "@convex-dev/batch-worker",
         ],

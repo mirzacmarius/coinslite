@@ -6,7 +6,7 @@ import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { useQuery } from "convex/react";
-import { Pencil, SearchX, Trash2 } from "lucide-react";
+import { ListFilter, Pencil, SearchX, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -71,6 +71,12 @@ export function AlbumDetail() {
         title={album.name}
         actions={
           <>
+            <Button variant="ghost" size="xs" asChild>
+              <Link href={`/collection?album=${album._id}`}>
+                <ListFilter strokeWidth={1.75} aria-hidden="true" />
+                {t("collection.showInCollection")}
+              </Link>
+            </Button>
             <Button
               variant="ghost"
               size="xs"

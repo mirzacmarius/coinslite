@@ -19,6 +19,16 @@ import {
 
 export default defineSchema({
   ...authTables,
+  /**
+   * Convex Auth's, plus an index so deleting an account (account/deletion.ts)
+   * finds the Google sign-ins its sessions started.
+   */
+  authVerifiers: defineTable({
+    sessionId: v.optional(v.id("authSessions")),
+    signature: v.optional(v.string()),
+  })
+    .index("signature", ["signature"])
+    .index("by_sessionId", ["sessionId"]),
   users: defineTable({
     // Convex Auth fields
     name: v.optional(v.string()),
@@ -119,11 +129,16 @@ export default defineSchema({
     // Album: at most one. Moving an Item in or out keeps the Album's itemCount
     // right (albums/membership.ts).
     albumId: v.optional(v.id("albums")),
+
+    // The Catalog entry the Item was created from (ADR 0001), if any. The
+    // Catalog shows how many of each entry a person holds from this link.
+    catalogEntryId: v.optional(v.id("catalogNodes")),
   })
     .index("by_ownerId", ["ownerId"])
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
-    .index("by_ownerId_and_albumId", ["ownerId", "albumId"]),
+    .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` is kept by every
@@ -188,11 +203,37 @@ export default defineSchema({
 
     /** Title, denomination, series and country, for the search index. */
     searchText: v.string(),
+
+    // For browsing (catalog/browse.ts), kept by catalog/tree.ts:
+    /** Roots and groupings: how many Catalog entries sit anywhere below. */
+    entryCount: v.optional(v.number()),
+    /**
+     * The key of the country the node is browsed under: its country root, or
+     * below a Theme, the Theme's child. Absent on Theme roots.
+     */
+    countryNodeKey: v.optional(v.string()),
   })
     .index("by_key", ["key"])
     .index("by_parentId_and_sortOrder", ["parentId", "sortOrder"])
     .index("by_path", ["path"])
     .index("by_kind_and_path", ["kind", "path"])
+    .index("by_parentId_and_kind_and_yearFrom_and_sortOrder", [
+      "parentId",
+      "kind",
+      "yearFrom",
+      "sortOrder",
+    ])
+    .index(
+      "by_kind_and_countryNodeKey_and_denomination_and_series_and_yearFrom_and_sortOrder",
+      [
+        "kind",
+        "countryNodeKey",
+        "denomination",
+        "series",
+        "yearFrom",
+        "sortOrder",
+      ],
+    )
     .searchIndex("search_searchText", {
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
@@ -211,6 +252,39 @@ export default defineSchema({
     checkedAt: v.number(),
     perDollar,
   }),
+
+  /**
+   * Premium subscriptions as Polar last reported them, one per Polar
+   * subscription (billing.ts). Amounts are minor units of `currency`; times are
+   * ms. `premium` is the Premium status rule (billing/rules.ts) applied at the
+   * last change, switched off by a scheduled check when the paid period runs
+   * out, so asking "is this person Premium?" needs no clock.
+   */
+  subscriptions: defineTable({
+    userId: v.id("users"),
+    polarId: v.string(),
+    polarCustomerId: v.string(),
+    productId: v.string(),
+    /** Polar's status: active, trialing, past_due, canceled, unpaid, incomplete… */
+    status: v.string(),
+    /** Polar's billing interval: "month" or "year" for Premium. */
+    interval: v.string(),
+    /** Upper-case ISO code, e.g. "NOK". */
+    currency: v.string(),
+    amount: v.number(),
+    currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.boolean(),
+    endedAt: v.optional(v.number()),
+    /** When Polar last changed it; older events are ignored. */
+    modifiedAt: v.number(),
+    premium: v.boolean(),
+    /** When Premium runs out unless Polar reports a renewal; unset if open-ended or not Premium. */
+    premiumUntil: v.optional(v.number()),
+    /** The scheduled check that ends Premium at `premiumUntil`. */
+    premiumCheck: v.optional(v.id("_scheduled_functions")),
+  })
+    .index("by_polarId", ["polarId"])
+    .index("by_userId_and_premium", ["userId", "premium"]),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

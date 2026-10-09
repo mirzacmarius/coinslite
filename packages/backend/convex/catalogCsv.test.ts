@@ -590,15 +590,39 @@ test("the bundled US Morgan and Peace dollars load once, with their sources, and
   }
 });
 
-test("a new preview deployment loads the bundled Catalog through the function its build names", async () => {
-  // `convex deploy --preview-run` calls the function by name, with no args.
-  const previewRun = /^\s*--preview-run\s+(\S+)/m.exec(vercelBuildScript)?.[1];
-  expect(previewRun).toBe("catalog/seed:load");
+test("every preview build loads the bundled Catalog through the function it names, bringing search words up to date", async () => {
+  // The build runs `convex run <function>` on the branch's preview deployment:
+  // by name, with no args.
+  const seedCommand = vercelBuildScript
+    .replace(/\\\n\s*/g, " ")
+    .split("\n")
+    .find((line) => /^\s*npx convex run\b/.test(line));
+  expect(seedCommand).toContain('--preview-name "$VERCEL_GIT_COMMIT_REF"');
+  const functionName = seedCommand?.trim().split(/\s+/).pop();
+  expect(functionName).toBe("catalog/seed:load");
 
   const t = newTest();
-  const seed = makeFunctionReference<"mutation">(previewRun ?? "");
+  const seed = makeFunctionReference<"mutation">(functionName ?? "");
   expect(await t.mutation(seed, {})).toEqual([
     { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
     { dataset: "euroCommemoratives", inserts: 609, updates: 0, unchanged: 0 },
   ]);
+
+  // A preview seeded before its search words changed finds nothing by them...
+  await t.run(async (ctx) => {
+    for (const node of await ctx.db.query("catalogNodes").take(200)) {
+      await ctx.db.patch(node._id, { searchText: "stale" });
+    }
+  });
+  const ada = await person(t, "ada@example.com");
+  const search = () =>
+    ada.as.query(api.catalog.search.find, { text: "Vereinigte Staaten" });
+  expect((await search()).groups).toEqual([]);
+
+  // ...until its next build loads the Catalog again.
+  expect(await t.mutation(seed, {})).toEqual([
+    { dataset: "usSilverDollars", inserts: 0, updates: 0, unchanged: 123 },
+    { dataset: "euroCommemoratives", inserts: 0, updates: 0, unchanged: 609 },
+  ]);
+  expect((await search()).groups).not.toEqual([]);
 });

@@ -27,7 +27,7 @@ const changes =
 const ecb = (link: string) => ({
   source: "European Central Bank",
   author: "European Central Bank",
-  licence: `ECB copyright: free reuse with the ECB cited as source. Free of charge at www.ecb.europa.eu. ${changes}`,
+  licence: `Reused under the ECB's copyright terms, citing the ECB. Available free of charge at www.ecb.europa.eu. ${changes}`,
   link,
 });
 const officialJournal = (notice: string, link: string) => ({

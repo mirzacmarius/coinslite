@@ -1,7 +1,8 @@
-import { isCountryCode } from "@coinslite/i18n";
+import { formatCountry, isCountryCode, locales } from "@coinslite/i18n";
 import { type Strike, strikes } from "../items/grades";
 import { type Material, materials } from "../items/rules";
 import { formatCsvRecord, parseCsv } from "./csvText";
+import { searchWords } from "./searchWords";
 
 /**
  * What a Catalog node holds, and how it reads from and writes to a Catalog CSV
@@ -84,6 +85,9 @@ export const catalogLimits = {
   earliestYear: -3000,
   latestYear: 3000,
 } as const;
+
+/** Lists of Catalog entries load this many at a time. */
+export const catalogPageSize = 50;
 
 /** A node's own values, one per CSV column, with provenance flattened. */
 export type NodeValues = {
@@ -597,11 +601,26 @@ export function sameValues(a: Partial<NodeValues>, b: Partial<NodeValues>) {
   );
 }
 
-/** The words a Catalog search matches: title, denomination, series and country. */
+/**
+ * The words a Catalog search matches: title, denomination, series and
+ * country, by its code and its name in every language of the app.
+ */
 export const searchTextOf = (values: Partial<NodeValues>) =>
-  [values.title, values.denomination, values.series, values.country]
-    .filter(Boolean)
-    .join(" ");
+  searchWords(
+    [
+      values.title,
+      values.denomination,
+      values.series,
+      values.country,
+      ...(values.country
+        ? locales.map((locale) =>
+            formatCountry(values.country as string, locale),
+          )
+        : []),
+    ]
+      .filter(Boolean)
+      .join(" "),
+  ).join(" ");
 
 /** A node as a CSV record, in `catalogCsvColumns` order. */
 export function csvRecordOf(node: {

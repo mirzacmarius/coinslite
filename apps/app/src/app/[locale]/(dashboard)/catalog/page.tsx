@@ -1,8 +1,12 @@
-import { placeholderMetadata } from "@/components/shell/placeholder-metadata";
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { CatalogPage } from "@/components/catalog/catalog-page";
+import { CatalogSearchButton } from "@/components/catalog/catalog-search-button";
+import { getI18n } from "@/locales/server";
 
-export const generateMetadata = () => placeholderMetadata("catalog");
+export async function generateMetadata() {
+  const t = await getI18n();
+  return { title: t("nav.catalog") };
+}
 
 export default function Page() {
-  return <PlaceholderPage section="catalog" />;
+  return <CatalogPage actions={<CatalogSearchButton />} />;
 }
