@@ -679,4 +679,42 @@ export default {
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
     },
   },
+  billing: {
+    currentPlan: "Din plan",
+    freeDescription: "Opptil {limit} objekter, uansett antall.",
+    premium: "Premium",
+    premiumDescription:
+      "Ubegrenset antall objekter, forsikringsrapporten og eksport til CSV og PDF.",
+    billingPeriod: "Faktureringsperiode",
+    monthly: "Månedlig",
+    yearly: "Årlig",
+    perMonth: "{price} / måned",
+    perYear: "{price} / år",
+    save: "Spar {percent} %",
+    currencyHint:
+      "Prisene er i {currency}. I kassen betaler du i valutaen der du bor, ellers i euro, og ser den endelige prisen.",
+    testMode:
+      "Testmodus: ingen ekte betalinger. Betal med testkortet 4242 4242 4242 4242.",
+    unavailable:
+      "Premium kan ikke kjøpes her ennå: betaling er ikke satt opp i dette miljøet.",
+    alreadyPremium: "Du har allerede Premium.",
+    checkoutFailed: "Kunne ikke åpne kassen. Prøv igjen.",
+    price: "Pris",
+    renews: "Fornyes",
+    ends: "Slutter",
+    endingNotice:
+      "Premium varer til {date}. Etter det er du på gratisplanen, og alle objektene dine kan fortsatt ses og redigeres.",
+    confirmationTitle: "Kasse",
+    confirmingTitle: "Bekrefter betalingen",
+    confirmingDescription:
+      "Dette tar vanligvis noen sekunder. Premium starter så snart betalingen er bekreftet.",
+    slowDescription:
+      "Dette tar lengre tid enn vanlig. Premium starter av seg selv når betalingen er bekreftet, så du kan fortsette i mellomtiden.",
+    welcomeTitle: "Velkommen til Premium",
+    welcomeDescription:
+      "Samlingen din har ikke lenger noen grense for antall objekter.",
+    toCollection: "Gå til samlingen",
+    seePlan: "Se planen din",
+    backToPlans: "Tilbake til abonnement",
+  },
 } as const satisfies Dictionary;

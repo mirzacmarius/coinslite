@@ -23,6 +23,10 @@ import type * as albums from "../albums.js";
 import type * as albums_membership from "../albums/membership.js";
 import type * as albums_rules from "../albums/rules.js";
 import type * as auth from "../auth.js";
+import type * as billing from "../billing.js";
+import type * as billing_polar from "../billing/polar.js";
+import type * as billing_rules from "../billing/rules.js";
+import type * as billing_webhook from "../billing/webhook.js";
 import type * as catalog_csv from "../catalog/csv.js";
 import type * as catalog_csvText from "../catalog/csvText.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
@@ -52,7 +56,6 @@ import type * as plans_rules from "../plans/rules.js";
 import type * as spotPrices from "../spotPrices.js";
 import type * as spotPrices_metalPriceApi from "../spotPrices/metalPriceApi.js";
 import type * as spotPrices_rates from "../spotPrices/rates.js";
-import type * as subscriptions from "../subscriptions.js";
 import type * as updates from "../updates.js";
 import type * as updates_releases from "../updates/releases.js";
 import type * as users from "../users.js";
@@ -81,6 +84,10 @@ declare const fullApi: ApiFromModules<{
   "albums/membership": typeof albums_membership;
   "albums/rules": typeof albums_rules;
   auth: typeof auth;
+  billing: typeof billing;
+  "billing/polar": typeof billing_polar;
+  "billing/rules": typeof billing_rules;
+  "billing/webhook": typeof billing_webhook;
   "catalog/csv": typeof catalog_csv;
   "catalog/csvText": typeof catalog_csvText;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
@@ -110,7 +117,6 @@ declare const fullApi: ApiFromModules<{
   spotPrices: typeof spotPrices;
   "spotPrices/metalPriceApi": typeof spotPrices_metalPriceApi;
   "spotPrices/rates": typeof spotPrices_rates;
-  subscriptions: typeof subscriptions;
   updates: typeof updates;
   "updates/releases": typeof updates_releases;
   users: typeof users;
@@ -145,6 +151,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  polar: import("@convex-dev/polar/_generated/component.js").ComponentApi<"polar">;
   rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };

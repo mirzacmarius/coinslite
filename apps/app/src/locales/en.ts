@@ -668,4 +668,41 @@ export default {
         "Nodes sit below this one, so it can't become a Catalog entry.",
     },
   },
+  billing: {
+    currentPlan: "Your plan",
+    freeDescription: "Up to {limit} Items, whatever their Quantity.",
+    premium: "Premium",
+    premiumDescription:
+      "Unlimited Items, the Insurance report, and CSV and PDF export.",
+    billingPeriod: "Billing period",
+    monthly: "Monthly",
+    yearly: "Yearly",
+    perMonth: "{price} / month",
+    perYear: "{price} / year",
+    save: "Save {percent}%",
+    currencyHint:
+      "Prices in {currency}. Checkout charges in the currency of where you live, or in euros, and shows the final price.",
+    testMode:
+      "Test mode: no real payments are taken. Pay with the test card 4242 4242 4242 4242.",
+    unavailable:
+      "Premium can't be bought here yet: billing isn't set up on this deployment.",
+    alreadyPremium: "You're on Premium already.",
+    checkoutFailed: "Couldn't open checkout. Try again.",
+    price: "Price",
+    renews: "Renews",
+    ends: "Ends",
+    endingNotice:
+      "Premium stays until {date}. After that you're on the Free plan, and every Item stays yours to view and edit.",
+    confirmationTitle: "Checkout",
+    confirmingTitle: "Confirming your payment",
+    confirmingDescription:
+      "This usually takes a few seconds. Premium starts as soon as the payment is confirmed.",
+    slowDescription:
+      "This is taking longer than usual. Premium starts by itself once the payment is confirmed, so you can carry on meanwhile.",
+    welcomeTitle: "Welcome to Premium",
+    welcomeDescription: "Your Collection has no Item limit any more.",
+    toCollection: "Go to Collection",
+    seePlan: "See your plan",
+    backToPlans: "Back to Plans",
+  },
 } as const;

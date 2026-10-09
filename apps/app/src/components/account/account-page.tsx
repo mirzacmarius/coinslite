@@ -49,7 +49,11 @@ export function AccountPage() {
           <h2 className="text-base font-medium">
             {account.displayName ?? account.email}
           </h2>
-          <Badge>{t("account.freePlan")}</Badge>
+          <Badge>
+            {account.plan === "premium"
+              ? t("billing.premium")
+              : t("account.freePlan")}
+          </Badge>
         </div>
         {account.displayName && (
           <p className="text-[13px] text-muted-foreground">{account.email}</p>

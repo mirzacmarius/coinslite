@@ -4,7 +4,7 @@ import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { itemsLeftToAdd, requireRoomForItems } from "./plans";
+import { itemsLeftToAdd, requirePremium, requireRoomForItems } from "./plans";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -192,4 +192,33 @@ test("adding several Items at once (say, from the Catalog) asks how many more fi
 
   await collectionOf(t, ada.userId, 10);
   expect(await t.run((ctx) => itemsLeftToAdd(ctx, ada.userId))).toBe(0);
+});
+
+test("Premium-only features let Premium members in and turn everyone else away", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const newcomer = await person(t, "new@example.com", { setUp: false });
+  const premiumMember = (who: { run: Test["run"] }) =>
+    who.run(async (ctx) => (await requirePremium(ctx)).email);
+
+  await expect(premiumMember(t)).rejects.toThrow("NOT_SIGNED_IN");
+  await expect(premiumMember(newcomer.as)).rejects.toThrow("NOT_SET_UP");
+  await expect(premiumMember(ada.as)).rejects.toThrow("PREMIUM_REQUIRED");
+
+  await t.run((ctx) =>
+    ctx.db.insert("subscriptions", {
+      userId: ada.userId,
+      polarId: "sub_1",
+      polarCustomerId: "cus_1",
+      productId: "prod_premium_monthly",
+      status: "active",
+      interval: "month",
+      currency: "NOK",
+      amount: 3900,
+      cancelAtPeriodEnd: false,
+      modifiedAt: Date.now(),
+      premium: true,
+    }),
+  );
+  expect(await premiumMember(ada.as)).toBe("ada@example.com");
 });

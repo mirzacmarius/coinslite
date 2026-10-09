@@ -691,4 +691,41 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
     },
   },
+  billing: {
+    currentPlan: "Votre formule",
+    freeDescription: "Jusqu’à {limit} objets, quelle que soit leur quantité.",
+    premium: "Premium",
+    premiumDescription:
+      "Objets illimités, le rapport d’assurance et l’export CSV et PDF.",
+    billingPeriod: "Période de facturation",
+    monthly: "Mensuel",
+    yearly: "Annuel",
+    perMonth: "{price} / mois",
+    perYear: "{price} / an",
+    save: "{percent} % d’économie",
+    currencyHint:
+      "Prix en {currency}. Le paiement se fait dans la devise de votre lieu de résidence, sinon en euros, et affiche le prix final.",
+    testMode:
+      "Mode test : aucun paiement réel n’est prélevé. Payez avec la carte de test 4242 4242 4242 4242.",
+    unavailable:
+      "Premium ne peut pas encore être acheté ici : la facturation n’est pas configurée sur cet environnement.",
+    alreadyPremium: "Vous avez déjà Premium.",
+    checkoutFailed: "Impossible d’ouvrir la page de paiement. Réessayez.",
+    price: "Prix",
+    renews: "Renouvellement le",
+    ends: "Fin le",
+    endingNotice:
+      "Premium reste actif jusqu’au {date}. Ensuite, vous passez à la formule gratuite et tous vos objets restent visibles et modifiables.",
+    confirmationTitle: "Paiement",
+    confirmingTitle: "Confirmation du paiement",
+    confirmingDescription:
+      "Cela prend généralement quelques secondes. Premium démarre dès que le paiement est confirmé.",
+    slowDescription:
+      "Cela prend plus de temps que d’habitude. Premium démarrera tout seul une fois le paiement confirmé ; vous pouvez continuer en attendant.",
+    welcomeTitle: "Bienvenue dans Premium",
+    welcomeDescription: "Votre collection n’a plus de limite d’objets.",
+    toCollection: "Aller à la collection",
+    seePlan: "Voir votre formule",
+    backToPlans: "Retour aux formules",
+  },
 } as const satisfies Dictionary;
