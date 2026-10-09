@@ -61,7 +61,13 @@ export function formatMoney(
     currency,
     currencyDisplay,
     ...(signed && { signDisplay: "exceptZero" }),
-    ...(compact && { notation: "compact", maximumFractionDigits: 1 }),
+    // Both digit bounds: older ICU versions otherwise keep the currency's two
+    // decimals, capped at one ("kr 150.0K" instead of "kr 150K").
+    ...(compact && {
+      notation: "compact",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    }),
   }).formatToParts(amountMinor / MINOR_UNITS_PER_MAJOR);
   const symbol = symbolOverrides[currency];
   return parts
