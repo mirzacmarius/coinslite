@@ -20,7 +20,9 @@
     "dev:backend": "turbo dev --filter=@coinslite/backend",
     "setup": "bun --filter @coinslite/backend setup",
     "test:e2e": "playwright test -c tooling/e2e/playwright.config.ts",
-    "format:check": "biome format ."
+    "test:e2e:local": "E2E_LOCAL_BACKEND=1 E2E_APP_PORT=3300 E2E_WEB_PORT=3301 playwright test -c tooling/e2e/playwright.config.ts",
+    "format:check": "biome format .",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
