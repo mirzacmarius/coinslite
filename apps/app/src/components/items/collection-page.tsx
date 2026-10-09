@@ -1,5 +1,6 @@
 "use client";
 
+import { CollectionTotalsSection } from "@/components/collection-totals/collection-totals";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { formatCountry } from "@coinslite/i18n";
@@ -38,6 +39,7 @@ export function CollectionPage() {
           </Button>
         }
       />
+      <CollectionTotalsSection />
       {status === "LoadingFirstPage" ? (
         <ListSkeleton />
       ) : results.length === 0 ? (

@@ -677,4 +677,38 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
     },
   },
+  collectionTotals: {
+    title: "Summen der Sammlung",
+    items: "Objekte",
+    itemsHint: "Jedes Objekt zählt einmal, egal wie hoch die Anzahl ist",
+    pieces: "Stück",
+    typesPlural: {
+      coin: "Münzen",
+      banknote: "Banknoten",
+      stamp: "Briefmarken",
+    },
+    purchasePrice: "Kaufpreis gesamt",
+    marketValue: "Marktwert gesamt",
+    gainLoss: "Gewinn/Verlust",
+    gainLossPartial: "Objekte mit Kaufpreis und Marktwert: {count} von {total}",
+    gainLossNone: "Erscheint, sobald ein Objekt Kaufpreis und Marktwert hat",
+    metalValue: {
+      gold: "Metallwert Gold",
+      silver: "Metallwert Silber",
+    },
+    fineWeight: "{grams}\u00a0g Feingewicht · {ounces}\u00a0oz\u00a0t",
+    noSpotPrices: "Warte auf Spotpreise",
+    view: "Ansicht",
+    chart: "Diagramm",
+    table: "Tabelle",
+    valueByDateAdded: "Wert nach Hinzufügedatum",
+    valueByDateAddedDescription:
+      "Kaufpreis und Marktwert von allem, was bis zum Ende jedes Monats hinzugefügt wurde",
+    month: "Monat",
+    monthKeys: "Mit den Pfeiltasten zwischen den Monaten wechseln.",
+    valueDistribution: "Wertverteilung",
+    valueDistributionDescription:
+      "Nach Objektart, dazu der Metallwert von Gold und Silber",
+    part: "Objektart oder Metall",
+  },
 } as const satisfies Dictionary;

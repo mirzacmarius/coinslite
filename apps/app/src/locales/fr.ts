@@ -664,4 +664,40 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
     },
   },
+  collectionTotals: {
+    title: "Totaux de la collection",
+    items: "Objets",
+    itemsHint: "Chaque objet compte une fois, quelle que soit sa quantité",
+    pieces: "Exemplaires",
+    typesPlural: {
+      coin: "Pièces",
+      banknote: "Billets",
+      stamp: "Timbres",
+    },
+    purchasePrice: "Prix d’achat total",
+    marketValue: "Valeur de marché totale",
+    gainLoss: "Gain/perte",
+    gainLossPartial:
+      "Objets avec un prix d’achat et une valeur de marché : {count} sur {total}",
+    gainLossNone:
+      "S’affiche dès qu’un objet a un prix d’achat et une valeur de marché",
+    metalValue: {
+      gold: "Valeur du métal (or)",
+      silver: "Valeur du métal (argent)",
+    },
+    fineWeight: "{grams}\u00a0g de métal fin · {ounces}\u00a0oz\u00a0t",
+    noSpotPrices: "En attente des cours spot",
+    view: "Affichage",
+    chart: "Graphique",
+    table: "Tableau",
+    valueByDateAdded: "Valeur par date d’ajout",
+    valueByDateAddedDescription:
+      "Prix d’achat et valeur de marché de tout ce qui a été ajouté à la fin de chaque mois",
+    month: "Mois",
+    monthKeys: "Utilisez les flèches pour passer d’un mois à l’autre.",
+    valueDistribution: "Répartition de la valeur",
+    valueDistributionDescription:
+      "Par type d’objet, plus la valeur du métal pour l’or et l’argent",
+    part: "Type d’objet ou métal",
+  },
 } as const satisfies Dictionary;

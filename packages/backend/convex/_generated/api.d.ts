@@ -29,6 +29,7 @@ import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSi
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_tree from "../catalog/tree.js";
+import type * as collectionTotals from "../collectionTotals.js";
 import type * as crons from "../crons.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
@@ -42,6 +43,7 @@ import type * as items_grades from "../items/grades.js";
 import type * as items_preciousMetal from "../items/preciousMetal.js";
 import type * as items_rules from "../items/rules.js";
 import type * as items_thumbnail from "../items/thumbnail.js";
+import type * as items_totals from "../items/totals.js";
 import type * as metalValues from "../metalValues.js";
 import type * as photos from "../photos.js";
 import type * as photos_rules from "../photos/rules.js";
@@ -85,6 +87,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/fields": typeof catalog_fields;
   "catalog/seed": typeof catalog_seed;
   "catalog/tree": typeof catalog_tree;
+  collectionTotals: typeof collectionTotals;
   crons: typeof crons;
   "email/index": typeof email_index;
   env: typeof env;
@@ -98,6 +101,7 @@ declare const fullApi: ApiFromModules<{
   "items/preciousMetal": typeof items_preciousMetal;
   "items/rules": typeof items_rules;
   "items/thumbnail": typeof items_thumbnail;
+  "items/totals": typeof items_totals;
   metalValues: typeof metalValues;
   photos: typeof photos;
   "photos/rules": typeof photos_rules;
