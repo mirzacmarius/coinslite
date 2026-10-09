@@ -409,6 +409,10 @@ test("every group of facts, notes and images names its source, and none may come
       { row: 3, column: "facts_source", code: "SOURCE_REQUIRED" },
       { row: 4, column: "notes_source", code: "SOURCE_REQUIRED" },
       { row: 5, column: "image_source", code: "SOURCE_REQUIRED" },
+      // An image also needs its author, licence and link.
+      { row: 5, column: "image_author", code: "CREDIT_REQUIRED" },
+      { row: 5, column: "image_licence", code: "CREDIT_REQUIRED" },
+      { row: 5, column: "image_link", code: "CREDIT_REQUIRED" },
       { row: 6, column: "facts_source", code: "SOURCE_REQUIRED" },
       { row: 7, column: "facts_source", code: "NUMISTA_DATA" },
       { row: 8, column: "image_url", code: "NUMISTA_DATA" },

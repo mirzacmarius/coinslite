@@ -6,6 +6,7 @@ import {
   albumColour,
   catalogItemType,
   catalogKind,
+  featureFlag,
   gradingScale,
   homeCurrency,
   itemType,
@@ -225,8 +226,14 @@ export default defineSchema({
     historicalNotes: v.optional(v.string()),
     notesProvenance: v.optional(provenance),
 
+    // The image: one an admin uploaded (catalog/images.ts), else one linked
+    // from a Catalog CSV file, credited in imageProvenance.
     imageUrl: v.optional(v.string()),
     imageProvenance: v.optional(provenance),
+    /** An uploaded image as WebP files: full size and a thumbnail. */
+    imageFiles: v.optional(
+      v.object({ full: v.id("_storage"), thumbnail: v.id("_storage") }),
+    ),
 
     /** A cross-reference only: no Numista data is ever stored (ADR 0003). */
     numistaId: v.optional(v.number()),
@@ -261,6 +268,9 @@ export default defineSchema({
       "yearFrom",
       "sortOrder",
     ])
+    // So each stored file is on at most one entry (utils/files.ts).
+    .index("by_imageFiles_full", ["imageFiles.full"])
+    .index("by_imageFiles_thumbnail", ["imageFiles.thumbnail"])
     .searchIndex("search_searchText", {
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
@@ -312,6 +322,12 @@ export default defineSchema({
   })
     .index("by_polarId", ["polarId"])
     .index("by_userId_and_premium", ["userId", "premium"]),
+
+  /**
+   * Feature flags admins switch in the app (featureFlags.ts): one document per
+   * flag that has been set; a flag without one holds its default.
+   */
+  featureFlags: defineTable(featureFlag).index("by_key", ["key"]),
 
   /**
    * How many Items (in all and of each Item type) and Albums each person has:

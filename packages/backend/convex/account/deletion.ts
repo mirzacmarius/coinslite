@@ -63,6 +63,7 @@ export const accountDataByTable = {
     "deleted: emails sent to the account's address (local and CI deployments only)",
   catalogNodes: "kept: the Catalog everyone shares",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",
+  featureFlags: "kept: the feature flags that apply to everyone",
 } as const satisfies Record<TableNames, `${"deleted" | "kept"}${string}`>;
 
 /** How many Items the confirmation counts before it says there are more. */

@@ -52,6 +52,8 @@ export const catalogErrors = {
   notForType: "FIELD_NOT_FOR_TYPE",
   yearsReversed: "YEARS_REVERSED",
   sourceRequired: "SOURCE_REQUIRED",
+  /** An image needs its source, author, licence and link. */
+  creditRequired: "CREDIT_REQUIRED",
   rootNotAddable: "ROOT_NOT_ADDABLE",
   // Its place in the tree
   parentNotFound: "PARENT_NOT_FOUND",
@@ -493,10 +495,15 @@ export function readCatalogFile(csv: string): {
   return { rows, errors };
 }
 
-/** The rules a node's values must meet once the file is merged into it. */
+/**
+ * The rules a node's values must meet once the file is merged into it.
+ * `uploadedImage` says the node keeps an image an admin uploaded, which the
+ * file's image credit then covers.
+ */
 export function checkNode(
   values: Partial<NodeValues>,
   kind: CatalogKind,
+  { uploadedImage = false }: { uploadedImage?: boolean } = {},
 ): Array<{ column: string; code: CatalogError }> {
   const problems: Array<{ column: string; code: CatalogError }> = [];
   if (kind === "entry" && values.itemType === undefined)
@@ -521,9 +528,9 @@ export function checkNode(
     problems.push({ column: "year_to", code: catalogErrors.yearsReversed });
   // Catalog data of unknown origin is never stored (ADR 0003).
   for (const group of provenanceGroups) {
-    const hasData = groupValues[group].some(
-      (value) => values[value] !== undefined,
-    );
+    const hasData =
+      groupValues[group].some((value) => values[value] !== undefined) ||
+      (group === "image" && uploadedImage);
     const credited = provenanceParts.some(
       (part) => values[provenanceKey(group, part)] !== undefined,
     );
@@ -535,6 +542,16 @@ export function checkNode(
         column: `${group}_source`,
         code: catalogErrors.sourceRequired,
       });
+  }
+  // Every image is credited in full: source, author, licence and link.
+  if (values.imageUrl !== undefined || uploadedImage) {
+    for (const part of ["author", "licence", "link"] as const) {
+      if (values[provenanceKey("image", part)] === undefined)
+        problems.push({
+          column: `image_${part}`,
+          code: catalogErrors.creditRequired,
+        });
+    }
   }
   return problems;
 }

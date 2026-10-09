@@ -6,6 +6,7 @@ import {
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { type QueryCtx, query } from "../_generated/server";
+import { catalogVisibleTo } from "../featureFlags";
 import { compareDenominations } from "../items/denominations";
 import { requireSetUpUser } from "../utils/auth";
 import {
@@ -15,6 +16,7 @@ import {
   provenance,
   strike,
 } from "../utils/validators";
+import { creditRequired } from "./imageRules";
 
 /**
  * Browsing the Catalog: countries and Themes, down through grouping nodes or
@@ -59,12 +61,22 @@ const byEntryCount = (
   b: { entryCount: number; title: string },
 ) => b.entryCount - a.entryCount || a.title.localeCompare(b.title);
 
+/**
+ * The set-up person browsing, or null while the Catalog is hidden from them
+ * (the Catalog visibility flag, featureFlags.ts): then every level reads as
+ * empty, as if there were no Catalog.
+ */
+async function browsingUser(ctx: QueryCtx) {
+  const user = await requireSetUpUser(ctx);
+  return (await catalogVisibleTo(ctx, user)) ? user : null;
+}
+
 /** The countries and Themes at the top of the Catalog, with their entry counts, most entries first. */
 export const roots = query({
   args: {},
   returns: v.array(groupRow),
   handler: async (ctx) => {
-    await requireSetUpUser(ctx);
+    if (!(await browsingUser(ctx))) return [];
     const nodes = await ctx.db
       .query("catalogNodes")
       .withIndex("by_parentId_and_sortOrder", (q) =>
@@ -130,7 +142,10 @@ const entryFields = {
   diameter: v.optional(v.number()),
   yearFrom: v.optional(v.number()),
   yearTo: v.optional(v.number()),
+  /** The image at full size: an uploaded one, else one linked from a CSV file. */
   imageUrl: v.optional(v.string()),
+  /** The image at thumbnail size, for rows; a linked image has only one size. */
+  thumbnailUrl: v.optional(v.string()),
   /** How many pieces of it the person holds. */
   held: v.number(),
 };
@@ -170,7 +185,6 @@ const rowFieldNames = [
   "diameter",
   "yearFrom",
   "yearTo",
-  "imageUrl",
 ] as const;
 
 /** What only an entry's detail view shows. */
@@ -195,11 +209,31 @@ function pick<T extends object, K extends keyof T>(
   return picked;
 }
 
+/** Links to an entry's image at both sizes, if it has one. */
+async function imageOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
+  if (node.imageFiles) {
+    const imageUrl = await ctx.storage.getUrl(node.imageFiles.full);
+    const thumbnailUrl = await ctx.storage.getUrl(node.imageFiles.thumbnail);
+    return {
+      ...(imageUrl && { imageUrl }),
+      ...(thumbnailUrl && { thumbnailUrl }),
+    };
+  }
+  if (node.imageUrl)
+    return { imageUrl: node.imageUrl, thumbnailUrl: node.imageUrl };
+  return {};
+}
+
 /** An entry as a row of a list, with how many the person holds. */
-const entryRowOf = (node: Doc<"catalogNodes">, held: number) => ({
+const entryRowOf = async (
+  ctx: QueryCtx,
+  node: Doc<"catalogNodes">,
+  held: number,
+) => ({
   key: node.key,
   title: node.title,
   ...pick(node, rowFieldNames),
+  ...(await imageOf(ctx, node)),
   held,
 });
 
@@ -212,14 +246,19 @@ export const node = query({
   args: { key: v.string() },
   returns: v.union(v.null(), entryDetail, groupDetail),
   handler: async (ctx, { key }) => {
-    const user = await requireSetUpUser(ctx);
+    const user = await browsingUser(ctx);
+    if (!user) return null;
     const node = await nodeByKey(ctx, key);
     if (!node) return null;
     const ancestors = await ancestorsOf(ctx, node);
 
     if (node.kind === "entry") {
       return {
-        ...entryRowOf(node, await heldCount(ctx, user._id, node._id)),
+        ...(await entryRowOf(
+          ctx,
+          node,
+          await heldCount(ctx, user._id, node._id),
+        )),
         kind: "entry" as const,
         ...pick(node, detailFieldNames),
         ancestors,
@@ -248,7 +287,11 @@ export const node = query({
   },
 });
 
-const entryRow = v.object(entryFields);
+const entryRow = v.object({
+  ...entryFields,
+  /** Who to credit beside the thumbnail, when the image's licence asks for it. */
+  imageCredit: v.optional(provenance),
+});
 type EntryRow = typeof entryRow.type;
 
 /** A page of Catalog entries as rows, with how many of each the person holds. */
@@ -258,9 +301,17 @@ async function entryRows(
   page: PaginationResult<Doc<"catalogNodes">>,
 ): Promise<PaginationResult<EntryRow>> {
   const rows = await Promise.all(
-    page.page.map(async (node) =>
-      entryRowOf(node, await heldCount(ctx, ownerId, node._id)),
-    ),
+    page.page.map(async (node) => {
+      const row = await entryRowOf(
+        ctx,
+        node,
+        await heldCount(ctx, ownerId, node._id),
+      );
+      const credit = node.imageProvenance;
+      return row.thumbnailUrl && credit && creditRequired(credit.licence)
+        ? { ...row, imageCredit: credit }
+        : row;
+    }),
   );
   return { ...page, page: rows };
 }
@@ -276,7 +327,8 @@ export const entries = query({
   args: { key: v.string(), paginationOpts: paginationOptsValidator },
   returns: paginationResultValidator(entryRow),
   handler: async (ctx, { key, paginationOpts }) => {
-    const user = await requireSetUpUser(ctx);
+    const user = await browsingUser(ctx);
+    if (!user) return noEntries;
     const parent = await nodeByKey(ctx, key);
     if (!parent) return noEntries;
     const page = await ctx.db
@@ -358,7 +410,7 @@ export const denominations = query({
     v.object({ denomination: nullable, seriesCount: v.number() }),
   ),
   handler: async (ctx, { key }) => {
-    await requireSetUpUser(ctx);
+    if (!(await browsingUser(ctx))) return [];
     const rows = [];
     for (const denomination of await denominationsIn(ctx, key)) {
       rows.push({
@@ -386,7 +438,7 @@ export const series = query({
     }),
   ),
   handler: async (ctx, { key, denomination }) => {
-    await requireSetUpUser(ctx);
+    if (!(await browsingUser(ctx))) return [];
     const rows = [];
     for (const series of await seriesIn(ctx, key, stored(denomination))) {
       const entries = () =>
@@ -431,7 +483,8 @@ export const seriesEntries = query({
   },
   returns: paginationResultValidator(entryRow),
   handler: async (ctx, { key, denomination, series, paginationOpts }) => {
-    const user = await requireSetUpUser(ctx);
+    const user = await browsingUser(ctx);
+    if (!user) return noEntries;
     const page = await ctx.db
       .query("catalogNodes")
       .withIndex(byDenomination, (q) =>

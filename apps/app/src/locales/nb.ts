@@ -268,8 +268,6 @@ export default {
   dashboard: {
     headerTitle: "Oversikt",
     headerDescription: "Oversikt over samlingen din.",
-    bodyTitle: "Velkommen til CoinsLite",
-    bodyDescription: "Samlingen din vises her.",
   },
   account: {
     pageTitle: "Konto",
@@ -667,6 +665,8 @@ export default {
       YEARS_REVERSED: "Siste år kommer før det første.",
       SOURCE_REQUIRED:
         "Oppgi kilden til disse faktaene, notatene eller bildet.",
+      CREDIT_REQUIRED:
+        "Et bilde trenger kilde, opphavsperson, lisens og lenke.",
       ROOT_NOT_ADDABLE:
         "Et land eller et tema kan ikke være en katalogoppføring. Gi raden en parent_id.",
       PARENT_NOT_FOUND: "Ingen rad i filen eller katalogen har denne id-en.",
@@ -878,6 +878,112 @@ export default {
       "Etter objekttype, pluss metallverdien av gull og sølv",
     part: "Objekttype eller metall",
   },
+  catalogImages: {
+    add: "Legg til bilde",
+    edit: "Rediger bilde",
+    remove: "Fjern bilde",
+    title: "Bilde",
+    description:
+      "Last opp et bilde for denne katalogoppføringen, og oppgi hvor det kommer fra.",
+    choose: "Velg bilde",
+    chooseAnother: "Velg et annet bilde",
+    formats: "JPEG, PNG, WebP eller GIF, opptil 25 MB.",
+    sizes:
+      "Lagres som WebP, høyst 800 px på den lengste siden, med et miniatyrbilde på 128 px. Mindre bilder beholder størrelsen.",
+    current: "Det nåværende bildet. Velg et annet for å bytte det ut.",
+    converting: "Konverterer …",
+    converted: "{full} px WebP, miniatyrbilde {thumbnail} px",
+    credit: "Kreditering",
+    creditHint:
+      "Kreves for hvert bilde. Lister viser den ved miniatyrbildet med mindre bildet er falt i det fri (public domain) eller CC0, og oppføringen viser den alltid.",
+    source: "Kilde",
+    sourcePlaceholder: "Wikimedia Commons",
+    author: "Opphavsperson",
+    authorPlaceholder: "Navnet på fotografen eller skaperen",
+    licence: "Lisens",
+    licencePlaceholder: "CC BY-SA 4.0",
+    link: "Lenke",
+    linkPlaceholder: "https://",
+    cancel: "Avbryt",
+    close: "Lukk",
+    save: "Lagre",
+    saved: "Bildet er lagret",
+    creditSaved: "Krediteringen er lagret",
+    removeTitle: "Fjerne bildet av «{title}»?",
+    removeBody:
+      "Filene og krediteringen slettes. Oppføringen viser en plassholder til et nytt bilde legges til.",
+    removed: "Bildet er fjernet",
+    errors: {
+      imageRequired: "Velg et bilde.",
+      sourceRequired: "Oppgi kilden.",
+      authorRequired: "Oppgi opphavspersonen.",
+      licenceRequired: "Oppgi lisensen.",
+      linkRequired: "Oppgi lenken.",
+      tooLong: "Bruk høyst {max} tegn.",
+      invalidLink:
+        "Skriv en fullstendig nettadresse som begynner med https://.",
+      numista: "Ingen data fra Numista kan lagres.",
+      failed: "Bildet kunne ikke lagres. Prøv igjen.",
+      removeFailed: "Bildet kunne ikke fjernes. Prøv igjen.",
+      CATALOG_ENTRY_NOT_FOUND: "Denne katalogoppføringen finnes ikke lenger.",
+      IMAGE_NOT_FOUND: "Opplastingen kom ikke frem. Prøv igjen.",
+      IMAGE_NOT_WEBP: "Bildet ble ikke lagret som WebP. Prøv igjen.",
+      IMAGE_TOO_LARGE:
+        "Det konverterte bildet er for stort. Prøv et mindre bilde.",
+      THUMBNAIL_TOO_LARGE:
+        "Det konverterte miniatyrbildet er for stort. Prøv igjen.",
+      NO_IMAGE:
+        "Denne oppføringen har ikke noe bilde å kreditere. Velg et bilde.",
+      CREDIT_REQUIRED: "Oppgi kilde, opphavsperson, lisens og lenke.",
+      TOO_LONG: "En del av krediteringen er for lang.",
+      INVALID_URL:
+        "Skriv en fullstendig nettadresse som begynner med https://.",
+      NUMISTA_DATA: "Ingen data fra Numista kan lagres.",
+      IMAGE_UNREADABLE:
+        "Filen kan ikke leses som et bilde. Velg en JPEG, PNG, WebP eller GIF.",
+      ORIGINAL_TOO_LARGE: "Velg et bilde på opptil 25 MB.",
+      WEBP_UNSUPPORTED:
+        "Denne nettleseren kan ikke lagre WebP-bilder. Prøv en annen, for eksempel Chrome eller Firefox.",
+      NOT_ADMIN: "Bare administratorer kan endre katalogbilder.",
+    },
+  },
+  featureFlags: {
+    menu: "Funksjonsflagg",
+    title: "Funksjonsflagg",
+    notAvailable: "Denne siden er ikke tilgjengelig",
+    notAvailableDescription:
+      "Bare administratorer kan slå funksjoner av og på.",
+    description: "Endringer gjelder for alle med en gang.",
+    catalog: "Vis katalogen",
+    catalogDescription:
+      "Når den er av, ser bare administratorer katalogen. Alle andre finner den ikke lenger i navigasjonen, ved blaing eller i søk.",
+    scanner: "Skanner",
+    scannerDescription:
+      "Hvem som kan fotografere en mynt og få foreslått en katalogoppføring. Administratorer kan det så lenge den ikke er av.",
+    scannerOptions: {
+      off: "Av",
+      admins: "Bare administratorer",
+      premiumBeta: "Premium-beta",
+    },
+    saved: "Funksjonsflagget er oppdatert",
+    saveFailed: "Funksjonsflagget kunne ikke oppdateres. Prøv igjen.",
+    catalogHiddenTitle: "Katalogen er ikke tilgjengelig",
+    catalogHiddenDescription:
+      "Den er slått av foreløpig. Objektene dine påvirkes ikke.",
+  },
+  overview: {
+    addShortcuts: "Legg til i samlingen",
+    add: {
+      coin: "Legg til mynt",
+      banknote: "Legg til seddel",
+      stamp: "Legg til frimerke",
+    },
+    latestItems: "Nyeste objekter",
+    viewCollection: "Vis samlingen",
+    firstRunTitle: "Start samlingen din",
+    firstRunDescription:
+      "Legg til en mynt, en seddel eller et frimerke du eier. Da vises totalene og de nyeste objektene her.",
+  },
   adminStats: {
     menu: "Statistikk",
     title: "Statistikk",
@@ -936,9 +1042,85 @@ export default {
     "inView#few": "{count} objekter i denne visningen",
     "inView#other": "{count} objekter i denne visningen",
     csv: "Eksporter som CSV",
+    pdf: "Eksporter som PDF",
+    pdfTooLarge:
+      "En PDF viser opptil {limit} objekter. Snevre inn visningen for å eksportere den.",
     premiumOnly: "Eksport av samlingen er en del av Premium.",
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",
+  },
+  catalogPicker: {
+    title: "Velg fra katalogen",
+    placeholder: {
+      coin: "Søk blant mynter etter tittel, pålydende, serie eller land…",
+      banknote: "Søk blant sedler etter tittel, pålydende, serie eller land…",
+    },
+    pickHint: "for å velge",
+    manual: "Legg til manuelt",
+    recent: "Nylig valgt",
+    browse: "Bla i katalogen",
+    back: "Tilbake",
+    empty: "Katalogen har ingenting å velge ennå.",
+    failed:
+      "Katalogoppføringen kunne ikke lastes. Velg den på nytt, eller legg til objektet manuelt.",
+    entry: "Katalogoppføring",
+    pick: "Velg fra katalogen",
+    factsHint:
+      "Disse opplysningene kommer fra katalogoppføringen og følger rettelsene i den. Endrer du en, beholdes din verdi; tømmer du feltet, brukes oppføringens verdi igjen.",
+  },
+  quickAdd: {
+    add: "Legg til i samlingen",
+    title: "Legg til i samlingen",
+    description:
+      "Legg til denne katalogoppføringen i samlingen som ett objekt.",
+    added: "Objektet er lagt til i samlingen",
+    open: "Åpne",
+    failed: "Objektet kunne ikke legges til. Prøv igjen.",
+  },
+  insuranceReport: {
+    title: "Forsikringsrapport",
+    lockedTitle: "Forsikringsrapporten er en del av Premium",
+    lockedDescription:
+      "En PDF til forsikringsselskapet med objektene du velger, verdiene deres, kontaktopplysningene dine og totalene.",
+    scopeTitle: "Objekter",
+    scopeDescription: "Velg hvilke objekter rapporten skal omfatte.",
+    scope: "Omfang",
+    wholeCollection: "Hele samlingen",
+    albums: "Album",
+    withoutAlbum: "Objekter uten album",
+    noAlbums: "Du har ingen album ennå.",
+    chooseScope: "Velg minst ett album, eller objekter uten album.",
+    valuesTitle: "Verdier",
+    valuesDescription:
+      "Forsikringsverdien er den høyeste av de valgte verdiene for hvert objekt.",
+    keepOne: "Behold minst én av innkjøpspris, markedsverdi og metallverdi.",
+    columns: {
+      purchasePrice: "Innkjøpspris",
+      marketValue: "Markedsverdi",
+      metalValue: "Metallverdi",
+      insuredValue: "Forsikringsverdi",
+    },
+    previewTitle: "Forhåndsvisning",
+    previewDescription: "Hver total gjelder alle stykkene i hvert objekt.",
+    items: "Objekter",
+    pieces: "Stykker",
+    noSpotPrices: "Ingen spotpriser ennå, så ingen objekter har metallverdi.",
+    staleSpotPrices: "Spotprisene kan være utdaterte.",
+    tooLarge: "En rapport kan ha høyst {limit} objekter. Velg færre album.",
+    nothingToReport: "Det er ingen objekter å rapportere her.",
+    ownerTitle: "Eier",
+    ownerDescription: "Vises i rapporten, hentet fra kontoen din.",
+    editContact: "Endre i Konto",
+    missingContact:
+      "Legg inn fullt navn, telefon og adresse under Konto, så forsikringsselskapet kan nå deg.",
+    download: "Last ned PDF",
+    downloaded: "Forsikringsrapporten er lastet ned",
+    failed: "Kunne ikke lage rapporten. Prøv igjen.",
+    errors: {
+      PREMIUM_REQUIRED: "Forsikringsrapporten er en del av Premium.",
+      REPORT_TOO_LARGE: "Rapporten har for mange objekter. Velg færre album.",
+      ALBUM_NOT_FOUND: "Et av de valgte albumene finnes ikke lenger.",
+    },
   },
   adminUsers: {
     menu: "Brukere",

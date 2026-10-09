@@ -1,5 +1,12 @@
+import { readFile } from "node:fs/promises";
 import { type Locator, type Page, expect, test } from "@playwright/test";
-import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
+import {
+  newEmail,
+  runInBackend,
+  signUpAndVerify,
+  visiblePage,
+} from "../support/accounts";
+import { addManually } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -8,9 +15,10 @@ test.skip(
 );
 test.use({ locale: "en-US" });
 
-/** Adds an Item of the given type with just a title. */
+/** Adds an Item of the given type with just a title, typed in rather than picked from the Catalog. */
 async function addItem(page: Page, main: Locator, title: string, type: string) {
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill(title);
   if (type !== "Coin") {
@@ -66,7 +74,10 @@ test("search, filter, sort and switch views, with the view kept in the URL", asy
   await expect(
     reloaded.getByRole("listitem").getByRole("link").first(),
   ).toContainText("Posthorn");
-  await page.getByRole("radio", { name: "Grid" }).check();
+  // The radio itself is visually hidden; people pick the segment's label.
+  const display = page.getByRole("dialog");
+  await display.getByText("Grid", { exact: true }).click();
+  await expect(display.getByRole("radio", { name: "Grid" })).toBeChecked();
   await page.keyboard.press("Escape");
   await page.goto(`${appUrl}/collection`);
   const later = visiblePage(page);
@@ -109,4 +120,56 @@ test("on the Free plan, Export shows the way to Premium instead of a file", asyn
   ).toBeVisible();
   await page.getByRole("menuitem", { name: "Upgrade to Premium" }).click();
   await expect(page).toHaveURL(/\/settings\/billing$/);
+});
+
+test("a Premium member exports the Collection view as a PDF and as a CSV", async ({
+  page,
+}) => {
+  const email = newEmail();
+  await signUpAndVerify(page, email);
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Posthorn", "Stamp");
+  // Premium, here without a payment.
+  runInBackend("testing/premium:grant", { email });
+
+  // The exports cover the view on screen.
+  await main.getByLabel("Search the Collection").fill("krone");
+  await expect(page).toHaveURL(/[?&]q=krone/);
+  await expect(main.getByRole("listitem").getByRole("link")).toHaveCount(1);
+
+  const menu = page.getByRole("menu");
+  const openExport = async (format: "PDF" | "CSV") => {
+    const entry = menu.getByRole("menuitem", { name: `Export as ${format}` });
+    // Retried until the menu shows Premium's entries.
+    await expect(async () => {
+      if (await menu.isVisible()) await page.keyboard.press("Escape");
+      await main.getByRole("button", { name: "Export" }).click();
+      await expect(menu.getByText("1 Item in this view")).toBeVisible({
+        timeout: 1000,
+      });
+      await expect(entry).toBeEnabled({ timeout: 1000 });
+    }).toPass();
+    return entry;
+  };
+
+  const pdfDownload = page.waitForEvent("download");
+  await (await openExport("PDF")).click();
+  const pdf = await pdfDownload;
+  expect(pdf.suggestedFilename()).toMatch(
+    /^coinslite-collection-\d{4}-\d{2}-\d{2}\.pdf$/,
+  );
+  const pdfFile = await readFile(await pdf.path());
+  expect(pdfFile.subarray(0, 5).toString("latin1")).toBe("%PDF-");
+
+  const csvDownload = page.waitForEvent("download");
+  await (await openExport("CSV")).click();
+  const csv = await csvDownload;
+  expect(csv.suggestedFilename()).toMatch(
+    /^coinslite-collection-\d{4}-\d{2}-\d{2}\.csv$/,
+  );
+  const csvText = await readFile(await csv.path(), "utf8");
+  expect(csvText).toContain("Krone 1875");
+  expect(csvText).not.toContain("Posthorn");
 });

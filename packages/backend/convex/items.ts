@@ -1,4 +1,7 @@
-import { paginationOptsValidator } from "convex/server";
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
@@ -9,13 +12,24 @@ import {
 } from "./_generated/server";
 import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
+import { catalogVisibleTo } from "./featureFlags";
+import { overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
-import { checkItem } from "./items/rules";
+import {
+  type CatalogEntryLink,
+  catalogEntryByKey,
+  itemResolver,
+  resolveItems,
+} from "./items/resolve";
+import { type ItemInput, checkItem } from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
 import { requireRoomForItems } from "./plans";
+import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
 import {
+  catalogItemType,
   gradingScale,
+  homeCurrency,
   itemType,
   material,
   metal,
@@ -74,49 +88,153 @@ export async function requireOwnItem(
   return item;
 }
 
-/** Adds an Item to the signed-in person's Collection. */
+/** A Catalog key that isn't a Catalog entry's: nothing to add an Item from. */
+export const catalogEntryNotFound = "CATALOG_ENTRY_NOT_FOUND";
+
+/**
+ * The Catalog entry with this key, if the person may see the Catalog: while
+ * it's hidden (featureFlags.ts) only admins add from it.
+ */
+async function visibleCatalogEntry(
+  ctx: QueryCtx,
+  user: Doc<"users">,
+  key: string,
+) {
+  if (!(await catalogVisibleTo(ctx, user))) return null;
+  return await catalogEntryByKey(ctx, key);
+}
+
+async function requireCatalogEntry(
+  ctx: QueryCtx,
+  user: Doc<"users">,
+  key: string,
+) {
+  const entry = await visibleCatalogEntry(ctx, user, key);
+  if (!entry) throw new ConvexError(catalogEntryNotFound);
+  return entry;
+}
+
+/**
+ * Checks the form's fields. An Item linked to a Catalog entry has the
+ * entry's Item type, and stores only the facts that differ from the entry's
+ * (ADR 0001); its weight and purity may rest on the entry's metal.
+ */
+function checkFields(fields: ItemInput, entry: CatalogEntryLink | null) {
+  if (!entry) return checkItem(fields, latestPurchaseDate());
+  const checked = checkItem(
+    {
+      ...fields,
+      type: entry.itemType,
+      metal: fields.metal ?? entry.facts.metal,
+    },
+    latestPurchaseDate(),
+  );
+  return overridesOnly(checked, entry.facts);
+}
+
+/** Stores a new Item in its owner's Collection, and in an Album of theirs if given one. */
+async function insertItem(
+  ctx: MutationCtx,
+  ownerId: Id<"users">,
+  fields: ReturnType<typeof checkFields>,
+  entry: CatalogEntryLink | null,
+  albumId: Id<"albums"> | undefined,
+) {
+  const album = await ownAlbumId(ctx, ownerId, albumId);
+  const itemId = await ctx.db.insert("items", {
+    ownerId,
+    ...fields,
+    ...(entry && { catalogEntryId: entry._id }),
+    ...(album && { albumId: album }),
+  });
+  await moveBetweenAlbums(ctx, undefined, album);
+  await countItemAdded(ctx, { ownerId, type: fields.type });
+  return itemId;
+}
+
+/**
+ * Adds an Item to the signed-in person's Collection: typed in by hand, or
+ * picked from the Catalog (`catalogEntryKey`), when it stays linked to its
+ * Catalog entry and keeps only the facts the person changed.
+ */
 export const add = mutation({
-  args: itemFields,
+  args: { ...itemFields, catalogEntryKey: v.optional(v.string()) },
   returns: v.id("items"),
-  handler: async (ctx, { albumId, ...fields }) => {
+  handler: async (ctx, { albumId, catalogEntryKey, ...fields }) => {
     const owner = await requireSetUpUser(ctx);
     await requireRoomForItems(ctx, owner._id);
-    const album = await ownAlbumId(ctx, owner._id, albumId);
-    const itemId = await ctx.db.insert("items", {
-      ownerId: owner._id,
-      ...checkItem(fields, latestPurchaseDate()),
-      ...(album && { albumId: album }),
-    });
-    await moveBetweenAlbums(ctx, undefined, album);
-    await countItemAdded(ctx, { ownerId: owner._id, type: fields.type });
-    return itemId;
+    const entry =
+      catalogEntryKey === undefined
+        ? null
+        : await requireCatalogEntry(ctx, owner, catalogEntryKey);
+    return await insertItem(
+      ctx,
+      owner._id,
+      checkFields(fields, entry),
+      entry,
+      albumId,
+    );
   },
 });
 
-/** Saves the whole Item form: a field left empty is cleared. */
+/**
+ * Quick add from a Catalog entry's page: ONE Item, linked to the entry and
+ * titled after it, with the Quantity, Grade and Album chosen. Every other
+ * fact is the entry's.
+ */
+export const quickAdd = mutation({
+  args: {
+    catalogEntryKey: v.string(),
+    quantity: v.optional(v.number()),
+    grade: v.optional(v.string()),
+    gradingScale: v.optional(gradingScale),
+    albumId: v.optional(v.id("albums")),
+  },
+  returns: v.id("items"),
+  handler: async (ctx, { catalogEntryKey, albumId, ...chosen }) => {
+    const owner = await requireSetUpUser(ctx);
+    await requireRoomForItems(ctx, owner._id);
+    const entry = await requireCatalogEntry(ctx, owner, catalogEntryKey);
+    const fields = checkFields(
+      { type: entry.itemType, title: entry.title, ...chosen },
+      entry,
+    );
+    return await insertItem(ctx, owner._id, fields, entry, albumId);
+  },
+});
+
+/**
+ * Saves the whole Item form: a field left empty is cleared. On an Item
+ * linked to a Catalog entry, a fact left empty or set to the entry's follows
+ * the entry again; only the facts that differ are kept as the person's.
+ */
 export const update = mutation({
   args: { itemId: v.id("items"), ...itemFields },
   returns: v.null(),
   handler: async (ctx, { itemId, albumId, ...fields }) => {
     const item = await requireOwnItem(ctx, itemId);
     const album = await ownAlbumId(ctx, item.ownerId, albumId);
+    const entry = await itemResolver(ctx).entryOf(item);
+    const checked = checkFields(fields, entry);
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
     await ctx.db.patch(itemId, {
       ...cleared,
-      ...checkItem(fields, latestPurchaseDate()),
+      ...checked,
       albumId: album,
     });
     await moveBetweenAlbums(ctx, item.albumId, album);
-    await countItemRetyped(ctx, item.ownerId, item.type, fields.type);
+    await countItemRetyped(ctx, item.ownerId, item.type, checked.type);
     return null;
   },
 });
 
 /**
  * A new Item with everything the person set on an existing one, to record a
- * similar piece quickly. Only form fields are copied, so photos stay behind.
+ * similar piece quickly. Only form fields are copied, so photos stay behind;
+ * a copy of a linked Item is linked to the same Catalog entry, with the same
+ * changed facts.
  */
 export const duplicate = mutation({
   args: { itemId: v.id("items") },
@@ -134,6 +252,7 @@ export const duplicate = mutation({
     const copyId = await ctx.db.insert("items", {
       ownerId: item.ownerId,
       ...copy,
+      ...(item.catalogEntryId && { catalogEntryId: item.catalogEntryId }),
       ...(album && { albumId: album }),
     });
     await moveBetweenAlbums(ctx, undefined, album);
@@ -152,12 +271,33 @@ export const remove = mutation({
   },
 });
 
+/** A Catalog entry's facts in Item terms (items/catalogFacts.ts). */
+const catalogFacts = v.object({
+  country: v.optional(v.string()),
+  year: v.optional(v.number()),
+  denomination: v.optional(v.string()),
+  series: v.optional(v.string()),
+  material: v.optional(material),
+  strike: v.optional(strike),
+  diameter: v.optional(v.number()),
+  numistaNumber: v.optional(v.number()),
+  metal: v.optional(metal),
+  weight: v.optional(v.number()),
+  purity: v.optional(v.number()),
+});
+
+const listedItem = schema
+  .doc("items")
+  .extend({ thumbnailUrl: v.union(v.string(), v.null()) });
+
 /**
- * The signed-in person's Items, newest first, a page at a time. Each comes
- * with its thumbnail: the front photo, else the back photo, else null.
+ * The signed-in person's Items, newest first, a page at a time, their facts
+ * resolved. Each comes with its thumbnail: the front photo, else the back
+ * photo, else null.
  */
 export const list = query({
   args: { paginationOpts: paginationOptsValidator },
+  returns: paginationResultValidator(listedItem),
   handler: async (ctx, { paginationOpts }) => {
     const owner = await requireSetUpUser(ctx);
     const items = await ctx.db
@@ -168,20 +308,71 @@ export const list = query({
     return {
       ...items,
       page: await Promise.all(
-        items.page.map((item) => withThumbnail(ctx, item)),
+        (await resolveItems(ctx, items.page)).map((item) =>
+          withThumbnail(ctx, item),
+        ),
       ),
     };
   },
 });
 
-/** One of the signed-in person's Items, with the currency its amounts are in; null if it isn't theirs. */
+/**
+ * One of the signed-in person's Items, its facts resolved, with the currency
+ * its amounts are in and the Catalog entry it's linked to (null for one
+ * added by hand); null if it isn't theirs.
+ */
 export const get = query({
   args: { itemId: v.string() },
+  returns: v.union(
+    v.null(),
+    schema.doc("items").extend({
+      currency: homeCurrency,
+      catalogEntry: v.union(
+        v.null(),
+        v.object({ key: v.string(), title: v.string(), facts: catalogFacts }),
+      ),
+    }),
+  ),
   handler: async (ctx, { itemId }) => {
     const owner = await requireSetUpUser(ctx);
     const id = ctx.db.normalizeId("items", itemId);
     const item = id ? await ctx.db.get(id) : null;
     if (!item || item.ownerId !== owner._id) return null;
-    return { ...item, currency: owner.homeCurrency };
+    const resolver = itemResolver(ctx);
+    const entry = await resolver.entryOf(item);
+    return {
+      ...(await resolver.resolve(item)),
+      currency: owner.homeCurrency,
+      catalogEntry: entry && {
+        key: entry.key,
+        title: entry.title,
+        facts: entry.facts,
+      },
+    };
+  },
+});
+
+/**
+ * A Catalog entry as the Item form takes it when the person picks it: its
+ * title, Item type and facts in Item terms. Null for any other key, and
+ * while the Catalog is hidden from the person.
+ */
+export const catalogEntry = query({
+  args: { key: v.string() },
+  returns: v.union(
+    v.null(),
+    v.object({
+      key: v.string(),
+      title: v.string(),
+      itemType: catalogItemType,
+      facts: catalogFacts,
+    }),
+  ),
+  handler: async (ctx, { key }) => {
+    const user = await requireSetUpUser(ctx);
+    const entry = await visibleCatalogEntry(ctx, user, key);
+    if (!entry) return null;
+    const { _id, ...link } = entry;
+    return link;
   },
 });

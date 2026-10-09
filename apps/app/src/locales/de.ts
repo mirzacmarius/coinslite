@@ -279,8 +279,6 @@ export default {
   dashboard: {
     headerTitle: "Übersicht",
     headerDescription: "Deine Sammlung auf einen Blick.",
-    bodyTitle: "Willkommen bei CoinsLite",
-    bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
   account: {
     pageTitle: "Konto",
@@ -691,6 +689,7 @@ export default {
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED:
         "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
+      CREDIT_REQUIRED: "Ein Bild braucht Quelle, Urheber, Lizenz und Link.",
       ROOT_NOT_ADDABLE:
         "Ein Land oder Thema kann kein Katalogeintrag sein. Gib der Zeile eine parent_id.",
       PARENT_NOT_FOUND:
@@ -907,6 +906,115 @@ export default {
       "Nach Objektart, dazu der Metallwert von Gold und Silber",
     part: "Objektart oder Metall",
   },
+  catalogImages: {
+    add: "Bild hinzufügen",
+    edit: "Bild bearbeiten",
+    remove: "Bild entfernen",
+    title: "Bild",
+    description:
+      "Lade ein Bild für diesen Katalogeintrag hoch und gib an, woher es stammt.",
+    choose: "Bild auswählen",
+    chooseAnother: "Anderes Bild auswählen",
+    formats: "JPEG, PNG, WebP oder GIF, bis 25 MB.",
+    sizes:
+      "Wird als WebP gespeichert, höchstens 800 px an der längsten Seite, mit einem Vorschaubild von 128 px. Kleinere Bilder behalten ihre Größe.",
+    current: "Das aktuelle Bild. Wähle ein anderes, um es zu ersetzen.",
+    converting: "Wird umgewandelt …",
+    converted: "{full} px WebP, Vorschaubild {thumbnail} px",
+    credit: "Bildnachweis",
+    creditHint:
+      "Für jedes Bild erforderlich. Listen zeigen ihn neben dem Vorschaubild, außer das Bild ist gemeinfrei oder CC0; der Eintrag zeigt ihn immer.",
+    source: "Quelle",
+    sourcePlaceholder: "Wikimedia Commons",
+    author: "Urheber",
+    authorPlaceholder: "Name des Fotografen oder Urhebers",
+    licence: "Lizenz",
+    licencePlaceholder: "CC BY-SA 4.0",
+    link: "Link",
+    linkPlaceholder: "https://",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    save: "Speichern",
+    saved: "Bild gespeichert",
+    creditSaved: "Bildnachweis gespeichert",
+    removeTitle: "Bild von „{title}“ entfernen?",
+    removeBody:
+      "Seine Dateien und der Bildnachweis werden gelöscht. Der Eintrag zeigt einen Platzhalter, bis ein anderes Bild hinzugefügt wird.",
+    removed: "Bild entfernt",
+    errors: {
+      imageRequired: "Wähle ein Bild aus.",
+      sourceRequired: "Gib die Quelle an.",
+      authorRequired: "Gib den Urheber an.",
+      licenceRequired: "Gib die Lizenz an.",
+      linkRequired: "Gib den Link an.",
+      tooLong: "Verwende höchstens {max} Zeichen.",
+      invalidLink:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      numista: "Daten von Numista dürfen nicht gespeichert werden.",
+      failed: "Das Bild konnte nicht gespeichert werden. Versuche es erneut.",
+      removeFailed:
+        "Das Bild konnte nicht entfernt werden. Versuche es erneut.",
+      CATALOG_ENTRY_NOT_FOUND: "Diesen Katalogeintrag gibt es nicht mehr.",
+      IMAGE_NOT_FOUND: "Der Upload ist nicht angekommen. Versuche es erneut.",
+      IMAGE_NOT_WEBP:
+        "Das Bild wurde nicht als WebP gespeichert. Versuche es erneut.",
+      IMAGE_TOO_LARGE:
+        "Das umgewandelte Bild ist zu groß. Versuche es mit einem kleineren Bild.",
+      THUMBNAIL_TOO_LARGE:
+        "Das umgewandelte Vorschaubild ist zu groß. Versuche es erneut.",
+      NO_IMAGE:
+        "Dieser Eintrag hat kein Bild, das nachgewiesen werden kann. Wähle ein Bild aus.",
+      CREDIT_REQUIRED: "Gib Quelle, Urheber, Lizenz und Link an.",
+      TOO_LONG: "Ein Teil des Bildnachweises ist zu lang.",
+      INVALID_URL:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      NUMISTA_DATA: "Daten von Numista dürfen nicht gespeichert werden.",
+      IMAGE_UNREADABLE:
+        "Diese Datei lässt sich nicht als Bild lesen. Wähle ein JPEG, PNG, WebP oder GIF.",
+      ORIGINAL_TOO_LARGE: "Wähle ein Bild mit höchstens 25 MB.",
+      WEBP_UNSUPPORTED:
+        "Dieser Browser kann keine WebP-Bilder speichern. Versuche es mit einem anderen, etwa Chrome oder Firefox.",
+      NOT_ADMIN: "Nur Admins können Katalogbilder ändern.",
+    },
+  },
+  featureFlags: {
+    menu: "Funktionsschalter",
+    title: "Funktionsschalter",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription:
+      "Nur Admins können Funktionen ein- und ausschalten.",
+    description: "Änderungen gelten sofort für alle.",
+    catalog: "Katalog anzeigen",
+    catalogDescription:
+      "Wenn aus, sehen nur Admins den Katalog. Alle anderen finden ihn nicht mehr in der Navigation, beim Stöbern oder in der Suche.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Wer eine Münze fotografieren kann, um einen passenden Katalogeintrag vorgeschlagen zu bekommen. Admins können es, solange er nicht aus ist.",
+    scannerOptions: {
+      off: "Aus",
+      admins: "Nur Admins",
+      premiumBeta: "Premium-Beta",
+    },
+    saved: "Funktionsschalter aktualisiert",
+    saveFailed:
+      "Der Funktionsschalter konnte nicht aktualisiert werden. Versuche es noch einmal.",
+    catalogHiddenTitle: "Der Katalog ist nicht verfügbar",
+    catalogHiddenDescription:
+      "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
+  },
+  overview: {
+    addShortcuts: "Zur Sammlung hinzufügen",
+    add: {
+      coin: "Münze hinzufügen",
+      banknote: "Banknote hinzufügen",
+      stamp: "Briefmarke hinzufügen",
+    },
+    latestItems: "Neueste Objekte",
+    viewCollection: "Sammlung ansehen",
+    firstRunTitle: "Beginne deine Sammlung",
+    firstRunDescription:
+      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
+  },
   adminStats: {
     menu: "Statistik",
     title: "Statistik",
@@ -966,10 +1074,90 @@ export default {
     "inView#few": "{count} Objekte in dieser Ansicht",
     "inView#other": "{count} Objekte in dieser Ansicht",
     csv: "Als CSV exportieren",
+    pdf: "Als PDF exportieren",
+    pdfTooLarge:
+      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
     premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
     fileName: "coinslite-sammlung-{date}.csv",
+  },
+  catalogPicker: {
+    title: "Aus dem Katalog wählen",
+    placeholder: {
+      coin: "Münzen nach Titel, Nennwert, Serie oder Land suchen…",
+      banknote: "Banknoten nach Titel, Nennwert, Serie oder Land suchen…",
+    },
+    pickHint: "zum Auswählen",
+    manual: "Manuell hinzufügen",
+    recent: "Zuletzt gewählt",
+    browse: "Katalog durchsuchen",
+    back: "Zurück",
+    empty: "Im Katalog gibt es noch nichts zum Auswählen.",
+    failed:
+      "Der Katalogeintrag konnte nicht geladen werden. Wähle ihn noch einmal oder füge das Objekt manuell hinzu.",
+    entry: "Katalogeintrag",
+    pick: "Aus dem Katalog wählen",
+    factsHint:
+      "Diese Angaben stammen aus dem Katalogeintrag und übernehmen seine Korrekturen. Änderst du eine, bleibt dein Wert; leerst du das Feld, gilt wieder der Wert des Eintrags.",
+  },
+  quickAdd: {
+    add: "Zur Sammlung hinzufügen",
+    title: "Zur Sammlung hinzufügen",
+    description:
+      "Füge diesen Katalogeintrag deiner Sammlung als ein Objekt hinzu.",
+    added: "Objekt zur Sammlung hinzugefügt",
+    open: "Öffnen",
+    failed: "Das Objekt konnte nicht hinzugefügt werden. Versuche es erneut.",
+  },
+  insuranceReport: {
+    title: "Versicherungsbericht",
+    lockedTitle: "Der Versicherungsbericht gehört zu Premium",
+    lockedDescription:
+      "Ein PDF für deine Versicherung mit den Objekten deiner Wahl, ihren Werten, deinen Kontaktdaten und den Summen.",
+    scopeTitle: "Objekte",
+    scopeDescription: "Wähle, welche Objekte der Bericht umfasst.",
+    scope: "Umfang",
+    wholeCollection: "Gesamte Sammlung",
+    albums: "Alben",
+    withoutAlbum: "Objekte ohne Album",
+    noAlbums: "Du hast noch keine Alben.",
+    chooseScope: "Wähle mindestens ein Album oder die Objekte ohne Album.",
+    valuesTitle: "Werte",
+    valuesDescription:
+      "Der Versicherungswert ist der höchste der gewählten Werte je Objekt.",
+    keepOne:
+      "Behalte mindestens einen von Kaufpreis, Marktwert oder Metallwert.",
+    columns: {
+      purchasePrice: "Kaufpreis",
+      marketValue: "Marktwert",
+      metalValue: "Metallwert",
+      insuredValue: "Versicherungswert",
+    },
+    previewTitle: "Vorschau",
+    previewDescription: "Jede Summe umfasst alle Stücke jedes Objekts.",
+    items: "Objekte",
+    pieces: "Stück",
+    noSpotPrices:
+      "Noch keine Spotpreise, daher hat kein Objekt einen Metallwert.",
+    staleSpotPrices: "Die Spotpreise sind möglicherweise veraltet.",
+    tooLarge:
+      "Ein Bericht umfasst höchstens {limit} Objekte. Wähle weniger Alben.",
+    nothingToReport: "Hier gibt es keine Objekte für den Bericht.",
+    ownerTitle: "Eigentümer",
+    ownerDescription: "Steht im Bericht, aus deinem Konto.",
+    editContact: "Im Konto bearbeiten",
+    missingContact:
+      "Trage im Konto deinen vollständigen Namen, deine Telefonnummer und Adresse ein, damit deine Versicherung dich erreicht.",
+    download: "PDF herunterladen",
+    downloaded: "Versicherungsbericht heruntergeladen",
+    failed: "Der Bericht konnte nicht erstellt werden. Versuche es erneut.",
+    errors: {
+      PREMIUM_REQUIRED: "Der Versicherungsbericht gehört zu Premium.",
+      REPORT_TOO_LARGE:
+        "Dieser Bericht hat zu viele Objekte. Wähle weniger Alben.",
+      ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
+    },
   },
   adminUsers: {
     menu: "Nutzer",

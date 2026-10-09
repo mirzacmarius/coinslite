@@ -271,8 +271,6 @@ export default {
   dashboard: {
     headerTitle: "Prezentare generală",
     headerDescription: "Colecția ta dintr-o privire.",
-    bodyTitle: "Bun venit la CoinsLite",
-    bodyDescription: "Colecția ta va apărea aici.",
   },
   account: {
     pageTitle: "Cont",
@@ -672,6 +670,7 @@ export default {
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED:
         "Precizează sursa acestor date, note sau a acestei imagini.",
+      CREDIT_REQUIRED: "O imagine are nevoie de sursă, autor, licență și link.",
       ROOT_NOT_ADDABLE:
         "O țară sau o temă nu poate fi intrare de catalog. Dă-i rândului un parent_id.",
       PARENT_NOT_FOUND:
@@ -887,6 +886,110 @@ export default {
       "După tipul obiectului, plus valoarea metalului pentru aur și argint",
     part: "Tip de obiect sau metal",
   },
+  catalogImages: {
+    add: "Adaugă imagine",
+    edit: "Editează imaginea",
+    remove: "Elimină imaginea",
+    title: "Imagine",
+    description:
+      "Încarcă o imagine pentru această intrare de catalog și precizează de unde provine.",
+    choose: "Alege imaginea",
+    chooseAnother: "Alege altă imagine",
+    formats: "JPEG, PNG, WebP sau GIF, până la 25 MB.",
+    sizes:
+      "Se salvează ca WebP, cel mult 800 px pe latura cea mai lungă, cu o miniatură de 128 px. Imaginile mai mici își păstrează dimensiunea.",
+    current: "Imaginea actuală. Alege alta ca să o înlocuiești.",
+    converting: "Se convertește…",
+    converted: "{full} px WebP, miniatură {thumbnail} px",
+    credit: "Credit",
+    creditHint:
+      "Obligatoriu pentru fiecare imagine. Listele îl afișează lângă miniatură, cu excepția imaginilor din domeniul public sau CC0, iar intrarea îl afișează mereu.",
+    source: "Sursă",
+    sourcePlaceholder: "Wikimedia Commons",
+    author: "Autor",
+    authorPlaceholder: "Numele fotografului sau al autorului",
+    licence: "Licență",
+    licencePlaceholder: "CC BY-SA 4.0",
+    link: "Link",
+    linkPlaceholder: "https://",
+    cancel: "Anulează",
+    close: "Închide",
+    save: "Salvează",
+    saved: "Imaginea a fost salvată",
+    creditSaved: "Creditul a fost salvat",
+    removeTitle: "Elimini imaginea pentru „{title}”?",
+    removeBody:
+      "Fișierele și creditul ei se șterg. Intrarea afișează un substituent până când se adaugă altă imagine.",
+    removed: "Imaginea a fost eliminată",
+    errors: {
+      imageRequired: "Alege o imagine.",
+      sourceRequired: "Precizează sursa.",
+      authorRequired: "Precizează autorul.",
+      licenceRequired: "Precizează licența.",
+      linkRequired: "Precizează linkul.",
+      tooLong: "Folosește cel mult {max} caractere.",
+      invalidLink: "Introdu o adresă web completă care începe cu https://.",
+      numista: "Nu se pot stoca date de la Numista.",
+      failed: "Imaginea nu a putut fi salvată. Încearcă din nou.",
+      removeFailed: "Imaginea nu a putut fi eliminată. Încearcă din nou.",
+      CATALOG_ENTRY_NOT_FOUND: "Această intrare de catalog nu mai există.",
+      IMAGE_NOT_FOUND: "Încărcarea nu a ajuns. Încearcă din nou.",
+      IMAGE_NOT_WEBP: "Imaginea nu a fost salvată ca WebP. Încearcă din nou.",
+      IMAGE_TOO_LARGE:
+        "Imaginea convertită este prea mare. Încearcă o imagine mai mică.",
+      THUMBNAIL_TOO_LARGE:
+        "Miniatura convertită este prea mare. Încearcă din nou.",
+      NO_IMAGE:
+        "Această intrare nu are o imagine de creditat. Alege o imagine.",
+      CREDIT_REQUIRED: "Precizează sursa, autorul, licența și linkul.",
+      TOO_LONG: "O parte a creditului este prea lungă.",
+      INVALID_URL: "Introdu o adresă web completă care începe cu https://.",
+      NUMISTA_DATA: "Nu se pot stoca date de la Numista.",
+      IMAGE_UNREADABLE:
+        "Fișierul nu poate fi citit ca imagine. Alege un JPEG, PNG, WebP sau GIF.",
+      ORIGINAL_TOO_LARGE: "Alege o imagine de cel mult 25 MB.",
+      WEBP_UNSUPPORTED:
+        "Acest browser nu poate salva imagini WebP. Încearcă altul, de exemplu Chrome sau Firefox.",
+      NOT_ADMIN: "Doar administratorii pot modifica imaginile din catalog.",
+    },
+  },
+  featureFlags: {
+    menu: "Activarea funcționalităților",
+    title: "Activarea funcționalităților",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription:
+      "Doar administratorii pot activa și dezactiva funcționalități.",
+    description: "Modificările se aplică imediat tuturor.",
+    catalog: "Afișează catalogul",
+    catalogDescription:
+      "Când este dezactivat, doar administratorii văd catalogul. Ceilalți nu îl mai găsesc în navigare, la răsfoire sau în căutare.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Cine poate fotografia o monedă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
+    scannerOptions: {
+      off: "Dezactivat",
+      admins: "Doar administratori",
+      premiumBeta: "Beta Premium",
+    },
+    saved: "Setare actualizată",
+    saveFailed: "Setarea nu a putut fi actualizată. Încearcă din nou.",
+    catalogHiddenTitle: "Catalogul nu este disponibil",
+    catalogHiddenDescription:
+      "Este dezactivat deocamdată. Obiectele tale nu sunt afectate.",
+  },
+  overview: {
+    addShortcuts: "Adaugă în colecție",
+    add: {
+      coin: "Adaugă monedă",
+      banknote: "Adaugă bancnotă",
+      stamp: "Adaugă timbru",
+    },
+    latestItems: "Cele mai noi obiecte",
+    viewCollection: "Vezi colecția",
+    firstRunTitle: "Începe-ți colecția",
+    firstRunDescription:
+      "Adaugă o monedă, o bancnotă sau un timbru pe care îl deții. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
+  },
   adminStats: {
     menu: "Statistici",
     title: "Statistici",
@@ -945,9 +1048,89 @@ export default {
     "inView#few": "{count} obiecte în această vizualizare",
     "inView#other": "{count} de obiecte în această vizualizare",
     csv: "Exportă ca CSV",
+    pdf: "Exportă ca PDF",
+    pdfTooLarge:
+      "Un PDF cuprinde cel mult {limit} obiecte. Restrânge vizualizarea pentru a o exporta.",
     premiumOnly: "Exportul colecției face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
+  },
+  catalogPicker: {
+    title: "Alege din catalog",
+    placeholder: {
+      coin: "Caută monede după titlu, valoare nominală, serie sau țară…",
+      banknote: "Caută bancnote după titlu, valoare nominală, serie sau țară…",
+    },
+    pickHint: "pentru a alege",
+    manual: "Adaugă manual",
+    recent: "Alese recent",
+    browse: "Răsfoiește catalogul",
+    back: "Înapoi",
+    empty: "Catalogul nu are încă nimic de ales.",
+    failed:
+      "Intrarea de catalog nu a putut fi încărcată. Alege-o din nou sau adaugă obiectul manual.",
+    entry: "Intrare de catalog",
+    pick: "Alege din catalog",
+    factsHint:
+      "Aceste date vin din intrarea de catalog și preiau corecturile ei. Dacă schimbi una, se păstrează valoarea ta; dacă golești câmpul, se folosește din nou valoarea intrării.",
+  },
+  quickAdd: {
+    add: "Adaugă în colecție",
+    title: "Adaugă în colecție",
+    description:
+      "Adaugă această intrare de catalog în colecție ca un singur obiect.",
+    added: "Obiect adăugat în colecție",
+    open: "Deschide",
+    failed: "Obiectul nu a putut fi adăugat. Încearcă din nou.",
+  },
+  insuranceReport: {
+    title: "Raport de asigurare",
+    lockedTitle: "Raportul de asigurare face parte din Premium",
+    lockedDescription:
+      "Un PDF pentru asigurător cu obiectele alese, valorile lor, datele tale de contact și totalurile.",
+    scopeTitle: "Obiecte",
+    scopeDescription: "Alege ce obiecte acoperă raportul.",
+    scope: "Acoperire",
+    wholeCollection: "Toată colecția",
+    albums: "Albume",
+    withoutAlbum: "Obiecte fără album",
+    noAlbums: "Încă nu ai albume.",
+    chooseScope: "Alege cel puțin un album sau obiectele fără album.",
+    valuesTitle: "Valori",
+    valuesDescription:
+      "Valoarea asigurată este cea mai mare dintre valorile alese pentru fiecare obiect.",
+    keepOne:
+      "Păstrează cel puțin una dintre prețul de achiziție, valoarea de piață și valoarea metalului.",
+    columns: {
+      purchasePrice: "Preț de achiziție",
+      marketValue: "Valoare de piață",
+      metalValue: "Valoarea metalului",
+      insuredValue: "Valoare asigurată",
+    },
+    previewTitle: "Previzualizare",
+    previewDescription: "Fiecare total acoperă toate bucățile fiecărui obiect.",
+    items: "Obiecte",
+    pieces: "Bucăți",
+    noSpotPrices:
+      "Încă nu există prețuri spot, așa că niciun obiect nu are valoarea metalului.",
+    staleSpotPrices: "Prețurile spot pot fi depășite.",
+    tooLarge:
+      "Un raport cuprinde cel mult {limit} obiecte. Alege mai puține albume.",
+    nothingToReport: "Aici nu există obiecte de raportat.",
+    ownerTitle: "Proprietar",
+    ownerDescription: "Apare în raport, din contul tău.",
+    editContact: "Editează în cont",
+    missingContact:
+      "Adaugă în cont numele complet, telefonul și adresa, ca asigurătorul să te poată contacta.",
+    download: "Descarcă PDF",
+    downloaded: "Raportul de asigurare a fost descărcat",
+    failed: "Raportul nu a putut fi creat. Încearcă din nou.",
+    errors: {
+      PREMIUM_REQUIRED: "Raportul de asigurare face parte din Premium.",
+      REPORT_TOO_LARGE:
+        "Raportul are prea multe obiecte. Alege mai puține albume.",
+      ALBUM_NOT_FOUND: "Unul dintre albumele alese nu mai există.",
+    },
   },
   adminUsers: {
     menu: "Utilizatori",

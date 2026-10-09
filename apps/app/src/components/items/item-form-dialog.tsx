@@ -3,6 +3,11 @@
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useAlbums } from "@/components/albums/use-albums";
 import {
+  CatalogPickerDialog,
+  type PickedCatalogEntry,
+} from "@/components/catalog/catalog-picker";
+import { useCatalogVisible } from "@/components/catalog/use-catalog-visible";
+import {
   ItemLimitNotice,
   isItemLimitError,
   useItemLimitMessage,
@@ -12,6 +17,8 @@ import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
+import type { CatalogItemType } from "@coinslite/backend/convex/catalog/fields";
+import type { CatalogFacts } from "@coinslite/backend/convex/items/catalogFacts";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
 import {
   type BullionPresetId,
@@ -41,6 +48,7 @@ import {
 } from "@coinslite/ui/dialog";
 import { CheckboxField, Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
+import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { MoneyInput } from "@coinslite/ui/money-input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
@@ -48,9 +56,10 @@ import { Switch } from "@coinslite/ui/switch";
 import { toast } from "@coinslite/ui/toaster";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useMutation, useQuery } from "convex/react";
+import { useConvex, useMutation, useQuery } from "convex/react";
 import {
   Award,
+  BookOpen,
   ChevronRight,
   Gem,
   Globe,
@@ -62,7 +71,14 @@ import {
   X,
 } from "lucide-react";
 import type * as React from "react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { z } from "zod";
 import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
@@ -70,7 +86,9 @@ import {
   type ItemFormValues,
   argsFromValues,
   blankItem,
+  changedFactsOnly,
   detailFields,
+  factValues,
   hasDetails,
   matchingPreset,
   parseDecimal,
@@ -104,24 +122,43 @@ type TextField =
   | "purchaseDate"
   | "source";
 
+/** The Catalog entry an Item is (or is about to be) linked to. */
+type LinkedEntry = { key: string; title: string; facts: CatalogFacts };
+
+/** An Item as its page reads it: facts resolved, with the Catalog entry it's linked to. */
+export type EditedItem = Doc<"items"> & { catalogEntry?: LinkedEntry | null };
+
+/** The Item types the Catalog holds, so the ones a Catalog picker is offered for. */
+const isCatalogType = (type: ItemType): type is CatalogItemType =>
+  type === "coin" || type === "banknote";
+
 /**
  * The one form for an Item's every field: "New Item" in a compact dialog, or
  * "Edit Item" when given an `item`. Basic fields stay in view; the rest sit
  * under "More details", which opens by itself when it holds values or errors.
+ *
+ * Coins and banknotes are added from the Catalog by default (spec 5.4): each
+ * opening starts on the Catalog picker, and Esc or "Add manually" leads to
+ * typing the facts in. A picked entry fills the facts; the Item stays linked
+ * to it and stores only the facts the person changes (ADR 0001).
  */
 export function ItemFormDialog({
   open,
   onOpenChange,
   item,
+  newItemType,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** The Item being edited; without one the dialog adds a new Item. */
-  item?: Doc<"items">;
+  item?: EditedItem;
+  /** For a new Item: the Item type already chosen each time the dialog opens. */
+  newItemType?: ItemType;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
   const mod = useModifierKey();
+  const convex = useConvex();
   const addItem = useMutation(api.items.add);
   const updateItem = useMutation(api.items.update);
   const user = useQuery(api.users.getUser);
@@ -135,8 +172,20 @@ export function ItemFormDialog({
   const [defaults] = useState(() =>
     item ? valuesFromItem(item, locale) : blankItem(),
   );
+  const catalogVisible = useCatalogVisible();
+  const [linked, setLinked] = useState<LinkedEntry | undefined>(
+    item?.catalogEntry ?? undefined,
+  );
+  // The entry's facts as the form writes them, to tell which ones the person changed.
+  const fromEntry = useMemo(
+    () => linked && factValues(linked.facts, locale),
+    [linked, locale],
+  );
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [createMore, setCreateMore] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(() => hasDetails(defaults));
+  const [detailsOpen, setDetailsOpen] = useState(() =>
+    hasDetails(defaults, fromEntry),
+  );
   const [failed, setFailed] = useState<string>();
   const itemLimitMessage = useItemLimitMessage();
 
@@ -230,13 +279,31 @@ export function ItemFormDialog({
     },
     onSubmit: async ({ value }) => {
       setFailed(undefined);
-      const args = argsFromValues(value, locale);
+      // A linked Item's cleared country or metal is the entry's again.
+      const args = fromEntry
+        ? changedFactsOnly(
+            argsFromValues(
+              {
+                ...value,
+                country: value.country ?? fromEntry.country,
+                metal: value.metal ?? fromEntry.metal,
+              },
+              locale,
+            ),
+            value,
+            fromEntry,
+          )
+        : argsFromValues(value, locale);
       // An Album deleted since the form opened can't take the Item.
       if (albums && !albums.some((album) => album._id === args.albumId))
         args.albumId = undefined;
       try {
         if (item) await updateItem({ itemId: item._id, ...args });
-        else await addItem(args);
+        else
+          await addItem({
+            ...args,
+            ...(linked && { catalogEntryKey: linked.key }),
+          });
       } catch (failure) {
         setFailed(
           isItemLimitError(failure)
@@ -252,12 +319,15 @@ export function ItemFormDialog({
       }
       form.reset();
       setDetailsOpen(false);
+      setLinked(undefined);
       if (createMore) {
-        // "Create more" keeps the pills for the next Item.
+        // "Create more" keeps the pills for the next Item, and starts it
+        // on the Catalog picker like the first.
         form.setFieldValue("type", value.type);
         form.setFieldValue("country", value.country);
         form.setFieldValue("albumId", value.albumId);
-        titleRef.current?.focus();
+        if (catalogVisible && isCatalogType(value.type)) setPickerOpen(true);
+        else titleRef.current?.focus();
       } else {
         onOpenChange(false);
       }
@@ -274,6 +344,59 @@ export function ItemFormDialog({
     )
       form.setFieldValue("albumId", onlyAlbum, { dontUpdateMeta: true });
   }, [open, onlyAlbum, form]);
+  // Before the first paint, so the type pill never shows the previous type.
+  useLayoutEffect(() => {
+    if (open && newItemType && !item)
+      form.setFieldValue("type", newItemType, { dontUpdateMeta: true });
+  }, [open, newItemType, item, form]);
+  // Each opening for a coin or banknote starts on the Catalog picker, unless
+  // the form already holds something.
+  const pickerOffered = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      pickerOffered.current = false;
+      setPickerOpen(false);
+      return;
+    }
+    if (pickerOffered.current || item || catalogVisible === undefined) return;
+    pickerOffered.current = true;
+    if (
+      catalogVisible &&
+      !linked &&
+      !form.state.isDirty &&
+      isCatalogType(newItemType ?? form.getFieldValue("type"))
+    )
+      setPickerOpen(true);
+  }, [open, item, catalogVisible, linked, newItemType, form]);
+  /** Links the form to a picked Catalog entry and fills the facts from it. */
+  const pickEntry = async (picked: PickedCatalogEntry) => {
+    setPickerOpen(false);
+    setFailed(undefined);
+    const entry = await convex
+      .query(api.items.catalogEntry, { key: picked.key })
+      .catch(() => null);
+    if (!entry) {
+      setFailed(t("catalogPicker.failed"));
+      return;
+    }
+    const title = form.getFieldValue("title").trim();
+    if (!title || title === linked?.title)
+      form.setFieldValue("title", entry.title);
+    setLinked({ key: entry.key, title: entry.title, facts: entry.facts });
+    const facts = factValues(entry.facts, locale);
+    form.setFieldValue("type", entry.itemType);
+    form.setFieldValue("country", facts.country);
+    form.setFieldValue("year", facts.year);
+    form.setFieldValue("denomination", facts.denomination);
+    form.setFieldValue("series", facts.series);
+    form.setFieldValue("material", facts.material);
+    form.setFieldValue("strike", facts.strike);
+    form.setFieldValue("diameter", facts.diameter);
+    form.setFieldValue("numistaNumber", facts.numistaNumber);
+    form.setFieldValue("metal", facts.metal);
+    form.setFieldValue("weight", facts.weight);
+    form.setFieldValue("purity", facts.purity);
+  };
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
@@ -287,9 +410,14 @@ export function ItemFormDialog({
       strike,
     }),
   );
-  const scale = scaleOf(values);
+  // A linked Item's cleared country or metal is its Catalog entry's.
+  const scale = scaleOf({
+    ...values,
+    country: values.country ?? fromEntry?.country,
+  });
   const isCoin = values.type === "coin";
-  const metal = form.useStore((state) => state.values.metal);
+  const metal =
+    form.useStore((state) => state.values.metal) ?? fromEntry?.metal;
   const preset = form.useStore(
     (state) => matchingPreset(bullionPresets, state.values)?.id,
   );
@@ -312,6 +440,14 @@ export function ItemFormDialog({
         undefined
       : undefined;
 
+  /** A Catalog entry's fact as the form writes it, shown where the person cleared it. */
+  const entryText = (name: TextField) => {
+    const fact = fromEntry?.[name as keyof typeof fromEntry];
+    return typeof fact === "string" ? fact : undefined;
+  };
+  /** The placeholder of a fact's pill: the entry's value, else `fallback`. */
+  const entryLabel = (label: string | undefined, fallback: string) =>
+    label ?? fallback;
   const textField = (
     name: TextField,
     label: string,
@@ -343,7 +479,7 @@ export function ItemFormDialog({
               type={options.type}
               max={options.max}
               inputMode={options.inputMode}
-              placeholder={options.placeholder}
+              placeholder={entryText(name) || options.placeholder}
               maxLength={options.maxLength}
               disabled={options.disabled}
               value={field.state.value}
@@ -480,18 +616,41 @@ export function ItemFormDialog({
             </form.Field>
 
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <form.Field name="type">
-                {(field) => (
-                  <PropertyPicker
-                    icon={itemTypeIcons[field.state.value]}
-                    label={t("items.type")}
-                    value={field.state.value}
-                    options={typeOptions}
-                    onChange={field.handleChange}
-                    noResults={t("items.noMatches")}
-                  />
+              {linked ? (
+                <CatalogEntryPill
+                  title={linked.title}
+                  label={t("catalogPicker.entry")}
+                  onClick={item ? undefined : () => setPickerOpen(true)}
+                />
+              ) : (
+                <form.Field name="type">
+                  {(field) => (
+                    <PropertyPicker
+                      icon={itemTypeIcons[field.state.value]}
+                      label={t("items.type")}
+                      value={field.state.value}
+                      options={typeOptions}
+                      onChange={field.handleChange}
+                      noResults={t("items.noMatches")}
+                    />
+                  )}
+                </form.Field>
+              )}
+              {!item &&
+                !linked &&
+                catalogVisible &&
+                isCatalogType(values.type) && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    aria-label={`${t("catalogPicker.entry")}: ${t("catalogPicker.pick")}`}
+                    onClick={() => setPickerOpen(true)}
+                  >
+                    <BookOpen strokeWidth={1.75} aria-hidden="true" />
+                    {t("catalogPicker.pick")}
+                  </Button>
                 )}
-              </form.Field>
               <form.Field name="albumId">
                 {(field) => (
                   <AlbumPicker
@@ -506,7 +665,11 @@ export function ItemFormDialog({
                   <PropertyPicker
                     icon={Globe}
                     label={t("items.country")}
-                    placeholder={t("items.setCountry")}
+                    placeholder={entryLabel(
+                      fromEntry?.country &&
+                        formatCountry(fromEntry.country, locale),
+                      t("items.setCountry"),
+                    )}
                     value={field.state.value}
                     options={countryOptions}
                     onChange={field.handleChange}
@@ -541,7 +704,10 @@ export function ItemFormDialog({
                     <PropertyPicker
                       icon={Hammer}
                       label={t("items.strike")}
-                      placeholder={t("items.setStrike")}
+                      placeholder={entryLabel(
+                        fromEntry?.strike && labels.strike(fromEntry.strike),
+                        t("items.setStrike"),
+                      )}
                       value={field.state.value}
                       options={labels.strikeOptions()}
                       onChange={field.handleChange}
@@ -597,6 +763,11 @@ export function ItemFormDialog({
                 {t("items.moreDetails")}
               </CollapsibleTrigger>
               <CollapsibleContent className="flex flex-col gap-5 pb-1 pt-3">
+                {linked && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("catalogPicker.factsHint")}
+                  </p>
+                )}
                 <DetailGroup title={t("items.description")}>
                   {textField("year", t("items.year"), {
                     rule: rules.year,
@@ -643,7 +814,11 @@ export function ItemFormDialog({
                               id={control.id}
                               icon={Gem}
                               label={t("items.material")}
-                              placeholder={t("items.setMaterial")}
+                              placeholder={entryLabel(
+                                fromEntry?.material &&
+                                  t(`items.materials.${fromEntry.material}`),
+                                t("items.setMaterial"),
+                              )}
                               value={field.state.value}
                               options={materialOptions}
                               onChange={field.handleChange}
@@ -704,7 +879,11 @@ export function ItemFormDialog({
                               id={control.id}
                               icon={Gem}
                               label={t("preciousMetal.metal")}
-                              placeholder={t("preciousMetal.setMetal")}
+                              placeholder={entryLabel(
+                                fromEntry?.metal &&
+                                  t(`items.materials.${fromEntry.metal}`),
+                                t("preciousMetal.setMetal"),
+                              )}
                               value={field.state.value}
                               options={metalOptions}
                               onChange={field.handleChange}
@@ -834,7 +1013,68 @@ export function ItemFormDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      {/* Beside the form's content, not in it, so keys pressed in the picker
+          (Cmd/Ctrl+Enter) never reach the form. */}
+      {!item && (
+        <CatalogPickerDialog
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          itemType={isCatalogType(values.type) ? values.type : "coin"}
+          onPick={(entry) => void pickEntry(entry)}
+          onManual={() => {
+            // The facts stay, as the person's own.
+            setLinked(undefined);
+            setPickerOpen(false);
+          }}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            titleRef.current?.focus();
+          }}
+        />
+      )}
     </Dialog>
+  );
+}
+
+/**
+ * The Catalog entry a new Item is linked to, in place of the Item type pill
+ * (the entry decides the type); clicking it picks another. Not a button on
+ * an existing Item, whose link stays.
+ */
+function CatalogEntryPill({
+  title,
+  label,
+  onClick,
+}: {
+  title: string;
+  label: string;
+  onClick?: () => void;
+}) {
+  const content = (
+    <>
+      <BookOpen strokeWidth={1.75} aria-hidden="true" />
+      <span className="truncate">{title}</span>
+    </>
+  );
+  if (!onClick) {
+    return (
+      <span className="inline-flex h-7 max-w-full items-center gap-1.5 rounded-md bg-muted px-2 text-[13px] font-medium [&_svg]:size-4 [&_svg]:shrink-0">
+        <span className="sr-only">{label}: </span>
+        {content}
+      </span>
+    );
+  }
+  return (
+    <Button
+      type="button"
+      variant="subtle"
+      size="xs"
+      aria-label={`${label}: ${title}`}
+      className="max-w-full justify-start"
+      onClick={onClick}
+    >
+      {content}
+    </Button>
   );
 }
 

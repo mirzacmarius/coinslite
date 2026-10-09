@@ -1,14 +1,28 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import { visiblePage } from "../support/accounts";
 import { appUrl } from "../urls";
 
 test.use({ locale: "en-US" });
 
 /** Makes the app believe a newer deployment just went live (the test servers are "e2e"). */
-async function deployNewerVersion(page: import("@playwright/test").Page) {
+async function deployNewerVersion(page: Page) {
   await page.route("**/api/version", (route) =>
     route.fulfill({ json: { deploymentId: "e2e-newer" } }),
   );
+}
+
+/**
+ * Gives the window focus until the tab asks which deployment is live. The tab
+ * only listens once the page has hydrated, which a dev server can take a while
+ * to get to after the page shows; focus before then goes unnoticed.
+ */
+async function focusUntilChecked(page: Page) {
+  await expect(async () => {
+    await Promise.all([
+      page.waitForRequest("**/api/version", { timeout: 1000 }),
+      page.evaluate(() => window.dispatchEvent(new Event("focus"))),
+    ]);
+  }).toPass();
 }
 
 test("an open tab moves to a newer deployment when it gains focus", async ({
@@ -23,7 +37,7 @@ test("an open tab moves to a newer deployment when it gains focus", async ({
   await deployNewerVersion(page);
 
   const reloaded = page.waitForEvent("load");
-  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await focusUntilChecked(page);
 
   await reloaded;
 });
@@ -38,7 +52,7 @@ test("a form with unsaved input holds the reload", async ({ page }) => {
     reloaded = true;
   });
 
-  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await focusUntilChecked(page);
   await page.waitForTimeout(1500);
 
   expect(reloaded).toBe(false);
