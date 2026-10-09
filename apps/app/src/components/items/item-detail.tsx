@@ -26,6 +26,7 @@ import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
 import { ItemPhotos } from "./item-photos";
+import { MetalValue } from "./metal-value";
 
 /** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
 export function ItemDetail() {
@@ -280,6 +281,29 @@ export function ItemDetail() {
                   {value}
                 </PropertyRow>
               ))}
+            </PanelSection>
+          )}
+          {item.type === "coin" && (item.metal || item.bullion) && (
+            <PanelSection title={t("preciousMetal.title")}>
+              <PropertyRow label={t("preciousMetal.metal")}>
+                {item.metal && t(`items.materials.${item.metal}`)}
+              </PropertyRow>
+              <PropertyRow label={t("preciousMetal.weight")}>
+                {item.weight !== undefined &&
+                  `${format.number(item.weight)} ${t("preciousMetal.grams")}`}
+              </PropertyRow>
+              <PropertyRow label={t("preciousMetal.purity")}>
+                {item.purity !== undefined &&
+                  format.number(item.purity, { maximumFractionDigits: 5 })}
+              </PropertyRow>
+              <PropertyRow label={t("preciousMetal.bullion")}>
+                {t(item.bullion ? "preciousMetal.yes" : "preciousMetal.no")}
+              </PropertyRow>
+              {item.metal && (
+                <PropertyRow label={t("preciousMetal.metalValue")} wrap>
+                  <MetalValue item={item} />
+                </PropertyRow>
+              )}
             </PanelSection>
           )}
           <PanelSection title={t("items.purchase")}>

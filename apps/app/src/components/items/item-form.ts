@@ -8,11 +8,13 @@ import {
   isGrade,
   scalesFor,
 } from "@coinslite/backend/convex/items/grades";
+import type { BullionPreset } from "@coinslite/backend/convex/items/preciousMetal";
 import {
   type Material,
   fieldSuits,
   type typeOnlyFields,
 } from "@coinslite/backend/convex/items/rules";
+import type { Metal } from "@coinslite/backend/convex/spotPrices/rates";
 import {
   type CountryCode,
   type Locale,
@@ -47,6 +49,11 @@ export type ItemFormValues = {
   materialNote: string;
   diameter: string;
   thickness: string;
+  bullion: boolean;
+  metal: Metal | undefined;
+  /** Grams. */
+  weight: string;
+  purity: string;
   purchasePrice: string;
   marketValue: string;
   purchaseDate: string;
@@ -78,6 +85,10 @@ export const blankItem = (): ItemFormValues => ({
   materialNote: "",
   diameter: "",
   thickness: "",
+  bullion: false,
+  metal: undefined,
+  weight: "",
+  purity: "",
   purchasePrice: "",
   marketValue: "",
   purchaseDate: "",
@@ -99,6 +110,10 @@ export const detailFields = [
   "materialNote",
   "diameter",
   "thickness",
+  "bullion",
+  "metal",
+  "weight",
+  "purity",
   "gradingScale",
   "gradeNote",
   "purchasePrice",
@@ -140,12 +155,12 @@ export function valuesFromItem(
 ): ItemFormValues {
   const whole = (value?: number) =>
     value === undefined ? "" : formatNumber(value, locale);
-  const decimal = (value?: number) =>
+  const decimal = (value?: number, maximumFractionDigits = 2) =>
     value === undefined
       ? ""
       : formatNumber(value, locale, {
           useGrouping: false,
-          maximumFractionDigits: 2,
+          maximumFractionDigits,
         });
   const money = (minor?: number) =>
     minor === undefined
@@ -178,6 +193,10 @@ export function valuesFromItem(
     materialNote: item.materialNote ?? "",
     diameter: decimal(item.diameter),
     thickness: decimal(item.thickness),
+    bullion: item.bullion ?? false,
+    metal: item.metal,
+    weight: decimal(item.weight, 3),
+    purity: decimal(item.purity, 5),
     purchasePrice: money(item.purchasePrice),
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
@@ -224,6 +243,11 @@ export function argsFromValues(
     materialNote: onlyFor("materialNote", values.materialNote),
     diameter: onlyFor("diameter", decimal(values.diameter)),
     thickness: onlyFor("thickness", decimal(values.thickness)),
+    // Weight and purity are the metal's: without one they aren't sent.
+    bullion: onlyFor("bullion", values.bullion || undefined),
+    metal: onlyFor("metal", values.metal),
+    weight: onlyFor("weight", values.metal && decimal(values.weight)),
+    purity: onlyFor("purity", values.metal && decimal(values.purity)),
     grade,
     gradingScale: grade ? scale : undefined,
     gradeNote: values.gradeNote,
@@ -234,4 +258,36 @@ export function argsFromValues(
     source: values.source,
     albumId: values.albumId,
   };
+}
+
+/** A preset's figures as the form shows them, in the person's language. */
+export function presetValues(
+  { metal, weight, purity, country }: BullionPreset,
+  locale: Locale,
+) {
+  const decimal = (value: number) =>
+    formatNumber(value, locale, {
+      useGrouping: false,
+      maximumFractionDigits: 5,
+    });
+  return {
+    metal,
+    weight: decimal(weight),
+    purity: decimal(purity),
+    country,
+  } satisfies Partial<ItemFormValues>;
+}
+
+/** The bullion preset the form's precious metal and country match, if any. */
+export function matchingPreset<P extends BullionPreset>(
+  presets: readonly P[],
+  values: Pick<ItemFormValues, "metal" | "weight" | "purity" | "country">,
+) {
+  return presets.find(
+    (preset) =>
+      preset.metal === values.metal &&
+      preset.country === values.country &&
+      parseDecimal(values.weight) === preset.weight &&
+      parseDecimal(values.purity) === preset.purity,
+  );
 }

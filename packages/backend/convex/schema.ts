@@ -8,6 +8,7 @@ import {
   itemType,
   language,
   material,
+  metal,
   perDollar,
   strike,
 } from "./utils/validators";
@@ -83,6 +84,14 @@ export default defineSchema({
     diameter: v.optional(v.number()),
     thickness: v.optional(v.number()),
     numistaNumber: v.optional(v.number()),
+    // Precious metal, a coin's only (items/preciousMetal.ts): weight and
+    // purity need a metal, and give the Item its Metal value.
+    bullion: v.optional(v.boolean()),
+    metal: v.optional(metal),
+    /** Grams. */
+    weight: v.optional(v.number()),
+    /** The share of the weight that is the metal, above 0 and at most 1. */
+    purity: v.optional(v.number()),
     // A Grade is a code on its scale (items/grades.ts); both or neither are set.
     grade: v.optional(v.string()),
     gradingScale: v.optional(gradingScale),
