@@ -16,7 +16,9 @@ export function runInBackend(functionName: string, args: object) {
       encoding: "utf8",
     },
   );
-  return JSON.parse(output.trim()) as unknown;
+  // Functions that return nothing print nothing.
+  const result = output.trim();
+  return result ? (JSON.parse(result) as unknown) : undefined;
 }
 
 /**

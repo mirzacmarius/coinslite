@@ -1,0 +1,113 @@
+import { env } from "../_generated/server";
+import type { BillingInterval } from "./rules";
+
+/**
+ * Polar's REST API, the few calls CoinsLite makes. Plain fetch rather than an
+ * SDK: Polar's API keeps growing (statuses, currencies), and strict client-side
+ * schemas would turn every addition into a failed call.
+ */
+
+export const isPolarSandbox = () => env.POLAR_SERVER !== "production";
+
+/** The Premium products checkout sells, or null until both are configured. */
+export function premiumProducts(): Record<BillingInterval, string> | null {
+  const month = env.POLAR_PREMIUM_MONTHLY_PRODUCT_ID;
+  const year = env.POLAR_PREMIUM_YEARLY_PRODUCT_ID;
+  return month && year ? { month, year } : null;
+}
+
+export class PolarError extends Error {
+  constructor(
+    readonly status: number,
+    readonly detail: string,
+    request: string,
+  ) {
+    super(`Polar answered ${status} to ${request}: ${detail}`);
+    this.name = "PolarError";
+  }
+}
+
+/** A client for Polar's API, or null on a deployment without an organization token. */
+export function polarApi() {
+  const token = env.POLAR_ORGANIZATION_TOKEN;
+  if (!token) return null;
+  const base = isPolarSandbox()
+    ? "https://sandbox-api.polar.sh/v1"
+    : "https://api.polar.sh/v1";
+
+  async function call(method: string, path: string, body?: unknown) {
+    const response = await fetch(`${base}${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        ...(body !== undefined && { "Content-Type": "application/json" }),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    if (!response.ok) {
+      throw new PolarError(
+        response.status,
+        await response.text(),
+        `${method} ${path}`,
+      );
+    }
+    return (await response.json()) as unknown;
+  }
+
+  return {
+    /**
+     * Opens a checkout and returns the page to send the buyer to. Polar picks
+     * the currency from `customerIp` (the buyer's location), falling back to
+     * the organization's default.
+     */
+    async createCheckout(checkout: {
+      productId: string;
+      userId: string;
+      email?: string;
+      customerIp?: string;
+      successUrl: string;
+      returnUrl: string;
+    }) {
+      const created = await call("POST", "/checkouts/", {
+        products: [checkout.productId],
+        external_customer_id: checkout.userId,
+        customer_email: checkout.email,
+        customer_ip_address: checkout.customerIp,
+        // Copied onto the subscription, so its events name the buyer.
+        metadata: { userId: checkout.userId },
+        success_url: checkout.successUrl,
+        return_url: checkout.returnUrl,
+      });
+      const url = (created as { url?: unknown } | null)?.url;
+      if (typeof url !== "string") {
+        throw new PolarError(200, "no checkout url", "POST /checkouts/");
+      }
+      return url;
+    },
+
+    /** Ends a subscription now, without charging again. */
+    async revokeSubscription(polarId: string) {
+      await call("PATCH", `/subscriptions/${encodeURIComponent(polarId)}`, {
+        revoke: true,
+      });
+    },
+
+    /** The organization's products that aren't archived (one page is plenty here). */
+    async listProducts() {
+      const page = await call("GET", "/products/?is_archived=false&limit=100");
+      const items = (page as { items?: unknown } | null)?.items;
+      return Array.isArray(items)
+        ? (items as {
+            id: string;
+            recurring_interval?: string | null;
+            metadata?: Record<string, unknown>;
+          }[])
+        : [];
+    },
+
+    async createProduct(product: Record<string, unknown>) {
+      return (await call("POST", "/products/", product)) as { id: string };
+    },
+  };
+}

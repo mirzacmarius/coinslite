@@ -213,6 +213,39 @@ export default defineSchema({
   }),
 
   /**
+   * Premium subscriptions as Polar last reported them, one per Polar
+   * subscription (billing.ts). Amounts are minor units of `currency`; times are
+   * ms. `premium` is the Premium status rule (billing/rules.ts) applied at the
+   * last change, switched off by a scheduled check when the paid period runs
+   * out, so asking "is this person Premium?" needs no clock.
+   */
+  subscriptions: defineTable({
+    userId: v.id("users"),
+    polarId: v.string(),
+    polarCustomerId: v.string(),
+    productId: v.string(),
+    /** Polar's status: active, trialing, past_due, canceled, unpaid, incomplete… */
+    status: v.string(),
+    /** Polar's billing interval: "month" or "year" for Premium. */
+    interval: v.string(),
+    /** Upper-case ISO code, e.g. "NOK". */
+    currency: v.string(),
+    amount: v.number(),
+    currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.boolean(),
+    endedAt: v.optional(v.number()),
+    /** When Polar last changed it; older events are ignored. */
+    modifiedAt: v.number(),
+    premium: v.boolean(),
+    /** When Premium runs out unless Polar reports a renewal; unset if open-ended or not Premium. */
+    premiumUntil: v.optional(v.number()),
+    /** The scheduled check that ends Premium at `premiumUntil`. */
+    premiumCheck: v.optional(v.id("_scheduled_functions")),
+  })
+    .index("by_polarId", ["polarId"])
+    .index("by_userId_and_premium", ["userId", "premium"]),
+
+  /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox
    * (local and CI test runs). Never used in production.
    */

@@ -33,6 +33,11 @@ type Env = {
   readonly EMAIL_DELIVERY: "outbox" | undefined;
   readonly FEEDBACK_EMAIL: string | undefined;
   readonly METALPRICE_API_KEY: string | undefined;
+  readonly POLAR_ORGANIZATION_TOKEN: string | undefined;
+  readonly POLAR_PREMIUM_MONTHLY_PRODUCT_ID: string | undefined;
+  readonly POLAR_PREMIUM_YEARLY_PRODUCT_ID: string | undefined;
+  readonly POLAR_SERVER: string | undefined;
+  readonly POLAR_WEBHOOK_SECRET: string | undefined;
   readonly SITE_URL: string | undefined;
 };
 

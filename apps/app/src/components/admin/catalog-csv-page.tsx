@@ -1,6 +1,7 @@
 "use client";
 
 import { localToday } from "@/components/items/item-fields";
+import { useHydrated } from "@/lib/use-hydrated";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -40,7 +41,9 @@ import { useId, useRef, useState } from "react";
  */
 export function CatalogCsvPage() {
   const t = useI18n();
-  const isAdmin = useQuery(api.admin.roles.isAdmin);
+  const isAdminQuery = useQuery(api.admin.roles.isAdmin);
+  // The workspace menu asks too; see useHydrated.
+  const isAdmin = useHydrated() ? isAdminQuery : undefined;
   return (
     <>
       <HeaderBar title={t("catalogAdmin.title")} />
