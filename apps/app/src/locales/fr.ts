@@ -103,8 +103,6 @@ export default {
       failed: "Ce code n’a pas fonctionné ou a expiré. Demandez-en un nouveau.",
     },
     backToSignIn: "Retour à la connexion",
-    or: "ou",
-    continueWithGoogle: "Continuer avec Google",
     noMatches: "Aucun résultat",
     failedGeneric: "Une erreur s’est produite. Réessayez.",
   },

@@ -1,12 +1,10 @@
 "use client";
 
-import { goTo } from "@/lib/next-path";
+import { goTo, nextQuery } from "@/lib/next-path";
 import { useCurrentLocale, useI18n } from "@/locales/client";
-import { normalizeEmail } from "@coinslite/backend/convex/accounts/email";
+import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { type HomeCurrency, homeCurrencies } from "@coinslite/i18n";
-import { Button } from "@coinslite/ui/button";
-import { Checkbox } from "@coinslite/ui/checkbox";
-import { Field } from "@coinslite/ui/field";
+import { CheckboxField, Field } from "@coinslite/ui/field";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
@@ -17,8 +15,8 @@ import { z } from "zod";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { CodeStep } from "./code-step";
-import { authSchemas } from "./schemas";
 import { TextField } from "./text-field";
+import { useAuthSchemas, useSubmitState } from "./use-auth-form";
 import { usePasswordAuth } from "./use-password-auth";
 
 export function SignUpFlow({
@@ -35,13 +33,8 @@ export function SignUpFlow({
   const t = useI18n();
   const locale = useCurrentLocale();
   const attempt = usePasswordAuth();
+  const schemas = useAuthSchemas();
   const ids = { currency: useId(), terms: useId() };
-  const schemas = authSchemas({
-    emailInvalid: t("auth.fields.emailInvalid"),
-    passwordTooShort: t("auth.fields.passwordTooShort"),
-    passwordRequired: t("auth.fields.passwordRequired"),
-    codeInvalid: t("auth.fields.codeInvalid"),
-  });
   const currencyOptions = useMemo(() => {
     const names = new Intl.DisplayNames(locale, { type: "currency" });
     return homeCurrencies.map((code) => ({
@@ -71,37 +64,26 @@ export function SignUpFlow({
         homeCurrency: value.homeCurrency,
         language: locale,
         acceptTerms: String(value.acceptTerms),
+        // The emailed link brings the person back here too.
+        redirectTo: next,
       });
       if (result === "signedIn") goTo(next);
       else if (result === "codeSent") setPendingEmail(email);
       else setFailed(true);
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
+  const { submitted, submitting } = useSubmitState(form);
 
   if (pendingEmail) {
     return (
       <CodeStep
         email={pendingEmail}
-        verify={async (code) => {
-          const result = await attempt({
-            flow: "email-verification",
-            email: pendingEmail,
-            code,
-          });
-          if (result === "signedIn") goTo(next);
-          return result;
-        }}
-        resend={() =>
-          attempt({ flow: "email-verification", email: pendingEmail })
-        }
+        next={next}
         onBack={() => setPendingEmail(undefined)}
       />
     );
   }
 
-  const withNext = next === "/" ? "" : `?next=${encodeURIComponent(next)}`;
   return (
     <AuthPanel
       title={t("auth.signUp.title")}
@@ -109,7 +91,7 @@ export function SignUpFlow({
       footer={
         <p>
           {t("auth.signUp.haveAccount")}{" "}
-          <Link href={`/login${withNext}`} className={authLink}>
+          <Link href={`/login${nextQuery(next)}`} className={authLink}>
             {t("auth.signIn.submit")}
           </Link>
         </p>
@@ -149,9 +131,10 @@ export function SignUpFlow({
               label={t("auth.fields.homeCurrency")}
               hint={t("auth.signUp.homeCurrencyHint")}
             >
-              {({ id }) => (
+              {(control) => (
                 <PropertyPicker
-                  id={id}
+                  id={control.id}
+                  aria-describedby={control["aria-describedby"]}
                   icon={Wallet}
                   label={t("auth.fields.homeCurrency")}
                   value={field.state.value}
@@ -171,59 +154,40 @@ export function SignUpFlow({
             }),
           }}
         >
-          {(field) => {
-            const showError = submitted && field.state.meta.errors.length > 0;
-            return (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-start gap-2">
-                  <Checkbox
-                    id={ids.terms}
-                    checked={field.state.value}
-                    onCheckedChange={(checked) =>
-                      field.handleChange(checked === true)
-                    }
-                    aria-invalid={showError || undefined}
-                    aria-describedby={
-                      showError ? `${ids.terms}-error` : undefined
-                    }
-                    className="mt-0.5"
-                  />
-                  <label htmlFor={ids.terms} className="text-[13px] leading-5">
-                    {t("auth.signUp.acceptTerms", {
-                      privacy: (
-                        <a
-                          href={privacyUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={authLink}
-                        >
-                          {t("auth.signUp.privacyPolicy")}
-                        </a>
-                      ),
-                      terms: (
-                        <a
-                          href={termsUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={authLink}
-                        >
-                          {t("auth.signUp.termsOfUse")}
-                        </a>
-                      ),
-                    })}
-                  </label>
-                </div>
-                {showError && (
-                  <p
-                    id={`${ids.terms}-error`}
-                    className="text-xs text-destructive"
+          {(field) => (
+            <CheckboxField
+              id={ids.terms}
+              checked={field.state.value}
+              onCheckedChange={field.handleChange}
+              error={
+                submitted && field.state.meta.errors.length > 0
+                  ? t("auth.signUp.termsRequired")
+                  : undefined
+              }
+              label={t("auth.signUp.acceptTerms", {
+                privacy: (
+                  <a
+                    href={privacyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={authLink}
                   >
-                    {t("auth.signUp.termsRequired")}
-                  </p>
-                )}
-              </div>
-            );
-          }}
+                    {t("auth.signUp.privacyPolicy")}
+                  </a>
+                ),
+                terms: (
+                  <a
+                    href={termsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={authLink}
+                  >
+                    {t("auth.signUp.termsOfUse")}
+                  </a>
+                ),
+              })}
+            />
+          )}
         </form.Field>
         {failed && <FormMessage>{t("auth.signUp.failed")}</FormMessage>}
         <SubmitButton submitting={submitting}>

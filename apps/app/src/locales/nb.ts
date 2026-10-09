@@ -100,8 +100,6 @@ export default {
       failed: "Koden fungerte ikke eller er utløpt. Be om en ny.",
     },
     backToSignIn: "Tilbake til innlogging",
-    or: "eller",
-    continueWithGoogle: "Fortsett med Google",
     noMatches: "Ingen treff",
     failedGeneric: "Noe gikk galt. Prøv igjen.",
   },

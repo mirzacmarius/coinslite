@@ -63,9 +63,9 @@ function regionOf(tag: string, { guess }: { guess: boolean }) {
 }
 
 /**
- * The Home currency to preselect at sign-up: the currency of the region in the
- * browser's languages (en-GB → GBP), else of the language's home region
- * (nb → NOK), else euro.
+ * The Home currency to preselect at sign-up: the currency of a region named in
+ * the browser's languages (en-GB → GBP), else of the home region of the
+ * browser's first language (nb → NOK), else of the interface language's, else euro.
  */
 export function suggestHomeCurrency({
   acceptLanguage,
@@ -74,10 +74,12 @@ export function suggestHomeCurrency({
   acceptLanguage?: string | null;
   locale: Locale;
 }): HomeCurrency {
+  const tags = preferredTags(acceptLanguage ?? "");
   const region =
-    preferredTags(acceptLanguage ?? "")
+    tags
       .map((tag) => regionOf(tag, { guess: false }))
       .find((found) => found !== undefined) ??
+    (tags[0] ? regionOf(tags[0], { guess: true }) : undefined) ??
     regionOf(locale, { guess: true });
   return (region && currencyByRegion[region]) || FALLBACK;
 }

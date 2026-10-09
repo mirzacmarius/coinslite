@@ -13,16 +13,15 @@ export const username = z
     "Username may only contain alphanumeric characters.",
   );
 
-const [firstLocale, secondLocale, ...otherLocales] = locales;
-export const language = v.union(
-  v.literal(firstLocale),
-  v.literal(secondLocale),
-  ...otherLocales.map((locale) => v.literal(locale)),
-);
+/** A validator accepting exactly the given strings, e.g. the supported locales. */
+function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
+  const [first, second, ...rest] = values;
+  return v.union(
+    v.literal(first),
+    v.literal(second),
+    ...rest.map((value) => v.literal(value)),
+  );
+}
 
-const [firstCurrency, secondCurrency, ...otherCurrencies] = homeCurrencies;
-export const homeCurrency = v.union(
-  v.literal(firstCurrency),
-  v.literal(secondCurrency),
-  ...otherCurrencies.map((currency) => v.literal(currency)),
-);
+export const language = literalUnion(locales);
+export const homeCurrency = literalUnion(homeCurrencies);

@@ -1,8 +1,15 @@
+import { safeNextPath } from "@/lib/next-path";
+
 /**
- * Reads the email and code that emailed links carry in the URL fragment, then
- * removes them from the address bar so they don't linger in history.
+ * Reads what emailed links carry in the URL fragment (email, code and the page
+ * to return to), then removes it from the address bar so it doesn't linger in
+ * history.
  */
-export function takeLinkFragment(): { email: string; code: string } | null {
+export function takeLinkFragment(): {
+  email: string;
+  code: string;
+  next?: string;
+} | null {
   const params = new URLSearchParams(window.location.hash.slice(1));
   const email = params.get("email");
   const code = params.get("code");
@@ -12,5 +19,6 @@ export function takeLinkFragment(): { email: string; code: string } | null {
     "",
     window.location.pathname + window.location.search,
   );
-  return { email, code };
+  const next = params.get("next");
+  return { email, code, ...(next && { next: safeNextPath(next) }) };
 }

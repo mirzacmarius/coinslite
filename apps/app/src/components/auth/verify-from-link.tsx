@@ -9,7 +9,10 @@ import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { takeLinkFragment } from "./link-fragment";
 import { usePasswordAuth } from "./use-password-auth";
 
-/** Opened from the verification email: checks the code in the link and signs in. */
+/**
+ * Opened from the verification email: checks the code in the link, signs in
+ * and returns to the page the person was heading to when they signed up.
+ */
 export function VerifyFromLink({ next }: { next: string }) {
   const t = useI18n();
   const attempt = usePasswordAuth();
@@ -27,8 +30,9 @@ export function VerifyFromLink({ next }: { next: string }) {
       setStatus("noLink");
       return;
     }
-    void attempt({ flow: "email-verification", ...link }).then((result) => {
-      if (result === "signedIn") goTo(next);
+    const { email, code, next: fromLink } = link;
+    void attempt({ flow: "email-verification", email, code }).then((result) => {
+      if (result === "signedIn") goTo(fromLink ?? next);
       else setStatus("failed");
     });
   }, [attempt, next]);

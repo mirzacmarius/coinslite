@@ -1,5 +1,4 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { asyncMap } from "convex-helpers";
+import { getAuthUserId, invalidateSessions } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, mutation, query } from "./_generated/server";
@@ -77,23 +76,21 @@ export const deleteUserAccount = internalMutation({
   args: {
     userId: v.id("users"),
   },
-  handler: async (ctx, args) => {
-    await asyncMap(
-      ["google" /* add other providers as needed */],
-      async (provider) => {
-        const authAccount = await ctx.db
-          .query("authAccounts")
-          .withIndex("userIdAndProvider", (q) =>
-            q.eq("userId", args.userId).eq("provider", provider),
-          )
-          .unique();
-        if (!authAccount) {
-          return;
-        }
-        await ctx.db.delete(authAccount._id);
-      },
-    );
-    await ctx.db.delete(args.userId);
+  handler: async (ctx, { userId }) => {
+    // Every sign-in method and its pending codes, so the email can be used again.
+    const accounts = await ctx.db
+      .query("authAccounts")
+      .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
+      .take(20);
+    for (const account of accounts) {
+      const codes = await ctx.db
+        .query("authVerificationCodes")
+        .withIndex("accountId", (q) => q.eq("accountId", account._id))
+        .take(20);
+      for (const code of codes) await ctx.db.delete(code._id);
+      await ctx.db.delete(account._id);
+    }
+    await ctx.db.delete(userId);
   },
 });
 
@@ -101,6 +98,7 @@ export const deleteCurrentUserAccount = action({
   args: {},
   handler: async (ctx) => {
     const userId = await requireUserId(ctx);
+    await invalidateSessions(ctx, { userId });
     // The alpha Polar component predates Convex 1.46's action context type.
     // Runtime is compatible; drop this when billing moves to @convex-dev/polar.
     const polarCtx = ctx as unknown as Parameters<

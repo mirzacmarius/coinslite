@@ -95,8 +95,6 @@ export default {
       failed: "That code didn't work or has expired. Ask for a new one.",
     },
     backToSignIn: "Back to sign in",
-    or: "or",
-    continueWithGoogle: "Continue with Google",
     noMatches: "No matches",
     failedGeneric: "Something went wrong. Try again.",
   },

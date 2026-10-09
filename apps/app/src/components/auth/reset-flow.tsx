@@ -2,32 +2,35 @@
 
 import { goTo } from "@/lib/next-path";
 import { useI18n } from "@/locales/client";
-import { normalizeEmail } from "@coinslite/backend/convex/accounts/email";
-import { Button } from "@coinslite/ui/button";
+import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
-import { AuthPanel, FormMessage, authLink } from "./auth-panel";
+import {
+  AuthPanel,
+  FormMessage,
+  type FormMessageState,
+  authLink,
+} from "./auth-panel";
+import { ResendCodeButton } from "./code-step";
 import { takeLinkFragment } from "./link-fragment";
-import { authSchemas } from "./schemas";
 import { TextField } from "./text-field";
+import {
+  codeInputProps,
+  useAuthSchemas,
+  useSubmitState,
+} from "./use-auth-form";
 import { usePasswordAuth } from "./use-password-auth";
 
 /** Forgot password: email a code, then choose a new password with it. */
 export function ResetFlow({ next }: { next: string }) {
-  const t = useI18n();
-  const attempt = usePasswordAuth();
-  const schemas = authSchemas({
-    emailInvalid: t("auth.fields.emailInvalid"),
-    passwordTooShort: t("auth.fields.passwordTooShort"),
-    passwordRequired: t("auth.fields.passwordRequired"),
-    codeInvalid: t("auth.fields.codeInvalid"),
-  });
-  const [step, setStep] = useState<{ email: string; code: string } | null>(
-    null,
-  );
+  const [step, setStep] = useState<{
+    email: string;
+    code: string;
+    next?: string;
+  } | null>(null);
 
   // The emailed link carries the email and code; go straight to the new password.
   // It may also be pasted into this tab, which only changes the fragment.
@@ -46,48 +49,31 @@ export function ResetFlow({ next }: { next: string }) {
       key={`${step.email} ${step.code}`}
       email={step.email}
       code={step.code}
-      schemas={schemas}
-      submit={async ({ code, newPassword }) => {
-        const result = await attempt({
-          flow: "reset-verification",
-          email: step.email,
-          code,
-          newPassword,
-        });
-        if (result === "signedIn") goTo(next);
-        return result;
-      }}
-      resend={() => attempt({ flow: "reset", email: step.email })}
+      next={step.next ?? next}
     />
   ) : (
-    <RequestStep
-      schemas={schemas}
-      submit={async (email) => {
-        // Whether or not the address has an account, the next step looks the same.
-        await attempt({ flow: "reset", email });
-        setStep({ email, code: "" });
-      }}
-    />
+    <RequestStep next={next} onSent={(email) => setStep({ email, code: "" })} />
   );
 }
 
-type Schemas = ReturnType<typeof authSchemas>;
-
 function RequestStep({
-  schemas,
-  submit,
-}: {
-  schemas: Schemas;
-  submit: (email: string) => Promise<void>;
-}) {
+  next,
+  onSent,
+}: { next: string; onSent: (email: string) => void }) {
   const t = useI18n();
+  const attempt = usePasswordAuth();
+  const schemas = useAuthSchemas();
   const form = useForm({
     defaultValues: { email: "" },
     validatorAdapter: zodValidator(),
-    onSubmit: ({ value }) => submit(normalizeEmail(value.email)),
+    onSubmit: async ({ value }) => {
+      const email = normalizeEmail(value.email);
+      // Whether or not the address has an account, the next step looks the same.
+      await attempt({ flow: "reset", email, redirectTo: next });
+      onSent(email);
+    },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
+  const { submitted, submitting } = useSubmitState(form);
   return (
     <AuthPanel
       title={t("auth.reset.title")}
@@ -121,20 +107,12 @@ function RequestStep({
 function NewPasswordStep({
   email,
   code,
-  schemas,
-  submit,
-  resend,
-}: {
-  email: string;
-  code: string;
-  schemas: Schemas;
-  submit: (values: { code: string; newPassword: string }) => Promise<string>;
-  resend: () => Promise<string>;
-}) {
+  next,
+}: { email: string; code: string; next: string }) {
   const t = useI18n();
-  const [message, setMessage] = useState<
-    { tone: "error" | "info"; text: string } | undefined
-  >(
+  const attempt = usePasswordAuth();
+  const schemas = useAuthSchemas();
+  const [message, setMessage] = useState<FormMessageState | undefined>(
     code
       ? undefined
       : { tone: "info", text: t("auth.reset.codeSent", { email }) },
@@ -144,16 +122,17 @@ function NewPasswordStep({
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setMessage(undefined);
-      const result = await submit({
+      const result = await attempt({
+        flow: "reset-verification",
+        email,
         code: value.code.trim(),
         newPassword: value.newPassword,
       });
-      if (result === "failed")
-        setMessage({ tone: "error", text: t("auth.reset.failed") });
+      if (result === "signedIn") goTo(next);
+      else setMessage({ tone: "error", text: t("auth.reset.failed") });
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
+  const { submitted, submitting } = useSubmitState(form);
   return (
     <AuthPanel
       title={t("auth.reset.newPasswordTitle")}
@@ -171,10 +150,7 @@ function NewPasswordStep({
               field={field}
               label={t("auth.fields.code")}
               showErrors={submitted}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={8}
-              className="font-mono tracking-[0.3em]"
+              {...codeInputProps}
             />
           )}
         </form.Field>
@@ -200,20 +176,11 @@ function NewPasswordStep({
           <SubmitButton submitting={submitting}>
             {t("auth.reset.submit")}
           </SubmitButton>
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={async () => {
-              await resend();
-              setMessage({
-                tone: "info",
-                text: t("auth.code.resent", { email }),
-              });
-            }}
-          >
-            {t("auth.code.resend")}
-          </Button>
+          <ResendCodeButton
+            email={email}
+            resend={() => attempt({ flow: "reset", email, redirectTo: next })}
+            onResult={setMessage}
+          />
         </div>
       </AuthForm>
     </AuthPanel>

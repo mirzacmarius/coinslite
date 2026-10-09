@@ -48,19 +48,16 @@ function withLanguage(request: NextRequest) {
   return response;
 }
 
-// The /design gallery shows the design system; it's public everywhere except production.
-const isDesignGallery = createRouteMatcher([
-  "/design",
-  ...locales.map((locale) => `/${locale}/design`),
-]);
-const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
-
 /** A page path plus its language-prefixed forms, e.g. /login and /ro/login. */
 const inEveryLanguage = (paths: string[]) =>
   paths.flatMap((path) => [
     path,
     ...locales.map((locale) => `/${locale}${path}`),
   ]);
+
+// The /design gallery shows the design system; it's public everywhere except production.
+const isDesignGallery = createRouteMatcher(inEveryLanguage(["/design"]));
+const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
 
 // Signing in, signing up and the verify link; signed-in visitors are sent on.
 const isSignInPage = createRouteMatcher(
@@ -73,7 +70,7 @@ const isPasswordResetPage = createRouteMatcher(inEveryLanguage(["/reset"]));
  * Tells the marketing site someone is signed in, so it can send them straight
  * to the app. Only shared when both sites sit under SIGNED_IN_HINT_DOMAIN
  * (e.g. ".coinslite.app"); locally, cookies are shared across ports anyway.
- * The marketing site reads the same name.
+ * apps/web/src/proxy.ts reads the same name.
  */
 const SIGNED_IN_HINT_COOKIE = "coinslite-signed-in";
 

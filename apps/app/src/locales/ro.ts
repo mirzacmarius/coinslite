@@ -101,8 +101,6 @@ export default {
       failed: "Codul nu a funcționat sau a expirat. Cere unul nou.",
     },
     backToSignIn: "Înapoi la conectare",
-    or: "sau",
-    continueWithGoogle: "Continuă cu Google",
     noMatches: "Niciun rezultat",
     failedGeneric: "Ceva nu a mers. Încearcă din nou.",
   },

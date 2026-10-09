@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
 import type { Value } from "convex/values";
 import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
@@ -24,6 +25,12 @@ beforeAll(async () => {
 });
 
 type Test = ReturnType<typeof convexTest>;
+
+const newTest = () => {
+  const t = convexTest(schema, modules);
+  rateLimiter.register(t);
+  return t;
+};
 
 const signIn = (t: Test, params: Record<string, Value>) =>
   t.action(api.auth.signIn, { provider: "password", params });
@@ -53,8 +60,11 @@ const signUpAndVerify = async (t: Test, email = "ada@example.com") => {
   return signIn(t, { flow: "email-verification", email, code });
 };
 
+const outbox = (t: Test) =>
+  t.run((ctx) => ctx.db.query("devOutbox").order("desc").collect());
+
 test("sign-up needs the privacy policy and terms accepted", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
 
   await expect(signUp(t, { acceptTerms: "false" })).rejects.toThrow(
     "TERMS_NOT_ACCEPTED",
@@ -63,7 +73,7 @@ test("sign-up needs the privacy policy and terms accepted", async () => {
 });
 
 test("sign-up needs a password of at least 8 characters", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
 
   await expect(signUp(t, { password: "short12" })).rejects.toThrow(
     "PASSWORD_TOO_SHORT",
@@ -72,7 +82,7 @@ test("sign-up needs a password of at least 8 characters", async () => {
 });
 
 test("sign-up needs one of the supported Home currencies", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
 
   await expect(signUp(t, { homeCurrency: "JPY" })).rejects.toThrow(
     "INVALID_HOME_CURRENCY",
@@ -80,7 +90,7 @@ test("sign-up needs one of the supported Home currencies", async () => {
 });
 
 test("emails are only accepted trimmed and in lower case, as the forms send them", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
 
   await expect(signUp(t, { email: " Ada@Example.com" })).rejects.toThrow(
     "INVALID_EMAIL",
@@ -96,7 +106,7 @@ test("emails are only accepted trimmed and in lower case, as the forms send them
 });
 
 test("sign-up creates the profile and emails a code, without signing in", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
 
   const result = await signUp(t, { email: "ada.lovelace@example.com" });
 
@@ -121,7 +131,7 @@ test("sign-up creates the profile and emails a code, without signing in", async 
 });
 
 test("an account can't sign in until its email is verified", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
   await signUp(t);
   const firstCode = await latestCode(t, "ada@example.com");
 
@@ -136,7 +146,7 @@ test("an account can't sign in until its email is verified", async () => {
 });
 
 test("the emailed code verifies the email and signs in", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
 
   const verified = await signUpAndVerify(t);
 
@@ -152,7 +162,7 @@ test("the emailed code verifies the email and signs in", async () => {
 });
 
 test("a wrong code is rejected", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
   await signUp(t);
   const code = await latestCode(t, "ada@example.com");
   const wrongCode = code === "00000000" ? "11111111" : "00000000";
@@ -169,7 +179,7 @@ test("a wrong code is rejected", async () => {
 });
 
 test("a code only works for the address it was sent to", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
   await signUp(t, { email: "ada@example.com" });
   await signUp(t, { email: "bob@example.com" });
   const adasCode = await latestCode(t, "ada@example.com");
@@ -187,7 +197,7 @@ test("a code only works for the address it was sent to", async () => {
 });
 
 test("a forgotten password is replaced using the emailed code", async () => {
-  const t = convexTest(schema, modules);
+  const t = newTest();
   await signUpAndVerify(t);
 
   await signIn(t, { flow: "reset", email: "ada@example.com" });
@@ -228,4 +238,67 @@ test("a forgotten password is replaced using the emailed code", async () => {
     password: "battery staple",
   });
   expect(signedIn.tokens?.token).toEqual(expect.any(String));
+});
+
+test("a reset code only works for the address it was sent to", async () => {
+  const t = newTest();
+  await signUpAndVerify(t, "ada@example.com");
+  await signUpAndVerify(t, "bob@example.com");
+  await signIn(t, { flow: "reset", email: "ada@example.com" });
+
+  await expect(
+    signIn(t, {
+      flow: "reset-verification",
+      email: "bob@example.com",
+      code: await latestCode(t, "ada@example.com"),
+      newPassword: "taken over",
+    }),
+  ).rejects.toThrow("INVALID_CODE");
+  await expect(
+    signIn(t, {
+      flow: "signIn",
+      email: "bob@example.com",
+      password: "taken over",
+    }),
+  ).rejects.toThrow();
+});
+
+test("no more than five code emails an hour go to one address", async () => {
+  const t = newTest();
+  await signUp(t);
+  for (let resend = 0; resend < 4; resend++) {
+    await signIn(t, { flow: "email-verification", email: "ada@example.com" });
+  }
+
+  await expect(
+    signIn(t, { flow: "email-verification", email: "ada@example.com" }),
+  ).rejects.toThrow("TOO_MANY_CODE_EMAILS");
+  expect(await outbox(t)).toHaveLength(5);
+});
+
+test("the emailed link returns to the page the person was heading to", async () => {
+  const t = newTest();
+
+  await signUp(t, { redirectTo: "/collection?type=coin" });
+
+  const [email] = await outbox(t);
+  const fragment = new URLSearchParams(email.text.split("#")[1]);
+  expect(fragment.get("next")).toBe("/collection?type=coin");
+  expect(fragment.get("code")).toBe(email.code);
+});
+
+test("a deleted account's email can sign up again", async () => {
+  const t = newTest();
+  await signUpAndVerify(t);
+  const [user] = await users(t);
+
+  await t.mutation(internal.users.deleteUserAccount, { userId: user._id });
+
+  expect(await users(t)).toEqual([]);
+  expect(await t.run((ctx) => ctx.db.query("authAccounts").collect())).toEqual(
+    [],
+  );
+  const again = await signUp(t);
+  expect(again.tokens ?? null).toBeNull();
+  expect(await users(t)).toHaveLength(1);
 });

@@ -1,44 +1,40 @@
 "use client";
 
+import { goTo } from "@/lib/next-path";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useEffect, useRef, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
-import { AuthPanel, FormMessage } from "./auth-panel";
-import { authSchemas } from "./schemas";
+import { AuthPanel, FormMessage, type FormMessageState } from "./auth-panel";
 import { TextField } from "./text-field";
-import type { AuthStepResult } from "./use-password-auth";
+import {
+  codeInputProps,
+  useAuthSchemas,
+  useSubmitState,
+} from "./use-auth-form";
+import { type AuthStepResult, usePasswordAuth } from "./use-password-auth";
 
 /**
- * "Check your email": the 8-digit code sent to verify an address. The same
- * code also arrives as a link, which opens the verify page instead.
+ * "Check your email": verifies an address with the emailed code, then signs in
+ * and goes on to `next`. The same code also arrives as a link to the verify page.
  */
 export function CodeStep({
   email,
+  next,
   description,
-  verify,
-  resend,
   onBack,
 }: {
   email: string;
+  next: string;
   description?: string;
-  verify: (code: string) => Promise<AuthStepResult>;
-  resend: () => Promise<AuthStepResult>;
   onBack: () => void;
 }) {
   const t = useI18n();
-  const schemas = authSchemas({
-    emailInvalid: t("auth.fields.emailInvalid"),
-    passwordTooShort: t("auth.fields.passwordTooShort"),
-    passwordRequired: t("auth.fields.passwordRequired"),
-    codeInvalid: t("auth.fields.codeInvalid"),
-  });
-  const [message, setMessage] = useState<{
-    tone: "error" | "info";
-    text: string;
-  }>();
+  const attempt = usePasswordAuth();
+  const schemas = useAuthSchemas();
+  const [message, setMessage] = useState<FormMessageState>();
   const codeInput = useRef<HTMLInputElement>(null);
   useEffect(() => codeInput.current?.focus(), []);
 
@@ -47,13 +43,16 @@ export function CodeStep({
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setMessage(undefined);
-      if ((await verify(value.code.trim())) === "failed") {
-        setMessage({ tone: "error", text: t("auth.code.failed") });
-      }
+      const result = await attempt({
+        flow: "email-verification",
+        email,
+        code: value.code.trim(),
+      });
+      if (result === "signedIn") goTo(next);
+      else setMessage({ tone: "error", text: t("auth.code.failed") });
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
+  const { submitted, submitting } = useSubmitState(form);
 
   return (
     <AuthPanel
@@ -82,10 +81,7 @@ export function CodeStep({
               field={field}
               label={t("auth.fields.code")}
               showErrors={submitted}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={8}
-              className="font-mono tracking-[0.3em]"
+              {...codeInputProps}
             />
           )}
         </form.Field>
@@ -96,22 +92,44 @@ export function CodeStep({
           <SubmitButton submitting={submitting}>
             {t("auth.code.submit")}
           </SubmitButton>
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={async () => {
-              setMessage(
-                (await resend()) === "failed"
-                  ? { tone: "error", text: t("auth.failedGeneric") }
-                  : { tone: "info", text: t("auth.code.resent", { email }) },
-              );
-            }}
-          >
-            {t("auth.code.resend")}
-          </Button>
+          <ResendCodeButton
+            email={email}
+            resend={() =>
+              attempt({ flow: "email-verification", email, redirectTo: next })
+            }
+            onResult={setMessage}
+          />
         </div>
       </AuthForm>
     </AuthPanel>
+  );
+}
+
+/** "Send a new code", reporting whether it went out. */
+export function ResendCodeButton({
+  email,
+  resend,
+  onResult,
+}: {
+  email: string;
+  resend: () => Promise<AuthStepResult>;
+  onResult: (message: FormMessageState) => void;
+}) {
+  const t = useI18n();
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      className="w-full"
+      onClick={async () => {
+        onResult(
+          (await resend()) === "failed"
+            ? { tone: "error", text: t("auth.failedGeneric") }
+            : { tone: "info", text: t("auth.code.resent", { email }) },
+        );
+      }}
+    >
+      {t("auth.code.resend")}
+    </Button>
   );
 }

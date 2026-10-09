@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
 import { EmptyState } from "@coinslite/ui/empty-state";
+import { CheckboxField, Field } from "@coinslite/ui/field";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { Input } from "@coinslite/ui/input";
 import { type ItemType, ItemTypeIcon } from "@coinslite/ui/item-type-icon";
@@ -339,6 +340,7 @@ export function DesignGallery() {
   const [album, setAlbum] = useState<string | undefined>("travel");
   const [grade, setGrade] = useState<string>();
   const [currency, setCurrency] = useState("NOK");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const totals = [
     { label: "Purchase price", value: money(436650, "EUR") },
     { label: "Market value", value: money(512000, "EUR") },
@@ -601,6 +603,29 @@ export function DesignGallery() {
                   <Switch id="design-bullion" />
                   <Label htmlFor="design-bullion">Bullion</Label>
                 </div>
+                <Field
+                  id="design-email"
+                  label="Email"
+                  hint="We send a code to check it's yours."
+                  error="Enter an email address, like name@example.com."
+                  className="sm:col-span-2"
+                >
+                  {(control) => (
+                    <Input {...control} type="email" defaultValue="ada@" />
+                  )}
+                </Field>
+                <CheckboxField
+                  id="design-terms"
+                  className="sm:col-span-2"
+                  checked={acceptedTerms}
+                  onCheckedChange={setAcceptedTerms}
+                  label="I accept the privacy policy and the terms of use"
+                  error={
+                    acceptedTerms
+                      ? undefined
+                      : "Accept the privacy policy and terms of use to continue."
+                  }
+                />
               </div>
             </Card>
           </Section>

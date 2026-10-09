@@ -10,7 +10,7 @@
 
 import type * as accounts_codeEmailMessages from "../accounts/codeEmailMessages.js";
 import type * as accounts_codeEmails from "../accounts/codeEmails.js";
-import type * as accounts_email from "../accounts/email.js";
+import type * as accounts_credentials from "../accounts/credentials.js";
 import type * as accounts_emails from "../accounts/emails.js";
 import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as auth from "../auth.js";
@@ -32,7 +32,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   "accounts/codeEmailMessages": typeof accounts_codeEmailMessages;
   "accounts/codeEmails": typeof accounts_codeEmails;
-  "accounts/email": typeof accounts_email;
+  "accounts/credentials": typeof accounts_credentials;
   "accounts/emails": typeof accounts_emails;
   "accounts/signUpProfile": typeof accounts_signUpProfile;
   auth: typeof auth;
@@ -74,4 +74,5 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   polar: import("@convex-dev/polar/_generated/component.js").ComponentApi<"polar">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };

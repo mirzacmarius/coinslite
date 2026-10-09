@@ -20,6 +20,12 @@ describe("suggestHomeCurrency", () => {
     );
   });
 
+  test("a browser language without a region still beats the chosen interface language", () => {
+    expect(
+      suggestHomeCurrency({ acceptLanguage: "nb,en;q=0.8", locale: "en" }),
+    ).toBe("NOK");
+  });
+
   test("uses the language's home region when the browser names none", () => {
     expect(suggestHomeCurrency({ acceptLanguage: "nb", locale: "nb" })).toBe(
       "NOK",

@@ -105,8 +105,6 @@ export default {
         "Der Code hat nicht funktioniert oder ist abgelaufen. Fordere einen neuen an.",
     },
     backToSignIn: "Zurück zur Anmeldung",
-    or: "oder",
-    continueWithGoogle: "Weiter mit Google",
     noMatches: "Keine Treffer",
     failedGeneric: "Etwas ist schiefgelaufen. Versuche es noch einmal.",
   },
