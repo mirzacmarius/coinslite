@@ -655,7 +655,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
       YEARS_REVERSED: "The last year comes before the first.",
       SOURCE_REQUIRED: "Name the source of these facts, notes or image.",
-      CREDIT_REQUIRED: "An image needs its source, author, licence and link.",
+      CREDIT_REQUIRED:
+        "Facts, notes and images each need their source, author, licence and link.",
       ROOT_NOT_ADDABLE:
         "A country or Theme can't be a Catalog entry. Give the row a parent_id.",
       PARENT_NOT_FOUND: "No row in the file or the Catalog has this id.",
@@ -1287,7 +1288,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
       YEARS_REVERSED: "The last year comes before the first.",
       SOURCE_REQUIRED: "Name the source of these facts or notes.",
-      CREDIT_REQUIRED: "The image needs its source, author, licence and link.",
+      CREDIT_REQUIRED:
+        "Facts, notes and the image each need their source, author, licence and link.",
       ROOT_NOT_ADDABLE: "A country or Theme can't be a Catalog entry.",
       PARENT_NOT_FOUND: "The node above it is gone. Close this and try again.",
       PARENT_IS_ENTRY: "Nothing can go below a Catalog entry.",

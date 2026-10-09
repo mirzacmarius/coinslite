@@ -692,7 +692,8 @@ export default {
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED:
         "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
-      CREDIT_REQUIRED: "Ein Bild braucht Quelle, Urheber, Lizenz und Link.",
+      CREDIT_REQUIRED:
+        "Fakten, Hinweise und Bilder brauchen jeweils Quelle, Urheber, Lizenz und Link.",
       ROOT_NOT_ADDABLE:
         "Ein Land oder Thema kann kein Katalogeintrag sein. Gib der Zeile eine parent_id.",
       PARENT_NOT_FOUND:
@@ -1354,7 +1355,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Maße.",
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED: "Nenne die Quelle dieser Fakten oder Hinweise.",
-      CREDIT_REQUIRED: "Das Bild braucht Quelle, Urheber, Lizenz und Link.",
+      CREDIT_REQUIRED:
+        "Fakten, Hinweise und das Bild brauchen jeweils Quelle, Urheber, Lizenz und Link.",
       ROOT_NOT_ADDABLE: "Ein Land oder Thema kann kein Katalogeintrag sein.",
       PARENT_NOT_FOUND:
         "Der Knoten darüber ist weg. Schließe dies und versuche es noch einmal.",

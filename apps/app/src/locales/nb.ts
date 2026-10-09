@@ -668,7 +668,7 @@ export default {
       SOURCE_REQUIRED:
         "Oppgi kilden til disse faktaene, notatene eller bildet.",
       CREDIT_REQUIRED:
-        "Et bilde trenger kilde, opphavsperson, lisens og lenke.",
+        "Fakta, notater og bilder trenger hver sin kilde, opphavsperson, lisens og lenke.",
       ROOT_NOT_ADDABLE:
         "Et land eller et tema kan ikke være en katalogoppføring. Gi raden en parent_id.",
       PARENT_NOT_FOUND: "Ingen rad i filen eller katalogen har denne id-en.",
@@ -1306,7 +1306,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Sedler har verken metall eller mål.",
       YEARS_REVERSED: "Siste år kommer før det første.",
       SOURCE_REQUIRED: "Oppgi kilden til disse faktaene eller notatene.",
-      CREDIT_REQUIRED: "Bildet trenger kilde, opphavsperson, lisens og lenke.",
+      CREDIT_REQUIRED:
+        "Fakta, notater og bildet trenger hver sin kilde, opphavsperson, lisens og lenke.",
       ROOT_NOT_ADDABLE:
         "Et land eller et tema kan ikke være en katalogoppføring.",
       PARENT_NOT_FOUND: "Noden over er borte. Lukk dette og prøv igjen.",

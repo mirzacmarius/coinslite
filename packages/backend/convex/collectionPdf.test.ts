@@ -392,8 +392,11 @@ test("an Item added from the Catalog shows its Catalog entry's facts in the PDF"
       "denomination",
       "year_from",
       "facts_source",
+      "facts_author",
+      "facts_licence",
+      "facts_link",
     ],
-    ["us", "", "United States", "", "", "US", "", "", ""],
+    ["us", "", "United States", "", "", "US", "", "", "", "", "", ""],
     [
       "us-morgan-1881-cc",
       "us",
@@ -404,6 +407,9 @@ test("an Item added from the Catalog shows its Catalog entry's facts in the PDF"
       "1 dollar",
       "1881",
       "United States Mint",
+      "United States Mint",
+      "Public domain",
+      "https://www.usmint.gov/",
     ],
   ]
     .map((row) => formatCsvRecord(row))

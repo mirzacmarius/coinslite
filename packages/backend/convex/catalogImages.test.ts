@@ -61,6 +61,9 @@ async function morganDollars(admin: Caller) {
       is_addable: "true",
       year_from: year,
       facts_source: "United States Mint",
+      facts_author: "United States Mint",
+      facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
     })),
   ]);
 }
@@ -745,6 +748,9 @@ test("Catalog CSV imports keep an uploaded image and its credit, unless the file
       title: "Morgan dollar 1881",
       year_from: "1881",
       facts_source: "US Mint",
+      facts_author: "US Mint",
+      facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
     },
   ]);
   expect(await detail()).toMatchObject({

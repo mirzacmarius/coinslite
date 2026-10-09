@@ -42,8 +42,18 @@ const columns = [
   "sort_order",
   "is_addable",
   "facts_source",
+  "facts_author",
+  "facts_licence",
+  "facts_link",
 ] as const;
 type Row = Partial<Record<(typeof columns)[number], string>>;
+
+const testCredit = {
+  facts_source: "Test source",
+  facts_author: "Test author",
+  facts_licence: "Test licence",
+  facts_link: "https://example.org/source",
+};
 
 /** A Catalog CSV file of these rows; facts are credited to a test source. */
 const catalogFile = (rows: Row[]) =>
@@ -52,8 +62,8 @@ const catalogFile = (rows: Row[]) =>
     ...rows.map((row) =>
       columns
         .map((column) =>
-          column === "facts_source" && (row.denomination || row.series)
-            ? "Test source"
+          column.startsWith("facts_") && (row.denomination || row.series)
+            ? testCredit[column as keyof typeof testCredit]
             : row[column] ?? "",
         )
         .join(","),

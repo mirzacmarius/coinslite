@@ -88,6 +88,9 @@ const entry = (
   is_addable: "true",
   ...(year !== null && { year_from: String(year), year_to: String(year) }),
   facts_source: "Test source",
+  facts_author: "Test source",
+  facts_licence: "Public domain",
+  facts_link: "https://example.org/facts",
   ...extra,
 });
 

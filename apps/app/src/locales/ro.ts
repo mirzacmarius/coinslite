@@ -672,7 +672,8 @@ export default {
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED:
         "Precizează sursa acestor date, note sau a acestei imagini.",
-      CREDIT_REQUIRED: "O imagine are nevoie de sursă, autor, licență și link.",
+      CREDIT_REQUIRED:
+        "Datele, notele și imaginile au nevoie fiecare de sursă, autor, licență și link.",
       ROOT_NOT_ADDABLE:
         "O țară sau o temă nu poate fi intrare de catalog. Dă-i rândului un parent_id.",
       PARENT_NOT_FOUND:
@@ -1316,7 +1317,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Bancnotele nu au metal sau dimensiuni.",
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED: "Precizează sursa acestor date sau note.",
-      CREDIT_REQUIRED: "Imaginea are nevoie de sursă, autor, licență și link.",
+      CREDIT_REQUIRED:
+        "Datele, notele și imaginea au nevoie fiecare de sursă, autor, licență și link.",
       ROOT_NOT_ADDABLE: "O țară sau o temă nu poate fi intrare de catalog.",
       PARENT_NOT_FOUND:
         "Nodul de deasupra nu mai există. Închide asta și încearcă din nou.",

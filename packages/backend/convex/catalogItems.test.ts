@@ -80,6 +80,9 @@ const morgan1881: Row = {
   year_to: "1881",
   numista_id: "1492",
   facts_source: "United States Mint",
+  facts_author: "United States Mint",
+  facts_licence: "Public domain",
+  facts_link: "https://example.org/facts",
 };
 
 /** A Catalog with one country and the Morgan dollar in it; returns an admin and a collector. */
@@ -330,6 +333,9 @@ test("an Item from the Catalog has its entry's Item type", async () => {
       denomination: "1 dollar",
       year_from: "1957",
       facts_source: "Bureau of Engraving and Printing",
+      facts_author: "Bureau of Engraving and Printing",
+      facts_licence: "Public domain",
+      facts_link: "https://example.org/facts",
     },
   ]);
 

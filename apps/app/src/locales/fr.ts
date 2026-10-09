@@ -681,7 +681,7 @@ export default {
       SOURCE_REQUIRED:
         "Indiquez la source de ces faits, de ces notes ou de cette image.",
       CREDIT_REQUIRED:
-        "Une image doit indiquer sa source, son auteur, sa licence et son lien.",
+        "Les données, les notes et les images doivent chacune indiquer leur source, leur auteur, leur licence et leur lien.",
       ROOT_NOT_ADDABLE:
         "Un pays ou un thème ne peut pas être une entrée du catalogue. Donnez un parent_id à la ligne.",
       PARENT_NOT_FOUND: "Aucune ligne du fichier ni du catalogue n’a cet id.",
@@ -1341,7 +1341,7 @@ export default {
       YEARS_REVERSED: "La dernière année précède la première.",
       SOURCE_REQUIRED: "Indiquez la source de ces données ou de ces notes.",
       CREDIT_REQUIRED:
-        "L’image doit indiquer sa source, son auteur, sa licence et son lien.",
+        "Les données, les notes et l’image doivent chacune indiquer leur source, leur auteur, leur licence et leur lien.",
       ROOT_NOT_ADDABLE:
         "Un pays ou un thème ne peut pas être une entrée du catalogue.",
       PARENT_NOT_FOUND:

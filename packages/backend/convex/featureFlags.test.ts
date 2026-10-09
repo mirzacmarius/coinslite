@@ -202,10 +202,10 @@ test("a Premium member whose Premium ends leaves the Premium beta", async () => 
 
 /** A small Catalog: Norway, a krone grouping and one entry. */
 const catalogCsv = [
-  "id,parent_id,item_type,title,country,denomination,series,year_from,is_addable,facts_source",
-  "no,,,Norway,NO,,,,,",
-  "no-krone,no,,Krone,,,,,,",
-  "no-krone-1875,no-krone,coin,1 krone 1875,NO,1 krone,Oscar II,1875,true,Test source",
+  "id,parent_id,item_type,title,country,denomination,series,year_from,is_addable,facts_source,facts_author,facts_licence,facts_link",
+  "no,,,Norway,NO,,,,,,,,",
+  "no-krone,no,,Krone,,,,,,,,,",
+  "no-krone-1875,no-krone,coin,1 krone 1875,NO,1 krone,Oscar II,1875,true,Test source,Test author,Test licence,https://example.org/",
 ].join("\n");
 
 /** Everything someone browsing or searching the Catalog would see. */

@@ -104,6 +104,9 @@ const entry = (id: string, parent: string, extra: Row = {}): Row => ({
   item_type: "coin",
   is_addable: "true",
   facts_source: "Test source",
+  facts_author: "Test source",
+  facts_licence: "Public domain",
+  facts_link: "https://example.org/facts",
   ...extra,
 });
 
@@ -330,10 +333,15 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
       year_from: "1881",
       year_to: "1881",
       facts_source: "United States Mint",
+      facts_author: "United States Mint",
       facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
       technical_details: "Mint: San Francisco.",
       historical_notes: "Struck under the Bland-Allison Act.",
       notes_source: "CoinsLite editorial",
+      notes_author: "CoinsLite",
+      notes_licence: "CoinsLite",
+      notes_link: "https://www.usmint.gov/",
       image_url: "https://images.example.com/morgan-1881-s.jpg",
       image_source: "Example Museum",
       image_author: "A. Photographer",
@@ -374,9 +382,16 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     historicalNotes: "Struck under the Bland-Allison Act.",
     factsProvenance: {
       source: "United States Mint",
+      author: "United States Mint",
       licence: "Public domain",
+      link: "https://www.usmint.gov/",
     },
-    notesProvenance: { source: "CoinsLite editorial" },
+    notesProvenance: {
+      source: "CoinsLite editorial",
+      author: "CoinsLite",
+      licence: "CoinsLite",
+      link: "https://www.usmint.gov/",
+    },
     imageUrl: "https://images.example.com/morgan-1881-s.jpg",
     // A linked image has one size.
     thumbnailUrl: "https://images.example.com/morgan-1881-s.jpg",
