@@ -503,3 +503,100 @@ test("an account holds up to 500 Albums", async () => {
   ).rejects.toThrow("TOO_MANY_ALBUMS");
   expect(await ada.as.query(api.albums.list, {})).toHaveLength(500);
 });
+
+/** A JPEG put in storage the way the browser uploads one, then attached. */
+async function addPhoto(
+  t: Test,
+  who: Awaited<ReturnType<typeof person>>,
+  itemId: Id<"items">,
+  side: "front" | "back",
+) {
+  const jpeg = new Uint8Array(64);
+  jpeg.set([0xff, 0xd8, 0xff, 0xe0, side === "front" ? 1 : 2]);
+  const storageId = await t.run((ctx) => ctx.storage.store(new Blob([jpeg])));
+  await who.as.action(api.photos.attach, { itemId, side, storageId });
+}
+
+test("Items deleted with their Album take their stored photos with them", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const travel = await ada.as.mutation(api.albums.create, {
+    name: "Travel",
+    colour: "blue",
+  });
+  const sold = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Sold dollar",
+    albumId: travel,
+  });
+  const kept = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Kept franc",
+    albumId: travel,
+  });
+  await addPhoto(t, ada, sold, "front");
+  await addPhoto(t, ada, sold, "back");
+  await addPhoto(t, ada, kept, "front");
+
+  await ada.as.mutation(api.albums.remove, {
+    albumId: travel,
+    deleteItemIds: [sold],
+  });
+
+  const storedFiles = await t.run(
+    async (ctx) => (await ctx.db.system.query("_storage").collect()).length,
+  );
+  expect(storedFiles).toBe(1);
+  expect(await ada.as.query(api.photos.ofItem, { itemId: kept })).toEqual({
+    front: expect.any(String),
+    back: null,
+  });
+});
+
+test("deleting an Item takes it out of its Album's count", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const travel = await ada.as.mutation(api.albums.create, {
+    name: "Travel",
+    colour: "blue",
+  });
+  const itemId = await ada.as.mutation(api.items.add, {
+    ...krone,
+    albumId: travel,
+  });
+  await ada.as.mutation(api.items.add, { ...krone, albumId: travel });
+
+  await ada.as.mutation(api.items.remove, { itemId });
+
+  expect(await counts(ada.as)).toEqual({ Travel: 1 });
+});
+
+test("an Album lists its Items with their thumbnails, like the Collection", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const travel = await ada.as.mutation(api.albums.create, {
+    name: "Travel",
+    colour: "blue",
+  });
+  const withPhoto = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "With photo",
+    albumId: travel,
+  });
+  await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Without",
+    albumId: travel,
+  });
+  await addPhoto(t, ada, withPhoto, "back");
+
+  const { page } = await ada.as.query(api.albums.items, {
+    albumId: travel,
+    paginationOpts: firstPage,
+  });
+
+  const photos = await ada.as.query(api.photos.ofItem, { itemId: withPhoto });
+  expect(
+    Object.fromEntries(page.map((item) => [item.title, item.thumbnailUrl])),
+  ).toEqual({ "With photo": photos?.back, Without: null });
+});

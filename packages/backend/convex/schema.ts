@@ -95,11 +95,18 @@ export default defineSchema({
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
 
+    // Photos, one file per side, private to the owner (photos.ts). The
+    // indexes keep each stored file on at most one Item side.
+    frontPhoto: v.optional(v.id("_storage")),
+    backPhoto: v.optional(v.id("_storage")),
+
     // Album: at most one. Moving an Item in or out keeps the Album's itemCount
     // right (albums/membership.ts).
     albumId: v.optional(v.id("albums")),
   })
     .index("by_ownerId", ["ownerId"])
+    .index("by_frontPhoto", ["frontPhoto"])
+    .index("by_backPhoto", ["backPhoto"])
     .index("by_ownerId_and_albumId", ["ownerId", "albumId"]),
 
   /**

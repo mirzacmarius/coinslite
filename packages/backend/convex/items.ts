@@ -1,9 +1,16 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
-import { type MutationCtx, mutation, query } from "./_generated/server";
+import {
+  type MutationCtx,
+  type QueryCtx,
+  mutation,
+  query,
+} from "./_generated/server";
 import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
+import { deleteItem } from "./items/deletion";
 import { checkItem } from "./items/rules";
+import { withThumbnail } from "./items/thumbnail";
 import { requireRoomForItems } from "./plans";
 import { requireSetUpUser } from "./utils/auth";
 import { gradingScale, itemType, material, strike } from "./utils/validators";
@@ -46,7 +53,10 @@ const latestPurchaseDate = () =>
   new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 /** One of the signed-in person's Items; anyone else's is reported as not found. */
-async function requireOwnItem(ctx: MutationCtx, itemId: Id<"items">) {
+export async function requireOwnItem(
+  ctx: QueryCtx | MutationCtx,
+  itemId: Id<"items">,
+) {
   const owner = await requireSetUpUser(ctx);
   const item = await ctx.db.get(itemId);
   if (!item || item.ownerId !== owner._id) throw new ConvexError(itemNotFound);
@@ -118,16 +128,35 @@ export const duplicate = mutation({
   },
 });
 
-/** The signed-in person's Items, newest first, a page at a time. */
+/** Deletes one of the signed-in person's Items, and its photos, for good. */
+export const remove = mutation({
+  args: { itemId: v.id("items") },
+  returns: v.null(),
+  handler: async (ctx, { itemId }) => {
+    await deleteItem(ctx, await requireOwnItem(ctx, itemId));
+    return null;
+  },
+});
+
+/**
+ * The signed-in person's Items, newest first, a page at a time. Each comes
+ * with its thumbnail: the front photo, else the back photo, else null.
+ */
 export const list = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, { paginationOpts }) => {
     const owner = await requireSetUpUser(ctx);
-    return await ctx.db
+    const items = await ctx.db
       .query("items")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
       .order("desc")
       .paginate(paginationOpts);
+    return {
+      ...items,
+      page: await Promise.all(
+        items.page.map((item) => withThumbnail(ctx, item)),
+      ),
+    };
   },
 });
 

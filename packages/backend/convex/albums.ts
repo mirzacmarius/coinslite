@@ -1,14 +1,13 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
-import type { Doc, Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 import {
   type MutationCtx,
   internalMutation,
   mutation,
   query,
 } from "./_generated/server";
-import { moveBetweenAlbums } from "./albums/membership";
 import {
   albumErrors,
   albumLimits,
@@ -16,6 +15,8 @@ import {
   nextColour,
 } from "./albums/rules";
 import { itemNotFound } from "./items";
+import { deleteItem } from "./items/deletion";
+import { withThumbnail } from "./items/thumbnail";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
 import { albumColour } from "./utils/validators";
@@ -102,18 +103,27 @@ export const get = query({
   },
 });
 
-/** The Items in one of the signed-in person's Albums, newest first, a page at a time. */
+/**
+ * The Items in one of the signed-in person's Albums, newest first, a page at
+ * a time, each with its list thumbnail as in the Collection.
+ */
 export const items = query({
   args: { albumId: v.id("albums"), paginationOpts: paginationOptsValidator },
   handler: async (ctx, { albumId, paginationOpts }) => {
     const owner = await requireSetUpUser(ctx);
-    return await ctx.db
+    const items = await ctx.db
       .query("items")
       .withIndex("by_ownerId_and_albumId", (q) =>
         q.eq("ownerId", owner._id).eq("albumId", albumId),
       )
       .order("desc")
       .paginate(paginationOpts);
+    return {
+      ...items,
+      page: await Promise.all(
+        items.page.map((item) => withThumbnail(ctx, item)),
+      ),
+    };
   },
 });
 
@@ -170,14 +180,4 @@ async function releaseItems(
       ownerId,
       albumId,
     });
-}
-
-/**
- * Deletes one Item for good. Deleting an Item also removes its stored photos
- * (spec 5.5), so once Items have photos this goes through the Items' own
- * deletion, which must keep the Album's count right as this does.
- */
-async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
-  await moveBetweenAlbums(ctx, item.albumId, undefined);
-  await ctx.db.delete(item._id);
 }

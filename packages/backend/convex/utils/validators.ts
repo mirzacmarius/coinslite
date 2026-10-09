@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { albumColours } from "../albums/rules";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
+import { photoSides } from "../photos/rules";
 
 /** A validator accepting exactly the given strings, e.g. the supported locales. */
 function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
@@ -34,6 +35,8 @@ export const strike = literalUnion(strikes);
 export const material = literalUnion(materials);
 /** One of the Album colours in albums/rules.ts. */
 export const albumColour = literalUnion(albumColours);
+/** Which side of an Item a photo shows: front or back. */
+export const photoSide = literalUnion(photoSides);
 
 /**
  * What one US dollar buys: units of each Home currency, and troy ounces of

@@ -1,12 +1,12 @@
 "use client";
 
+import { ItemThumbnail } from "@/components/items/item-thumbnail";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { Button } from "@coinslite/ui/button";
 import { Checkbox } from "@coinslite/ui/checkbox";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
-import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, usePaginatedQuery } from "convex/react";
@@ -127,8 +127,9 @@ export function DeleteAlbumDialog({
                         tick([item._id], checked === true)
                       }
                     />
-                    <ItemTypeIcon
+                    <ItemThumbnail
                       type={item.type}
+                      url={item.thumbnailUrl}
                       className="size-6 [&_svg]:size-3.5"
                     />
                     <span className="min-w-0 flex-1 truncate">

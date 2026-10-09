@@ -415,6 +415,52 @@ export default {
       deleteFailed: "Albumul nu a putut fi șters. Încearcă din nou.",
     },
   },
+  photos: {
+    title: "Fotografii",
+    sides: {
+      front: "Față",
+      back: "Spate",
+      obverse: "Avers",
+      reverse: "Revers",
+    },
+    add: "Adaugă fotografie",
+    formats: "JPEG, PNG, WebP sau GIF, până la 10 MB",
+    uploading: "Se încarcă fotografia",
+    view: "Vezi pe tot ecranul",
+    actions: "Acțiuni pentru fotografie",
+    replace: "Înlocuiește fotografia",
+    remove: "Elimină fotografia",
+    removeTitles: {
+      front: "Elimini fotografia feței?",
+      back: "Elimini fotografia spatelui?",
+      obverse: "Elimini fotografia aversului?",
+      reverse: "Elimini fotografia reversului?",
+    },
+    removeBody: "Fotografia se șterge definitiv. Poți adăuga oricând una nouă.",
+    cancel: "Anulează",
+    close: "Închide",
+    previous: "Fotografia anterioară",
+    next: "Fotografia următoare",
+    errors: {
+      tooLarge: "Fișierul are peste 10 MB. Alege o fotografie mai mică.",
+      notAnImage: "Fișierul nu este o imagine JPEG, PNG, WebP sau GIF.",
+      failed: "Fotografia nu a putut fi salvată. Încearcă din nou.",
+      removeFailed: "Fotografia nu a putut fi eliminată. Încearcă din nou.",
+    },
+  },
+  deleteItem: {
+    delete: "Șterge",
+    title: "Ștergi „{title}”?",
+    body: "Obiectul se șterge definitiv. Acțiunea nu poate fi anulată.",
+    bodyOnePhoto:
+      "Obiectul și fotografia lui se șterg definitiv. Acțiunea nu poate fi anulată.",
+    bodyTwoPhotos:
+      "Obiectul și cele 2 fotografii ale lui se șterg definitiv. Acțiunea nu poate fi anulată.",
+    confirm: "Șterge obiectul",
+    cancel: "Anulează",
+    deleted: "Obiect șters",
+    failed: "Obiectul nu a putut fi șters. Încearcă din nou.",
+  },
   feedback: {
     title: "Feedback",
     description:
