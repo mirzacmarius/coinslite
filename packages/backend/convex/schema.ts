@@ -376,6 +376,20 @@ export default defineSchema({
   }).index("by_finishedAt", ["finishedAt"]),
 
   /**
+   * Uploads someone registered but hasn't made a photo or a Catalog image yet
+   * (utils/files.ts): only they can put one to that use. The hourly clean-up
+   * deletes those older than an hour (uploads.ts); deleting the account
+   * deletes theirs.
+   */
+  uploads: defineTable({
+    storageId: v.id("_storage"),
+    ownerId: v.id("users"),
+    purpose: v.union(v.literal("photo"), v.literal("catalogImage")),
+  })
+    .index("by_storageId", ["storageId"])
+    .index("by_ownerId", ["ownerId"]),
+
+  /**
    * A Polar checkout someone has open (billing.ts): at most one per person, so
    * asking again sends them back to it instead of opening a second one that
    * could be paid as well. Without a `url` it is still being opened.

@@ -21,6 +21,12 @@ export const photoErrors = {
   notAnImage: "PHOTO_NOT_AN_IMAGE",
 } as const;
 
+/** Error codes for uploads of any kind, photos and Catalog images alike. */
+export const uploadErrors = {
+  /** More uploads in a short time than anyone adding photos needs. */
+  tooMany: "TOO_MANY_UPLOADS",
+} as const;
+
 /** The accepted formats, by the signature their files start with. */
 const signatures = {
   "image/jpeg": [[0xff, 0xd8, 0xff]],

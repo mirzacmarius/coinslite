@@ -439,6 +439,8 @@ export default {
     errors: {
       tooLarge: "Fișierul are peste 10 MB. Alege o fotografie mai mică.",
       notAnImage: "Fișierul nu este o imagine JPEG, PNG, WebP sau GIF.",
+      tooMany:
+        "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
       failed: "Fotografia nu a putut fi salvată. Încearcă din nou.",
       removeFailed: "Fotografia nu a putut fi eliminată. Încearcă din nou.",
     },
@@ -940,6 +942,8 @@ export default {
       failed: "Imaginea nu a putut fi salvată. Încearcă din nou.",
       removeFailed: "Imaginea nu a putut fi eliminată. Încearcă din nou.",
       CATALOG_ENTRY_NOT_FOUND: "Această intrare de catalog nu mai există.",
+      TOO_MANY_UPLOADS:
+        "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
       IMAGE_NOT_FOUND: "Încărcarea nu a ajuns. Încearcă din nou.",
       IMAGE_NOT_WEBP: "Imaginea nu a fost salvată ca WebP. Încearcă din nou.",
       IMAGE_TOO_LARGE:

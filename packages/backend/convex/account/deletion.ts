@@ -23,6 +23,7 @@ import { chargesAgain } from "../billing/rules";
 import { deleteCollectionCountsOf } from "../collectionCounts";
 import { rateLimiter as feedbackLimits } from "../feedback";
 import { deleteItem } from "../items/deletion";
+import { deleteUploadsOf, rateLimiter as uploadLimits } from "../uploads";
 import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
 
 /**
@@ -68,6 +69,7 @@ export const accountDataByTable = {
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   pendingCheckouts: "deleted at once: the checkout left open, if any",
+  uploads: "deleted: files they uploaded but never made a photo or an image",
   accountClosures:
     "kept: that the account id was deleted, naming no one, so Polar's late events about it end the subscription they report",
   collectionCounts:
@@ -152,6 +154,7 @@ type Remainder = Infer<typeof remainder>;
 async function forgetPerson(ctx: MutationCtx, user: Doc<"users">) {
   await feedbackLimits.reset(ctx, "feedback", { key: user._id });
   await emailChangeLimits.reset(ctx, "emailChange", { key: user._id });
+  await uploadLimits.reset(ctx, "upload", { key: user._id });
   const { email } = user;
   if (email === undefined) return;
   await codeEmailLimits.reset(ctx, "codeEmail", { key: email });
@@ -264,10 +267,14 @@ const deleteOutbox: Step = async (ctx, { outbox }, budget) => {
   );
 };
 
+const deleteUploads: Step = (ctx, { userId }, budget) =>
+  deleteUploadsOf(ctx, userId, budget);
+
 /** In order: sessions first, so every device is signed out at once. */
 const steps: Step[] = [
   deleteSessions,
   deleteEmailChanges,
+  deleteUploads,
   deleteAlbums,
   deleteItems,
   deleteOutbox,

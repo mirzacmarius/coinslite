@@ -102,6 +102,7 @@ import type * as spotPrices_rates from "../spotPrices/rates.js";
 import type * as testing_premium from "../testing/premium.js";
 import type * as updates from "../updates.js";
 import type * as updates_releases from "../updates/releases.js";
+import type * as uploads from "../uploads.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_files from "../utils/files.js";
@@ -208,6 +209,7 @@ declare const fullApi: ApiFromModules<{
   "testing/premium": typeof testing_premium;
   updates: typeof updates;
   "updates/releases": typeof updates_releases;
+  uploads: typeof uploads;
   users: typeof users;
   "utils/auth": typeof utils_auth;
   "utils/files": typeof utils_files;

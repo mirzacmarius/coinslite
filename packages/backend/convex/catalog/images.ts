@@ -7,11 +7,16 @@ import {
   type QueryCtx,
   action,
   internalMutation,
-  internalQuery,
   mutation,
 } from "../_generated/server";
+import { limitUploads } from "../uploads";
 import { requireAdmin } from "../utils/auth";
-import { freshUpload } from "../utils/files";
+import {
+  claimUpload,
+  discardUpload,
+  ownUpload,
+  settleUpload,
+} from "../utils/files";
 import {
   type CatalogImageError,
   type ImageCredit,
@@ -62,17 +67,20 @@ type Upload = {
 
 /**
  * An admin, the entry, and the two files they uploaded for it: fresh uploads
- * that no Item or Catalog entry uses, one for each size.
+ * registered to them for a Catalog image that no Item or Catalog entry uses,
+ * one for each size.
  */
 async function checkUpload(
   ctx: QueryCtx,
   { key, full, thumbnail }: Upload,
   now: number,
 ) {
-  await requireAdmin(ctx);
+  const admin = await requireAdmin(ctx);
   const entry = await requireEntry(ctx, key);
-  const fullFile = await freshUpload(ctx, full, now);
-  const thumbnailFile = await freshUpload(ctx, thumbnail, now);
+  const own = (file: Id<"_storage">) =>
+    ownUpload(ctx, file, admin._id, "catalogImage", now);
+  const fullFile = await own(full);
+  const thumbnailFile = await own(thumbnail);
   if (!fullFile || !thumbnailFile || full === thumbnail)
     throw new ConvexError(catalogImageErrors.notFound);
   return { entry, fullFile, thumbnailFile };
@@ -85,13 +93,31 @@ async function deleteFiles(ctx: MutationCtx, entry: Doc<"catalogNodes">) {
   await ctx.storage.delete(entry.imageFiles.thumbnail);
 }
 
-/** A one-time address the admin's browser sends one image file to before `attach`. */
+/** A one-time address the admin's browser sends one image file to before `register`. */
 export const generateUploadUrl = mutation({
   args: {},
   returns: v.string(),
   handler: async (ctx) => {
-    await requireAdmin(ctx);
+    const admin = await requireAdmin(ctx);
+    await limitUploads(ctx, admin._id);
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+/**
+ * Registers a file the admin just uploaded as their Catalog image upload, so
+ * nobody else can use it or have it thrown away. `attach` registers files
+ * that aren't yet.
+ */
+export const register = mutation({
+  args: { storageId: v.id("_storage") },
+  returns: v.null(),
+  handler: async (ctx, { storageId }) => {
+    const admin = await requireAdmin(ctx);
+    const now = Date.now();
+    if (!(await claimUpload(ctx, storageId, admin._id, "catalogImage", now)))
+      throw new ConvexError(catalogImageErrors.notFound);
+    return null;
   },
 });
 
@@ -147,9 +173,9 @@ export const attach = action({
   args: { ...uploadArgs, credit },
   returns: v.null(),
   handler: async (ctx, { credit, ...upload }) => {
-    const bytes: { full: number; thumbnail: number } = await ctx.runQuery(
-      internal.catalog.images.upload,
-      { ...upload, now: Date.now() },
+    const bytes: { full: number; thumbnail: number } = await ctx.runMutation(
+      internal.catalog.images.claim,
+      upload,
     );
     const checked = checkImageCredit(credit);
     const problem =
@@ -165,24 +191,33 @@ export const attach = action({
   },
 });
 
-/** The sizes in bytes of the files an admin may put on the entry. */
-export const upload = internalQuery({
-  args: { ...uploadArgs, now: v.number() },
+/**
+ * Registers the files to the admin if nobody has yet, and returns the sizes
+ * in bytes of the files they may put on the entry.
+ */
+export const claim = internalMutation({
+  args: uploadArgs,
   returns: v.object({ full: v.number(), thumbnail: v.number() }),
-  handler: async (ctx, { now, ...upload }) => {
+  handler: async (ctx, upload) => {
+    const admin = await requireAdmin(ctx);
+    const now = Date.now();
+    if (upload.full !== upload.thumbnail) {
+      for (const file of [upload.full, upload.thumbnail])
+        await claimUpload(ctx, file, admin._id, "catalogImage", now);
+    }
     const { fullFile, thumbnailFile } = await checkUpload(ctx, upload, now);
     return { full: fullFile.size, thumbnail: thumbnailFile.size };
   },
 });
 
-/** Throws away uploads that were rejected. */
+/** Throws away uploads of the admin's that were rejected. */
 export const discard = internalMutation({
   args: uploadArgs,
   returns: v.null(),
   handler: async (ctx, upload) => {
     await checkUpload(ctx, upload, Date.now());
-    await ctx.storage.delete(upload.full);
-    await ctx.storage.delete(upload.thumbnail);
+    await discardUpload(ctx, upload.full);
+    await discardUpload(ctx, upload.thumbnail);
     return null;
   },
 });
@@ -200,6 +235,8 @@ export const save = internalMutation({
       imageProvenance,
       imageUrl: undefined,
     });
+    await settleUpload(ctx, upload.full);
+    await settleUpload(ctx, upload.thumbnail);
     return null;
   },
 });

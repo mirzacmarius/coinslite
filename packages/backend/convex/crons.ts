@@ -19,4 +19,12 @@ crons.interval(
   {},
 );
 
+/** Uploads that never became a photo or a Catalog image (uploads.ts). */
+crons.interval(
+  "delete unused uploads",
+  { hours: 1 },
+  internal.uploads.sweep,
+  {},
+);
+
 export default crons;

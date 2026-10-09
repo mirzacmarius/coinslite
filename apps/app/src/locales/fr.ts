@@ -443,6 +443,8 @@ export default {
     errors: {
       tooLarge: "Ce fichier dépasse 10 Mo. Choisissez une photo plus légère.",
       notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
+      tooMany:
+        "Trop de téléversements en peu de temps. Réessayez dans quelques minutes.",
       failed: "Impossible d’enregistrer la photo. Réessayez.",
       removeFailed: "Impossible de retirer la photo. Réessayez.",
     },
@@ -949,6 +951,8 @@ export default {
       failed: "Impossible d’enregistrer l’image. Réessayez.",
       removeFailed: "Impossible de retirer l’image. Réessayez.",
       CATALOG_ENTRY_NOT_FOUND: "Cette entrée du catalogue n’existe plus.",
+      TOO_MANY_UPLOADS:
+        "Trop de téléversements en peu de temps. Réessayez dans quelques minutes.",
       IMAGE_NOT_FOUND: "Le téléversement n’est pas arrivé. Réessayez.",
       IMAGE_NOT_WEBP: "L’image n’a pas été enregistrée en WebP. Réessayez.",
       IMAGE_TOO_LARGE:

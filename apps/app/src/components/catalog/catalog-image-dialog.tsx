@@ -14,6 +14,7 @@ import {
   commonLicences,
   isWebAddress,
 } from "@coinslite/backend/convex/catalog/imageRules";
+import { uploadErrors } from "@coinslite/backend/convex/photos/rules";
 import { Button } from "@coinslite/ui/button";
 import {
   Dialog,
@@ -52,9 +53,13 @@ const accept = "image/jpeg,image/png,image/webp,image/gif";
 /** The codes an image function or the conversion can fail with, each with its message. */
 const failureCodes = new Set<string>([
   ...Object.values(catalogImageErrors),
+  uploadErrors.tooMany,
   "NOT_ADMIN",
 ]);
-type FailureCode = CatalogImageError | "NOT_ADMIN";
+type FailureCode =
+  | CatalogImageError
+  | (typeof uploadErrors)["tooMany"]
+  | "NOT_ADMIN";
 const failureCode = (failure: unknown) => {
   const code = failure instanceof ConvexError ? String(failure.data) : "";
   return failureCodes.has(code) ? (code as FailureCode) : undefined;
@@ -63,6 +68,7 @@ const failureCode = (failure: unknown) => {
 /** Sends one file to storage through a one-time upload address. */
 function useStoreFile() {
   const generateUploadUrl = useMutation(api.catalog.images.generateUploadUrl);
+  const register = useMutation(api.catalog.images.register);
   return async (file: Blob) => {
     const response = await fetch(await generateUploadUrl(), {
       method: "POST",
@@ -73,6 +79,8 @@ function useStoreFile() {
     const { storageId } = (await response.json()) as {
       storageId: Id<"_storage">;
     };
+    // At once, so the upload is the admin's before anything else can use it.
+    await register({ storageId });
     return storageId;
   };
 }

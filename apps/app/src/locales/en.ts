@@ -431,6 +431,7 @@ export default {
     errors: {
       tooLarge: "That file is larger than 10 MB. Pick a smaller photo.",
       notAnImage: "That file isn't a JPEG, PNG, WebP or GIF image.",
+      tooMany: "Too many uploads in a short time. Try again in a few minutes.",
       failed: "The photo couldn't be saved. Try again.",
       removeFailed: "The photo couldn't be removed. Try again.",
     },
@@ -922,6 +923,8 @@ export default {
       failed: "Couldn't save the image. Try again.",
       removeFailed: "Couldn't remove the image. Try again.",
       CATALOG_ENTRY_NOT_FOUND: "This Catalog entry no longer exists.",
+      TOO_MANY_UPLOADS:
+        "Too many uploads in a short time. Try again in a few minutes.",
       IMAGE_NOT_FOUND: "The upload didn't arrive. Try again.",
       IMAGE_NOT_WEBP: "The image wasn't saved as WebP. Try again.",
       IMAGE_TOO_LARGE:

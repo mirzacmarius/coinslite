@@ -437,6 +437,8 @@ export default {
     errors: {
       tooLarge: "Filen er større enn 10 MB. Velg et mindre bilde.",
       notAnImage: "Filen er ikke et JPEG-, PNG-, WebP- eller GIF-bilde.",
+      tooMany:
+        "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
       failed: "Bildet kunne ikke lagres. Prøv igjen.",
       removeFailed: "Bildet kunne ikke fjernes. Prøv igjen.",
     },
@@ -933,6 +935,8 @@ export default {
       failed: "Bildet kunne ikke lagres. Prøv igjen.",
       removeFailed: "Bildet kunne ikke fjernes. Prøv igjen.",
       CATALOG_ENTRY_NOT_FOUND: "Denne katalogoppføringen finnes ikke lenger.",
+      TOO_MANY_UPLOADS:
+        "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
       IMAGE_NOT_FOUND: "Opplastingen kom ikke frem. Prøv igjen.",
       IMAGE_NOT_WEBP: "Bildet ble ikke lagret som WebP. Prøv igjen.",
       IMAGE_TOO_LARGE:
