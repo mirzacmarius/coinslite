@@ -1,7 +1,7 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { homeCurrency, language } from "./utils/validators";
+import { homeCurrency, itemType, language } from "./utils/validators";
 
 export default defineSchema({
   ...authTables,
@@ -25,6 +25,25 @@ export default defineSchema({
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
   }).index("email", ["email"]),
+
+  /**
+   * What a user owns: one or more identical pieces (Quantity). Money is in
+   * minor units of the owner's Home currency; dates are "YYYY-MM-DD".
+   */
+  items: defineTable({
+    ownerId: v.id("users"),
+    type: itemType,
+    title: v.string(),
+    country: v.optional(v.string()),
+    year: v.optional(v.number()),
+    denomination: v.optional(v.string()),
+    quantity: v.number(),
+    purchasePrice: v.optional(v.number()),
+    marketValue: v.optional(v.number()),
+    purchaseDate: v.optional(v.string()),
+    source: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  }).index("by_ownerId", ["ownerId"]),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

@@ -1,4 +1,8 @@
 import { EndSession } from "@/components/end-session";
+import {
+  AddItemProvider,
+  AddItemQuickAction,
+} from "@/components/items/add-item";
 import { AppShell } from "@/components/shell/app-shell";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
@@ -29,13 +33,15 @@ async function AccountCheck() {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell>
-      {/* Alongside the page, not before it: the shell and the page are on
-          screen without waiting for the backend. */}
-      <Suspense>
-        <AccountCheck />
-      </Suspense>
-      {children}
-    </AppShell>
+    <AddItemProvider>
+      <AppShell quickActions={<AddItemQuickAction />}>
+        {/* Alongside the page, not before it: the shell and the page are on
+            screen without waiting for the backend. */}
+        <Suspense>
+          <AccountCheck />
+        </Suspense>
+        {children}
+      </AppShell>
+    </AddItemProvider>
   );
 }
