@@ -297,3 +297,133 @@ test("Grades are written the way collectors write them", () => {
   expect(gradeMeaning("international", "PR")).toBe("poor");
   expect(gradeMeaning("norwegian", "01")).toBeUndefined();
 });
+
+const fullCoin = {
+  ...morgan,
+  series: "Morgan",
+  category: "Circulation coins",
+  material: "silver" as const,
+  materialNote: " .900 silver ",
+  mintMark: "S",
+  ruler: "Republic",
+  mintage: 12_760_000,
+  diameter: 38.126,
+  thickness: 2.4,
+  numistaNumber: 1492,
+};
+
+test("a coin keeps every descriptive fact; sizes are kept to hundredths", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+
+  const itemId = await ada.as.mutation(api.items.add, fullCoin);
+
+  expect(await ada.as.query(api.items.get, { itemId })).toMatchObject({
+    series: "Morgan",
+    category: "Circulation coins",
+    material: "silver",
+    materialNote: ".900 silver",
+    mintMark: "S",
+    ruler: "Republic",
+    mintage: 12_760_000,
+    diameter: 38.13,
+    thickness: 2.4,
+    numistaNumber: 1492,
+  });
+});
+
+test("metal and size are a coin's; banknotes share ruler, mintage and Numista", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const add = (fields: Partial<FunctionArgs<typeof api.items.add>>) =>
+    ada.as.mutation(api.items.add, { ...morgan, ...fields });
+
+  await expect(add({ type: "banknote", material: "silver" })).rejects.toThrow(
+    "FIELD_NOT_FOR_TYPE",
+  );
+  await expect(add({ type: "banknote", diameter: 30 })).rejects.toThrow(
+    "FIELD_NOT_FOR_TYPE",
+  );
+  await expect(add({ type: "stamp", ruler: "Haakon VII" })).rejects.toThrow(
+    "FIELD_NOT_FOR_TYPE",
+  );
+  await expect(add({ mintage: 0 })).rejects.toThrow("INVALID_NUMBER");
+  await expect(add({ diameter: -1 })).rejects.toThrow("INVALID_NUMBER");
+  await expect(add({ numistaNumber: 1.5 })).rejects.toThrow("INVALID_NUMBER");
+
+  const note = await add({
+    type: "banknote",
+    ruler: "Haakon VII",
+    mintage: 500_000,
+    numistaNumber: 2050,
+  });
+  const stamp = await add({ type: "stamp", series: "Posthorn" });
+  expect(await ada.as.query(api.items.get, { itemId: note })).toMatchObject({
+    ruler: "Haakon VII",
+    mintage: 500_000,
+  });
+  expect(await ada.as.query(api.items.get, { itemId: stamp })).toMatchObject({
+    series: "Posthorn",
+  });
+});
+
+test("any field can be edited, and a field left empty is cleared", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, fullCoin);
+
+  await ada.as.mutation(api.items.update, {
+    itemId,
+    type: "coin",
+    title: "Morgan dollar 1881-O",
+    mintMark: "O",
+    quantity: 1,
+  });
+
+  const item = await ada.as.query(api.items.get, { itemId });
+  expect(item).toMatchObject({
+    title: "Morgan dollar 1881-O",
+    mintMark: "O",
+    quantity: 1,
+  });
+  expect(item?.series).toBeUndefined();
+  expect(item?.purchasePrice).toBeUndefined();
+});
+
+test("duplicating copies what the person set into a new Item", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, fullCoin);
+
+  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
+
+  expect(copyId).not.toBe(itemId);
+  const { _id, _creationTime, ...original } = (await ada.as.query(
+    api.items.get,
+    { itemId },
+  ))!;
+  expect(await ada.as.query(api.items.get, { itemId: copyId })).toMatchObject(
+    original,
+  );
+  const { page } = await ada.as.query(api.items.list, {
+    paginationOpts: firstPage,
+  });
+  expect(page).toHaveLength(2);
+});
+
+test("nobody edits or duplicates someone else's Item", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  const itemId = await ada.as.mutation(api.items.add, morgan);
+
+  await expect(
+    bob.as.mutation(api.items.update, { itemId, ...morgan, title: "Mine" }),
+  ).rejects.toThrow("ITEM_NOT_FOUND");
+  await expect(
+    bob.as.mutation(api.items.duplicate, { itemId }),
+  ).rejects.toThrow("ITEM_NOT_FOUND");
+  expect((await ada.as.query(api.items.get, { itemId }))?.title).toBe(
+    "Morgan dollar 1881-S",
+  );
+});

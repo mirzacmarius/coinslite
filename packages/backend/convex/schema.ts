@@ -6,6 +6,7 @@ import {
   homeCurrency,
   itemType,
   language,
+  material,
   strike,
 } from "./utils/validators";
 
@@ -62,6 +63,18 @@ export default defineSchema({
     country: v.optional(v.string()),
     year: v.optional(v.number()),
     denomination: v.optional(v.string()),
+    series: v.optional(v.string()),
+    category: v.optional(v.string()),
+    // Which fields suit which Item type: typeOnlyFields in items/rules.ts.
+    material: v.optional(material),
+    materialNote: v.optional(v.string()),
+    mintMark: v.optional(v.string()),
+    ruler: v.optional(v.string()),
+    mintage: v.optional(v.number()),
+    /** Millimetres. */
+    diameter: v.optional(v.number()),
+    thickness: v.optional(v.number()),
+    numistaNumber: v.optional(v.number()),
     // A Grade is a code on its scale (items/grades.ts); both or neither are set.
     grade: v.optional(v.string()),
     gradingScale: v.optional(gradingScale),

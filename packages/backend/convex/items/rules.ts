@@ -24,11 +24,65 @@ export const itemErrors = {
   invalidDate: "INVALID_DATE",
   invalidGrade: "INVALID_GRADE",
   invalidStrike: "INVALID_STRIKE",
+  invalidNumber: "INVALID_NUMBER",
+  notForType: "FIELD_NOT_FOR_TYPE",
 } as const;
+
+/** What a coin is made of. */
+export const materials = [
+  "gold",
+  "silver",
+  "platinum",
+  "palladium",
+  "copper",
+  "bronze",
+  "brass",
+  "cupronickel",
+  "nickelBrass",
+  "nickel",
+  "iron",
+  "steel",
+  "aluminium",
+  "aluminiumBronze",
+  "zinc",
+  "tin",
+  "bimetallic",
+  "other",
+] as const;
+export type Material = (typeof materials)[number];
+
+/**
+ * Fields only some Item types have; every other field suits all three.
+ * Metal and size are a coin's; banknotes share ruler, mintage and Numista.
+ */
+export const typeOnlyFields = {
+  material: ["coin"],
+  materialNote: ["coin"],
+  mintMark: ["coin"],
+  diameter: ["coin"],
+  thickness: ["coin"],
+  ruler: ["coin", "banknote"],
+  mintage: ["coin", "banknote"],
+  numistaNumber: ["coin", "banknote"],
+} as const satisfies Record<string, readonly ItemType[]>;
+
+export const fieldSuits = (
+  field: keyof typeof typeOnlyFields,
+  type: ItemType,
+) => (typeOnlyFields[field] as readonly ItemType[]).includes(type);
 
 export const itemLimits = {
   title: 200,
   denomination: 100,
+  series: 100,
+  category: 100,
+  materialNote: 100,
+  mintMark: 20,
+  ruler: 100,
+  mintage: 1_000_000_000_000,
+  /** Millimetres. */
+  diameter: 500,
+  thickness: 100,
   gradeNote: 200,
   source: 200,
   notes: 5000,
@@ -46,6 +100,16 @@ export type ItemInput = {
   country?: string;
   year?: number;
   denomination?: string;
+  series?: string;
+  category?: string;
+  material?: Material;
+  materialNote?: string;
+  mintMark?: string;
+  ruler?: string;
+  mintage?: number;
+  diameter?: number;
+  thickness?: number;
+  numistaNumber?: number;
   grade?: string;
   gradingScale?: GradingScale;
   gradeNote?: string;
@@ -120,10 +184,36 @@ export function checkItem(input: ItemInput, today: string) {
   if (purchaseDate !== undefined && !isPastOrToday(purchaseDate, today))
     fail(itemErrors.invalidDate);
 
+  for (const field of Object.keys(typeOnlyFields) as Array<
+    keyof typeof typeOnlyFields
+  >) {
+    if (input[field] !== undefined && !fieldSuits(field, input.type))
+      fail(itemErrors.notForType);
+  }
+
   return {
     type: input.type,
     title,
     quantity,
+    ...withText("series", text(input.series, itemLimits.series)),
+    ...withText("category", text(input.category, itemLimits.category)),
+    ...(input.material && { material: input.material }),
+    ...withText(
+      "materialNote",
+      text(input.materialNote, itemLimits.materialNote),
+    ),
+    ...withText("mintMark", text(input.mintMark, itemLimits.mintMark)),
+    ...withText("ruler", text(input.ruler, itemLimits.ruler)),
+    ...withNumber("mintage", wholeNumber(input.mintage, itemLimits.mintage)),
+    ...withNumber("diameter", millimetres(input.diameter, itemLimits.diameter)),
+    ...withNumber(
+      "thickness",
+      millimetres(input.thickness, itemLimits.thickness),
+    ),
+    ...withNumber(
+      "numistaNumber",
+      wholeNumber(input.numistaNumber, Number.MAX_SAFE_INTEGER),
+    ),
     ...checkGrade(input),
     ...(country && { country }),
     ...(input.year !== undefined && { year: input.year }),
@@ -131,12 +221,28 @@ export function checkItem(input: ItemInput, today: string) {
       "denomination",
       text(input.denomination, itemLimits.denomination),
     ),
-    ...withAmount("purchasePrice", amount(input.purchasePrice)),
-    ...withAmount("marketValue", amount(input.marketValue)),
+    ...withNumber("purchasePrice", amount(input.purchasePrice)),
+    ...withNumber("marketValue", amount(input.marketValue)),
     ...(purchaseDate && { purchaseDate }),
     ...withText("source", text(input.source, itemLimits.source)),
     ...withText("notes", text(input.notes, itemLimits.notes)),
   };
+}
+
+/** A count or catalogue number: a whole number from 1 to `max`. */
+function wholeNumber(value: number | undefined, max: number) {
+  if (value === undefined) return undefined;
+  if (!Number.isSafeInteger(value) || value < 1 || value > max)
+    fail(itemErrors.invalidNumber);
+  return value;
+}
+
+/** A size in millimetres, above zero, kept to hundredths. */
+function millimetres(value: number | undefined, max: number) {
+  if (value === undefined) return undefined;
+  if (!Number.isFinite(value) || value <= 0 || value > max)
+    fail(itemErrors.invalidNumber);
+  return Math.round(value * 100) / 100;
 }
 
 /**
@@ -169,5 +275,5 @@ function checkGrade({
 
 const withText = <K extends string>(key: K, value: string | undefined) =>
   (value === undefined ? {} : { [key]: value }) as Partial<Record<K, string>>;
-const withAmount = <K extends string>(key: K, value: number | undefined) =>
+const withNumber = <K extends string>(key: K, value: number | undefined) =>
   (value === undefined ? {} : { [key]: value }) as Partial<Record<K, number>>;

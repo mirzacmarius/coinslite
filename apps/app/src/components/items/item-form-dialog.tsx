@@ -4,21 +4,14 @@ import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
+import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
 import {
-  type GradingScale,
-  type Strike,
-  defaultScale,
-  hasStrike,
-  isGrade,
-  scalesFor,
-} from "@coinslite/backend/convex/items/grades";
-import { itemLimits } from "@coinslite/backend/convex/items/rules";
-import {
-  type CountryCode,
-  countryCodes,
-  formatCountry,
-  parseMoney,
-} from "@coinslite/i18n";
+  fieldSuits,
+  itemLimits,
+  materials,
+} from "@coinslite/backend/convex/items/rules";
+import { countryCodes, formatCountry, parseMoney } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   Collapsible,
@@ -36,7 +29,6 @@ import {
 } from "@coinslite/ui/dialog";
 import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
-import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { MoneyInput } from "@coinslite/ui/money-input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
@@ -48,6 +40,7 @@ import { useMutation, useQuery } from "convex/react";
 import {
   Award,
   ChevronRight,
+  Gem,
   Globe,
   Hammer,
   Library,
@@ -55,113 +48,81 @@ import {
   Ruler,
   X,
 } from "lucide-react";
+import type * as React from "react";
 import { useId, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
+import {
+  type ItemFormValues,
+  argsFromValues,
+  blankItem,
+  detailFields,
+  hasDetails,
+  parseDecimal,
+  parseWholeNumber,
+  scaleOf,
+  valuesFromItem,
+} from "./item-form";
 
 const titleInput =
   "w-full bg-transparent px-0 text-base font-medium placeholder:text-muted-foreground focus:outline-none";
 const notesInput =
   "w-full resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
 
-type Values = {
-  title: string;
-  notes: string;
-  type: ItemType;
-  country: CountryCode | undefined;
-  grade: string | undefined;
-  /** Picked by hand; until then the country's default scale applies. */
-  gradingScale: GradingScale | undefined;
-  gradeNote: string;
-  strike: Strike | undefined;
-  quantity: string;
-  year: string;
-  denomination: string;
-  purchasePrice: string;
-  marketValue: string;
-  purchaseDate: string;
-  source: string;
-};
+/** Fields typed as plain text in "More details". */
+type TextField =
+  | "year"
+  | "denomination"
+  | "series"
+  | "category"
+  | "ruler"
+  | "mintMark"
+  | "mintage"
+  | "numistaNumber"
+  | "materialNote"
+  | "diameter"
+  | "thickness"
+  | "gradeNote"
+  | "purchaseDate"
+  | "source";
 
-const blank = (): Values => ({
-  title: "",
-  notes: "",
-  type: "coin",
-  country: undefined,
-  grade: undefined,
-  gradingScale: undefined,
-  gradeNote: "",
-  strike: undefined,
-  quantity: "1",
-  year: "",
-  denomination: "",
-  purchasePrice: "",
-  marketValue: "",
-  purchaseDate: "",
-  source: "",
-});
-
-/** The scale an Item's Grade is on: the one picked, if it suits the type, or the country's default. */
-function scaleOf({
-  type,
-  country,
-  gradingScale,
-}: Pick<Values, "type" | "country" | "gradingScale">) {
-  return gradingScale && scalesFor(type).includes(gradingScale)
-    ? gradingScale
-    : defaultScale(type, country);
-}
-
-/** The fields in "More details": they open by themselves when one needs fixing. */
-const detailFields = [
-  "year",
-  "denomination",
-  "purchasePrice",
-  "marketValue",
-  "purchaseDate",
-  "source",
-] as const;
-
-/** "New Item": a compact dialog for adding a manually described Item to the Collection. */
-export function AddItemDialog({
+/**
+ * The one form for an Item's every field: "New Item" in a compact dialog, or
+ * "Edit Item" when given an `item`. Basic fields stay in view; the rest sit
+ * under "More details", which opens by itself when it holds values or errors.
+ */
+export function ItemFormDialog({
   open,
   onOpenChange,
+  item,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** The Item being edited; without one the dialog adds a new Item. */
+  item?: Doc<"items">;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
   const mod = useModifierKey();
   const addItem = useMutation(api.items.add);
+  const updateItem = useMutation(api.items.update);
   const user = useQuery(api.users.getUser);
   const currency = user?.homeCurrency ?? "";
   const titleRef = useRef<HTMLInputElement>(null);
-  const ids = {
-    year: useId(),
-    denomination: useId(),
-    price: useId(),
-    value: useId(),
-    date: useId(),
-    source: useId(),
-    scale: useId(),
-    gradeNote: useId(),
-  };
+  const baseId = useId();
   const labels = useGradeLabels();
-  const [createMore, setCreateMore] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [failed, setFailed] = useState<string>();
   // One object for the dialog's life: the form resets when it sees new defaults.
-  const [defaults] = useState(blank);
+  const [defaults] = useState(() =>
+    item ? valuesFromItem(item, locale) : blankItem(),
+  );
+  const [createMore, setCreateMore] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(() => hasDetails(defaults));
+  const [failed, setFailed] = useState<string>();
 
   const rules = useMemo(() => {
-    const money = z
-      .string()
-      .refine(
-        (text) => !text.trim() || parseMoney(text, locale) !== null,
-        t("items.errors.amount"),
-      );
+    const optional = (check: (text: string) => boolean, message: string) =>
+      z.string().refine((text) => !text.trim() || check(text), message);
     return {
       title: z
         .string()
@@ -177,13 +138,22 @@ export function AddItemDialog({
             Number(text) <= itemLimits.quantity,
           t("items.errors.quantity"),
         ),
-      year: z
-        .string()
-        .refine(
-          (text) => !text.trim() || /^-?\d{1,4}$/.test(text.trim()),
-          t("items.errors.year"),
-        ),
-      money,
+      year: optional(
+        (text) => /^-?\d{1,4}$/.test(text.trim()),
+        t("items.errors.year"),
+      ),
+      money: optional(
+        (text) => parseMoney(text, locale) !== null,
+        t("items.errors.amount"),
+      ),
+      whole: optional(
+        (text) => (parseWholeNumber(text) ?? 0) >= 1,
+        t("items.errors.wholeNumber"),
+      ),
+      size: optional(
+        (text) => (parseDecimal(text) ?? 0) > 0,
+        t("items.errors.number"),
+      ),
       purchaseDate: z
         .string()
         .refine(
@@ -208,6 +178,10 @@ export function AddItemDialog({
       icon: <Icon strokeWidth={1.75} />,
     };
   });
+  const materialOptions = materials.map((material) => ({
+    value: material,
+    label: t(`items.materials.${material}`),
+  }));
 
   const form = useForm({
     defaultValues: defaults,
@@ -220,49 +194,36 @@ export function AddItemDialog({
     },
     onSubmit: async ({ value }) => {
       setFailed(undefined);
-      const amount = (text: string) =>
-        text.trim() ? parseMoney(text, locale) ?? undefined : undefined;
-      const scale = scaleOf(value);
-      // A Grade picked on another scale (before the type or country changed) is dropped.
-      const grade =
-        value.grade && isGrade(scale, value.grade) ? value.grade : undefined;
+      const args = argsFromValues(value, locale);
       try {
-        await addItem({
-          type: value.type,
-          title: value.title,
-          notes: value.notes,
-          country: value.country,
-          quantity: Number(value.quantity),
-          year: value.year.trim() ? Number(value.year) : undefined,
-          denomination: value.denomination,
-          grade,
-          gradingScale: grade ? scale : undefined,
-          gradeNote: value.gradeNote,
-          strike: hasStrike(value.type) ? value.strike : undefined,
-          purchasePrice: amount(value.purchasePrice),
-          marketValue: amount(value.marketValue),
-          purchaseDate: value.purchaseDate || undefined,
-          source: value.source,
-        });
+        if (item) await updateItem({ itemId: item._id, ...args });
+        else await addItem(args);
       } catch {
-        setFailed(t("items.errors.failed"));
+        setFailed(t(item ? "items.errors.saveFailed" : "items.errors.failed"));
         return;
       }
-      toast.success(t("items.added"));
+      toast.success(t(item ? "items.saved" : "items.added"));
+      if (item) {
+        onOpenChange(false);
+        return;
+      }
       form.reset();
+      setDetailsOpen(false);
       if (createMore) {
         // "Create more" keeps the pills for the next Item.
         form.setFieldValue("type", value.type);
         form.setFieldValue("country", value.country);
+        titleRef.current?.focus();
+      } else {
+        onOpenChange(false);
       }
-      setDetailsOpen(false);
-      if (createMore) titleRef.current?.focus();
-      else onOpenChange(false);
     },
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
+  // A new deployment waits while an Item is half entered.
+  useUnsavedInput(open && isDirty);
   const values = form.useStore(
     ({ values: { type, country, gradingScale, strike } }) => ({
       type,
@@ -272,13 +233,76 @@ export function AddItemDialog({
     }),
   );
   const scale = scaleOf(values);
-  // A new deployment waits while an Item is half entered.
-  useUnsavedInput(open && isDirty);
+  const isCoin = values.type === "coin";
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
         undefined
       : undefined;
+
+  const textField = (
+    name: TextField,
+    label: string,
+    options: {
+      rule?: z.ZodType<string>;
+      hint?: string;
+      placeholder?: string;
+      maxLength?: number;
+      inputMode?: "numeric" | "decimal";
+      type?: "date";
+      max?: string;
+    } = {},
+  ) => (
+    <form.Field
+      name={name}
+      validators={options.rule ? { onChange: options.rule } : undefined}
+    >
+      {(field) => (
+        <Field
+          id={`${baseId}-${name}`}
+          label={label}
+          hint={options.hint}
+          error={errorOf(field.state.meta.errors)}
+        >
+          {(control) => (
+            <Input
+              {...control}
+              type={options.type}
+              max={options.max}
+              inputMode={options.inputMode}
+              placeholder={options.placeholder}
+              maxLength={options.maxLength}
+              value={field.state.value}
+              onChange={(event) => field.handleChange(event.target.value)}
+              onBlur={field.handleBlur}
+            />
+          )}
+        </Field>
+      )}
+    </form.Field>
+  );
+  const moneyField = (name: "purchasePrice" | "marketValue", label: string) => (
+    <form.Field name={name} validators={{ onChange: rules.money }}>
+      {(field) => (
+        <Field
+          id={`${baseId}-${name}`}
+          label={label}
+          hint={t("items.perPiece")}
+          error={errorOf(field.state.meta.errors)}
+        >
+          {(control) => (
+            <MoneyInput
+              {...control}
+              currency={currency}
+              value={field.state.value}
+              onChange={(event) => field.handleChange(event.target.value)}
+              onBlur={field.handleBlur}
+            />
+          )}
+        </Field>
+      )}
+    </form.Field>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -314,7 +338,7 @@ export function AddItemDialog({
               <span>{t("nav.collection")}</span>
               <ChevronRight className="size-3.5" aria-hidden="true" />
               <DialogTitle className="text-foreground">
-                {t("items.new")}
+                {t(item ? "items.editItem" : "items.new")}
               </DialogTitle>
             </div>
             <DialogClose asChild>
@@ -343,7 +367,7 @@ export function AddItemDialog({
                       aria-label={t("items.title")}
                       aria-invalid={error ? true : undefined}
                       aria-describedby={
-                        error ? "add-item-title-error" : undefined
+                        error ? `${baseId}-title-error` : undefined
                       }
                       placeholder={t("items.titlePlaceholder")}
                       className={titleInput}
@@ -356,7 +380,7 @@ export function AddItemDialog({
                     />
                     {error && (
                       <p
-                        id="add-item-title-error"
+                        id={`${baseId}-title-error`}
                         className="text-xs text-destructive"
                       >
                         {error}
@@ -402,6 +426,8 @@ export function AddItemDialog({
                     value={field.state.value}
                     options={countryOptions}
                     onChange={field.handleChange}
+                    onClear={() => field.handleChange(undefined)}
+                    clearLabel={t("account.contact.noCountry")}
                     noResults={t("items.noMatches")}
                   />
                 )}
@@ -486,174 +512,120 @@ export function AddItemDialog({
                 />
                 {t("items.moreDetails")}
               </CollapsibleTrigger>
-              <CollapsibleContent className="grid grid-cols-1 gap-x-4 gap-y-3 pb-1 pt-3 sm:grid-cols-2">
-                <form.Field name="gradingScale">
-                  {(field) => (
-                    <Field id={ids.scale} label={t("items.gradingScale")}>
-                      {(control) => (
-                        <PropertyPicker
-                          id={control.id}
-                          aria-describedby={control["aria-describedby"]}
-                          icon={Ruler}
-                          label={t("items.gradingScale")}
-                          value={scale}
-                          options={labels.scaleOptions(values.type)}
-                          onChange={field.handleChange}
-                          noResults={t("items.noMatches")}
-                        />
+              <CollapsibleContent className="flex flex-col gap-5 pb-1 pt-3">
+                <DetailGroup title={t("items.description")}>
+                  {textField("year", t("items.year"), {
+                    rule: rules.year,
+                    inputMode: "numeric",
+                  })}
+                  {textField("denomination", t("items.denomination"), {
+                    maxLength: itemLimits.denomination,
+                  })}
+                  {textField("series", t("items.series"), {
+                    maxLength: itemLimits.series,
+                  })}
+                  {textField("category", t("items.category"), {
+                    maxLength: itemLimits.category,
+                  })}
+                  {fieldSuits("ruler", values.type) &&
+                    textField("ruler", t("items.ruler"), {
+                      maxLength: itemLimits.ruler,
+                    })}
+                  {fieldSuits("mintMark", values.type) &&
+                    textField("mintMark", t("items.mintMark"), {
+                      maxLength: itemLimits.mintMark,
+                    })}
+                  {fieldSuits("mintage", values.type) &&
+                    textField("mintage", t("items.mintage"), {
+                      rule: rules.whole,
+                      inputMode: "numeric",
+                    })}
+                  {fieldSuits("numistaNumber", values.type) &&
+                    textField("numistaNumber", t("items.numistaNumber"), {
+                      rule: rules.whole,
+                      inputMode: "numeric",
+                    })}
+                </DetailGroup>
+                {isCoin && (
+                  <DetailGroup title={t("items.physical")}>
+                    <form.Field name="material">
+                      {(field) => (
+                        <Field
+                          id={`${baseId}-material`}
+                          label={t("items.material")}
+                        >
+                          {(control) => (
+                            <PropertyPicker
+                              id={control.id}
+                              icon={Gem}
+                              label={t("items.material")}
+                              placeholder={t("items.setMaterial")}
+                              value={field.state.value}
+                              options={materialOptions}
+                              onChange={field.handleChange}
+                              onClear={() => field.handleChange(undefined)}
+                              clearLabel={t("items.noMaterial")}
+                              noResults={t("items.noMatches")}
+                            />
+                          )}
+                        </Field>
                       )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field name="gradeNote">
-                  {(field) => (
-                    <Field id={ids.gradeNote} label={t("items.gradeNote")}>
-                      {(control) => (
-                        <Input
-                          {...control}
-                          placeholder={t("items.gradeNotePlaceholder")}
-                          maxLength={itemLimits.gradeNote}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field name="year" validators={{ onChange: rules.year }}>
-                  {(field) => (
-                    <Field
-                      id={ids.year}
-                      label={t("items.year")}
-                      error={errorOf(field.state.meta.errors)}
-                    >
-                      {(control) => (
-                        <Input
-                          {...control}
-                          inputMode="numeric"
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                          onBlur={field.handleBlur}
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field name="denomination">
-                  {(field) => (
-                    <Field
-                      id={ids.denomination}
-                      label={t("items.denomination")}
-                    >
-                      {(control) => (
-                        <Input
-                          {...control}
-                          maxLength={itemLimits.denomination}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field
-                  name="purchasePrice"
-                  validators={{ onChange: rules.money }}
-                >
-                  {(field) => (
-                    <Field
-                      id={ids.price}
-                      label={t("items.purchasePrice")}
-                      hint={t("items.perPiece")}
-                      error={errorOf(field.state.meta.errors)}
-                    >
-                      {(control) => (
-                        <MoneyInput
-                          {...control}
-                          currency={currency}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                          onBlur={field.handleBlur}
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field
-                  name="marketValue"
-                  validators={{ onChange: rules.money }}
-                >
-                  {(field) => (
-                    <Field
-                      id={ids.value}
-                      label={t("items.marketValue")}
-                      hint={t("items.perPiece")}
-                      error={errorOf(field.state.meta.errors)}
-                    >
-                      {(control) => (
-                        <MoneyInput
-                          {...control}
-                          currency={currency}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                          onBlur={field.handleBlur}
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field
-                  name="purchaseDate"
-                  validators={{ onChange: rules.purchaseDate }}
-                >
-                  {(field) => (
-                    <Field
-                      id={ids.date}
-                      label={t("items.purchaseDate")}
-                      error={errorOf(field.state.meta.errors)}
-                    >
-                      {(control) => (
-                        <Input
-                          {...control}
-                          type="date"
-                          max={localToday()}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                          onBlur={field.handleBlur}
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
-                <form.Field name="source">
-                  {(field) => (
-                    <Field id={ids.source} label={t("items.source")}>
-                      {(control) => (
-                        <Input
-                          {...control}
-                          placeholder={t("items.sourcePlaceholder")}
-                          maxLength={itemLimits.source}
-                          value={field.state.value}
-                          onChange={(event) =>
-                            field.handleChange(event.target.value)
-                          }
-                        />
-                      )}
-                    </Field>
-                  )}
-                </form.Field>
+                    </form.Field>
+                    {textField("materialNote", t("items.materialNote"), {
+                      placeholder: t("items.materialNotePlaceholder"),
+                      maxLength: itemLimits.materialNote,
+                    })}
+                    {textField("diameter", t("items.diameter"), {
+                      rule: rules.size,
+                      hint: t("items.millimetres"),
+                      inputMode: "decimal",
+                    })}
+                    {textField("thickness", t("items.thickness"), {
+                      rule: rules.size,
+                      hint: t("items.millimetres"),
+                      inputMode: "decimal",
+                    })}
+                  </DetailGroup>
+                )}
+                <DetailGroup title={t("items.grade")}>
+                  <form.Field name="gradingScale">
+                    {(field) => (
+                      <Field
+                        id={`${baseId}-scale`}
+                        label={t("items.gradingScale")}
+                      >
+                        {(control) => (
+                          <PropertyPicker
+                            id={control.id}
+                            icon={Ruler}
+                            label={t("items.gradingScale")}
+                            value={scale}
+                            options={labels.scaleOptions(values.type)}
+                            onChange={field.handleChange}
+                            noResults={t("items.noMatches")}
+                          />
+                        )}
+                      </Field>
+                    )}
+                  </form.Field>
+                  {textField("gradeNote", t("items.gradeNote"), {
+                    placeholder: t("items.gradeNotePlaceholder"),
+                    maxLength: itemLimits.gradeNote,
+                  })}
+                </DetailGroup>
+                <DetailGroup title={t("items.purchase")}>
+                  {moneyField("purchasePrice", t("items.purchasePrice"))}
+                  {moneyField("marketValue", t("items.marketValue"))}
+                  {textField("purchaseDate", t("items.purchaseDate"), {
+                    rule: rules.purchaseDate,
+                    type: "date",
+                    max: localToday(),
+                  })}
+                  {textField("source", t("items.source"), {
+                    placeholder: t("items.sourcePlaceholder"),
+                    maxLength: itemLimits.source,
+                  })}
+                </DetailGroup>
               </CollapsibleContent>
             </Collapsible>
             {failed && (
@@ -664,10 +636,14 @@ export function AddItemDialog({
           </div>
 
           <DialogFooter>
-            <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
-              <Switch checked={createMore} onCheckedChange={setCreateMore} />
-              {t("items.createMore")}
-            </label>
+            {item ? (
+              <span />
+            ) : (
+              <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
+                <Switch checked={createMore} onCheckedChange={setCreateMore} />
+                {t("items.createMore")}
+              </label>
+            )}
             <div className="flex items-center gap-2">
               <DialogClose asChild>
                 <Button type="button" variant="ghost">
@@ -684,7 +660,7 @@ export function AddItemDialog({
                 {submitting && (
                   <Loader2 className="animate-spin" aria-hidden="true" />
                 )}
-                {t("items.add")}
+                {t(item ? "items.save" : "items.add")}
                 {mod && (
                   <Kbd className="ml-1 border-primary-foreground/40 bg-transparent text-primary-foreground">
                     {mod}↵
@@ -696,5 +672,20 @@ export function AddItemDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** A titled block of fields under "More details". */
+function DetailGroup({
+  title,
+  children,
+}: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="flex flex-col gap-3">
+      <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>
+      <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+        {children}
+      </div>
+    </section>
   );
 }

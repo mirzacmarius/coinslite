@@ -84,3 +84,38 @@ test("an Item that isn't yours, or doesn't exist, isn't shown", async ({
     }),
   ).toBeVisible();
 });
+
+test("edit an Item, then duplicate it", async ({ page }) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  const dialog = page.getByRole("dialog", { name: "New Item" });
+  await dialog.getByLabel("Title").fill("2 kroner 1910");
+  await dialog.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(dialog).toBeHidden();
+  await main.getByRole("link", { name: /2 kroner 1910/ }).click();
+
+  const detail = visiblePage(page);
+  await detail.getByRole("button", { name: "Edit", exact: true }).click();
+  const edit = page.getByRole("dialog", { name: "Edit Item" });
+  await expect(edit.getByLabel("Title")).toHaveValue("2 kroner 1910");
+  await edit.getByRole("button", { name: "More details" }).click();
+  await edit.getByLabel("Mint mark").fill("KB");
+  await edit.getByRole("button", { name: "Material: Set material" }).click();
+  await page.getByRole("option", { name: "Silver" }).click();
+  await edit.getByLabel("Diameter").fill("31,5");
+  await edit.getByRole("button", { name: /^Save/ }).click();
+  await expect(edit).toBeHidden();
+  await expect(detail.getByText("31.5 mm")).toBeVisible();
+  await expect(detail.getByText("Silver")).toBeVisible();
+
+  const original = page.url();
+  await detail.getByRole("button", { name: "Duplicate", exact: true }).click();
+  await expect(page).not.toHaveURL(original);
+  await expect(visiblePage(page).getByText("31.5 mm")).toBeVisible();
+  await page.goto(`${appUrl}/collection`);
+  await expect(
+    visiblePage(page).getByRole("link", { name: /2 kroner 1910/ }),
+  ).toHaveCount(2);
+});
