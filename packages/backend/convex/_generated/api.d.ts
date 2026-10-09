@@ -25,6 +25,8 @@ import type * as albums_rules from "../albums/rules.js";
 import type * as auth from "../auth.js";
 import type * as catalog_csv from "../catalog/csv.js";
 import type * as catalog_csvText from "../catalog/csvText.js";
+import type * as catalog_datasets_euroCommemorativeCoins from "../catalog/datasets/euroCommemorativeCoins.js";
+import type * as catalog_datasets_euroCommemoratives from "../catalog/datasets/euroCommemoratives.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_seed from "../catalog/seed.js";
@@ -83,6 +85,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "catalog/csv": typeof catalog_csv;
   "catalog/csvText": typeof catalog_csvText;
+  "catalog/datasets/euroCommemorativeCoins": typeof catalog_datasets_euroCommemorativeCoins;
+  "catalog/datasets/euroCommemoratives": typeof catalog_datasets_euroCommemoratives;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
   "catalog/fields": typeof catalog_fields;
   "catalog/seed": typeof catalog_seed;

@@ -537,15 +537,23 @@ test("the bundled US Morgan and Peace dollars load once, with their sources, and
   const admin = await person(t, "admin@example.com", { admin: true });
 
   // 1 country, 2 series, 96 Morgan and 24 Peace dollar dates and mints.
-  expect(await t.mutation(internal.catalog.seed.load, {})).toEqual([
-    { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
-  ]);
-  expect(await t.mutation(internal.catalog.seed.load, {})).toEqual([
-    { dataset: "usSilverDollars", inserts: 0, updates: 0, unchanged: 123 },
-  ]);
+  expect(await t.mutation(internal.catalog.seed.load, {})).toContainEqual({
+    dataset: "usSilverDollars",
+    inserts: 123,
+    updates: 0,
+    unchanged: 0,
+  });
+  expect(await t.mutation(internal.catalog.seed.load, {})).toContainEqual({
+    dataset: "usSilverDollars",
+    inserts: 0,
+    updates: 0,
+    unchanged: 123,
+  });
 
   const nodes = records(await exportAll(admin.as));
-  const entries = nodes.filter((node) => node.is_addable === "true");
+  const entries = nodes.filter(
+    (node) => node.is_addable === "true" && node.country === "US",
+  );
   expect(entries).toHaveLength(120);
   expect(
     nodes.find((node) => node.id === "us-morgan-dollar-1893-cc"),
@@ -591,5 +599,6 @@ test("a new preview deployment loads the bundled Catalog through the function it
   const seed = makeFunctionReference<"mutation">(previewRun ?? "");
   expect(await t.mutation(seed, {})).toEqual([
     { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
+    { dataset: "euroCommemoratives", inserts: 609, updates: 0, unchanged: 0 },
   ]);
 });
