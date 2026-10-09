@@ -1,5 +1,6 @@
 "use client";
 
+import { CollectionTotalsSection } from "@/components/collection-totals/collection-totals";
 import { CollectionBrowser } from "@/components/collection/collection-browser";
 import { ResultsSkeleton } from "@/components/collection/collection-results";
 import { useI18n } from "@/locales/client";
@@ -28,6 +29,7 @@ export function CollectionPage() {
           </Button>
         }
       />
+      <CollectionTotalsSection />
       <Suspense
         fallback={
           <>

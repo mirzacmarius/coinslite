@@ -851,4 +851,40 @@ export default {
     noImage: "Încă nu există imagine",
     imageCredit: "Imagine",
   },
+  collectionTotals: {
+    title: "Totalurile colecției",
+    items: "Obiecte",
+    itemsHint: "Fiecare obiect se numără o dată, oricare i-ar fi cantitatea",
+    pieces: "Bucăți",
+    typesPlural: {
+      coin: "Monede",
+      banknote: "Bancnote",
+      stamp: "Timbre",
+    },
+    purchasePrice: "Preț de achiziție total",
+    marketValue: "Valoare de piață totală",
+    gainLoss: "Câștig/pierdere",
+    gainLossPartial:
+      "Obiecte cu preț de achiziție și valoare de piață: {count} din {total}",
+    gainLossNone:
+      "Apare când un obiect are atât preț de achiziție, cât și valoare de piață",
+    metalValue: {
+      gold: "Valoarea metalului (aur)",
+      silver: "Valoarea metalului (argint)",
+    },
+    fineWeight: "{grams}\u00a0g metal fin · {ounces}\u00a0oz\u00a0t",
+    noSpotPrices: "Se așteaptă prețurile spot",
+    view: "Afișare",
+    chart: "Grafic",
+    table: "Tabel",
+    valueByDateAdded: "Valoare după data adăugării",
+    valueByDateAddedDescription:
+      "Prețul de achiziție și valoarea de piață ale tuturor obiectelor adăugate până la sfârșitul fiecărei luni",
+    month: "Luna",
+    monthKeys: "Folosește săgețile pentru a trece de la o lună la alta.",
+    valueDistribution: "Distribuția valorii",
+    valueDistributionDescription:
+      "După tipul obiectului, plus valoarea metalului pentru aur și argint",
+    part: "Tip de obiect sau metal",
+  },
 } as const satisfies Dictionary;

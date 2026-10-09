@@ -843,4 +843,39 @@ export default {
     noImage: "Ikke noe bilde ennå",
     imageCredit: "Bilde",
   },
+  collectionTotals: {
+    title: "Totaler for samlingen",
+    items: "Objekter",
+    itemsHint: "Hvert objekt telles én gang, uansett antall",
+    pieces: "Stykker",
+    typesPlural: {
+      coin: "Mynter",
+      banknote: "Sedler",
+      stamp: "Frimerker",
+    },
+    purchasePrice: "Samlet innkjøpspris",
+    marketValue: "Samlet markedsverdi",
+    gainLoss: "Gevinst/tap",
+    gainLossPartial:
+      "Objekter med både innkjøpspris og markedsverdi: {count} av {total}",
+    gainLossNone: "Vises når et objekt har både innkjøpspris og markedsverdi",
+    metalValue: {
+      gold: "Metallverdi gull",
+      silver: "Metallverdi sølv",
+    },
+    fineWeight: "{grams}\u00a0g finvekt · {ounces}\u00a0oz\u00a0t",
+    noSpotPrices: "Venter på spotpriser",
+    view: "Visning",
+    chart: "Diagram",
+    table: "Tabell",
+    valueByDateAdded: "Verdi etter dato lagt til",
+    valueByDateAddedDescription:
+      "Innkjøpspris og markedsverdi for alt som var lagt til ved slutten av hver måned",
+    month: "Måned",
+    monthKeys: "Bruk piltastene for å gå mellom månedene.",
+    valueDistribution: "Verdifordeling",
+    valueDistributionDescription:
+      "Etter objekttype, pluss metallverdien av gull og sølv",
+    part: "Objekttype eller metall",
+  },
 } as const satisfies Dictionary;

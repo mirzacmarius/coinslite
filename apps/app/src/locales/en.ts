@@ -833,4 +833,40 @@ export default {
     noImage: "No image yet",
     imageCredit: "Image",
   },
+  collectionTotals: {
+    title: "Collection totals",
+    items: "Items",
+    itemsHint: "Each Item counts once, whatever its Quantity",
+    pieces: "Pieces",
+    typesPlural: {
+      coin: "Coins",
+      banknote: "Banknotes",
+      stamp: "Stamps",
+    },
+    purchasePrice: "Total Purchase price",
+    marketValue: "Total Market value",
+    gainLoss: "Gain/loss",
+    gainLossPartial:
+      "Items with both a Purchase price and a Market value: {count} of {total}",
+    gainLossNone:
+      "Shows once an Item has both a Purchase price and a Market value",
+    metalValue: {
+      gold: "Gold Metal value",
+      silver: "Silver Metal value",
+    },
+    fineWeight: "{grams}\u00a0g fine weight · {ounces}\u00a0oz\u00a0t",
+    noSpotPrices: "Waiting for Spot prices",
+    view: "View",
+    chart: "Chart",
+    table: "Table",
+    valueByDateAdded: "Value by date added",
+    valueByDateAddedDescription:
+      "Purchase price and Market value of everything added by the end of each month",
+    month: "Month",
+    monthKeys: "Use the arrow keys to move between months.",
+    valueDistribution: "Value distribution",
+    valueDistributionDescription:
+      "By Item type, plus the Metal value of gold and silver",
+    part: "Item type or metal",
+  },
 } as const;
