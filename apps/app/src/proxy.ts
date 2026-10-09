@@ -53,8 +53,10 @@ const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
 const isSignInPage = createRouteMatcher(
   inEveryLanguage(["/login", "/signup", "/verify", "/link"]),
 );
-// The reset link works whether or not someone is signed in.
-const isPasswordResetPage = createRouteMatcher(inEveryLanguage(["/reset"]));
+// Links from emails (password reset, email change) work signed in or not.
+const isOpenPage = createRouteMatcher(
+  inEveryLanguage(["/reset", "/confirm-email"]),
+);
 
 /**
  * Tells the marketing site someone is signed in, so it can send them straight
@@ -91,7 +93,7 @@ const redirect = (request: NextRequest, pathAndQuery: string) =>
   NextResponse.redirect(new URL(pathAndQuery, request.url));
 
 function route(request: NextRequest, isAuthenticated: boolean) {
-  if (isPasswordResetPage(request)) {
+  if (isOpenPage(request)) {
     return withLanguage(request);
   }
   if (isSignInPage(request)) {

@@ -1,10 +1,14 @@
 import { isLocale } from "@coinslite/i18n";
 import { v } from "convex/values";
+import { internal } from "../_generated/api";
 import {
   type QueryCtx,
+  env,
+  internalAction,
   internalMutation,
   internalQuery,
 } from "../_generated/server";
+import { sendEmail } from "../email";
 
 /** The language to write a user's emails in, by their email address. */
 export const languageFor = internalQuery({
@@ -56,4 +60,38 @@ export const latestLinkFor = internalQuery({
   handler: async (ctx, { email }) =>
     (await latestEmailTo(ctx, email))?.text.match(/https?:\/\/\S+/)?.[0] ??
     null,
+});
+
+const escapeHtml = (text: string) =>
+  text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
+
+/**
+ * Sends an email, with an optional link, through Resend; on deployments with
+ * EMAIL_DELIVERY=outbox it lands in the dev outbox instead.
+ */
+export const send = internalAction({
+  args: {
+    to: v.string(),
+    subject: v.string(),
+    body: v.string(),
+    link: v.optional(v.object({ url: v.string(), label: v.string() })),
+  },
+  returns: v.null(),
+  handler: async (ctx, { to, subject, body, link }) => {
+    const text = link ? `${body}\n\n${link.label}: ${link.url}` : body;
+    if (env.EMAIL_DELIVERY === "outbox") {
+      await ctx.runMutation(internal.accounts.emails.recordInOutbox, {
+        to,
+        subject,
+        text,
+      });
+      return null;
+    }
+    const linkHtml = link
+      ? `<p><a href="${escapeHtml(link.url)}">${escapeHtml(link.label)}</a></p>`
+      : "";
+    const html = `<p>${escapeHtml(body)}</p>${linkHtml}`;
+    await sendEmail({ to, subject, text, html });
+    return null;
+  },
 });

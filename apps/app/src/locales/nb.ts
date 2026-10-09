@@ -184,26 +184,76 @@ export default {
     bodyTitle: "Velkommen til CoinsLite",
     bodyDescription: "Samlingen din vises her.",
   },
-  settings: {
-    title: "Innstillinger",
-    headerTitle: "Innstillinger",
-    headerDescription: "Administrer kontoinnstillingene dine.",
-    avatar: {
-      title: "Profilbildet ditt",
-      description: "Dette er profilbildet ditt. Det vises på profilen din.",
-      uploadHint: "Klikk på profilbildet for å laste opp ditt eget bilde.",
-      resetButton: "Tilbakestill",
+  account: {
+    pageTitle: "Konto",
+    freePlan: "Gratisplan",
+    contact: {
+      title: "Kontakt og adresse",
+      description: "Vises i forsikringsrapporten.",
+      displayName: "Visningsnavn",
+      fullName: "Fullt navn",
+      streetAddress: "Adresse",
+      postalCode: "Postnummer",
+      city: "Sted",
+      country: "Land",
+      setCountry: "Velg land",
+      noCountry: "Ingen land",
+      phone: "Telefon",
+      save: "Lagre",
+      saved: "Lagret",
+      displayNameRequired: "Skriv inn et visningsnavn.",
+      invalidPhone: "Skriv inn et telefonnummer, for eksempel +47 22 12 34 56.",
+      failed: "Kunne ikke lagre. Prøv igjen.",
     },
-    deleteAccount: {
-      title: "Slett konto",
-      description: "Slett CoinsLite-kontoen din og alt innholdet permanent.",
-      warning: "Dette kan ikke angres. Vær forsiktig.",
-      deleteButton: "Slett konto",
-      confirmButton: "Er du sikker?",
+    preferences: {
+      title: "Innstillinger",
+      language: "Språk",
+      homeCurrency: "Hjemmevaluta",
+      homeCurrencyNote: "Snart kan du endre den, og alle beløp regnes om.",
+      languageNotSaved:
+        "Kunne ikke lagre språket på kontoen din, så det er bare endret på denne enheten.",
     },
-    sidebar: {
-      general: "Generelt",
-      billing: "Fakturering",
+    email: {
+      title: "E-post",
+      current: "Du logger inn som {email}.",
+      newEmail: "Ny e-postadresse",
+      send: "Send bekreftelseslenke",
+      sent: "Vi har sendt en lenke til {email}. Åpne den der for å fullføre endringen.",
+      invalid: "Skriv inn en e-postadresse, for eksempel navn@eksempel.no.",
+      same: "Det er allerede e-postadressen din.",
+      tooMany: "For mange forespørsler. Prøv igjen om en time.",
+      signInAgain:
+        "Av hensyn til sikkerheten må du logge inn på nytt før du endrer e-postadressen.",
+      signInAgainAction: "Logg inn på nytt",
+      failed: "Kunne ikke sende lenken. Prøv igjen.",
+    },
+    danger: {
+      title: "Logg ut eller slett",
+      signOut: "Logg ut",
+      delete: "Slett kontoen",
+      deleteConfirm: "Klikk igjen for å slette alt",
+      deleteWarning:
+        "Når du sletter kontoen, fjernes den og alt i den. Dette kan ikke angres.",
+    },
+    confirmEmail: {
+      pageTitle: "Bekreft e-post",
+      title: "Bekreft den nye e-postadressen",
+      description:
+        "Fra nå av logger du inn på CoinsLite med adressen denne lenken ble sendt til.",
+      confirm: "Bekreft ny e-postadresse",
+      done: "E-postadressen din er nå {email}.",
+      toAccount: "Gå til kontoen",
+      failed:
+        "Lenken er utløpt eller allerede brukt. Be om en ny fra kontoen din.",
+      inUse: "Den e-postadressen tilhører nå en annen konto.",
+      noLink: "Åpne lenken fra e-posten vi sendte til den nye adressen din.",
+      signInFirst:
+        "For å bekrefte, logg inn med kontoen som ba om denne endringen.",
+      signIn: "Logg inn for å bekrefte",
+      otherAccount:
+        "Denne lenken gjelder en annen konto. Logg inn med kontoen som ba om endringen.",
+      switchAccount: "Logg inn med en annen konto",
+      tryAgain: "Kunne ikke bekrefte akkurat nå. Prøv igjen.",
     },
   },
 } as const satisfies Dictionary;

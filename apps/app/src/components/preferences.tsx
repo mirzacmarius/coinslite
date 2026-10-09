@@ -2,7 +2,8 @@
 
 import { rememberLanguage } from "@/lib/language-cookie";
 import { useChangeLocale, useCurrentLocale, useI18n } from "@/locales/client";
-import { isLocale, localeNames, locales } from "@coinslite/i18n";
+import { api } from "@coinslite/backend/convex/_generated/api";
+import { type Locale, isLocale, localeNames, locales } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   DropdownMenu,
@@ -11,20 +12,45 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
+import { toast } from "@coinslite/ui/toaster";
+import { useConvexAuth, useMutation } from "convex/react";
 import { ChevronDown, Languages } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useCallback } from "react";
+
+/**
+ * Switches the interface language: stored in this browser and, when signed
+ * in, on the profile, so every device the person signs in on uses it.
+ */
+export function useChooseLanguage() {
+  const t = useI18n();
+  const changeLocale = useChangeLocale();
+  const { isAuthenticated } = useConvexAuth();
+  const setLanguage = useMutation(api.account.setLanguage);
+  return useCallback(
+    async (locale: Locale) => {
+      rememberLanguage(locale);
+      if (isAuthenticated) {
+        // This browser switches anyway; other devices keep the old language.
+        await setLanguage({ language: locale }).catch(() =>
+          toast.error(t("account.preferences.languageNotSaved")),
+        );
+      }
+      changeLocale(locale);
+    },
+    [changeLocale, isAuthenticated, setLanguage, t],
+  );
+}
 
 /** The five languages, as radio items for a menu. */
 export function LanguageRadioItems() {
-  const changeLocale = useChangeLocale();
+  const chooseLanguage = useChooseLanguage();
   const locale = useCurrentLocale();
   return (
     <DropdownMenuRadioGroup
       value={locale}
       onValueChange={(value) => {
-        if (!isLocale(value)) return;
-        rememberLanguage(value);
-        changeLocale(value);
+        if (isLocale(value)) void chooseLanguage(value);
       }}
     >
       {locales.map((value) => (

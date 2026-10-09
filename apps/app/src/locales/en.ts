@@ -179,27 +179,76 @@ export default {
     bodyTitle: "Welcome to CoinsLite",
     bodyDescription: "Your collection will appear here.",
   },
-  settings: {
-    title: "Settings",
-    headerTitle: "Settings",
-    headerDescription: "Manage your account settings.",
-    avatar: {
-      title: "Your avatar",
-      description: "This is your avatar. It's shown on your profile.",
-      uploadHint: "Click the avatar to upload your own picture.",
-      resetButton: "Reset",
+  account: {
+    pageTitle: "Account",
+    freePlan: "Free plan",
+    contact: {
+      title: "Contact and address",
+      description: "Shown on your Insurance report.",
+      displayName: "Display name",
+      fullName: "Full name",
+      streetAddress: "Address",
+      postalCode: "Postal code",
+      city: "City",
+      country: "Country",
+      setCountry: "Set country",
+      noCountry: "No country",
+      phone: "Phone",
+      save: "Save",
+      saved: "Saved",
+      displayNameRequired: "Enter a display name.",
+      invalidPhone: "Enter a phone number like +47 22 12 34 56.",
+      failed: "Couldn't save. Try again.",
     },
-    deleteAccount: {
-      title: "Delete account",
+    preferences: {
+      title: "Preferences",
+      language: "Language",
+      homeCurrency: "Home currency",
+      homeCurrencyNote:
+        "Changing it, with every amount converted, is coming soon.",
+      languageNotSaved:
+        "Couldn't save the language to your account, so it changed on this device only.",
+    },
+    email: {
+      title: "Email",
+      current: "You sign in as {email}.",
+      newEmail: "New email",
+      send: "Send confirmation link",
+      sent: "We sent a link to {email}. Open it there to finish the change.",
+      invalid: "Enter an email address, like name@example.com.",
+      same: "That's already your email.",
+      tooMany: "Too many requests. Try again in an hour.",
+      signInAgain: "For your safety, sign in again before changing your email.",
+      signInAgainAction: "Sign in again",
+      failed: "Couldn't send the link. Try again.",
+    },
+    danger: {
+      title: "Sign out or delete",
+      signOut: "Sign out",
+      delete: "Delete account",
+      deleteConfirm: "Click again to delete everything",
+      deleteWarning:
+        "Deleting your account removes it and everything in it. This can't be undone.",
+    },
+    confirmEmail: {
+      pageTitle: "Confirm email",
+      title: "Confirm your new email",
       description:
-        "Permanently delete your CoinsLite account and everything in it.",
-      warning: "This can't be undone. Proceed with care.",
-      deleteButton: "Delete account",
-      confirmButton: "Are you sure?",
-    },
-    sidebar: {
-      general: "General",
-      billing: "Billing",
+        "From now on, sign in to CoinsLite with the address this link was sent to.",
+      confirm: "Confirm new email",
+      done: "Your email is now {email}.",
+      toAccount: "Go to your Account",
+      failed:
+        "This link has expired or was already used. Ask for a new one from your Account.",
+      inUse: "That email now belongs to another account.",
+      noLink: "Open the link from the email we sent to your new address.",
+      signInFirst:
+        "To confirm, sign in with the account that asked for this change.",
+      signIn: "Sign in to confirm",
+      otherAccount:
+        "This link is for another account. Sign in with the account that asked for the change.",
+      switchAccount: "Sign in with another account",
+      tryAgain: "Couldn't confirm just now. Try again.",
     },
   },
 } as const;

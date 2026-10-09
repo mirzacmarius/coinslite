@@ -12,3 +12,11 @@ export function rememberLanguage(locale: Locale) {
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `${LANGUAGE_COOKIE}=${locale}; Max-Age=${ONE_YEAR_IN_SECONDS}; Path=/; SameSite=Lax${secure}`;
 }
+
+/** The language this browser last picked, if any. */
+export function rememberedLanguage() {
+  return document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${LANGUAGE_COOKIE}=`))
+    ?.slice(LANGUAGE_COOKIE.length + 1);
+}

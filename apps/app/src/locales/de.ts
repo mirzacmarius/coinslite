@@ -193,27 +193,78 @@ export default {
     bodyTitle: "Willkommen bei CoinsLite",
     bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
-  settings: {
-    title: "Einstellungen",
-    headerTitle: "Einstellungen",
-    headerDescription: "Verwalte deine Kontoeinstellungen.",
-    avatar: {
-      title: "Dein Avatar",
-      description: "Das ist dein Avatar. Er wird in deinem Profil angezeigt.",
-      uploadHint: "Klicke auf den Avatar, um ein eigenes Bild hochzuladen.",
-      resetButton: "Zurücksetzen",
+  account: {
+    pageTitle: "Konto",
+    freePlan: "Gratis-Tarif",
+    contact: {
+      title: "Kontakt und Adresse",
+      description: "Erscheint in deinem Versicherungsbericht.",
+      displayName: "Anzeigename",
+      fullName: "Vollständiger Name",
+      streetAddress: "Adresse",
+      postalCode: "Postleitzahl",
+      city: "Ort",
+      country: "Land",
+      setCountry: "Land wählen",
+      noCountry: "Kein Land",
+      phone: "Telefon",
+      save: "Speichern",
+      saved: "Gespeichert",
+      displayNameRequired: "Gib einen Anzeigenamen ein.",
+      invalidPhone: "Gib eine Telefonnummer wie +49 30 1234567 ein.",
+      failed: "Speichern fehlgeschlagen. Versuche es noch einmal.",
     },
-    deleteAccount: {
-      title: "Konto löschen",
-      description: "Lösche dein CoinsLite-Konto mit allen Inhalten dauerhaft.",
-      warning:
-        "Das kann nicht rückgängig gemacht werden. Sei bitte vorsichtig.",
-      deleteButton: "Konto löschen",
-      confirmButton: "Bist du sicher?",
+    preferences: {
+      title: "Einstellungen",
+      language: "Sprache",
+      homeCurrency: "Heimatwährung",
+      homeCurrencyNote:
+        "Bald kannst du sie ändern, und alle Beträge werden umgerechnet.",
+      languageNotSaved:
+        "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },
-    sidebar: {
-      general: "Allgemein",
-      billing: "Abrechnung",
+    email: {
+      title: "E-Mail",
+      current: "Du meldest dich mit {email} an.",
+      newEmail: "Neue E-Mail-Adresse",
+      send: "Bestätigungslink senden",
+      sent: "Wir haben einen Link an {email} gesendet. Öffne ihn dort, um die Änderung abzuschließen.",
+      invalid: "Gib eine E-Mail-Adresse ein, z. B. name@beispiel.de.",
+      same: "Das ist bereits deine E-Mail-Adresse.",
+      tooMany: "Zu viele Anfragen. Versuche es in einer Stunde noch einmal.",
+      signInAgain:
+        "Melde dich zu deiner Sicherheit erneut an, bevor du deine E-Mail-Adresse änderst.",
+      signInAgainAction: "Erneut anmelden",
+      failed: "Der Link konnte nicht gesendet werden. Versuche es noch einmal.",
+    },
+    danger: {
+      title: "Abmelden oder löschen",
+      signOut: "Abmelden",
+      delete: "Konto löschen",
+      deleteConfirm: "Zum Löschen von allem erneut klicken",
+      deleteWarning:
+        "Beim Löschen deines Kontos wird es mit allem darin entfernt. Das lässt sich nicht rückgängig machen.",
+    },
+    confirmEmail: {
+      pageTitle: "E-Mail bestätigen",
+      title: "Bestätige deine neue E-Mail-Adresse",
+      description:
+        "Ab jetzt meldest du dich bei CoinsLite mit der Adresse an, an die dieser Link ging.",
+      confirm: "Neue E-Mail-Adresse bestätigen",
+      done: "Deine E-Mail-Adresse ist jetzt {email}.",
+      toAccount: "Zu deinem Konto",
+      failed:
+        "Dieser Link ist abgelaufen oder wurde schon verwendet. Fordere in deinem Konto einen neuen an.",
+      inUse: "Diese E-Mail-Adresse gehört inzwischen zu einem anderen Konto.",
+      noLink: "Öffne den Link aus der E-Mail an deine neue Adresse.",
+      signInFirst:
+        "Melde dich zum Bestätigen mit dem Konto an, das diese Änderung angefordert hat.",
+      signIn: "Zum Bestätigen anmelden",
+      otherAccount:
+        "Dieser Link gehört zu einem anderen Konto. Melde dich mit dem Konto an, das die Änderung angefordert hat.",
+      switchAccount: "Mit einem anderen Konto anmelden",
+      tryAgain:
+        "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
 } as const satisfies Dictionary;

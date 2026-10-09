@@ -1,3 +1,4 @@
+import { ProfileLanguage } from "@/components/account/profile-language";
 import { EndSession } from "@/components/end-session";
 import {
   AddItemProvider,
@@ -40,6 +41,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Suspense>
           <AccountCheck />
         </Suspense>
+        <ProfileLanguage />
         {children}
       </AppShell>
     </AddItemProvider>
