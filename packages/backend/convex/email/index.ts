@@ -23,12 +23,14 @@ export type SendEmailOptions = {
   subject: string;
   html: string;
   text?: string;
+  /** Where replies go, instead of the sender address. */
+  replyTo?: string;
 };
 
-export async function sendEmail(options: SendEmailOptions) {
+export async function sendEmail({ replyTo, ...options }: SendEmailOptions) {
   const from =
     env.RESEND_SENDER_EMAIL_AUTH ?? "CoinsLite <onboarding@resend.dev>";
-  const email = { from, ...options };
+  const email = { from, ...options, ...(replyTo && { reply_to: replyTo }) };
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",

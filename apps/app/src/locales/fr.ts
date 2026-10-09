@@ -350,6 +350,58 @@ export default {
       tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
+  feedback: {
+    title: "Votre avis",
+    description:
+      "Une idée, un problème ou quelque chose qui vous plaît ? Dites-le à l’équipe CoinsLite. Nous lisons chaque message.",
+    open: "Donner votre avis",
+    dialogTitle: "Donner votre avis",
+    message: "Message",
+    placeholder:
+      "Ce qui fonctionne pour vous, ce qui ne fonctionne pas, ce que vous aimeriez…",
+    note: "Nous joignons l’adresse e-mail de votre compte pour pouvoir vous répondre.",
+    cancel: "Annuler",
+    send: "Envoyer",
+    close: "Fermer",
+    sent: "Merci ! Votre avis a bien été envoyé.",
+    required: "Écrivez d’abord un message.",
+    tooLong: "{limit} caractères maximum.",
+    tooMany:
+      "Vous avez envoyé plusieurs messages en peu de temps. Réessayez dans quelques minutes.",
+    failed: "Impossible d’envoyer votre avis. Réessayez.",
+  },
+  plans: {
+    freePlan: "Formule gratuite",
+    itemsUsed: "{used} / {limit} objets",
+    overLimit: "Plus de {limit} objets",
+    usageLabel: "Objets utilisés dans la formule gratuite",
+    nearLimit: "Limite proche",
+    full: "Limite atteinte",
+    upgrade: "Passer à Premium",
+    upgradeToPremium: "Passer à Premium",
+    usedOf: "{used} objets utilisés sur {limit}",
+    premiumPitch: "Premium n’a pas de limite d’objets.",
+    nearLimitNotice:
+      "Vous avez utilisé {used} des {limit} objets de la formule gratuite.",
+    fullNotice:
+      "Votre collection a atteint les {limit} objets de la formule gratuite.",
+    keepItems:
+      "Tous vos objets restent visibles et modifiables. Passez à Premium pour en ajouter d’autres.",
+    limitError:
+      "La formule gratuite est limitée à {limit} objets, rien n’a donc été ajouté. Passez à Premium pour en ajouter d’autres.",
+  },
+  spotPrices: {
+    title: "Cours spot",
+    metal: "Métal",
+    perGram: "Par gramme",
+    perOunce: "Par once troy",
+    updated: "Mis à jour le {time}",
+    stale:
+      "Ces cours n’ont pas été mis à jour depuis plus d’une heure et peuvent être dépassés.",
+    emptyTitle: "Pas encore de cours spot",
+    emptyDescription:
+      "Les cours de l’or et de l’argent s’afficheront ici dès qu’ils auront été récupérés. Ils sont actualisés toutes les 15 minutes.",
+  },
   updates: {
     title: "Nouveautés",
     unseen: "Nouvelle version",

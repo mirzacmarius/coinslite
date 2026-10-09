@@ -7,6 +7,7 @@ import {
   itemType,
   language,
   material,
+  perDollar,
   strike,
 } from "./utils/validators";
 
@@ -93,6 +94,20 @@ export default defineSchema({
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
   }).index("by_ownerId", ["ownerId"]),
+
+  /**
+   * The latest Spot prices and exchange rates (spotPrices.ts): one document,
+   * replaced by each successful refresh and kept when a refresh fails.
+   */
+  spotPriceSnapshots: defineTable({
+    /** When the provider quoted the prices. */
+    quotedAt: v.number(),
+    /** When CoinsLite stored them. */
+    fetchedAt: v.number(),
+    /** The latest refresh attempt, whether or not it succeeded. */
+    checkedAt: v.number(),
+    perDollar,
+  }),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

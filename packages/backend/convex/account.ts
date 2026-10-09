@@ -15,6 +15,7 @@ import { emailChangeMessages } from "./account/emailChangeMessages";
 import { checkContact } from "./account/rules";
 import { requireNormalizedEmail } from "./accounts/credentials";
 import { deleteUserAndSignInMethods } from "./accounts/linking";
+import { planOf } from "./plans";
 import { requireSetUpUser, requireUserId } from "./utils/auth";
 import { language } from "./utils/validators";
 
@@ -60,8 +61,7 @@ export const get = query({
       contactPhone: user.contactPhone,
       language: user.language,
       homeCurrency: user.homeCurrency,
-      // Every account is on the Free plan until billing exists (MUS-709).
-      plan: "free" as const,
+      plan: await planOf(ctx, user._id),
       // An expired change is deleted when it expires (expireEmailChange).
       pendingEmail: pending?.newEmail,
     };
