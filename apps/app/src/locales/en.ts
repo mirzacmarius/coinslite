@@ -919,4 +919,15 @@ export default {
       albumsCreatedLast30Days: "Albums created in the last 30 days",
     },
   },
+  collectionExport: {
+    export: "Export",
+    "inView#zero": "No Items in this view",
+    "inView#one": "1 Item in this view",
+    "inView#few": "{count} Items in this view",
+    "inView#other": "{count} Items in this view",
+    csv: "Export as CSV",
+    premiumOnly: "Exporting your Collection is part of Premium.",
+    failed: "Couldn't export the Collection. Try again.",
+    fileName: "coinslite-collection-{date}.csv",
+  },
 } as const;

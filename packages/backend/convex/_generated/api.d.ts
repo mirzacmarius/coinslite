@@ -41,6 +41,8 @@ import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_tree from "../catalog/tree.js";
 import type * as collection from "../collection.js";
 import type * as collection_browse from "../collection/browse.js";
+import type * as collection_exportLabels from "../collection/exportLabels.js";
+import type * as collection_exports from "../collection/exports.js";
 import type * as collection_view from "../collection/view.js";
 import type * as collectionCounts from "../collectionCounts.js";
 import type * as collectionTotals from "../collectionTotals.js";
@@ -115,6 +117,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/tree": typeof catalog_tree;
   collection: typeof collection;
   "collection/browse": typeof collection_browse;
+  "collection/exportLabels": typeof collection_exportLabels;
+  "collection/exports": typeof collection_exports;
   "collection/view": typeof collection_view;
   collectionCounts: typeof collectionCounts;
   collectionTotals: typeof collectionTotals;

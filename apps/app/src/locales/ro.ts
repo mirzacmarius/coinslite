@@ -938,4 +938,15 @@ export default {
       albumsCreatedLast30Days: "Albume create în ultimele 30 de zile",
     },
   },
+  collectionExport: {
+    export: "Exportă",
+    "inView#zero": "Niciun obiect în această vizualizare",
+    "inView#one": "1 obiect în această vizualizare",
+    "inView#few": "{count} obiecte în această vizualizare",
+    "inView#other": "{count} de obiecte în această vizualizare",
+    csv: "Exportă ca CSV",
+    premiumOnly: "Exportul colecției face parte din Premium.",
+    failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
+    fileName: "coinslite-colectie-{date}.csv",
+  },
 } as const satisfies Dictionary;
