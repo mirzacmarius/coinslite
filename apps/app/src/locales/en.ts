@@ -245,6 +245,8 @@ export default {
       submit: "Email me a link",
       sentTitle: "Check your email",
       sent: "We sent a sign-in link to {email}. It works once and expires in 15 minutes.",
+      resend: "Resend the sign-in link",
+      resent: "We sent another sign-in link to {email}.",
       usePassword: "Use a password instead",
       failed:
         "This sign-in link has expired or was already used. Ask for a new one.",
@@ -813,6 +815,12 @@ export default {
     emptyDescription:
       "Countries and Themes show here once Catalog entries are added.",
     theme: "Theme",
+    themes: { euroCommemoratives: "2-euro commemoratives" },
+    groupings: {
+      commemorativeCoins: "Commemorative coins",
+      denominationCoins: "{denomination} coins",
+      denominationBanknotes: "{denomination} banknotes",
+    },
     entryCount: "Catalog entries",
     browseBy: "Browse by",
     byGroup: "Groups",

@@ -257,6 +257,8 @@ export default {
       submit: "M’envoyer un lien",
       sentTitle: "Consultez vos e-mails",
       sent: "Nous avons envoyé un lien de connexion à {email}. Il ne fonctionne qu’une fois et expire dans 15 minutes.",
+      resend: "Renvoyer le lien de connexion",
+      resent: "Nous avons renvoyé un lien de connexion à {email}.",
       usePassword: "Utiliser un mot de passe",
       failed:
         "Ce lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
@@ -841,6 +843,12 @@ export default {
     emptyDescription:
       "Les pays et les thèmes apparaissent ici dès que des entrées du catalogue sont ajoutées.",
     theme: "Thème",
+    themes: { euroCommemoratives: "Pièces commémoratives de 2 euros" },
+    groupings: {
+      commemorativeCoins: "Pièces commémoratives",
+      denominationCoins: "{denomination} en pièces",
+      denominationBanknotes: "{denomination} en billets",
+    },
     entryCount: "Entrées du catalogue",
     browseBy: "Parcourir par",
     byGroup: "Groupes",

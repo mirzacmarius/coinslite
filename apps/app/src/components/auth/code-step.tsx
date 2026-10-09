@@ -110,10 +110,12 @@ export function ResendCodeButton({
   email,
   resend,
   onResult,
+  isLink = false,
 }: {
   email: string;
   resend: () => Promise<AuthStepResult>;
   onResult: (message: FormMessageState) => void;
+  isLink?: boolean;
 }) {
   const t = useI18n();
   return (
@@ -125,11 +127,16 @@ export function ResendCodeButton({
         onResult(
           (await resend()) === "failed"
             ? { tone: "error", text: t("auth.failedGeneric") }
-            : { tone: "info", text: t("auth.code.resent", { email }) },
+            : {
+                tone: "info",
+                text: t(isLink ? "auth.link.resent" : "auth.code.resent", {
+                  email,
+                }),
+              },
         );
       }}
     >
-      {t("auth.code.resend")}
+      {t(isLink ? "auth.link.resend" : "auth.code.resend")}
     </Button>
   );
 }

@@ -261,6 +261,8 @@ export default {
       submit: "Link senden",
       sentTitle: "Prüfe dein Postfach",
       sent: "Wir haben einen Anmeldelink an {email} gesendet. Er funktioniert einmal und läuft in 15 Minuten ab.",
+      resend: "Anmeldelink erneut senden",
+      resent: "Wir haben einen neuen Anmeldelink an {email} gesendet.",
       usePassword: "Stattdessen mit Passwort anmelden",
       failed:
         "Dieser Anmeldelink ist abgelaufen oder wurde schon verwendet. Fordere einen neuen an.",
@@ -855,6 +857,12 @@ export default {
     emptyDescription:
       "Länder und Themen erscheinen hier, sobald Katalogeinträge hinzugefügt sind.",
     theme: "Thema",
+    themes: { euroCommemoratives: "2-Euro-Gedenkmünzen" },
+    groupings: {
+      commemorativeCoins: "Gedenkmünzen",
+      denominationCoins: "{denomination}-Münzen",
+      denominationBanknotes: "{denomination}-Banknoten",
+    },
     entryCount: "Katalogeinträge",
     browseBy: "Durchsuchen nach",
     byGroup: "Gruppen",

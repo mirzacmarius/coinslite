@@ -97,8 +97,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-lu-2005-50th-birthday-of-grand-duke-henri-5th-anniversary",
     country: "LU",
     year: 2005,
-    title:
-      "50th birthday of Grand Duke Henri, 5th anniversary of his accession to the throne and 100th anniversary of the death of Grand Duke Adolphe",
+    title: "Grand Dukes Henri and Adolphe",
     language: "en",
     description:
       "Depicted in the centre of the coin is the effigy of Grand Duke Henri, looking to the right and superimposed on the effigy of Grand Duke Adolphe. Above the effigies appears the legend ‘GRANDS-DUCS DE LUXEMBOURG’. The names ‘HENRI’, set above ‘*1955’, and ‘ADOLPHE’, set above ‘†1905’, are inscribed below the respective effigies. On the outer ring of the coin, the 12 stars of the EU surrounding the design are placed between the letters of the word ‘LËTZEBUERG’ and the year of issue, 2005, with the latter centred below the effigies and flanked by the letter ‘S’ on the left and the logo of the mint on the right.",
@@ -1018,8 +1017,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-nl-2011-500th-anniversary-of-the-publication-of-the-world",
     country: "NL",
     year: 2011,
-    title:
-      "500ste verjaardag van de publicatie van het wereldberoemde boek Laus stultitiae van de Nederlandse filosoof, humanist en theoloog Desiderius Erasmus",
+    title: "Desiderius Erasmus en Lof der Zotheid",
     language: "nl",
     description:
       'The inner part of the coin shows Erasmus writing his book on the right and the effigy of Queen Beatrix to the left. The two images are separated by the vertical inscription "Beatrix Koningin der Nederlanden". The year "2011", the Mint master’s mark and the mintmark are positioned horizontally near the centre of the coin. The coin’s outer ring bears the 12 stars of the European Union.',
@@ -1628,8 +1626,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-fr-2013-150th-anniversary-of-the-birth-of-pierre-de",
     country: "FR",
     year: 2013,
-    title:
-      "150e anniversaire de la naissance de Pierre de Coubertin, initiateur de la rénovation des Jeux olympiques et premier président du Comité international olympique",
+    title: "Pierre de Coubertin",
     language: "fr",
     description:
       "The inner part of the coin shows a portrait of Pierre de Coubertin at a young age, set slightly off-centre to the right, with stylised Olympic rings in the background. They provide the framework for silhouettes symbolising the Olympic sports. To the left of the portrait, the letters “RF”, denoting the issuing country, are given above the year of issue “2013”. The name “PIERRE DE COUBERTIN” is inscribed along the top edge of the inner part of the coin. The coin’s outer ring bears the 12 stars of the European Union.",
@@ -1707,8 +1704,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-be-2013-100th-anniversary-of-the-creation-of-the-royal",
     country: "BE",
     year: 2013,
-    title:
-      "100th anniversary of the creation of the Royal Meteorological Institute (Koninklijk Meteorologisch Instituut/Institut Royal Météorologique)",
+    title: "Royal Meteorological Institute",
     language: "en",
     description:
       "The obverse of the coin displays in its centre the number 100 with the first zero encircling the abbreviations ‘KMI’ and ‘IRM’ and the second zero representing a sun. Isobars, raindrops and snowflakes are depicted to the left of the sun. The year ‘2013’ is displayed in the upper rays of the sun and the nationality ‘BE’ is indicated in the lower rays. The mark of the mint master and the mark of the Brussels mint, a helmeted profile of the Archangel Michael, are displayed under the ‘1’ of the number ‘100’. The coin’s outer ring bears the 12 stars of the European Union.",
@@ -2232,8 +2228,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-pt-2015-500-years-of-the-first-contacts-with-timor-nowadays",
     country: "PT",
     year: 2015,
-    title:
-      "500 anos do primeiro contacto de Portugal com Timor, atualmente um país independente de língua portuguesa (Timor Lorosae)",
+    title: "Portugal e Timor-Leste",
     language: "pt",
     description:
       "The design depicts a XVI Century ship, representing the arrival of the Portuguese navigators to the island, and a local house thatched roof top, including the typical wood sculptures, permanent memories of myths and legends. The one depicted on the coin represents the history of the first inhabitants, who arrived by boat from other parts of the Asian continent and the importance of the horse to travel around the steep mountains which cover most of the island. At the top right, the year ‘1515’ and the name of the issuing country ‘PORTUGAL’. At the bottom left, the inscription ‘TIMOR’ and the year ‘2015’. At the bottom, the signature of the artist Fernando Fonseca. The coin’s outer ring bears the 12 stars of the European Union.",
@@ -3422,8 +3417,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-ee-2018-estonia-latvia-and-lithuania-jointly-issued-a",
     country: "EE",
     year: 2018,
-    title:
-      "Eesti, Läti ja Leedu lasid 2018. aastal ühiselt käibele ühtse kujundusega euromälestusmündi, millega tähistatakse Eesti riigi ja Läti riigi asutamist ning Leedu omariikluse taastamist",
+    title: "Balti riigid",
     language: "et",
     description:
       "The three Baltic States are symbolically represented as a braid. They are united by their history: a common past, present and future. A stylised numeral representing the 100th anniversary, and the heraldic signs of all three States, are featured as well. At the left side is the name of the issuing country ‘EESTI’ and at the right side is the year of issuance ‘2018’. The design was selected by public voting in all three Baltic countries. The coin’s outer ring bears the 12 stars of the European Union.",
@@ -3434,8 +3428,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-lv-2018-estonia-latvia-and-lithuania-jointly-issued-a",
     country: "LV",
     year: 2018,
-    title:
-      "Igaunija, Latvija un Lietuva 2018. gadā kopīgi emitēja euro monētu ar vienādu zīmējumu, svinot Igaunijas un Latvijas valsts izveidošanu un Lietuvas valsts atjaunošanu",
+    title: "Baltijas valstis",
     language: "lv",
     description:
       "The three Baltic States are symbolically represented as a braid. They are united by their history: a common past, present and future. A stylized numeral representing the 100th anniversary, and the heraldic signs of all three States, are featured as well. At the left side is the name of the issuing country ‘LATVIJA’ and at the right side is the year of issuance ‘2018’. The design was selected by public voting in all three Baltic countries. The coin’s outer ring bears the 12 stars of the European Union.",
@@ -3446,8 +3439,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-lt-2018-estonia-latvia-and-lithuania-jointly-issued-a",
     country: "LT",
     year: 2018,
-    title:
-      "2018 m. Estija, Latvija ir Lietuva kartu išleido proginę bendro dizaino monetą, skirtą Estijos ir Latvijos valstybių sukūrimo ir Lietuvos valstybės atkūrimo progoms paminėti.",
+    title: "Baltijos valstybės",
     language: "lt",
     description:
       "The three Baltic States are symbolically represented as a braid. They are united by their history: a common past, present and future. A stylised numeral representing the 100th anniversary, and the heraldic signs of all three States, are featured as well. At the left side is the name of the issuing country ‘LIETUVA’ and the mint mark and at the right side is the year of issuance ‘2018’ and the mark of the designer ‘JP’. The design was selected by public voting in all three Baltic countries. The coin’s outer ring bears the 12 stars of the European Union.",
@@ -4016,8 +4008,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-pt-2019-500-years-of-the-first-circumnavigation-organised",
     country: "PT",
     year: 2019,
-    title:
-      "500 anos da primeira viagem de circum‑navegação, organizada e comandada pelo explorador e navegador português Fernão de Magalhães",
+    title: "Primeira circum-navegação de Fernão de Magalhães",
     language: "pt",
     description:
       "The Spanish expedition to the East Indies began in 1519 and ended in 1522, resulting in the first circumnavigation of the Earth. The design bears the effigy of Fernão de Magalhães. At the right side, in semicircle, is the inscription ‘CIRCUM NAVEGAÇÃO’ (circumnavigation) and underneath the inscription ‘1519 FERNÃO DE MAGALHÃES’. At the left side, in semicircle, is the year of issuance ‘2019’ and the name of the issuing country ‘PORTUGAL’. The coin’s outer ring bears the 12 stars of the European flag.",
@@ -4051,8 +4042,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-lt-2019-sutartines-lithuanian-multipart-songs-inscribed-on",
     country: "LT",
     year: 2019,
-    title:
-      "Sutartinės (lietuviškos polifoninės dainos, įrašytos į UNESCO reprezentatyvųjį žmonijos nematerialiojo kultūros paveldo sąrašą)",
+    title: "Sutartinės",
     language: "lt",
     description:
       "The design features linear motifs, symbolising polyphonic melodies of the unique Lithuanian heritage — folk songs sutartinės. The lines are widening and narrowing again, spinning into a swirl decorated with various miniature geometric and nature figures. The inscription of the issuing country ‘LIETUVA’, as well as the inscription ‘SUTARTINĖS’ (Lithuanian multipart songs) and the year of issuance ‘2019’ are depicted in semicircle. The mark of the Lithuanian Mint is featured as well. The coin’s outer ring bears the 12 stars of the European flag.",
@@ -4764,8 +4754,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-be-2021-500th-anniversary-of-the-appearance-of-the",
     country: "BE",
     year: 2021,
-    title:
-      "The 500th anniversary of the appearance of the ordinance of the second period of coin issuance during the reign of Charles V",
+    title: "Charles V's second coinage period",
     language: "en",
     description:
       "The national side of the coin depicts in the inner part of the piece the portrait of the Charles V, together with the text Carolus V. At the left you can find the 500 year old golden Carolus guilder, issued after the ordinance of the second period of coin issuance during the reign of Charles V. As the Royal Dutch Mint will strike the coins, the mintmark of Utrecht, a mercury staff is located on the bottom together with the Belgian mint director mintmark, the coat of arms of the municipality Herzele. It also contains the initials LL, referring to the designer of the coin, Mr. Luc Luycx. The country code BE and the year mark 2021 are located on the left. The coin’s outer ring bears the 12 stars of the European flag.",
@@ -5818,8 +5807,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-lu-2024-100th-anniversary-of-the-signature-by-the-grand",
     country: "LU",
     year: 2024,
-    title:
-      "The 100th anniversary of the signature by the Grand Duchess Charlotte of the Grand Ducal decree concerning the issuance of the divisional currency in nickel, commonly called ‘Feierstéppler’",
+    title: "Feierstéppler",
     language: "en",
     description:
       "The design depicts in its centre the representation of the Luxembourg coin issued in 1924 showing a steel industry worker, this representation being integrated in the figure ‘100’ as indication of the anniversary of the first issuance of one of the longest circulating Luxembourg franc coins. The name of the issuing country LÉTZEBUERG as well as the year date 2024 appear at the top of the design. The bottom of the design depicts the word ‘FEIERSTÉPPLER’, the common and popular designation of this coin. The monogram (letter ‘H’ with a crown) is a representation of Grand Duke Henri. As the producing mint is not yet known, the mint marks might be adapted within the spaceholder. The coin’s outer ring bears the 12 stars of the European flag.",
@@ -5841,8 +5829,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-de-2024-175th-anniversary-of-the-frankfurt-constitution",
     country: "DE",
     year: 2024,
-    title:
-      "175. Jubiläum der Frankfurter Verfassung (oder „Paulskirchenverfassung“, des ersten Versuchs einer gesamtstaatlichen Verfassung für ein vereintes Deutschland)",
+    title: "Frankfurter Verfassung",
     language: "de",
     description:
       "The design features several thematic layers. In the foreground is a perspective depiction of St Paul’s Church with the representatives of the national constitutional assembly filing in. This overlays a rendering of the constitutional document and a quill, representing the outcome of the Frankfurt Parliament. Finally, the design is crowned by three female allegories – Unity, Justice and Freedom – and the tricolour flag of black, red and gold. The vibrant three- dimensional relief evokes the timelessness of the basic democratic principles that were put down in writing for the first time and in a foundational way in the Frankfurt Constitution. The coin’s inner ring also features the inscription ‘PAULSKIRCHENVERFASSUNG 1849’ (‘St Paul’s Church Constitution 1849’) and, at the bottom, the year of issue ‘2024’, Germany’s issuing country code ‘D’, the mint mark of the respective mint (‘A’, ‘D’, ‘F’, ‘G’ or ‘J’), and the initials of the artist, Bodo Broschat from Berlin. The coin’s outer ring bears the 12 stars of the European flag.",
@@ -5864,8 +5851,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-es-2024-recognition-of-seville-archivo-de-indias-real",
     country: "ES",
     year: 2024,
-    title:
-      "Reconocimiento de Sevilla (Archivo de Indias, Real Alcázar de Sevilla y Catedral de Sevilla) como Patrimonio Mundial de la UNESCO",
+    title: "Sevilla y el Patrimonio Mundial",
     language: "es",
     description:
       "The design shows a view of the ‘Patio de las Doncellas’ of the Real Alcåzar of Seville. At the top, in a circular direction and in capital letters, the legend SEVILLA; below, the mint mark ‘Eme Coronada’. At the bottom, in a circular direction and in capital letters, the legend ESPANA and the year of issue 2024. The coin’s outer ring bears the 12 stars of the European flag.",
@@ -6153,8 +6139,7 @@ export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
     key: "eur2-lt-2024-lithuanian-tradition-of-straw-gardens-inscribed-on",
     country: "LT",
     year: 2024,
-    title:
-      "Lietuvos šiaudinių sodų rišimo tradicija, įrašyta į UNESCO Reprezentatyvųjį žmonijos nematerialiojo kultūros paveldo sąrašą",
+    title: "Lietuvos šiaudinių sodų rišimo tradicija",
     language: "lt",
     description:
       "The design features a stylised straw garden consisting of geometric shapes of varying sizes, one tip of which is pointed upwards (to the sky) and the other downwards (to the underground). The design also bears the inscription “LIETUVA” (LITHUANIA), the year of issue (2024) and the mintmark of the Lithuanian Mint. Straw gardens are a Baltic cultural tradition that carries decorative and ceremonial significance and is related to well-being and spirituality. The national side of the coin is designed by Tomas Dragūnas. The coin’s outer ring bears the 12 stars of the European flag.",
