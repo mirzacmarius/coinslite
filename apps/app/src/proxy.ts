@@ -42,6 +42,9 @@ const inEveryLanguage = (paths: string[]) =>
     ...locales.map((locale) => `/${locale}${path}`),
   ]);
 
+// Open tabs ask which deployment is live; signed in or not, in any language.
+const isVersionCheck = createRouteMatcher(["/api/version"]);
+
 // The /design gallery shows the design system; it's public everywhere except production.
 const isDesignGallery = createRouteMatcher(inEveryLanguage(["/design"]));
 const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
@@ -113,6 +116,9 @@ function route(request: NextRequest, isAuthenticated: boolean) {
 
 export const proxy = convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
+    if (isVersionCheck(request)) {
+      return NextResponse.next();
+    }
     if (designGalleryIsPublic && isDesignGallery(request)) {
       return withLanguage(request);
     }

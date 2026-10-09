@@ -1,6 +1,7 @@
 "use client";
 
 import { type SubmittableForm, submitForm } from "@/lib/submit-form";
+import { useUnsavedInput } from "@/lib/unsaved-input";
 import { Button } from "@coinslite/ui/button";
 import { Loader2 } from "lucide-react";
 import type * as React from "react";
@@ -15,9 +16,13 @@ export function AuthForm({
   form,
   children,
 }: {
-  form: SubmittableForm;
+  form: SubmittableForm & {
+    useStore: <T>(select: (state: { isDirty: boolean }) => T) => T;
+  };
   children: React.ReactNode;
 }) {
+  // A new deployment waits while someone is typing here.
+  useUnsavedInput(form.useStore((state) => state.isDirty));
   const [interactive, setInteractive] = useState(false);
   useEffect(() => setInteractive(true), []);
   return (
