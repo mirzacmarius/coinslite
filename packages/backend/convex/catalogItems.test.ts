@@ -246,6 +246,57 @@ test("editing a linked Item stores only what differs from the entry; a cleared f
   });
 });
 
+test("an override survives edits to other fields, even while it matches the entry; only changing it to the entry's value ends it", async () => {
+  const t = newTest();
+  const { admin, ada } = await withCatalog(t);
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Morgan dollar 1881-CC",
+    catalogEntryKey: "us-morgan-1881-cc",
+    denomination: "One dollar",
+  });
+  /** The whole form as the Item form sends it, from what the Item shows. */
+  const save = async (changes: {
+    quantity?: number;
+    denomination?: string;
+  }) => {
+    const shown = (await ada.as.query(api.items.get, { itemId }))!;
+    await ada.as.mutation(api.items.update, {
+      itemId,
+      type: "coin",
+      title: shown.title,
+      country: shown.country,
+      year: shown.year,
+      denomination: shown.denomination,
+      series: shown.series,
+      metal: shown.metal,
+      weight: shown.weight,
+      purity: shown.purity,
+      quantity: shown.quantity,
+      ...changes,
+    });
+  };
+
+  // The Catalog comes to say what the person said, then they change the Quantity.
+  await importRows(admin.as, [{ ...morgan1881, denomination: "One dollar" }]);
+  await save({ quantity: 2 });
+  await importRows(admin.as, [
+    { ...morgan1881, denomination: "1 dollar (silver)" },
+  ]);
+  expect(await ada.as.query(api.items.get, { itemId })).toMatchObject({
+    denomination: "One dollar",
+    quantity: 2,
+  });
+
+  // Setting it to the entry's value in a save makes it follow the entry again.
+  await save({ denomination: "1 dollar (silver)" });
+  await importRows(admin.as, [{ ...morgan1881, denomination: "1 dollar" }]);
+  expect(await ada.as.query(api.items.get, { itemId })).toMatchObject({
+    denomination: "1 dollar",
+    quantity: 2,
+  });
+});
+
 test("Items added by hand keep their own facts, whatever the Catalog says", async () => {
   const t = newTest();
   const { admin, ada } = await withCatalog(t);

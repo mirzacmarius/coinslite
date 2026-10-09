@@ -118,9 +118,15 @@ async function requireCatalogEntry(
 /**
  * Checks the form's fields. An Item linked to a Catalog entry has the
  * entry's Item type, and stores only the facts that differ from the entry's
- * (ADR 0001); its weight and purity may rest on the entry's metal.
+ * (ADR 0001); its weight and purity may rest on the entry's metal. For an
+ * edit, `stored` is the Item as it was: facts the form leaves as they were
+ * shown keep their stored state.
  */
-function checkFields(fields: ItemInput, entry: CatalogEntryLink | null) {
+function checkFields(
+  fields: ItemInput,
+  entry: CatalogEntryLink | null,
+  stored?: Doc<"items">,
+) {
   if (!entry) return checkItem(fields, latestPurchaseDate());
   const checked = checkItem(
     {
@@ -130,7 +136,7 @@ function checkFields(fields: ItemInput, entry: CatalogEntryLink | null) {
     },
     latestPurchaseDate(),
   );
-  return overridesOnly(checked, entry.facts);
+  return overridesOnly(checked, entry.facts, stored);
 }
 
 /** Stores a new Item in its owner's Collection, and in an Album of theirs if given one. */
@@ -284,7 +290,7 @@ export const update = mutation({
     const item = await requireOwnItem(ctx, itemId);
     const album = await ownAlbumId(ctx, item.ownerId, albumId);
     const entry = await itemResolver(ctx).entryOf(item);
-    const checked = checkFields(fields, entry);
+    const checked = checkFields(fields, entry, item);
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
