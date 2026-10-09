@@ -38,7 +38,8 @@ export default defineConfig({
         {
           command: `bunx next dev -p ${appPort}`,
           cwd: "../../apps/app",
-          env: { NEXT_PUBLIC_WEB_URL: webUrl },
+          // A deployment id, so open tabs can tell when a newer one is live.
+          env: { NEXT_PUBLIC_WEB_URL: webUrl, NEXT_DEPLOYMENT_ID: "e2e" },
           url: appUrl,
           reuseExistingServer: !isCI,
           timeout: 120_000,

@@ -1,6 +1,7 @@
 "use client";
 
 import { submitForm } from "@/lib/submit-form";
+import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { itemLimits } from "@coinslite/backend/convex/items/rules";
@@ -210,6 +211,9 @@ export function AddItemDialog({
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
+  const isDirty = form.useStore((state) => state.isDirty);
+  // A new deployment waits while an Item is half entered.
+  useUnsavedInput(open && isDirty);
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
