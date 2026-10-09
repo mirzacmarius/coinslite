@@ -1,6 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
-import { polar } from "./subscriptions";
 
 export const getUser = query({
   args: {},
@@ -13,13 +12,9 @@ export const getUser = query({
     if (!user) {
       return;
     }
-    const subscription = await polar.getCurrentSubscription(ctx, {
-      userId: user._id,
-    });
     return {
       ...user,
       name: user.displayName ?? user.name,
-      subscription,
     };
   },
 });

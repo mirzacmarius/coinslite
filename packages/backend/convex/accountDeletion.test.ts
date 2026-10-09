@@ -140,6 +140,28 @@ async function fillCollection(t: Test, person: Person) {
   return { albums: [travel, silver], photos };
 }
 
+const DAY = 24 * 60 * 60 * 1000;
+
+/** A Premium subscription as Polar reported it: renewing, or ending with the paid period. */
+const subscribe = (t: Test, person: Person, { renews }: { renews: boolean }) =>
+  t.run((ctx) =>
+    ctx.db.insert("subscriptions", {
+      userId: person.userId,
+      polarId: `sub_${person.userId}`,
+      polarCustomerId: `cus_${person.userId}`,
+      productId: "prod_premium_monthly",
+      status: "active",
+      interval: "month",
+      currency: "NOK",
+      amount: 3900,
+      currentPeriodEnd: Date.now() + 30 * DAY,
+      cancelAtPeriodEnd: !renews,
+      modifiedAt: Date.now(),
+      premium: true,
+      premiumUntil: Date.now() + 30 * DAY,
+    }),
+  );
+
 const fileExists = (t: Test, storageId: Id<"_storage">) =>
   t.run(async (ctx) => (await ctx.db.system.get(storageId)) !== null);
 
@@ -147,7 +169,7 @@ test("deleting the account signs the person out and removes their profile and si
   const t = newTest();
   const ada = await signedUp(t, "ada@example.com");
 
-  await ada.as.mutation(api.account.deletion.deleteAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
 
   expect(await ada.as.query(api.users.getUser, {})).toBeNull();
   // Screens still open while the app signs out show nothing, not an error.
@@ -177,7 +199,7 @@ test("deleting the account removes the Items, their stored photos and the Albums
   const ada = await signedUp(t, "ada@example.com");
   const { photos } = await fillCollection(t, ada);
 
-  await ada.as.mutation(api.account.deletion.deleteAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
 
   const left = await t.run(async (ctx) => ({
     items: await ctx.db.query("items").collect(),
@@ -284,6 +306,9 @@ test("nothing of the person remains afterwards, and nobody else's data changes",
   for (const person of [ada, bo]) await useAccount(t, person);
   const { photos } = await fillCollection(t, ada);
   await fillCollection(t, bo);
+  // Ada's Premium ends with its paid period, so Polar has nothing to stop.
+  await subscribe(t, ada, { renews: false });
+  await subscribe(t, bo, { renews: true });
   // A profile picture from before CoinsLite, still on old accounts.
   const picture = await t.run(async (ctx) => {
     const imageId = await ctx.storage.store(jpeg());
@@ -298,7 +323,7 @@ test("nothing of the person remains afterwards, and nobody else's data changes",
     codeEmail: 5,
   });
 
-  await ada.as.mutation(api.account.deletion.deleteAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
   await runDueWork(t);
 
   const adas = idsOfTheirs(before, [ada.userId, ada.email, ...photos, picture]);
@@ -327,6 +352,7 @@ test("nothing of the person remains afterwards, and nobody else's data changes",
       "emailChanges",
       "files",
       "items",
+      "subscriptions",
       "users",
     ].sort(),
   );
@@ -374,7 +400,7 @@ test("a large Collection goes in the background, a batch at a time, after the ac
         ).length,
     );
 
-  await ada.as.mutation(api.account.deletion.deleteAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
 
   const atOnce = await t.run(async (ctx) => ({
     user: await ctx.db.get(ada.userId),
@@ -409,7 +435,7 @@ test("the email is free at once: signing up with it again starts a new, empty ac
   await ada.as.mutation(api.items.add, { type: "coin", title: "Krone" });
   vi.advanceTimersByTime(1000);
 
-  await ada.as.mutation(api.account.deletion.deleteAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
   // Before the background has finished: the clock stands still meanwhile.
   const again = await signedUp(t, "ada@example.com");
   await t.finishAllScheduledFunctions(vi.runAllTimers);
@@ -443,6 +469,7 @@ test("the confirmation counts the Items, photos and Albums that will go", async 
     photos: 3,
     albums: 2,
     more: false,
+    endsSubscription: false,
   });
   expect(await t.query(api.account.deletion.summary, {})).toBeNull();
 });
@@ -465,5 +492,20 @@ test("past its limit the confirmation counts Items no further and says there are
     photos: 0,
     albums: 0,
     more: true,
+    endsSubscription: false,
   });
+});
+
+test("the confirmation says when a renewing Premium subscription ends with the account", async () => {
+  const t = newTest();
+  const ada = await signedUp(t, "ada@example.com");
+  const bo = await signedUp(t, "bo@example.com");
+  const ends = async (person: Person) =>
+    (await person.as.query(api.account.deletion.summary, {}))?.endsSubscription;
+
+  await subscribe(t, ada, { renews: true });
+  await subscribe(t, bo, { renews: false });
+
+  expect(await ends(ada)).toBe(true);
+  expect(await ends(bo)).toBe(false);
 });

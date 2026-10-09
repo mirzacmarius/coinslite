@@ -2,17 +2,33 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { type QueryCtx, query } from "./_generated/server";
+import { premiumSubscriptionOf } from "./billing";
 import { type Plan, freePlan, planErrors } from "./plans/rules";
+import { requireSetUpUser } from "./utils/auth";
 
 /**
- * The plan a person is on. Everyone is on the Free plan until billing exists:
- * MUS-709 decides Premium from the subscription here, and nowhere else.
+ * The plan a person is on: Premium while a subscription makes them Premium
+ * (the rule is in billing/rules.ts, applied as Polar reports changes and when
+ * a paid period runs out), otherwise Free. Decided here and nowhere else.
  */
 export async function planOf(
-  _ctx: QueryCtx,
-  _userId: Id<"users">,
+  ctx: QueryCtx,
+  userId: Id<"users">,
 ): Promise<Plan> {
-  return "free";
+  return (await premiumSubscriptionOf(ctx, userId)) ? "premium" : "free";
+}
+
+/**
+ * For Premium-only features (exports, the Insurance report): the signed-in,
+ * set-up person if they're on Premium. Anyone else is turned away:
+ * NOT_SIGNED_IN, NOT_SET_UP, or PREMIUM_REQUIRED for the Free plan.
+ */
+export async function requirePremium(ctx: QueryCtx) {
+  const user = await requireSetUpUser(ctx);
+  if ((await planOf(ctx, user._id)) !== "premium") {
+    throw new ConvexError(planErrors.premiumRequired);
+  }
+  return user;
 }
 
 /**

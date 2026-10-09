@@ -311,7 +311,7 @@ test("deleting the account drops a pending email change", async () => {
     newEmail: "ada@lovelace.dev",
   });
 
-  await as.mutation(api.account.deletion.deleteAccount, {});
+  await as.action(api.account.deletion.deleteAccount, {});
 
   expect(await t.run((ctx) => ctx.db.query("emailChanges").collect())).toEqual(
     [],

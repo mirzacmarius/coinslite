@@ -4,27 +4,33 @@ import { internal } from "../_generated/api";
 import type { Doc, Id, TableNames } from "../_generated/dataModel";
 import {
   type MutationCtx,
+  action,
   internalMutation,
-  mutation,
   query,
 } from "../_generated/server";
 import { rateLimiter as emailChangeLimits } from "../account";
 import { rateLimiter as codeEmailLimits } from "../accounts/codeEmails";
 import { deleteSignInMethods } from "../accounts/linking";
 import { albumLimits } from "../albums/rules";
+import { deleteSubscriptionsOf, stopBilling } from "../billing";
+import { chargesAgain } from "../billing/rules";
 import { rateLimiter as feedbackLimits } from "../feedback";
 import { deleteItem } from "../items/deletion";
 import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
 
 /**
- * Deleting an account (spec §2): the person, everything in their Collection
- * and every way to sign in as them, for good. It happens in two parts:
+ * Deleting an account (spec §2): the person, everything in their Collection,
+ * their subscription link and every way to sign in as them, for good. It
+ * happens in three stages:
  *
- * 1. At once, in one transaction: the profile, the sign-in methods and
- *    whatever is keyed on the email address go, so nobody can use or sign in
- *    to the account any more and the address is free for a new sign-up,
- *    together with a first batch of the rest (for most accounts, all of it).
- * 2. In the background, a batch per transaction: whatever didn't fit, so a
+ * 1. Billing: a subscription that would charge again is ended at Polar. If
+ *    that fails, nothing is deleted, so no deleted account is still billed.
+ * 2. At once, in one transaction: the subscription link, the profile, the
+ *    sign-in methods and whatever is keyed on the email address go, so nobody
+ *    can use or sign in to the account any more and the address is free for a
+ *    new sign-up, together with a first batch of the rest (for most accounts,
+ *    all of it).
+ * 3. In the background, a batch per transaction: whatever didn't fit, so a
  *    Collection of any size can go.
  */
 
@@ -45,6 +51,8 @@ export const accountDataByTable = {
   emailChanges: "deleted: email changes waiting for their link",
   albums: "deleted: the Albums",
   items: "deleted: the Items, with their stored photos",
+  subscriptions:
+    "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   devOutbox:
     "deleted: emails sent to the account's address (local and CI deployments only)",
   catalogNodes: "kept: the Catalog everyone shares",
@@ -57,8 +65,9 @@ export const summaryItemLimit = 1000;
 /**
  * What deleting the account would take with it, for the confirmation: how
  * many Items (up to `summaryItemLimit`; `more` says there are others), their
- * photos and the Albums. Null without an account, so a screen still open
- * while the app signs out after the deletion shows nothing rather than fails.
+ * photos and the Albums, and whether a subscription that would renew is ended
+ * too. Null without an account, so a screen still open while the app signs
+ * out after the deletion shows nothing rather than fails.
  */
 export const summary = query({
   args: {},
@@ -69,6 +78,7 @@ export const summary = query({
       photos: v.number(),
       albums: v.number(),
       more: v.boolean(),
+      endsSubscription: v.boolean(),
     }),
   ),
   handler: async (ctx) => {
@@ -84,6 +94,10 @@ export const summary = query({
       .query("albums")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
       .take(albumLimits.count);
+    const subscriptions = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_userId_and_premium", (q) => q.eq("userId", user._id))
+      .take(100);
     return {
       items: counted.length,
       photos: counted.reduce(
@@ -93,6 +107,7 @@ export const summary = query({
       ),
       albums: albums.length,
       more: items.length > summaryItemLimit,
+      endsSubscription: subscriptions.some(chargesAgain),
     };
   },
 });
@@ -107,16 +122,6 @@ const remainder = v.object({
   outbox: v.optional(v.object({ email: v.string(), sentBefore: v.number() })),
 });
 type Remainder = Infer<typeof remainder>;
-
-/**
- * The account's link to its subscription. Runs first, while the profile is
- * still there.
- *
- * TODO(MUS-712): end the subscription with the payment provider and remove the
- * customer link kept for this user, so nobody is billed for, or linked to, an
- * account that's gone. Until billing exists there's nothing to do.
- */
-async function handleSubscriptionLink(_ctx: MutationCtx, _user: Doc<"users">) {}
 
 /**
  * Whatever is keyed on the person's id or email address beyond their
@@ -273,16 +278,32 @@ async function deleteInBatches(ctx: MutationCtx, left: Remainder) {
 /**
  * Deletes the signed-in person's account and everything in it, for good.
  * From the moment it returns, the account can't be used or signed in to; a
- * large Collection finishes disappearing in the background.
+ * large Collection finishes disappearing in the background. Fails, deleting
+ * nothing, while a subscription that would charge again can't be ended.
  */
-export const deleteAccount = mutation({
+export const deleteAccount = action({
   args: {},
   returns: v.null(),
   handler: async (ctx) => {
     const userId = await requireUserId(ctx);
+    // First, so a deleted account is never charged again.
+    await stopBilling(ctx, userId);
+    await ctx.runMutation(internal.account.deletion.closeAccount, { userId });
+    return null;
+  },
+});
+
+/**
+ * Closes an account whose billing has stopped, in one transaction, and
+ * deletes the first batch of the rest.
+ */
+export const closeAccount = internalMutation({
+  args: { userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, { userId }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError(NOT_SIGNED_IN);
-    await handleSubscriptionLink(ctx, user);
+    await deleteSubscriptionsOf(ctx, userId);
     await deleteSignInMethods(ctx, userId);
     await forgetPerson(ctx, user);
     // A profile picture from before CoinsLite, still on some old accounts.

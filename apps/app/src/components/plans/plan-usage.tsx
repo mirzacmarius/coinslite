@@ -12,7 +12,7 @@ import { ConvexError } from "convex/values";
 import Link from "next/link";
 import type * as React from "react";
 
-/** Where to upgrade: the Plans page (a placeholder until billing exists). */
+/** Where to upgrade: the Plans page, with Premium's prices and checkout. */
 export const upgradeHref = "/settings/billing";
 
 /** True when adding or duplicating was turned away by the Free plan's limit. */

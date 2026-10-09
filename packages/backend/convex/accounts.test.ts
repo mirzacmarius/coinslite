@@ -301,7 +301,7 @@ test("a deleted account's email can sign up again", async () => {
 
   await t
     .withIdentity({ subject: `${user._id}|${session?._id}` })
-    .mutation(api.account.deletion.deleteAccount, {});
+    .action(api.account.deletion.deleteAccount, {});
 
   expect(await users(t)).toEqual([]);
   expect(await t.run((ctx) => ctx.db.query("authAccounts").collect())).toEqual(

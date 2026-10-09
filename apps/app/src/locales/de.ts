@@ -704,4 +704,43 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
     },
   },
+  billing: {
+    currentPlan: "Dein Tarif",
+    freeDescription: "Bis zu {limit} Objekte, unabhängig von ihrer Anzahl.",
+    premium: "Premium",
+    premiumDescription:
+      "Unbegrenzt viele Objekte, der Versicherungsbericht und Export als CSV und PDF.",
+    billingPeriod: "Abrechnungszeitraum",
+    monthly: "Monatlich",
+    yearly: "Jährlich",
+    perMonth: "{price} / Monat",
+    perYear: "{price} / Jahr",
+    save: "{percent} % sparen",
+    currencyHint:
+      "Preise in {currency}. Beim Bezahlen wird in der Währung deines Wohnorts abgerechnet, sonst in Euro, und der Endpreis angezeigt.",
+    testMode:
+      "Testmodus: Es werden keine echten Zahlungen abgebucht. Bezahle mit der Testkarte 4242 4242 4242 4242.",
+    unavailable:
+      "Premium kann hier noch nicht gekauft werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
+    alreadyPremium: "Du hast bereits Premium.",
+    checkoutFailed:
+      "Die Bezahlseite konnte nicht geöffnet werden. Versuche es noch einmal.",
+    price: "Preis",
+    renews: "Verlängert sich am",
+    ends: "Endet am",
+    endingNotice:
+      "Premium bleibt bis {date}. Danach bist du im Gratis-Tarif, und alle deine Objekte bleiben sichtbar und bearbeitbar.",
+    confirmationTitle: "Bezahlung",
+    confirmingTitle: "Zahlung wird bestätigt",
+    confirmingDescription:
+      "Das dauert meist nur ein paar Sekunden. Premium beginnt, sobald die Zahlung bestätigt ist.",
+    slowDescription:
+      "Das dauert länger als üblich. Premium beginnt von selbst, sobald die Zahlung bestätigt ist; du kannst inzwischen weitermachen.",
+    welcomeTitle: "Willkommen bei Premium",
+    welcomeDescription:
+      "Deine Sammlung hat jetzt keine Begrenzung bei Objekten mehr.",
+    toCollection: "Zur Sammlung",
+    seePlan: "Tarif ansehen",
+    backToPlans: "Zurück zu den Tarifen",
+  },
 } as const satisfies Dictionary;
