@@ -309,6 +309,26 @@ test("nothing of the person remains afterwards, and nobody else's data changes",
   // Ada's Premium ends with its paid period, so Polar has nothing to stop.
   await subscribe(t, ada, { renews: false });
   await subscribe(t, bo, { renews: true });
+  // An Item of each made from the same Catalog entry: the entry everyone
+  // shares stays, and so does Bo's link to it.
+  await t.run(async (ctx) => {
+    const entry = await ctx.db.insert("catalogNodes", {
+      key: "us-morgan-dollar-1881",
+      path: "us-morgan-dollar-1881",
+      kind: "entry",
+      title: "Morgan dollar 1881",
+      sortOrder: 0,
+      searchText: "Morgan dollar 1881",
+    });
+    for (const person of [ada, bo]) {
+      const item = await ctx.db
+        .query("items")
+        .withIndex("by_ownerId", (q) => q.eq("ownerId", person.userId))
+        .first();
+      if (!item) throw new Error(`${person.email} has no Items`);
+      await ctx.db.patch("items", item._id, { catalogEntryId: entry });
+    }
+  });
   // A profile picture from before CoinsLite, still on old accounts.
   const picture = await t.run(async (ctx) => {
     const imageId = await ctx.storage.store(jpeg());

@@ -50,7 +50,8 @@ export const accountDataByTable = {
   authVerifiers: "deleted: Google sign-ins a session started",
   emailChanges: "deleted: email changes waiting for their link",
   albums: "deleted: the Albums",
-  items: "deleted: the Items, with their stored photos",
+  items:
+    "deleted: the Items, with their stored photos and their links to Catalog entries",
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   devOutbox:
