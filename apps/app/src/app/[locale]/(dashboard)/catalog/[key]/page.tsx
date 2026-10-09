@@ -1,3 +1,4 @@
+import { CatalogGate } from "@/components/catalog/catalog-gate";
 import { CatalogNodePage } from "@/components/catalog/catalog-node-page";
 import { CatalogSearchButton } from "@/components/catalog/catalog-search-button";
 import { getI18n } from "@/locales/server";
@@ -11,8 +12,10 @@ export async function generateMetadata() {
 /** The node comes from the URL, and its level from the search params, so both are read inside Suspense. */
 export default function Page() {
   return (
-    <Suspense>
-      <CatalogNodePage actions={<CatalogSearchButton />} />
-    </Suspense>
+    <CatalogGate>
+      <Suspense>
+        <CatalogNodePage actions={<CatalogSearchButton />} />
+      </Suspense>
+    </CatalogGate>
   );
 }

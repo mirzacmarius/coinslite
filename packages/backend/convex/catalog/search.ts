@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Doc } from "../_generated/dataModel";
 import { internalMutation, query } from "../_generated/server";
+import { catalogVisibleTo } from "../featureFlags";
 import { requireUserId } from "../utils/auth";
 import {
   catalogItemType,
@@ -65,7 +66,8 @@ const hitOf = (node: Doc<"catalogNodes">): CatalogSearchHit => ({
  * The nodes matching every word typed (each word starts a word of the title,
  * denomination, series or country), best matches first, grouped by country
  * and then series. At most 50; `capped` says there were more. The Catalog
- * picker asks for one Item type's Catalog entries only.
+ * picker asks for one Item type's Catalog entries only. Nothing matches while
+ * the Catalog is hidden from the person (featureFlags.ts).
  */
 export const find = query({
   args: {
@@ -84,9 +86,10 @@ export const find = query({
     capped: v.boolean(),
   }),
   handler: async (ctx, { text, itemType, entriesOnly }) => {
-    await requireUserId(ctx);
+    const user = await ctx.db.get("users", await requireUserId(ctx));
     const words = searchQueryWords(text);
-    if (words.length === 0) return { groups: [], capped: false };
+    if (words.length === 0 || !(await catalogVisibleTo(ctx, user)))
+      return { groups: [], capped: false };
 
     const candidates = await ctx.db
       .query("catalogNodes")
