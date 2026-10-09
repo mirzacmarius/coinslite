@@ -742,5 +742,16 @@ export default {
     toCollection: "Zur Sammlung",
     seePlan: "Tarif ansehen",
     backToPlans: "Zurück zu den Tarifen",
+    manage: "Abo verwalten",
+    manageHint:
+      "Bei Polar kannst du zwischen monatlich und jährlich wechseln, deine Karte aktualisieren oder kündigen. Nach einer Kündigung bleibt Premium bis zum Ende des bezahlten Zeitraums.",
+    portalUnavailable:
+      "Das Abo kann hier nicht verwaltet werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
+    portalUnavailableShort: "Abrechnung hier nicht eingerichtet",
+    portalFailed:
+      "Die Abo-Seite konnte nicht geöffnet werden. Versuche es noch einmal.",
+    noSubscription: "Es gibt kein Premium-Abo zu verwalten.",
+    renewsOn: "Verlängert sich am {date}",
+    endsOn: "Endet am {date}",
   },
 } as const satisfies Dictionary;

@@ -727,5 +727,15 @@ export default {
     toCollection: "Aller à la collection",
     seePlan: "Voir votre formule",
     backToPlans: "Retour aux formules",
+    manage: "Gérer l’abonnement",
+    manageHint:
+      "Sur Polar, vous pouvez passer du mensuel à l’annuel, mettre à jour votre carte ou résilier. Après une résiliation, Premium reste actif jusqu’à la fin de la période payée.",
+    portalUnavailable:
+      "L’abonnement ne peut pas être géré ici : la facturation n’est pas configurée sur cet environnement.",
+    portalUnavailableShort: "Facturation non configurée ici",
+    portalFailed: "Impossible d’ouvrir la page d’abonnement. Réessayez.",
+    noSubscription: "Aucun abonnement Premium à gérer.",
+    renewsOn: "Renouvellement le {date}",
+    endsOn: "Fin le {date}",
   },
 } as const satisfies Dictionary;

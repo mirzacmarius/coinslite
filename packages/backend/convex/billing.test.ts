@@ -543,7 +543,14 @@ test("someone signed out, or not set up yet, has no Premium page to show", async
   expect(await newcomer.as.query(api.billing.status, {})).toBeNull();
 });
 
-/** Polar's API, faked at the network: answers checkouts and subscription updates. */
+/** The customer portal page Polar opens for a customer session. */
+const portalUrl = (customerId: string) =>
+  `https://sandbox.polar.sh/coinslite/portal?customer_session_token=polar_cst_${customerId}`;
+
+/**
+ * Polar's API, faked at the network: answers checkouts, customer sessions
+ * and subscription updates.
+ */
 function fakePolar({ fail = false } = {}) {
   const polar = vi.fn(async (url: string, init?: RequestInit) => {
     if (fail) return new Response('{"detail":"nope"}', { status: 422 });
@@ -551,6 +558,18 @@ function fakePolar({ fail = false } = {}) {
     if (init?.method === "POST" && path === "/v1/checkouts/") {
       return Response.json(
         { id: "chk_1", url: "https://sandbox.polar.sh/checkout/chk_1" },
+        { status: 201 },
+      );
+    }
+    if (init?.method === "POST" && path === "/v1/customer-sessions/") {
+      const { customer_id } = JSON.parse(String(init.body));
+      return Response.json(
+        {
+          id: "cs_1",
+          token: `polar_cst_${customer_id}`,
+          customer_id,
+          customer_portal_url: portalUrl(customer_id),
+        },
         { status: 201 },
       );
     }
@@ -703,5 +722,234 @@ test("a subscription already set to end needs nothing from Polar when the accoun
   expect(polar).not.toHaveBeenCalled();
   expect(await t.run((ctx) => ctx.db.query("subscriptions").take(5))).toEqual(
     [],
+  );
+});
+
+test("a Premium member opens Polar's customer portal for their own subscription, with a way back to Plans", async () => {
+  configurePolar();
+  const { polar, request } = fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+
+  const portal = await ada.as.action(api.billing.customerPortal, {});
+
+  expect(portal).toEqual({ url: portalUrl("cus_1") });
+  expect(polar).toHaveBeenCalledTimes(1);
+  const sent = request();
+  expect(sent).toMatchObject({
+    url: "https://sandbox-api.polar.sh/v1/customer-sessions/",
+    method: "POST",
+    body: {
+      customer_id: "cus_1",
+      return_url: "https://app.coinslite.test/settings/billing",
+    },
+  });
+  expect(sent.headers.get("authorization")).toBe("Bearer polar_oat_test");
+});
+
+test("the portal only ever opens for the caller's own subscription; someone without one is told there's nothing to manage", async () => {
+  configurePolar();
+  const { polar, request } = fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const ben = await person(t, "ben@example.com");
+  const cleo = await person(t, "cleo@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+  await deliver(
+    t,
+    subscriptionEvent("subscription.created", ben.userId, {
+      id: "sub_2",
+      customer_id: "cus_2",
+      customer: { id: "cus_2", external_id: ben.userId },
+    }),
+  );
+
+  expect(await ben.as.action(api.billing.customerPortal, {})).toEqual({
+    url: portalUrl("cus_2"),
+  });
+  expect(request().body).toMatchObject({ customer_id: "cus_2" });
+
+  await expect(cleo.as.action(api.billing.customerPortal, {})).rejects.toThrow(
+    "NO_SUBSCRIPTION",
+  );
+  expect(polar).toHaveBeenCalledTimes(1);
+});
+
+test("the portal is for signed-in people who have finished signing up", async () => {
+  configurePolar();
+  const { polar } = fakePolar();
+  const t = newTest();
+  const newcomer = await person(t, "new@example.com", { setUp: false });
+
+  await expect(t.action(api.billing.customerPortal, {})).rejects.toThrow(
+    "NOT_SIGNED_IN",
+  );
+  await expect(
+    newcomer.as.action(api.billing.customerPortal, {}),
+  ).rejects.toThrow("NOT_SET_UP");
+  expect(polar).not.toHaveBeenCalled();
+});
+
+test("without Polar set up on the deployment, the Plans page says the subscription can't be managed here", async () => {
+  const { polar } = fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+
+  expect(await ada.as.query(api.billing.status, {})).toMatchObject({
+    plan: "premium",
+    portalAvailable: false,
+  });
+  await expect(ada.as.action(api.billing.customerPortal, {})).rejects.toThrow(
+    "BILLING_UNAVAILABLE",
+  );
+  expect(polar).not.toHaveBeenCalled();
+
+  configurePolar();
+  expect(await ada.as.query(api.billing.status, {})).toMatchObject({
+    portalAvailable: true,
+  });
+});
+
+test("when Polar can't open the portal, the member is told it failed", async () => {
+  configurePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+  fakePolar({ fail: true });
+  vi.spyOn(console, "error").mockImplementation(() => {});
+
+  await expect(ada.as.action(api.billing.customerPortal, {})).rejects.toThrow(
+    "PORTAL_FAILED",
+  );
+});
+
+test("cancelling and then resuming before the period ends keeps Premium going, and renewing", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const periodEnd = Date.now() + 10 * DAY;
+  const at = (ms: number) => ({
+    current_period_end: iso(periodEnd),
+    modified_at: iso(ms),
+  });
+  await deliver(
+    t,
+    subscriptionEvent("subscription.created", ada.userId, at(Date.now())),
+  );
+  await deliver(
+    t,
+    subscriptionEvent("subscription.canceled", ada.userId, {
+      ...at(Date.now() + 1),
+      cancel_at_period_end: true,
+    }),
+  );
+  await wait(t, 5 * DAY);
+
+  await deliver(
+    t,
+    subscriptionEvent("subscription.uncanceled", ada.userId, at(Date.now())),
+  );
+
+  expect(await ada.as.query(api.billing.status, {})).toMatchObject({
+    plan: "premium",
+    subscription: { currentPeriodEnd: periodEnd, cancelAtPeriodEnd: false },
+  });
+  // Past the cancelled end, inside the renewal's grace: still Premium.
+  await wait(t, 5 * DAY + 60 * 60 * 1000);
+  expect(await planOfPerson(ada)).toBe("premium");
+});
+
+test("switching from monthly to yearly in the portal shows the new plan and its renewal date", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+  const yearEnd = Date.now() + 365 * DAY;
+
+  await deliver(
+    t,
+    subscriptionEvent("subscription.updated", ada.userId, {
+      product_id: YEARLY,
+      recurring_interval: "year",
+      amount: 34900,
+      current_period_end: iso(yearEnd),
+      modified_at: iso(Date.now() + 1),
+    }),
+  );
+
+  expect(await ada.as.query(api.billing.status, {})).toMatchObject({
+    plan: "premium",
+    subscription: {
+      interval: "year",
+      amount: 34900,
+      currentPeriodEnd: yearEnd,
+      cancelAtPeriodEnd: false,
+    },
+  });
+});
+
+test("after Premium ends, every Item stays visible and editable, and the Free plan's limit applies to adding again", async () => {
+  configurePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const periodEnd = Date.now() + 3 * DAY;
+  await deliver(
+    t,
+    subscriptionEvent("subscription.created", ada.userId, {
+      current_period_end: iso(periodEnd),
+    }),
+  );
+  await collectionOf(t, ada.userId, 60);
+  await deliver(
+    t,
+    subscriptionEvent("subscription.canceled", ada.userId, {
+      current_period_end: iso(periodEnd),
+      cancel_at_period_end: true,
+      modified_at: iso(Date.now() + 1),
+    }),
+  );
+
+  await wait(t, 3 * DAY);
+
+  // Back on the Free plan, with checkout on offer again.
+  expect(await ada.as.query(api.billing.status, {})).toMatchObject({
+    plan: "free",
+    subscription: null,
+    checkoutAvailable: true,
+  });
+  expect(await ada.as.query(api.plans.usage, {})).toMatchObject({
+    plan: "free",
+    used: 51,
+    canAdd: false,
+  });
+  // Every Item is still there to see and change.
+  const all = await ada.as.query(api.items.list, {
+    paginationOpts: { numItems: 100, cursor: null },
+  });
+  expect(all.page).toHaveLength(60);
+  const [newest, next, ...rest] = all.page.map((item) => item._id);
+  await ada.as.mutation(api.items.update, {
+    itemId: newest as Id<"items">,
+    ...krone,
+    quantity: 3,
+  });
+  expect(await ada.as.query(api.items.get, { itemId: newest })).toMatchObject({
+    title: "1 krone 1875",
+    quantity: 3,
+  });
+  await ada.as.mutation(api.items.remove, { itemId: next as Id<"items"> });
+  // Adding, one way or another, isn't, until the Collection is under 50 again.
+  await expect(ada.as.mutation(api.items.add, krone)).rejects.toThrow(
+    "ITEM_LIMIT_REACHED",
+  );
+  await expect(
+    ada.as.mutation(api.items.duplicate, { itemId: newest as Id<"items"> }),
+  ).rejects.toThrow("ITEM_LIMIT_REACHED");
+  for (const itemId of rest.slice(0, 10)) {
+    await ada.as.mutation(api.items.remove, { itemId });
+  }
+  await ada.as.mutation(api.items.add, krone);
+  await expect(ada.as.mutation(api.items.add, krone)).rejects.toThrow(
+    "ITEM_LIMIT_REACHED",
   );
 });

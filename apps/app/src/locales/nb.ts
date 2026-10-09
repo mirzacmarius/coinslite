@@ -716,5 +716,15 @@ export default {
     toCollection: "Gå til samlingen",
     seePlan: "Se planen din",
     backToPlans: "Tilbake til abonnement",
+    manage: "Administrer abonnementet",
+    manageHint:
+      "Hos Polar kan du bytte mellom månedlig og årlig, oppdatere kortet eller si opp. Sier du opp, varer Premium ut perioden du har betalt for.",
+    portalUnavailable:
+      "Abonnementet kan ikke administreres her: betaling er ikke satt opp i dette miljøet.",
+    portalUnavailableShort: "Betaling er ikke satt opp her",
+    portalFailed: "Kunne ikke åpne abonnementssiden. Prøv igjen.",
+    noSubscription: "Du har ikke noe Premium-abonnement å administrere.",
+    renewsOn: "Fornyes {date}",
+    endsOn: "Slutter {date}",
   },
 } as const satisfies Dictionary;

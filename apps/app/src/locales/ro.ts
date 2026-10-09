@@ -721,5 +721,16 @@ export default {
     toCollection: "Mergi la colecție",
     seePlan: "Vezi planul",
     backToPlans: "Înapoi la planuri",
+    manage: "Gestionează abonamentul",
+    manageHint:
+      "Pe Polar poți trece de la lunar la anual, îți poți actualiza cardul sau poți anula. Dacă anulezi, Premium rămâne activ până la sfârșitul perioadei plătite.",
+    portalUnavailable:
+      "Abonamentul nu poate fi gestionat aici: facturarea nu este configurată în acest mediu.",
+    portalUnavailableShort: "Facturarea nu e configurată aici",
+    portalFailed:
+      "Pagina abonamentului nu s-a putut deschide. Încearcă din nou.",
+    noSubscription: "Nu ai niciun abonament Premium de gestionat.",
+    renewsOn: "Se reînnoiește pe {date}",
+    endsOn: "Se încheie pe {date}",
   },
 } as const satisfies Dictionary;

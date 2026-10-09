@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  PlanLink,
+  SubscriptionSummary,
+} from "@/components/billing/account-plan";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
@@ -58,7 +62,9 @@ export function AccountPage() {
         {account.displayName && (
           <p className="text-[13px] text-muted-foreground">{account.email}</p>
         )}
+        <SubscriptionSummary />
       </header>
+      <PlanLink plan={account.plan} />
       <PhoneAccountLinks />
       <UpdatesLink />
       <ContactSection account={account} />
