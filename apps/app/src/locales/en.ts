@@ -291,8 +291,6 @@ export default {
       title: "Preferences",
       language: "Language",
       homeCurrency: "Home currency",
-      homeCurrencyNote:
-        "Changing it, with every amount converted, is coming soon.",
       languageNotSaved:
         "Couldn't save the language to your account, so it changed on this device only.",
     },
@@ -500,6 +498,35 @@ export default {
     emptyTitle: "No Spot prices yet",
     emptyDescription:
       "Gold and silver prices show here once they've been fetched. They're refreshed every 15 minutes.",
+  },
+  homeCurrency: {
+    hint: "Changing it converts every Purchase price and Market value in your Collection.",
+    confirmTitle: "Change Home currency to {currency}?",
+    confirm: "Change to {currency}",
+    cancel: "Cancel",
+    checking: "Counting the amounts to convert…",
+    willConvert:
+      "Every Purchase price and Market value in your Collection will be converted from {from} to {to} at this exchange rate.",
+    nothingToConvert:
+      "None of your Items has a Purchase price or Market value, so there's nothing to convert.",
+    noRate:
+      "There's no exchange rate to convert your amounts with yet. Try again in a few minutes.",
+    tooLarge:
+      "Your Collection has more than {limit} Items, too many to convert in one change. Send feedback and we'll help.",
+    amounts: "Amounts to convert",
+    rate: "Exchange rate",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Rate as of",
+    stale:
+      "This rate hasn't been updated for over an hour and may be out of date.",
+    changed: "Your Home currency is now {currency}.",
+    rateChanged:
+      "The exchange rate was just updated. Check the new rate and confirm again.",
+    amountTooLarge:
+      "One of your amounts would be too large in the new currency, so nothing was changed.",
+    sameCurrency: "That's already your Home currency.",
+    failed:
+      "Couldn't change your Home currency, and nothing was converted. Try again.",
   },
   preciousMetal: {
     title: "Precious metal",

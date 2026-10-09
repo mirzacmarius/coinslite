@@ -34,6 +34,8 @@ import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
 import type * as feedback from "../feedback.js";
 import type * as feedback_rules from "../feedback/rules.js";
+import type * as homeCurrency from "../homeCurrency.js";
+import type * as homeCurrency_rules from "../homeCurrency/rules.js";
 import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as items from "../items.js";
@@ -90,6 +92,8 @@ declare const fullApi: ApiFromModules<{
   env: typeof env;
   feedback: typeof feedback;
   "feedback/rules": typeof feedback_rules;
+  homeCurrency: typeof homeCurrency;
+  "homeCurrency/rules": typeof homeCurrency_rules;
   http: typeof http;
   init: typeof init;
   items: typeof items;
