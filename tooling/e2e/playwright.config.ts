@@ -11,6 +11,8 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? [["github"], ["list"]] : "list",
+  // CI's dev servers compile each page on its first visit.
+  expect: { timeout: isCI ? 15_000 : 5_000 },
   use: {
     trace: "retain-on-failure",
     // Lets the suite through Vercel's deployment protection on previews.
