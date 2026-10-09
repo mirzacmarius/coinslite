@@ -60,6 +60,55 @@ type Plan = {
 
 const segments = (path: string) => path.split("/");
 const parentKeyOf = (path: string) => segments(path).at(-2) ?? null;
+/** The keys of the nodes above the one at `path`, root first. */
+const ancestorKeysOf = (path: string) => segments(path).slice(0, -1);
+
+/**
+ * The key of the country a node at `path` is browsed under: its country root,
+ * or below a Theme, the Theme's child (2-euro commemoratives › Germany).
+ */
+export function countryNodeKeyOf(path: string, rootKind: CatalogKind) {
+  const keys = segments(path);
+  return rootKind === "theme" ? keys[1] : keys[0];
+}
+
+/** The fields browsing reads that follow from a node's place in the tree. */
+type BrowseFields = { entryCount?: number; countryNodeKey?: string };
+
+const browseFieldsChanged = (node: Doc<"catalogNodes">, fields: BrowseFields) =>
+  node.entryCount !== fields.entryCount ||
+  node.countryNodeKey !== fields.countryNodeKey;
+
+/**
+ * Works out every node's browse fields afresh from the whole Catalog and
+ * stores the ones that differ. Imports keep them in step as they go; this
+ * fills them in for Catalog data stored before they existed.
+ */
+export async function refreshBrowseFields(ctx: MutationCtx) {
+  const nodes: Doc<"catalogNodes">[] = [];
+  for await (const node of ctx.db.query("catalogNodes").withIndex("by_path")) {
+    nodes.push(node);
+  }
+  const kinds = new Map(nodes.map((node) => [node.key, node.kind]));
+  const entryCounts = new Map<string, number>();
+  for (const node of nodes) {
+    if (node.kind !== "entry") continue;
+    for (const key of ancestorKeysOf(node.path)) {
+      entryCounts.set(key, (entryCounts.get(key) ?? 0) + 1);
+    }
+  }
+  for (const node of nodes) {
+    const rootKind = kinds.get(segments(node.path)[0] as string) ?? node.kind;
+    const fields: BrowseFields = {
+      entryCount:
+        node.kind === "entry" ? undefined : entryCounts.get(node.key) ?? 0,
+      countryNodeKey: countryNodeKeyOf(node.path, rootKind),
+    };
+    if (browseFieldsChanged(node, fields)) {
+      await ctx.db.patch("catalogNodes", node._id, fields);
+    }
+  }
+}
 
 async function nodeByKey(ctx: QueryCtx, key: string) {
   return await ctx.db
@@ -256,11 +305,37 @@ export async function importCatalogFile(
   const ids = new Map<string, Id<"catalogNodes">>(
     [...stored].map(([key, node]) => [key, node._id]),
   );
+  const plannedKinds = new Map(planned.map((node) => [node.key, node.kind]));
+  /** What the root of a path is once the file is in: a country or a Theme. */
+  const rootKindOf = async (path: string) => {
+    const rootKey = segments(path)[0] as string;
+    const kind = plannedKinds.get(rootKey) ?? stored.get(rootKey)?.kind;
+    if (kind !== undefined) return kind;
+    const root = await nodeByKey(ctx, rootKey);
+    if (root) stored.set(rootKey, root);
+    return root?.kind ?? "country";
+  };
+
+  // Each root and grouping counts the entries below it. A node's count
+  // changes by the entries that leave or join the paths below it.
+  const entryCountChanges = new Map<string, number>();
+  const countEntry = (path: string, isEntry: boolean, change: 1 | -1) => {
+    if (!isEntry) return;
+    for (const key of ancestorKeysOf(path)) {
+      entryCountChanges.set(key, (entryCountChanges.get(key) ?? 0) + change);
+    }
+  };
+
   const depth = (node: Planned) => segments(pathOf(node.key)).length;
-  /** The old paths of nodes that moved. */
-  const moved: string[] = [];
+  /** Where nodes the file doesn't mention may have to follow: old paths of moved nodes, roots that changed kind. */
+  const refresh: string[] = [];
   for (const node of [...planned].sort((a, b) => depth(a) - depth(b))) {
     const path = pathOf(node.key);
+    const keptCount =
+      node.existing && node.existing.kind !== "entry"
+        ? node.existing.entryCount ?? 0
+        : 0;
+    const countryNodeKey = countryNodeKeyOf(path, await rootKindOf(path));
     const document = {
       key: node.key,
       kind: node.kind,
@@ -268,32 +343,52 @@ export async function importCatalogFile(
       ...(node.parentKey !== null && { parentId: ids.get(node.parentKey) }),
       ...fieldsFromValues(node.values),
       searchText: searchTextOf(node.values),
+      ...(node.kind !== "entry" && { entryCount: keptCount }),
+      ...(countryNodeKey !== undefined && { countryNodeKey }),
     };
+    countEntry(path, node.kind === "entry", 1);
     if (!node.existing) {
       ids.set(node.key, await ctx.db.insert("catalogNodes", document));
       continue;
     }
-    if (node.existing.path !== path) moved.push(node.existing.path);
+    countEntry(node.existing.path, node.existing.kind === "entry", -1);
+    if (node.existing.path !== path) refresh.push(node.existing.path);
+    else if (node.parentKey === null && node.existing.kind !== node.kind)
+      refresh.push(path);
     await ctx.db.replace("catalogNodes", node.existing._id, document);
   }
 
-  // Nodes the file doesn't mention move along with their moved ancestors.
+  // Nodes the file doesn't mention move along with their moved ancestors,
+  // and follow their root when it turns from a country into a Theme.
   const inFile = new Set(planned.map((node) => node.key));
-  const below: Doc<"catalogNodes">[] = [];
-  for (const oldPath of moved) {
+  const below = new Map<string, Doc<"catalogNodes">>();
+  for (const oldPath of refresh) {
     for await (const node of ctx.db
       .query("catalogNodes")
       .withIndex("by_path", (q) =>
         q.gt("path", `${oldPath}/`).lt("path", `${oldPath}0`),
       )) {
-      if (!inFile.has(node.key)) below.push(node);
+      if (!inFile.has(node.key)) below.set(node.key, node);
     }
   }
-  for (const node of below) stored.set(node.key, node);
-  for (const node of below) {
+  for (const node of below.values()) stored.set(node.key, node);
+  for (const node of below.values()) {
     const path = pathOf(node.key);
-    if (path !== node.path)
-      await ctx.db.patch("catalogNodes", node._id, { path });
+    const countryNodeKey = countryNodeKeyOf(path, await rootKindOf(path));
+    countEntry(node.path, node.kind === "entry", -1);
+    countEntry(path, node.kind === "entry", 1);
+    if (path !== node.path || countryNodeKey !== node.countryNodeKey)
+      await ctx.db.patch("catalogNodes", node._id, { path, countryNodeKey });
+  }
+
+  for (const [key, change] of entryCountChanges) {
+    if (change === 0) continue;
+    const id = ids.get(key) ?? (await nodeByKey(ctx, key))?._id;
+    const node = id && (await ctx.db.get("catalogNodes", id));
+    if (!node || node.kind === "entry") continue;
+    await ctx.db.patch("catalogNodes", node._id, {
+      entryCount: (node.entryCount ?? 0) + change,
+    });
   }
   return { ...report, applied: true };
 }
