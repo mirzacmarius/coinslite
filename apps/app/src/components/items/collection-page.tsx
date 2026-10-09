@@ -11,12 +11,14 @@ import { usePaginatedQuery } from "convex/react";
 import { Coins, Plus } from "lucide-react";
 import Link from "next/link";
 import { useAddItem } from "./add-item";
+import { useGradeLabels } from "./grade-labels";
 
 const PAGE_SIZE = 25;
 
 /** The Collection: every Item the person owns, newest first. */
 export function CollectionPage() {
   const t = useI18n();
+  const labels = useGradeLabels();
   const locale = useCurrentLocale();
   const addItem = useAddItem();
   const { results, status, loadMore } = usePaginatedQuery(
@@ -57,6 +59,9 @@ export function CollectionPage() {
                 item.year,
                 item.denomination,
                 item.country && formatCountry(item.country, locale),
+                item.grade &&
+                  item.gradingScale &&
+                  labels.grade(item.gradingScale, item.grade, item.strike),
               ].filter(Boolean);
               return (
                 <li key={item._id}>

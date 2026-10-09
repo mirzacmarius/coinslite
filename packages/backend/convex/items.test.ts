@@ -1,9 +1,19 @@
 /// <reference types="vite/client" />
 import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
+import type { FunctionArgs } from "convex/server";
 import { expect, test } from "vitest";
 import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import {
+  defaultScale,
+  gradeCode,
+  gradeMeaning,
+  gradeRank,
+  gradingScaleIds,
+  gradingScales,
+  scalesFor,
+} from "./items/grades";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -186,4 +196,104 @@ test("an id that isn't an Item finds nothing", async () => {
   expect(
     await ada.as.query(api.items.get, { itemId: ada.userId as Id<"users"> }),
   ).toBeNull();
+});
+
+test("a Grade is kept with its scale, beside a grade note and a Strike", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+
+  const itemId = await ada.as.mutation(api.items.add, {
+    ...morgan,
+    grade: "65",
+    gradingScale: "sheldon",
+    gradeNote: "  Light toning ",
+    strike: "proof",
+  });
+
+  expect(await ada.as.query(api.items.get, { itemId })).toMatchObject({
+    grade: "65",
+    gradingScale: "sheldon",
+    gradeNote: "Light toning",
+    strike: "proof",
+  });
+});
+
+test("a Grade must be on a scale that suits the Item type, and stamps have no Strike", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const add = (fields: Partial<FunctionArgs<typeof api.items.add>>) =>
+    ada.as.mutation(api.items.add, { ...morgan, ...fields });
+
+  await expect(add({ grade: "65" })).rejects.toThrow("INVALID_GRADE");
+  await expect(add({ grade: "AU", gradingScale: "european" })).rejects.toThrow(
+    "INVALID_GRADE",
+  );
+  await expect(
+    add({ type: "banknote", grade: "65", gradingScale: "sheldon" }),
+  ).rejects.toThrow("INVALID_GRADE");
+  await expect(add({ grade: "mnh", gradingScale: "stamp" })).rejects.toThrow(
+    "INVALID_GRADE",
+  );
+  await expect(add({ type: "stamp", strike: "proof" })).rejects.toThrow(
+    "INVALID_STRIKE",
+  );
+
+  const stamp = await add({
+    type: "stamp",
+    grade: "mnh",
+    gradingScale: "stamp",
+  });
+  const banknote = await add({
+    type: "banknote",
+    grade: "1-",
+    gradingScale: "norwegian",
+    strike: "circulation",
+  });
+  expect(await ada.as.query(api.items.get, { itemId: stamp })).toMatchObject({
+    grade: "mnh",
+  });
+  expect(await ada.as.query(api.items.get, { itemId: banknote })).toMatchObject(
+    { grade: "1-", strike: "circulation" },
+  );
+});
+
+test("each country starts on its own scale, and every default suits the Item type", () => {
+  expect(defaultScale("coin", "NO")).toBe("norwegian");
+  expect(defaultScale("banknote", "NO")).toBe("norwegian");
+  expect(defaultScale("coin", "US")).toBe("sheldon");
+  expect(defaultScale("banknote", "US")).toBe("international");
+  expect(defaultScale("coin", "DE")).toBe("european");
+  expect(defaultScale("banknote")).toBe("international");
+  expect(defaultScale("stamp", "NO")).toBe("stamp");
+  for (const type of ["coin", "banknote", "stamp"] as const)
+    for (const country of [undefined, "NO", "US", "FR"])
+      expect(scalesFor(type)).toContain(defaultScale(type, country));
+});
+
+test("Grades sort best first, across scales too", () => {
+  for (const scale of gradingScaleIds) {
+    const ranks = gradingScales[scale].grades.map((grade) =>
+      gradeRank(scale, grade),
+    );
+    expect(ranks[0]).toBe(1);
+    expect(ranks).toEqual([...ranks].sort((a, b) => b - a));
+    expect(new Set(ranks).size).toBe(ranks.length);
+  }
+  expect(gradeRank("sheldon", "65")).toBeGreaterThan(
+    gradeRank("european", "XF"),
+  );
+  expect(gradeRank("norwegian", "3")).toBeLessThan(gradeRank("sheldon", "20"));
+});
+
+test("Grades are written the way collectors write them", () => {
+  expect(gradeCode("sheldon", "65")).toBe("MS-65");
+  expect(gradeCode("sheldon", "65", "proof")).toBe("PF-65");
+  expect(gradeCode("sheldon", "20")).toBe("VF-20");
+  expect(gradeCode("sheldon", "1")).toBe("PO-1");
+  expect(gradeCode("norwegian", "1-")).toBe("1−");
+  expect(gradeCode("international", "AU")).toBe("AU");
+  expect(gradeCode("stamp", "mnh")).toBeUndefined();
+  expect(gradeMeaning("sheldon", "45")).toBe("extremelyFine");
+  expect(gradeMeaning("international", "PR")).toBe("poor");
+  expect(gradeMeaning("norwegian", "01")).toBeUndefined();
 });

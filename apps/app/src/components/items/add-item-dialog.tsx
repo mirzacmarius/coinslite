@@ -4,6 +4,14 @@ import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import {
+  type GradingScale,
+  type Strike,
+  defaultScale,
+  hasStrike,
+  isGrade,
+  scalesFor,
+} from "@coinslite/backend/convex/items/grades";
 import { itemLimits } from "@coinslite/backend/convex/items/rules";
 import {
   type CountryCode,
@@ -37,9 +45,19 @@ import { toast } from "@coinslite/ui/toaster";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useMutation, useQuery } from "convex/react";
-import { ChevronRight, Globe, Library, Loader2, X } from "lucide-react";
+import {
+  Award,
+  ChevronRight,
+  Globe,
+  Hammer,
+  Library,
+  Loader2,
+  Ruler,
+  X,
+} from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 import { z } from "zod";
+import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
 
 const titleInput =
@@ -52,6 +70,11 @@ type Values = {
   notes: string;
   type: ItemType;
   country: CountryCode | undefined;
+  grade: string | undefined;
+  /** Picked by hand; until then the country's default scale applies. */
+  gradingScale: GradingScale | undefined;
+  gradeNote: string;
+  strike: Strike | undefined;
   quantity: string;
   year: string;
   denomination: string;
@@ -66,6 +89,10 @@ const blank = (): Values => ({
   notes: "",
   type: "coin",
   country: undefined,
+  grade: undefined,
+  gradingScale: undefined,
+  gradeNote: "",
+  strike: undefined,
   quantity: "1",
   year: "",
   denomination: "",
@@ -74,6 +101,17 @@ const blank = (): Values => ({
   purchaseDate: "",
   source: "",
 });
+
+/** The scale an Item's Grade is on: the one picked, if it suits the type, or the country's default. */
+function scaleOf({
+  type,
+  country,
+  gradingScale,
+}: Pick<Values, "type" | "country" | "gradingScale">) {
+  return gradingScale && scalesFor(type).includes(gradingScale)
+    ? gradingScale
+    : defaultScale(type, country);
+}
 
 /** The fields in "More details": they open by themselves when one needs fixing. */
 const detailFields = [
@@ -107,10 +145,15 @@ export function AddItemDialog({
     value: useId(),
     date: useId(),
     source: useId(),
+    scale: useId(),
+    gradeNote: useId(),
   };
+  const labels = useGradeLabels();
   const [createMore, setCreateMore] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [failed, setFailed] = useState<string>();
+  // One object for the dialog's life: the form resets when it sees new defaults.
+  const [defaults] = useState(blank);
 
   const rules = useMemo(() => {
     const money = z
@@ -167,7 +210,7 @@ export function AddItemDialog({
   });
 
   const form = useForm({
-    defaultValues: blank(),
+    defaultValues: defaults,
     validatorAdapter: zodValidator(),
     onSubmitInvalid: ({ formApi }) => {
       if (
@@ -179,6 +222,10 @@ export function AddItemDialog({
       setFailed(undefined);
       const amount = (text: string) =>
         text.trim() ? parseMoney(text, locale) ?? undefined : undefined;
+      const scale = scaleOf(value);
+      // A Grade picked on another scale (before the type or country changed) is dropped.
+      const grade =
+        value.grade && isGrade(scale, value.grade) ? value.grade : undefined;
       try {
         await addItem({
           type: value.type,
@@ -188,6 +235,10 @@ export function AddItemDialog({
           quantity: Number(value.quantity),
           year: value.year.trim() ? Number(value.year) : undefined,
           denomination: value.denomination,
+          grade,
+          gradingScale: grade ? scale : undefined,
+          gradeNote: value.gradeNote,
+          strike: hasStrike(value.type) ? value.strike : undefined,
           purchasePrice: amount(value.purchasePrice),
           marketValue: amount(value.marketValue),
           purchaseDate: value.purchaseDate || undefined,
@@ -212,6 +263,15 @@ export function AddItemDialog({
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
+  const values = form.useStore(
+    ({ values: { type, country, gradingScale, strike } }) => ({
+      type,
+      country,
+      gradingScale,
+      strike,
+    }),
+  );
+  const scale = scaleOf(values);
   // A new deployment waits while an Item is half entered.
   useUnsavedInput(open && isDirty);
   const errorOf = (errors: unknown[]) =>
@@ -346,6 +406,42 @@ export function AddItemDialog({
                   />
                 )}
               </form.Field>
+              <form.Field name="grade">
+                {(field) => (
+                  <PropertyPicker
+                    icon={Award}
+                    label={t("items.grade")}
+                    placeholder={t("items.setGrade")}
+                    value={
+                      field.state.value && isGrade(scale, field.state.value)
+                        ? field.state.value
+                        : undefined
+                    }
+                    options={labels.gradeOptions(scale, values.strike)}
+                    onChange={field.handleChange}
+                    onClear={() => field.handleChange(undefined)}
+                    clearLabel={t("items.noGrade")}
+                    noResults={t("items.noMatches")}
+                  />
+                )}
+              </form.Field>
+              {hasStrike(values.type) && (
+                <form.Field name="strike">
+                  {(field) => (
+                    <PropertyPicker
+                      icon={Hammer}
+                      label={t("items.strike")}
+                      placeholder={t("items.setStrike")}
+                      value={field.state.value}
+                      options={labels.strikeOptions()}
+                      onChange={field.handleChange}
+                      onClear={() => field.handleChange(undefined)}
+                      clearLabel={t("items.noStrike")}
+                      noResults={t("items.noMatches")}
+                    />
+                  )}
+                </form.Field>
+              )}
               <form.Field
                 name="quantity"
                 validators={{ onChange: rules.quantity }}
@@ -391,6 +487,41 @@ export function AddItemDialog({
                 {t("items.moreDetails")}
               </CollapsibleTrigger>
               <CollapsibleContent className="grid grid-cols-1 gap-x-4 gap-y-3 pb-1 pt-3 sm:grid-cols-2">
+                <form.Field name="gradingScale">
+                  {(field) => (
+                    <Field id={ids.scale} label={t("items.gradingScale")}>
+                      {(control) => (
+                        <PropertyPicker
+                          id={control.id}
+                          aria-describedby={control["aria-describedby"]}
+                          icon={Ruler}
+                          label={t("items.gradingScale")}
+                          value={scale}
+                          options={labels.scaleOptions(values.type)}
+                          onChange={field.handleChange}
+                          noResults={t("items.noMatches")}
+                        />
+                      )}
+                    </Field>
+                  )}
+                </form.Field>
+                <form.Field name="gradeNote">
+                  {(field) => (
+                    <Field id={ids.gradeNote} label={t("items.gradeNote")}>
+                      {(control) => (
+                        <Input
+                          {...control}
+                          placeholder={t("items.gradeNotePlaceholder")}
+                          maxLength={itemLimits.gradeNote}
+                          value={field.state.value}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                        />
+                      )}
+                    </Field>
+                  )}
+                </form.Field>
                 <form.Field name="year" validators={{ onChange: rules.year }}>
                   {(field) => (
                     <Field

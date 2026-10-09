@@ -24,6 +24,12 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   await dialog.getByRole("button", { name: "Country: Set country" }).click();
   await page.getByPlaceholder("Country").fill("United States");
   await page.keyboard.press("Enter");
+  // An American coin is graded on the Sheldon scale; a proof keeps its Grade.
+  await dialog.getByRole("button", { name: "Grade: Set grade" }).click();
+  await page.getByPlaceholder("Grade").fill("65");
+  await page.keyboard.press("Enter");
+  await dialog.getByRole("button", { name: "Strike: Set strike" }).click();
+  await page.getByRole("option", { name: "Proof" }).click();
   await dialog.getByLabel("Quantity").fill("2");
   await dialog.getByRole("button", { name: "More details" }).click();
   await dialog.getByLabel("Year").fill("1881");
@@ -34,7 +40,7 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   await expect(dialog).toBeHidden();
 
   const row = main.getByRole("link", { name: /Morgan dollar 1881-S/ });
-  await expect(row).toContainText("1881 · 1 dollar · United States");
+  await expect(row).toContainText("1881 · 1 dollar · United States · PF-65");
   await expect(row).toContainText("×2");
   await row.click();
 
@@ -44,6 +50,8 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   ).toBeVisible();
   await expect(detail.getByText("$75.50")).toBeVisible();
   await expect(detail.getByText("May 1, 2024")).toBeVisible();
+  await expect(detail.getByText("PF-65")).toBeVisible();
+  await expect(detail.getByText("Sheldon (1–70)")).toBeVisible();
 });
 
 test("C opens the New Item dialog from anywhere in the app", async ({

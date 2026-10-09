@@ -1,7 +1,13 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { homeCurrency, itemType, language } from "./utils/validators";
+import {
+  gradingScale,
+  homeCurrency,
+  itemType,
+  language,
+  strike,
+} from "./utils/validators";
 
 export default defineSchema({
   ...authTables,
@@ -56,6 +62,11 @@ export default defineSchema({
     country: v.optional(v.string()),
     year: v.optional(v.number()),
     denomination: v.optional(v.string()),
+    // A Grade is a code on its scale (items/grades.ts); both or neither are set.
+    grade: v.optional(v.string()),
+    gradingScale: v.optional(gradingScale),
+    gradeNote: v.optional(v.string()),
+    strike: v.optional(strike),
     quantity: v.number(),
     purchasePrice: v.optional(v.number()),
     marketValue: v.optional(v.number()),

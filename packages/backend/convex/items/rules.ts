@@ -1,5 +1,13 @@
 import { isCountryCode } from "@coinslite/i18n";
 import { ConvexError } from "convex/values";
+import {
+  type GradingScale,
+  type ItemType,
+  type Strike,
+  gradingScales,
+  hasStrike,
+  isGrade,
+} from "./grades";
 
 /**
  * What an Item may hold. Pure, so the add form checks the same limits before
@@ -14,11 +22,14 @@ export const itemErrors = {
   invalidCountry: "INVALID_COUNTRY",
   invalidAmount: "INVALID_AMOUNT",
   invalidDate: "INVALID_DATE",
+  invalidGrade: "INVALID_GRADE",
+  invalidStrike: "INVALID_STRIKE",
 } as const;
 
 export const itemLimits = {
   title: 200,
   denomination: 100,
+  gradeNote: 200,
   source: 200,
   notes: 5000,
   quantity: 1_000_000,
@@ -30,10 +41,15 @@ export const itemLimits = {
 
 /** The fields a person types for an Item, as sent by the add form. */
 export type ItemInput = {
+  type: ItemType;
   title: string;
   country?: string;
   year?: number;
   denomination?: string;
+  grade?: string;
+  gradingScale?: GradingScale;
+  gradeNote?: string;
+  strike?: Strike;
   quantity?: number;
   purchasePrice?: number;
   marketValue?: number;
@@ -105,8 +121,10 @@ export function checkItem(input: ItemInput, today: string) {
     fail(itemErrors.invalidDate);
 
   return {
+    type: input.type,
     title,
     quantity,
+    ...checkGrade(input),
     ...(country && { country }),
     ...(input.year !== undefined && { year: input.year }),
     ...withText(
@@ -118,6 +136,34 @@ export function checkItem(input: ItemInput, today: string) {
     ...(purchaseDate && { purchaseDate }),
     ...withText("source", text(input.source, itemLimits.source)),
     ...withText("notes", text(input.notes, itemLimits.notes)),
+  };
+}
+
+/**
+ * A Grade comes with the scale it's on, and that scale must suit the Item
+ * type; a scale without a Grade isn't kept. Strike is for coins and banknotes.
+ */
+function checkGrade({
+  type,
+  grade,
+  gradingScale,
+  gradeNote,
+  strike,
+}: ItemInput) {
+  if (grade !== undefined) {
+    const fits =
+      gradingScale !== undefined &&
+      (gradingScales[gradingScale].itemTypes as readonly ItemType[]).includes(
+        type,
+      ) &&
+      isGrade(gradingScale, grade);
+    if (!fits) fail(itemErrors.invalidGrade);
+  }
+  if (strike !== undefined && !hasStrike(type)) fail(itemErrors.invalidStrike);
+  return {
+    ...(grade !== undefined && { grade, gradingScale }),
+    ...withText("gradeNote", text(gradeNote, itemLimits.gradeNote)),
+    ...(strike && { strike }),
   };
 }
 

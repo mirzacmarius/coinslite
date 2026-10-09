@@ -1,0 +1,46 @@
+import { useI18n } from "@/locales/client";
+import {
+  type GradingScale,
+  type ItemType,
+  type Strike,
+  gradeCode,
+  gradeMeaning,
+  gradingScales,
+  scalesFor,
+  strikes,
+} from "@coinslite/backend/convex/items/grades";
+import { useMemo } from "react";
+
+type StampGrade = (typeof gradingScales.stamp.grades)[number];
+
+/** Grades, Grading scales and Strikes as people read them, in the current language. */
+export function useGradeLabels() {
+  const t = useI18n();
+  return useMemo(() => {
+    const grade = (scale: GradingScale, value: string, strike?: Strike) =>
+      gradeCode(scale, value, strike) ??
+      t(`grades.stamp.${value as StampGrade}`);
+    const meaning = (scale: GradingScale, value: string) => {
+      const words = gradeMeaning(scale, value);
+      return words && t(`grades.meanings.${words}`);
+    };
+    const scale = (value: GradingScale) => t(`grades.scales.${value}`);
+    const strike = (value: Strike) => t(`grades.strikes.${value}`);
+    return {
+      grade,
+      meaning,
+      scale,
+      strike,
+      gradeOptions: (on: GradingScale, struck?: Strike) =>
+        gradingScales[on].grades.map((value: string) => ({
+          value,
+          label: grade(on, value, struck),
+          hint: meaning(on, value),
+        })),
+      scaleOptions: (type: ItemType) =>
+        scalesFor(type).map((value) => ({ value, label: scale(value) })),
+      strikeOptions: () =>
+        strikes.map((value) => ({ value, label: strike(value) })),
+    };
+  }, [t]);
+}

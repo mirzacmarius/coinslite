@@ -6,11 +6,13 @@ import { api } from "@coinslite/backend/convex/_generated/api";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
+import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
 import { SearchX } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type * as React from "react";
+import { useGradeLabels } from "./grade-labels";
 
 /** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
 export function ItemDetail() {
@@ -18,6 +20,7 @@ export function ItemDetail() {
   const { itemId } = useParams<{ itemId: string }>();
   const item = useQuery(api.items.get, { itemId });
   const format = useFormatters();
+  const labels = useGradeLabels();
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
       {t("nav.collection")}
@@ -100,6 +103,34 @@ export function ItemDetail() {
             <PropertyRow label={t("items.type")}>
               {t(`items.types.${item.type}`)}
             </PropertyRow>
+            <PropertyRow label={t("items.grade")}>
+              {item.grade && item.gradingScale && (
+                <>
+                  {labels.grade(item.gradingScale, item.grade, item.strike)}
+                  {labels.meaning(item.gradingScale, item.grade) && (
+                    <span className="text-muted-foreground">
+                      {" · "}
+                      {labels.meaning(item.gradingScale, item.grade)}
+                    </span>
+                  )}
+                </>
+              )}
+            </PropertyRow>
+            {item.gradingScale && (
+              <PropertyRow label={t("items.gradingScale")}>
+                {labels.scale(item.gradingScale)}
+              </PropertyRow>
+            )}
+            {item.gradeNote && (
+              <PropertyRow label={t("items.gradeNote")} wrap>
+                {item.gradeNote}
+              </PropertyRow>
+            )}
+            {item.type !== "stamp" && (
+              <PropertyRow label={t("items.strike")}>
+                {item.strike && labels.strike(item.strike)}
+              </PropertyRow>
+            )}
             <PropertyRow label={t("items.quantity")}>
               {format.number(item.quantity)}
             </PropertyRow>
@@ -136,15 +167,28 @@ function PanelSection({
   );
 }
 
-/** A label and its value; a missing value shows as a dash. */
+/** A label and its value; a missing value shows as a dash. Long text can `wrap`. */
 function PropertyRow({
   label,
+  wrap = false,
   children,
-}: { label: string; children: React.ReactNode }) {
+}: { label: string; wrap?: boolean; children: React.ReactNode }) {
   return (
-    <div className="grid min-h-7 grid-cols-[112px_1fr] items-center gap-2">
+    <div
+      className={cn(
+        "grid min-h-7 grid-cols-[112px_1fr] gap-2",
+        wrap ? "items-start py-1" : "items-center",
+      )}
+    >
       <span className="truncate text-xs text-muted-foreground">{label}</span>
-      <span className="min-w-0 truncate text-[13px]">{children ?? "–"}</span>
+      <span
+        className={cn(
+          "min-w-0 text-[13px]",
+          wrap ? "whitespace-pre-line break-words" : "truncate",
+        )}
+      >
+        {children || "–"}
+      </span>
     </div>
   );
 }
