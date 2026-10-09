@@ -48,4 +48,12 @@ test("moving between sections shows the next screen at once", async ({
       page.getByRole("heading", { level: 1, name: "Albums" }),
     ).toBeVisible();
   });
+
+  await instant(page, async () => {
+    await page.getByRole("link", { name: "Catalog", exact: true }).click();
+    await page.waitForURL((url) => url.pathname === "/catalog");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Catalog" }),
+    ).toBeVisible();
+  });
 });
