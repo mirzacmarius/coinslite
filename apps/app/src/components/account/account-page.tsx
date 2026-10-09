@@ -286,15 +286,19 @@ function PreferencesSection({ account }: { account: Account }) {
         <span className="text-xs text-muted-foreground">
           {t("account.preferences.homeCurrency")}
         </span>
-        <div className="flex flex-col gap-1">
+        <div>
           <HomeCurrencySetting
             current={account.homeCurrency}
             hintId={currencyHintId}
           />
-          <span id={currencyHintId} className="text-xs text-muted-foreground">
-            {t("homeCurrency.hint")}
-          </span>
         </div>
+        {/* A row of its own, so the label lines up with the pill, not the hint. */}
+        <span
+          id={currencyHintId}
+          className="col-start-2 -mt-2 text-xs text-muted-foreground"
+        >
+          {t("homeCurrency.hint")}
+        </span>
       </div>
     </Section>
   );
