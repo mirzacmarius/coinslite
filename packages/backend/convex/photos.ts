@@ -19,6 +19,7 @@ import {
   photoType,
 } from "./photos/rules";
 import { requireSetUpUser } from "./utils/auth";
+import { freshUpload } from "./utils/files";
 import { photoSide } from "./utils/validators";
 
 /** Where each side's photo is kept on the Item. */
@@ -27,13 +28,10 @@ const photoFields = { front: "frontPhoto", back: "backPhoto" } as const;
 const urlOf = async (ctx: QueryCtx, photo: Id<"_storage"> | undefined) =>
   photo ? await ctx.storage.getUrl(photo) : null;
 
-/** How long after uploading a file it can still become a photo. */
-const uploadLifetime = 60 * 60 * 1000;
-
 /**
  * One of the caller's Items, and a file they may put on it: a fresh upload
- * that isn't already a photo of any Item. A file id alone is no key to a file
- * someone else stored.
+ * that isn't already a photo of any Item or a Catalog image. A file id alone
+ * is no key to a file someone else stored.
  */
 async function checkUpload(
   ctx: QueryCtx | MutationCtx,
@@ -41,19 +39,8 @@ async function checkUpload(
   now: number,
 ) {
   const item = await requireOwnItem(ctx, itemId);
-  const stored = await ctx.db.system.get("_storage", storageId);
-  const file =
-    stored && stored._creationTime > now - uploadLifetime ? stored : null;
-  const onAnItem =
-    (await ctx.db
-      .query("items")
-      .withIndex("by_frontPhoto", (q) => q.eq("frontPhoto", storageId))
-      .first()) ??
-    (await ctx.db
-      .query("items")
-      .withIndex("by_backPhoto", (q) => q.eq("backPhoto", storageId))
-      .first());
-  if (!file || onAnItem) throw new ConvexError(photoErrors.notFound);
+  const file = await freshUpload(ctx, storageId, now);
+  if (!file) throw new ConvexError(photoErrors.notFound);
   return { item, file };
 }
 

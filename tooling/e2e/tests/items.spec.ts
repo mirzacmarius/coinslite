@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
+import { addManually, catalogPicker } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -15,6 +16,7 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   await expect(main.getByText("Your Collection is empty")).toBeVisible();
 
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   // A title is required.
   await dialog.getByRole("button", { name: /^Add Item/ }).click();
@@ -60,12 +62,19 @@ test("C opens the New Item dialog from anywhere in the app", async ({
 }) => {
   await signUpAndVerify(page, newEmail());
 
+  // A coin is picked from the Catalog first; Esc leads to typing it in.
+  const picker = catalogPicker(page);
   await expect(async () => {
     await page.keyboard.press("c");
-    await expect(page.getByRole("dialog", { name: "New Item" })).toBeVisible({
-      timeout: 1000,
-    });
+    await expect(picker).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await expect(
+    picker.getByPlaceholder(
+      "Search coins by title, denomination, series or country…",
+    ),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(picker).toBeHidden();
   await expect(page.getByLabel("Title")).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "New Item" })).toBeHidden();
@@ -91,6 +100,7 @@ test("edit an Item, then duplicate it", async ({ page }) => {
   await page.goto(`${appUrl}/collection`);
   const main = visiblePage(page);
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("2 kroner 1910");
   await dialog.getByRole("button", { name: /^Add Item/ }).click();
@@ -134,6 +144,7 @@ test("add a photo, view it full screen, then delete the Item", async ({
   await page.goto(`${appUrl}/collection`);
   const main = visiblePage(page);
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("1 krone 1875");
   await dialog.getByRole("button", { name: /^Add Item/ }).click();

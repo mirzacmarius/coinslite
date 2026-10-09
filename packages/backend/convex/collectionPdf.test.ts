@@ -5,6 +5,7 @@ import type { FunctionArgs } from "convex/server";
 import { getDocumentProxy } from "unpdf";
 import { afterEach, expect, test, vi } from "vitest";
 import { api } from "./_generated/api";
+import { formatCsvRecord } from "./catalog/csvText";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -372,3 +373,54 @@ test("a PDF lists up to 5 000 Items; a larger view is turned away rather than cu
   const { all } = await pdfText(coins.pdf);
   expect(all).toContain("Total 5,000");
 }, 60_000);
+
+test("an Item added from the Catalog shows its Catalog entry's facts in the PDF", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const admin = await t.run((ctx) =>
+    ctx.db.insert("users", { email: "admin@example.com", role: "admin" }),
+  );
+  // A Catalog with a country and, under it, a Morgan dollar with its facts.
+  const csv = [
+    [
+      "id",
+      "parent_id",
+      "title",
+      "item_type",
+      "is_addable",
+      "country",
+      "denomination",
+      "year_from",
+      "facts_source",
+    ],
+    ["us", "", "United States", "", "", "US", "", "", ""],
+    [
+      "us-morgan-1881-cc",
+      "us",
+      "Morgan dollar 1881-CC",
+      "coin",
+      "true",
+      "US",
+      "1 dollar",
+      "1881",
+      "United States Mint",
+    ],
+  ]
+    .map((row) => formatCsvRecord(row))
+    .join("");
+  const report = await t
+    .withIdentity({ subject: `${admin}|session` })
+    .mutation(api.catalog.csv.importFile, { csv });
+  expect(report.errors).toEqual([]);
+  await add(ada, {
+    type: "coin",
+    title: "Morgan dollar 1881-CC",
+    catalogEntryKey: "us-morgan-1881-cc",
+    quantity: 2,
+  });
+
+  const { all } = await download(ada, { view: { country: "US" } });
+
+  expect(all).toContain("Country: United States");
+  expect(all).toContain("Coin Morgan dollar 1881-CC 1881 1 dollar 2");
+});

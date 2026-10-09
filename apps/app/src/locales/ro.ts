@@ -670,6 +670,7 @@ export default {
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED:
         "Precizează sursa acestor date, note sau a acestei imagini.",
+      CREDIT_REQUIRED: "O imagine are nevoie de sursă, autor, licență și link.",
       ROOT_NOT_ADDABLE:
         "O țară sau o temă nu poate fi intrare de catalog. Dă-i rândului un parent_id.",
       PARENT_NOT_FOUND:
@@ -885,6 +886,73 @@ export default {
       "După tipul obiectului, plus valoarea metalului pentru aur și argint",
     part: "Tip de obiect sau metal",
   },
+  catalogImages: {
+    add: "Adaugă imagine",
+    edit: "Editează imaginea",
+    remove: "Elimină imaginea",
+    title: "Imagine",
+    description:
+      "Încarcă o imagine pentru această intrare de catalog și precizează de unde provine.",
+    choose: "Alege imaginea",
+    chooseAnother: "Alege altă imagine",
+    formats: "JPEG, PNG, WebP sau GIF, până la 25 MB.",
+    sizes:
+      "Se salvează ca WebP, cel mult 800 px pe latura cea mai lungă, cu o miniatură de 128 px. Imaginile mai mici își păstrează dimensiunea.",
+    current: "Imaginea actuală. Alege alta ca să o înlocuiești.",
+    converting: "Se convertește…",
+    converted: "{full} px WebP, miniatură {thumbnail} px",
+    credit: "Credit",
+    creditHint:
+      "Obligatoriu pentru fiecare imagine. Listele îl afișează lângă miniatură, cu excepția imaginilor din domeniul public sau CC0, iar intrarea îl afișează mereu.",
+    source: "Sursă",
+    sourcePlaceholder: "Wikimedia Commons",
+    author: "Autor",
+    authorPlaceholder: "Numele fotografului sau al autorului",
+    licence: "Licență",
+    licencePlaceholder: "CC BY-SA 4.0",
+    link: "Link",
+    linkPlaceholder: "https://",
+    cancel: "Anulează",
+    close: "Închide",
+    save: "Salvează",
+    saved: "Imaginea a fost salvată",
+    creditSaved: "Creditul a fost salvat",
+    removeTitle: "Elimini imaginea pentru „{title}”?",
+    removeBody:
+      "Fișierele și creditul ei se șterg. Intrarea afișează un substituent până când se adaugă altă imagine.",
+    removed: "Imaginea a fost eliminată",
+    errors: {
+      imageRequired: "Alege o imagine.",
+      sourceRequired: "Precizează sursa.",
+      authorRequired: "Precizează autorul.",
+      licenceRequired: "Precizează licența.",
+      linkRequired: "Precizează linkul.",
+      tooLong: "Folosește cel mult {max} caractere.",
+      invalidLink: "Introdu o adresă web completă care începe cu https://.",
+      numista: "Nu se pot stoca date de la Numista.",
+      failed: "Imaginea nu a putut fi salvată. Încearcă din nou.",
+      removeFailed: "Imaginea nu a putut fi eliminată. Încearcă din nou.",
+      CATALOG_ENTRY_NOT_FOUND: "Această intrare de catalog nu mai există.",
+      IMAGE_NOT_FOUND: "Încărcarea nu a ajuns. Încearcă din nou.",
+      IMAGE_NOT_WEBP: "Imaginea nu a fost salvată ca WebP. Încearcă din nou.",
+      IMAGE_TOO_LARGE:
+        "Imaginea convertită este prea mare. Încearcă o imagine mai mică.",
+      THUMBNAIL_TOO_LARGE:
+        "Miniatura convertită este prea mare. Încearcă din nou.",
+      NO_IMAGE:
+        "Această intrare nu are o imagine de creditat. Alege o imagine.",
+      CREDIT_REQUIRED: "Precizează sursa, autorul, licența și linkul.",
+      TOO_LONG: "O parte a creditului este prea lungă.",
+      INVALID_URL: "Introdu o adresă web completă care începe cu https://.",
+      NUMISTA_DATA: "Nu se pot stoca date de la Numista.",
+      IMAGE_UNREADABLE:
+        "Fișierul nu poate fi citit ca imagine. Alege un JPEG, PNG, WebP sau GIF.",
+      ORIGINAL_TOO_LARGE: "Alege o imagine de cel mult 25 MB.",
+      WEBP_UNSUPPORTED:
+        "Acest browser nu poate salva imagini WebP. Încearcă altul, de exemplu Chrome sau Firefox.",
+      NOT_ADMIN: "Doar administratorii pot modifica imaginile din catalog.",
+    },
+  },
   featureFlags: {
     menu: "Activarea funcționalităților",
     title: "Activarea funcționalităților",
@@ -986,6 +1054,34 @@ export default {
     premiumOnly: "Exportul colecției face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
+  },
+  catalogPicker: {
+    title: "Alege din catalog",
+    placeholder: {
+      coin: "Caută monede după titlu, valoare nominală, serie sau țară…",
+      banknote: "Caută bancnote după titlu, valoare nominală, serie sau țară…",
+    },
+    pickHint: "pentru a alege",
+    manual: "Adaugă manual",
+    recent: "Alese recent",
+    browse: "Răsfoiește catalogul",
+    back: "Înapoi",
+    empty: "Catalogul nu are încă nimic de ales.",
+    failed:
+      "Intrarea de catalog nu a putut fi încărcată. Alege-o din nou sau adaugă obiectul manual.",
+    entry: "Intrare de catalog",
+    pick: "Alege din catalog",
+    factsHint:
+      "Aceste date vin din intrarea de catalog și preiau corecturile ei. Dacă schimbi una, se păstrează valoarea ta; dacă golești câmpul, se folosește din nou valoarea intrării.",
+  },
+  quickAdd: {
+    add: "Adaugă în colecție",
+    title: "Adaugă în colecție",
+    description:
+      "Adaugă această intrare de catalog în colecție ca un singur obiect.",
+    added: "Obiect adăugat în colecție",
+    open: "Deschide",
+    failed: "Obiectul nu a putut fi adăugat. Încearcă din nou.",
   },
   insuranceReport: {
     title: "Raport de asigurare",

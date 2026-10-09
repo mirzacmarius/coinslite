@@ -15,6 +15,8 @@ import type { FunctionReturnType } from "convex/server";
 import { Banknote, Coins } from "lucide-react";
 import type * as React from "react";
 import { CatalogHeader, type Crumb } from "./catalog-header";
+import { CatalogImageAdmin } from "./catalog-image-admin";
+import { QuickAdd } from "./quick-add";
 import { useCatalogFormat } from "./use-catalog-format";
 
 type CatalogEntry = Extract<
@@ -87,7 +89,16 @@ export function CatalogEntryDetail({
 
   return (
     <>
-      <CatalogHeader crumbs={crumbs} title={entry.title} actions={actions} />
+      <CatalogHeader
+        crumbs={crumbs}
+        title={entry.title}
+        actions={
+          <>
+            <QuickAdd entry={entry} />
+            {actions}
+          </>
+        }
+      />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
           <EntryImage entry={entry} />
@@ -180,8 +191,20 @@ function Credit({ provenance }: { provenance: Provenance }) {
 
 const placeholderIcons = { coin: Coins, banknote: Banknote } as const;
 
-/** The entry's picture with its credit, or a neutral placeholder until a licensed one is added. */
+/**
+ * The entry's picture with its credit, or a neutral placeholder until a
+ * licensed one is added; below it, admins' actions on the image.
+ */
 function EntryImage({ entry }: { entry: CatalogEntry }) {
+  return (
+    <div className="flex w-full max-w-60 flex-col gap-1.5">
+      <EntryPicture entry={entry} />
+      <CatalogImageAdmin entry={entry} />
+    </div>
+  );
+}
+
+function EntryPicture({ entry }: { entry: CatalogEntry }) {
   const t = useI18n();
   if (!entry.imageUrl) {
     const Icon = placeholderIcons[entry.itemType ?? "coin"];
@@ -189,14 +212,14 @@ function EntryImage({ entry }: { entry: CatalogEntry }) {
       <div
         role="img"
         aria-label={t("catalog.noImage")}
-        className="flex aspect-square w-full max-w-60 items-center justify-center rounded-lg border bg-muted text-muted-foreground"
+        className="flex aspect-square w-full items-center justify-center rounded-lg border bg-muted text-muted-foreground"
       >
         <Icon className="size-8" strokeWidth={1.25} aria-hidden="true" />
       </div>
     );
   }
   return (
-    <figure className="flex w-full max-w-60 flex-col gap-1.5">
+    <figure className="flex w-full flex-col gap-1.5">
       <img
         src={entry.imageUrl}
         alt={entry.title}

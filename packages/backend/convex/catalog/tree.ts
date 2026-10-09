@@ -210,7 +210,9 @@ async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
     else if (segments(pathOf(node.key)).length > catalogLimits.depth)
       fail(catalogErrors.tooDeep, "parent_id");
 
-    for (const problem of checkNode(node.values, node.kind)) {
+    for (const problem of checkNode(node.values, node.kind, {
+      uploadedImage: keepsUploadedImage(node),
+    })) {
       fail(problem.code, problem.column);
     }
 
@@ -261,6 +263,13 @@ async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
     stored,
   };
 }
+
+/**
+ * Whether a node keeps the image an admin uploaded for it: files don't carry
+ * uploaded images, so it stays unless the file links another image instead.
+ */
+const keepsUploadedImage = (node: Planned) =>
+  node.existing?.imageFiles !== undefined && node.values.imageUrl === undefined;
 
 /** A file row laid over the node it updates, if any. */
 function merge(row: FileRow, existing: Doc<"catalogNodes"> | null): Planned {
@@ -336,12 +345,14 @@ export async function importCatalogFile(
         ? node.existing.entryCount ?? 0
         : 0;
     const countryNodeKey = countryNodeKeyOf(path, await rootKindOf(path));
+    const imageFiles = node.existing?.imageFiles;
     const document = {
       key: node.key,
       kind: node.kind,
       path,
       ...(node.parentKey !== null && { parentId: ids.get(node.parentKey) }),
       ...fieldsFromValues(node.values),
+      ...(imageFiles && keepsUploadedImage(node) && { imageFiles }),
       searchText: searchTextOf(node.values),
       ...(node.kind !== "entry" && { entryCount: keptCount }),
       ...(countryNodeKey !== undefined && { countryNodeKey }),
@@ -350,6 +361,11 @@ export async function importCatalogFile(
     if (!node.existing) {
       ids.set(node.key, await ctx.db.insert("catalogNodes", document));
       continue;
+    }
+    if (imageFiles && !keepsUploadedImage(node)) {
+      // The file links another image in place of the uploaded one.
+      await ctx.storage.delete(imageFiles.full);
+      await ctx.storage.delete(imageFiles.thumbnail);
     }
     countEntry(node.existing.path, node.existing.kind === "entry", -1);
     if (node.existing.path !== path) refresh.push(node.existing.path);

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { metalValue } from "./items/preciousMetal";
+import { itemResolver } from "./items/resolve";
 import { latestRates } from "./spotPrices";
 import { requireSetUpUser } from "./utils/auth";
 import { homeCurrency } from "./utils/validators";
@@ -28,7 +29,9 @@ export const ofItem = query({
     if (!item || item.ownerId !== owner._id) return null;
     const rates = await latestRates(ctx);
     if (!rates) return null;
-    const amount = metalValue(item, rates, owner.homeCurrency);
+    // A linked Item's metal, weight and purity may be its Catalog entry's.
+    const resolved = await itemResolver(ctx).resolve(item);
+    const amount = metalValue(resolved, rates, owner.homeCurrency);
     if (amount === undefined) return null;
     return {
       amount,
