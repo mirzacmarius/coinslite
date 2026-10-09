@@ -15,9 +15,10 @@ import { Button } from "@coinslite/ui/button";
 import { useAction, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import { ConvexError } from "convex/values";
-import { Loader2 } from "lucide-react";
+import { ExternalLink, Loader2 } from "lucide-react";
 import type * as React from "react";
 import { useId, useState } from "react";
+import { useCustomerPortal } from "./customer-portal";
 
 type Status = NonNullable<FunctionReturnType<typeof api.billing.status>>;
 
@@ -33,7 +34,8 @@ export function BillingPageSkeleton() {
 /**
  * Plans: on the Free plan, Premium's prices (in the currency checkout will
  * charge, from the visitor's `country` when known) and the way to buy it; on
- * Premium, the plan and when it renews or ends.
+ * Premium, the plan, when it renews or ends, and the way to change or cancel
+ * it in Polar's customer portal.
  */
 export function BillingPage({ country }: { country?: string }) {
   const status = useQuery(api.billing.status, { country });
@@ -192,6 +194,7 @@ function UpgradeToPremium({ status }: { status: Status }) {
 function PremiumPlan({ status }: { status: Status }) {
   const t = useI18n();
   const { money, date } = useFormatters();
+  const portal = useCustomerPortal();
   const subscription = status.subscription;
   const periodEnd = subscription?.currentPeriodEnd ?? null;
   const ending = subscription?.cancelAtPeriodEnd ?? false;
@@ -233,6 +236,30 @@ function PremiumPlan({ status }: { status: Status }) {
       {ending && periodEnd !== null && (
         <p className="text-xs text-muted-foreground">
           {t("billing.endingNotice", { date: date(periodEnd) })}
+        </p>
+      )}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t pt-4">
+        <p className="min-w-0 flex-1 text-xs text-muted-foreground">
+          {status.portalAvailable
+            ? t("billing.manageHint")
+            : t("billing.portalUnavailable")}
+        </p>
+        <Button
+          variant="outline"
+          onClick={() => void portal.open()}
+          disabled={!status.portalAvailable || portal.opening}
+        >
+          {portal.opening ? (
+            <Loader2 className="animate-spin" aria-hidden="true" />
+          ) : (
+            <ExternalLink strokeWidth={1.75} aria-hidden="true" />
+          )}
+          {t("billing.manage")}
+        </Button>
+      </div>
+      {portal.error && (
+        <p role="alert" className="text-xs text-destructive">
+          {portal.error}
         </p>
       )}
     </Section>
