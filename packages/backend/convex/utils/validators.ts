@@ -1,7 +1,9 @@
 import { homeCurrencies, locales } from "@coinslite/i18n";
 import { v } from "convex/values";
+import { albumColours } from "../albums/rules";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
+import { photoSides } from "../photos/rules";
 import { metals } from "../spotPrices/rates";
 
 /** A validator accepting exactly the given strings, e.g. the supported locales. */
@@ -32,6 +34,10 @@ export const gradingScale = literalUnion(
 export const strike = literalUnion(strikes);
 /** One of the coin materials in items/rules.ts. */
 export const material = literalUnion(materials);
+/** One of the Album colours in albums/rules.ts. */
+export const albumColour = literalUnion(albumColours);
+/** Which side of an Item a photo shows: front or back. */
+export const photoSide = literalUnion(photoSides);
 
 /**
  * What one US dollar buys: units of each Home currency, and troy ounces of

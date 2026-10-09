@@ -6,12 +6,12 @@ import { formatCountry } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
-import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { usePaginatedQuery } from "convex/react";
 import { Coins, Plus } from "lucide-react";
 import Link from "next/link";
 import { useAddItem } from "./add-item";
 import { useGradeLabels } from "./grade-labels";
+import { ItemThumbnail } from "./item-thumbnail";
 
 const PAGE_SIZE = 25;
 
@@ -69,7 +69,7 @@ export function CollectionPage() {
                     href={`/collection/${item._id}`}
                     className="flex min-h-11 items-center gap-3 px-4 py-1.5 outline-none transition-colors duration-100 hover:bg-muted focus-visible:bg-muted"
                   >
-                    <ItemTypeIcon type={item.type} />
+                    <ItemThumbnail type={item.type} url={item.thumbnailUrl} />
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="truncate text-[13px] font-medium">
                         {item.title}
