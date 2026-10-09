@@ -618,9 +618,9 @@ test("the bundled US silver dollars browse by series grouping and by denominatio
   const ada = await person(t, "ada@example.com");
   await t.mutation(internal.catalog.seed.load, {});
 
-  expect(await ada.as.query(api.catalog.browse.roots, {})).toEqual([
+  expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 120 }),
-  ]);
+  );
   expect(
     await ada.as.query(api.catalog.browse.node, { key: "us" }),
   ).toMatchObject({
@@ -657,14 +657,14 @@ test("loading the bundled datasets fills in browsing for Catalog data stored bef
       });
     }
   });
-  expect(await ada.as.query(api.catalog.browse.roots, {})).toEqual([
+  expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 0 }),
-  ]);
+  );
 
   await t.mutation(internal.catalog.seed.load, {});
-  expect(await ada.as.query(api.catalog.browse.roots, {})).toEqual([
+  expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 120 }),
-  ]);
+  );
   expect(
     await ada.as.query(api.catalog.browse.denominations, { key: "us" }),
   ).toEqual([{ denomination: "1 dollar", seriesCount: 2 }]);

@@ -271,8 +271,6 @@ export default {
   dashboard: {
     headerTitle: "Prezentare generală",
     headerDescription: "Colecția ta dintr-o privire.",
-    bodyTitle: "Bun venit la CoinsLite",
-    bodyDescription: "Colecția ta va apărea aici.",
   },
   account: {
     pageTitle: "Cont",
@@ -886,6 +884,43 @@ export default {
     valueDistributionDescription:
       "După tipul obiectului, plus valoarea metalului pentru aur și argint",
     part: "Tip de obiect sau metal",
+  },
+  featureFlags: {
+    menu: "Activarea funcționalităților",
+    title: "Activarea funcționalităților",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription:
+      "Doar administratorii pot activa și dezactiva funcționalități.",
+    description: "Modificările se aplică imediat tuturor.",
+    catalog: "Afișează catalogul",
+    catalogDescription:
+      "Când este dezactivat, doar administratorii văd catalogul. Ceilalți nu îl mai găsesc în navigare, la răsfoire sau în căutare.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Cine poate fotografia o monedă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
+    scannerOptions: {
+      off: "Dezactivat",
+      admins: "Doar administratori",
+      premiumBeta: "Beta Premium",
+    },
+    saved: "Setare actualizată",
+    saveFailed: "Setarea nu a putut fi actualizată. Încearcă din nou.",
+    catalogHiddenTitle: "Catalogul nu este disponibil",
+    catalogHiddenDescription:
+      "Este dezactivat deocamdată. Obiectele tale nu sunt afectate.",
+  },
+  overview: {
+    addShortcuts: "Adaugă în colecție",
+    add: {
+      coin: "Adaugă monedă",
+      banknote: "Adaugă bancnotă",
+      stamp: "Adaugă timbru",
+    },
+    latestItems: "Cele mai noi obiecte",
+    viewCollection: "Vezi colecția",
+    firstRunTitle: "Începe-ți colecția",
+    firstRunDescription:
+      "Adaugă o monedă, o bancnotă sau un timbru pe care îl deții. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
   },
   adminStats: {
     menu: "Statistici",

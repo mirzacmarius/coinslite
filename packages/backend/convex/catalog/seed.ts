@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { internalMutation } from "../_generated/server";
+import { euroCommemoratives } from "./datasets/euroCommemoratives";
 import { usSilverDollars } from "./datasets/usSilverDollars";
 import { importCatalogFile, refreshBrowseFields } from "./tree";
 
@@ -8,7 +9,7 @@ import { importCatalogFile, refreshBrowseFields } from "./tree";
  * order they load. Each is CoinsLite's own data from a source it may store
  * (ADR 0003); nothing is fetched while loading.
  */
-const datasets = { usSilverDollars };
+const datasets = { usSilverDollars, euroCommemoratives };
 
 /**
  * Loads every bundled dataset through the CSV import, so loading again only

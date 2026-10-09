@@ -279,8 +279,6 @@ export default {
   dashboard: {
     headerTitle: "Übersicht",
     headerDescription: "Deine Sammlung auf einen Blick.",
-    bodyTitle: "Willkommen bei CoinsLite",
-    bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
   account: {
     pageTitle: "Konto",
@@ -906,6 +904,44 @@ export default {
     valueDistributionDescription:
       "Nach Objektart, dazu der Metallwert von Gold und Silber",
     part: "Objektart oder Metall",
+  },
+  featureFlags: {
+    menu: "Funktionsschalter",
+    title: "Funktionsschalter",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription:
+      "Nur Admins können Funktionen ein- und ausschalten.",
+    description: "Änderungen gelten sofort für alle.",
+    catalog: "Katalog anzeigen",
+    catalogDescription:
+      "Wenn aus, sehen nur Admins den Katalog. Alle anderen finden ihn nicht mehr in der Navigation, beim Stöbern oder in der Suche.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Wer eine Münze fotografieren kann, um einen passenden Katalogeintrag vorgeschlagen zu bekommen. Admins können es, solange er nicht aus ist.",
+    scannerOptions: {
+      off: "Aus",
+      admins: "Nur Admins",
+      premiumBeta: "Premium-Beta",
+    },
+    saved: "Funktionsschalter aktualisiert",
+    saveFailed:
+      "Der Funktionsschalter konnte nicht aktualisiert werden. Versuche es noch einmal.",
+    catalogHiddenTitle: "Der Katalog ist nicht verfügbar",
+    catalogHiddenDescription:
+      "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
+  },
+  overview: {
+    addShortcuts: "Zur Sammlung hinzufügen",
+    add: {
+      coin: "Münze hinzufügen",
+      banknote: "Banknote hinzufügen",
+      stamp: "Briefmarke hinzufügen",
+    },
+    latestItems: "Neueste Objekte",
+    viewCollection: "Sammlung ansehen",
+    firstRunTitle: "Beginne deine Sammlung",
+    firstRunDescription:
+      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
   },
   adminStats: {
     menu: "Statistik",

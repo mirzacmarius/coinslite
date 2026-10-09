@@ -101,7 +101,7 @@ export function CollectionBrowser() {
           }
           title={t("items.emptyTitle")}
           description={t("items.emptyDescription")}
-          action={<Button onClick={addItem}>{t("items.add")}</Button>}
+          action={<Button onClick={() => addItem()}>{t("items.add")}</Button>}
         />
       </div>
     );

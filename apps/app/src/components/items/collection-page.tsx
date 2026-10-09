@@ -23,7 +23,7 @@ export function CollectionPage() {
       <HeaderBar
         title={t("nav.collection")}
         actions={
-          <Button size="xs" onClick={addItem}>
+          <Button size="xs" onClick={() => addItem()}>
             <Plus aria-hidden="true" />
             {t("items.add")}
           </Button>

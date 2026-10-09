@@ -13,7 +13,9 @@ type ExportedTable = {
 
 // convex-test accepts any name, but a deployment refuses the whole schema.
 test("every index name is one a deployment accepts", () => {
-  const { tables } = JSON.parse(schema.export()) as {
+  // `export()` is what a deployment receives; Convex leaves it out of its types.
+  const exported = (schema as unknown as { export(): string }).export();
+  const { tables } = JSON.parse(exported) as {
     tables: ExportedTable[];
   };
   const names = tables.flatMap((table) =>

@@ -6,6 +6,7 @@ import {
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { type QueryCtx, query } from "../_generated/server";
+import { catalogVisibleTo } from "../featureFlags";
 import { compareDenominations } from "../items/denominations";
 import { requireSetUpUser } from "../utils/auth";
 import {
@@ -59,12 +60,22 @@ const byEntryCount = (
   b: { entryCount: number; title: string },
 ) => b.entryCount - a.entryCount || a.title.localeCompare(b.title);
 
+/**
+ * The set-up person browsing, or null while the Catalog is hidden from them
+ * (the Catalog visibility flag, featureFlags.ts): then every level reads as
+ * empty, as if there were no Catalog.
+ */
+async function browsingUser(ctx: QueryCtx) {
+  const user = await requireSetUpUser(ctx);
+  return (await catalogVisibleTo(ctx, user)) ? user : null;
+}
+
 /** The countries and Themes at the top of the Catalog, with their entry counts, most entries first. */
 export const roots = query({
   args: {},
   returns: v.array(groupRow),
   handler: async (ctx) => {
-    await requireSetUpUser(ctx);
+    if (!(await browsingUser(ctx))) return [];
     const nodes = await ctx.db
       .query("catalogNodes")
       .withIndex("by_parentId_and_sortOrder", (q) =>
@@ -212,7 +223,8 @@ export const node = query({
   args: { key: v.string() },
   returns: v.union(v.null(), entryDetail, groupDetail),
   handler: async (ctx, { key }) => {
-    const user = await requireSetUpUser(ctx);
+    const user = await browsingUser(ctx);
+    if (!user) return null;
     const node = await nodeByKey(ctx, key);
     if (!node) return null;
     const ancestors = await ancestorsOf(ctx, node);
@@ -276,7 +288,8 @@ export const entries = query({
   args: { key: v.string(), paginationOpts: paginationOptsValidator },
   returns: paginationResultValidator(entryRow),
   handler: async (ctx, { key, paginationOpts }) => {
-    const user = await requireSetUpUser(ctx);
+    const user = await browsingUser(ctx);
+    if (!user) return noEntries;
     const parent = await nodeByKey(ctx, key);
     if (!parent) return noEntries;
     const page = await ctx.db
@@ -358,7 +371,7 @@ export const denominations = query({
     v.object({ denomination: nullable, seriesCount: v.number() }),
   ),
   handler: async (ctx, { key }) => {
-    await requireSetUpUser(ctx);
+    if (!(await browsingUser(ctx))) return [];
     const rows = [];
     for (const denomination of await denominationsIn(ctx, key)) {
       rows.push({
@@ -386,7 +399,7 @@ export const series = query({
     }),
   ),
   handler: async (ctx, { key, denomination }) => {
-    await requireSetUpUser(ctx);
+    if (!(await browsingUser(ctx))) return [];
     const rows = [];
     for (const series of await seriesIn(ctx, key, stored(denomination))) {
       const entries = () =>
@@ -431,7 +444,8 @@ export const seriesEntries = query({
   },
   returns: paginationResultValidator(entryRow),
   handler: async (ctx, { key, denomination, series, paginationOpts }) => {
-    const user = await requireSetUpUser(ctx);
+    const user = await browsingUser(ctx);
+    if (!user) return noEntries;
     const page = await ctx.db
       .query("catalogNodes")
       .withIndex(byDenomination, (q) =>

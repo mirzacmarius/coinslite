@@ -41,6 +41,7 @@ import {
 } from "@coinslite/ui/dialog";
 import { CheckboxField, Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
+import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { MoneyInput } from "@coinslite/ui/money-input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
@@ -62,7 +63,14 @@ import {
   X,
 } from "lucide-react";
 import type * as React from "react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { z } from "zod";
 import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
@@ -113,11 +121,14 @@ export function ItemFormDialog({
   open,
   onOpenChange,
   item,
+  newItemType,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** The Item being edited; without one the dialog adds a new Item. */
   item?: Doc<"items">;
+  /** For a new Item: the Item type already chosen each time the dialog opens. */
+  newItemType?: ItemType;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -274,6 +285,11 @@ export function ItemFormDialog({
     )
       form.setFieldValue("albumId", onlyAlbum, { dontUpdateMeta: true });
   }, [open, onlyAlbum, form]);
+  // Before the first paint, so the type pill never shows the previous type.
+  useLayoutEffect(() => {
+    if (open && newItemType && !item)
+      form.setFieldValue("type", newItemType, { dontUpdateMeta: true });
+  }, [open, newItemType, item, form]);
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
