@@ -5,7 +5,6 @@ import { action, internalMutation, mutation, query } from "./_generated/server";
 import { deleteUserAndSignInMethods } from "./accounts/linking";
 import { polar } from "./subscriptions";
 import { requireUserId } from "./utils/auth";
-import { username } from "./utils/validators";
 
 export const getUser = query({
   args: {},
@@ -23,53 +22,9 @@ export const getUser = query({
     });
     return {
       ...user,
-      name: user.displayName ?? user.username ?? user.name,
+      name: user.displayName ?? user.name,
       subscription,
-      avatarUrl: user.imageId
-        ? await ctx.storage.getUrl(user.imageId)
-        : undefined,
     };
-  },
-});
-
-export const updateUsername = mutation({
-  args: {
-    username: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const userId = await requireUserId(ctx);
-    const validatedUsername = username.safeParse(args.username);
-
-    if (!validatedUsername.success) {
-      throw new Error(validatedUsername.error.message);
-    }
-    await ctx.db.patch(userId, { username: validatedUsername.data });
-  },
-});
-
-export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
-    await requireUserId(ctx);
-    return await ctx.storage.generateUploadUrl();
-  },
-});
-
-export const updateUserImage = mutation({
-  args: {
-    imageId: v.id("_storage"),
-  },
-  handler: async (ctx, args) => {
-    const userId = await requireUserId(ctx);
-    await ctx.db.patch(userId, { imageId: args.imageId });
-  },
-});
-
-export const removeUserImage = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await requireUserId(ctx);
-    await ctx.db.patch(userId, { imageId: undefined, image: undefined });
   },
 });
 

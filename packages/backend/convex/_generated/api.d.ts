@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as account from "../account.js";
+import type * as account_emailChangeMessages from "../account/emailChangeMessages.js";
+import type * as account_rules from "../account/rules.js";
 import type * as accounts_codeEmailMessages from "../accounts/codeEmailMessages.js";
 import type * as accounts_codeEmails from "../accounts/codeEmails.js";
 import type * as accounts_credentials from "../accounts/credentials.js";
@@ -34,6 +37,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  account: typeof account;
+  "account/emailChangeMessages": typeof account_emailChangeMessages;
+  "account/rules": typeof account_rules;
   "accounts/codeEmailMessages": typeof accounts_codeEmailMessages;
   "accounts/codeEmails": typeof accounts_codeEmails;
   "accounts/credentials": typeof accounts_credentials;

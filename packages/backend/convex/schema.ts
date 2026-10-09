@@ -21,10 +21,29 @@ export default defineSchema({
     homeCurrency: v.optional(homeCurrency),
     termsAcceptedAt: v.optional(v.number()),
 
-    // Template fields, superseded by the profile in MUS-686
+    // Contact and address, for the Insurance report
+    fullName: v.optional(v.string()),
+    streetAddress: v.optional(v.string()),
+    postalCode: v.optional(v.string()),
+    city: v.optional(v.string()),
+    country: v.optional(v.string()),
+    // Not `phone`: Convex Auth keeps that one for phone sign-in.
+    contactPhone: v.optional(v.string()),
+
+    // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
   }).index("email", ["email"]),
+
+  /** A requested email change, waiting for its link to be opened at the new address. */
+  emailChanges: defineTable({
+    userId: v.id("users"),
+    newEmail: v.string(),
+    tokenHash: v.string(),
+    expiresAt: v.number(),
+  })
+    .index("by_tokenHash", ["tokenHash"])
+    .index("by_userId", ["userId"]),
 
   /**
    * What a user owns: one or more identical pieces (Quantity). Money is in
