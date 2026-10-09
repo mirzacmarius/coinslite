@@ -611,6 +611,79 @@ export function valuesFromFields(fields: NodeFields): NodeValues {
 const isProvenanceKey = (key: string): key is ProvenanceKey =>
   provenanceKeys.has(key);
 
+/**
+ * The values the Catalog editor sets on a node: all of them but the image
+ * and its credit, which catalog/images.ts looks after.
+ */
+export const editorValueKeys = [
+  "title",
+  "sortOrder",
+  "itemType",
+  "country",
+  "denomination",
+  "series",
+  "material",
+  "strike",
+  "metal",
+  "weight",
+  "fineness",
+  "diameter",
+  "yearFrom",
+  "yearTo",
+  "technicalDetails",
+  "historicalNotes",
+  "numistaId",
+  "factsSource",
+  "factsAuthor",
+  "factsLicence",
+  "factsLink",
+  "notesSource",
+  "notesAuthor",
+  "notesLicence",
+  "notesLink",
+] as const satisfies readonly ValueKey[];
+export type EditorValueKey = (typeof editorValueKeys)[number];
+
+/** A node's values as the Catalog editor saves them; one left out is cleared. */
+export type EditorValues = Pick<NodeValues, "title" | "sortOrder"> &
+  Partial<Pick<NodeValues, Exclude<EditorValueKey, "title" | "sortOrder">>>;
+
+/** The CSV column that holds a value, which problems name. */
+export const columnOfValue = (key: ValueKey) => columnOf[key];
+
+/**
+ * The editor's values read the way a Catalog CSV file's cells are, so a node
+ * saved in the editor meets the same rules as one imported: trimmed, within
+ * the limits, nothing from Numista. Every editor value is present in
+ * `values`, undefined when empty, so saving clears it.
+ */
+export function readEditorValues(input: EditorValues): {
+  values: Partial<NodeValues>;
+  problems: Array<{ column: string; code: CatalogError }>;
+} {
+  const values: Record<string, unknown> = {};
+  const problems: Array<{ column: string; code: CatalogError }> = [];
+  for (const key of editorValueKeys) {
+    const column = columnOf[key];
+    const value = input[key];
+    try {
+      values[key] = (valueColumns[column] as { read: Read }).read(
+        value === undefined ? "" : String(value),
+      );
+    } catch (error) {
+      if (!(error instanceof CellError)) throw error;
+      problems.push({ column, code: error.code });
+      values[key] = undefined;
+    }
+  }
+  if (values.title === undefined && !problems.some((p) => p.column === "title"))
+    problems.push({ column: "title", code: catalogErrors.titleRequired });
+  return { values: values as Partial<NodeValues>, problems };
+}
+
+/** A node id as typed, lowercased, or undefined when it can't be one. */
+export const readCatalogKey = (text: string) => readKey(text);
+
 /** Whether two nodes' values are the same. */
 export function sameValues(a: Partial<NodeValues>, b: Partial<NodeValues>) {
   return Object.keys(columnOf).every(

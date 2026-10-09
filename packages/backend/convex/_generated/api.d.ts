@@ -36,6 +36,7 @@ import type * as catalog_csvText from "../catalog/csvText.js";
 import type * as catalog_datasets_euroCommemorativeCoins from "../catalog/datasets/euroCommemorativeCoins.js";
 import type * as catalog_datasets_euroCommemoratives from "../catalog/datasets/euroCommemoratives.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
+import type * as catalog_editor from "../catalog/editor.js";
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_imageRules from "../catalog/imageRules.js";
 import type * as catalog_images from "../catalog/images.js";
@@ -129,6 +130,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/datasets/euroCommemorativeCoins": typeof catalog_datasets_euroCommemorativeCoins;
   "catalog/datasets/euroCommemoratives": typeof catalog_datasets_euroCommemoratives;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
+  "catalog/editor": typeof catalog_editor;
   "catalog/fields": typeof catalog_fields;
   "catalog/imageRules": typeof catalog_imageRules;
   "catalog/images": typeof catalog_images;

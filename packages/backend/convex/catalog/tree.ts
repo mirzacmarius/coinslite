@@ -48,7 +48,7 @@ type Planned = {
   values: NodeValues;
 };
 
-type Plan = {
+export type Plan = {
   report: ImportReport;
   /** Rows in file order. */
   planned: Planned[];
@@ -117,9 +117,15 @@ async function nodeByKey(ctx: QueryCtx, key: string) {
     .unique();
 }
 
-/** Reads a Catalog CSV file and works out what importing it would change. */
-async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
-  const file = readCatalogFile(csv);
+/**
+ * Works out what bringing rows into the Catalog would change: a CSV file's,
+ * or the one node the Catalog editor saves. Each row updates the node with
+ * its key, or adds one.
+ */
+export async function planRows(
+  ctx: QueryCtx,
+  file: { rows: FileRow[]; errors: RowError[] },
+): Promise<Plan> {
   const errors = [...file.errors];
   const rows = new Map(file.rows.map((row) => [row.key, row]));
 
@@ -296,7 +302,7 @@ function merge(row: FileRow, existing: Doc<"catalogNodes"> | null): Planned {
 
 /** What importing a file would change, without changing anything. */
 export async function previewImport(ctx: QueryCtx, csv: string) {
-  return (await planImport(ctx, csv)).report;
+  return (await planRows(ctx, readCatalogFile(csv))).report;
 }
 
 /**
@@ -308,7 +314,17 @@ export async function importCatalogFile(
   ctx: MutationCtx,
   csv: string,
 ): Promise<ImportReport & { applied: boolean }> {
-  const { report, planned, pathOf, stored } = await planImport(ctx, csv);
+  return await applyPlan(ctx, await planRows(ctx, readCatalogFile(csv)));
+}
+
+/**
+ * Makes the changes a plan works out, keeping every node's path, entry count,
+ * country and search words right. A plan with any problem changes nothing.
+ */
+export async function applyPlan(
+  ctx: MutationCtx,
+  { report, planned, pathOf, stored }: Plan,
+): Promise<ImportReport & { applied: boolean }> {
   if (report.errorCount > 0) return { ...report, applied: false };
 
   const ids = new Map<string, Id<"catalogNodes">>(
