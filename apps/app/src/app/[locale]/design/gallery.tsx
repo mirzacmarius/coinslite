@@ -387,6 +387,7 @@ export function DesignGallery() {
   const { money } = useFormatters();
   const [itemType, setItemType] = useState<ItemType>("coin");
   const [album, setAlbum] = useState<string | undefined>("travel");
+  const [newAlbums, setNewAlbums] = useState<string[]>([]);
   const [grade, setGrade] = useState<string>();
   const [currency, setCurrency] = useState("NOK");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -533,8 +534,23 @@ export function DesignGallery() {
                   label="Album"
                   placeholder="Add to Album"
                   value={album}
-                  options={albumOptions}
+                  options={[
+                    ...albumOptions,
+                    ...newAlbums.map((name) => ({
+                      value: name,
+                      label: name,
+                      icon: albumDot("#64748b"),
+                      count: 0,
+                    })),
+                  ]}
                   onChange={setAlbum}
+                  onClear={() => setAlbum(undefined)}
+                  clearLabel="No Album"
+                  createLabel={(name) => `Create Album “${name}”`}
+                  onCreate={(name) => {
+                    setNewAlbums((names) => [...names, name]);
+                    setAlbum(name);
+                  }}
                   noResults="No matches"
                 />
               </PropertyRow>

@@ -1,5 +1,7 @@
 "use client";
 
+import { AlbumDot } from "@/components/albums/album-colours";
+import { useAlbums } from "@/components/albums/use-albums";
 import {
   isItemLimitError,
   upgradeHref,
@@ -32,6 +34,7 @@ export function ItemDetail() {
   const item = useQuery(api.items.get, { itemId });
   const format = useFormatters();
   const labels = useGradeLabels();
+  const albums = useAlbums();
   const router = useRouter();
   const duplicateItem = useMutation(api.items.duplicate);
   // Each opening starts the form afresh from the Item as it is now.
@@ -79,6 +82,7 @@ export function ItemDetail() {
     );
   }
 
+  const album = albums?.find(({ _id }) => _id === item.albumId);
   const money = (amount: number | undefined) =>
     amount === undefined ? undefined : format.money(amount, item.currency);
   const millimetres = (value: number | undefined) =>
@@ -225,6 +229,17 @@ export function ItemDetail() {
           <PanelSection title={t("items.details")}>
             <PropertyRow label={t("items.type")}>
               {t(`items.types.${item.type}`)}
+            </PropertyRow>
+            <PropertyRow label={t("albums.album")}>
+              {album && (
+                <Link
+                  href={`/albums/${album._id}`}
+                  className="inline-flex max-w-full items-center gap-1.5 hover:underline"
+                >
+                  <AlbumDot colour={album.colour} />
+                  <span className="truncate">{album.name}</span>
+                </Link>
+              )}
             </PropertyRow>
             <PropertyRow label={t("items.grade")}>
               {item.grade && item.gradingScale && (
