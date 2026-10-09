@@ -20,14 +20,18 @@ export function Kbd({
   );
 }
 
+type ModifierKey = "⌘" | "Ctrl" | "Strg";
+
 /**
- * The modifier key as shortcut hints show it: "⌘" on Apple devices, "Ctrl"
- * elsewhere, and null until the browser is known (so nothing renders on the server).
+ * The modifier key as shortcut hints show it: "⌘" on Apple devices, else the
+ * Ctrl key as keyboards in the page's language label it ("Strg" in German),
+ * and null until the browser is known (so nothing renders on the server).
  */
-export function useModifierKey(): "⌘" | "Ctrl" | null {
-  const [key, setKey] = useState<"⌘" | "Ctrl" | null>(null);
+export function useModifierKey(): ModifierKey | null {
+  const [key, setKey] = useState<ModifierKey | null>(null);
   useEffect(() => {
-    setKey(/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl");
+    if (/Mac|iPhone|iPad/.test(navigator.platform)) setKey("⌘");
+    else setKey(document.documentElement.lang === "de" ? "Strg" : "Ctrl");
   }, []);
   return key;
 }

@@ -240,13 +240,13 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     aboutValues: "À propos de ces valeurs",
     notes: {
       perItem: (currency) =>
-        `Montants en ${currency}, pour tous les exemplaires d’un objet : montant par exemplaire × quantité.`,
+        `Montants en ${currency}, pour tous les exemplaires d’un objet\u00a0: montant par exemplaire × quantité.`,
       gainLoss:
         "Le gain/perte est la valeur de marché moins le prix d’achat, pour les objets qui ont les deux.",
       ownerStated:
         "Les prix d’achat et les valeurs de marché sont déclarés par le propriétaire, sans expertise.",
       incomplete: (count) =>
-        `La collection est trop grande pour être lue d’un coup : ce document ne couvre que les ${count} premiers objets ajoutés.`,
+        `La collection est trop grande pour être lue d’un coup\u00a0: ce document ne couvre que les ${count} premiers objets ajoutés.`,
     },
   },
   ro: {
@@ -296,7 +296,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
       ownerStated:
         "Prețurile de achiziție și valorile de piață sunt declarate de proprietar, nu evaluate.",
       incomplete: (count) =>
-        `Colecția este prea mare pentru a fi citită dintr-odată, așa că aceasta cuprinde doar primele ${count} obiecte adăugate.`,
+        `Colecția este prea mare pentru a fi citită dintr-odată, așa că aceasta cuprinde doar primele ${count} de obiecte adăugate.`,
     },
   },
 };

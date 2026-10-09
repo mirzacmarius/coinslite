@@ -234,7 +234,7 @@ export const reportMessages: Record<Locale, ReportMessages> = {
     report: "Rapport",
     scope: "Périmètre",
     wholeCollection: "Toute la collection",
-    albums: (names) => `Albums : ${names}`,
+    albums: (names) => `Albums\u00a0: ${names}`,
     withoutAlbum: "Objets sans album",
     items: "Objets",
     pieces: "Exemplaires",
@@ -251,8 +251,8 @@ export const reportMessages: Record<Locale, ReportMessages> = {
       `${perGram} le gramme\n${perOunce} l’once troy`,
     quotedAt: "Au",
     noSpotPrices:
-      "Pas encore de cours spot : aucun objet n’a donc de valeur du métal.",
-    stale: "Non mis à jour depuis plus d’une heure ; peut-être dépassé.",
+      "Pas encore de cours spot\u00a0: aucun objet n’a donc de valeur du métal.",
+    stale: "Non mis à jour depuis plus d’une heure\u00a0; peut-être dépassé.",
     summary: "Synthèse",
     type: "Type",
     itemTitle: "Titre",
@@ -277,7 +277,7 @@ export const reportMessages: Record<Locale, ReportMessages> = {
     aboutValues: "À propos de ces valeurs",
     notes: {
       perItem: (currency) =>
-        `Montants en ${currency}, pour tous les exemplaires d’un objet : montant par exemplaire × quantité.`,
+        `Montants en ${currency}, pour tous les exemplaires d’un objet\u00a0: montant par exemplaire × quantité.`,
       ownerStated:
         "Les prix d’achat et les valeurs de marché sont déclarés par le propriétaire, sans expertise.",
       metalValue:
@@ -327,9 +327,9 @@ export const reportMessages: Record<Locale, ReportMessages> = {
     },
     itemTypes: { coin: "Monedă", banknote: "Bancnotă", stamp: "Timbru" },
     stampGrades: {
-      mnh: "Nestampilat, fără sarnieră",
-      mh: "Nestampilat, cu sarnieră",
-      used: "Stampilat",
+      mnh: "Neștampilat, fără șarnieră",
+      mh: "Neștampilat, cu șarnieră",
+      used: "Ștampilat",
     },
     total: "Total",
     page: (page, pages) => `Pagina ${page} din ${pages}`,

@@ -9,6 +9,7 @@ import {
   catalogKind,
   preciousMetal,
 } from "../utils/validators";
+import { isCountryNode } from "./browse";
 import { catalogLimits, searchTextOf, valuesFromFields } from "./fields";
 import {
   catalogSearchLimits,
@@ -33,6 +34,8 @@ const hit = v.object({
   sortOrder: v.number(),
   itemType: v.optional(catalogItemType),
   country: v.optional(v.string()),
+  /** A country (see browse.ts), which the app names in the reader's language. */
+  countryNode: v.boolean(),
   denomination: v.optional(v.string()),
   series: v.optional(v.string()),
   yearFrom: v.optional(v.number()),
@@ -53,6 +56,7 @@ const hitOf = (node: Doc<"catalogNodes">): CatalogSearchHit => ({
   sortOrder: node.sortOrder,
   itemType: node.itemType,
   country: node.country,
+  countryNode: isCountryNode(node),
   denomination: node.denomination,
   series: node.series,
   yearFrom: node.yearFrom,

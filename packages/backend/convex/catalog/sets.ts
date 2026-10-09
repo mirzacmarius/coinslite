@@ -9,6 +9,7 @@ import {
   creditedEntryRow,
   entryRow,
   heldCount,
+  isCountryNode,
   nodeByKey,
   nullable,
   stored,
@@ -33,14 +34,27 @@ const setGroup = v.object({
   key: v.string(),
   /** The groupings from just below the Set down to the sub-group; empty for the Set's own entries. */
   titles: v.array(v.string()),
+  /**
+   * The country the sub-group is in, when the Set spans countries (a Theme):
+   * the first title is that country's, which the app names in the reader's
+   * language.
+   */
+  country: v.optional(v.string()),
   /** By year, then sort order. */
   entries: v.array(entryRow),
 });
 
-const setView = v.object({
+/** The grouping a Set is made of; a country (see browse.ts) comes with its code. */
+const setNode = {
   key: v.string(),
   title: v.string(),
+  country: v.optional(v.string()),
+  countryNode: v.boolean(),
   ancestors: v.array(ancestor),
+};
+
+const setView = v.object({
+  ...setNode,
   /** How many entries the Set has. */
   total: v.number(),
   /** How many of them the person holds at least one Item of. */
@@ -52,9 +66,7 @@ const setView = v.object({
 
 /** A grouping with more entries than a Set may have: viewed through the Sets below it. */
 const tooLargeSet = v.object({
-  key: v.string(),
-  title: v.string(),
-  ancestors: v.array(ancestor),
+  ...setNode,
   tooLarge: v.literal(true),
 });
 
@@ -99,14 +111,23 @@ async function entriesBelow(ctx: QueryCtx, node: Doc<"catalogNodes">) {
   const walk = async (
     grouping: Doc<"catalogNodes">,
     titles: string[],
+    country?: string,
   ): Promise<boolean> => {
     const children = await childrenOf(ctx, grouping._id, budget);
     if (!children) return false;
     if (children.entries.length > 0) {
-      groups.push({ key: grouping.key, titles, entries: children.entries });
+      groups.push({
+        key: grouping.key,
+        titles,
+        ...(country !== undefined && { country }),
+        entries: children.entries,
+      });
     }
     for (const child of children.groupings) {
-      if (!(await walk(child, [...titles, child.title]))) return false;
+      const inCountry =
+        country ?? (isCountryNode(child) ? child.country : undefined);
+      if (!(await walk(child, [...titles, child.title], inCountry)))
+        return false;
     }
     return true;
   };
@@ -120,9 +141,8 @@ async function withHeld(
   groups: EntryGroup[],
 ): Promise<SetGroup[]> {
   return await Promise.all(
-    groups.map(async ({ key, titles, entries }) => ({
-      key,
-      titles,
+    groups.map(async ({ entries, ...group }) => ({
+      ...group,
       entries: await Promise.all(
         entries.map(async (entry) =>
           creditedEntryRow(
@@ -207,7 +227,7 @@ async function setEntries(
     return (await entriesBelow(ctx, node)) ?? "tooLarge";
   }
   // Only a country is browsed by denomination.
-  if (node.countryNodeKey !== node.key) return null;
+  if (!isCountryNode(node)) return null;
   const entries = await denominationEntries(
     ctx,
     node.key,
@@ -253,6 +273,9 @@ export const get = query({
     const about = {
       key: node.key,
       title: node.title,
+      ...(isCountryNode(node) &&
+        node.country !== undefined && { country: node.country }),
+      countryNode: isCountryNode(node),
       ancestors: await ancestorsOf(ctx, node),
     };
     if (groups === "tooLarge") return { ...about, tooLarge: true as const };

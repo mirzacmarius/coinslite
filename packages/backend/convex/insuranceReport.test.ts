@@ -474,7 +474,7 @@ test("the PDF is in the language asked for, every character included", async () 
   expect(text).toContain(
     "Monedă Ducat Ștefan cel Mare 1910 PF-65 2 12.000,00 NOK 13.889,12 NOK 13.889,12 NOK",
   );
-  expect(text).toContain("Timbru Posthorn 1 øre Nestampilat, fără sarnieră 1");
+  expect(text).toContain("Timbru Posthorn 1 øre Neștampilat, fără șarnieră 1");
   expect(text).toContain("Total 3 12.000,00 NOK 13.889,12 NOK 13.889,12 NOK");
   expect(text).toContain("Pagina 1 din 1");
   expect(text).toContain(

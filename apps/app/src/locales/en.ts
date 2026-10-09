@@ -1362,4 +1362,10 @@ export default {
     ended: "Ended",
     collection: "Collection",
   },
+  notFound: {
+    title: "Page not found",
+    description:
+      "There's nothing at this address. It may have moved, or the link may be wrong.",
+    home: "Go to the Overview",
+  },
 } as const;

@@ -57,6 +57,7 @@ type SetGroup = OpenSet["groups"][number];
  */
 export function CatalogSetPage({ actions }: { actions?: React.ReactNode }) {
   const t = useI18n();
+  const { nodeTitle } = useCatalogFormat();
   const { key } = useParams<{ key: string }>();
   const params = useSearchParams();
   const scope = useMemo(() => setScopeFrom(key, params), [key, params]);
@@ -100,7 +101,7 @@ export function CatalogSetPage({ actions }: { actions?: React.ReactNode }) {
                 className="text-[13px] font-medium text-primary hover:underline"
               >
                 {set
-                  ? t("sets.browse", { title: set.title })
+                  ? t("sets.browse", { title: nodeTitle(set) })
                   : t("catalog.backToCatalog")}
               </Link>
             }
@@ -115,21 +116,24 @@ export function CatalogSetPage({ actions }: { actions?: React.ReactNode }) {
 /** The levels above a Set, down to the grouping it's of, for the header. */
 function useSetCrumbs(
   scope: SetScope,
-  set: Pick<SetResult, "title" | "ancestors"> | undefined,
+  set:
+    | Pick<SetResult, "title" | "country" | "countryNode" | "ancestors">
+    | undefined,
 ): Crumb[] {
   const t = useI18n();
+  const { nodeTitle } = useCatalogFormat();
   if (!set) return [];
   const crumbs: Crumb[] = set.ancestors.map((ancestor) => ({
     href: catalogNodeHref(ancestor.key),
-    label: ancestor.title,
+    label: nodeTitle(ancestor),
   }));
   const { key, denomination, series } = scope;
   if (denomination === undefined) {
-    return [...crumbs, { href: catalogNodeHref(key), label: set.title }];
+    return [...crumbs, { href: catalogNodeHref(key), label: nodeTitle(set) }];
   }
   crumbs.push({
     href: levelHref(key, { view: "denominations" }),
-    label: set.title,
+    label: nodeTitle(set),
   });
   crumbs.push({
     href: levelHref(key, { view: "series", denomination }),
@@ -160,6 +164,8 @@ function SetView({
   actions?: React.ReactNode;
 }) {
   const t = useI18n();
+  const format = useFormatters();
+  const { nodeTitle } = useCatalogFormat();
   const selection = useEntrySelection();
   const [show, setShow] = useState<"missing" | "all">();
   const showing = show ?? (opensMissingOnly(set.total) ? "missing" : "all");
@@ -217,7 +223,13 @@ function SetView({
     }))
     .filter((group) => group.shown.length > 0);
   const ownLabel =
-    scope.denomination === undefined ? set.title : t("catalog.noSeries");
+    scope.denomination === undefined ? nodeTitle(set) : t("catalog.noSeries");
+  /** A sub-group's way down from the Set; a Theme's country by its name in the reader's language. */
+  const groupLabel = ({ titles, country }: SetGroup) => {
+    const [first, ...rest] = titles;
+    if (first === undefined) return ownLabel;
+    return [country ? format.country(country) : first, ...rest].join(" › ");
+  };
 
   return (
     <>
@@ -267,21 +279,9 @@ function SetView({
       ) : (
         <div className="border-b">
           {groups.map((group) => (
-            <section
-              key={group.key}
-              aria-label={
-                group.titles.length > 0 ? group.titles.join(" › ") : ownLabel
-              }
-            >
+            <section key={group.key} aria-label={groupLabel(group)}>
               {set.groups.length > 1 && (
-                <GroupHeading
-                  group={group}
-                  label={
-                    group.titles.length > 0
-                      ? group.titles.join(" › ")
-                      : ownLabel
-                  }
-                />
+                <GroupHeading group={group} label={groupLabel(group)} />
               )}
               <ul className="divide-y">
                 {group.shown.map((entry) => (

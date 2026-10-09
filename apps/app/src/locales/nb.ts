@@ -141,7 +141,7 @@ export default {
     },
     strikes: {
       circulation: "Omløp",
-      bu: "Brilliant uncirculated (BU)",
+      bu: "Usirkulert kvalitet (BU)",
       proof: "Proof",
     },
     meanings: {
@@ -613,7 +613,7 @@ export default {
     chooseAnother: "Velg en annen fil",
     clearFile: "Fjern filen",
     readFailed: "Filen kunne ikke leses. Velg en CSV-fil.",
-    checking: "Sjekker filen …",
+    checking: "Sjekker filen…",
     inserts: "Legges til",
     updates: "Oppdateres",
     unchanged: "Uendret",
@@ -895,7 +895,7 @@ export default {
     sizes:
       "Lagres som WebP, høyst 800 px på den lengste siden, med et miniatyrbilde på 128 px. Mindre bilder beholder størrelsen.",
     current: "Det nåværende bildet. Velg et annet for å bytte det ut.",
-    converting: "Konverterer …",
+    converting: "Konverterer…",
     converted: "{full} px WebP, miniatyrbilde {thumbnail} px",
     credit: "Kreditering",
     creditHint:
@@ -1265,7 +1265,7 @@ export default {
     added: "«{title}» er lagt til i katalogen",
     saved: "«{title}» er lagret",
     deleteTitle: "Slette «{title}»?",
-    deleteCounting: "Teller hva som følger med …",
+    deleteCounting: "Teller hva som følger med…",
     deleteTooLarge:
       "Dette ville tatt med seg over {nodes} noder eller {items} tilknyttede objekter. Slett nodene under den først.",
     "deleteBelow#zero": "Ingenting under den følger med.",
@@ -1381,5 +1381,11 @@ export default {
     started: "Startet",
     ended: "Avsluttet",
     collection: "Samling",
+  },
+  notFound: {
+    title: "Fant ikke siden",
+    description:
+      "Det finnes ingenting på denne adressen. Den kan ha blitt flyttet, eller lenken kan være feil.",
+    home: "Gå til oversikten",
   },
 } as const satisfies Dictionary;

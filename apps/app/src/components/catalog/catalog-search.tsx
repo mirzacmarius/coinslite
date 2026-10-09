@@ -32,6 +32,7 @@ import {
 import type * as React from "react";
 import { useRef, useState } from "react";
 import { HeldCount } from "./catalog-rows";
+import { useCatalogFormat } from "./use-catalog-format";
 import type { SelectableEntry } from "./use-entry-selection";
 
 export type { CatalogSearchHit };
@@ -249,6 +250,7 @@ function ResultRow({
       ? Banknote
       : kindIcons[hit.kind];
   const facts = useHitFacts(hit);
+  const { nodeTitle } = useCatalogFormat();
   return (
     <CommandItem value={hit._id} onSelect={() => onPick(hit)} className="h-8">
       <Icon
@@ -256,7 +258,7 @@ function ResultRow({
         strokeWidth={1.75}
         aria-hidden="true"
       />
-      <span className="min-w-0 shrink truncate">{hit.title}</span>
+      <span className="min-w-0 shrink truncate">{nodeTitle(hit)}</span>
       {facts && (
         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
           {facts}
