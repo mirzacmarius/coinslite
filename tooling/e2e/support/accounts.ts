@@ -28,23 +28,31 @@ export function latestCode(email: string): string {
   return code;
 }
 
+/**
+ * The page on screen. After a link click the previous page stays in the DOM,
+ * hidden, so that going back is instant; locators must not match its fields.
+ */
+export const visiblePage = (page: Page) => page.locator("main:visible");
+
 export async function signUp(page: Page, email: string) {
-  await page.getByLabel("Email", { exact: true }).fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("checkbox", { name: /I accept/ }).check();
-  await page.getByRole("button", { name: "Create account" }).click();
+  const main = visiblePage(page);
+  await main.getByLabel("Email", { exact: true }).fill(email);
+  await main.getByLabel("Password", { exact: true }).fill(password);
+  await main.getByRole("checkbox", { name: /I accept/ }).check();
+  await main.getByRole("button", { name: "Create account" }).click();
   await expect(
-    page.getByRole("heading", { name: "Check your email" }),
+    main.getByRole("heading", { name: "Check your email" }),
   ).toBeVisible();
 }
 
 export async function signUpAndVerify(page: Page, email: string) {
   await page.goto(`${appUrl}/signup`);
   await signUp(page, email);
-  await page.getByLabel("Code").fill(latestCode(email));
-  await page.getByRole("button", { name: "Verify email" }).click();
+  const main = visiblePage(page);
+  await main.getByLabel("Code").fill(latestCode(email));
+  await main.getByRole("button", { name: "Verify email" }).click();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Overview" }),
+    main.getByRole("heading", { level: 1, name: "Overview" }),
   ).toBeVisible();
 }
 

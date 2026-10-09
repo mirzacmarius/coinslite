@@ -3,6 +3,7 @@ import { AppShell } from "@/components/shell/app-shell";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 /**
@@ -10,6 +11,9 @@ import { Suspense } from "react";
  * opens. A plain redirect would loop: the proxy still sees a valid token.
  */
 async function DeletedAccountCheck() {
+  // Per request, never part of a prerendered shell: it reads the session
+  // cookie, and the Convex client it creates draws random ids.
+  await connection();
   const user = await fetchQuery(
     api.users.getUser,
     {},

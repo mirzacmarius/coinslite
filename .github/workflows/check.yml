@@ -19,6 +19,11 @@ jobs:
         run: bun run format:check
       - name: Typecheck
         run: bun run typecheck
+      - name: Build
+        # A route that can't produce its static shell only fails at build time.
+        run: bun run build --filter=@coinslite/app --filter=@coinslite/web
+        env:
+          NEXT_PUBLIC_CONVEX_URL: http://127.0.0.1:3210
       - name: Backend tests
         run: bun run test
       - name: Install Playwright browser

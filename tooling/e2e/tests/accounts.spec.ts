@@ -6,6 +6,7 @@ import {
   signOut,
   signUp,
   signUpAndVerify,
+  visiblePage,
 } from "../support/accounts";
 import { appUrl, hasLocalBackend, webUrl } from "../urls";
 
@@ -21,30 +22,42 @@ test("sign up, verify with the emailed code, and land on the page asked for", as
   const email = newEmail();
   await page.goto(`${appUrl}/collection`);
   await expect(page).toHaveURL(/\/login\?next=%2Fcollection$/);
-  await page.getByRole("link", { name: "Create an account" }).click();
+  await visiblePage(page)
+    .getByRole("link", { name: "Create an account" })
+    .click();
 
   // en-US suggests US dollars as the Home currency.
   await expect(
-    page.getByRole("button", { name: "Home currency: USD" }),
+    visiblePage(page).getByRole("button", { name: "Home currency: USD" }),
   ).toBeVisible();
-  await page.getByLabel("Email", { exact: true }).fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Create account" }).click();
+  await visiblePage(page).getByLabel("Email", { exact: true }).fill(email);
+  await visiblePage(page)
+    .getByLabel("Password", { exact: true })
+    .fill(password);
+  await visiblePage(page)
+    .getByRole("button", { name: "Create account" })
+    .click();
   await expect(
-    page.getByText("Accept the privacy policy and terms of use to continue."),
+    visiblePage(page).getByText(
+      "Accept the privacy policy and terms of use to continue.",
+    ),
   ).toBeVisible();
 
-  await page.getByRole("checkbox", { name: /I accept/ }).check();
-  await page.getByRole("button", { name: "Create account" }).click();
+  await visiblePage(page)
+    .getByRole("checkbox", { name: /I accept/ })
+    .check();
+  await visiblePage(page)
+    .getByRole("button", { name: "Create account" })
+    .click();
   await expect(
-    page.getByRole("heading", { name: "Check your email" }),
+    visiblePage(page).getByRole("heading", { name: "Check your email" }),
   ).toBeVisible();
-  await page.getByLabel("Code").fill(latestCode(email));
-  await page.getByRole("button", { name: "Verify email" }).click();
+  await visiblePage(page).getByLabel("Code").fill(latestCode(email));
+  await visiblePage(page).getByRole("button", { name: "Verify email" }).click();
 
   await expect(page).toHaveURL(/\/collection$/);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Collection" }),
+    visiblePage(page).getByRole("heading", { level: 1, name: "Collection" }),
   ).toBeVisible();
 });
 
@@ -71,15 +84,23 @@ test("sign out and back in; a wrong password is refused", async ({ page }) => {
   await signUpAndVerify(page, email);
   await signOut(page);
 
-  await page.getByLabel("Email", { exact: true }).fill(email);
-  await page.getByLabel("Password", { exact: true }).fill("not the password");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page.getByText(/don't match/)).toBeVisible();
+  await visiblePage(page).getByLabel("Email", { exact: true }).fill(email);
+  await visiblePage(page)
+    .getByLabel("Password", { exact: true })
+    .fill("not the password");
+  await visiblePage(page)
+    .getByRole("button", { name: "Sign in", exact: true })
+    .click();
+  await expect(visiblePage(page).getByText(/don't match/)).toBeVisible();
 
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await visiblePage(page)
+    .getByLabel("Password", { exact: true })
+    .fill(password);
+  await visiblePage(page)
+    .getByRole("button", { name: "Sign in", exact: true })
+    .click();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Overview" }),
+    visiblePage(page).getByRole("heading", { level: 1, name: "Overview" }),
   ).toBeVisible();
 });
 
@@ -91,14 +112,16 @@ test("a forgotten password is replaced from the emailed link", async ({
   await signUpAndVerify(page, email);
   await signOut(page);
 
-  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await visiblePage(page)
+    .getByRole("link", { name: "Forgot password?" })
+    .click();
   await expect(
-    page.getByRole("heading", { name: "Reset your password" }),
+    visiblePage(page).getByRole("heading", { name: "Reset your password" }),
   ).toBeVisible();
-  await page.getByLabel("Email", { exact: true }).fill(email);
-  await page.getByRole("button", { name: "Send code" }).click();
+  await visiblePage(page).getByLabel("Email", { exact: true }).fill(email);
+  await visiblePage(page).getByRole("button", { name: "Send code" }).click();
   await expect(
-    page.getByRole("heading", { name: "Choose a new password" }),
+    visiblePage(page).getByRole("heading", { name: "Choose a new password" }),
   ).toBeVisible();
 
   const fragment = new URLSearchParams({ email, code: latestCode(email) });
@@ -113,13 +136,15 @@ test("a forgotten password is replaced from the emailed link", async ({
   await mailClient.close();
 
   await page.goto(`${appUrl}/login`);
-  await page.getByLabel("Email", { exact: true }).fill(email);
-  await page
+  await visiblePage(page).getByLabel("Email", { exact: true }).fill(email);
+  await visiblePage(page)
     .getByLabel("Password", { exact: true })
     .fill("battery staple horse");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await visiblePage(page)
+    .getByRole("button", { name: "Sign in", exact: true })
+    .click();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Overview" }),
+    visiblePage(page).getByRole("heading", { level: 1, name: "Overview" }),
   ).toBeVisible();
 });
 
