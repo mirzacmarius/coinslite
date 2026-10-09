@@ -198,6 +198,7 @@ Covered in [§7](#7-market-value-and-price-data). It's primarily a price source,
 - **Euro coin common side** (primary: [COM(2001) 600](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:52001DC0600)):
   > "Reproduction of all or part of the common face design of the euro coins is authorised without recourse to a specific procedure in the following cases: for photographs, drawings, paintings, films, images, and generally reproductions in flat format (without relief) provided they are in faithful likeness and are used in ways which do not damage or detract from the image of the euro."
 - **Verdict:** the facts and text are **allowed with attribution** (ECB). It's the best authoritative seed for the 2-euro commemorative series. Showing a commemorative's national side is **unclear**: the rights sit with each member state, and the ECB's text licence doesn't obviously extend to them.
+- **Titles in CoinsLite's bundled dataset:** each coin's title comes from the ECB's page in the issuing country's language. Where a country has several official languages (Belgium, Cyprus, Finland, Luxembourg, Malta, Ireland) or one the ECB doesn't publish in (Andorra), the title stays in the ECB's English, since picking one of the languages would be CoinsLite's choice rather than the source's.
 
 ### 6.5 Norges Bank
 - **Offers:** HTML pages on current and withdrawn banknote series (I–VII) and coins (e.g. which withdrawn notes and coins can still be exchanged). No structured catalogue.

@@ -279,8 +279,6 @@ export default {
   dashboard: {
     headerTitle: "Übersicht",
     headerDescription: "Deine Sammlung auf einen Blick.",
-    bodyTitle: "Willkommen bei CoinsLite",
-    bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
   account: {
     pageTitle: "Konto",
@@ -307,8 +305,6 @@ export default {
       title: "Einstellungen",
       language: "Sprache",
       homeCurrency: "Heimatwährung",
-      homeCurrencyNote:
-        "Bald kannst du sie ändern, und alle Beträge werden umgerechnet.",
       languageNotSaved:
         "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },
@@ -330,7 +326,6 @@ export default {
       title: "Abmelden oder löschen",
       signOut: "Abmelden",
       delete: "Konto löschen",
-      deleteConfirm: "Zum Löschen von allem erneut klicken",
       deleteWarning:
         "Beim Löschen deines Kontos wird es mit allem darin entfernt. Das lässt sich nicht rückgängig machen.",
     },
@@ -355,5 +350,1105 @@ export default {
       tryAgain:
         "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
+  },
+  albums: {
+    album: "Album",
+    new: "Neues Album",
+    editAlbum: "Album bearbeiten",
+    edit: "Bearbeiten",
+    delete: "Löschen",
+    name: "Name",
+    namePlaceholder: "Name des Albums, z. B. Reisen",
+    description: "Beschreibung",
+    descriptionPlaceholder: "Beschreibung hinzufügen…",
+    colour: "Farbe",
+    colours: {
+      grey: "Grau",
+      red: "Rot",
+      orange: "Orange",
+      yellow: "Gelb",
+      green: "Grün",
+      teal: "Petrol",
+      blue: "Blau",
+      indigo: "Indigo",
+      purple: "Lila",
+      pink: "Rosa",
+    },
+    create: "Album erstellen",
+    save: "Speichern",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    created: "Album erstellt",
+    saved: "Album gespeichert",
+    deleted: "Album gelöscht",
+    itemCount: "Objekte",
+    emptyTitle: "Noch keine Alben",
+    emptyDescription:
+      "Erstelle ein Album, um Objekte nach Thema, Land oder ganz nach Wunsch zu gruppieren.",
+    notFoundTitle: "Album nicht gefunden",
+    notFound: "Dieses Album gibt es nicht, oder es gehört nicht dir.",
+    backToAlbums: "Zurück zu den Alben",
+    noItemsTitle: "Keine Objekte in diesem Album",
+    noItemsDescription:
+      "Wähle dieses Album im Formular eines Objekts, um das Objekt hier abzulegen.",
+    addToAlbum: "Zu Album hinzufügen",
+    noAlbum: "Kein Album",
+    createNamed: "Album „{name}“ erstellen",
+    deleteTitle: "„{name}“ löschen?",
+    deleteDescription:
+      "Hake die Objekte an, die mit dem Album gelöscht werden sollen, etwa verkaufte. Die übrigen bleiben ohne Album in deiner Sammlung.",
+    deleteDescriptionEmpty:
+      "Das Album enthält keine Objekte, es wird also keines gelöscht.",
+    selectAll: "Alle auswählen",
+    "deleteCount#zero": "Es werden keine Objekte gelöscht.",
+    "deleteCount#one": "1 Objekt wird endgültig gelöscht.",
+    "deleteCount#few": "{count} Objekte werden endgültig gelöscht.",
+    "deleteCount#other": "{count} Objekte werden endgültig gelöscht.",
+    "deleteConfirm#zero": "Album löschen",
+    "deleteConfirm#one": "Album und 1 Objekt löschen",
+    "deleteConfirm#few": "Album und {count} Objekte löschen",
+    "deleteConfirm#other": "Album und {count} Objekte löschen",
+    errors: {
+      nameRequired: "Gib dem Album einen Namen.",
+      nameTooLong: "Verwende höchstens {max} Zeichen.",
+      descriptionTooLong: "Verwende höchstens {max} Zeichen.",
+      tooMany:
+        "Du hast {max} Alben, so viele, wie ein Konto haben kann. Lösche eines, um Platz zu schaffen.",
+      saveFailed:
+        "Das Album konnte nicht gespeichert werden. Versuche es noch einmal.",
+      createFailed:
+        "Das Album konnte nicht erstellt werden. Versuche es noch einmal.",
+      deleteFailed:
+        "Das Album konnte nicht gelöscht werden. Versuche es noch einmal.",
+    },
+  },
+  photos: {
+    title: "Fotos",
+    sides: {
+      front: "Vorderseite",
+      back: "Rückseite",
+      obverse: "Avers",
+      reverse: "Revers",
+    },
+    add: "Foto hinzufügen",
+    formats: "JPEG, PNG, WebP oder GIF, bis 10 MB",
+    uploading: "Foto wird hochgeladen",
+    view: "Im Vollbild ansehen",
+    actions: "Fotoaktionen",
+    replace: "Foto ersetzen",
+    remove: "Foto entfernen",
+    removeTitles: {
+      front: "Foto der Vorderseite entfernen?",
+      back: "Foto der Rückseite entfernen?",
+      obverse: "Foto des Avers entfernen?",
+      reverse: "Foto des Revers entfernen?",
+    },
+    removeBody:
+      "Das Foto wird endgültig gelöscht. Du kannst jederzeit ein neues hinzufügen.",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    previous: "Vorheriges Foto",
+    next: "Nächstes Foto",
+    errors: {
+      tooLarge: "Die Datei ist größer als 10 MB. Wähle ein kleineres Foto.",
+      notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
+      tooMany:
+        "Zu viele Uploads in kurzer Zeit. Versuche es in ein paar Minuten erneut.",
+      failed:
+        "Das Foto konnte nicht gespeichert werden. Versuche es noch einmal.",
+      removeFailed:
+        "Das Foto konnte nicht entfernt werden. Versuche es noch einmal.",
+    },
+  },
+  deleteItem: {
+    delete: "Löschen",
+    title: "„{title}“ löschen?",
+    body: "Das Objekt wird endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    bodyOnePhoto:
+      "Das Objekt und sein Foto werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    bodyTwoPhotos:
+      "Das Objekt und seine 2 Fotos werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    confirm: "Objekt löschen",
+    cancel: "Abbrechen",
+    deleted: "Objekt gelöscht",
+    failed: "Das Objekt konnte nicht gelöscht werden. Versuche es noch einmal.",
+  },
+  feedback: {
+    title: "Feedback",
+    description:
+      "Eine Idee, ein Problem oder etwas, das dir gefällt? Sag es dem CoinsLite-Team. Wir lesen jede Nachricht.",
+    open: "Feedback senden",
+    dialogTitle: "Feedback senden",
+    message: "Nachricht",
+    placeholder: "Was funktioniert für dich, was nicht, was wünschst du dir…",
+    note: "Wir senden die E-Mail-Adresse deines Kontos mit, damit wir antworten können.",
+    cancel: "Abbrechen",
+    send: "Senden",
+    close: "Schließen",
+    sent: "Danke! Dein Feedback wurde gesendet.",
+    required: "Schreib zuerst eine Nachricht.",
+    tooLong: "Höchstens {limit} Zeichen.",
+    tooMany:
+      "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Versuche es in ein paar Minuten noch einmal.",
+    failed:
+      "Dein Feedback konnte nicht gesendet werden. Versuche es noch einmal.",
+  },
+  plans: {
+    freePlan: "Gratis-Tarif",
+    itemsUsed: "{used} / {limit} Objekte",
+    overLimit: "Über {limit} Objekte",
+    usageLabel: "Genutzte Objekte im Gratis-Tarif",
+    nearLimit: "Fast ausgeschöpft",
+    full: "Grenze erreicht",
+    upgrade: "Upgraden",
+    upgradeToPremium: "Auf Premium upgraden",
+    usedOf: "{used} von {limit} Objekten genutzt",
+    premiumPitch: "Premium hat keine Begrenzung bei Objekten.",
+    nearLimitNotice:
+      "Du hast {used} von {limit} Objekten des Gratis-Tarifs genutzt.",
+    fullNotice:
+      "Deine Sammlung hat die {limit} Objekte des Gratis-Tarifs erreicht.",
+    keepItems:
+      "Alle deine Objekte bleiben sichtbar und bearbeitbar. Mit einem Upgrade kannst du weitere hinzufügen.",
+    limitError:
+      "Der Gratis-Tarif umfasst {limit} Objekte, daher wurde nichts hinzugefügt. Mit Premium kannst du weitere hinzufügen.",
+  },
+  spotPrices: {
+    title: "Spotpreise",
+    metal: "Metall",
+    perGram: "Pro Gramm",
+    perOunce: "Pro Feinunze",
+    updated: "Aktualisiert am {time}",
+    stale:
+      "Diese Preise wurden seit über einer Stunde nicht aktualisiert und sind möglicherweise veraltet.",
+    emptyTitle: "Noch keine Spotpreise",
+    emptyDescription:
+      "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
+  },
+  homeCurrency: {
+    hint: "Wenn du sie änderst, werden alle Kaufpreise und Marktwerte in deiner Sammlung umgerechnet.",
+    confirmTitle: "Heimatwährung zu {currency} ändern?",
+    confirm: "Zu {currency} wechseln",
+    cancel: "Abbrechen",
+    checking: "Die umzurechnenden Beträge werden gezählt…",
+    willConvert:
+      "Alle Kaufpreise und Marktwerte in deiner Sammlung werden zu diesem Wechselkurs von {from} in {to} umgerechnet.",
+    nothingToConvert:
+      "Keines deiner Objekte hat einen Kaufpreis oder Marktwert, es gibt also nichts umzurechnen.",
+    noRate:
+      "Es gibt noch keinen Wechselkurs, um deine Beträge umzurechnen. Versuche es in ein paar Minuten noch einmal.",
+    tooLarge:
+      "Deine Sammlung hat mehr als {limit} Objekte, zu viele für eine einzige Umrechnung. Schick uns Feedback, dann helfen wir dir.",
+    amounts: "Umzurechnende Beträge",
+    rate: "Wechselkurs",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Stand",
+    stale:
+      "Dieser Kurs wurde seit über einer Stunde nicht aktualisiert und ist möglicherweise veraltet.",
+    changed: "Deine Heimatwährung ist jetzt {currency}.",
+    rateChanged:
+      "Der Wechselkurs wurde gerade aktualisiert. Prüfe den neuen Kurs und bestätige noch einmal.",
+    amountTooLarge:
+      "Ein Betrag wäre in der neuen Währung zu groß, daher wurde nichts geändert.",
+    sameCurrency: "Das ist bereits deine Heimatwährung.",
+    failed:
+      "Die Heimatwährung konnte nicht geändert werden, und nichts wurde umgerechnet. Versuche es noch einmal.",
+  },
+  preciousMetal: {
+    title: "Edelmetall",
+    metal: "Metall",
+    setMetal: "Metall wählen",
+    noMetal: "Kein Metall",
+    weight: "Gewicht",
+    weightHint: "Gramm",
+    grams: "g",
+    purity: "Feinheit",
+    purityHint: "Von 0 bis 1, z. B. 0,999",
+    chooseMetalFirst: "Zuerst ein Metall wählen",
+    bullion: "Anlagemünze",
+    bullionLabel: "Anlagemünze, wegen des Metalls gekauft",
+    yes: "Ja",
+    no: "Nein",
+    preset: "Vorlage für Anlagemünzen",
+    presetPlaceholder: "Aus einer Anlagemünze übernehmen",
+    presetHint:
+      "Füllt Metall, Gewicht, Feinheit und Land aus, und den Titel, wenn er leer ist.",
+    metalValue: "Metallwert",
+    needsWeightAndPurity: "Gewicht und Feinheit angeben",
+    noSpotPrices: "Noch keine Spotpreise",
+    stale: "Die Spotpreise sind möglicherweise veraltet",
+    errors: {
+      weight: "Gib ein Gewicht in Gramm ein, z. B. 31,103.",
+      purity: "Gib eine Feinheit über 0 und bis 1 ein, z. B. 0,999.",
+    },
+    presets: {
+      krugerrandGold1oz: "Krugerrand 1 oz Gold",
+      krugerrandGoldHalfOz: "Krugerrand ½ oz Gold",
+      krugerrandGoldQuarterOz: "Krugerrand ¼ oz Gold",
+      krugerrandGoldTenthOz: "Krugerrand 1/10 oz Gold",
+      mapleLeafGold: "Maple Leaf 1 oz Gold",
+      britanniaGold: "Britannia 1 oz Gold",
+      viennaPhilharmonicGold: "Wiener Philharmoniker 1 oz Gold",
+      americanEagleGold: "American Eagle 1 oz Gold",
+      americanBuffaloGold: "American Buffalo 1 oz Gold",
+      pandaGold: "Panda 30 g Gold",
+      mapleLeafSilver: "Maple Leaf 1 oz Silber",
+      americanEagleSilver: "American Eagle 1 oz Silber",
+      britanniaSilver: "Britannia 1 oz Silber",
+      viennaPhilharmonicSilver: "Wiener Philharmoniker 1 oz Silber",
+      krugerrandSilver: "Krugerrand 1 oz Silber",
+      pandaSilver: "Panda 30 g Silber",
+    },
+  },
+  updates: {
+    title: "Neuigkeiten",
+    unseen: "Neue Version",
+    new: "Neu",
+    version: "Version {version}",
+    latest: "Aktuell",
+    groups: {
+      catalog: "Neu im Katalog",
+      features: "Neue Funktionen",
+      improvements: "Verbesserungen",
+      fixes: "Fehlerbehebungen",
+    },
+    highlightsTitle: "Neu in CoinsLite {version}",
+    seeAll: "Alle Neuigkeiten ansehen",
+    gotIt: "Verstanden",
+    close: "Schließen",
+    workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
+  },
+  catalogAdmin: {
+    menu: "Katalog importieren und exportieren",
+    title: "Katalog importieren und exportieren",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription:
+      "Nur Admins können den Katalog importieren und exportieren.",
+    exportTitle: "Export",
+    exportDescription:
+      "Lade den ganzen Katalog als CSV-Datei herunter. Bearbeite sie in einer Tabellenkalkulation und importiere sie wieder.",
+    exportAction: "CSV exportieren",
+    exportFailed:
+      "Der Katalog konnte nicht exportiert werden. Versuche es noch einmal.",
+    importTitle: "Import",
+    importDescription:
+      "Zeilen, deren ID schon im Katalog steht, aktualisieren diesen Knoten, die übrigen werden hinzugefügt. Eine parent_id kann auf eine andere Zeile derselben Datei verweisen. Jede Gruppe von Fakten, Notizen und Bildern braucht ihre Quelle.",
+    chooseFile: "CSV-Datei auswählen",
+    chooseAnother: "Andere Datei auswählen",
+    clearFile: "Datei entfernen",
+    readFailed: "Die Datei konnte nicht gelesen werden. Wähle eine CSV-Datei.",
+    checking: "Datei wird geprüft…",
+    inserts: "Neu",
+    updates: "Geändert",
+    unchanged: "Unverändert",
+    upToDate: "Der Katalog entspricht dieser Datei bereits.",
+    problemsTitle: "Zu behebende Fehler",
+    problemsDescription:
+      "Es wird nichts importiert, bis alle Zeilen stimmen. Behebe diese Fehler und wähle die Datei erneut.",
+    showingFirst: "Die ersten {shown} von {total}.",
+    row: "Zeile",
+    column: "Spalte",
+    problem: "Fehler",
+    importAction: "Importieren",
+    confirmTitle: "„{file}“ importieren?",
+    confirmDescription:
+      "Die Änderungen gelten sofort für den Katalog, den alle durchsuchen. Zeilen, die schon stimmen, bleiben, wie sie sind.",
+    cancel: "Abbrechen",
+    imported:
+      "Katalog aktualisiert: {inserts} hinzugefügt, {updates} geändert.",
+    importBlocked:
+      "Der Katalog hat sich seit der Prüfung geändert, und die Datei hat jetzt Fehler. Es wurde nichts importiert.",
+    importFailed:
+      "Die Datei konnte nicht importiert werden. Versuche es noch einmal.",
+    errors: {
+      EMPTY_FILE: "Unter der Kopfzeile stehen keine Zeilen.",
+      UNCLOSED_QUOTE:
+        "Ein Anführungszeichen, das in dieser Zeile beginnt, wird nie geschlossen.",
+      MISSING_COLUMN: "Die Datei braucht diese Spalte.",
+      UNKNOWN_COLUMN: "Das ist keine Katalogspalte. Prüfe die Schreibweise.",
+      DUPLICATE_COLUMN: "Diese Spalte kommt mehr als einmal vor.",
+      TOO_MANY_ROWS:
+        "Die Datei ist zu groß. Teile sie in Dateien mit höchstens 3.000 Zeilen auf.",
+      ID_REQUIRED: "Gib der Zeile eine ID.",
+      INVALID_ID:
+        "Verwende bis zu 64 Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
+      DUPLICATE_ID: "Eine Zeile weiter oben hat schon diese ID.",
+      TITLE_REQUIRED: "Gib der Zeile einen Titel.",
+      TOO_LONG: "Dieser Wert ist zu lang.",
+      INVALID_VALUE: "Dieser Wert ist in dieser Spalte nicht erlaubt.",
+      INVALID_COUNTRY:
+        "Verwende einen zweistelligen Ländercode wie US oder NO.",
+      INVALID_NUMBER:
+        "Gib eine Zahl im erlaubten Bereich dieser Spalte ein, mit Punkt als Dezimaltrennzeichen.",
+      INVALID_YEAR:
+        "Gib ein ganzes Jahr ein, Jahre v. Chr. als negative Zahlen.",
+      INVALID_URL:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      NUMISTA_DATA:
+        "Daten von Numista dürfen nicht gespeichert werden. Behalte nur die Numista-Nummer, in numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "Ein Katalogeintrag braucht eine Objektart: Münze oder Banknote.",
+      FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Größe.",
+      YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
+      SOURCE_REQUIRED:
+        "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
+      CREDIT_REQUIRED:
+        "Fakten, Hinweise und Bilder brauchen jeweils Quelle, Urheber, Lizenz und Link.",
+      ROOT_NOT_ADDABLE:
+        "Ein Land oder Thema kann kein Katalogeintrag sein. Gib der Zeile eine parent_id.",
+      PARENT_NOT_FOUND:
+        "Keine Zeile der Datei und kein Knoten im Katalog hat diese ID.",
+      PARENT_IS_ENTRY:
+        "Dieses Elternelement ist ein Katalogeintrag, darunter kann nichts stehen.",
+      PARENT_CYCLE: "Die Elternelemente führen zurück zu dieser Zeile.",
+      TOO_DEEP: "Der Katalog hat höchstens 8 Ebenen.",
+      ENTRY_HAS_CHILDREN:
+        "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
+      ENTRY_HAS_ITEMS:
+        "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer. Lass is_addable auf true.",
+      TOO_MANY_NODES_BELOW:
+        "Unter den Knoten, die diese Datei verschiebt, liegen mehr als 2.000 Knoten. Verschiebe weniger auf einmal.",
+      TOO_MANY_LINKED_ITEMS:
+        "Mit den Einträgen, deren Objektart sich ändert, sind über 1.000 Objekte verknüpft. Ändere weniger auf einmal.",
+    },
+  },
+  collection: {
+    search: "Sammlung durchsuchen",
+    searchPlaceholder: "Titel, Nennwert, Land suchen",
+    clearSearch: "Suche leeren",
+    filter: "Filter",
+    filterBy: "Filtern nach…",
+    back: "Zurück",
+    nothingToFilter: "Noch keines deiner Objekte hat diese Angabe.",
+    filters: {
+      type: "Objektart",
+      origin: "Herkunft",
+      country: "Land",
+      denomination: "Nennwert",
+      grade: "Erhaltung",
+      album: "Album",
+    },
+    bullionCoins: "Anlagemünzen",
+    origins: {
+      own: "Inländisch ({country})",
+      foreign: "Ausländisch",
+    },
+    withoutAlbum: "Ohne Album",
+    unknownAlbum: "Unbekanntes Album",
+    activeFilters: "Aktive Filter",
+    removeFilter: "Filter entfernen: {name}",
+    clear: "Leeren",
+    clearFilters: "Filter entfernen",
+    noMatchesTitle: "Keine Objekte passen zu diesen Filtern",
+    display: "Anzeige",
+    layout: "Ansicht",
+    layouts: {
+      list: "Liste",
+      grid: "Raster",
+    },
+    sort: "Sortierung",
+    sorts: {
+      year: "Jahr, älteste zuerst",
+      newest: "Zuletzt hinzugefügt",
+      oldest: "Zuerst hinzugefügt",
+      price: "Höchster Kaufpreis",
+      denomination: "Nennwert",
+      grade: "Erhaltung, beste zuerst",
+    },
+    pageSize: "Objekte pro Seite",
+    pagination: "Seiten",
+    range: "{from}–{to} von {total}",
+    pageOf: "Seite {page} von {pages}",
+    previousPage: "Vorherige Seite",
+    nextPage: "Nächste Seite",
+    incomplete:
+      "Deine Sammlung ist zu groß, um sie auf einmal zu durchsuchen. Diese Ansicht umfasst die ersten {count} Objekte, die du hinzugefügt hast.",
+    showInCollection: "In der Sammlung zeigen",
+  },
+  billing: {
+    currentPlan: "Dein Tarif",
+    freeDescription: "Bis zu {limit} Objekte, unabhängig von ihrer Anzahl.",
+    premium: "Premium",
+    premiumDescription:
+      "Unbegrenzt viele Objekte, der Versicherungsbericht und Export als CSV und PDF.",
+    billingPeriod: "Abrechnungszeitraum",
+    monthly: "Monatlich",
+    yearly: "Jährlich",
+    perMonth: "{price} / Monat",
+    perYear: "{price} / Jahr",
+    save: "{percent} % sparen",
+    currencyHint:
+      "Preise in {currency}. Beim Bezahlen wird in der Währung deines Wohnorts abgerechnet, sonst in Euro, und der Endpreis angezeigt.",
+    testMode:
+      "Testmodus: Es werden keine echten Zahlungen abgebucht. Bezahle mit der Testkarte 4242 4242 4242 4242.",
+    unavailable:
+      "Premium kann hier noch nicht gekauft werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
+    alreadyPremium: "Du hast bereits Premium.",
+    checkoutPending:
+      "Eine Bezahlseite für den anderen Tarif ist noch offen. Schließe sie dort ab oder versuche es in einer Stunde erneut.",
+    accountClosing: "Dein Konto wird gerade gelöscht.",
+    checkoutFailed:
+      "Die Bezahlseite konnte nicht geöffnet werden. Versuche es noch einmal.",
+    price: "Preis",
+    renews: "Verlängert sich am",
+    ends: "Endet am",
+    endingNotice:
+      "Premium bleibt bis {date}. Danach bist du im Gratis-Tarif, und alle deine Objekte bleiben sichtbar und bearbeitbar.",
+    confirmationTitle: "Bezahlung",
+    confirmingTitle: "Zahlung wird bestätigt",
+    confirmingDescription:
+      "Das dauert meist nur ein paar Sekunden. Premium beginnt, sobald die Zahlung bestätigt ist.",
+    slowDescription:
+      "Das dauert länger als üblich. Premium beginnt von selbst, sobald die Zahlung bestätigt ist; du kannst inzwischen weitermachen.",
+    welcomeTitle: "Willkommen bei Premium",
+    welcomeDescription:
+      "Deine Sammlung hat jetzt keine Begrenzung bei Objekten mehr.",
+    toCollection: "Zur Sammlung",
+    seePlan: "Tarif ansehen",
+    backToPlans: "Zurück zu den Tarifen",
+    manage: "Abo verwalten",
+    manageHint:
+      "Bei Polar kannst du zwischen monatlich und jährlich wechseln, deine Karte aktualisieren oder kündigen. Nach einer Kündigung bleibt Premium bis zum Ende des bezahlten Zeitraums.",
+    portalUnavailable:
+      "Das Abo kann hier nicht verwaltet werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
+    portalUnavailableShort: "Abrechnung hier nicht eingerichtet",
+    portalFailed:
+      "Die Abo-Seite konnte nicht geöffnet werden. Versuche es noch einmal.",
+    noSubscription: "Es gibt kein Premium-Abo zu verwalten.",
+    renewsOn: "Verlängert sich am {date}",
+    endsOn: "Endet am {date}",
+  },
+  catalogSearch: {
+    open: "Suchen",
+    title: "Im Katalog suchen",
+    placeholder: "Nach Titel, Nennwert, Serie oder Land suchen…",
+    minLength: "Gib mindestens 2 Zeichen ein, um zu suchen.",
+    noResults: "Nichts im Katalog passt zu „{text}“.",
+    capped:
+      "Die ersten {count} werden angezeigt. Füge ein Wort hinzu, um die Suche einzugrenzen.",
+    themes: "Themen",
+    moveHint: "zum Bewegen",
+    openHint: "zum Öffnen",
+    closeHint: "zum Schließen",
+  },
+  deleteAccount: {
+    title: "Konto löschen?",
+    description:
+      "Dein Profil, deine Kontaktdaten und deine Anmeldemethoden werden endgültig gelöscht, zusammen mit allem in deiner Sammlung. Das lässt sich nicht rückgängig machen.",
+    endsSubscription:
+      "Dein Premium-Abo endet sofort und wird nicht mehr abgerechnet.",
+    items: "Objekte",
+    photos: "Fotos",
+    albums: "Alben",
+    atLeast: "{value}+",
+    confirm: "Konto löschen",
+    cancel: "Abbrechen",
+    failed:
+      "Dein Konto konnte nicht gelöscht werden, und es wurde nichts entfernt. Versuche es noch einmal.",
+  },
+  catalog: {
+    emptyTitle: "Der Katalog ist leer",
+    emptyDescription:
+      "Länder und Themen erscheinen hier, sobald Katalogeinträge hinzugefügt sind.",
+    theme: "Thema",
+    entryCount: "Katalogeinträge",
+    browseBy: "Durchsuchen nach",
+    byGroup: "Gruppen",
+    byDenomination: "Nennwerte",
+    groupsHeading: "Gruppen",
+    entriesHeading: "Katalogeinträge",
+    noDenomination: "Ohne Nennwert",
+    noSeries: "Ohne Serie",
+    "seriesCount#zero": "Keine Serien",
+    "seriesCount#one": "1 Serie",
+    "seriesCount#few": "{count} Serien",
+    "seriesCount#other": "{count} Serien",
+    nothingHere: "Hier wurde noch nichts hinzugefügt.",
+    noEntries: "Hier gibt es noch keine Katalogeinträge.",
+    showMore: "Mehr anzeigen",
+    notFoundTitle: "Nicht im Katalog",
+    notFound:
+      "Diesen Teil des Katalogs gibt es nicht. Vielleicht wurde er verschoben.",
+    backToCatalog: "Zurück zum Katalog",
+    youHold: "Du besitzt {count}",
+    yourCollection: "Deine Sammlung",
+    held: "Du besitzt",
+    years: "Jahre",
+    fineness: "Feingehalt",
+    historicalNotes: "Historische Hinweise",
+    technicalDetails: "Technische Angaben",
+    sources: "Quellen",
+    facts: "Fakten",
+    notes: "Hinweise",
+    numista: "Numista",
+    numistaLink: "N# {id} bei Numista",
+    noImage: "Noch kein Bild",
+    imageCredit: "Bild",
+  },
+  collectionTotals: {
+    title: "Summen der Sammlung",
+    items: "Objekte",
+    itemsHint: "Jedes Objekt zählt einmal, egal wie hoch die Anzahl ist",
+    pieces: "Stück",
+    typesPlural: {
+      coin: "Münzen",
+      banknote: "Banknoten",
+      stamp: "Briefmarken",
+    },
+    purchasePrice: "Kaufpreis gesamt",
+    marketValue: "Marktwert gesamt",
+    gainLoss: "Gewinn/Verlust",
+    gainLossPartial: "Objekte mit Kaufpreis und Marktwert: {count} von {total}",
+    gainLossNone: "Erscheint, sobald ein Objekt Kaufpreis und Marktwert hat",
+    metalValue: {
+      gold: "Metallwert Gold",
+      silver: "Metallwert Silber",
+    },
+    fineWeight: "{grams}\u00a0g Feingewicht · {ounces}\u00a0oz\u00a0t",
+    noSpotPrices: "Warte auf Spotpreise",
+    view: "Ansicht",
+    chart: "Diagramm",
+    table: "Tabelle",
+    valueByDateAdded: "Wert nach Hinzufügedatum",
+    valueByDateAddedDescription:
+      "Kaufpreis und Marktwert von allem, was bis zum Ende jedes Monats hinzugefügt wurde",
+    month: "Monat",
+    monthKeys: "Mit den Pfeiltasten zwischen den Monaten wechseln.",
+    valueDistribution: "Wertverteilung",
+    valueDistributionDescription:
+      "Nach Objektart, dazu der Metallwert von Gold und Silber",
+    part: "Objektart oder Metall",
+  },
+  catalogImages: {
+    add: "Bild hinzufügen",
+    edit: "Bild bearbeiten",
+    remove: "Bild entfernen",
+    title: "Bild",
+    description:
+      "Lade ein Bild für diesen Katalogeintrag hoch und gib an, woher es stammt.",
+    choose: "Bild auswählen",
+    chooseAnother: "Anderes Bild auswählen",
+    formats: "JPEG, PNG, WebP oder GIF, bis 25 MB.",
+    sizes:
+      "Wird als WebP gespeichert, höchstens 800 px an der längsten Seite, mit einem Vorschaubild von 128 px. Kleinere Bilder behalten ihre Größe.",
+    current: "Das aktuelle Bild. Wähle ein anderes, um es zu ersetzen.",
+    converting: "Wird umgewandelt…",
+    converted: "{full} px WebP, Vorschaubild {thumbnail} px",
+    credit: "Bildnachweis",
+    creditHint:
+      "Für jedes Bild erforderlich. Listen zeigen ihn neben dem Vorschaubild, außer das Bild ist gemeinfrei oder CC0; der Eintrag zeigt ihn immer.",
+    source: "Quelle",
+    sourcePlaceholder: "Wikimedia Commons",
+    author: "Urheber",
+    authorPlaceholder: "Name des Fotografen oder Urhebers",
+    licence: "Lizenz",
+    licencePlaceholder: "CC BY-SA 4.0",
+    link: "Link",
+    linkPlaceholder: "https://",
+    cancel: "Abbrechen",
+    close: "Schließen",
+    save: "Speichern",
+    saved: "Bild gespeichert",
+    creditSaved: "Bildnachweis gespeichert",
+    removeTitle: "Bild von „{title}“ entfernen?",
+    removeBody:
+      "Seine Dateien und der Bildnachweis werden gelöscht. Der Eintrag zeigt einen Platzhalter, bis ein anderes Bild hinzugefügt wird.",
+    removed: "Bild entfernt",
+    errors: {
+      imageRequired: "Wähle ein Bild aus.",
+      sourceRequired: "Gib die Quelle an.",
+      authorRequired: "Gib den Urheber an.",
+      licenceRequired: "Gib die Lizenz an.",
+      linkRequired: "Gib den Link an.",
+      tooLong: "Verwende höchstens {max} Zeichen.",
+      invalidLink:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      numista: "Daten von Numista dürfen nicht gespeichert werden.",
+      failed:
+        "Das Bild konnte nicht gespeichert werden. Versuche es noch einmal.",
+      removeFailed:
+        "Das Bild konnte nicht entfernt werden. Versuche es noch einmal.",
+      CATALOG_ENTRY_NOT_FOUND: "Diesen Katalogeintrag gibt es nicht mehr.",
+      TOO_MANY_UPLOADS:
+        "Zu viele Uploads in kurzer Zeit. Versuche es in ein paar Minuten erneut.",
+      IMAGE_NOT_FOUND:
+        "Der Upload ist nicht angekommen. Versuche es noch einmal.",
+      IMAGE_NOT_WEBP:
+        "Das Bild wurde nicht als WebP gespeichert. Versuche es noch einmal.",
+      IMAGE_TOO_LARGE:
+        "Das umgewandelte Bild ist zu groß. Versuche es mit einem kleineren Bild.",
+      THUMBNAIL_TOO_LARGE:
+        "Das umgewandelte Vorschaubild ist zu groß. Versuche es noch einmal.",
+      NO_IMAGE:
+        "Dieser Eintrag hat kein Bild, das nachgewiesen werden kann. Wähle ein Bild aus.",
+      CREDIT_REQUIRED: "Gib Quelle, Urheber, Lizenz und Link an.",
+      TOO_LONG: "Ein Teil des Bildnachweises ist zu lang.",
+      INVALID_URL:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      NUMISTA_DATA: "Daten von Numista dürfen nicht gespeichert werden.",
+      IMAGE_UNREADABLE:
+        "Diese Datei lässt sich nicht als Bild lesen. Wähle ein JPEG, PNG, WebP oder GIF.",
+      ORIGINAL_TOO_LARGE: "Wähle ein Bild mit höchstens 25 MB.",
+      WEBP_UNSUPPORTED:
+        "Dieser Browser kann keine WebP-Bilder speichern. Versuche es mit einem anderen, etwa Chrome oder Firefox.",
+      NOT_ADMIN: "Nur Admins können Katalogbilder ändern.",
+    },
+  },
+  featureFlags: {
+    menu: "Funktionsschalter",
+    title: "Funktionsschalter",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription:
+      "Nur Admins können Funktionen ein- und ausschalten.",
+    description: "Änderungen gelten sofort für alle.",
+    catalog: "Katalog anzeigen",
+    catalogDescription:
+      "Wenn aus, sehen nur Admins den Katalog. Alle anderen finden ihn nicht mehr in der Navigation, beim Stöbern oder in der Suche.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Wer eine Münze fotografieren kann, um einen passenden Katalogeintrag vorgeschlagen zu bekommen. Admins können es, solange er nicht aus ist.",
+    scannerOptions: {
+      off: "Aus",
+      admins: "Nur Admins",
+      premiumBeta: "Premium-Beta",
+    },
+    saved: "Funktionsschalter aktualisiert",
+    saveFailed:
+      "Der Funktionsschalter konnte nicht aktualisiert werden. Versuche es noch einmal.",
+    catalogHiddenTitle: "Der Katalog ist nicht verfügbar",
+    catalogHiddenDescription:
+      "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
+  },
+  overview: {
+    addShortcuts: "Zur Sammlung hinzufügen",
+    add: {
+      coin: "Münze hinzufügen",
+      banknote: "Banknote hinzufügen",
+      stamp: "Briefmarke hinzufügen",
+    },
+    latestItems: "Neueste Objekte",
+    viewCollection: "Sammlung ansehen",
+    firstRunTitle: "Beginne deine Sammlung",
+    firstRunDescription:
+      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
+  },
+  adminStats: {
+    menu: "Statistik",
+    title: "Statistik",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription: "Nur Admins können die Statistik sehen.",
+    refresh: "Neu zählen",
+    counting: "Wird gezählt…",
+    countedAt: "Gezählt am {time}",
+    hourly: "Wird jede Stunde neu gezählt.",
+    refreshFailed:
+      "Die Zählung konnte nicht gestartet werden. Versuche es noch einmal.",
+    emptyTitle: "Noch nicht gezählt",
+    emptyDescription:
+      "Die Statistik wird jede Stunde gezählt. Zähl jetzt, um sie sofort zu sehen.",
+    countNow: "Jetzt zählen",
+    countingTitle: "Statistik wird gezählt",
+    countingDescription:
+      "Das dauert ein paar Sekunden. Die Zahlen erscheinen, sobald es fertig ist.",
+    users: {
+      title: "Nutzer",
+      description:
+        "Konten, die ihre E-Mail-Adresse bestätigt und die Registrierung abgeschlossen haben.",
+      total: "Alle Nutzer",
+      newLast30Days: "Neu in den letzten 30 Tagen",
+      premium: "Premium",
+      free: "Gratis-Tarif",
+    },
+    subscriptions: {
+      title: "Abos",
+      description:
+        "Aktive geben jetzt Premium. Endende werden nicht verlängert.",
+      active: "Aktiv",
+      endingWithin30Days: "Enden in den nächsten 30 Tagen",
+      ended: "Beendet",
+    },
+    collection: {
+      title: "Inhalt der Sammlungen",
+      description: "Alles in allen Sammlungen.",
+      items: "Objekte",
+      coins: "Münzen",
+      banknotes: "Banknoten",
+      stamps: "Briefmarken",
+      albums: "Alben",
+    },
+    activity: {
+      title: "Aktivität",
+      description: "Kürzlich hinzugefügte Objekte und Alben, die es noch gibt.",
+      itemsAddedLast24Hours: "Objekte, hinzugefügt in den letzten 24 Stunden",
+      itemsAddedLast7Days: "Objekte, hinzugefügt in den letzten 7 Tagen",
+      albumsCreatedLast30Days: "Alben, erstellt in den letzten 30 Tagen",
+    },
+  },
+  collectionExport: {
+    export: "Exportieren",
+    "inView#zero": "Keine Objekte in dieser Ansicht",
+    "inView#one": "1 Objekt in dieser Ansicht",
+    "inView#few": "{count} Objekte in dieser Ansicht",
+    "inView#other": "{count} Objekte in dieser Ansicht",
+    csv: "Als CSV exportieren",
+    pdf: "Als PDF exportieren",
+    pdfTooLarge:
+      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
+    tooLarge:
+      "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
+    premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
+    failed:
+      "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
+    fileName: "coinslite-sammlung-{date}.csv",
+  },
+  catalogPicker: {
+    title: "Aus dem Katalog wählen",
+    placeholder: {
+      coin: "Münzen nach Titel, Nennwert, Serie oder Land suchen…",
+      banknote: "Banknoten nach Titel, Nennwert, Serie oder Land suchen…",
+    },
+    pickHint: "zum Auswählen",
+    manual: "Manuell hinzufügen",
+    recent: "Zuletzt gewählt",
+    browse: "Katalog durchsuchen",
+    back: "Zurück",
+    empty: "Im Katalog gibt es noch nichts zum Auswählen.",
+    failed:
+      "Der Katalogeintrag konnte nicht geladen werden. Wähle ihn noch einmal oder füge das Objekt manuell hinzu.",
+    entry: "Katalogeintrag",
+    pick: "Aus dem Katalog wählen",
+    factsHint:
+      "Diese Angaben stammen aus dem Katalogeintrag und übernehmen seine Korrekturen. Änderst du eine, bleibt dein Wert; leerst du das Feld, gilt wieder der Wert des Eintrags.",
+  },
+  quickAdd: {
+    add: "Zur Sammlung hinzufügen",
+    title: "Zur Sammlung hinzufügen",
+    description:
+      "Füge diesen Katalogeintrag deiner Sammlung als ein Objekt hinzu.",
+    added: "Objekt zur Sammlung hinzugefügt",
+    open: "Öffnen",
+    failed:
+      "Das Objekt konnte nicht hinzugefügt werden. Versuche es noch einmal.",
+  },
+  insuranceReport: {
+    title: "Versicherungsbericht",
+    lockedTitle: "Der Versicherungsbericht gehört zu Premium",
+    lockedDescription:
+      "Ein PDF für deine Versicherung mit den Objekten deiner Wahl, ihren Werten, deinen Kontaktdaten und den Summen.",
+    scopeTitle: "Objekte",
+    scopeDescription: "Wähle, welche Objekte der Bericht umfasst.",
+    scope: "Umfang",
+    wholeCollection: "Gesamte Sammlung",
+    albums: "Alben",
+    withoutAlbum: "Objekte ohne Album",
+    noAlbums: "Du hast noch keine Alben.",
+    chooseScope: "Wähle mindestens ein Album oder die Objekte ohne Album.",
+    valuesTitle: "Werte",
+    valuesDescription:
+      "Der Versicherungswert ist der höchste der gewählten Werte je Objekt.",
+    keepOne:
+      "Behalte mindestens einen von Kaufpreis, Marktwert oder Metallwert.",
+    columns: {
+      purchasePrice: "Kaufpreis",
+      marketValue: "Marktwert",
+      metalValue: "Metallwert",
+      insuredValue: "Versicherungswert",
+    },
+    previewTitle: "Vorschau",
+    previewDescription: "Jede Summe umfasst alle Stücke jedes Objekts.",
+    items: "Objekte",
+    pieces: "Stück",
+    noSpotPrices:
+      "Noch keine Spotpreise, daher hat kein Objekt einen Metallwert.",
+    staleSpotPrices: "Die Spotpreise sind möglicherweise veraltet.",
+    tooLarge:
+      "Ein Bericht umfasst höchstens {limit} Objekte. Wähle weniger Alben.",
+    nothingToReport: "Hier gibt es keine Objekte für den Bericht.",
+    ownerTitle: "Eigentümer",
+    ownerDescription: "Steht im Bericht, aus deinem Konto.",
+    editContact: "Im Konto bearbeiten",
+    missingContact:
+      "Trage im Konto deinen vollständigen Namen, deine Telefonnummer und Adresse ein, damit deine Versicherung dich erreicht.",
+    download: "PDF herunterladen",
+    downloaded: "Versicherungsbericht heruntergeladen",
+    failed:
+      "Der Bericht konnte nicht erstellt werden. Versuche es noch einmal.",
+    errors: {
+      PREMIUM_REQUIRED: "Der Versicherungsbericht gehört zu Premium.",
+      REPORT_TOO_LARGE:
+        "Dieser Bericht hat zu viele Objekte. Wähle weniger Alben.",
+      ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
+    },
+  },
+  sets: {
+    title: "Set",
+    viewAsSet: "Als Set anzeigen",
+    completion: "{held} von {total} vorhanden",
+    completionLabel: "Vollständigkeit des Sets",
+    groupCompletion: "{held} / {total}",
+    show: "Anzeigen",
+    missing: "Fehlend ({count})",
+    all: "Alle ({count})",
+    selectAllMissing: "Alle fehlenden auswählen",
+    allowDuplicates: "Duplikate erlauben",
+    nothingMissing: "Du besitzt jeden Katalogeintrag dieses Sets.",
+    showAll: "Alle anzeigen",
+    openEntry: "{title} öffnen",
+    openEntryHint: "Katalogeintrag öffnen",
+    selectedFirst:
+      "Die ersten {limit} fehlenden Einträge sind ausgewählt. Füge sie hinzu und wähle dann den Rest aus.",
+    notASetTitle: "Kein Set",
+    notASet:
+      "Ein Set ist eine Gruppierung mit mehr als einem Katalogeintrag darunter. Diese ist keine, oder sie wurde verschoben.",
+    tooLargeTitle: "Zu groß für ein einzelnes Set",
+    tooLarge:
+      "Ein Set umfasst höchstens {limit} Katalogeinträge. Öffne eine der Gruppierungen darunter und zeige sie als Set an.",
+    browse: "{title} ansehen",
+    addBar: "Ausgewählte Katalogeinträge hinzufügen",
+    "selected#one": "1 ausgewählt",
+    "selected#few": "{count} ausgewählt",
+    "selected#other": "{count} ausgewählt",
+    clearSelection: "Auswahl aufheben",
+    isSelected: "Ausgewählt",
+    tooMany:
+      "Es können höchstens {limit} Einträge auf einmal hinzugefügt werden.",
+    "itemsLeft#zero": "Kein Objekt mehr frei im Gratis-Tarif",
+    "itemsLeft#one": "Noch 1 Objekt frei im Gratis-Tarif",
+    "itemsLeft#few": "Noch {count} Objekte frei im Gratis-Tarif",
+    "itemsLeft#other": "Noch {count} Objekte frei im Gratis-Tarif",
+    "overQuota#zero": "Im Gratis-Tarif ist kein Platz für weitere Objekte.",
+    "overQuota#one": "Im Gratis-Tarif ist nur noch Platz für 1 Objekt.",
+    "overQuota#few": "Im Gratis-Tarif ist nur noch Platz für {count} Objekte.",
+    "overQuota#other":
+      "Im Gratis-Tarif ist nur noch Platz für {count} Objekte.",
+    "add#one": "1 Objekt hinzufügen",
+    "add#few": "{count} Objekte hinzufügen",
+    "add#other": "{count} Objekte hinzufügen",
+    addNone: "Objekte hinzufügen",
+    "added#one": "1 Objekt zur Sammlung hinzugefügt",
+    "added#few": "{count} Objekte zur Sammlung hinzugefügt",
+    "added#other": "{count} Objekte zur Sammlung hinzugefügt",
+    openCollection: "Sammlung öffnen",
+    selectSeveral: "Mehrere auswählen",
+    pickOne: "Einzeln wählen",
+    selectHint: "zum Markieren",
+    selectMissingIn: "Alle fehlenden in {title} auswählen",
+    "missingCount#one": "1 fehlt",
+    "missingCount#few": "{count} fehlen",
+    "missingCount#other": "{count} fehlen",
+    errors: {
+      alreadyHeld:
+        "Einige dieser Katalogeinträge besitzt du schon. Erlaube Duplikate, um sie noch einmal hinzuzufügen.",
+      tooMany:
+        "Es können höchstens {limit} Einträge auf einmal hinzugefügt werden.",
+      entryGone:
+        "Einer dieser Katalogeinträge ist nicht mehr im Katalog. Wähle erneut aus.",
+      albumGone: "Dieses Album gibt es nicht mehr. Wähle ein anderes.",
+      failed:
+        "Die Objekte konnten nicht hinzugefügt werden. Versuche es noch einmal.",
+    },
+  },
+  catalogEditor: {
+    menu: "Katalog bearbeiten",
+    title: "Katalog bearbeiten",
+    description:
+      "Alle Länder, Themen, Gruppierungen und Katalogeinträge. Änderungen gelten sofort für den Katalog, den alle durchsuchen, und für die damit verknüpften Objekte.",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription: "Nur Admins können den Katalog bearbeiten.",
+    addRoot: "Land oder Thema hinzufügen",
+    importExport: "Import und Export",
+    emptyTitle: "Der Katalog ist leer",
+    emptyDescription:
+      "Füge zuerst ein Land oder ein Thema hinzu, oder importiere eine CSV-Datei.",
+    nothingBelow: "Noch nichts darunter",
+    showMore: "Mehr anzeigen",
+    expand: "Zeigen, was unter {title} steht",
+    collapse: "Ausblenden, was unter {title} steht",
+    actions: "Aktionen für {title}",
+    moreActions: "Weitere Aktionen",
+    addBelow: "Darunter hinzufügen",
+    addBelowNamed: "Unter {title} hinzufügen",
+    edit: "Bearbeiten",
+    editEntry: "Bearbeiten",
+    openInCatalog: "Im Katalog öffnen",
+    delete: "Löschen",
+    kinds: {
+      country: "Land",
+      theme: "Thema",
+      grouping: "Gruppierung",
+      entry: "Katalogeintrag",
+    },
+    kindHints: {
+      country: "Ein Land ganz oben im Katalog.",
+      theme:
+        "Eine Gruppe über mehrere Länder, etwa 2-Euro-Gedenkmünzen. Füge ihre Länder darunter hinzu.",
+      grouping:
+        "Fasst zusammen, was darunter steht, etwa einen Nennwert oder eine Serie.",
+      entry:
+        "Eine bestimmte Ausgabe. Nur aus Katalogeinträgen können Objekte werden.",
+    },
+    "entryCount#zero": "Keine Katalogeinträge",
+    "entryCount#one": "1 Katalogeintrag",
+    "entryCount#few": "{count} Katalogeinträge",
+    "entryCount#other": "{count} Katalogeinträge",
+    newNode: "Neuer Knoten",
+    editNode: "Knoten bearbeiten",
+    sheetDescription:
+      "Die Werte des Knotens und woher seine Fakten und Hinweise stammen.",
+    close: "Schließen",
+    kind: "Art",
+    id: "ID",
+    idHint:
+      "Seine ID in CSV-Dateien, die sich später nicht ändern lässt. Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
+    idFixedHint: "Seine ID in CSV-Dateien.",
+    sortOrder: "Reihenfolge",
+    sortOrderHint: "Kleinere Zahlen stehen unter Geschwistern weiter vorn.",
+    setItemType: "Objektart wählen",
+    noItemType: "Keine Objektart",
+    noCountry: "Kein Land",
+    yearFrom: "Erstes Jahr",
+    yearTo: "Letztes Jahr",
+    yearHint: "Jahre v. Chr. als negative Zahlen.",
+    yearToHint: "Leer lassen bei einer Ausgabe aus einem Jahr.",
+    weightHint: "Gramm",
+    finenessHint: "Der Anteil des Metalls, z. B. 0,9 für 900/1000.",
+    factsSources: "Woher die Fakten stammen",
+    notesSources: "Woher die Hinweise stammen",
+    sourcesHint:
+      "Fakten und Hinweise brauchen ihre Quelle. Katalogdaten unbekannter Herkunft werden nicht gespeichert.",
+    numistaId: "Numista-Nummer",
+    numistaHint:
+      "Nur ein Querverweis: Es werden keine Numista-Daten gespeichert.",
+    image: "Bild",
+    imageHint: "Noch kein Bild. Füge eines mit seinem Nachweis hinzu.",
+    add: "Knoten hinzufügen",
+    added: "„{title}“ zum Katalog hinzugefügt",
+    saved: "„{title}“ gespeichert",
+    deleteTitle: "„{title}“ löschen?",
+    deleteCounting: "Zählt, was mitgelöscht wird…",
+    deleteTooLarge:
+      "Damit würden mehr als {nodes} Knoten oder {items} verknüpfte Objekte mitgelöscht. Lösche zuerst die Knoten darunter.",
+    "deleteBelow#zero": "Darunter wird nichts mitgelöscht.",
+    "deleteBelow#one": "1 Knoten darunter wird mitgelöscht.",
+    "deleteBelow#few": "{count} Knoten darunter werden mitgelöscht.",
+    "deleteBelow#other": "{count} Knoten darunter werden mitgelöscht.",
+    "deleteItems#zero": "Keine Objekte sind damit verknüpft.",
+    "deleteItems#one":
+      "1 Objekt ist mit einem Katalogeintrag hier verknüpft und behält dessen Fakten als eigene.",
+    "deleteItems#few":
+      "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    "deleteItems#other":
+      "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    deleted: "„{title}“ gelöscht",
+    deleteFailed: "Konnte nicht gelöscht werden. Versuche es noch einmal.",
+    errors: {
+      TITLE_REQUIRED: "Gib einen Titel ein.",
+      TOO_LONG: "Das ist zu lang.",
+      INVALID_VALUE: "Wähle einen der angebotenen Werte.",
+      INVALID_COUNTRY: "Wähle ein Land.",
+      INVALID_NUMBER: "Gib eine Zahl im zulässigen Bereich ein.",
+      INVALID_YEAR:
+        "Gib ein ganzes Jahr ein, Jahre v. Chr. als negative Zahlen.",
+      INVALID_URL:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      NUMISTA_DATA:
+        "Numista-Daten dürfen nicht gespeichert werden. Behalte nur die Numista-Nummer.",
+      ITEM_TYPE_REQUIRED: "Ein Katalogeintrag braucht eine Objektart.",
+      FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Maße.",
+      YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
+      SOURCE_REQUIRED: "Nenne die Quelle dieser Fakten oder Hinweise.",
+      CREDIT_REQUIRED:
+        "Fakten, Hinweise und das Bild brauchen jeweils Quelle, Urheber, Lizenz und Link.",
+      ROOT_NOT_ADDABLE: "Ein Land oder Thema kann kein Katalogeintrag sein.",
+      PARENT_NOT_FOUND:
+        "Der Knoten darüber ist weg. Schließe dies und versuche es noch einmal.",
+      PARENT_IS_ENTRY: "Unter einem Katalogeintrag kann nichts stehen.",
+      TOO_DEEP: "Der Katalog geht höchstens 8 Ebenen tief.",
+      ENTRY_HAS_CHILDREN:
+        "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
+      ENTRY_HAS_ITEMS:
+        "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer.",
+      TOO_MANY_NODES_BELOW:
+        "Unter diesem Knoten liegen mehr als 2.000 Knoten, zu viele, um sie auf einmal zu verschieben.",
+      TOO_MANY_LINKED_ITEMS:
+        "Mit diesem Eintrag sind über 1.000 Objekte verknüpft, zu viele, um ihre Objektart auf einmal zu ändern.",
+      ID_REQUIRED: "Gib eine ID ein.",
+      INVALID_ID:
+        "Verwende bis zu 64 Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
+      DUPLICATE_ID: "Ein anderer Knoten hat diese ID schon.",
+      COUNTRY_REQUIRED: "Wähle das Land, oder mach es zu einem Thema.",
+      CATALOG_NODE_NOT_FOUND: "Dieser Knoten ist nicht mehr im Katalog.",
+      NOT_ADMIN: "Nur Admins können den Katalog bearbeiten.",
+      failed: "Konnte nicht gespeichert werden. Versuche es noch einmal.",
+    },
+  },
+  adminUsers: {
+    menu: "Nutzer",
+    title: "Nutzer",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription: "Nur Admins können Nutzer nachschlagen.",
+    search: "Nutzer suchen",
+    searchPlaceholder: "Nach Name oder E-Mail suchen",
+    clearSearch: "Suche leeren",
+    plan: "Tarif",
+    plans: { all: "Alle", premium: "Premium", free: "Gratis" },
+    planNames: { premium: "Premium", free: "Gratis-Tarif" },
+    columns: {
+      name: "Name",
+      email: "E-Mail",
+      created: "Erstellt",
+      plan: "Tarif",
+      planEnd: "Tarif endet",
+      items: "Objekte",
+      albums: "Alben",
+      lastSignIn: "Letzte Anmeldung",
+    },
+    admin: "Admin",
+    notSignedUp: "Registrierung nicht abgeschlossen",
+    noName: "Ohne Namen",
+    noMatches: "Keine passenden Nutzer",
+    noUsers: "Noch keine Nutzer",
+    clearFilters: "Filter entfernen",
+    showMore: "Mehr anzeigen",
+    moreMatches:
+      "Die {count} besten Treffer. Gib mehr vom Namen oder der E-Mail ein, um andere zu finden.",
+    notFoundTitle: "Nutzer nicht gefunden",
+    notFound:
+      "Unter diesem Link gibt es keinen Nutzer. Vielleicht wurde das Konto gelöscht.",
+    backToUsers: "Zurück zu den Nutzern",
+    profile: "Profil",
+    fullName: "Vollständiger Name",
+    phone: "Telefon",
+    address: "Adresse",
+    homeCurrency: "Heimatwährung",
+    account: "Konto",
+    role: "Rolle",
+    noRole: "Keine Rolle",
+    emailConfirmed: "E-Mail bestätigt",
+    notConfirmed: "Nicht bestätigt",
+    signedUp: "Registrierung abgeschlossen",
+    notFinished: "Nicht abgeschlossen",
+    planAndSubscription: "Tarif und Abo",
+    subscription: "Abo",
+    noSubscription: "Keins",
+    status: "Status",
+    statuses: {
+      active: "Aktiv",
+      trialing: "Testphase",
+      past_due: "Zahlung überfällig",
+      canceled: "Gekündigt",
+      unpaid: "Unbezahlt",
+      incomplete: "Erste Zahlung ausstehend",
+      incomplete_expired: "Erste Zahlung fehlgeschlagen",
+    },
+    started: "Begonnen",
+    ended: "Beendet",
+    collection: "Sammlung",
+  },
+  notFound: {
+    title: "Seite nicht gefunden",
+    description:
+      "Unter dieser Adresse gibt es nichts. Vielleicht wurde die Seite verschoben, oder der Link ist falsch.",
+    home: "Zur Übersicht",
   },
 } as const satisfies Dictionary;

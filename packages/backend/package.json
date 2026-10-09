@@ -6,6 +6,7 @@
     "dev": "convex dev --tail-logs",
     "setup": "convex dev --once && bun scripts/link-app-env.ts",
     "seed": "convex dev --once && convex run init",
+    "seed:catalog": "convex run catalog/seed:load",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit -p convex",
@@ -18,12 +19,12 @@
     "@auth/core": "0.37.0",
     "@coinslite/i18n": "workspace:*",
     "@convex-dev/auth": "^0.0.80",
-    "@convex-dev/polar": "npm:@erquhart/convex-polar@0.2.0-alpha.5",
     "@convex-dev/rate-limiter": "^0.4.1",
-    "@polar-sh/sdk": "^0.26.1",
+    "@pdf-lib/fontkit": "^1.1.1",
     "convex": "^1.46.0",
     "convex-helpers": "^0.1.63",
     "oslo": "^1.1.2",
+    "pdf-lib": "^1.17.1",
     "standardwebhooks": "^1.0.0"
   },
   "devDependencies": {
@@ -31,6 +32,7 @@
     "convex-test": "^0.0.60",
     "jose": "^5.10.0",
     "typescript": "^5.5.4",
+    "unpdf": "^1.8.1",
     "vitest": "^3.2.4"
   }
 }

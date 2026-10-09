@@ -15,6 +15,8 @@ import { emailChangeMessages } from "./account/emailChangeMessages";
 import { checkContact } from "./account/rules";
 import { requireNormalizedEmail } from "./accounts/credentials";
 import { deleteUserAndSignInMethods } from "./accounts/linking";
+import { nameKey } from "./admin/userList";
+import { planOf } from "./plans";
 import { requireSetUpUser, requireUserId } from "./utils/auth";
 import { language } from "./utils/validators";
 
@@ -32,7 +34,7 @@ const LINK_LIFETIME_MS = 60 * 60 * 1000;
 const RECENT_SIGN_IN_MS = 15 * 60 * 1000;
 
 /** No more than five email-change requests an hour per person. */
-const rateLimiter = new RateLimiter(components.rateLimiter, {
+export const rateLimiter = new RateLimiter(components.rateLimiter, {
   emailChange: { kind: "token bucket", rate: 5, period: HOUR, capacity: 5 },
 });
 
@@ -60,8 +62,7 @@ export const get = query({
       contactPhone: user.contactPhone,
       language: user.language,
       homeCurrency: user.homeCurrency,
-      // Every account is on the Free plan until billing exists (MUS-709).
-      plan: "free" as const,
+      plan: await planOf(ctx, user._id),
       // An expired change is deleted when it expires (expireEmailChange).
       pendingEmail: pending?.newEmail,
     };
@@ -82,7 +83,11 @@ export const updateContact = mutation({
   returns: v.null(),
   handler: async (ctx, contact) => {
     const user = await requireSetUpUser(ctx);
-    await ctx.db.patch(user._id, checkContact(contact));
+    const checked = checkContact(contact);
+    await ctx.db.patch(user._id, {
+      ...checked,
+      nameKey: nameKey(checked.displayName),
+    });
     return null;
   },
 });

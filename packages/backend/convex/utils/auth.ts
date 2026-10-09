@@ -4,6 +4,7 @@ import type { ActionCtx, MutationCtx, QueryCtx } from "../_generated/server";
 
 export const NOT_SIGNED_IN = "NOT_SIGNED_IN";
 export const NOT_SET_UP = "NOT_SET_UP";
+export const NOT_ADMIN = "NOT_ADMIN";
 
 /** The signed-in user's id; anyone else is turned away. */
 export async function requireUserId(ctx: QueryCtx | MutationCtx | ActionCtx) {
@@ -28,4 +29,16 @@ export async function requireSetUpUser(ctx: QueryCtx | MutationCtx) {
     throw new ConvexError(NOT_SET_UP);
   }
   return { ...user, termsAcceptedAt, homeCurrency };
+}
+
+/**
+ * The signed-in user, if they hold the admin role. Everyone else is turned
+ * away, so every admin-only function starts with this.
+ */
+export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
+  const userId = await requireUserId(ctx);
+  const user = await ctx.db.get(userId);
+  if (!user) throw new ConvexError(NOT_SIGNED_IN);
+  if (user.role !== "admin") throw new ConvexError(NOT_ADMIN);
+  return user;
 }

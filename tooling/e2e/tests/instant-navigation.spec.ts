@@ -16,9 +16,12 @@ test("moving between sections shows the next screen at once", async ({
   page,
 }) => {
   await signUpAndVerify(page, newEmail());
+  // The sidebar's links: pages link to sections too, like the Overview's
+  // "View Collection" while its latest Items load.
+  const nav = page.getByRole("navigation", { name: "Main" });
 
   await instant(page, async () => {
-    await page.getByRole("link", { name: "Collection" }).click();
+    await nav.getByRole("link", { name: "Collection", exact: true }).click();
     await page.waitForURL((url) => url.pathname === "/collection");
     await expect(
       page.getByRole("heading", { level: 1, name: "Collection" }),
@@ -26,7 +29,7 @@ test("moving between sections shows the next screen at once", async ({
   });
 
   await instant(page, async () => {
-    await page.getByRole("link", { name: "Account" }).click();
+    await nav.getByRole("link", { name: "Account", exact: true }).click();
     await page.waitForURL((url) => url.pathname === "/settings");
     await expect(
       page.getByRole("heading", { level: 1, name: "Account" }),
@@ -34,10 +37,26 @@ test("moving between sections shows the next screen at once", async ({
   });
 
   await instant(page, async () => {
-    await page.getByRole("link", { name: "Overview" }).click();
+    await nav.getByRole("link", { name: "Overview", exact: true }).click();
     await page.waitForURL((url) => url.pathname === "/");
     await expect(
       page.getByRole("heading", { level: 1, name: "Overview" }),
+    ).toBeVisible();
+  });
+
+  await instant(page, async () => {
+    await nav.getByRole("link", { name: "Albums", exact: true }).click();
+    await page.waitForURL((url) => url.pathname === "/albums");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Albums" }),
+    ).toBeVisible();
+  });
+
+  await instant(page, async () => {
+    await nav.getByRole("link", { name: "Catalog", exact: true }).click();
+    await page.waitForURL((url) => url.pathname === "/catalog");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Catalog" }),
     ).toBeVisible();
   });
 });

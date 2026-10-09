@@ -1,10 +1,23 @@
 "use client";
 
+import { seriesColorVariables } from "@/components/collection-totals/chart-card";
+import { TotalsFigures } from "@/components/collection-totals/collection-totals";
+import { ValueByDateAddedChart } from "@/components/collection-totals/value-by-date-added-chart";
+import { ValueDistributionChart } from "@/components/collection-totals/value-distribution-chart";
 import { AppShell } from "@/components/shell/app-shell";
+import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useFormatters } from "@/locales/use-formatters";
+import { collectionTotals } from "@coinslite/backend/convex/items/totals";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { Card } from "@coinslite/ui/card";
+import {
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@coinslite/ui/command";
 import {
   Dialog,
   DialogClose,
@@ -25,11 +38,14 @@ import {
 } from "@coinslite/ui/dropdown-menu";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { CheckboxField, Field } from "@coinslite/ui/field";
+import { FilterChip } from "@coinslite/ui/filter-chip";
 import { HeaderBar } from "@coinslite/ui/header-bar";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Input } from "@coinslite/ui/input";
 import { type ItemType, ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Label } from "@coinslite/ui/label";
+import { PhotoViewer } from "@coinslite/ui/photo-viewer";
 import { Progress } from "@coinslite/ui/progress";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
@@ -43,11 +59,11 @@ import {
   TableRow,
 } from "@coinslite/ui/table";
 import { toast } from "@coinslite/ui/toaster";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import {
   Award,
   Banknote,
+  Check,
   ChevronRight,
   Coins,
   Copy,
@@ -56,6 +72,8 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
+  SlidersHorizontal,
+  Sparkles,
   Stamp,
   Trash2,
   Wallet,
@@ -141,6 +159,31 @@ const currencyOptions = [
   { value: "EUR", label: "EUR", hint: "Euro" },
   { value: "RON", label: "RON", hint: "Romanian leu" },
 ];
+
+/** A sample Collection for the charts: Items added over a year and a half. */
+const sampleTotals = {
+  ...collectionTotals(
+    [
+      ["2025-02", "coin", 3, 15_000, 18_000],
+      ["2025-03", "banknote", 1, 40_000, 35_000],
+      ["2025-06", "coin", 1, 250_000, 310_000],
+      ["2025-09", "stamp", 12, 2_500, 4_000],
+      ["2026-01", "coin", 2, 90_000, 120_000],
+      ["2026-05", "banknote", 4, 12_000, 12_500],
+    ].map(([month, type, quantity, purchasePrice, marketValue]) => ({
+      _creationTime: Date.parse(`${month}-15T12:00:00Z`),
+      type: type as ItemType,
+      quantity: Number(quantity),
+      purchasePrice: Number(purchasePrice),
+      marketValue: Number(marketValue),
+    })),
+    { currency: "NOK", rates: null },
+  ),
+  metals: {
+    gold: { fineWeight: 62.2, value: 512_000 },
+    silver: { fineWeight: 311, value: 98_000 },
+  },
+};
 
 const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
@@ -334,10 +377,57 @@ function ItemMenu() {
   );
 }
 
+const coinPicture = (text: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="78" fill="#c9a227" stroke="#8a6d12" stroke-width="6"/><text x="100" y="111" font-family="sans-serif" font-size="30" text-anchor="middle" fill="#5c4708">${text}</text></svg>`,
+  )}`;
+const samplePhotos = [
+  { src: coinPicture("1881"), caption: "Obverse" },
+  { src: coinPicture("ONE $"), caption: "Reverse" },
+];
+
+function ItemPhotosSample() {
+  const [index, setIndex] = useState<number | null>(null);
+  return (
+    <>
+      <div className="grid max-w-sm grid-cols-2 gap-3">
+        {samplePhotos.map((photo, at) => (
+          <div key={photo.caption} className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={() => setIndex(at)}
+              aria-label={`${photo.caption}, view full screen`}
+              className="aspect-square overflow-hidden rounded-lg border bg-muted"
+            >
+              <img
+                src={photo.src}
+                alt=""
+                className="size-full object-contain"
+              />
+            </button>
+            <span className="flex h-7 items-center text-xs text-muted-foreground">
+              {photo.caption}
+            </span>
+          </div>
+        ))}
+      </div>
+      <PhotoViewer
+        index={index}
+        onIndexChange={setIndex}
+        photos={samplePhotos}
+        closeLabel="Close"
+        previousLabel="Previous photo"
+        nextLabel="Next photo"
+      />
+    </>
+  );
+}
+
 export function DesignGallery() {
   const { money } = useFormatters();
   const [itemType, setItemType] = useState<ItemType>("coin");
   const [album, setAlbum] = useState<string | undefined>("travel");
+  const [newAlbums, setNewAlbums] = useState<string[]>([]);
   const [grade, setGrade] = useState<string>();
   const [currency, setCurrency] = useState("NOK");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -370,19 +460,10 @@ export function DesignGallery() {
           title="Design system"
           actions={
             <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon-xs" aria-label="Filter">
-                    <ListFilter strokeWidth={1.75} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="flex items-center gap-2">
-                  Filter{" "}
-                  <Kbd className="border-background/20 bg-background/10 text-background">
-                    F
-                  </Kbd>
-                </TooltipContent>
-              </Tooltip>
+              {/* Icon-only buttons: label in the tooltip, with the shortcut. */}
+              <IconButton label="Filter" shortcut="F">
+                <ListFilter strokeWidth={1.75} />
+              </IconButton>
               <Button
                 size="xs"
                 onClick={() => toast.success("Item added to your Collection")}
@@ -484,8 +565,23 @@ export function DesignGallery() {
                   label="Album"
                   placeholder="Add to Album"
                   value={album}
-                  options={albumOptions}
+                  options={[
+                    ...albumOptions,
+                    ...newAlbums.map((name) => ({
+                      value: name,
+                      label: name,
+                      icon: albumDot("#64748b"),
+                      count: 0,
+                    })),
+                  ]}
                   onChange={setAlbum}
+                  onClear={() => setAlbum(undefined)}
+                  clearLabel="No Album"
+                  createLabel={(name) => `Create Album “${name}”`}
+                  onCreate={(name) => {
+                    setNewAlbums((names) => [...names, name]);
+                    setAlbum(name);
+                  }}
                   noResults="No matches"
                 />
               </PropertyRow>
@@ -689,8 +785,118 @@ export function DesignGallery() {
               action={<Button>Add Item</Button>}
             />
           </Section>
+
+          <Section title="Item photos and viewer">
+            <ItemPhotosSample />
+          </Section>
+
+          <Section title="Filters">
+            <FiltersSample />
+          </Section>
+
+          <Section title="Unseen marker">
+            <div className="flex w-[220px] flex-col rounded-lg border bg-popover p-1">
+              <div className="flex h-7 items-center gap-2 rounded-md px-2 text-[13px]">
+                <Sparkles
+                  className="size-4 text-muted-foreground"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+                Updates
+                <UnseenMarker className="ml-auto" />
+                <span className="sr-only">New release</span>
+              </div>
+            </div>
+          </Section>
+
+          <Section title="Collection charts">
+            <TotalsFigures totals={sampleTotals} />
+            <div
+              className={cn("grid gap-4 lg:grid-cols-2", seriesColorVariables)}
+            >
+              <ValueByDateAddedChart totals={sampleTotals} />
+              <ValueDistributionChart totals={sampleTotals} />
+            </div>
+          </Section>
         </div>
       </div>
     </AppShell>
+  );
+}
+
+/** A list toolbar with a filter on, as the Collection shows it. */
+function FiltersSample() {
+  const [open, setOpen] = useState(false);
+  const [grade, setGrade] = useState("XF");
+  const grades = [
+    { value: "UNC", count: 4 },
+    { value: "XF", count: 12 },
+    { value: "VF", count: 7 },
+  ];
+  return (
+    <div className="rounded-lg border bg-card">
+      <div className="flex h-10 items-center justify-between gap-2 border-b px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-1">
+          <Button variant="ghost" size="xs">
+            <ListFilter strokeWidth={1.75} aria-hidden="true" />
+            Filter
+            <span className="rounded-md bg-accent px-1 text-xs text-accent-foreground">
+              1
+            </span>
+          </Button>
+          <Input
+            aria-label="Search the Collection"
+            placeholder="Search title, denomination, country"
+            className="h-7 w-[220px] text-[13px]"
+          />
+        </div>
+        <Button variant="ghost" size="xs">
+          <SlidersHorizontal strokeWidth={1.75} aria-hidden="true" />
+          Display
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5 px-4 py-2">
+        <FilterChip
+          icon={Award}
+          label="Grade"
+          value={grade}
+          removeLabel="Remove filter: Grade"
+          onRemove={() => toast("Filter removed")}
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <Command>
+            <CommandInput placeholder="Grade" />
+            <CommandList>
+              <CommandGroup>
+                {grades.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={() => {
+                      setGrade(option.value);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className="flex size-4 items-center justify-center">
+                      {option.value === grade && (
+                        <Check className="text-primary" aria-hidden="true" />
+                      )}
+                    </span>
+                    {option.value}
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {option.count}
+                    </span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </FilterChip>
+        <Button variant="ghost" size="xs">
+          Clear
+        </Button>
+      </div>
+    </div>
   );
 }

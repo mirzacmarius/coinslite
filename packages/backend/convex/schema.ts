@@ -1,17 +1,36 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { statsFigures, statsTable } from "./admin/statsFigures";
 import {
+  albumColour,
+  catalogItemType,
+  catalogKind,
+  featureFlag,
   gradingScale,
   homeCurrency,
   itemType,
   language,
   material,
+  metal,
+  perDollar,
+  preciousMetal,
+  provenance,
   strike,
 } from "./utils/validators";
 
 export default defineSchema({
   ...authTables,
+  /**
+   * Convex Auth's, plus an index so deleting an account (account/deletion.ts)
+   * finds the Google sign-ins its sessions started.
+   */
+  authVerifiers: defineTable({
+    sessionId: v.optional(v.id("authSessions")),
+    signature: v.optional(v.string()),
+  })
+    .index("signature", ["signature"])
+    .index("by_sessionId", ["sessionId"]),
   users: defineTable({
     // Convex Auth fields
     name: v.optional(v.string()),
@@ -37,10 +56,48 @@ export default defineSchema({
     // Not `phone`: Convex Auth keeps that one for phone sign-in.
     contactPhone: v.optional(v.string()),
 
+    /** Admins maintain the Catalog; everyone else has no role. Granted with admin/roles:grant. */
+    role: v.optional(v.literal("admin")),
+
+    // Updates (updates/releases.ts): the version of the newest release they've
+    // seen in the list (new accounts start at the current one), and of the
+    // newest whose highlights they've been shown.
+    lastSeenRelease: v.optional(v.string()),
+    lastShownHighlights: v.optional(v.string()),
+
+    // The admin user list (admin/users.ts) sorts and filters by these. The
+    // plan fields are copies: read someone's plan with planOf (plans.ts).
+    /** The display name as the list sorts it (`nameKey` in admin/userList.ts). */
+    nameKey: v.optional(v.string()),
+    /** Set while they're on Premium, unset on the Free plan. Kept by billing.ts. */
+    plan: v.optional(v.literal("premium")),
+    /** When their Premium's current paid period ends, if it has an end. Kept by billing.ts. */
+    planEnd: v.optional(v.number()),
+    /** When they last signed in, on any device (auth.ts). */
+    lastSignInAt: v.optional(v.number()),
+
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
-  }).index("email", ["email"]),
+  })
+    .index("email", ["email"])
+    // The admin user list's orders, across everyone and within one plan.
+    .index("by_nameKey", ["nameKey"])
+    .index("by_plan_and_nameKey", ["plan", "nameKey"])
+    .index("by_plan_and_email", ["plan", "email"])
+    .index("by_plan", ["plan"])
+    .index("by_planEnd", ["planEnd"])
+    .index("by_plan_and_planEnd", ["plan", "planEnd"])
+    .index("by_lastSignInAt", ["lastSignInAt"])
+    .index("by_plan_and_lastSignInAt", ["plan", "lastSignInAt"])
+    .searchIndex("search_displayName", {
+      searchField: "displayName",
+      filterFields: ["plan"],
+    })
+    .searchIndex("search_email", {
+      searchField: "email",
+      filterFields: ["plan"],
+    }),
 
   /** A requested email change, waiting for its link to be opened at the new address. */
   emailChanges: defineTable({
@@ -75,6 +132,14 @@ export default defineSchema({
     diameter: v.optional(v.number()),
     thickness: v.optional(v.number()),
     numistaNumber: v.optional(v.number()),
+    // Precious metal, a coin's only (items/preciousMetal.ts): weight and
+    // purity need a metal, and give the Item its Metal value.
+    bullion: v.optional(v.boolean()),
+    metal: v.optional(metal),
+    /** Grams. */
+    weight: v.optional(v.number()),
+    /** The share of the weight that is the metal, above 0 and at most 1. */
+    purity: v.optional(v.number()),
     // A Grade is a code on its scale (items/grades.ts); both or neither are set.
     grade: v.optional(v.string()),
     gradingScale: v.optional(gradingScale),
@@ -86,7 +151,275 @@ export default defineSchema({
     purchaseDate: v.optional(v.string()),
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
+
+    // Photos, one file per side, private to the owner (photos.ts). The
+    // indexes keep each stored file on at most one Item side.
+    frontPhoto: v.optional(v.id("_storage")),
+    backPhoto: v.optional(v.id("_storage")),
+
+    // Album: at most one. Moving an Item in or out keeps the Album's itemCount
+    // right (albums/membership.ts).
+    albumId: v.optional(v.id("albums")),
+
+    // The Catalog entry the Item was created from (ADR 0001), if any. The
+    // Catalog shows how many of each entry a person holds from this link.
+    catalogEntryId: v.optional(v.id("catalogNodes")),
+  })
+    .index("by_ownerId", ["ownerId"])
+    .index("by_frontPhoto", ["frontPhoto"])
+    .index("by_backPhoto", ["backPhoto"])
+    .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
+    // Everyone's Items linked to one Catalog entry, for the admins' Catalog
+    // editor: a new Item type reaches them, and deleting the entry leaves them
+    // its facts (catalog/linkedItems.ts).
+    .index("by_catalogEntryId", ["catalogEntryId"]),
+
+  /**
+   * A named group of Items within a Collection. `itemCount` is kept by every
+   * write that moves an Item in or out, so lists never count Items one by one.
+   */
+  albums: defineTable({
+    ownerId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    colour: albumColour,
+    itemCount: v.number(),
   }).index("by_ownerId", ["ownerId"]),
+
+  /**
+   * The Catalog: a tree of country and Theme roots, grouping nodes and, as
+   * leaves, Catalog entries (kind "entry"), the only nodes Items can be created
+   * from ("addable"). CoinsLite's own data (ADR 0003):
+   * each group of facts records where it comes from. catalog/tree.ts keeps
+   * `path` and `searchText` in step with the rest.
+   */
+  catalogNodes: defineTable({
+    /** The node's id in Catalog CSV files, stable across deployments: "us-morgan-dollar-1881-s". */
+    key: v.string(),
+    /** Absent on roots. */
+    parentId: v.optional(v.id("catalogNodes")),
+    /** The keys from the root down to this node, joined by "/": every node below starts with `${path}/`. */
+    path: v.string(),
+    kind: catalogKind,
+    title: v.string(),
+    /** Order among siblings, ascending. */
+    sortOrder: v.number(),
+    itemType: v.optional(catalogItemType),
+    /** ISO 3166-1 alpha-2. */
+    country: v.optional(v.string()),
+
+    // Facts, from the source in factsProvenance
+    denomination: v.optional(v.string()),
+    series: v.optional(v.string()),
+    material: v.optional(material),
+    strike: v.optional(strike),
+    metal: v.optional(preciousMetal),
+    /** Grams. */
+    weight: v.optional(v.number()),
+    /** Share of the weight that is `metal`, from 0 to 1 (0.9 for 900/1000). */
+    fineness: v.optional(v.number()),
+    /** Millimetres. */
+    diameter: v.optional(v.number()),
+    yearFrom: v.optional(v.number()),
+    yearTo: v.optional(v.number()),
+    factsProvenance: v.optional(provenance),
+
+    // Notes, from the source in notesProvenance
+    technicalDetails: v.optional(v.string()),
+    historicalNotes: v.optional(v.string()),
+    notesProvenance: v.optional(provenance),
+
+    // The image: one an admin uploaded (catalog/images.ts), else one linked
+    // from a Catalog CSV file, credited in imageProvenance.
+    imageUrl: v.optional(v.string()),
+    imageProvenance: v.optional(provenance),
+    /** An uploaded image as WebP files: full size and a thumbnail. */
+    imageFiles: v.optional(
+      v.object({ full: v.id("_storage"), thumbnail: v.id("_storage") }),
+    ),
+
+    /** A cross-reference only: no Numista data is ever stored (ADR 0003). */
+    numistaId: v.optional(v.number()),
+
+    /** Title, denomination, series and country, for the search index. */
+    searchText: v.string(),
+
+    // For browsing (catalog/browse.ts), kept by catalog/tree.ts:
+    /** Roots and groupings: how many Catalog entries sit anywhere below. */
+    entryCount: v.optional(v.number()),
+    /**
+     * The key of the country the node is browsed under: its country root, or
+     * below a Theme, the Theme's child. Absent on Theme roots.
+     */
+    countryNodeKey: v.optional(v.string()),
+  })
+    .index("by_key", ["key"])
+    .index("by_parentId_and_sortOrder", ["parentId", "sortOrder"])
+    .index("by_path", ["path"])
+    .index("by_kind_and_path", ["kind", "path"])
+    .index("by_parentId_and_kind_and_yearFrom_and_sortOrder", [
+      "parentId",
+      "kind",
+      "yearFrom",
+      "sortOrder",
+    ])
+    .index("by_kind_countryNodeKey_denomination_series_yearFrom_sortOrder", [
+      "kind",
+      "countryNodeKey",
+      "denomination",
+      "series",
+      "yearFrom",
+      "sortOrder",
+    ])
+    // So each stored file is on at most one entry (utils/files.ts).
+    .index("by_imageFiles_full", ["imageFiles.full"])
+    .index("by_imageFiles_thumbnail", ["imageFiles.thumbnail"])
+    .searchIndex("search_searchText", {
+      searchField: "searchText",
+      filterFields: ["kind", "itemType", "country"],
+    }),
+
+  /**
+   * The latest Spot prices and exchange rates (spotPrices.ts): one document,
+   * replaced by each successful refresh and kept when a refresh fails.
+   */
+  spotPriceSnapshots: defineTable({
+    /** When the provider quoted the prices. */
+    quotedAt: v.number(),
+    /** When CoinsLite stored them. */
+    fetchedAt: v.number(),
+    /** The latest refresh attempt, whether or not it succeeded. */
+    checkedAt: v.number(),
+    perDollar,
+  }),
+
+  /**
+   * Premium subscriptions as Polar last reported them, one per Polar
+   * subscription (billing.ts). Amounts are minor units of `currency`; times are
+   * ms. `premium` is the Premium status rule (billing/rules.ts) applied at the
+   * last change, switched off by a scheduled check when the paid period runs
+   * out, so asking "is this person Premium?" needs no clock.
+   */
+  subscriptions: defineTable({
+    userId: v.id("users"),
+    polarId: v.string(),
+    polarCustomerId: v.string(),
+    productId: v.string(),
+    /** Polar's status: active, trialing, past_due, canceled, unpaid, incomplete… */
+    status: v.string(),
+    /** Polar's billing interval: "month" or "year" for Premium. */
+    interval: v.string(),
+    /** Upper-case ISO code, e.g. "NOK". */
+    currency: v.string(),
+    amount: v.number(),
+    currentPeriodEnd: v.optional(v.number()),
+    cancelAtPeriodEnd: v.boolean(),
+    endedAt: v.optional(v.number()),
+    /** When Polar last changed it; older events are ignored. */
+    modifiedAt: v.number(),
+    premium: v.boolean(),
+    /** When Premium runs out unless Polar reports a renewal; unset if open-ended or not Premium. */
+    premiumUntil: v.optional(v.number()),
+    /** The scheduled check that ends Premium at `premiumUntil`. */
+    premiumCheck: v.optional(v.id("_scheduled_functions")),
+  })
+    .index("by_polarId", ["polarId"])
+    .index("by_userId_and_premium", ["userId", "premium"]),
+
+  /**
+   * Feature flags admins switch in the app (featureFlags.ts): one document per
+   * flag that has been set; a flag without one holds its default.
+   */
+  featureFlags: defineTable(featureFlag).index("by_key", ["key"]),
+
+  /**
+   * How many Items (in all and of each Item type) and Albums each person has:
+   * one document per person, kept by every write that adds, removes or
+   * retypes their Items or Albums (collectionCounts.ts), so figures across
+   * everyone never count Items one by one. The `items` and `albums` indexes
+   * list people by how much they hold, in the admin user list.
+   */
+  collectionCounts: defineTable({
+    userId: v.id("users"),
+    items: v.number(),
+    coins: v.number(),
+    banknotes: v.number(),
+    stamps: v.number(),
+    albums: v.number(),
+    /** A copy of the person's plan, for listing one plan's people by how much they hold. Kept by billing.ts. */
+    plan: v.optional(v.literal("premium")),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_items", ["items"])
+    .index("by_albums", ["albums"])
+    .index("by_plan_and_items", ["plan", "items"])
+    .index("by_plan_and_albums", ["plan", "albums"]),
+
+  /**
+   * Admin stats (admin/stats.ts): figures across everyone, counted in the
+   * background a batch per transaction. Admins see the newest finished count;
+   * one in progress has no `finishedAt` yet and carries where it has got to.
+   */
+  adminStats: defineTable({
+    /** When the count began; "the last 30 days" and the like count back from here. */
+    startedAt: v.number(),
+    finishedAt: v.optional(v.number()),
+    /** The table being counted and the cursor into it; unset once finished. */
+    progress: v.optional(
+      v.object({
+        table: statsTable,
+        cursor: v.union(v.string(), v.null()),
+      }),
+    ),
+    figures: statsFigures,
+  }).index("by_finishedAt", ["finishedAt"]),
+
+  /**
+   * When photo links are issued as of, and the secret they're signed with on
+   * a deployment without PHOTO_LINK_SECRET (photos/links.ts): one document.
+   */
+  photoLinkKeys: defineTable({
+    issuedAt: v.number(),
+    fallbackSecret: v.string(),
+  }),
+
+  /**
+   * Uploads someone registered but hasn't made a photo or a Catalog image yet
+   * (utils/files.ts): only they can put one to that use. The hourly clean-up
+   * deletes those older than an hour (uploads.ts); deleting the account
+   * deletes theirs.
+   */
+  uploads: defineTable({
+    storageId: v.id("_storage"),
+    ownerId: v.id("users"),
+    purpose: v.union(v.literal("photo"), v.literal("catalogImage")),
+  })
+    .index("by_storageId", ["storageId"])
+    .index("by_ownerId", ["ownerId"]),
+
+  /**
+   * A Polar checkout someone has open (billing.ts): at most one per person, so
+   * asking again sends them back to it instead of opening a second one that
+   * could be paid as well. Without a `url` it is still being opened.
+   */
+  pendingCheckouts: defineTable({
+    userId: v.id("users"),
+    interval: v.union(v.literal("month"), v.literal("year")),
+    url: v.optional(v.string()),
+    expiresAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  /**
+   * Accounts being deleted, then deleted (account/deletion.ts). While
+   * `closedAt` is unset the deletion is under way and no checkout opens; after
+   * it, the record stays, naming no one but the old account id, so a Polar
+   * subscription reported for the deleted account later is ended at Polar.
+   */
+  accountClosures: defineTable({
+    userId: v.id("users"),
+    closedAt: v.optional(v.number()),
+  }).index("by_userId", ["userId"]),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

@@ -9,6 +9,7 @@
     "lint": "biome lint",
     "format": "biome format --write .",
     "start": "next start -p 3000",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -17,8 +18,6 @@
     "@coinslite/i18n": "workspace:*",
     "@coinslite/ui": "workspace:*",
     "@convex-dev/auth": "^0.0.80",
-    "@convex-dev/polar": "npm:@erquhart/convex-polar@0.2.0-alpha.5",
-    "@polar-sh/sdk": "^0.26.1",
     "@tanstack/react-form": "^0.33.0",
     "@tanstack/zod-form-adapter": "^0.33.0",
     "@xixixao/uploadstuff": "^0.0.5",
@@ -38,6 +37,7 @@
     "@types/node": "^22",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^3.2.4"
   }
 }

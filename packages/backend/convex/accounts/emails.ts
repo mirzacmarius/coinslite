@@ -67,7 +67,8 @@ const escapeHtml = (text: string) =>
 
 /**
  * Sends an email, with an optional link, through Resend; on deployments with
- * EMAIL_DELIVERY=outbox it lands in the dev outbox instead.
+ * EMAIL_DELIVERY=outbox it lands in the dev outbox instead. Replies go to
+ * `replyTo` when it's given.
  */
 export const send = internalAction({
   args: {
@@ -75,9 +76,10 @@ export const send = internalAction({
     subject: v.string(),
     body: v.string(),
     link: v.optional(v.object({ url: v.string(), label: v.string() })),
+    replyTo: v.optional(v.string()),
   },
   returns: v.null(),
-  handler: async (ctx, { to, subject, body, link }) => {
+  handler: async (ctx, { to, subject, body, link, replyTo }) => {
     const text = link ? `${body}\n\n${link.label}: ${link.url}` : body;
     if (env.EMAIL_DELIVERY === "outbox") {
       await ctx.runMutation(internal.accounts.emails.recordInOutbox, {
@@ -90,8 +92,8 @@ export const send = internalAction({
     const linkHtml = link
       ? `<p><a href="${escapeHtml(link.url)}">${escapeHtml(link.label)}</a></p>`
       : "";
-    const html = `<p>${escapeHtml(body)}</p>${linkHtml}`;
-    await sendEmail({ to, subject, text, html });
+    const html = `<p>${escapeHtml(body).replace(/\n/g, "<br>")}</p>${linkHtml}`;
+    await sendEmail({ to, subject, text, html, replyTo });
     return null;
   },
 });

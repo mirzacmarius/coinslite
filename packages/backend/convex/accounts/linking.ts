@@ -2,9 +2,13 @@ import { ConvexError } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import {
-  localPart,
+  deleteCollectionCountsOf,
+  startCollectionCounts,
+} from "../collectionCounts";
+import {
   normalizeEmail,
   requireNormalizedEmail,
+  startingName,
 } from "./credentials";
 
 /**
@@ -65,10 +69,12 @@ export async function createOrUpdateUser(
   const existing = email ? await userByEmail(ctx, email) : null;
 
   if (existing === null) {
-    return await ctx.db.insert(
+    const userId = await ctx.db.insert(
       "users",
       newUser(type, fields, email, emailVerified === true),
     );
+    await startCollectionCounts(ctx, userId);
+    return userId;
   }
   if (type === "credentials") {
     if (existing.emailVerificationTime !== undefined) {
@@ -98,7 +104,7 @@ function newUser(
     return { ...(fields as Partial<Doc<"users">>), ...proven };
   }
   return {
-    ...(email && { email, displayName: localPart(email) }),
+    ...(email && { email, ...startingName(email) }),
     ...(typeof fields.name === "string" && { name: fields.name }),
     ...(typeof fields.image === "string" && { image: fields.image }),
     ...proven,
@@ -133,7 +139,7 @@ async function claim(ctx: MutationCtx, userId: Id<"users">, provenBy: string) {
       termsAcceptedAt: undefined,
       homeCurrency: undefined,
       language: undefined,
-      ...(user.email && { displayName: localPart(user.email) }),
+      ...(user.email && startingName(user.email)),
     }),
   });
 }
@@ -159,21 +165,36 @@ async function deleteAccount(ctx: MutationCtx, account: Doc<"authAccounts">) {
     .withIndex("accountId", (q) => q.eq("accountId", account._id))
     .take(50);
   for (const code of codes) await ctx.db.delete(code._id);
+  // Failed password attempts are counted per sign-in method.
+  const failedAttempts = await ctx.db
+    .query("authRateLimits")
+    .withIndex("identifier", (q) => q.eq("identifier", account._id))
+    .unique();
+  if (failedAttempts) await ctx.db.delete(failedAttempts._id);
   await ctx.db.delete(account._id);
 }
 
-/** Removes a user with every sign-in method, pending code and email change, so the email is free again. */
-export async function deleteUserAndSignInMethods(
+/** Removes every way to sign in as a user, with the codes pending for each. */
+export async function deleteSignInMethods(
   ctx: MutationCtx,
   userId: Id<"users">,
 ) {
   for (const account of await accountsOf(ctx, userId))
     await deleteAccount(ctx, account);
+}
+
+/** Removes a user with every sign-in method, pending code and email change and their (empty) Collection counts, so the email is free again. */
+export async function deleteUserAndSignInMethods(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+) {
+  await deleteSignInMethods(ctx, userId);
   const changes = await ctx.db
     .query("emailChanges")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
     .take(20);
   for (const change of changes) await ctx.db.delete(change._id);
+  await deleteCollectionCountsOf(ctx, userId);
   await ctx.db.delete(userId);
 }
 

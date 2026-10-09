@@ -1,5 +1,10 @@
 import type { api } from "@coinslite/backend/convex/_generated/api";
-import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
+import {
+  type CatalogFactName,
+  type CatalogFacts,
+  catalogFactNames,
+} from "@coinslite/backend/convex/items/catalogFacts";
 import {
   type GradingScale,
   type Strike,
@@ -8,11 +13,13 @@ import {
   isGrade,
   scalesFor,
 } from "@coinslite/backend/convex/items/grades";
+import type { BullionPreset } from "@coinslite/backend/convex/items/preciousMetal";
 import {
   type Material,
   fieldSuits,
   type typeOnlyFields,
 } from "@coinslite/backend/convex/items/rules";
+import type { Metal } from "@coinslite/backend/convex/spotPrices/rates";
 import {
   type CountryCode,
   type Locale,
@@ -47,10 +54,16 @@ export type ItemFormValues = {
   materialNote: string;
   diameter: string;
   thickness: string;
+  bullion: boolean;
+  metal: Metal | undefined;
+  /** Grams. */
+  weight: string;
+  purity: string;
   purchasePrice: string;
   marketValue: string;
   purchaseDate: string;
   source: string;
+  albumId: Id<"albums"> | undefined;
 };
 
 export type ItemArgs = FunctionArgs<typeof api.items.add>;
@@ -77,10 +90,15 @@ export const blankItem = (): ItemFormValues => ({
   materialNote: "",
   diameter: "",
   thickness: "",
+  bullion: false,
+  metal: undefined,
+  weight: "",
+  purity: "",
   purchasePrice: "",
   marketValue: "",
   purchaseDate: "",
   source: "",
+  albumId: undefined,
 });
 
 /** The fields under "More details": the group opens when any of them holds a value. */
@@ -97,6 +115,10 @@ export const detailFields = [
   "materialNote",
   "diameter",
   "thickness",
+  "bullion",
+  "metal",
+  "weight",
+  "purity",
   "gradingScale",
   "gradeNote",
   "purchasePrice",
@@ -105,8 +127,27 @@ export const detailFields = [
   "source",
 ] as const satisfies ReadonlyArray<keyof ItemFormValues>;
 
-export const hasDetails = (values: ItemFormValues) =>
-  detailFields.some((name) => Boolean(values[name]));
+/** Whether a fact as typed says the same as the Catalog entry's. */
+const sameFact = (typed: unknown, fromEntry: unknown) => {
+  const text = (value: unknown) =>
+    typeof value === "string" ? value.trim() : value ?? "";
+  return text(typed) === text(fromEntry);
+};
+
+/** Whether "More details" holds anything; with a Catalog entry, anything besides the entry's own facts. */
+export const hasDetails = (
+  values: ItemFormValues,
+  fromEntry?: Partial<ItemFormValues>,
+) =>
+  detailFields.some(
+    (name) =>
+      Boolean(values[name]) &&
+      !(
+        fromEntry &&
+        name in fromEntry &&
+        sameFact(values[name], fromEntry[name])
+      ),
+  );
 
 /** The scale an Item's Grade is on: the one picked, if it suits the type, or the country's default. */
 export function scaleOf({
@@ -131,20 +172,54 @@ export function parseDecimal(text: string) {
   return /^\d+(\.\d+)?$/.test(value) ? Number(value) : null;
 }
 
+/** How the form writes numbers in the person's language. */
+function numberText(locale: Locale) {
+  return {
+    whole: (value?: number) =>
+      value === undefined ? "" : formatNumber(value, locale),
+    decimal: (value?: number, maximumFractionDigits = 2) =>
+      value === undefined
+        ? ""
+        : formatNumber(value, locale, {
+            useGrouping: false,
+            maximumFractionDigits,
+          }),
+  };
+}
+
+/** The form fields a Catalog entry can fill (items/catalogFacts.ts). */
+type FactValues = Pick<ItemFormValues, CatalogFactName>;
+
+/**
+ * Descriptive facts as form values: an Item's own, or a Catalog entry's.
+ * Both are written the same way, so the form can tell which ones the person
+ * changed.
+ */
+export function factValues(facts: CatalogFacts, locale: Locale): FactValues {
+  const { decimal } = numberText(locale);
+  return {
+    country:
+      facts.country && isCountryCode(facts.country) ? facts.country : undefined,
+    year: facts.year === undefined ? "" : String(facts.year),
+    denomination: facts.denomination ?? "",
+    series: facts.series ?? "",
+    material: facts.material,
+    strike: facts.strike,
+    diameter: decimal(facts.diameter),
+    numistaNumber:
+      facts.numistaNumber === undefined ? "" : String(facts.numistaNumber),
+    metal: facts.metal,
+    weight: decimal(facts.weight, 3),
+    purity: decimal(facts.purity, 5),
+  };
+}
+
 /** An existing Item as form values, written the way the person's language writes numbers. */
 export function valuesFromItem(
   item: Doc<"items">,
   locale: Locale,
 ): ItemFormValues {
-  const whole = (value?: number) =>
-    value === undefined ? "" : formatNumber(value, locale);
-  const decimal = (value?: number) =>
-    value === undefined
-      ? ""
-      : formatNumber(value, locale, {
-          useGrouping: false,
-          maximumFractionDigits: 2,
-        });
+  const { whole, decimal } = numberText(locale);
   const money = (minor?: number) =>
     minor === undefined
       ? ""
@@ -153,34 +228,44 @@ export function valuesFromItem(
           minimumFractionDigits: 2,
         });
   return {
+    ...factValues(item, locale),
     title: item.title,
     notes: item.notes ?? "",
     type: item.type,
-    country:
-      item.country && isCountryCode(item.country) ? item.country : undefined,
     grade: item.grade,
     gradingScale: item.gradingScale,
     gradeNote: item.gradeNote ?? "",
-    strike: item.strike,
     quantity: String(item.quantity),
-    year: item.year === undefined ? "" : String(item.year),
-    denomination: item.denomination ?? "",
-    series: item.series ?? "",
     category: item.category ?? "",
     ruler: item.ruler ?? "",
     mintMark: item.mintMark ?? "",
     mintage: whole(item.mintage),
-    numistaNumber:
-      item.numistaNumber === undefined ? "" : String(item.numistaNumber),
-    material: item.material,
     materialNote: item.materialNote ?? "",
-    diameter: decimal(item.diameter),
     thickness: decimal(item.thickness),
+    bullion: item.bullion ?? false,
     purchasePrice: money(item.purchasePrice),
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
     source: item.source ?? "",
+    albumId: item.albumId,
   };
+}
+
+/**
+ * What a form linked to a Catalog entry sends: only the facts the person
+ * changed. A fact left as the entry has it, or cleared, isn't sent, so the
+ * Item keeps following the entry (ADR 0001).
+ */
+export function changedFactsOnly(
+  args: ItemArgs,
+  values: ItemFormValues,
+  fromEntry: FactValues,
+): ItemArgs {
+  const changed = { ...args };
+  for (const name of catalogFactNames) {
+    if (sameFact(values[name], fromEntry[name])) changed[name] = undefined;
+  }
+  return changed;
 }
 
 /**
@@ -221,6 +306,11 @@ export function argsFromValues(
     materialNote: onlyFor("materialNote", values.materialNote),
     diameter: onlyFor("diameter", decimal(values.diameter)),
     thickness: onlyFor("thickness", decimal(values.thickness)),
+    // Weight and purity are the metal's: without one they aren't sent.
+    bullion: onlyFor("bullion", values.bullion || undefined),
+    metal: onlyFor("metal", values.metal),
+    weight: onlyFor("weight", values.metal && decimal(values.weight)),
+    purity: onlyFor("purity", values.metal && decimal(values.purity)),
     grade,
     gradingScale: grade ? scale : undefined,
     gradeNote: values.gradeNote,
@@ -229,5 +319,38 @@ export function argsFromValues(
     marketValue: money(values.marketValue),
     purchaseDate: values.purchaseDate || undefined,
     source: values.source,
+    albumId: values.albumId,
   };
+}
+
+/** A preset's figures as the form shows them, in the person's language. */
+export function presetValues(
+  { metal, weight, purity, country }: BullionPreset,
+  locale: Locale,
+) {
+  const decimal = (value: number) =>
+    formatNumber(value, locale, {
+      useGrouping: false,
+      maximumFractionDigits: 5,
+    });
+  return {
+    metal,
+    weight: decimal(weight),
+    purity: decimal(purity),
+    country,
+  } satisfies Partial<ItemFormValues>;
+}
+
+/** The bullion preset the form's precious metal and country match, if any. */
+export function matchingPreset<P extends BullionPreset>(
+  presets: readonly P[],
+  values: Pick<ItemFormValues, "metal" | "weight" | "purity" | "country">,
+) {
+  return presets.find(
+    (preset) =>
+      preset.metal === values.metal &&
+      preset.country === values.country &&
+      parseDecimal(values.weight) === preset.weight &&
+      parseDecimal(values.purity) === preset.purity,
+  );
 }

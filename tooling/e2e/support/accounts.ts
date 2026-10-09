@@ -6,7 +6,7 @@ export const password = "correct horse battery";
 export const newEmail = () =>
   `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
 
-function runInBackend(functionName: string, args: object) {
+export function runInBackend(functionName: string, args: object) {
   const output = execFileSync(
     "npx",
     ["convex", "run", functionName, JSON.stringify(args)],
@@ -16,7 +16,9 @@ function runInBackend(functionName: string, args: object) {
       encoding: "utf8",
     },
   );
-  return JSON.parse(output.trim()) as unknown;
+  // Functions that return nothing print nothing.
+  const result = output.trim();
+  return result ? (JSON.parse(result) as unknown) : undefined;
 }
 
 /**

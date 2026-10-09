@@ -180,6 +180,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Lists every entry below the node, grouped by sub-group and sorted by year.
   - Shows completion (held / total and %).
   - Can show everything or only what's missing. Missing-only is the default for large Sets (> 40 entries).
+  - A Set lists at most 1,000 entries. A grouping with more is shown as too large to view as one Set, and is viewed through the Sets below it. (No grouping in the Catalog comes close: the largest, the 2-euro commemoratives Theme, has about 600.)
 - **Adding from a Set** follows the multi-select rules in §6.2.
 
 ## 7. Collection

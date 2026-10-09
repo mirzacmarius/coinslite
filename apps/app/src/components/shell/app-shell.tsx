@@ -1,8 +1,12 @@
 "use client";
 
+import { UnseenMarker } from "@/components/updates/unseen-marker";
+import { useUpdatesStatus } from "@/components/updates/use-updates-status";
 import { useI18n } from "@/locales/client";
+import { api } from "@coinslite/backend/convex/_generated/api";
 import { SkipLink } from "@coinslite/ui/skip-link";
 import { cn } from "@coinslite/ui/utils";
+import { useQuery } from "convex/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
@@ -18,14 +22,27 @@ function NavLinks({
 }) {
   const t = useI18n();
   const pathname = usePathname();
+  const unseen = useUpdatesStatus()?.unseen === true;
   return (
     <ul
-      className={
-        layout === "sidebar" ? "flex flex-col gap-0.5" : "grid grid-cols-4"
+      className={layout === "sidebar" ? "flex flex-col gap-0.5" : "grid"}
+      style={
+        layout === "tabs"
+          ? { gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }
+          : undefined
       }
     >
       {items.map(({ key, href, icon: Icon }) => {
         const current = isCurrent(pathname, href);
+        // On phones the Account tab is where Updates are reached from.
+        const marked = layout === "tabs" && key === "account" && unseen;
+        const icon = (
+          <Icon
+            className={layout === "sidebar" ? "size-4" : "size-5"}
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+        );
         return (
           <li key={key}>
             <Link
@@ -45,12 +62,16 @@ function NavLinks({
                     )
               }
             >
-              <Icon
-                className={layout === "sidebar" ? "size-4" : "size-5"}
-                strokeWidth={1.75}
-                aria-hidden="true"
-              />
+              {marked ? (
+                <span className="relative flex">
+                  {icon}
+                  <UnseenMarker className="absolute -right-0.5 -top-0.5 size-2 ring-2 ring-card" />
+                </span>
+              ) : (
+                icon
+              )}
               {t(`nav.${key}`)}
+              {marked && <span className="sr-only">{t("updates.unseen")}</span>}
             </Link>
           </li>
         );
@@ -60,9 +81,22 @@ function NavLinks({
 }
 
 /**
+ * The navigation this person gets: everything, except the Catalog while an
+ * admin has hidden it from them (feature flags). While that's loading the
+ * Catalog shows, as it does by default.
+ */
+function useNavItems() {
+  const catalogVisible = useQuery(api.featureFlags.isCatalogVisible);
+  return catalogVisible === false
+    ? navItems.filter(({ key }) => key !== "catalog")
+    : navItems;
+}
+
+/**
  * The frame around every signed-in screen: a sidebar on tablets and desktops,
- * and on phones a compact top bar plus four tabs. Each page starts with its own
- * HeaderBar, which holds the title and actions such as Add.
+ * and on phones a compact top bar plus four tabs (three while the Catalog is
+ * hidden). Each page starts with its own HeaderBar, which holds the title and
+ * actions such as Add.
  */
 export function AppShell({
   children,
@@ -76,6 +110,7 @@ export function AppShell({
   sidebarFooter?: React.ReactNode;
 }) {
   const t = useI18n();
+  const items = useNavItems();
 
   return (
     <div className="min-h-dvh bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:grid md:grid-cols-[232px_1fr]">
@@ -83,12 +118,12 @@ export function AppShell({
 
       <div className="sticky top-0 hidden h-dvh flex-col justify-between gap-2 border-r bg-sidebar p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
         <div className="flex flex-col gap-3">
-          <WorkspaceMenu className="h-8 w-full" />
+          <WorkspaceMenu className="h-8 w-full" markUnseen />
           {quickActions && (
             <div className="flex flex-col gap-1">{quickActions}</div>
           )}
           <nav aria-label={t("shell.primaryNavigation")}>
-            <NavLinks items={navItems} layout="sidebar" />
+            <NavLinks items={items} layout="sidebar" />
           </nav>
         </div>
         {sidebarFooter}
@@ -112,7 +147,7 @@ export function AppShell({
         className="fixed inset-x-0 bottom-0 z-40 border-t bg-card pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         <NavLinks
-          items={navItems.filter(({ onPhoneTabs }) => onPhoneTabs)}
+          items={items.filter(({ onPhoneTabs }) => onPhoneTabs)}
           layout="tabs"
         />
       </nav>

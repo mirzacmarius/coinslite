@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
+import { addManually, catalogPicker } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -15,6 +16,7 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   await expect(main.getByText("Your Collection is empty")).toBeVisible();
 
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   // A title is required.
   await dialog.getByRole("button", { name: /^Add Item/ }).click();
@@ -40,7 +42,8 @@ test("add a coin, see it in the Collection, and open it", async ({ page }) => {
   await expect(dialog).toBeHidden();
 
   const row = main.getByRole("link", { name: /Morgan dollar 1881-S/ });
-  await expect(row).toContainText("1881 · 1 dollar · United States · PF-65");
+  await expect(row).toContainText("1881 · 1 dollar · United States");
+  await expect(row).toContainText("PF-65");
   await expect(row).toContainText("×2");
   await row.click();
 
@@ -59,12 +62,19 @@ test("C opens the New Item dialog from anywhere in the app", async ({
 }) => {
   await signUpAndVerify(page, newEmail());
 
+  // A coin is picked from the Catalog first; Esc leads to typing it in.
+  const picker = catalogPicker(page);
   await expect(async () => {
     await page.keyboard.press("c");
-    await expect(page.getByRole("dialog", { name: "New Item" })).toBeVisible({
-      timeout: 1000,
-    });
+    await expect(picker).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await expect(
+    picker.getByPlaceholder(
+      "Search coins by title, denomination, series or country…",
+    ),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(picker).toBeHidden();
   await expect(page.getByLabel("Title")).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "New Item" })).toBeHidden();
@@ -90,6 +100,7 @@ test("edit an Item, then duplicate it", async ({ page }) => {
   await page.goto(`${appUrl}/collection`);
   const main = visiblePage(page);
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("2 kroner 1910");
   await dialog.getByRole("button", { name: /^Add Item/ }).click();
@@ -118,4 +129,63 @@ test("edit an Item, then duplicate it", async ({ page }) => {
   await expect(
     visiblePage(page).getByRole("link", { name: /2 kroner 1910/ }),
   ).toHaveCount(2);
+});
+
+/** A real 1×1 PNG. */
+const pixel = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+test("add a photo, view it full screen, then delete the Item", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
+  const dialog = page.getByRole("dialog", { name: "New Item" });
+  await dialog.getByLabel("Title").fill("1 krone 1875");
+  await dialog.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(dialog).toBeHidden();
+  await main.getByRole("link", { name: /1 krone 1875/ }).click();
+
+  const detail = visiblePage(page);
+  const photos = detail.getByRole("region", { name: "Photos" });
+  const addObverse = photos.getByRole("button", { name: "Obverse Add photo" });
+  const choose = async (name: string, buffer: Buffer) => {
+    const chooser = page.waitForEvent("filechooser");
+    await addObverse.click();
+    await (await chooser).setFiles({ name, mimeType: "image/png", buffer });
+  };
+  // Judged by content, not by name.
+  await choose("notes.png", Buffer.from("just some text"));
+  await expect(
+    page.getByText("That file isn't a JPEG, PNG, WebP or GIF image."),
+  ).toBeVisible();
+  await choose("obverse.png", pixel);
+  const obverse = photos.getByRole("button", {
+    name: "Obverse View full screen",
+  });
+  await expect(obverse).toBeVisible();
+
+  await obverse.click();
+  const viewer = page.getByRole("dialog", { name: "Obverse" });
+  await expect(viewer.getByRole("img", { name: "Obverse" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(viewer).toBeHidden();
+
+  await detail.getByRole("button", { name: "Delete", exact: true }).click();
+  const confirm = page.getByRole("alertdialog", {
+    name: "Delete “1 krone 1875”?",
+  });
+  await expect(
+    confirm.getByText("The Item and its photo are deleted for good."),
+  ).toBeVisible();
+  await confirm.getByRole("button", { name: "Delete Item" }).click();
+  await expect(page).toHaveURL(/\/collection$/);
+  await expect(
+    visiblePage(page).getByText("Your Collection is empty"),
+  ).toBeVisible();
 });
