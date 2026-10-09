@@ -704,4 +704,17 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
     },
   },
+  catalogSearch: {
+    open: "Suchen",
+    title: "Im Katalog suchen",
+    placeholder: "Nach Titel, Nennwert, Serie oder Land suchen…",
+    minLength: "Gib mindestens 2 Zeichen ein, um zu suchen.",
+    noResults: "Nichts im Katalog passt zu „{text}“.",
+    capped:
+      "Die ersten {count} werden angezeigt. Füge ein Wort hinzu, um die Suche einzugrenzen.",
+    themes: "Themen",
+    moveHint: "zum Bewegen",
+    openHint: "zum Öffnen",
+    closeHint: "zum Schließen",
+  },
 } as const satisfies Dictionary;

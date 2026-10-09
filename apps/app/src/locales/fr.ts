@@ -691,4 +691,17 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
     },
   },
+  catalogSearch: {
+    open: "Rechercher",
+    title: "Rechercher dans le catalogue",
+    placeholder: "Rechercher par titre, valeur faciale, série ou pays…",
+    minLength: "Saisissez au moins 2 caractères pour rechercher.",
+    noResults: "Rien dans le catalogue ne correspond à « {text} ».",
+    capped:
+      "Affichage des {count} premiers. Ajoutez un mot pour affiner la recherche.",
+    themes: "Thèmes",
+    moveHint: "pour se déplacer",
+    openHint: "pour ouvrir",
+    closeHint: "pour fermer",
+  },
 } as const satisfies Dictionary;

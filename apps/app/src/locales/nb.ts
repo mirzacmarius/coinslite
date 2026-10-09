@@ -679,4 +679,16 @@ export default {
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
     },
   },
+  catalogSearch: {
+    open: "Søk",
+    title: "Søk i katalogen",
+    placeholder: "Søk etter tittel, pålydende, serie eller land…",
+    minLength: "Skriv minst 2 tegn for å søke.",
+    noResults: "Ingenting i katalogen passer til «{text}».",
+    capped: "Viser de første {count}. Legg til et ord for å snevre inn søket.",
+    themes: "Temaer",
+    moveHint: "for å flytte",
+    openHint: "for å åpne",
+    closeHint: "for å lukke",
+  },
 } as const satisfies Dictionary;
