@@ -18,6 +18,7 @@ import {
   statsFigures,
   statsTables,
 } from "./statsFigures";
+import { updateListedFields } from "./users";
 
 /**
  * Admin stats (spec §15): how CoinsLite is doing, across everyone.
@@ -29,7 +30,9 @@ import {
  *
  * - users, each with their plan and their Collection's counts (kept per
  *   person as Items and Albums come and go: collectionCounts.ts), so the
- *   Collection totals cost one small read per person, not one per Item;
+ *   Collection totals cost one small read per person, not one per Item.
+ *   Passing by, it brings what the admin user list sorts everyone by up to
+ *   date (admin/users.ts), for accounts from before it was kept;
  * - subscriptions;
  * - the Items and Albums added within the activity windows, through the
  *   creation-time index, so only recent ones are read.
@@ -230,6 +233,7 @@ const countUsers: CountBatch = async (ctx, { figures, startedAt, cursor }) => {
     .query("users")
     .paginate({ cursor, numItems: batchSize.users });
   for (const user of page.page) {
+    await updateListedFields(ctx, user);
     if (!isUser(user)) continue;
     figures.users.total++;
     if (user._creationTime >= startedAt - 30 * DAY)

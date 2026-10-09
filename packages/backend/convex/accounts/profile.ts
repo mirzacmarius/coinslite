@@ -3,7 +3,7 @@ import { mutation } from "../_generated/server";
 import { latestRelease } from "../updates/releases";
 import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
 import { homeCurrency, language } from "../utils/validators";
-import { localPart } from "./credentials";
+import { startingName } from "./credentials";
 
 /**
  * The last step of signing up with Google or a sign-in link: the same choices
@@ -26,7 +26,8 @@ export const completeSignUp = mutation({
       // New accounts see no Updates prompt until the next release.
       lastSeenRelease: latestRelease().version,
       ...(user.displayName === undefined &&
-        user.email && { displayName: localPart(user.email) }),
+        user.email &&
+        startingName(user.email)),
     });
     return null;
   },
