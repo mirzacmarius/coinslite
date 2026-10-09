@@ -722,4 +722,17 @@ export default {
     seePlan: "Vezi planul",
     backToPlans: "Înapoi la planuri",
   },
+  catalogSearch: {
+    open: "Caută",
+    title: "Caută în catalog",
+    placeholder: "Caută după titlu, valoare nominală, serie sau țară…",
+    minLength: "Scrie cel puțin 2 caractere pentru a căuta.",
+    noResults: "Nimic din catalog nu se potrivește cu „{text}”.",
+    capped:
+      "Se afișează primele {count}. Adaugă un cuvânt pentru a restrânge căutarea.",
+    themes: "Teme",
+    moveHint: "pentru a te deplasa",
+    openHint: "pentru a deschide",
+    closeHint: "pentru a închide",
+  },
 } as const satisfies Dictionary;

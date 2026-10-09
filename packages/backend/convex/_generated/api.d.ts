@@ -31,6 +31,8 @@ import type * as catalog_csv from "../catalog/csv.js";
 import type * as catalog_csvText from "../catalog/csvText.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
 import type * as catalog_fields from "../catalog/fields.js";
+import type * as catalog_search from "../catalog/search.js";
+import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_tree from "../catalog/tree.js";
 import type * as crons from "../crons.js";
@@ -92,6 +94,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/csvText": typeof catalog_csvText;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
   "catalog/fields": typeof catalog_fields;
+  "catalog/search": typeof catalog_search;
+  "catalog/searchWords": typeof catalog_searchWords;
   "catalog/seed": typeof catalog_seed;
   "catalog/tree": typeof catalog_tree;
   crons: typeof crons;

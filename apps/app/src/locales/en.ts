@@ -705,4 +705,16 @@ export default {
     seePlan: "See your plan",
     backToPlans: "Back to Plans",
   },
+  catalogSearch: {
+    open: "Search",
+    title: "Search the Catalog",
+    placeholder: "Search by title, denomination, series or country…",
+    minLength: "Type at least 2 characters to search.",
+    noResults: "Nothing in the Catalog matches “{text}”.",
+    capped: "Showing the first {count}. Add a word to narrow the search.",
+    themes: "Themes",
+    moveHint: "to move",
+    openHint: "to open",
+    closeHint: "to close",
+  },
 } as const;
