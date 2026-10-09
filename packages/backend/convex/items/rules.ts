@@ -277,3 +277,14 @@ const withText = <K extends string>(key: K, value: string | undefined) =>
   (value === undefined ? {} : { [key]: value }) as Partial<Record<K, string>>;
 const withNumber = <K extends string>(key: K, value: number | undefined) =>
   (value === undefined ? {} : { [key]: value }) as Partial<Record<K, number>>;
+
+/**
+ * Every Item field that holds money, in minor units of the owner's Home
+ * currency. Changing the Home currency converts exactly these, so a new money
+ * field on Items belongs here too.
+ */
+export const itemMoneyFields = [
+  "purchasePrice",
+  "marketValue",
+] as const satisfies ReadonlyArray<keyof ItemInput>;
+export type ItemMoneyField = (typeof itemMoneyFields)[number];

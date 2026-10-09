@@ -299,8 +299,6 @@ export default {
       title: "Preferințe",
       language: "Limbă",
       homeCurrency: "Moneda de bază",
-      homeCurrencyNote:
-        "În curând o vei putea schimba, iar toate sumele vor fi convertite.",
       languageNotSaved:
         "Limba nu a putut fi salvată în cont, așa că s-a schimbat doar pe acest dispozitiv.",
     },
@@ -397,5 +395,34 @@ export default {
     emptyTitle: "Încă nu există prețuri spot",
     emptyDescription:
       "Prețurile aurului și argintului apar aici după ce sunt preluate. Se actualizează la fiecare 15 minute.",
+  },
+  homeCurrency: {
+    hint: "Dacă o schimbi, toate prețurile de achiziție și valorile de piață din colecție sunt convertite.",
+    confirmTitle: "Schimbi moneda de bază în {currency}?",
+    confirm: "Schimbă în {currency}",
+    cancel: "Anulează",
+    checking: "Se numără sumele de convertit…",
+    willConvert:
+      "Toate prețurile de achiziție și valorile de piață din colecția ta vor fi convertite din {from} în {to} la acest curs de schimb.",
+    nothingToConvert:
+      "Niciunul dintre obiectele tale nu are preț de achiziție sau valoare de piață, deci nu e nimic de convertit.",
+    noRate:
+      "Încă nu avem un curs de schimb cu care să convertim sumele. Încearcă din nou peste câteva minute.",
+    tooLarge:
+      "Colecția ta are peste {limit} obiecte, prea multe pentru a fi convertite într-o singură schimbare. Trimite-ne feedback și te ajutăm.",
+    amounts: "Sume de convertit",
+    rate: "Curs de schimb",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Curs la",
+    stale:
+      "Acest curs nu a mai fost actualizat de peste o oră și poate fi depășit.",
+    changed: "Moneda ta de bază este acum {currency}.",
+    rateChanged:
+      "Cursul de schimb tocmai a fost actualizat. Verifică noul curs și confirmă din nou.",
+    amountTooLarge:
+      "Una dintre sume ar fi prea mare în noua monedă, așa că nu s-a schimbat nimic.",
+    sameCurrency: "Aceasta este deja moneda ta de bază.",
+    failed:
+      "Moneda de bază nu a putut fi schimbată și nu s-a convertit nimic. Încearcă din nou.",
   },
 } as const satisfies Dictionary;

@@ -302,8 +302,6 @@ export default {
       title: "Préférences",
       language: "Langue",
       homeCurrency: "Devise de référence",
-      homeCurrencyNote:
-        "Bientôt, vous pourrez la changer et tous les montants seront convertis.",
       languageNotSaved:
         "Impossible d’enregistrer la langue dans votre compte : elle n’a changé que sur cet appareil.",
     },
@@ -401,5 +399,34 @@ export default {
     emptyTitle: "Pas encore de cours spot",
     emptyDescription:
       "Les cours de l’or et de l’argent s’afficheront ici dès qu’ils auront été récupérés. Ils sont actualisés toutes les 15 minutes.",
+  },
+  homeCurrency: {
+    hint: "La changer convertit tous les prix d’achat et valeurs de marché de votre collection.",
+    confirmTitle: "Passer la devise de référence en {currency} ?",
+    confirm: "Passer en {currency}",
+    cancel: "Annuler",
+    checking: "Décompte des montants à convertir…",
+    willConvert:
+      "Tous les prix d’achat et valeurs de marché de votre collection seront convertis de {from} en {to} à ce taux de change.",
+    nothingToConvert:
+      "Aucun de vos objets n’a de prix d’achat ni de valeur de marché : il n’y a rien à convertir.",
+    noRate:
+      "Nous n’avons pas encore de taux de change pour convertir vos montants. Réessayez dans quelques minutes.",
+    tooLarge:
+      "Votre collection compte plus de {limit} objets, trop pour les convertir en une seule fois. Donnez-nous votre avis et nous vous aiderons.",
+    amounts: "Montants à convertir",
+    rate: "Taux de change",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Taux au",
+    stale:
+      "Ce taux n’a pas été mis à jour depuis plus d’une heure et peut être dépassé.",
+    changed: "Votre devise de référence est désormais {currency}.",
+    rateChanged:
+      "Le taux de change vient d’être mis à jour. Vérifiez le nouveau taux et confirmez à nouveau.",
+    amountTooLarge:
+      "L’un de vos montants serait trop élevé dans la nouvelle devise : rien n’a été modifié.",
+    sameCurrency: "C’est déjà votre devise de référence.",
+    failed:
+      "Impossible de changer la devise de référence ; aucun montant n’a été converti. Réessayez.",
   },
 } as const satisfies Dictionary;

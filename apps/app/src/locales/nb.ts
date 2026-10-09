@@ -296,7 +296,6 @@ export default {
       title: "Innstillinger",
       language: "Språk",
       homeCurrency: "Hjemmevaluta",
-      homeCurrencyNote: "Snart kan du endre den, og alle beløp regnes om.",
       languageNotSaved:
         "Kunne ikke lagre språket på kontoen din, så det er bare endret på denne enheten.",
     },
@@ -391,5 +390,34 @@ export default {
     emptyTitle: "Ingen spotpriser ennå",
     emptyDescription:
       "Gull- og sølvprisene vises her når de er hentet. De oppdateres hvert 15. minutt.",
+  },
+  homeCurrency: {
+    hint: "Når du endrer den, regnes alle innkjøpspriser og markedsverdier i samlingen om.",
+    confirmTitle: "Endre hjemmevaluta til {currency}?",
+    confirm: "Endre til {currency}",
+    cancel: "Avbryt",
+    checking: "Teller beløpene som skal regnes om…",
+    willConvert:
+      "Alle innkjøpspriser og markedsverdier i samlingen regnes om fra {from} til {to} med denne vekslingskursen.",
+    nothingToConvert:
+      "Ingen av objektene dine har innkjøpspris eller markedsverdi, så det er ingenting å regne om.",
+    noRate:
+      "Vi har ingen vekslingskurs å regne om beløpene med ennå. Prøv igjen om noen minutter.",
+    tooLarge:
+      "Samlingen din har mer enn {limit} objekter, for mange til å regne om i én endring. Send oss en tilbakemelding, så hjelper vi deg.",
+    amounts: "Beløp som regnes om",
+    rate: "Vekslingskurs",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Kurs per",
+    stale:
+      "Denne kursen er ikke oppdatert på over en time og kan være utdatert.",
+    changed: "Hjemmevalutaen din er nå {currency}.",
+    rateChanged:
+      "Vekslingskursen ble nettopp oppdatert. Se over den nye kursen og bekreft på nytt.",
+    amountTooLarge:
+      "Et av beløpene ville blitt for stort i den nye valutaen, så ingenting ble endret.",
+    sameCurrency: "Det er allerede hjemmevalutaen din.",
+    failed:
+      "Kunne ikke endre hjemmevalutaen, og ingenting ble regnet om. Prøv igjen.",
   },
 } as const satisfies Dictionary;

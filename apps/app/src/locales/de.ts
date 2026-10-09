@@ -307,8 +307,6 @@ export default {
       title: "Einstellungen",
       language: "Sprache",
       homeCurrency: "Heimatwährung",
-      homeCurrencyNote:
-        "Bald kannst du sie ändern, und alle Beträge werden umgerechnet.",
       languageNotSaved:
         "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },
@@ -407,5 +405,34 @@ export default {
     emptyTitle: "Noch keine Spotpreise",
     emptyDescription:
       "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
+  },
+  homeCurrency: {
+    hint: "Wenn du sie änderst, werden alle Kaufpreise und Marktwerte in deiner Sammlung umgerechnet.",
+    confirmTitle: "Heimatwährung zu {currency} ändern?",
+    confirm: "Zu {currency} wechseln",
+    cancel: "Abbrechen",
+    checking: "Die umzurechnenden Beträge werden gezählt…",
+    willConvert:
+      "Alle Kaufpreise und Marktwerte in deiner Sammlung werden zu diesem Wechselkurs von {from} in {to} umgerechnet.",
+    nothingToConvert:
+      "Keines deiner Objekte hat einen Kaufpreis oder Marktwert, es gibt also nichts umzurechnen.",
+    noRate:
+      "Es gibt noch keinen Wechselkurs, um deine Beträge umzurechnen. Versuche es in ein paar Minuten noch einmal.",
+    tooLarge:
+      "Deine Sammlung hat mehr als {limit} Objekte, zu viele für eine einzige Umrechnung. Schick uns Feedback, dann helfen wir dir.",
+    amounts: "Umzurechnende Beträge",
+    rate: "Wechselkurs",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Stand",
+    stale:
+      "Dieser Kurs wurde seit über einer Stunde nicht aktualisiert und ist möglicherweise veraltet.",
+    changed: "Deine Heimatwährung ist jetzt {currency}.",
+    rateChanged:
+      "Der Wechselkurs wurde gerade aktualisiert. Prüfe den neuen Kurs und bestätige noch einmal.",
+    amountTooLarge:
+      "Ein Betrag wäre in der neuen Währung zu groß, daher wurde nichts geändert.",
+    sameCurrency: "Das ist bereits deine Heimatwährung.",
+    failed:
+      "Die Heimatwährung konnte nicht geändert werden, und nichts wurde umgerechnet. Versuche es noch einmal.",
   },
 } as const satisfies Dictionary;
