@@ -354,6 +354,48 @@ In CoinsLite, an Item's market value is entered by its owner, and the insurance 
 - **Numista and Colnect** cover Norway's coins and banknotes, under the terms in §3 and §4.
 - **Banknotes, Norway:** no dedicated licensable private catalogue was identified in this pass. Use Norges Bank series pages plus Pick (CCG) or Numista live.
 
+### 10.1 The bundled Norway dataset
+
+CoinsLite ships Norway as a bundled Catalog dataset (`packages/backend/convex/catalog/datasets/norway.ts`), loaded by `catalog/seed:load` like the others. Each source's reuse terms were checked on **2026-10-09**, before any of its data was used. Only the first source below feeds the dataset.
+
+| Source | Reuse terms (quote) | Checked | Verdict | Used |
+|---|---|---|---|---|
+| Norges Bank website ([copyright and liability](https://www.norges-bank.no/en/disclaimer/), edited 22 August 2020) | *"copies – both electronic and paper-based – may be made of material on this website, provided that Norges Bank is quoted as the source."* Limits: *"No changes may be made in the contents of the material or the website."* No restriction on commercial use. | 2026-10-09 | **Facts: allowed with attribution.** Dates, sizes, alloys, weights and mintages are facts in any case. CoinsLite stores the facts and writes its own notes, and quotes Norges Bank as the source ("Kilde: Norges Bank"). | **Yes:** every fact group |
+| Norges Bank [guidelines for banknote and coin designs](https://www.norges-bank.no/en/topics/notes-and-coins/rules-regulations/Guidelines-banknote-coin-designs/) (edited 13 March 2017) | 3.1 (up to series VII and commemoratives before 2018): *"The right to modify or use all or part of a banknote and coin design in a context other than ordinary use by the central bank requires the prior consent of the copyright holder."* 3.2 (series VIII and coins from 2018): *"Such consent is not usually given if the banknote and coin design is intended for use in a commercial context."* | 2026-10-09 | **Images: consent needed** (BONO or Norges Bank) | No: placeholders only |
+| Norges Bank open data, listed under [NLOD](https://data.norge.no/nlod/en/2.0) on data.norge.no | NLOD 2.0: *"This licence grants you the right to copy, use and distribute information, provided you acknowledge the contributors"*. The listing covers Norges Bank's statistics API: exchange rates, interest rates and similar series. | 2026-10-09 | Allowed with attribution, but **no notes or coins data** in it. The website pages above are under the website terms, not NLOD. | No |
+| *Norges Mynter* (Samlerforlaget Norges Mynter AS, owned by Samlerhuset) | No terms of use, licence or API published; *"© Copyright 2025 - Samlerforlaget Norges Mynter AS"*. | 2026-10-09 | **Written licence** needed (§10) | No: off limits until licensed |
+| Det Norske Myntverket (the mint; also owned by Samlerhuset), mintage pages | Terms not checked | – | Unknown | No |
+| DigitaltMuseum | Licence per object (§6.11) | 2026-10-08 | Allowed per object (CC0, CC BY, CC BY-SA) where the design is out of copyright | Not yet: no images in this pass |
+
+**Scope of the first release:** Norway's money in the krone era, as far as Norges Bank documents it:
+
+- every banknote from series I (1877) to the current series VIII, plus the small-denomination notes of 1917–1925 and 1940–1950;
+- circulation coins from 1958, one Catalog entry per coin type with its years of minting;
+- commemorative coins from 1906 to 2024, including the Lillehammer 1994 series.
+
+The tree is country Norway → denomination ("1-krone coins", "100-krone notes") → series (Olav V, Harald V, Commemorative coins, Lillehammer 1994 Winter Olympics; banknote series I–VIII and the small-denomination notes) → entries. That makes 100 coin entries and 46 banknote entries. Strike is set where Norges Bank states it: circulation for circulation coins, proof where a commemorative was issued in proof.
+
+**Pages used** (all Norges Bank, checked 2026-10-09):
+
+- banknote series I–VII and the small-denomination notes under [withdrawn notes and coins](https://www.norges-bank.no/en/topics/notes-and-coins/withdrawn-notes-coins/);
+- the series VIII notes under [legal tender notes and coins](https://www.norges-bank.no/en/topics/notes-and-coins/legal-tender-notes-coins/);
+- [coins 1957–1991](https://www.norges-bank.no/en/topics/notes-and-coins/withdrawn-notes-coins/Coins-1957-1991/), [coins 1992–1996](https://www.norges-bank.no/en/topics/notes-and-coins/withdrawn-notes-coins/Coins-1992-1996/) and the [50-øre coin 1996–2011](https://www.norges-bank.no/en/topics/notes-and-coins/withdrawn-notes-coins/50-ore-coin-1996-2011/);
+- the current coins' design and technical data pages, for example the [1-krone coin](https://www.norges-bank.no/tema/Sedler-og-mynter/gyldige-sedler-mynter/1-kronemynten/1-utforming/);
+- the [overview of commemorative coins 1906–2004](https://www.norges-bank.no/globalassets/upload/sedler-og-mynter/minnemynter_norges_bank.pdf) (PDF, Norwegian), the [commemorative coin pages](https://www.norges-bank.no/tema/Sedler-og-mynter/Minnemynter/) from 2002 and their [mintage table](https://www.norges-bank.no/tema/Sedler-og-mynter/Minnemynter/Opplagstall/).
+
+Commemorative titles use Norges Bank's Norwegian name for the occasion, as the 2-euro titles use the issuing country's language (§6.4). Where the overview gives a figure that contradicts the rest of the coin's data, the figure is left out rather than guessed: the 1978 5-krone and 1993 Grieg 1500-krone diameters, and the 1999 100-krone weight. For the 2011 ski coin, the mintage comes from the mintage table, because the coin's own page repeats another coin's figure.
+
+**Not yet in the dataset:**
+
+- circulation coins from 1875 to 1957, which Norges Bank's pages don't cover;
+- an entry per year struck for the coins from 1958. Norges Bank gives only each type's years of minting, and a year inside that range may not have been struck.
+
+Both need a year-by-year source. The obvious one is *Norges Mynter*, once licensed.
+
+**Images:** none. Every entry shows the placeholder until the design's rights holder consents (BONO for designs up to series VII and commemoratives before 2018; Norges Bank for series VIII and coins from 2018). Any banknote image must also follow the reproduction rules: at most 72 dpi, with "SPECIMEN" across it.
+
+**Licensing enquiries:** a human sends them, to Norges Bank about design images and to Samlerforlaget Norges Mynter about a data licence. Their outcome is recorded on the Norway ticket and here.
+
 ---
 
 ## 11. Banknotes specifically
@@ -459,6 +501,12 @@ All accessed **2026-10-08**. "(search excerpt)" means the page couldn't be opene
 - https://norgesmynter.no/om-samlerhuset-samlerforlaget-katalogen/
 - https://www.myntverket.no/utgivelser-opplag-norske-mynter/
 - https://www.numismatikk.no/ (under maintenance)
+- https://www.norges-bank.no/en/topics/notes-and-coins/legal-tender-notes-coins/ (checked 2026-10-09)
+- https://www.norges-bank.no/en/topics/notes-and-coins/Commemorative-coins/ (checked 2026-10-09)
+- https://www.norges-bank.no/tema/Sedler-og-mynter/Minnemynter/ (checked 2026-10-09)
+- https://www.norges-bank.no/globalassets/upload/sedler-og-mynter/minnemynter_norges_bank.pdf (checked 2026-10-09)
+- https://data.norge.no/nlod/en/2.0 (NLOD 2.0, checked 2026-10-09)
+- https://data.norge.no/en/datasets/23076ce8-b442-407c-817f-0d4ec3cbe744 (Norges Bank open data listing, search excerpt, 2026-10-09)
 - https://dok.digitaltmuseum.org/en/terms-of-use
 - https://en.wikipedia.org/wiki/Kolbj%C3%B8rn_Skaare (search excerpt, secondary)
 

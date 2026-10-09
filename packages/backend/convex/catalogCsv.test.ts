@@ -694,6 +694,7 @@ test("every preview build loads the bundled Catalog through the function it name
   expect(await t.mutation(seed, {})).toEqual([
     { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
     { dataset: "euroCommemoratives", inserts: 609, updates: 0, unchanged: 0 },
+    { dataset: "norway", inserts: 246, updates: 0, unchanged: 0 },
   ]);
 
   // A preview seeded before its search words changed finds nothing by them...
@@ -711,6 +712,7 @@ test("every preview build loads the bundled Catalog through the function it name
   expect(await t.mutation(seed, {})).toEqual([
     { dataset: "usSilverDollars", inserts: 0, updates: 0, unchanged: 123 },
     { dataset: "euroCommemoratives", inserts: 0, updates: 0, unchanged: 609 },
+    { dataset: "norway", inserts: 0, updates: 0, unchanged: 246 },
   ]);
   expect((await search()).groups).not.toEqual([]);
 });
