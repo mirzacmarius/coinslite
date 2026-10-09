@@ -29,6 +29,9 @@ import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSi
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_tree from "../catalog/tree.js";
+import type * as collection from "../collection.js";
+import type * as collection_browse from "../collection/browse.js";
+import type * as collection_view from "../collection/view.js";
 import type * as crons from "../crons.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
@@ -38,6 +41,7 @@ import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as items from "../items.js";
 import type * as items_deletion from "../items/deletion.js";
+import type * as items_denominations from "../items/denominations.js";
 import type * as items_grades from "../items/grades.js";
 import type * as items_preciousMetal from "../items/preciousMetal.js";
 import type * as items_rules from "../items/rules.js";
@@ -85,6 +89,9 @@ declare const fullApi: ApiFromModules<{
   "catalog/fields": typeof catalog_fields;
   "catalog/seed": typeof catalog_seed;
   "catalog/tree": typeof catalog_tree;
+  collection: typeof collection;
+  "collection/browse": typeof collection_browse;
+  "collection/view": typeof collection_view;
   crons: typeof crons;
   "email/index": typeof email_index;
   env: typeof env;
@@ -94,6 +101,7 @@ declare const fullApi: ApiFromModules<{
   init: typeof init;
   items: typeof items;
   "items/deletion": typeof items_deletion;
+  "items/denominations": typeof items_denominations;
   "items/grades": typeof items_grades;
   "items/preciousMetal": typeof items_preciousMetal;
   "items/rules": typeof items_rules;
