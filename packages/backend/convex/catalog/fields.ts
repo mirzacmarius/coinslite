@@ -85,6 +85,9 @@ export const catalogLimits = {
   latestYear: 3000,
 } as const;
 
+/** Lists of Catalog entries load this many at a time. */
+export const catalogPageSize = 50;
+
 /** A node's own values, one per CSV column, with provenance flattened. */
 export type NodeValues = {
   title: string;

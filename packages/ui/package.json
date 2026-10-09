@@ -45,6 +45,7 @@
     "./popover": "./src/components/popover.tsx",
     "./postcss": "./postcss.config.js",
     "./progress": "./src/components/progress.tsx",
+    "./property-panel": "./src/components/property-panel.tsx",
     "./property-picker": "./src/components/property-picker.tsx",
     "./scroll-area": "./src/components/scroll-area.tsx",
     "./segmented-control": "./src/components/segmented-control.tsx",

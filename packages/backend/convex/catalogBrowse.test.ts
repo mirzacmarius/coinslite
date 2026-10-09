@@ -4,8 +4,8 @@ import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { catalogPageSize } from "./catalog/browse";
 import { formatCsvRecord } from "./catalog/csvText";
+import { catalogPageSize } from "./catalog/fields";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");

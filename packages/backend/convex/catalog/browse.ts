@@ -23,9 +23,6 @@ import {
  * deployments), so each has its own URL.
  */
 
-/** Entry lists load this many at a time. */
-export const catalogPageSize = 50;
-
 /** More roots, or groupings below one node, than this is not a Catalog anyone browses. */
 const rootLimit = 1000;
 const groupingLimit = 1000;
