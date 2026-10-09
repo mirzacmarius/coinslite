@@ -85,7 +85,11 @@ export default {
     save: "Save",
     saved: "Item saved",
     duplicate: "Duplicate",
-    duplicated: "Copy created. Change what differs.",
+    duplicateTitle: "Duplicate Item",
+    duplicateDescription:
+      "A new Item filled in from “{title}”. Change what differs; photos aren't copied.",
+    newDescription: "Record a coin, banknote or stamp in your Collection.",
+    editDescription: "Change any of this Item's details.",
     materials: {
       gold: "Gold",
       silver: "Silver",
@@ -119,7 +123,6 @@ export default {
       number: "Enter a number, like 38.1.",
       wholeNumber: "Use a whole number, like 1200.",
       saveFailed: "The Item couldn't be saved. Try again.",
-      duplicateFailed: "The Item couldn't be duplicated. Try again.",
       titleRequired: "Give the Item a title.",
       quantity: "Use a whole number of 1 or more.",
       year: "Enter a year like 1881.",
@@ -337,6 +340,7 @@ export default {
     album: "Album",
     new: "New Album",
     editAlbum: "Edit Album",
+    editDescription: "Change this Album's name, description or colour.",
     edit: "Edit",
     delete: "Delete",
     name: "Name",

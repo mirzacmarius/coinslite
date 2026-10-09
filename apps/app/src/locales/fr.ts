@@ -90,7 +90,12 @@ export default {
     save: "Enregistrer",
     saved: "Objet enregistré",
     duplicate: "Dupliquer",
-    duplicated: "Copie créée. Modifiez ce qui diffère.",
+    duplicateTitle: "Dupliquer l’objet",
+    duplicateDescription:
+      "Un nouvel objet rempli à partir de «\u00a0{title}\u00a0». Modifiez ce qui diffère\u00a0; les photos ne sont pas copiées.",
+    newDescription:
+      "Enregistrez une pièce, un billet ou un timbre dans votre collection.",
+    editDescription: "Modifiez n’importe quelle information de cet objet.",
     materials: {
       gold: "Or",
       silver: "Argent",
@@ -124,7 +129,6 @@ export default {
       number: "Saisissez un nombre, p. ex. 38,1.",
       wholeNumber: "Saisissez un nombre entier, p. ex. 1200.",
       saveFailed: "Impossible d’enregistrer l’objet. Réessayez.",
-      duplicateFailed: "Impossible de dupliquer l’objet. Réessayez.",
       titleRequired: "Donnez un titre à l’objet.",
       quantity: "Utilisez un nombre entier supérieur ou égal à 1.",
       year: "Saisissez une année, par ex. 1881.",
@@ -349,6 +353,8 @@ export default {
     album: "Album",
     new: "Nouvel album",
     editAlbum: "Modifier l’album",
+    editDescription:
+      "Modifiez le nom, la description ou la couleur de l’album.",
     edit: "Modifier",
     delete: "Supprimer",
     name: "Nom",

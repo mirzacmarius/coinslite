@@ -90,7 +90,12 @@ export default {
     save: "Speichern",
     saved: "Objekt gespeichert",
     duplicate: "Duplizieren",
-    duplicated: "Kopie erstellt. Ändere, was abweicht.",
+    duplicateTitle: "Objekt duplizieren",
+    duplicateDescription:
+      "Ein neues Objekt, ausgefüllt nach „{title}“. Ändere, was abweicht; Fotos werden nicht kopiert.",
+    newDescription:
+      "Erfasse eine Münze, Banknote oder Briefmarke in deiner Sammlung.",
+    editDescription: "Ändere beliebige Angaben zu diesem Objekt.",
     materials: {
       gold: "Gold",
       silver: "Silber",
@@ -125,8 +130,6 @@ export default {
       wholeNumber: "Gib eine ganze Zahl ein, z. B. 1200.",
       saveFailed:
         "Das Objekt konnte nicht gespeichert werden. Versuche es noch einmal.",
-      duplicateFailed:
-        "Das Objekt konnte nicht dupliziert werden. Versuche es noch einmal.",
       titleRequired: "Gib dem Objekt einen Titel.",
       quantity: "Verwende eine ganze Zahl ab 1.",
       year: "Gib ein Jahr wie 1881 ein.",
@@ -355,6 +358,7 @@ export default {
     album: "Album",
     new: "Neues Album",
     editAlbum: "Album bearbeiten",
+    editDescription: "Ändere Namen, Beschreibung oder Farbe des Albums.",
     edit: "Bearbeiten",
     delete: "Löschen",
     name: "Name",

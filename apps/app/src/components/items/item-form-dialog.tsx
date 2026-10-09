@@ -88,11 +88,10 @@ import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
 import {
   type ItemFormValues,
-  argsFromValues,
   blankItem,
-  changedFactsOnly,
   detailFields,
   factValues,
+  formArgs,
   hasDetails,
   matchingPreset,
   parseDecimal,
@@ -105,7 +104,7 @@ import {
 const titleInput =
   "w-full bg-transparent px-0 text-base font-medium placeholder:text-muted-foreground focus:outline-none";
 const notesInput =
-  "w-full resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
+  "w-full shrink-0 resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
 
 /** Fields typed as plain text in "More details". */
 type TextField =
@@ -142,17 +141,24 @@ const isCatalogType = (type: ItemType): type is CatalogItemType =>
  * under "More details", which opens by itself when it holds values or errors.
  *
  * Coins and banknotes are added from the Catalog by default (spec 5.4): each
- * opening starts on the Catalog picker, and Esc or "Add manually" leads to
- * typing the facts in. A picked entry fills the facts; the Item stays linked
- * to it and stores only the facts the person changes (ADR 0001).
+ * opening starts on the Catalog picker; "Add manually" leads to typing the
+ * facts in, and Esc closes the dialog. A picked entry fills the facts; the
+ * Item stays linked to it and stores only the facts the person changes
+ * (ADR 0001).
  *
  * After a coin scan the form opens filled with the scanner's suggestion,
  * marked as such, and the scan's photos become the new Item's when it's added.
+ *
+ * Duplicating (spec 5.5) opens the new Item's form filled in from `copyOf`,
+ * linked to the same Catalog entry, without its photos; nothing is added
+ * until the person saves.
  */
 export function ItemFormDialog({
   open,
   onOpenChange,
   item,
+  copyOf,
+  onAdded,
   newItemType,
   scan,
 }: {
@@ -160,6 +166,10 @@ export function ItemFormDialog({
   onOpenChange: (open: boolean) => void;
   /** The Item being edited; without one the dialog adds a new Item. */
   item?: EditedItem;
+  /** For a new Item: an existing Item it starts as a copy of. */
+  copyOf?: EditedItem;
+  /** For a new Item: called with it once it's added. */
+  onAdded?: (itemId: Id<"items">) => void;
   /** For a new Item: the Item type already chosen each time the dialog opens. */
   newItemType?: ItemType;
   /** For a new Item: a coin scan's photos and suggestion, applied each time it changes. */
@@ -180,12 +190,13 @@ export function ItemFormDialog({
   // Only while open: the "New Item" dialog is mounted on every page.
   const albums = useAlbums(open);
   // One object for the dialog's life: the form resets when it sees new defaults.
-  const [defaults] = useState(() =>
-    item ? valuesFromItem(item, locale) : blankItem(),
-  );
+  const [defaults] = useState(() => {
+    const from = item ?? copyOf;
+    return from ? valuesFromItem(from, locale) : blankItem();
+  });
   const catalogVisible = useCatalogVisible();
   const [linked, setLinked] = useState<LinkedEntry | undefined>(
-    item?.catalogEntry ?? undefined,
+    (item ?? copyOf)?.catalogEntry ?? undefined,
   );
   // The entry's facts as the form writes them, to tell which ones the person changed.
   const fromEntry = useMemo(
@@ -193,6 +204,14 @@ export function ItemFormDialog({
     [linked, locale],
   );
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Whether the picker is where adding started, so closing it closes the
+  // dialog, rather than one opened from the form's Catalog pill.
+  const pickerFirst = useRef(false);
+  /** Opens the Catalog picker; `first` when adding starts on it. */
+  const openPicker = (first: boolean) => {
+    pickerFirst.current = first;
+    setPickerOpen(true);
+  };
   const [createMore, setCreateMore] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(() =>
     hasDetails(defaults, fromEntry),
@@ -292,21 +311,10 @@ export function ItemFormDialog({
     },
     onSubmit: async ({ value }) => {
       setFailed(undefined);
-      // A linked Item's cleared country or metal is the entry's again.
-      const args = fromEntry
-        ? changedFactsOnly(
-            argsFromValues(
-              {
-                ...value,
-                country: value.country ?? fromEntry.country,
-                metal: value.metal ?? fromEntry.metal,
-              },
-              locale,
-            ),
-            value,
-            fromEntry,
-          )
-        : argsFromValues(value, locale);
+      // A copy of a linked Item, made while the Catalog is hidden, becomes
+      // the person's own: only an existing link stays.
+      const link = item || catalogVisible !== false ? linked : undefined;
+      const args = formArgs(value, link && fromEntry, locale);
       // An Album deleted since the form opened can't take the Item.
       if (albums && !albums.some((album) => album._id === args.albumId))
         args.albumId = undefined;
@@ -316,7 +324,7 @@ export function ItemFormDialog({
         else
           added = await addItem({
             ...args,
-            ...(linked && { catalogEntryKey: linked.key }),
+            ...(link && { catalogEntryKey: link.key }),
           });
       } catch (failure) {
         setFailed(
@@ -332,7 +340,8 @@ export function ItemFormDialog({
         setScanned(undefined);
         await attachScanPhotos(added, photos);
       }
-      if (item) {
+      if (added) onAdded?.(added);
+      if (item || copyOf) {
         onOpenChange(false);
         return;
       }
@@ -345,7 +354,7 @@ export function ItemFormDialog({
         form.setFieldValue("type", value.type);
         form.setFieldValue("country", value.country);
         form.setFieldValue("albumId", value.albumId);
-        if (catalogVisible && isCatalogType(value.type)) setPickerOpen(true);
+        if (catalogVisible && isCatalogType(value.type)) openPicker(true);
         else titleRef.current?.focus();
       } else {
         onOpenChange(false);
@@ -353,7 +362,8 @@ export function ItemFormDialog({
     },
   });
   // With exactly one Album, a new Item goes into it unless the person picks otherwise.
-  const onlyAlbum = !item && albums?.length === 1 ? albums[0]?._id : undefined;
+  const onlyAlbum =
+    !item && !copyOf && albums?.length === 1 ? albums[0]?._id : undefined;
   useEffect(() => {
     if (
       open &&
@@ -379,15 +389,18 @@ export function ItemFormDialog({
     }
     if (pickerOffered.current || item || catalogVisible === undefined) return;
     pickerOffered.current = true;
+    if (copyOf) return;
     if (
       !scan &&
       catalogVisible &&
       !linked &&
       !form.state.isDirty &&
       isCatalogType(newItemType ?? form.getFieldValue("type"))
-    )
+    ) {
+      pickerFirst.current = true;
       setPickerOpen(true);
-  }, [open, item, catalogVisible, linked, newItemType, form, scan]);
+    }
+  }, [open, item, copyOf, catalogVisible, linked, newItemType, form, scan]);
   /** Links the form to a picked Catalog entry and fills the facts from it. */
   const pickEntry = async (picked: PickedCatalogEntry) => {
     setPickerOpen(false);
@@ -631,7 +644,13 @@ export function ItemFormDialog({
               <span>{t("nav.collection")}</span>
               <ChevronRight className="size-3.5" aria-hidden="true" />
               <DialogTitle className="text-foreground">
-                {t(item ? "items.editItem" : "items.new")}
+                {t(
+                  item
+                    ? "items.editItem"
+                    : copyOf
+                      ? "items.duplicateTitle"
+                      : "items.new",
+                )}
               </DialogTitle>
             </div>
             <DialogClose asChild>
@@ -640,9 +659,15 @@ export function ItemFormDialog({
               </IconButton>
             </DialogClose>
           </DialogHeader>
-          <DialogDescription className="sr-only">
-            {t("items.emptyDescription")}
-          </DialogDescription>
+          {copyOf ? (
+            <DialogDescription className="px-4 text-xs text-muted-foreground">
+              {t("items.duplicateDescription", { title: copyOf.title })}
+            </DialogDescription>
+          ) : (
+            <DialogDescription className="sr-only">
+              {t(item ? "items.editDescription" : "items.newDescription")}
+            </DialogDescription>
+          )}
 
           <div className="flex flex-col gap-2 overflow-y-auto px-4 pb-3 pt-1">
             {!item && <ItemLimitNotice />}
@@ -699,7 +724,7 @@ export function ItemFormDialog({
                 <CatalogEntryPill
                   title={linked.title}
                   label={t("catalogPicker.entry")}
-                  onClick={item ? undefined : () => setPickerOpen(true)}
+                  onClick={item ? undefined : () => openPicker(false)}
                 />
               ) : (
                 <form.Field name="type">
@@ -724,7 +749,7 @@ export function ItemFormDialog({
                     variant="ghost"
                     size="xs"
                     aria-label={`${t("catalogPicker.entry")}: ${t("catalogPicker.pick")}`}
-                    onClick={() => setPickerOpen(true)}
+                    onClick={() => openPicker(false)}
                   >
                     <BookOpen strokeWidth={1.75} aria-hidden="true" />
                     {t("catalogPicker.pick")}
@@ -1057,7 +1082,7 @@ export function ItemFormDialog({
           </div>
 
           <DialogFooter>
-            {item ? (
+            {item || copyOf ? (
               <span />
             ) : (
               <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
@@ -1097,7 +1122,12 @@ export function ItemFormDialog({
       {!item && (
         <CatalogPickerDialog
           open={pickerOpen}
-          onOpenChange={setPickerOpen}
+          // Esc closes the picker, as its hint says: when adding started
+          // on it, that's the whole dialog, not a way into the form.
+          onOpenChange={(next) => {
+            setPickerOpen(next);
+            if (!next && pickerFirst.current) onOpenChange(false);
+          }}
           itemType={isCatalogType(values.type) ? values.type : "coin"}
           onPick={(entry) => void pickEntry(entry)}
           onManual={() => {

@@ -183,7 +183,7 @@ export function AlbumFormDialog({
             </DialogClose>
           </DialogHeader>
           <DialogDescription className="sr-only">
-            {t("albums.emptyDescription")}
+            {t(album ? "albums.editDescription" : "albums.emptyDescription")}
           </DialogDescription>
 
           <div className="flex flex-col gap-2 overflow-y-auto px-4 pb-3 pt-1">
