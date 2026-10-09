@@ -795,4 +795,15 @@ export default {
     cancel: "Avbryt",
     failed: "Kontoen kunne ikke slettes, og ingenting ble fjernet. Prøv igjen.",
   },
+  collectionExport: {
+    export: "Eksporter",
+    "inView#zero": "Ingen objekter i denne visningen",
+    "inView#one": "1 objekt i denne visningen",
+    "inView#few": "{count} objekter i denne visningen",
+    "inView#other": "{count} objekter i denne visningen",
+    csv: "Eksporter som CSV",
+    premiumOnly: "Eksport av samlingen er en del av Premium.",
+    failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
+    fileName: "coinslite-samling-{date}.csv",
+  },
 } as const satisfies Dictionary;

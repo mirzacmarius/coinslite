@@ -784,4 +784,15 @@ export default {
     failed:
       "Your account couldn't be deleted, and nothing was removed. Try again.",
   },
+  collectionExport: {
+    export: "Export",
+    "inView#zero": "No Items in this view",
+    "inView#one": "1 Item in this view",
+    "inView#few": "{count} Items in this view",
+    "inView#other": "{count} Items in this view",
+    csv: "Export as CSV",
+    premiumOnly: "Exporting your Collection is part of Premium.",
+    failed: "Couldn't export the Collection. Try again.",
+    fileName: "coinslite-collection-{date}.csv",
+  },
 } as const;

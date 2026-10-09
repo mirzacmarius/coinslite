@@ -802,4 +802,15 @@ export default {
     failed:
       "Contul nu a putut fi șters și nu s-a eliminat nimic. Încearcă din nou.",
   },
+  collectionExport: {
+    export: "Exportă",
+    "inView#zero": "Niciun obiect în această vizualizare",
+    "inView#one": "1 obiect în această vizualizare",
+    "inView#few": "{count} obiecte în această vizualizare",
+    "inView#other": "{count} de obiecte în această vizualizare",
+    csv: "Exportă ca CSV",
+    premiumOnly: "Exportul colecției face parte din Premium.",
+    failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
+    fileName: "coinslite-colectie-{date}.csv",
+  },
 } as const satisfies Dictionary;

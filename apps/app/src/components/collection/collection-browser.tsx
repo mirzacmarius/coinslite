@@ -19,6 +19,7 @@ import {
 import { CollectionSearch } from "./collection-search";
 import { useCollectionUrl } from "./collection-url";
 import { DisplayMenu } from "./display-menu";
+import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
 import { type BrowseResult, useFilters } from "./filter-options";
 import { useCollectionDisplay } from "./use-collection-display";
@@ -124,17 +125,20 @@ export function CollectionBrowser() {
             }
           />
         </div>
-        <DisplayMenu
-          display={display}
-          onDisplayChange={(change) => {
-            changeDisplay(change);
-            // A new page size starts again at the first page.
-            if (change.pageSize && change.pageSize !== display.pageSize)
-              goToPage(1);
-          }}
-          sort={view.sort ?? defaultSort}
-          onSortChange={(sort) => update({ sort })}
-        />
+        <div className="flex shrink-0 items-center gap-1">
+          <DisplayMenu
+            display={display}
+            onDisplayChange={(change) => {
+              changeDisplay(change);
+              // A new page size starts again at the first page.
+              if (change.pageSize && change.pageSize !== display.pageSize)
+                goToPage(1);
+            }}
+            sort={view.sort ?? defaultSort}
+            onSortChange={(sort) => update({ sort })}
+          />
+          <ExportMenu view={view} count={result.total} />
+        </div>
       </div>
       <FilterChips filters={filters} onChange={update} onClearAll={clearAll} />
       {!result.complete && (
