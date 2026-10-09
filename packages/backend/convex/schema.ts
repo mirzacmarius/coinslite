@@ -224,17 +224,14 @@ export default defineSchema({
       "yearFrom",
       "sortOrder",
     ])
-    .index(
-      "by_kind_and_countryNodeKey_and_denomination_and_series_and_yearFrom_and_sortOrder",
-      [
-        "kind",
-        "countryNodeKey",
-        "denomination",
-        "series",
-        "yearFrom",
-        "sortOrder",
-      ],
-    )
+    .index("by_kind_countryNodeKey_denomination_series_yearFrom_sortOrder", [
+      "kind",
+      "countryNodeKey",
+      "denomination",
+      "series",
+      "yearFrom",
+      "sortOrder",
+    ])
     .searchIndex("search_searchText", {
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
