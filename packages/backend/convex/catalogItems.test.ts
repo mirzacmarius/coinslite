@@ -629,3 +629,41 @@ test("the Item form reads a Catalog entry's facts as an Item would take them", a
     t.query(api.items.catalogEntry, { key: "us-morgan-1881-cc" }),
   ).rejects.toThrow("NOT_SIGNED_IN");
 });
+
+test("while the Catalog is hidden, only admins add from it; linked Items keep their facts", async () => {
+  const t = newTest();
+  const { admin, ada } = await withCatalog(t);
+  const itemId = await ada.as.mutation(api.items.quickAdd, {
+    catalogEntryKey: "us-morgan-1881-cc",
+  });
+
+  await admin.as.mutation(api.featureFlags.set, {
+    flag: { key: "catalogVisible", value: false },
+  });
+
+  const picked = {
+    type: "coin" as const,
+    title: "Morgan dollar 1881-CC",
+    catalogEntryKey: "us-morgan-1881-cc",
+  };
+  await expect(ada.as.mutation(api.items.add, picked)).rejects.toThrow(
+    "CATALOG_ENTRY_NOT_FOUND",
+  );
+  await expect(
+    ada.as.mutation(api.items.quickAdd, {
+      catalogEntryKey: "us-morgan-1881-cc",
+    }),
+  ).rejects.toThrow("CATALOG_ENTRY_NOT_FOUND");
+  expect(
+    await ada.as.query(api.items.catalogEntry, { key: "us-morgan-1881-cc" }),
+  ).toBeNull();
+  expect(await ada.as.query(api.items.get, { itemId })).toMatchObject({
+    denomination: "1 dollar",
+    year: 1881,
+  });
+
+  await admin.as.mutation(api.items.add, picked);
+  await admin.as.mutation(api.items.quickAdd, {
+    catalogEntryKey: "us-morgan-1881-cc",
+  });
+});

@@ -12,6 +12,7 @@ import {
 } from "./_generated/server";
 import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
+import { catalogVisibleTo } from "./featureFlags";
 import { overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
 import {
@@ -90,8 +91,25 @@ export async function requireOwnItem(
 /** A Catalog key that isn't a Catalog entry's: nothing to add an Item from. */
 export const catalogEntryNotFound = "CATALOG_ENTRY_NOT_FOUND";
 
-async function requireCatalogEntry(ctx: QueryCtx, key: string) {
-  const entry = await catalogEntryByKey(ctx, key);
+/**
+ * The Catalog entry with this key, if the person may see the Catalog: while
+ * it's hidden (featureFlags.ts) only admins add from it.
+ */
+async function visibleCatalogEntry(
+  ctx: QueryCtx,
+  user: Doc<"users">,
+  key: string,
+) {
+  if (!(await catalogVisibleTo(ctx, user))) return null;
+  return await catalogEntryByKey(ctx, key);
+}
+
+async function requireCatalogEntry(
+  ctx: QueryCtx,
+  user: Doc<"users">,
+  key: string,
+) {
+  const entry = await visibleCatalogEntry(ctx, user, key);
   if (!entry) throw new ConvexError(catalogEntryNotFound);
   return entry;
 }
@@ -148,7 +166,7 @@ export const add = mutation({
     const entry =
       catalogEntryKey === undefined
         ? null
-        : await requireCatalogEntry(ctx, catalogEntryKey);
+        : await requireCatalogEntry(ctx, owner, catalogEntryKey);
     return await insertItem(
       ctx,
       owner._id,
@@ -176,7 +194,7 @@ export const quickAdd = mutation({
   handler: async (ctx, { catalogEntryKey, albumId, ...chosen }) => {
     const owner = await requireSetUpUser(ctx);
     await requireRoomForItems(ctx, owner._id);
-    const entry = await requireCatalogEntry(ctx, catalogEntryKey);
+    const entry = await requireCatalogEntry(ctx, owner, catalogEntryKey);
     const fields = checkFields(
       { type: entry.itemType, title: entry.title, ...chosen },
       entry,
@@ -336,7 +354,8 @@ export const get = query({
 
 /**
  * A Catalog entry as the Item form takes it when the person picks it: its
- * title, Item type and facts in Item terms. Null for any other key.
+ * title, Item type and facts in Item terms. Null for any other key, and
+ * while the Catalog is hidden from the person.
  */
 export const catalogEntry = query({
   args: { key: v.string() },
@@ -350,8 +369,8 @@ export const catalogEntry = query({
     }),
   ),
   handler: async (ctx, { key }) => {
-    await requireSetUpUser(ctx);
-    const entry = await catalogEntryByKey(ctx, key);
+    const user = await requireSetUpUser(ctx);
+    const entry = await visibleCatalogEntry(ctx, user, key);
     if (!entry) return null;
     const { _id, ...link } = entry;
     return link;
