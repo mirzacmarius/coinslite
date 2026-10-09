@@ -180,11 +180,6 @@ export async function collectionPdf(
         messages.notes.perItem(currency),
         messages.notes.gainLoss,
         messages.notes.ownerStated,
-        ...(contents.complete
-          ? []
-          : [
-              messages.notes.incomplete(format.number(contents.collectionSize)),
-            ]),
       ],
     },
     pageLabel: messages.page,

@@ -1056,6 +1056,8 @@ export default {
     pdf: "Eksporter som PDF",
     pdfTooLarge:
       "En PDF viser opptil {limit} objekter. Snevre inn visningen for å eksportere den.",
+    tooLarge:
+      "Samlingen din er for stor til å eksporteres på én gang, så den eksporteres ikke i stedet for å mangle objekter.",
     premiumOnly: "Eksport av samlingen er en del av Premium.",
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",

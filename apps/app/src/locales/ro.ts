@@ -1062,6 +1062,8 @@ export default {
     pdf: "Exportă ca PDF",
     pdfTooLarge:
       "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o exporta.",
+    tooLarge:
+      "Colecția ta este prea mare pentru a fi exportată dintr-odată, așa că nu este exportată în loc să lipsească obiecte.",
     premiumOnly: "Exportul colecției face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",

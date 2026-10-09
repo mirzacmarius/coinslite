@@ -318,12 +318,15 @@ function countOptions(
 /**
  * How often reading a Collection checks what's left of the query's read
  * allowance, and how much it leaves for the rest of the query (the person,
- * thumbnails), in documents and bytes. An Item is at most a few kilobytes,
- * and so is the Catalog entry it may be linked to.
+ * thumbnails), in documents, bytes and lookups. An Item is at most a few
+ * kilobytes, and so is the Catalog entry it may be linked to; each Item
+ * linked to an entry not seen yet is one lookup more, so between two checks
+ * at most `readCheckEvery` lookups are made.
  */
 const readCheckEvery = 100;
 const documentsKept = 500;
 const bytesKept = 2 * 1024 * 1024;
+const lookupsKept = readCheckEvery + 100;
 
 /**
  * Every Item in a person's Collection, as added, with its facts resolved
@@ -331,9 +334,9 @@ const bytesKept = 2 * 1024 * 1024;
  * and number its pages, so this reads the owner's whole index range once
  * rather than page by page. A Free plan Collection is at most 50 Items; a
  * Premium one of many thousands still fits in what one query may read
- * (32,000 documents, 16 MiB), each Catalog entry read once. Beyond that it
- * stops before the limit and reports the Collection as incomplete, rather
- * than failing.
+ * (32,000 documents, 16 MiB, 4,096 lookups), each Catalog entry read once.
+ * Beyond that it stops before the limit and reports the Collection as
+ * incomplete, rather than failing; exports refuse such a Collection.
  */
 async function readCollection(ctx: QueryCtx, ownerId: Id<"users">) {
   const items: Item[] = [];
@@ -343,11 +346,12 @@ async function readCollection(ctx: QueryCtx, ownerId: Id<"users">) {
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
     items.push(await resolver.resolve(item));
     if (items.length % readCheckEvery === 0) {
-      const { documentsRead, bytesRead } =
+      const { documentsRead, bytesRead, databaseQueries } =
         await ctx.meta.getTransactionMetrics();
       if (
         documentsRead.remaining < documentsKept ||
-        bytesRead.remaining < bytesKept
+        bytesRead.remaining < bytesKept ||
+        databaseQueries.remaining < lookupsKept
       )
         return { items, complete: false };
     }

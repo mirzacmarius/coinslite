@@ -1091,6 +1091,8 @@ export default {
     pdf: "Als PDF exportieren",
     pdfTooLarge:
       "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
+    tooLarge:
+      "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
     premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",

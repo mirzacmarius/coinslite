@@ -1039,6 +1039,8 @@ export default {
     pdf: "Export as PDF",
     pdfTooLarge:
       "A PDF lists up to {limit} Items. Narrow the view to export it.",
+    tooLarge:
+      "Your Collection is too large to export in one go. Rather than leave Items out, it isn't exported.",
     premiumOnly: "Exporting your Collection is part of Premium.",
     failed: "Couldn't export the Collection. Try again.",
     fileName: "coinslite-collection-{date}.csv",

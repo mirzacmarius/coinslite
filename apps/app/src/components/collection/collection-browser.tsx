@@ -137,7 +137,11 @@ export function CollectionBrowser() {
             sort={view.sort ?? defaultSort}
             onSortChange={(sort) => update({ sort })}
           />
-          <ExportMenu view={view} count={result.total} />
+          <ExportMenu
+            view={view}
+            count={result.total}
+            complete={result.complete}
+          />
         </div>
       </div>
       <FilterChips filters={filters} onChange={update} onClearAll={clearAll} />

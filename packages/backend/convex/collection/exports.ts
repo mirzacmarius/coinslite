@@ -20,7 +20,9 @@ import { withoutAlbum } from "./view";
 
 /**
  * The Collection exports (Premium): a file of exactly the Items a Collection
- * view shows, in its order, made on the server in the person's language.
+ * view shows, in its order, made on the server in the person's language. A
+ * Collection too large to read in one go isn't exported at all, rather than
+ * exported with Items missing.
  */
 
 /** Every Home currency divides into 100 minor units (packages/i18n). */
@@ -86,7 +88,8 @@ export const csv = query({
   handler: async (ctx, { view, locale }) => {
     const owner = await requirePremium(ctx);
     const written = locale ?? owner.language ?? defaultLocale;
-    const { items } = await findItems(ctx, owner, view, written);
+    const { items, complete } = await findItems(ctx, owner, view, written);
+    if (!complete) throw new ConvexError(collectionExportErrors.incomplete);
     const labels = exportLabels[written];
     return formatCsvFile([
       csvColumns.map((column) => labels.columns[column]),
@@ -111,10 +114,6 @@ export const pdfContents = v.object({
   albumName: v.optional(v.string()),
   /** The country the origin filter compares against; null when there's none. */
   ownCountry: v.union(v.string(), v.null()),
-  /** False when the Collection was too large to read whole (see browse.ts). */
-  complete: v.boolean(),
-  /** How many Items were read, for saying how far an incomplete view goes. */
-  collectionSize: v.number(),
   /** One per Item, in the view's order. Amounts are for all of an Item's pieces. */
   rows: v.array(
     v.object({
@@ -150,7 +149,8 @@ export type PdfContents = Infer<typeof pdfContents>;
  * What the Collection PDF shows, for the signed-in Premium member (the action
  * that makes the PDF runs this as them): exactly the Items the view shows, in
  * its order, each with its amounts × Quantity and Gain/loss, and the totals.
- * A view with more Items than a PDF lists is turned away rather than cut short.
+ * A view with more Items than a PDF lists, or of a Collection too large to
+ * read whole, is turned away rather than cut short.
  */
 export const pdf = internalQuery({
   args: {
@@ -162,12 +162,13 @@ export const pdf = internalQuery({
   handler: async (ctx, { view, locale }) => {
     const owner = await requirePremium(ctx);
     const written = locale ?? owner.language ?? defaultLocale;
-    const { items, ownCountry, complete, collectionSize } = await findItems(
+    const { items, ownCountry, complete } = await findItems(
       ctx,
       owner,
       view,
       written,
     );
+    if (!complete) throw new ConvexError(collectionExportErrors.incomplete);
     if (items.length > collectionPdfLimits.items)
       throw new ConvexError(collectionExportErrors.tooManyItems);
     const currency = owner.homeCurrency;
@@ -189,8 +190,6 @@ export const pdf = internalQuery({
       view,
       albumName: album && album.ownerId === owner._id ? album.name : undefined,
       ownCountry,
-      complete,
-      collectionSize,
       rows: items.map((item) => ({
         type: item.type,
         title: item.title,
