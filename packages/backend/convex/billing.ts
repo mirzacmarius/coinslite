@@ -259,6 +259,7 @@ export const recordSubscription = internalMutation({
     const subscriptionId =
       stored?._id ?? (await ctx.db.insert("subscriptions", subscription));
     await bookPremiumCheck(ctx, subscriptionId, subscription.premiumUntil);
+    await updatePlanCopies(ctx, userId);
     return null;
   },
 });
@@ -323,9 +324,42 @@ export const endPremiumIfDue = internalMutation({
     const state = premiumState(subscription);
     await ctx.db.patch(subscriptionId, state);
     await bookPremiumCheck(ctx, subscriptionId, state.premiumUntil);
+    await updatePlanCopies(ctx, subscription.userId);
     return null;
   },
 });
+
+/**
+ * The person's plan as the admin user list sorts and filters by it
+ * (admin/users.ts): "premium" while a subscription makes them Premium, with
+ * the end of its paid period if it has one; nothing on the Free plan.
+ */
+export async function planCopiesOf(ctx: QueryCtx, userId: Id<"users">) {
+  const subscription = await premiumSubscriptionOf(ctx, userId);
+  return {
+    plan: subscription ? ("premium" as const) : undefined,
+    planEnd: subscription?.currentPeriodEnd,
+  };
+}
+
+/**
+ * Brings the copies of a person's plan up to date: on their profile and on
+ * their Collection counts, where the admin user list finds them. Runs after
+ * every change to whether, or until when, a subscription makes them Premium.
+ */
+export async function updatePlanCopies(ctx: MutationCtx, userId: Id<"users">) {
+  const user = await ctx.db.get(userId);
+  if (!user) return;
+  const { plan, planEnd } = await planCopiesOf(ctx, userId);
+  if (user.plan !== plan || user.planEnd !== planEnd) {
+    await ctx.db.patch(userId, { plan, planEnd });
+  }
+  const counts = await ctx.db
+    .query("collectionCounts")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .unique();
+  if (counts && counts.plan !== plan) await ctx.db.patch(counts._id, { plan });
+}
 
 /** Every subscription record a person has; a handful at most. */
 const subscriptionsOf = (ctx: QueryCtx, userId: Id<"users">) =>

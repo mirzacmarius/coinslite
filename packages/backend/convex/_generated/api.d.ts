@@ -22,6 +22,8 @@ import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as admin_roles from "../admin/roles.js";
 import type * as admin_stats from "../admin/stats.js";
 import type * as admin_statsFigures from "../admin/statsFigures.js";
+import type * as admin_userList from "../admin/userList.js";
+import type * as admin_users from "../admin/users.js";
 import type * as albums from "../albums.js";
 import type * as albums_membership from "../albums/membership.js";
 import type * as albums_rules from "../albums/rules.js";
@@ -100,6 +102,8 @@ declare const fullApi: ApiFromModules<{
   "admin/roles": typeof admin_roles;
   "admin/stats": typeof admin_stats;
   "admin/statsFigures": typeof admin_statsFigures;
+  "admin/userList": typeof admin_userList;
+  "admin/users": typeof admin_users;
   albums: typeof albums;
   "albums/membership": typeof albums_membership;
   "albums/rules": typeof albums_rules;

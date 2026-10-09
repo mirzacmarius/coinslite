@@ -41,7 +41,8 @@ import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
  * someone's data, deleted below).
  */
 export const accountDataByTable = {
-  users: "deleted at once: the profile",
+  users:
+    "deleted at once: the profile, with when they last signed in and the copies of their name key and plan the admin user list sorts by",
   authAccounts: "deleted at once: the sign-in methods",
   authVerificationCodes: "deleted at once: codes pending for a sign-in method",
   authRateLimits:
@@ -56,7 +57,7 @@ export const accountDataByTable = {
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   collectionCounts:
-    "deleted at once: how many Items and Albums the Collection holds",
+    "deleted at once: how many Items and Albums the Collection holds, with a copy of the plan",
   adminStats: "kept: figures across everyone, which name no one",
   devOutbox:
     "deleted: emails sent to the account's address (local and CI deployments only)",
