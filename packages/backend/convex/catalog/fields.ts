@@ -157,13 +157,13 @@ const groupValues: Record<ProvenanceGroup, ValueKey[]> = {
 };
 
 /** Coins only: a banknote has no metal or size. */
-const coinOnly: ValueKey[] = [
+export const coinOnlyValues = [
   "material",
   "metal",
   "weight",
   "fineness",
   "diameter",
-];
+] as const satisfies readonly ValueKey[];
 
 class CellError {
   constructor(readonly code: CatalogError) {}
@@ -520,7 +520,7 @@ export function checkNode(
       code: catalogErrors.itemTypeRequired,
     });
   if (values.itemType === "banknote") {
-    for (const value of coinOnly) {
+    for (const value of coinOnlyValues) {
       if (values[value] !== undefined)
         problems.push({
           column: columnOf[value],

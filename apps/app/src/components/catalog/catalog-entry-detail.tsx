@@ -14,6 +14,7 @@ import {
 import type { FunctionReturnType } from "convex/server";
 import { Banknote, Coins } from "lucide-react";
 import type * as React from "react";
+import { CatalogEntryEdit } from "./catalog-entry-edit";
 import { CatalogHeader, type Crumb } from "./catalog-header";
 import { CatalogImageAdmin } from "./catalog-image-admin";
 import { QuickAdd } from "./quick-add";
@@ -94,6 +95,7 @@ export function CatalogEntryDetail({
         title={entry.title}
         actions={
           <>
+            <CatalogEntryEdit entryKey={entry.key} />
             <QuickAdd entry={entry} />
             {actions}
           </>

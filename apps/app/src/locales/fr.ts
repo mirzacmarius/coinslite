@@ -688,6 +688,10 @@ export default {
       TOO_DEEP: "Le catalogue compte au plus 8 niveaux.",
       ENTRY_HAS_CHILDREN:
         "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
+      ENTRY_HAS_ITEMS:
+        "Des objets sont liés à cette entrée du catalogue : elle le reste. Gardez is_addable à true.",
+      TOO_MANY_LINKED_ITEMS:
+        "Plus de 1 000 objets sont liés aux entrées dont le type d’objet change. Modifiez-en moins à la fois.",
     },
   },
   collection: {
@@ -1139,6 +1143,140 @@ export default {
       REPORT_TOO_LARGE:
         "Ce rapport compte trop d’objets. Choisissez moins d’albums.",
       ALBUM_NOT_FOUND: "L’un des albums choisis n’existe plus.",
+    },
+  },
+  catalogEditor: {
+    menu: "Éditeur du catalogue",
+    title: "Éditeur du catalogue",
+    description:
+      "Tous les pays, thèmes, regroupements et entrées du catalogue. Les modifications s’appliquent tout de suite au catalogue que chacun parcourt et aux objets qui y sont liés.",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent modifier le catalogue.",
+    addRoot: "Ajouter un pays ou un thème",
+    importExport: "Import et export",
+    emptyTitle: "Le catalogue est vide",
+    emptyDescription:
+      "Ajoutez un pays ou un thème pour commencer, ou importez un fichier CSV.",
+    nothingBelow: "Rien en dessous pour l’instant",
+    showMore: "Afficher plus",
+    expand: "Afficher ce qui se trouve sous {title}",
+    collapse: "Masquer ce qui se trouve sous {title}",
+    actions: "Actions pour {title}",
+    moreActions: "Plus d’actions",
+    addBelow: "Ajouter en dessous",
+    addBelowNamed: "Ajouter sous {title}",
+    edit: "Modifier",
+    editEntry: "Modifier",
+    openInCatalog: "Ouvrir dans le catalogue",
+    delete: "Supprimer",
+    kinds: {
+      country: "Pays",
+      theme: "Thème",
+      grouping: "Regroupement",
+      entry: "Entrée du catalogue",
+    },
+    kindHints: {
+      country: "Un pays tout en haut du catalogue.",
+      theme:
+        "Un groupe qui couvre plusieurs pays, comme les pièces commémoratives de 2 euros. Ajoutez ses pays en dessous.",
+      grouping:
+        "Regroupe ce qui se trouve en dessous, comme une valeur faciale ou une série.",
+      entry:
+        "Une émission précise. Seules les entrées du catalogue peuvent devenir des objets.",
+    },
+    "entryCount#zero": "Aucune entrée du catalogue",
+    "entryCount#one": "1 entrée du catalogue",
+    "entryCount#few": "{count} entrées du catalogue",
+    "entryCount#other": "{count} entrées du catalogue",
+    newNode: "Nouveau nœud",
+    editNode: "Modifier le nœud",
+    sheetDescription:
+      "Les valeurs du nœud, et d’où viennent ses données et ses notes.",
+    close: "Fermer",
+    kind: "Nature",
+    id: "Identifiant",
+    idHint:
+      "Son identifiant dans les fichiers CSV, qui ne pourra plus changer. Lettres minuscules, chiffres, points, tirets et tirets bas.",
+    idFixedHint: "Son identifiant dans les fichiers CSV.",
+    sortOrder: "Ordre de tri",
+    sortOrderHint:
+      "Les plus petits nombres passent en premier parmi les nœuds voisins.",
+    setItemType: "Choisir le type d’objet",
+    noItemType: "Aucun type d’objet",
+    noCountry: "Aucun pays",
+    yearFrom: "Première année",
+    yearTo: "Dernière année",
+    yearHint: "Les années av. J.-C. en nombres négatifs.",
+    yearToHint: "Laissez vide pour une émission d’une seule année.",
+    weightHint: "Grammes",
+    finenessHint: "La part de métal, par ex. 0,9 pour 900/1000.",
+    factsSources: "D’où viennent les données",
+    notesSources: "D’où viennent les notes",
+    sourcesHint:
+      "Les données et les notes doivent indiquer leur source. Aucune donnée d’origine inconnue n’est enregistrée dans le catalogue.",
+    numistaId: "Numéro Numista",
+    numistaHint: "Simple renvoi : aucune donnée de Numista n’est enregistrée.",
+    image: "Image",
+    imageHint: "Pas encore d’image. Ajoutez-en une avec son crédit.",
+    add: "Ajouter le nœud",
+    added: "« {title} » ajouté au catalogue",
+    saved: "« {title} » enregistré",
+    deleteTitle: "Supprimer « {title} » ?",
+    deleteCounting: "Calcul de ce qui sera supprimé avec…",
+    deleteTooLarge:
+      "Cela emporterait plus de {nodes} nœuds ou {items} objets liés. Supprimez d’abord les nœuds en dessous.",
+    "deleteBelow#zero": "Rien en dessous n’est supprimé avec.",
+    "deleteBelow#one": "1 nœud en dessous est supprimé avec.",
+    "deleteBelow#few": "{count} nœuds en dessous sont supprimés avec.",
+    "deleteBelow#other": "{count} nœuds en dessous sont supprimés avec.",
+    "deleteItems#zero": "Aucun objet n’y est lié.",
+    "deleteItems#one":
+      "1 objet est lié à une entrée du catalogue ici et garde ses données comme les siennes.",
+    "deleteItems#few":
+      "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
+    "deleteItems#other":
+      "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
+    deleted: "« {title} » supprimé",
+    deleteFailed: "Impossible de supprimer. Réessayez.",
+    errors: {
+      TITLE_REQUIRED: "Donnez-lui un titre.",
+      TOO_LONG: "C’est trop long.",
+      INVALID_VALUE: "Choisissez l’une des valeurs proposées.",
+      INVALID_COUNTRY: "Choisissez un pays.",
+      INVALID_NUMBER: "Saisissez un nombre dans la plage autorisée.",
+      INVALID_YEAR:
+        "Saisissez une année entière, les années av. J.-C. en nombres négatifs.",
+      INVALID_URL:
+        "Saisissez une adresse web complète commençant par https://.",
+      NUMISTA_DATA:
+        "Aucune donnée de Numista ne peut être enregistrée. Gardez seulement le numéro Numista.",
+      ITEM_TYPE_REQUIRED: "Une entrée du catalogue a besoin d’un type d’objet.",
+      FIELD_NOT_FOR_TYPE: "Les billets n’ont ni métal ni dimensions.",
+      YEARS_REVERSED: "La dernière année précède la première.",
+      SOURCE_REQUIRED: "Indiquez la source de ces données ou de ces notes.",
+      CREDIT_REQUIRED:
+        "L’image doit indiquer sa source, son auteur, sa licence et son lien.",
+      ROOT_NOT_ADDABLE:
+        "Un pays ou un thème ne peut pas être une entrée du catalogue.",
+      PARENT_NOT_FOUND:
+        "Le nœud au-dessus n’existe plus. Fermez ceci et réessayez.",
+      PARENT_IS_ENTRY: "Rien ne peut se trouver sous une entrée du catalogue.",
+      TOO_DEEP: "Le catalogue compte au plus 8 niveaux.",
+      ENTRY_HAS_CHILDREN:
+        "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
+      ENTRY_HAS_ITEMS:
+        "Des objets sont liés à cette entrée du catalogue : elle le reste.",
+      TOO_MANY_LINKED_ITEMS:
+        "Plus de 1 000 objets sont liés à cette entrée, trop pour changer leur type d’objet d’un coup.",
+      ID_REQUIRED: "Donnez-lui un identifiant.",
+      INVALID_ID:
+        "Utilisez jusqu’à 64 lettres minuscules, chiffres, points, tirets et tirets bas.",
+      DUPLICATE_ID: "Un autre nœud a déjà cet identifiant.",
+      COUNTRY_REQUIRED: "Choisissez le pays, ou faites-en un thème.",
+      CATALOG_NODE_NOT_FOUND: "Ce nœud n’est plus dans le catalogue.",
+      NOT_ADMIN: "Seuls les administrateurs peuvent modifier le catalogue.",
+      failed: "Impossible d’enregistrer. Réessayez.",
     },
   },
 } as const satisfies Dictionary;

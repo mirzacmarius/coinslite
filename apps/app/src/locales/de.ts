@@ -700,6 +700,10 @@ export default {
       TOO_DEEP: "Der Katalog hat höchstens 8 Ebenen.",
       ENTRY_HAS_CHILDREN:
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
+      ENTRY_HAS_ITEMS:
+        "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer. Lass is_addable auf true.",
+      TOO_MANY_LINKED_ITEMS:
+        "Mit den Einträgen, deren Objektart sich ändert, sind über 1.000 Objekte verknüpft. Ändere weniger auf einmal.",
     },
   },
   collection: {
@@ -1154,6 +1158,137 @@ export default {
       REPORT_TOO_LARGE:
         "Dieser Bericht hat zu viele Objekte. Wähle weniger Alben.",
       ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
+    },
+  },
+  catalogEditor: {
+    menu: "Katalog bearbeiten",
+    title: "Katalog bearbeiten",
+    description:
+      "Alle Länder, Themen, Gruppierungen und Katalogeinträge. Änderungen gelten sofort für den Katalog, den alle durchsuchen, und für die damit verknüpften Objekte.",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription: "Nur Admins können den Katalog bearbeiten.",
+    addRoot: "Land oder Thema hinzufügen",
+    importExport: "Import und Export",
+    emptyTitle: "Der Katalog ist leer",
+    emptyDescription:
+      "Füge zuerst ein Land oder ein Thema hinzu, oder importiere eine CSV-Datei.",
+    nothingBelow: "Noch nichts darunter",
+    showMore: "Mehr anzeigen",
+    expand: "Zeigen, was unter {title} steht",
+    collapse: "Ausblenden, was unter {title} steht",
+    actions: "Aktionen für {title}",
+    moreActions: "Weitere Aktionen",
+    addBelow: "Darunter hinzufügen",
+    addBelowNamed: "Unter {title} hinzufügen",
+    edit: "Bearbeiten",
+    editEntry: "Bearbeiten",
+    openInCatalog: "Im Katalog öffnen",
+    delete: "Löschen",
+    kinds: {
+      country: "Land",
+      theme: "Thema",
+      grouping: "Gruppierung",
+      entry: "Katalogeintrag",
+    },
+    kindHints: {
+      country: "Ein Land ganz oben im Katalog.",
+      theme:
+        "Eine Gruppe über mehrere Länder, etwa 2-Euro-Gedenkmünzen. Füge ihre Länder darunter hinzu.",
+      grouping:
+        "Fasst zusammen, was darunter steht, etwa einen Nennwert oder eine Serie.",
+      entry:
+        "Eine bestimmte Ausgabe. Nur aus Katalogeinträgen können Objekte werden.",
+    },
+    "entryCount#zero": "Keine Katalogeinträge",
+    "entryCount#one": "1 Katalogeintrag",
+    "entryCount#few": "{count} Katalogeinträge",
+    "entryCount#other": "{count} Katalogeinträge",
+    newNode: "Neuer Knoten",
+    editNode: "Knoten bearbeiten",
+    sheetDescription:
+      "Die Werte des Knotens und woher seine Fakten und Hinweise stammen.",
+    close: "Schließen",
+    kind: "Art",
+    id: "ID",
+    idHint:
+      "Seine ID in CSV-Dateien, die sich später nicht ändern lässt. Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
+    idFixedHint: "Seine ID in CSV-Dateien.",
+    sortOrder: "Reihenfolge",
+    sortOrderHint: "Kleinere Zahlen stehen unter Geschwistern weiter vorn.",
+    setItemType: "Objektart wählen",
+    noItemType: "Keine Objektart",
+    noCountry: "Kein Land",
+    yearFrom: "Erstes Jahr",
+    yearTo: "Letztes Jahr",
+    yearHint: "Jahre v. Chr. als negative Zahlen.",
+    yearToHint: "Leer lassen bei einer Ausgabe aus einem Jahr.",
+    weightHint: "Gramm",
+    finenessHint: "Der Anteil des Metalls, z. B. 0,9 für 900/1000.",
+    factsSources: "Woher die Fakten stammen",
+    notesSources: "Woher die Hinweise stammen",
+    sourcesHint:
+      "Fakten und Hinweise brauchen ihre Quelle. Katalogdaten unbekannter Herkunft werden nicht gespeichert.",
+    numistaId: "Numista-Nummer",
+    numistaHint:
+      "Nur ein Querverweis: Es werden keine Numista-Daten gespeichert.",
+    image: "Bild",
+    imageHint: "Noch kein Bild. Füge eines mit seinem Nachweis hinzu.",
+    add: "Knoten hinzufügen",
+    added: "„{title}“ zum Katalog hinzugefügt",
+    saved: "„{title}“ gespeichert",
+    deleteTitle: "„{title}“ löschen?",
+    deleteCounting: "Zählt, was mitgelöscht wird …",
+    deleteTooLarge:
+      "Damit würden mehr als {nodes} Knoten oder {items} verknüpfte Objekte mitgelöscht. Lösche zuerst die Knoten darunter.",
+    "deleteBelow#zero": "Darunter wird nichts mitgelöscht.",
+    "deleteBelow#one": "1 Knoten darunter wird mitgelöscht.",
+    "deleteBelow#few": "{count} Knoten darunter werden mitgelöscht.",
+    "deleteBelow#other": "{count} Knoten darunter werden mitgelöscht.",
+    "deleteItems#zero": "Keine Objekte sind damit verknüpft.",
+    "deleteItems#one":
+      "1 Objekt ist mit einem Katalogeintrag hier verknüpft und behält dessen Fakten als eigene.",
+    "deleteItems#few":
+      "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    "deleteItems#other":
+      "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    deleted: "„{title}“ gelöscht",
+    deleteFailed: "Konnte nicht gelöscht werden. Versuche es noch einmal.",
+    errors: {
+      TITLE_REQUIRED: "Gib einen Titel ein.",
+      TOO_LONG: "Das ist zu lang.",
+      INVALID_VALUE: "Wähle einen der angebotenen Werte.",
+      INVALID_COUNTRY: "Wähle ein Land.",
+      INVALID_NUMBER: "Gib eine Zahl im zulässigen Bereich ein.",
+      INVALID_YEAR:
+        "Gib ein ganzes Jahr ein, Jahre v. Chr. als negative Zahlen.",
+      INVALID_URL:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      NUMISTA_DATA:
+        "Numista-Daten dürfen nicht gespeichert werden. Behalte nur die Numista-Nummer.",
+      ITEM_TYPE_REQUIRED: "Ein Katalogeintrag braucht eine Objektart.",
+      FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Maße.",
+      YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
+      SOURCE_REQUIRED: "Nenne die Quelle dieser Fakten oder Hinweise.",
+      CREDIT_REQUIRED: "Das Bild braucht Quelle, Urheber, Lizenz und Link.",
+      ROOT_NOT_ADDABLE: "Ein Land oder Thema kann kein Katalogeintrag sein.",
+      PARENT_NOT_FOUND:
+        "Der Knoten darüber ist weg. Schließe dies und versuche es noch einmal.",
+      PARENT_IS_ENTRY: "Unter einem Katalogeintrag kann nichts stehen.",
+      TOO_DEEP: "Der Katalog geht höchstens 8 Ebenen tief.",
+      ENTRY_HAS_CHILDREN:
+        "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
+      ENTRY_HAS_ITEMS:
+        "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer.",
+      TOO_MANY_LINKED_ITEMS:
+        "Mit diesem Eintrag sind über 1.000 Objekte verknüpft, zu viele, um ihre Objektart auf einmal zu ändern.",
+      ID_REQUIRED: "Gib eine ID ein.",
+      INVALID_ID:
+        "Verwende bis zu 64 Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
+      DUPLICATE_ID: "Ein anderer Knoten hat diese ID schon.",
+      COUNTRY_REQUIRED: "Wähle das Land, oder mach es zu einem Thema.",
+      CATALOG_NODE_NOT_FOUND: "Dieser Knoten ist nicht mehr im Katalog.",
+      NOT_ADMIN: "Nur Admins können den Katalog bearbeiten.",
+      failed: "Konnte nicht gespeichert werden. Versuche es noch einmal.",
     },
   },
 } as const satisfies Dictionary;
