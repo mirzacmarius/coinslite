@@ -6,6 +6,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
+import { addManually, catalogPicker } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -21,12 +22,12 @@ test("the Insurance report is Premium's; a Premium member previews it and downlo
   // An American browser suggests US dollars as the Home currency.
   await signUpAndVerify(page, email);
 
+  // A coin starts on the Catalog picker; this one is typed in.
   await expect(async () => {
     await page.keyboard.press("c");
-    await expect(page.getByRole("dialog", { name: "New Item" })).toBeVisible({
-      timeout: 1000,
-    });
+    await expect(catalogPicker(page)).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("2 kroner 1914");
   await dialog.getByLabel("Quantity").fill("3");

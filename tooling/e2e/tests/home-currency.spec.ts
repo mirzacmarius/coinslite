@@ -5,6 +5,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
+import { addManually } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -40,6 +41,7 @@ test("changing the Home currency converts the Collection's amounts", async ({
     .getByRole("button", { name: "Add Item" })
     .first()
     .click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill("Morgan dollar 1881-S");
   await dialog.getByRole("button", { name: "More details" }).click();
@@ -73,6 +75,11 @@ test("changing the Home currency converts the Collection's amounts", async ({
   await visiblePage(page)
     .getByRole("link", { name: /Morgan dollar 1881-S/ })
     .click();
+  // The Collection shows the amount too; check it on the Item once it's open.
+  const detail = visiblePage(page);
+  await expect(
+    detail.getByRole("heading", { level: 1, name: "Morgan dollar 1881-S" }),
+  ).toBeVisible();
   // $75.50 at 0.80 is €60.40.
-  await expect(visiblePage(page).getByText("€60.40")).toBeVisible();
+  await expect(detail.getByText("€60.40")).toBeVisible();
 });

@@ -1,5 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
+import { addManually } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -8,9 +9,10 @@ test.skip(
 );
 test.use({ locale: "en-US" });
 
-/** Adds an Item of the given type with just a title. */
+/** Adds an Item of the given type with just a title, typed in rather than picked from the Catalog. */
 async function addItem(page: Page, main: Locator, title: string, type: string) {
   await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await dialog.getByLabel("Title").fill(title);
   if (type !== "Coin") {
@@ -66,7 +68,10 @@ test("search, filter, sort and switch views, with the view kept in the URL", asy
   await expect(
     reloaded.getByRole("listitem").getByRole("link").first(),
   ).toContainText("Posthorn");
-  await page.getByRole("radio", { name: "Grid" }).check();
+  // The radio itself is visually hidden; people pick the segment's label.
+  const display = page.getByRole("dialog");
+  await display.getByText("Grid", { exact: true }).click();
+  await expect(display.getByRole("radio", { name: "Grid" })).toBeChecked();
   await page.keyboard.press("Escape");
   await page.goto(`${appUrl}/collection`);
   const later = visiblePage(page);
