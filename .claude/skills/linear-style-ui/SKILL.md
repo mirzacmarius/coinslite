@@ -37,7 +37,11 @@ so write `t("...")` keys, not literals.
    sizes and code recipes; this file holds only the rules that apply everywhere.
 3. **Check `packages/ui/src/components`** for an existing component. If a shadcn component is
    missing, add it following `references/shadcn-setup.md` (monorepo gotchas: relative `../utils`
-   imports, per-file `exports`, lucide icons).
+   imports, per-file `exports`, lucide icons). Pattern primitives live in `@coinslite/ui` too
+   (`HeaderBar`, `PropertyPicker`, `Kbd`, `Field`, `ItemTypeIcon`); the ones not yet in the
+   repo (PropertyRow, ConfirmDialog, MoneyInput, QuantityInput) and a PropertyPicker with
+   multi-select and inline create are in `assets/components/`. Copy from there instead of
+   rewriting; see the README there.
 4. **Build with the recipes**, then add a section to the `/design` gallery
    (`apps/app/src/app/[locale]/design/gallery.tsx`) if you created a reusable pattern.
 5. **Run the checklist** at the end of this file: keyboard, both themes, phone width, axe.
@@ -164,7 +168,7 @@ sentence and offer the one button that does it.
 - [ ] Looks right in light and dark (`.dark` class) and at 375px wide.
 - [ ] Loading, empty and error states exist; filtered-empty differs from truly empty.
 - [ ] New reusable pattern added to the `/design` gallery; e2e axe scan still passes
-      (`bun test:e2e -- design-system`).
+      (`bun test:e2e design-system`).
 
 ## References
 
@@ -180,3 +184,6 @@ sentence and offer the one button that does it.
   pills and pickers, property rows, optional groups, validation, inline editing, TanStack Form.
 - `references/shadcn-setup.md`: adding shadcn components to `packages/ui` in this monorepo,
   the list of components this style needs, and the post-add fixes.
+- `assets/components/`: drop-in `packages/ui` files for the pattern primitives (PropertyPicker
+  with single/multi select and inline create, PropertyRow, Kbd, ConfirmDialog, MoneyInput,
+  QuantityInput). Copy, export, format; don't reimplement.
