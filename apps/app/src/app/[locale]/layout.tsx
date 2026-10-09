@@ -1,5 +1,6 @@
 import "@coinslite/ui/globals.css";
 import { NewDeploymentReload } from "@/components/new-deployment-reload";
+import { ThemeProvider } from "@/components/theme-provider";
 import { brand } from "@/lib/brand";
 import { I18nProvider } from "@/locales/client";
 import { loaders } from "@/locales/loaders";
@@ -11,7 +12,6 @@ import { cn } from "@coinslite/ui/utils";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
-import { ThemeProvider } from "next-themes";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { ConvexClientProvider } from "../convex-client-provider";
