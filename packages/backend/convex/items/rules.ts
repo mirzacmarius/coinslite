@@ -1,5 +1,6 @@
 import { isCountryCode } from "@coinslite/i18n";
 import { ConvexError } from "convex/values";
+import type { Metal } from "../spotPrices/rates";
 import {
   type GradingScale,
   type ItemType,
@@ -26,6 +27,7 @@ export const itemErrors = {
   invalidStrike: "INVALID_STRIKE",
   invalidNumber: "INVALID_NUMBER",
   notForType: "FIELD_NOT_FOR_TYPE",
+  metalRequired: "METAL_REQUIRED",
 } as const;
 
 /** What a coin is made of. */
@@ -64,6 +66,10 @@ export const typeOnlyFields = {
   ruler: ["coin", "banknote"],
   mintage: ["coin", "banknote"],
   numistaNumber: ["coin", "banknote"],
+  bullion: ["coin"],
+  metal: ["coin"],
+  weight: ["coin"],
+  purity: ["coin"],
 } as const satisfies Record<string, readonly ItemType[]>;
 
 export const fieldSuits = (
@@ -91,6 +97,10 @@ export const itemLimits = {
   earliestYear: -3000,
   /** Amounts in minor units: up to a hundred billion in any Home currency. */
   amount: 10_000_000_000_000,
+  /** Grams, kept to milligrams: up to 100 kg, for the largest bullion coins. */
+  weight: 100_000,
+  /** The precious metal's share of the weight; 0.9999 is "four nines" fine. */
+  purity: 1,
 } as const;
 
 /** The fields a person types for an Item, as sent by the add form. */
@@ -110,6 +120,12 @@ export type ItemInput = {
   diameter?: number;
   thickness?: number;
   numistaNumber?: number;
+  bullion?: boolean;
+  metal?: Metal;
+  /** Grams. */
+  weight?: number;
+  /** Above 0 and at most 1. */
+  purity?: number;
   grade?: string;
   gradingScale?: GradingScale;
   gradeNote?: string;
@@ -214,6 +230,7 @@ export function checkItem(input: ItemInput, today: string) {
       "numistaNumber",
       wholeNumber(input.numistaNumber, Number.MAX_SAFE_INTEGER),
     ),
+    ...checkPreciousMetal(input),
     ...checkGrade(input),
     ...(country && { country }),
     ...(input.year !== undefined && { year: input.year }),
@@ -243,6 +260,28 @@ function millimetres(value: number | undefined, max: number) {
   if (!Number.isFinite(value) || value <= 0 || value > max)
     fail(itemErrors.invalidNumber);
   return Math.round(value * 100) / 100;
+}
+
+/** A measure above zero and at most `max`, kept to `decimals` places. */
+function positive(value: number | undefined, max: number, decimals: number) {
+  if (value === undefined) return undefined;
+  const scale = 10 ** decimals;
+  const kept = Math.round(value * scale) / scale;
+  if (!Number.isFinite(kept) || kept <= 0 || kept > max)
+    fail(itemErrors.invalidNumber);
+  return kept;
+}
+
+/** A coin's precious metal. Weight and purity are the metal's, so they need one. */
+function checkPreciousMetal({ bullion, metal, weight, purity }: ItemInput) {
+  if ((weight !== undefined || purity !== undefined) && metal === undefined)
+    fail(itemErrors.metalRequired);
+  return {
+    ...(bullion && { bullion }),
+    ...(metal && { metal }),
+    ...withNumber("weight", positive(weight, itemLimits.weight, 3)),
+    ...withNumber("purity", positive(purity, itemLimits.purity, 5)),
+  };
 }
 
 /**
@@ -277,3 +316,14 @@ const withText = <K extends string>(key: K, value: string | undefined) =>
   (value === undefined ? {} : { [key]: value }) as Partial<Record<K, string>>;
 const withNumber = <K extends string>(key: K, value: number | undefined) =>
   (value === undefined ? {} : { [key]: value }) as Partial<Record<K, number>>;
+
+/**
+ * Every Item field that holds money, in minor units of the owner's Home
+ * currency. Changing the Home currency converts exactly these, so a new money
+ * field on Items belongs here too.
+ */
+export const itemMoneyFields = [
+  "purchasePrice",
+  "marketValue",
+] as const satisfies ReadonlyArray<keyof ItemInput>;
+export type ItemMoneyField = (typeof itemMoneyFields)[number];

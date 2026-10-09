@@ -6,6 +6,7 @@
     "dev": "convex dev --tail-logs",
     "setup": "convex dev --once && bun scripts/link-app-env.ts",
     "seed": "convex dev --once && convex run init",
+    "seed:catalog": "convex run catalog/seed:load",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit -p convex",

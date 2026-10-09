@@ -18,6 +18,11 @@ const app = defineApp({
      */
     FEEDBACK_EMAIL: v.optional(v.string()),
     /**
+     * MetalpriceAPI key for Spot prices and exchange rates. Without it the
+     * refresh logs a warning and the last stored prices stay in place.
+     */
+    METALPRICE_API_KEY: v.optional(v.string()),
+    /**
      * Polar billing (billing.ts). Until all of the organization token and both
      * Premium product ids are set, the Premium page says checkout isn't
      * available on this deployment; without the webhook secret, Polar's

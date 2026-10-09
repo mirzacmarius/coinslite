@@ -1,5 +1,7 @@
 "use client";
 
+import { AlbumPicker } from "@/components/albums/album-picker";
+import { useAlbums } from "@/components/albums/use-albums";
 import {
   ItemLimitNotice,
   isItemLimitError,
@@ -12,10 +14,15 @@ import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
 import {
+  type BullionPresetId,
+  bullionPresets,
+} from "@coinslite/backend/convex/items/preciousMetal";
+import {
   fieldSuits,
   itemLimits,
   materials,
 } from "@coinslite/backend/convex/items/rules";
+import { metals } from "@coinslite/backend/convex/spotPrices/rates";
 import { countryCodes, formatCountry, parseMoney } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
@@ -32,7 +39,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coinslite/ui/dialog";
-import { Field } from "@coinslite/ui/field";
+import { CheckboxField, Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { MoneyInput } from "@coinslite/ui/money-input";
@@ -51,10 +58,11 @@ import {
   Library,
   Loader2,
   Ruler,
+  Sparkles,
   X,
 } from "lucide-react";
 import type * as React from "react";
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
@@ -64,8 +72,10 @@ import {
   blankItem,
   detailFields,
   hasDetails,
+  matchingPreset,
   parseDecimal,
   parseWholeNumber,
+  presetValues,
   scaleOf,
   valuesFromItem,
 } from "./item-form";
@@ -88,6 +98,8 @@ type TextField =
   | "materialNote"
   | "diameter"
   | "thickness"
+  | "weight"
+  | "purity"
   | "gradeNote"
   | "purchaseDate"
   | "source";
@@ -117,6 +129,8 @@ export function ItemFormDialog({
   const titleRef = useRef<HTMLInputElement>(null);
   const baseId = useId();
   const labels = useGradeLabels();
+  // Only while open: the "New Item" dialog is mounted on every page.
+  const albums = useAlbums(open);
   // One object for the dialog's life: the form resets when it sees new defaults.
   const [defaults] = useState(() =>
     item ? valuesFromItem(item, locale) : blankItem(),
@@ -160,6 +174,14 @@ export function ItemFormDialog({
         (text) => (parseDecimal(text) ?? 0) > 0,
         t("items.errors.number"),
       ),
+      weight: optional((text) => {
+        const grams = parseDecimal(text) ?? 0;
+        return grams > 0 && grams <= itemLimits.weight;
+      }, t("preciousMetal.errors.weight")),
+      purity: optional((text) => {
+        const purity = parseDecimal(text) ?? 0;
+        return purity > 0 && purity <= itemLimits.purity;
+      }, t("preciousMetal.errors.purity")),
       purchaseDate: z
         .string()
         .refine(
@@ -188,6 +210,14 @@ export function ItemFormDialog({
     value: material,
     label: t(`items.materials.${material}`),
   }));
+  const metalOptions = metals.map((metal) => ({
+    value: metal,
+    label: t(`items.materials.${metal}`),
+  }));
+  const presetOptions = bullionPresets.map(({ id }) => ({
+    value: id,
+    label: t(`preciousMetal.presets.${id}`),
+  }));
 
   const form = useForm({
     defaultValues: defaults,
@@ -201,6 +231,9 @@ export function ItemFormDialog({
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       const args = argsFromValues(value, locale);
+      // An Album deleted since the form opened can't take the Item.
+      if (albums && !albums.some((album) => album._id === args.albumId))
+        args.albumId = undefined;
       try {
         if (item) await updateItem({ itemId: item._id, ...args });
         else await addItem(args);
@@ -223,12 +256,24 @@ export function ItemFormDialog({
         // "Create more" keeps the pills for the next Item.
         form.setFieldValue("type", value.type);
         form.setFieldValue("country", value.country);
+        form.setFieldValue("albumId", value.albumId);
         titleRef.current?.focus();
       } else {
         onOpenChange(false);
       }
     },
   });
+  // With exactly one Album, a new Item goes into it unless the person picks otherwise.
+  const onlyAlbum = !item && albums?.length === 1 ? albums[0]?._id : undefined;
+  useEffect(() => {
+    if (
+      open &&
+      onlyAlbum &&
+      form.getFieldValue("albumId") === undefined &&
+      !form.getFieldMeta("albumId")?.isTouched
+    )
+      form.setFieldValue("albumId", onlyAlbum, { dontUpdateMeta: true });
+  }, [open, onlyAlbum, form]);
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
@@ -244,6 +289,23 @@ export function ItemFormDialog({
   );
   const scale = scaleOf(values);
   const isCoin = values.type === "coin";
+  const metal = form.useStore((state) => state.values.metal);
+  const preset = form.useStore(
+    (state) => matchingPreset(bullionPresets, state.values)?.id,
+  );
+  /** Fills the precious metal and country from a bullion coin, and the title when it's empty. */
+  const applyPreset = (id: BullionPresetId) => {
+    const chosen = bullionPresets.find((preset) => preset.id === id);
+    if (!chosen) return;
+    const filled = presetValues(chosen, locale);
+    form.setFieldValue("metal", filled.metal);
+    form.setFieldValue("weight", filled.weight);
+    form.setFieldValue("purity", filled.purity);
+    form.setFieldValue("country", filled.country);
+    form.setFieldValue("bullion", true);
+    if (!form.getFieldValue("title").trim())
+      form.setFieldValue("title", t(`preciousMetal.presets.${id}`));
+  };
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -261,6 +323,7 @@ export function ItemFormDialog({
       inputMode?: "numeric" | "decimal";
       type?: "date";
       max?: string;
+      disabled?: boolean;
     } = {},
   ) => (
     <form.Field
@@ -282,6 +345,7 @@ export function ItemFormDialog({
               inputMode={options.inputMode}
               placeholder={options.placeholder}
               maxLength={options.maxLength}
+              disabled={options.disabled}
               value={field.state.value}
               onChange={(event) => field.handleChange(event.target.value)}
               onBlur={field.handleBlur}
@@ -425,6 +489,15 @@ export function ItemFormDialog({
                     options={typeOptions}
                     onChange={field.handleChange}
                     noResults={t("items.noMatches")}
+                  />
+                )}
+              </form.Field>
+              <form.Field name="albumId">
+                {(field) => (
+                  <AlbumPicker
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    onCreateFailed={setFailed}
                   />
                 )}
               </form.Field>
@@ -595,6 +668,85 @@ export function ItemFormDialog({
                       rule: rules.size,
                       hint: t("items.millimetres"),
                       inputMode: "decimal",
+                    })}
+                  </DetailGroup>
+                )}
+                {isCoin && (
+                  <DetailGroup title={t("preciousMetal.title")}>
+                    <Field
+                      id={`${baseId}-preset`}
+                      label={t("preciousMetal.preset")}
+                      hint={t("preciousMetal.presetHint")}
+                      className="sm:col-span-2"
+                    >
+                      {(control) => (
+                        <PropertyPicker
+                          id={control.id}
+                          aria-describedby={control["aria-describedby"]}
+                          icon={Sparkles}
+                          label={t("preciousMetal.preset")}
+                          placeholder={t("preciousMetal.presetPlaceholder")}
+                          value={preset}
+                          options={presetOptions}
+                          onChange={applyPreset}
+                          noResults={t("items.noMatches")}
+                        />
+                      )}
+                    </Field>
+                    <form.Field name="metal">
+                      {(field) => (
+                        <Field
+                          id={`${baseId}-metal`}
+                          label={t("preciousMetal.metal")}
+                        >
+                          {(control) => (
+                            <PropertyPicker
+                              id={control.id}
+                              icon={Gem}
+                              label={t("preciousMetal.metal")}
+                              placeholder={t("preciousMetal.setMetal")}
+                              value={field.state.value}
+                              options={metalOptions}
+                              onChange={field.handleChange}
+                              onClear={() => {
+                                // Weight and purity are the metal's.
+                                field.handleChange(undefined);
+                                form.setFieldValue("weight", "");
+                                form.setFieldValue("purity", "");
+                              }}
+                              clearLabel={t("preciousMetal.noMetal")}
+                              noResults={t("items.noMatches")}
+                            />
+                          )}
+                        </Field>
+                      )}
+                    </form.Field>
+                    <form.Field name="bullion">
+                      {(field) => (
+                        <CheckboxField
+                          id={`${baseId}-bullion`}
+                          label={t("preciousMetal.bullionLabel")}
+                          checked={field.state.value}
+                          onCheckedChange={field.handleChange}
+                          className="sm:self-end sm:pb-1"
+                        />
+                      )}
+                    </form.Field>
+                    {textField("weight", t("preciousMetal.weight"), {
+                      rule: rules.weight,
+                      hint: metal
+                        ? t("preciousMetal.weightHint")
+                        : t("preciousMetal.chooseMetalFirst"),
+                      inputMode: "decimal",
+                      disabled: !metal,
+                    })}
+                    {textField("purity", t("preciousMetal.purity"), {
+                      rule: rules.purity,
+                      hint: metal
+                        ? t("preciousMetal.purityHint")
+                        : t("preciousMetal.chooseMetalFirst"),
+                      inputMode: "decimal",
+                      disabled: !metal,
                     })}
                   </DetailGroup>
                 )}

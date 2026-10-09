@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, type LucideIcon } from "lucide-react";
+import { Check, type LucideIcon, Plus } from "lucide-react";
 import type * as React from "react";
 import { useState } from "react";
 import { cn } from "../utils";
@@ -39,6 +39,8 @@ export function PropertyPicker<T extends string>({
   clearLabel,
   placeholder,
   noResults,
+  onCreate,
+  createLabel,
   id,
   "aria-describedby": describedBy,
   align = "start",
@@ -57,6 +59,10 @@ export function PropertyPicker<T extends string>({
   /** Shown in muted text when there is no value, e.g. "Set Grade". */
   placeholder?: string;
   noResults: string;
+  /** Offers to create what was typed when no option is named exactly that, e.g. a new Album. */
+  onCreate?: (name: string) => void;
+  /** The create row's text for what was typed, e.g. `Create Album "Travel"`. */
+  createLabel?: (name: string) => string;
   id?: string;
   /** Links a hint or error, e.g. when the pill sits in a labelled Field. */
   "aria-describedby"?: string;
@@ -64,11 +70,24 @@ export function PropertyPicker<T extends string>({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  // Each opening starts with an empty search.
+  const show = (next: boolean) => {
+    setOpen(next);
+    if (!next) setQuery("");
+  };
   const selected = options.find((option) => option.value === value);
   const shown = selected?.label ?? placeholder ?? label;
+  const typed = query.trim();
+  const canCreate =
+    onCreate !== undefined &&
+    typed !== "" &&
+    !options.some(
+      (option) => option.label.toLowerCase() === typed.toLowerCase(),
+    );
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={show}>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -95,7 +114,11 @@ export function PropertyPicker<T extends string>({
       </PopoverTrigger>
       <PopoverContent align={align}>
         <Command>
-          <CommandInput placeholder={label} />
+          <CommandInput
+            placeholder={label}
+            value={query}
+            onValueChange={setQuery}
+          />
           <CommandList>
             <CommandEmpty>{noResults}</CommandEmpty>
             <CommandGroup>
@@ -104,7 +127,7 @@ export function PropertyPicker<T extends string>({
                   value={clearLabel}
                   onSelect={() => {
                     onClear();
-                    setOpen(false);
+                    show(false);
                   }}
                 >
                   <span className="truncate text-muted-foreground">
@@ -124,7 +147,7 @@ export function PropertyPicker<T extends string>({
                   value={`${option.label} ${option.hint ?? ""}`}
                   onSelect={() => {
                     onChange(option.value);
-                    setOpen(false);
+                    show(false);
                   }}
                 >
                   {option.icon}
@@ -147,6 +170,22 @@ export function PropertyPicker<T extends string>({
                 </CommandItem>
               ))}
             </CommandGroup>
+            {canCreate && (
+              <CommandGroup>
+                <CommandItem
+                  value={`create ${typed}`}
+                  onSelect={() => {
+                    onCreate?.(typed);
+                    show(false);
+                  }}
+                >
+                  <Plus className="text-muted-foreground" aria-hidden="true" />
+                  <span className="truncate">
+                    {createLabel?.(typed) ?? typed}
+                  </span>
+                </CommandItem>
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

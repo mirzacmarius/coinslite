@@ -302,8 +302,6 @@ export default {
       title: "Préférences",
       language: "Langue",
       homeCurrency: "Devise de référence",
-      homeCurrencyNote:
-        "Bientôt, vous pourrez la changer et tous les montants seront convertis.",
       languageNotSaved:
         "Impossible d’enregistrer la langue dans votre compte : elle n’a changé que sur cet appareil.",
     },
@@ -350,6 +348,121 @@ export default {
       tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
+  albums: {
+    album: "Album",
+    new: "Nouvel album",
+    editAlbum: "Modifier l’album",
+    edit: "Modifier",
+    delete: "Supprimer",
+    name: "Nom",
+    namePlaceholder: "Nom de l’album, p. ex. Voyages",
+    description: "Description",
+    descriptionPlaceholder: "Ajouter une description…",
+    colour: "Couleur",
+    colours: {
+      grey: "Gris",
+      red: "Rouge",
+      orange: "Orange",
+      yellow: "Jaune",
+      green: "Vert",
+      teal: "Bleu canard",
+      blue: "Bleu",
+      indigo: "Indigo",
+      purple: "Violet",
+      pink: "Rose",
+    },
+    create: "Créer l’album",
+    save: "Enregistrer",
+    cancel: "Annuler",
+    close: "Fermer",
+    created: "Album créé",
+    saved: "Album enregistré",
+    deleted: "Album supprimé",
+    itemCount: "Objets",
+    emptyTitle: "Aucun album pour l’instant",
+    emptyDescription:
+      "Créez un album pour regrouper vos objets par thème, par pays ou comme bon vous semble.",
+    notFoundTitle: "Album introuvable",
+    notFound: "Cet album n’existe pas ou ne vous appartient pas.",
+    backToAlbums: "Retour aux albums",
+    noItemsTitle: "Aucun objet dans cet album",
+    noItemsDescription:
+      "Choisissez cet album dans le formulaire d’un objet pour l’y ranger.",
+    addToAlbum: "Ajouter à un album",
+    noAlbum: "Sans album",
+    createNamed: "Créer l’album « {name} »",
+    deleteTitle: "Supprimer « {name} » ?",
+    deleteDescription:
+      "Cochez les objets à supprimer avec l’album, par exemple ceux que vous avez vendus. Les autres restent dans votre collection, sans album.",
+    deleteDescriptionEmpty:
+      "L’album ne contient aucun objet : aucun ne sera supprimé.",
+    selectAll: "Tout sélectionner",
+    "deleteCount#zero": "Aucun objet ne sera supprimé.",
+    "deleteCount#one": "1 objet sera définitivement supprimé.",
+    "deleteCount#few": "{count} objets seront définitivement supprimés.",
+    "deleteCount#other": "{count} objets seront définitivement supprimés.",
+    "deleteConfirm#zero": "Supprimer l’album",
+    "deleteConfirm#one": "Supprimer l’album et 1 objet",
+    "deleteConfirm#few": "Supprimer l’album et {count} objets",
+    "deleteConfirm#other": "Supprimer l’album et {count} objets",
+    errors: {
+      nameRequired: "Donnez un nom à l’album.",
+      nameTooLong: "{max} caractères au maximum.",
+      descriptionTooLong: "{max} caractères au maximum.",
+      tooMany:
+        "Vous avez {max} albums, le maximum pour un compte. Supprimez-en un pour faire de la place.",
+      saveFailed: "Impossible d’enregistrer l’album. Réessayez.",
+      createFailed: "Impossible de créer l’album. Réessayez.",
+      deleteFailed: "Impossible de supprimer l’album. Réessayez.",
+    },
+  },
+  photos: {
+    title: "Photos",
+    sides: {
+      front: "Recto",
+      back: "Verso",
+      obverse: "Avers",
+      reverse: "Revers",
+    },
+    add: "Ajouter une photo",
+    formats: "JPEG, PNG, WebP ou GIF, jusqu’à 10 Mo",
+    uploading: "Envoi de la photo",
+    view: "Voir en plein écran",
+    actions: "Actions sur la photo",
+    replace: "Remplacer la photo",
+    remove: "Retirer la photo",
+    removeTitles: {
+      front: "Retirer la photo du recto ?",
+      back: "Retirer la photo du verso ?",
+      obverse: "Retirer la photo de l’avers ?",
+      reverse: "Retirer la photo du revers ?",
+    },
+    removeBody:
+      "La photo est supprimée définitivement. Vous pouvez en ajouter une nouvelle à tout moment.",
+    cancel: "Annuler",
+    close: "Fermer",
+    previous: "Photo précédente",
+    next: "Photo suivante",
+    errors: {
+      tooLarge: "Ce fichier dépasse 10 Mo. Choisissez une photo plus légère.",
+      notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
+      failed: "Impossible d’enregistrer la photo. Réessayez.",
+      removeFailed: "Impossible de retirer la photo. Réessayez.",
+    },
+  },
+  deleteItem: {
+    delete: "Supprimer",
+    title: "Supprimer « {title} » ?",
+    body: "L’objet est supprimé définitivement. Cette action est irréversible.",
+    bodyOnePhoto:
+      "L’objet et sa photo sont supprimés définitivement. Cette action est irréversible.",
+    bodyTwoPhotos:
+      "L’objet et ses 2 photos sont supprimés définitivement. Cette action est irréversible.",
+    confirm: "Supprimer l’objet",
+    cancel: "Annuler",
+    deleted: "Objet supprimé",
+    failed: "Impossible de supprimer l’objet. Réessayez.",
+  },
   feedback: {
     title: "Votre avis",
     description:
@@ -389,5 +502,193 @@ export default {
       "Tous vos objets restent visibles et modifiables. Passez à Premium pour en ajouter d’autres.",
     limitError:
       "La formule gratuite est limitée à {limit} objets, rien n’a donc été ajouté. Passez à Premium pour en ajouter d’autres.",
+  },
+  spotPrices: {
+    title: "Cours spot",
+    metal: "Métal",
+    perGram: "Par gramme",
+    perOunce: "Par once troy",
+    updated: "Mis à jour le {time}",
+    stale:
+      "Ces cours n’ont pas été mis à jour depuis plus d’une heure et peuvent être dépassés.",
+    emptyTitle: "Pas encore de cours spot",
+    emptyDescription:
+      "Les cours de l’or et de l’argent s’afficheront ici dès qu’ils auront été récupérés. Ils sont actualisés toutes les 15 minutes.",
+  },
+  homeCurrency: {
+    hint: "La changer convertit tous les prix d’achat et valeurs de marché de votre collection.",
+    confirmTitle: "Passer la devise de référence en {currency} ?",
+    confirm: "Passer en {currency}",
+    cancel: "Annuler",
+    checking: "Décompte des montants à convertir…",
+    willConvert:
+      "Tous les prix d’achat et valeurs de marché de votre collection seront convertis de {from} en {to} à ce taux de change.",
+    nothingToConvert:
+      "Aucun de vos objets n’a de prix d’achat ni de valeur de marché : il n’y a rien à convertir.",
+    noRate:
+      "Nous n’avons pas encore de taux de change pour convertir vos montants. Réessayez dans quelques minutes.",
+    tooLarge:
+      "Votre collection compte plus de {limit} objets, trop pour les convertir en une seule fois. Donnez-nous votre avis et nous vous aiderons.",
+    amounts: "Montants à convertir",
+    rate: "Taux de change",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Taux au",
+    stale:
+      "Ce taux n’a pas été mis à jour depuis plus d’une heure et peut être dépassé.",
+    changed: "Votre devise de référence est désormais {currency}.",
+    rateChanged:
+      "Le taux de change vient d’être mis à jour. Vérifiez le nouveau taux et confirmez à nouveau.",
+    amountTooLarge:
+      "L’un de vos montants serait trop élevé dans la nouvelle devise : rien n’a été modifié.",
+    sameCurrency: "C’est déjà votre devise de référence.",
+    failed:
+      "Impossible de changer la devise de référence ; aucun montant n’a été converti. Réessayez.",
+  },
+  preciousMetal: {
+    title: "Métal précieux",
+    metal: "Métal précieux",
+    setMetal: "Choisir le métal précieux",
+    noMetal: "Aucun métal précieux",
+    weight: "Poids",
+    weightHint: "Grammes",
+    grams: "g",
+    purity: "Pureté",
+    purityHint: "De 0 à 1, par ex. 0,999",
+    chooseMetalFirst: "Choisissez d’abord un métal",
+    bullion: "Pièce d’investissement",
+    bullionLabel: "Pièce d’investissement, achetée pour son métal",
+    yes: "Oui",
+    no: "Non",
+    preset: "Modèle de pièce d’investissement",
+    presetPlaceholder: "Remplir depuis une pièce d’investissement",
+    presetHint:
+      "Remplit le métal, le poids, la pureté et le pays, ainsi que le titre s’il est vide.",
+    metalValue: "Valeur du métal",
+    needsWeightAndPurity: "Ajoutez le poids et la pureté",
+    noSpotPrices: "Pas encore de cours spot",
+    stale: "Les cours spot sont peut-être dépassés",
+    errors: {
+      weight: "Saisissez un poids en grammes, par ex. 31,103.",
+      purity:
+        "Saisissez une pureté supérieure à 0 et jusqu’à 1, par ex. 0,999.",
+    },
+    presets: {
+      krugerrandGold1oz: "Krugerrand 1 oz or",
+      krugerrandGoldHalfOz: "Krugerrand ½ oz or",
+      krugerrandGoldQuarterOz: "Krugerrand ¼ oz or",
+      krugerrandGoldTenthOz: "Krugerrand 1/10 oz or",
+      mapleLeafGold: "Maple Leaf 1 oz or",
+      britanniaGold: "Britannia 1 oz or",
+      viennaPhilharmonicGold: "Philharmonique de Vienne 1 oz or",
+      americanEagleGold: "American Eagle 1 oz or",
+      americanBuffaloGold: "American Buffalo 1 oz or",
+      pandaGold: "Panda 30 g or",
+      mapleLeafSilver: "Maple Leaf 1 oz argent",
+      americanEagleSilver: "American Eagle 1 oz argent",
+      britanniaSilver: "Britannia 1 oz argent",
+      viennaPhilharmonicSilver: "Philharmonique de Vienne 1 oz argent",
+      krugerrandSilver: "Krugerrand 1 oz argent",
+      pandaSilver: "Panda 30 g argent",
+    },
+  },
+  updates: {
+    title: "Nouveautés",
+    unseen: "Nouvelle version",
+    new: "Nouveau",
+    version: "Version {version}",
+    latest: "Actuelle",
+    groups: {
+      catalog: "Nouveau dans le catalogue",
+      features: "Nouvelles fonctionnalités",
+      improvements: "Améliorations",
+      fixes: "Corrections",
+    },
+    highlightsTitle: "Nouveautés de CoinsLite {version}",
+    seeAll: "Voir toutes les nouveautés",
+    gotIt: "J’ai compris",
+    close: "Fermer",
+    workspaceMenuUnseen: "Compte et préférences, nouvelle version",
+  },
+  catalogAdmin: {
+    menu: "Import et export du catalogue",
+    title: "Import et export du catalogue",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent importer et exporter le catalogue.",
+    exportTitle: "Export",
+    exportDescription:
+      "Téléchargez tout le catalogue dans un fichier CSV. Modifiez-le dans un tableur, puis importez-le à nouveau.",
+    exportAction: "Exporter en CSV",
+    exportFailed: "Impossible d’exporter le catalogue. Réessayez.",
+    importTitle: "Import",
+    importDescription:
+      "Les lignes dont l’id existe déjà dans le catalogue mettent à jour ce nœud, les autres sont ajoutées. Un parent_id peut désigner une autre ligne du même fichier. Chaque groupe de faits, de notes et d’images doit indiquer sa source.",
+    chooseFile: "Choisir un fichier CSV",
+    chooseAnother: "Choisir un autre fichier",
+    clearFile: "Retirer le fichier",
+    readFailed: "Impossible de lire ce fichier. Choisissez un fichier CSV.",
+    checking: "Vérification du fichier…",
+    inserts: "À ajouter",
+    updates: "À mettre à jour",
+    unchanged: "Inchangées",
+    upToDate: "Le catalogue correspond déjà à ce fichier.",
+    problemsTitle: "Erreurs à corriger",
+    problemsDescription:
+      "Rien n’est importé tant que toutes les lignes ne sont pas correctes. Corrigez ces erreurs, puis choisissez à nouveau le fichier.",
+    showingFirst: "Affichage des {shown} premières sur {total}.",
+    row: "Ligne",
+    column: "Colonne",
+    problem: "Erreur",
+    importAction: "Importer",
+    confirmTitle: "Importer « {file} » ?",
+    confirmDescription:
+      "Les modifications s’appliquent tout de suite au catalogue que tout le monde consulte. Les lignes déjà à jour restent telles quelles.",
+    cancel: "Annuler",
+    imported: "Catalogue mis à jour : {inserts} ajoutés, {updates} mis à jour.",
+    importBlocked:
+      "Le catalogue a changé depuis la vérification et le fichier contient maintenant des erreurs. Rien n’a été importé.",
+    importFailed: "Impossible d’importer le fichier. Réessayez.",
+    errors: {
+      EMPTY_FILE: "Le fichier n’a aucune ligne sous l’en-tête.",
+      UNCLOSED_QUOTE:
+        "Un guillemet ouvert dans cette ligne n’est jamais fermé.",
+      MISSING_COLUMN: "Le fichier doit contenir cette colonne.",
+      UNKNOWN_COLUMN:
+        "Ce n’est pas une colonne du catalogue. Vérifiez son orthographe.",
+      DUPLICATE_COLUMN: "Cette colonne apparaît plusieurs fois.",
+      TOO_MANY_ROWS:
+        "Le fichier est trop volumineux. Divisez-le en fichiers de 3 000 lignes au plus.",
+      ID_REQUIRED: "Donnez un id à la ligne.",
+      INVALID_ID:
+        "Utilisez jusqu’à 64 lettres minuscules, chiffres, points, tirets et tirets bas.",
+      DUPLICATE_ID: "Une ligne plus haut a déjà cet id.",
+      TITLE_REQUIRED: "Donnez un titre à la ligne.",
+      TOO_LONG: "Cette valeur est trop longue.",
+      INVALID_VALUE: "Cette valeur n’est pas autorisée dans cette colonne.",
+      INVALID_COUNTRY: "Utilisez un code pays à deux lettres, comme US ou NO.",
+      INVALID_NUMBER:
+        "Saisissez un nombre dans la plage de cette colonne, avec un point comme séparateur décimal.",
+      INVALID_YEAR:
+        "Saisissez une année entière, les années av. J.-C. en nombres négatifs.",
+      INVALID_URL:
+        "Saisissez une adresse web complète commençant par https://.",
+      NUMISTA_DATA:
+        "Aucune donnée de Numista ne peut être stockée. Gardez seulement le numéro Numista, dans numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "Une entrée du catalogue doit avoir un type d’objet : pièce ou billet.",
+      FIELD_NOT_FOR_TYPE: "Les billets n’ont ni métal ni dimensions.",
+      YEARS_REVERSED: "La dernière année précède la première.",
+      SOURCE_REQUIRED:
+        "Indiquez la source de ces faits, de ces notes ou de cette image.",
+      ROOT_NOT_ADDABLE:
+        "Un pays ou un thème ne peut pas être une entrée du catalogue. Donnez un parent_id à la ligne.",
+      PARENT_NOT_FOUND: "Aucune ligne du fichier ni du catalogue n’a cet id.",
+      PARENT_IS_ENTRY:
+        "Ce parent est une entrée du catalogue : rien ne peut se trouver en dessous.",
+      PARENT_CYCLE: "Les parents ramènent à cette ligne.",
+      TOO_DEEP: "Le catalogue compte au plus 8 niveaux.",
+      ENTRY_HAS_CHILDREN:
+        "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
+    },
   },
 } as const satisfies Dictionary;

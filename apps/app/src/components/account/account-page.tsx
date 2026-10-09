@@ -2,6 +2,7 @@
 
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
+import { UpdatesLink } from "@/components/updates/updates-link";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -23,6 +24,7 @@ import { Globe, Loader2 } from "lucide-react";
 import type * as React from "react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
+import { HomeCurrencySetting } from "./home-currency-setting";
 import { LanguagePicker } from "./language-picker";
 import { SendFeedback } from "./send-feedback";
 
@@ -54,6 +56,7 @@ export function AccountPage() {
         )}
       </header>
       <PhoneAccountLinks />
+      <UpdatesLink />
       <ContactSection account={account} />
       <PreferencesSection account={account} />
       <EmailSection account={account} />
@@ -258,6 +261,7 @@ function ContactSection({ account }: { account: Account }) {
 
 function PreferencesSection({ account }: { account: Account }) {
   const t = useI18n();
+  const currencyHintId = useId();
   return (
     <Section title={t("account.preferences.title")}>
       <div className="grid grid-cols-[140px_1fr] items-center gap-x-3 gap-y-3 text-[13px]">
@@ -270,10 +274,13 @@ function PreferencesSection({ account }: { account: Account }) {
         <span className="text-xs text-muted-foreground">
           {t("account.preferences.homeCurrency")}
         </span>
-        <div className="flex flex-col gap-0.5">
-          <span>{account.homeCurrency}</span>
-          <span className="text-xs text-muted-foreground">
-            {t("account.preferences.homeCurrencyNote")}
+        <div className="flex flex-col gap-1">
+          <HomeCurrencySetting
+            current={account.homeCurrency}
+            hintId={currencyHintId}
+          />
+          <span id={currencyHintId} className="text-xs text-muted-foreground">
+            {t("homeCurrency.hint")}
           </span>
         </div>
       </div>
