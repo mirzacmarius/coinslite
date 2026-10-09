@@ -1,6 +1,7 @@
 "use client";
 
 import { localToday } from "@/components/items/item-fields";
+import { saveFile } from "@/lib/save-file";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
@@ -106,18 +107,6 @@ function Section({
   );
 }
 
-/** Saves text as a UTF-8 file, with the byte order mark spreadsheets look for. */
-function saveFile(name: string, text: string) {
-  const url = URL.createObjectURL(
-    new Blob(["﻿", text], { type: "text/csv;charset=utf-8" }),
-  );
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = name;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
 function ExportSection() {
   const t = useI18n();
   const convex = useConvex();
@@ -137,7 +126,8 @@ function ExportSection() {
         if (page.isDone) break;
         cursor = page.continueCursor;
       }
-      saveFile(`coinslite-catalog-${localToday()}.csv`, csv);
+      // With the byte order mark spreadsheets look for.
+      saveFile(`coinslite-catalog-${localToday()}.csv`, ["\ufeff", csv]);
     } catch {
       toast.error(t("catalogAdmin.exportFailed"));
     } finally {

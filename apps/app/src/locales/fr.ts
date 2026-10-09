@@ -904,4 +904,67 @@ export default {
     firstRunDescription:
       "Ajoutez une pièce, un billet ou un timbre que vous possédez. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
   },
+  adminStats: {
+    menu: "Statistiques",
+    title: "Statistiques",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent voir les statistiques.",
+    refresh: "Recompter",
+    counting: "Comptage…",
+    countedAt: "Comptées le {time}",
+    hourly: "Recomptées toutes les heures.",
+    refreshFailed: "Impossible de lancer le comptage. Réessayez.",
+    emptyTitle: "Pas encore comptées",
+    emptyDescription:
+      "Les statistiques sont comptées toutes les heures. Comptez-les maintenant pour les voir tout de suite.",
+    countNow: "Compter maintenant",
+    countingTitle: "Comptage des statistiques",
+    countingDescription:
+      "Cela prend quelques secondes. Les chiffres s’affichent dès que c’est terminé.",
+    users: {
+      title: "Utilisateurs",
+      description:
+        "Comptes dont l’e-mail est confirmé et l’inscription terminée.",
+      total: "Tous les utilisateurs",
+      newLast30Days: "Nouveaux ces 30 derniers jours",
+      premium: "Premium",
+      free: "Formule gratuite",
+    },
+    subscriptions: {
+      title: "Abonnements",
+      description:
+        "Les actifs donnent Premium maintenant. Ceux qui se terminent ne seront pas renouvelés.",
+      active: "Actifs",
+      endingWithin30Days: "Se terminent d’ici 30 jours",
+      ended: "Terminés",
+    },
+    collection: {
+      title: "Contenu des collections",
+      description: "Tout ce que contiennent les collections de chacun.",
+      items: "Objets",
+      coins: "Pièces",
+      banknotes: "Billets",
+      stamps: "Timbres",
+      albums: "Albums",
+    },
+    activity: {
+      title: "Activité",
+      description: "Objets et albums ajoutés récemment et toujours présents.",
+      itemsAddedLast24Hours: "Objets ajoutés ces dernières 24 heures",
+      itemsAddedLast7Days: "Objets ajoutés ces 7 derniers jours",
+      albumsCreatedLast30Days: "Albums créés ces 30 derniers jours",
+    },
+  },
+  collectionExport: {
+    export: "Exporter",
+    "inView#zero": "Aucun objet dans cette vue",
+    "inView#one": "1 objet dans cette vue",
+    "inView#few": "{count} objets dans cette vue",
+    "inView#other": "{count} objets dans cette vue",
+    csv: "Exporter en CSV",
+    premiumOnly: "L’export de votre collection fait partie de Premium.",
+    failed: "Impossible d’exporter la collection. Réessayez.",
+    fileName: "coinslite-collection-{date}.csv",
+  },
 } as const satisfies Dictionary;

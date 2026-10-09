@@ -889,4 +889,66 @@ export default {
     firstRunDescription:
       "Legg til en mynt, en seddel eller et frimerke du eier. Da vises totalene og de nyeste objektene her.",
   },
+  adminStats: {
+    menu: "Statistikk",
+    title: "Statistikk",
+    notAvailable: "Denne siden er ikke tilgjengelig",
+    notAvailableDescription: "Bare administratorer kan se statistikken.",
+    refresh: "Tell på nytt",
+    counting: "Teller…",
+    countedAt: "Talt {time}",
+    hourly: "Telles på nytt hver time.",
+    refreshFailed: "Kunne ikke starte tellingen. Prøv igjen.",
+    emptyTitle: "Ikke talt ennå",
+    emptyDescription:
+      "Statistikken telles hver time. Tell nå for å se den med en gang.",
+    countNow: "Tell nå",
+    countingTitle: "Teller statistikken",
+    countingDescription:
+      "Dette tar noen sekunder. Tallene vises så snart det er ferdig.",
+    users: {
+      title: "Brukere",
+      description:
+        "Kontoer som har bekreftet e-postadressen og fullført registreringen.",
+      total: "Alle brukere",
+      newLast30Days: "Nye siste 30 dager",
+      premium: "Premium",
+      free: "Gratisplan",
+    },
+    subscriptions: {
+      title: "Abonnementer",
+      description:
+        "Aktive gir Premium nå. De som avsluttes, blir ikke fornyet.",
+      active: "Aktive",
+      endingWithin30Days: "Avsluttes innen 30 dager",
+      ended: "Avsluttet",
+    },
+    collection: {
+      title: "Innhold i samlingene",
+      description: "Alt i alles samlinger.",
+      items: "Objekter",
+      coins: "Mynter",
+      banknotes: "Sedler",
+      stamps: "Frimerker",
+      albums: "Album",
+    },
+    activity: {
+      title: "Aktivitet",
+      description: "Objekter og album lagt til nylig som fortsatt finnes.",
+      itemsAddedLast24Hours: "Objekter lagt til siste 24 timer",
+      itemsAddedLast7Days: "Objekter lagt til siste 7 dager",
+      albumsCreatedLast30Days: "Album opprettet siste 30 dager",
+    },
+  },
+  collectionExport: {
+    export: "Eksporter",
+    "inView#zero": "Ingen objekter i denne visningen",
+    "inView#one": "1 objekt i denne visningen",
+    "inView#few": "{count} objekter i denne visningen",
+    "inView#other": "{count} objekter i denne visningen",
+    csv: "Eksporter som CSV",
+    premiumOnly: "Eksport av samlingen er en del av Premium.",
+    failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
+    fileName: "coinslite-samling-{date}.csv",
+  },
 } as const satisfies Dictionary;

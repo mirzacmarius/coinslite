@@ -94,3 +94,19 @@ test("a view nothing matches says so and clears in one click", async ({
   ).toBeVisible();
   await expect(page).toHaveURL(/\/collection$/);
 });
+
+test("on the Free plan, Export shows the way to Premium instead of a file", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+
+  await main.getByRole("button", { name: "Export" }).click();
+  await expect(
+    page.getByText("Exporting your Collection is part of Premium."),
+  ).toBeVisible();
+  await page.getByRole("menuitem", { name: "Upgrade to Premium" }).click();
+  await expect(page).toHaveURL(/\/settings\/billing$/);
+});
