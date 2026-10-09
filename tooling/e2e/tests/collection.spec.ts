@@ -6,7 +6,7 @@ import {
   signUpAndVerify,
   visiblePage,
 } from "../support/accounts";
-import { addManually } from "../support/items";
+import { addManually, waitForAddedToasts } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -131,6 +131,8 @@ test("a Premium member exports the Collection view as a PDF and as a CSV", async
   const main = visiblePage(page);
   await addItem(page, main, "Krone 1875", "Coin");
   await addItem(page, main, "Posthorn", "Stamp");
+  // Their toasts would cover the toolbar's Export button.
+  await waitForAddedToasts(page);
   // Premium, here without a payment.
   runInBackend("testing/premium:grant", { email });
 
