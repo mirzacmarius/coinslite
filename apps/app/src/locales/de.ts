@@ -907,4 +907,68 @@ export default {
       "Nach Objektart, dazu der Metallwert von Gold und Silber",
     part: "Objektart oder Metall",
   },
+  adminStats: {
+    menu: "Statistik",
+    title: "Statistik",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription: "Nur Admins können die Statistik sehen.",
+    refresh: "Neu zählen",
+    counting: "Wird gezählt…",
+    countedAt: "Gezählt am {time}",
+    hourly: "Wird jede Stunde neu gezählt.",
+    refreshFailed:
+      "Die Zählung konnte nicht gestartet werden. Versuch es noch einmal.",
+    emptyTitle: "Noch nicht gezählt",
+    emptyDescription:
+      "Die Statistik wird jede Stunde gezählt. Zähl jetzt, um sie sofort zu sehen.",
+    countNow: "Jetzt zählen",
+    countingTitle: "Statistik wird gezählt",
+    countingDescription:
+      "Das dauert ein paar Sekunden. Die Zahlen erscheinen, sobald es fertig ist.",
+    users: {
+      title: "Nutzer",
+      description:
+        "Konten, die ihre E-Mail-Adresse bestätigt und die Registrierung abgeschlossen haben.",
+      total: "Alle Nutzer",
+      newLast30Days: "Neu in den letzten 30 Tagen",
+      premium: "Premium",
+      free: "Gratis-Tarif",
+    },
+    subscriptions: {
+      title: "Abos",
+      description:
+        "Aktive geben jetzt Premium. Endende werden nicht verlängert.",
+      active: "Aktiv",
+      endingWithin30Days: "Enden in den nächsten 30 Tagen",
+      ended: "Beendet",
+    },
+    collection: {
+      title: "Inhalt der Sammlungen",
+      description: "Alles in allen Sammlungen.",
+      items: "Objekte",
+      coins: "Münzen",
+      banknotes: "Banknoten",
+      stamps: "Briefmarken",
+      albums: "Alben",
+    },
+    activity: {
+      title: "Aktivität",
+      description: "Kürzlich hinzugefügte Objekte und Alben, die es noch gibt.",
+      itemsAddedLast24Hours: "Objekte, hinzugefügt in den letzten 24 Stunden",
+      itemsAddedLast7Days: "Objekte, hinzugefügt in den letzten 7 Tagen",
+      albumsCreatedLast30Days: "Alben, erstellt in den letzten 30 Tagen",
+    },
+  },
+  collectionExport: {
+    export: "Exportieren",
+    "inView#zero": "Keine Objekte in dieser Ansicht",
+    "inView#one": "1 Objekt in dieser Ansicht",
+    "inView#few": "{count} Objekte in dieser Ansicht",
+    "inView#other": "{count} Objekte in dieser Ansicht",
+    csv: "Als CSV exportieren",
+    premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
+    failed:
+      "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
+    fileName: "coinslite-sammlung-{date}.csv",
+  },
 } as const satisfies Dictionary;

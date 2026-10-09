@@ -100,7 +100,7 @@ const folded = (text: string) =>
   text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 
 /** A country's name in `locale`; its code where names aren't available. */
-function countryName(code: string, locale: Locale) {
+export function countryName(code: string, locale: Locale) {
   try {
     return formatCountry(code, locale);
   } catch {
