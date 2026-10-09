@@ -36,6 +36,20 @@ function useFreePlanUsage() {
 
 type Usage = NonNullable<ReturnType<typeof useFreePlanUsage>>;
 
+/**
+ * How many more Items the person may add: what's left of the Free plan's
+ * limit, or Infinity on Premium; undefined while loading.
+ */
+export function useItemsLeft() {
+  const usage = useQuery(api.plans.usage);
+  // The sidebar subscribes too (see useFreePlanUsage).
+  const hydrated = useHydrated();
+  if (!hydrated || !usage) return undefined;
+  return usage.plan === "premium"
+    ? Number.POSITIVE_INFINITY
+    : Math.max(0, usage.limit - usage.used);
+}
+
 function UsageCount({ usage }: { usage: Usage }) {
   const t = useI18n();
   const { used, limit } = usage;
@@ -55,7 +69,7 @@ function UsageBar({ usage }: { usage: Usage }) {
   );
 }
 
-function UpgradeLink({
+export function UpgradeLink({
   children,
   className,
 }: { children: React.ReactNode; className?: string }) {

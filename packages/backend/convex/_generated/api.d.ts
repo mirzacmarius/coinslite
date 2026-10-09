@@ -46,6 +46,8 @@ import type * as catalog_linkedItems from "../catalog/linkedItems.js";
 import type * as catalog_search from "../catalog/search.js";
 import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
+import type * as catalog_setRules from "../catalog/setRules.js";
+import type * as catalog_sets from "../catalog/sets.js";
 import type * as catalog_tree from "../catalog/tree.js";
 import type * as collection from "../collection.js";
 import type * as collection_browse from "../collection/browse.js";
@@ -148,6 +150,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/search": typeof catalog_search;
   "catalog/searchWords": typeof catalog_searchWords;
   "catalog/seed": typeof catalog_seed;
+  "catalog/setRules": typeof catalog_setRules;
+  "catalog/sets": typeof catalog_sets;
   "catalog/tree": typeof catalog_tree;
   collection: typeof collection;
   "collection/browse": typeof collection_browse;

@@ -3,11 +3,19 @@
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { catalogPageSize } from "@coinslite/backend/convex/catalog/fields";
+import { isSet } from "@coinslite/backend/convex/catalog/setRules";
 import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
-import { Coins, Flag, ListOrdered, ListTree, SearchX } from "lucide-react";
+import {
+  Coins,
+  Flag,
+  ListChecks,
+  ListOrdered,
+  ListTree,
+  SearchX,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import type * as React from "react";
@@ -15,10 +23,12 @@ import { CatalogEntryDetail } from "./catalog-entry-detail";
 import { CatalogHeader, type Crumb } from "./catalog-header";
 import {
   type CatalogLevel,
+  type SetScope,
   catalogHref,
   catalogNodeHref,
   levelFrom,
   levelHref,
+  setHref,
 } from "./catalog-levels";
 import {
   CatalogRow,
@@ -124,7 +134,15 @@ function CatalogGroup({
         <CatalogHeader
           crumbs={[...crumbs, nodeCrumb]}
           title={denominationLabel(level.denomination)}
-          actions={actions}
+          actions={
+            <>
+              <DenominationSetLink
+                nodeKey={node.key}
+                denomination={level.denomination}
+              />
+              {actions}
+            </>
+          }
         />
         <SeriesList nodeKey={node.key} denomination={level.denomination} />
       </>
@@ -146,7 +164,16 @@ function CatalogGroup({
             },
           ]}
           title={level.series ?? t("catalog.noSeries")}
-          actions={actions}
+          actions={
+            <>
+              <SeriesSetLink
+                nodeKey={node.key}
+                denomination={level.denomination}
+                series={level.series}
+              />
+              {actions}
+            </>
+          }
         />
         <SeriesEntries
           nodeKey={node.key}
@@ -158,7 +185,16 @@ function CatalogGroup({
   }
   return (
     <>
-      <CatalogHeader crumbs={crumbs} title={node.title} actions={actions} />
+      <CatalogHeader
+        crumbs={crumbs}
+        title={node.title}
+        actions={
+          <>
+            {isSet(node.entryCount) && <ViewAsSet scope={{ key: node.key }} />}
+            {actions}
+          </>
+        }
+      />
       {node.countryNode && <BrowseBy nodeKey={node.key} level={level} />}
       {level.view === "denominations" ? (
         <DenominationList nodeKey={node.key} />
@@ -198,6 +234,62 @@ function BrowseBy({
       </nav>
     </div>
   );
+}
+
+/** Opens a grouping as a Set: every entry below it, with how complete it is. */
+function ViewAsSet({ scope }: { scope: SetScope }) {
+  const t = useI18n();
+  return (
+    <Button asChild variant="ghost" size="xs">
+      <Link href={setHref(scope)}>
+        <ListChecks strokeWidth={1.75} aria-hidden="true" />
+        {t("sets.viewAsSet")}
+      </Link>
+    </Button>
+  );
+}
+
+/**
+ * "View as Set" for a denomination, once its series show it has more than
+ * one entry: several series, or one over several years.
+ */
+function DenominationSetLink({
+  nodeKey,
+  denomination,
+}: {
+  nodeKey: string;
+  denomination: string | null;
+}) {
+  const rows = useQuery(api.catalog.browse.series, {
+    key: nodeKey,
+    denomination,
+  });
+  const [only] = rows ?? [];
+  const several =
+    rows !== undefined &&
+    (rows.length > 1 ||
+      (only !== undefined && only.firstYear !== only.lastYear));
+  return several ? <ViewAsSet scope={{ key: nodeKey, denomination }} /> : null;
+}
+
+/** "View as Set" for one series of a denomination with more than one entry. */
+function SeriesSetLink({
+  nodeKey,
+  denomination,
+  series,
+}: {
+  nodeKey: string;
+  denomination: string | null;
+  series: string | null;
+}) {
+  const { results } = usePaginatedQuery(
+    api.catalog.browse.seriesEntries,
+    { key: nodeKey, denomination, series },
+    { initialNumItems: catalogPageSize },
+  );
+  return results.length > 1 ? (
+    <ViewAsSet scope={{ key: nodeKey, denomination, series }} />
+  ) : null;
 }
 
 /** "Show more" under a list that has another page. */

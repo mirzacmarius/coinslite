@@ -1026,6 +1026,11 @@ export function ItemFormDialog({
             setLinked(undefined);
             setPickerOpen(false);
           }}
+          // Several entries added at once: nothing is left to fill in here.
+          onAdded={() => {
+            setPickerOpen(false);
+            onOpenChange(false);
+          }}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             titleRef.current?.focus();

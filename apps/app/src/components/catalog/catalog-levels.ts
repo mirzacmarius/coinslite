@@ -59,3 +59,39 @@ export function levelHref(key: string, level: CatalogLevel) {
   if (level.view === "entries") params.set("series", toParam(level.series));
   return `${catalogNodeHref(key)}?${params}`;
 }
+
+/**
+ * What a Set is of: a grouping node, or on a country's denomination path one
+ * denomination (and maybe one of its series). Null stands for the entries
+ * without one.
+ */
+export type SetScope = {
+  key: string;
+  denomination?: string | null;
+  series?: string | null;
+};
+
+/** The Set view's URL: `/catalog/<key>/set`, plus the denomination path's parameters. */
+export function setHref({ key, denomination, series }: SetScope) {
+  const params = new URLSearchParams();
+  if (denomination !== undefined)
+    params.set("denomination", toParam(denomination));
+  if (denomination !== undefined && series !== undefined)
+    params.set("series", toParam(series));
+  const query = params.size > 0 ? `?${params}` : "";
+  return `${catalogNodeHref(key)}/set${query}`;
+}
+
+/** The Set a URL's parameters ask for, below the node `key`. */
+export function setScopeFrom(key: string, params: URLSearchParams): SetScope {
+  const denomination = params.get("denomination");
+  const series = params.get("series");
+  if (denomination === null) return { key };
+  return series === null
+    ? { key, denomination: fromParam(denomination) }
+    : {
+        key,
+        denomination: fromParam(denomination),
+        series: fromParam(series),
+      };
+}

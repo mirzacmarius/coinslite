@@ -18,9 +18,11 @@ import {
 } from "@coinslite/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@coinslite/ui/dialog";
 import { Kbd } from "@coinslite/ui/kbd";
+import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
 import {
   Banknote,
+  Check,
   Coins,
   Flag,
   FolderOpen,
@@ -29,8 +31,22 @@ import {
 } from "lucide-react";
 import type * as React from "react";
 import { useRef, useState } from "react";
+import { HeldCount } from "./catalog-rows";
+import type { SelectableEntry } from "./use-entry-selection";
 
 export type { CatalogSearchHit };
+
+/**
+ * Selecting several Catalog entries instead of picking one (the Catalog
+ * picker's multi-select): each entry shows whether it's selected and how
+ * many the person holds, and choosing it toggles it.
+ */
+export type HitSelection = {
+  isSelected: (key: string) => boolean;
+  /** Whether an entry with `held` pieces held may be selected. */
+  canSelect: (held: number) => boolean;
+  toggle: (entry: SelectableEntry) => void;
+};
 
 type CatalogSearchProps = {
   /** Only this Item type's nodes, as the Catalog picker asks. */
@@ -45,6 +61,8 @@ type CatalogSearchProps = {
   idle?: React.ReactNode;
   /** A button at the end of the footer, e.g. "Add manually". */
   action?: React.ReactNode;
+  /** While selecting several entries, what choosing one does instead of `onPick`. */
+  selection?: HitSelection;
 };
 
 /**
@@ -60,6 +78,7 @@ export function CatalogSearch({
   placeholder,
   idle,
   action,
+  selection,
 }: CatalogSearchProps) {
   const t = useI18n();
   const [text, setText] = useState("");
@@ -72,6 +91,17 @@ export function CatalogSearch({
   const previous = useRef(latest);
   if (latest !== undefined) previous.current = latest;
   const results = searching ? latest ?? previous.current : undefined;
+  // While selecting, how many of each entry found the person holds.
+  const entryKeys = selection
+    ? (results?.groups ?? []).flatMap((group) =>
+        group.nodes.flatMap((hit) => (hit.kind === "entry" ? [hit.key] : [])),
+      )
+    : [];
+  const heldRows = useQuery(
+    api.catalog.sets.heldCounts,
+    entryKeys.length > 0 ? { keys: entryKeys } : "skip",
+  );
+  const held = new Map(heldRows?.map((row) => [row.key, row.held]));
 
   return (
     <Command shouldFilter={false} loop label={placeholder}>
@@ -94,6 +124,8 @@ export function CatalogSearch({
               key={`${group.country ?? ""}/${group.series ?? ""}`}
               group={group}
               onPick={onPick}
+              selection={selection}
+              held={held}
             />
           ))
         )}
@@ -148,9 +180,13 @@ type Group = {
 function ResultGroup({
   group,
   onPick,
+  selection,
+  held,
 }: {
   group: Group;
   onPick: (hit: CatalogSearchHit) => void;
+  selection?: HitSelection;
+  held: ReadonlyMap<string, number>;
 }) {
   const t = useI18n();
   const { country } = useFormatters();
@@ -160,9 +196,18 @@ function ResultGroup({
       .join(" · ") || t("catalogSearch.themes");
   return (
     <CommandGroup heading={heading}>
-      {group.nodes.map((hit) => (
-        <ResultRow key={hit._id} hit={hit} onPick={onPick} />
-      ))}
+      {group.nodes.map((hit) =>
+        selection && hit.kind === "entry" ? (
+          <SelectableRow
+            key={hit._id}
+            hit={hit}
+            selection={selection}
+            held={held.get(hit.key)}
+          />
+        ) : (
+          <ResultRow key={hit._id} hit={hit} onPick={onPick} />
+        ),
+      )}
     </CommandGroup>
   );
 }
@@ -174,6 +219,24 @@ const kindIcons: Record<CatalogSearchHit["kind"], LucideIcon> = {
   entry: Coins,
 };
 
+/** A hit's years, denomination and metal. */
+function useHitFacts(hit: CatalogSearchHit) {
+  const t = useI18n();
+  const years =
+    hit.yearFrom === undefined
+      ? undefined
+      : hit.yearTo === undefined || hit.yearTo === hit.yearFrom
+        ? String(hit.yearFrom)
+        : `${hit.yearFrom}–${hit.yearTo}`;
+  return [
+    years,
+    hit.denomination,
+    hit.metal && t(`items.materials.${hit.metal}`),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 function ResultRow({
   hit,
   onPick,
@@ -181,24 +244,11 @@ function ResultRow({
   hit: CatalogSearchHit;
   onPick: (hit: CatalogSearchHit) => void;
 }) {
-  const t = useI18n();
   const Icon =
     hit.kind === "entry" && hit.itemType === "banknote"
       ? Banknote
       : kindIcons[hit.kind];
-  const years =
-    hit.yearFrom === undefined
-      ? undefined
-      : hit.yearTo === undefined || hit.yearTo === hit.yearFrom
-        ? String(hit.yearFrom)
-        : `${hit.yearFrom}–${hit.yearTo}`;
-  const facts = [
-    years,
-    hit.denomination,
-    hit.metal && t(`items.materials.${hit.metal}`),
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const facts = useHitFacts(hit);
   return (
     <CommandItem value={hit._id} onSelect={() => onPick(hit)} className="h-8">
       <Icon
@@ -213,6 +263,54 @@ function ResultRow({
         </span>
       )}
     </CommandItem>
+  );
+}
+
+/** A Catalog entry found while selecting several: choosing it selects it, or lets go of it. */
+function SelectableRow({
+  hit,
+  selection,
+  held,
+}: {
+  hit: CatalogSearchHit;
+  selection: HitSelection;
+  /** Undefined until known. */
+  held?: number;
+}) {
+  const facts = useHitFacts(hit);
+  const selected = selection.isSelected(hit.key);
+  return (
+    <CommandItem
+      value={hit._id}
+      disabled={held !== undefined && !selected && !selection.canSelect(held)}
+      onSelect={() => selection.toggle({ key: hit.key, held: held ?? 0 })}
+      className="h-8"
+    >
+      <SelectBox selected={selected} />
+      <span className="min-w-0 shrink truncate">{hit.title}</span>
+      <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+        {facts}
+      </span>
+      {held !== undefined && <HeldCount held={held} />}
+    </CommandItem>
+  );
+}
+
+/** The checkbox of a row in a list where several can be selected; says "selected" to screen readers. */
+export function SelectBox({ selected }: { selected: boolean }) {
+  const t = useI18n();
+  return (
+    <span
+      className={cn(
+        "flex size-4 shrink-0 items-center justify-center rounded border border-input bg-card",
+        selected && "border-primary bg-primary text-primary-foreground",
+      )}
+    >
+      {selected && (
+        <Check className="!size-3.5" strokeWidth={2.5} aria-hidden="true" />
+      )}
+      {selected && <span className="sr-only">{t("sets.isSelected")}</span>}
+    </span>
   );
 }
 
