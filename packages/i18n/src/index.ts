@@ -9,6 +9,7 @@ export {
 export {
   formatCountry,
   formatDate,
+  formatDateTime,
   formatMoney,
   formatNumber,
   formattersFor,

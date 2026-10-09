@@ -396,4 +396,16 @@ export default {
     limitError:
       "Der Gratis-Tarif umfasst {limit} Objekte, daher wurde nichts hinzugefügt. Mit Premium kannst du weitere hinzufügen.",
   },
+  spotPrices: {
+    title: "Spotpreise",
+    metal: "Metall",
+    perGram: "Pro Gramm",
+    perOunce: "Pro Feinunze",
+    updated: "Aktualisiert am {time}",
+    stale:
+      "Diese Preise wurden seit über einer Stunde nicht aktualisiert und sind möglicherweise veraltet.",
+    emptyTitle: "Noch keine Spotpreise",
+    emptyDescription:
+      "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
+  },
 } as const satisfies Dictionary;
