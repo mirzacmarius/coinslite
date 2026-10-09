@@ -338,4 +338,16 @@ export default {
       tryAgain: "Couldn't confirm just now. Try again.",
     },
   },
+  spotPrices: {
+    title: "Spot prices",
+    metal: "Metal",
+    perGram: "Per gram",
+    perOunce: "Per troy ounce",
+    updated: "Updated {time}",
+    stale:
+      "These prices haven't been updated for over an hour and may be out of date.",
+    emptyTitle: "No Spot prices yet",
+    emptyDescription:
+      "Gold and silver prices show here once they've been fetched. They're refreshed every 15 minutes.",
+  },
 } as const;

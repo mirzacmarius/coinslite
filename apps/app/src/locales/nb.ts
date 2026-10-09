@@ -343,4 +343,16 @@ export default {
       tryAgain: "Kunne ikke bekrefte akkurat nå. Prøv igjen.",
     },
   },
+  spotPrices: {
+    title: "Spotpriser",
+    metal: "Metall",
+    perGram: "Per gram",
+    perOunce: "Per troy unse",
+    updated: "Oppdatert {time}",
+    stale:
+      "Disse prisene er ikke oppdatert på over en time og kan være utdaterte.",
+    emptyTitle: "Ingen spotpriser ennå",
+    emptyDescription:
+      "Gull- og sølvprisene vises her når de er hentet. De oppdateres hvert 15. minutt.",
+  },
 } as const satisfies Dictionary;

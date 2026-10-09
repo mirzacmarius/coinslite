@@ -347,4 +347,16 @@ export default {
       tryAgain: "Confirmarea nu a reușit acum. Încearcă din nou.",
     },
   },
+  spotPrices: {
+    title: "Prețuri spot",
+    metal: "Metal",
+    perGram: "Pe gram",
+    perOunce: "Pe uncie troy",
+    updated: "Actualizat la {time}",
+    stale:
+      "Aceste prețuri nu au mai fost actualizate de peste o oră și pot fi depășite.",
+    emptyTitle: "Încă nu există prețuri spot",
+    emptyDescription:
+      "Prețurile aurului și argintului apar aici după ce sunt preluate. Se actualizează la fiecare 15 minute.",
+  },
 } as const satisfies Dictionary;

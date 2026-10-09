@@ -356,4 +356,16 @@ export default {
         "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
+  spotPrices: {
+    title: "Spotpreise",
+    metal: "Metall",
+    perGram: "Pro Gramm",
+    perOunce: "Pro Feinunze",
+    updated: "Aktualisiert am {time}",
+    stale:
+      "Diese Preise wurden seit über einer Stunde nicht aktualisiert und sind möglicherweise veraltet.",
+    emptyTitle: "Noch keine Spotpreise",
+    emptyDescription:
+      "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
+  },
 } as const satisfies Dictionary;

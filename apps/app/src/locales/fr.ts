@@ -350,4 +350,16 @@ export default {
       tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
+  spotPrices: {
+    title: "Cours spot",
+    metal: "Métal",
+    perGram: "Par gramme",
+    perOunce: "Par once troy",
+    updated: "Mis à jour le {time}",
+    stale:
+      "Ces cours n’ont pas été mis à jour depuis plus d’une heure et peuvent être dépassés.",
+    emptyTitle: "Pas encore de cours spot",
+    emptyDescription:
+      "Les cours de l’or et de l’argent s’afficheront ici dès qu’ils auront été récupérés. Ils sont actualisés toutes les 15 minutes.",
+  },
 } as const satisfies Dictionary;
