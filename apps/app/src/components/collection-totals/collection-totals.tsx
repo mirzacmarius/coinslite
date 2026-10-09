@@ -65,8 +65,17 @@ export function CollectionTotalsSection() {
   );
 }
 
-/** The totals as figures in one card: counts, money, then each metal held. */
-export function TotalsFigures({ totals }: { totals: CollectionTotals }) {
+/**
+ * The totals as figures in one card: counts, money, then each metal held. The
+ * Overview's keep to pieces and money (spec 9).
+ */
+export function TotalsFigures({
+  totals,
+  variant = "collection",
+}: {
+  totals: CollectionTotals;
+  variant?: "collection" | "overview";
+}) {
   const t = useI18n();
   const format = useFormatters();
   const money = (amount: number) => format.money(amount, totals.currency);
@@ -75,11 +84,13 @@ export function TotalsFigures({ totals }: { totals: CollectionTotals }) {
   return (
     <div className="overflow-hidden rounded-lg border bg-card">
       <dl className="-mb-px -mr-px grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]">
-        <Figure
-          label={t("collectionTotals.items")}
-          value={format.number(totals.items)}
-          hint={t("collectionTotals.itemsHint")}
-        />
+        {variant === "collection" && (
+          <Figure
+            label={t("collectionTotals.items")}
+            value={format.number(totals.items)}
+            hint={t("collectionTotals.itemsHint")}
+          />
+        )}
         <Figure
           label={t("collectionTotals.pieces")}
           value={format.number(totalPieces(totals))}
@@ -131,7 +142,10 @@ export function TotalsFigures({ totals }: { totals: CollectionTotals }) {
           }
         />
         {metals
-          .filter((metal) => totals.metals[metal].fineWeight > 0)
+          .filter(
+            (metal) =>
+              variant === "collection" && totals.metals[metal].fineWeight > 0,
+          )
           .map((metal) => {
             const { fineWeight, value } = totals.metals[metal];
             return (
@@ -183,14 +197,15 @@ function Figure({
   );
 }
 
-function FiguresSkeleton() {
+/** TotalsFigures while the totals load: up to five grey placeholders. */
+export function FiguresSkeleton({ figures = 5 }: { figures?: number }) {
   return (
     <div
       className="overflow-hidden rounded-lg border bg-card"
       aria-hidden="true"
     >
       <div className="-mb-px -mr-px grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]">
-        {[0, 1, 2, 3, 4].map((figure) => (
+        {[0, 1, 2, 3, 4].slice(0, figures).map((figure) => (
           <div
             key={figure}
             className="flex flex-col gap-2 border-b border-r px-4 py-3"

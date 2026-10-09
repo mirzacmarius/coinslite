@@ -268,8 +268,6 @@ export default {
   dashboard: {
     headerTitle: "Oversikt",
     headerDescription: "Oversikt over samlingen din.",
-    bodyTitle: "Velkommen til CoinsLite",
-    bodyDescription: "Samlingen din vises her.",
   },
   account: {
     pageTitle: "Konto",
@@ -901,6 +899,19 @@ export default {
     catalogHiddenTitle: "Katalogen er ikke tilgjengelig",
     catalogHiddenDescription:
       "Den er slått av foreløpig. Objektene dine påvirkes ikke.",
+  },
+  overview: {
+    addShortcuts: "Legg til i samlingen",
+    add: {
+      coin: "Legg til mynt",
+      banknote: "Legg til seddel",
+      stamp: "Legg til frimerke",
+    },
+    latestItems: "Nyeste objekter",
+    viewCollection: "Vis samlingen",
+    firstRunTitle: "Start samlingen din",
+    firstRunDescription:
+      "Legg til en mynt, en seddel eller et frimerke du eier. Da vises totalene og de nyeste objektene her.",
   },
   adminStats: {
     menu: "Statistikk",

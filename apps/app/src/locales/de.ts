@@ -279,8 +279,6 @@ export default {
   dashboard: {
     headerTitle: "Übersicht",
     headerDescription: "Deine Sammlung auf einen Blick.",
-    bodyTitle: "Willkommen bei CoinsLite",
-    bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
   account: {
     pageTitle: "Konto",
@@ -931,6 +929,19 @@ export default {
     catalogHiddenTitle: "Der Katalog ist nicht verfügbar",
     catalogHiddenDescription:
       "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
+  },
+  overview: {
+    addShortcuts: "Zur Sammlung hinzufügen",
+    add: {
+      coin: "Münze hinzufügen",
+      banknote: "Banknote hinzufügen",
+      stamp: "Briefmarke hinzufügen",
+    },
+    latestItems: "Neueste Objekte",
+    viewCollection: "Sammlung ansehen",
+    firstRunTitle: "Beginne deine Sammlung",
+    firstRunDescription:
+      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
   },
   adminStats: {
     menu: "Statistik",

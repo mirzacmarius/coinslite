@@ -274,8 +274,6 @@ export default {
   dashboard: {
     headerTitle: "Aperçu",
     headerDescription: "Votre collection en un coup d’œil.",
-    bodyTitle: "Bienvenue sur CoinsLite",
-    bodyDescription: "Votre collection apparaîtra ici.",
   },
   account: {
     pageTitle: "Compte",
@@ -916,6 +914,19 @@ export default {
     catalogHiddenTitle: "Le catalogue n’est pas disponible",
     catalogHiddenDescription:
       "Il est désactivé pour le moment. Vos objets ne sont pas concernés.",
+  },
+  overview: {
+    addShortcuts: "Ajouter à votre collection",
+    add: {
+      coin: "Ajouter une pièce",
+      banknote: "Ajouter un billet",
+      stamp: "Ajouter un timbre",
+    },
+    latestItems: "Derniers objets ajoutés",
+    viewCollection: "Voir la collection",
+    firstRunTitle: "Commencez votre collection",
+    firstRunDescription:
+      "Ajoutez une pièce, un billet ou un timbre que vous possédez. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
   },
   adminStats: {
     menu: "Statistiques",
