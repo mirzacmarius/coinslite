@@ -343,4 +343,22 @@ export default {
       tryAgain: "Kunne ikke bekrefte akkurat nå. Prøv igjen.",
     },
   },
+  updates: {
+    title: "Nyheter",
+    unseen: "Ny versjon",
+    new: "Ny",
+    version: "Versjon {version}",
+    latest: "Nyeste",
+    groups: {
+      catalog: "Nytt i katalogen",
+      features: "Nye funksjoner",
+      improvements: "Forbedringer",
+      fixes: "Rettelser",
+    },
+    highlightsTitle: "Nytt i CoinsLite {version}",
+    seeAll: "Se alle nyheter",
+    gotIt: "Greit",
+    close: "Lukk",
+    workspaceMenuUnseen: "Konto og innstillinger, ny versjon",
+  },
 } as const satisfies Dictionary;

@@ -2,6 +2,7 @@
 
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
+import { UpdatesLink } from "@/components/updates/updates-link";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -53,6 +54,7 @@ export function AccountPage() {
         )}
       </header>
       <PhoneAccountLinks />
+      <UpdatesLink />
       <ContactSection account={account} />
       <PreferencesSection account={account} />
       <EmailSection account={account} />

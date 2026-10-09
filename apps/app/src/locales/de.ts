@@ -356,4 +356,22 @@ export default {
         "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
+  updates: {
+    title: "Neuigkeiten",
+    unseen: "Neue Version",
+    new: "Neu",
+    version: "Version {version}",
+    latest: "Aktuell",
+    groups: {
+      catalog: "Neu im Katalog",
+      features: "Neue Funktionen",
+      improvements: "Verbesserungen",
+      fixes: "Fehlerbehebungen",
+    },
+    highlightsTitle: "Neu in CoinsLite {version}",
+    seeAll: "Alle Neuigkeiten ansehen",
+    gotIt: "Verstanden",
+    close: "Schließen",
+    workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
+  },
 } as const satisfies Dictionary;

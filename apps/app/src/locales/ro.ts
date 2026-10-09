@@ -347,4 +347,22 @@ export default {
       tryAgain: "Confirmarea nu a reușit acum. Încearcă din nou.",
     },
   },
+  updates: {
+    title: "Noutăți",
+    unseen: "Versiune nouă",
+    new: "Nou",
+    version: "Versiunea {version}",
+    latest: "Actuală",
+    groups: {
+      catalog: "Nou în catalog",
+      features: "Funcții noi",
+      improvements: "Îmbunătățiri",
+      fixes: "Remedieri",
+    },
+    highlightsTitle: "Noutăți în CoinsLite {version}",
+    seeAll: "Vezi toate noutățile",
+    gotIt: "Am înțeles",
+    close: "Închide",
+    workspaceMenuUnseen: "Cont și preferințe, versiune nouă",
+  },
 } as const satisfies Dictionary;

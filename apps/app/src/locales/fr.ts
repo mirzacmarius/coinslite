@@ -350,4 +350,22 @@ export default {
       tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
+  updates: {
+    title: "Nouveautés",
+    unseen: "Nouvelle version",
+    new: "Nouveau",
+    version: "Version {version}",
+    latest: "Actuelle",
+    groups: {
+      catalog: "Nouveau dans le catalogue",
+      features: "Nouvelles fonctionnalités",
+      improvements: "Améliorations",
+      fixes: "Corrections",
+    },
+    highlightsTitle: "Nouveautés de CoinsLite {version}",
+    seeAll: "Voir toutes les nouveautés",
+    gotIt: "J’ai compris",
+    close: "Fermer",
+    workspaceMenuUnseen: "Compte et préférences, nouvelle version",
+  },
 } as const satisfies Dictionary;
