@@ -347,4 +347,23 @@ export default {
       tryAgain: "Confirmarea nu a reușit acum. Încearcă din nou.",
     },
   },
+  feedback: {
+    title: "Feedback",
+    description:
+      "Ai o idee, o problemă sau ceva ce îți place? Spune-i echipei CoinsLite. Citim fiecare mesaj.",
+    open: "Trimite feedback",
+    dialogTitle: "Trimite feedback",
+    message: "Mesaj",
+    placeholder: "Ce funcționează pentru tine, ce nu, ce ți-ai dori…",
+    note: "Includem adresa de e-mail a contului tău, ca să-ți putem răspunde.",
+    cancel: "Anulează",
+    send: "Trimite",
+    close: "Închide",
+    sent: "Mulțumim! Feedbackul tău a fost trimis.",
+    required: "Scrie mai întâi un mesaj.",
+    tooLong: "Cel mult {limit} de caractere.",
+    tooMany:
+      "Ai trimis mai multe mesaje într-un timp scurt. Încearcă din nou peste câteva minute.",
+    failed: "Feedbackul nu a putut fi trimis. Încearcă din nou.",
+  },
 } as const satisfies Dictionary;
