@@ -1,7 +1,7 @@
 import { defaultLocale, isHomeCurrency, isLocale } from "@coinslite/i18n";
 import { ConvexError, type Value } from "convex/values";
 import { latestRelease } from "../updates/releases";
-import { localPart, requireNormalizedEmail } from "./credentials";
+import { requireNormalizedEmail, startingName } from "./credentials";
 
 /** Why a sign-up was refused; the backend tests assert on these. */
 export const signUpErrors = {
@@ -28,7 +28,7 @@ export function passwordProfile(params: Record<string, Value | undefined>): {
   }
   return {
     email,
-    displayName: localPart(email),
+    ...startingName(email),
     language: isLocale(params.language) ? params.language : defaultLocale,
     homeCurrency: params.homeCurrency,
     termsAcceptedAt: Date.now(),

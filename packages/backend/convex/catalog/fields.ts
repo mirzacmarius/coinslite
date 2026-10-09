@@ -61,6 +61,10 @@ export const catalogErrors = {
   parentCycle: "PARENT_CYCLE",
   tooDeep: "TOO_DEEP",
   entryHasChildren: "ENTRY_HAS_CHILDREN",
+  /** Items link to this entry, so it stays a Catalog entry. */
+  entryHasItems: "ENTRY_HAS_ITEMS",
+  /** More Items link to the entries changed than one save can update. */
+  tooManyLinkedItems: "TOO_MANY_LINKED_ITEMS",
 } as const;
 export type CatalogError = (typeof catalogErrors)[keyof typeof catalogErrors];
 
@@ -83,6 +87,10 @@ export const catalogLimits = {
   /** Millimetres. */
   diameter: 500,
   sortOrder: 1_000_000_000,
+  /** Items one save or delete updates: those linked to the entries it changes. */
+  linkedItems: 1000,
+  /** Nodes one delete removes, the node and everything below it. */
+  deleteNodes: 2000,
   /** Years are whole numbers, BC as negatives. */
   earliestYear: -3000,
   latestYear: 3000,
@@ -149,13 +157,13 @@ const groupValues: Record<ProvenanceGroup, ValueKey[]> = {
 };
 
 /** Coins only: a banknote has no metal or size. */
-const coinOnly: ValueKey[] = [
+export const coinOnlyValues = [
   "material",
   "metal",
   "weight",
   "fineness",
   "diameter",
-];
+] as const satisfies readonly ValueKey[];
 
 class CellError {
   constructor(readonly code: CatalogError) {}
@@ -512,7 +520,7 @@ export function checkNode(
       code: catalogErrors.itemTypeRequired,
     });
   if (values.itemType === "banknote") {
-    for (const value of coinOnly) {
+    for (const value of coinOnlyValues) {
       if (values[value] !== undefined)
         problems.push({
           column: columnOf[value],
@@ -610,6 +618,79 @@ export function valuesFromFields(fields: NodeFields): NodeValues {
 
 const isProvenanceKey = (key: string): key is ProvenanceKey =>
   provenanceKeys.has(key);
+
+/**
+ * The values the Catalog editor sets on a node: all of them but the image
+ * and its credit, which catalog/images.ts looks after.
+ */
+export const editorValueKeys = [
+  "title",
+  "sortOrder",
+  "itemType",
+  "country",
+  "denomination",
+  "series",
+  "material",
+  "strike",
+  "metal",
+  "weight",
+  "fineness",
+  "diameter",
+  "yearFrom",
+  "yearTo",
+  "technicalDetails",
+  "historicalNotes",
+  "numistaId",
+  "factsSource",
+  "factsAuthor",
+  "factsLicence",
+  "factsLink",
+  "notesSource",
+  "notesAuthor",
+  "notesLicence",
+  "notesLink",
+] as const satisfies readonly ValueKey[];
+export type EditorValueKey = (typeof editorValueKeys)[number];
+
+/** A node's values as the Catalog editor saves them; one left out is cleared. */
+export type EditorValues = Pick<NodeValues, "title" | "sortOrder"> &
+  Partial<Pick<NodeValues, Exclude<EditorValueKey, "title" | "sortOrder">>>;
+
+/** The CSV column that holds a value, which problems name. */
+export const columnOfValue = (key: ValueKey) => columnOf[key];
+
+/**
+ * The editor's values read the way a Catalog CSV file's cells are, so a node
+ * saved in the editor meets the same rules as one imported: trimmed, within
+ * the limits, nothing from Numista. Every editor value is present in
+ * `values`, undefined when empty, so saving clears it.
+ */
+export function readEditorValues(input: EditorValues): {
+  values: Partial<NodeValues>;
+  problems: Array<{ column: string; code: CatalogError }>;
+} {
+  const values: Record<string, unknown> = {};
+  const problems: Array<{ column: string; code: CatalogError }> = [];
+  for (const key of editorValueKeys) {
+    const column = columnOf[key];
+    const value = input[key];
+    try {
+      values[key] = (valueColumns[column] as { read: Read }).read(
+        value === undefined ? "" : String(value),
+      );
+    } catch (error) {
+      if (!(error instanceof CellError)) throw error;
+      problems.push({ column, code: error.code });
+      values[key] = undefined;
+    }
+  }
+  if (values.title === undefined && !problems.some((p) => p.column === "title"))
+    problems.push({ column: "title", code: catalogErrors.titleRequired });
+  return { values: values as Partial<NodeValues>, problems };
+}
+
+/** A node id as typed, lowercased, or undefined when it can't be one. */
+export const readCatalogKey = (text: string) => readKey(text);
 
 /** Whether two nodes' values are the same. */
 export function sameValues(a: Partial<NodeValues>, b: Partial<NodeValues>) {

@@ -65,10 +65,39 @@ export default defineSchema({
     lastSeenRelease: v.optional(v.string()),
     lastShownHighlights: v.optional(v.string()),
 
+    // The admin user list (admin/users.ts) sorts and filters by these. The
+    // plan fields are copies: read someone's plan with planOf (plans.ts).
+    /** The display name as the list sorts it (`nameKey` in admin/userList.ts). */
+    nameKey: v.optional(v.string()),
+    /** Set while they're on Premium, unset on the Free plan. Kept by billing.ts. */
+    plan: v.optional(v.literal("premium")),
+    /** When their Premium's current paid period ends, if it has an end. Kept by billing.ts. */
+    planEnd: v.optional(v.number()),
+    /** When they last signed in, on any device (auth.ts). */
+    lastSignInAt: v.optional(v.number()),
+
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
-  }).index("email", ["email"]),
+  })
+    .index("email", ["email"])
+    // The admin user list's orders, across everyone and within one plan.
+    .index("by_nameKey", ["nameKey"])
+    .index("by_plan_and_nameKey", ["plan", "nameKey"])
+    .index("by_plan_and_email", ["plan", "email"])
+    .index("by_plan", ["plan"])
+    .index("by_planEnd", ["planEnd"])
+    .index("by_plan_and_planEnd", ["plan", "planEnd"])
+    .index("by_lastSignInAt", ["lastSignInAt"])
+    .index("by_plan_and_lastSignInAt", ["plan", "lastSignInAt"])
+    .searchIndex("search_displayName", {
+      searchField: "displayName",
+      filterFields: ["plan"],
+    })
+    .searchIndex("search_email", {
+      searchField: "email",
+      filterFields: ["plan"],
+    }),
 
   /** A requested email change, waiting for its link to be opened at the new address. */
   emailChanges: defineTable({
@@ -140,7 +169,11 @@ export default defineSchema({
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
     .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
-    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"]),
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
+    // Everyone's Items linked to one Catalog entry, for the admins' Catalog
+    // editor: a new Item type reaches them, and deleting the entry leaves them
+    // its facts (catalog/linkedItems.ts).
+    .index("by_catalogEntryId", ["catalogEntryId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` is kept by every
@@ -305,7 +338,7 @@ export default defineSchema({
    * one document per person, kept by every write that adds, removes or
    * retypes their Items or Albums (collectionCounts.ts), so figures across
    * everyone never count Items one by one. The `items` and `albums` indexes
-   * list people by how much they hold.
+   * list people by how much they hold, in the admin user list.
    */
   collectionCounts: defineTable({
     userId: v.id("users"),
@@ -314,10 +347,14 @@ export default defineSchema({
     banknotes: v.number(),
     stamps: v.number(),
     albums: v.number(),
+    /** A copy of the person's plan, for listing one plan's people by how much they hold. Kept by billing.ts. */
+    plan: v.optional(v.literal("premium")),
   })
     .index("by_userId", ["userId"])
     .index("by_items", ["items"])
-    .index("by_albums", ["albums"]),
+    .index("by_albums", ["albums"])
+    .index("by_plan_and_items", ["plan", "items"])
+    .index("by_plan_and_albums", ["plan", "albums"]),
 
   /**
    * Admin stats (admin/stats.ts): figures across everyone, counted in the

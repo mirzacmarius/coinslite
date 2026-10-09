@@ -1,6 +1,7 @@
 import type { Doc, Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { albumLimits } from "./albums/rules";
+import { planCopiesOf } from "./billing";
 
 /**
  * How many Items (in all and of each Item type) and Albums each person has,
@@ -13,14 +14,18 @@ import { albumLimits } from "./albums/rules";
  * after inserting an Item (once per Item when adding many),
  * `countItemRemoved` when deleting one (`deleteItem` in items/deletion.ts
  * does), `countItemRetyped` when its type changes, and `countAlbumCreated` /
- * `countAlbumDeleted` for Albums. Deleting an account deletes its counts
- * with the profile (`deleteCollectionCountsOf`). Read counts with
- * `collectionCountsOf`.
+ * `countAlbumDeleted` for Albums. A new account starts with empty counts
+ * (`startCollectionCounts`), so the admin user list ranks everyone by them;
+ * deleting an account deletes its counts with the profile
+ * (`deleteCollectionCountsOf`). Read counts with `collectionCountsOf`.
  *
  * Collections from before counting began have no document yet. Theirs is made
  * the first time it's needed, by counting what's there; a removal before
  * that changes nothing, since that count will see the result. A removal for
  * someone whose account is being deleted doesn't make one either.
+ *
+ * Each document also carries a copy of its person's plan, kept by billing.ts,
+ * so the admin user list can rank the people on one plan.
  */
 
 export type CollectionCounts = Pick<
@@ -119,8 +124,17 @@ export async function ensureCollectionCounts(
   const stored = await storedCounts(ctx, userId);
   if (stored) return countsOnly(stored);
   const counts = await countCollection(ctx, userId);
-  await ctx.db.insert("collectionCounts", { userId, ...counts });
+  const { plan } = await planCopiesOf(ctx, userId);
+  await ctx.db.insert("collectionCounts", { userId, ...counts, plan });
   return counts;
+}
+
+/** A new account's counts: nothing yet, on the Free plan. */
+export async function startCollectionCounts(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+) {
+  await ctx.db.insert("collectionCounts", { userId, ...noCollection() });
 }
 
 /**

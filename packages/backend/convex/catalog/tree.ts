@@ -2,6 +2,7 @@ import type { PaginationOptions } from "convex/server";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import {
+  type CatalogItemType,
   type CatalogKind,
   type FileRow,
   type NodeValues,
@@ -18,6 +19,12 @@ import {
   searchTextOf,
   valuesFromFields,
 } from "./fields";
+import {
+  countLinkedItems,
+  detachLinkedItems,
+  hasLinkedItems,
+  retypeLinkedItems,
+} from "./linkedItems";
 
 /**
  * The Catalog tree: where each node sits, and bringing a whole CSV file in at
@@ -48,7 +55,7 @@ type Planned = {
   values: NodeValues;
 };
 
-type Plan = {
+export type Plan = {
   report: ImportReport;
   /** Rows in file order. */
   planned: Planned[];
@@ -56,6 +63,8 @@ type Plan = {
   pathOf: (key: string) => string;
   /** Catalog nodes the file refers to, by key. */
   stored: Map<string, Doc<"catalogNodes">>;
+  /** Entries given another Item type, which the Items linked to them take too. */
+  retyped: Array<{ entryId: Id<"catalogNodes">; type: CatalogItemType }>;
 };
 
 const segments = (path: string) => path.split("/");
@@ -117,9 +126,15 @@ async function nodeByKey(ctx: QueryCtx, key: string) {
     .unique();
 }
 
-/** Reads a Catalog CSV file and works out what importing it would change. */
-async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
-  const file = readCatalogFile(csv);
+/**
+ * Works out what bringing rows into the Catalog would change: a CSV file's,
+ * or the one node the Catalog editor saves. Each row updates the node with
+ * its key, or adds one.
+ */
+export async function planRows(
+  ctx: QueryCtx,
+  file: { rows: FileRow[]; errors: RowError[] },
+): Promise<Plan> {
   const errors = [...file.errors];
   const rows = new Map(file.rows.map((row) => [row.key, row]));
 
@@ -185,6 +200,9 @@ async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
   const kindOfKey = (key: string) =>
     planned.get(key)?.kind ?? stored.get(key)?.kind;
 
+  /** Entries whose Item type changes, for their linked Items to follow. */
+  const retyped: Plan["retyped"] = [];
+  let linkedItemsToRetype = 0;
   for (const node of planned.values()) {
     // One problem per cell: a cell that couldn't be read isn't reported again.
     const fail = (code: RowError["code"], column?: string) => {
@@ -235,6 +253,28 @@ async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
         }
       }
     }
+
+    // Items link to entries (ADR 0001): an entry they link to stays one, and
+    // a new Item type reaches them, as many as one save can update.
+    if (node.existing?.kind === "entry") {
+      const entryId = node.existing._id;
+      if (node.kind !== "entry") {
+        if (await hasLinkedItems(ctx, entryId))
+          fail(catalogErrors.entryHasItems, "is_addable");
+      } else if (
+        node.values.itemType !== undefined &&
+        node.values.itemType !== (node.existing.itemType ?? "coin")
+      ) {
+        linkedItemsToRetype += await countLinkedItems(
+          ctx,
+          entryId,
+          Math.max(0, catalogLimits.linkedItems - linkedItemsToRetype),
+        );
+        if (linkedItemsToRetype > catalogLimits.linkedItems)
+          fail(catalogErrors.tooManyLinkedItems, "item_type");
+        else retyped.push({ entryId, type: node.values.itemType });
+      }
+    }
   }
 
   // Counts cover the rows that would go in once the file has no problems.
@@ -261,6 +301,7 @@ async function planImport(ctx: QueryCtx, csv: string): Promise<Plan> {
     planned: [...planned.values()],
     pathOf,
     stored,
+    retyped,
   };
 }
 
@@ -296,7 +337,7 @@ function merge(row: FileRow, existing: Doc<"catalogNodes"> | null): Planned {
 
 /** What importing a file would change, without changing anything. */
 export async function previewImport(ctx: QueryCtx, csv: string) {
-  return (await planImport(ctx, csv)).report;
+  return (await planRows(ctx, readCatalogFile(csv))).report;
 }
 
 /**
@@ -308,7 +349,17 @@ export async function importCatalogFile(
   ctx: MutationCtx,
   csv: string,
 ): Promise<ImportReport & { applied: boolean }> {
-  const { report, planned, pathOf, stored } = await planImport(ctx, csv);
+  return await applyPlan(ctx, await planRows(ctx, readCatalogFile(csv)));
+}
+
+/**
+ * Makes the changes a plan works out, keeping every node's path, entry count,
+ * country and search words right. A plan with any problem changes nothing.
+ */
+export async function applyPlan(
+  ctx: MutationCtx,
+  { report, planned, pathOf, stored, retyped }: Plan,
+): Promise<ImportReport & { applied: boolean }> {
   if (report.errorCount > 0) return { ...report, applied: false };
 
   const ids = new Map<string, Id<"catalogNodes">>(
@@ -406,6 +457,10 @@ export async function importCatalogFile(
       entryCount: (node.entryCount ?? 0) + change,
     });
   }
+
+  for (const { entryId, type } of retyped) {
+    await retypeLinkedItems(ctx, entryId, type);
+  }
   return { ...report, applied: true };
 }
 
@@ -432,4 +487,75 @@ export async function exportCatalogPage(
     isDone: page.isDone,
     continueCursor: page.continueCursor,
   };
+}
+
+/** What deleting a node takes with it. */
+export type Deletion = {
+  /** Every node below it, root first; at most `catalogLimits.deleteNodes`. */
+  below: Doc<"catalogNodes">[];
+  /** Items linked to it or to the entries below it, counted up to just past the limit. */
+  linkedItems: number;
+  /** Whether it takes more nodes or Items than one delete may. */
+  tooLarge: boolean;
+};
+
+/** Works out what deleting a node would take with it, without changing anything. */
+export async function planDeletion(
+  ctx: QueryCtx,
+  node: Doc<"catalogNodes">,
+): Promise<Deletion> {
+  const below = await ctx.db
+    .query("catalogNodes")
+    .withIndex("by_path", (q) =>
+      q.gt("path", `${node.path}/`).lt("path", `${node.path}0`),
+    )
+    .take(catalogLimits.deleteNodes);
+  let linkedItems = 0;
+  for (const each of [node, ...below]) {
+    if (each.kind !== "entry") continue;
+    linkedItems += await countLinkedItems(
+      ctx,
+      each._id,
+      catalogLimits.linkedItems - linkedItems,
+    );
+    if (linkedItems > catalogLimits.linkedItems) break;
+  }
+  return {
+    below,
+    linkedItems,
+    tooLarge:
+      below.length + 1 > catalogLimits.deleteNodes ||
+      linkedItems > catalogLimits.linkedItems,
+  };
+}
+
+/**
+ * Deletes a node and everything below it, with their uploaded images. The
+ * Items linked to entries there take those entries' facts as their own
+ * first, and the entry counts above follow. The deletion must not be too
+ * large (`planDeletion`).
+ */
+export async function deleteSubtree(
+  ctx: MutationCtx,
+  node: Doc<"catalogNodes">,
+  { below }: Deletion,
+) {
+  const removed = [node, ...below];
+  for (const each of removed) {
+    if (each.kind === "entry") await detachLinkedItems(ctx, each);
+    if (each.imageFiles) {
+      await ctx.storage.delete(each.imageFiles.full);
+      await ctx.storage.delete(each.imageFiles.thumbnail);
+    }
+    await ctx.db.delete("catalogNodes", each._id);
+  }
+  const entries = removed.filter((each) => each.kind === "entry").length;
+  if (entries === 0) return;
+  for (const key of ancestorKeysOf(node.path)) {
+    const ancestor = await nodeByKey(ctx, key);
+    if (!ancestor || ancestor.kind === "entry") continue;
+    await ctx.db.patch("catalogNodes", ancestor._id, {
+      entryCount: Math.max(0, (ancestor.entryCount ?? 0) - entries),
+    });
+  }
 }

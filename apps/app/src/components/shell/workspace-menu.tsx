@@ -30,11 +30,13 @@ import {
   CreditCard,
   FileSpreadsheet,
   Languages,
+  ListTree,
   LogOut,
   Sparkles,
   SunMoon,
   ToggleRight,
   UserRound,
+  UsersRound,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -100,6 +102,14 @@ export function WorkspaceMenu({
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem asChild>
+            <Link href="/admin/catalog/editor">
+              <ListTree strokeWidth={1.75} />
+              {t("catalogEditor.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
             <Link href="/admin/catalog">
               <FileSpreadsheet strokeWidth={1.75} />
               {t("catalogAdmin.menu")}
@@ -119,6 +129,14 @@ export function WorkspaceMenu({
             <Link href="/admin/flags">
               <ToggleRight strokeWidth={1.75} />
               {t("featureFlags.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/users">
+              <UsersRound strokeWidth={1.75} />
+              {t("adminUsers.menu")}
             </Link>
           </DropdownMenuItem>
         )}

@@ -2,6 +2,7 @@
 
 import { type Locale, formattersFor } from "@coinslite/i18n";
 import { type ItemType, gradeCode } from "../items/grades";
+import { calendarDate } from "../pdf/dates";
 import {
   type PdfColumn,
   type PdfFacts,
@@ -25,19 +26,6 @@ function gradeText(row: Row, messages: ReportMessages) {
       ""
     );
   return gradeCode(row.gradingScale, row.grade, row.strike) ?? "";
-}
-
-/** The date in `timeZone` as "YYYY-MM-DD", for the file name. */
-function calendarDate(time: number, timeZone: string) {
-  const parts = new Intl.DateTimeFormat("en", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(time);
-  const part = (type: string) =>
-    parts.find((each) => each.type === type)?.value ?? "";
-  return `${part("year")}-${part("month")}-${part("day")}`;
 }
 
 /**

@@ -1,5 +1,6 @@
 import { homeCurrencies, locales } from "@coinslite/i18n";
 import { v } from "convex/values";
+import { planFilters, sortOrders, userSorts } from "../admin/userList";
 import { albumColours } from "../albums/rules";
 import {
   catalogItemTypes,
@@ -80,6 +81,13 @@ export const perDollar = v.object({
 
 /** A precious metal with a Spot price: gold or silver. */
 export const metal = literalUnion(metals);
+
+/** What the admin user list sorts by (admin/userList.ts). */
+export const userSort = literalUnion(userSorts);
+/** Ascending or descending. */
+export const sortOrder = literalUnion(sortOrders);
+/** Everyone, or the people on one plan. */
+export const planFilter = literalUnion(planFilters);
 
 /** Who may use the scanner: off, admins only, or Premium beta. */
 export const scannerAvailability = literalUnion(scannerAvailabilities);
