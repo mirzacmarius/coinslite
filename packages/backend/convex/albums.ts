@@ -134,16 +134,22 @@ export const items = query({
   },
 });
 
+/** How many ticked Items one transaction deletes with an Album; the rest follow. */
+export const albumDeleteBatch = 100;
+
 /**
  * Deletes an Album. The ticked Items, which must be in it, are deleted for
- * good; the rest stay in the Collection without an Album.
+ * good; the rest stay in the Collection without an Album. The Album and the
+ * first batch of ticked Items go at once, the other Items in the
+ * background, a batch per transaction.
  */
 export const remove = mutation({
   args: { albumId: v.id("albums"), deleteItemIds: v.array(v.id("items")) },
   returns: v.null(),
   handler: async (ctx, { albumId, deleteItemIds }) => {
     const album = await requireOwnAlbum(ctx, albumId);
-    for (const itemId of new Set(deleteItemIds)) {
+    const ticked = [...new Set(deleteItemIds)];
+    for (const itemId of ticked.slice(0, albumDeleteBatch)) {
       const item = await ctx.db.get(itemId);
       if (!item || item.ownerId !== album.ownerId || item.albumId !== albumId)
         throw new ConvexError(itemNotFound);
@@ -151,7 +157,53 @@ export const remove = mutation({
     }
     await ctx.db.delete(albumId);
     await countAlbumDeleted(ctx, album);
-    await releaseItems(ctx, album.ownerId, albumId);
+    await deleteTickedThenRelease(ctx, {
+      ownerId: album.ownerId,
+      albumId,
+      itemIds: ticked.slice(albumDeleteBatch),
+    });
+    return null;
+  },
+});
+
+const albumRemainder = {
+  ownerId: v.id("users"),
+  albumId: v.id("albums"),
+  /** Ticked Items still to delete; the Album's other Items are released after. */
+  itemIds: v.array(v.id("items")),
+};
+
+/**
+ * Schedules the next batch of a deleted Album's ticked Items, or, once they
+ * are all gone, starts letting go of the rest.
+ */
+async function deleteTickedThenRelease(
+  ctx: MutationCtx,
+  left: { ownerId: Id<"users">; albumId: Id<"albums">; itemIds: Id<"items">[] },
+) {
+  if (left.itemIds.length > 0)
+    await ctx.scheduler.runAfter(0, internal.albums.deleteTicked, left);
+  else await releaseItems(ctx, left.ownerId, left.albumId);
+}
+
+/**
+ * Deletes the next batch of a deleted Album's ticked Items. One that has
+ * left the Album or gone meanwhile is passed over.
+ */
+export const deleteTicked = internalMutation({
+  args: albumRemainder,
+  returns: v.null(),
+  handler: async (ctx, { ownerId, albumId, itemIds }) => {
+    for (const itemId of itemIds.slice(0, albumDeleteBatch)) {
+      const item = await ctx.db.get(itemId);
+      if (item && item.ownerId === ownerId && item.albumId === albumId)
+        await deleteItem(ctx, item);
+    }
+    await deleteTickedThenRelease(ctx, {
+      ownerId,
+      albumId,
+      itemIds: itemIds.slice(albumDeleteBatch),
+    });
     return null;
   },
 });
