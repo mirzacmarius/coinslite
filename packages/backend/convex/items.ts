@@ -9,6 +9,7 @@ import {
 } from "./_generated/server";
 import { deleteItem } from "./items/deletion";
 import { checkItem } from "./items/rules";
+import { requireRoomForItems } from "./plans";
 import { requireSetUpUser } from "./utils/auth";
 import { gradingScale, itemType, material, strike } from "./utils/validators";
 
@@ -65,6 +66,7 @@ export const add = mutation({
   returns: v.id("items"),
   handler: async (ctx, fields) => {
     const owner = await requireSetUpUser(ctx);
+    await requireRoomForItems(ctx, owner._id);
     return await ctx.db.insert("items", {
       ownerId: owner._id,
       ...checkItem(fields, latestPurchaseDate()),
@@ -98,6 +100,7 @@ export const duplicate = mutation({
   returns: v.id("items"),
   handler: async (ctx, { itemId }) => {
     const item = await requireOwnItem(ctx, itemId);
+    await requireRoomForItems(ctx, item.ownerId);
     const copy = Object.fromEntries(
       fieldNames.flatMap((name) =>
         item[name] === undefined ? [] : [[name, item[name]]],

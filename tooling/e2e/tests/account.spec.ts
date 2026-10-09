@@ -103,3 +103,20 @@ test("the language picked on one device is used on the next", async ({
   await expect(other.locator("html")).toHaveAttribute("lang", "ro");
   await laptop.close();
 });
+
+test("feedback goes to the team from the Account screen", async ({ page }) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/settings`);
+  await visiblePage(page)
+    .getByRole("button", { name: "Send feedback" })
+    .click();
+  const dialog = page.getByRole("dialog", { name: "Send feedback" });
+
+  await dialog.getByRole("button", { name: "Send" }).click();
+  await expect(dialog.getByText("Write a message first.")).toBeVisible();
+  await dialog.getByLabel("Message").fill("Albums for stamps, please.");
+  await page.keyboard.press("ControlOrMeta+Enter");
+
+  await expect(page.getByText("Thanks! Your feedback was sent.")).toBeVisible();
+  await expect(dialog).toBeHidden();
+});

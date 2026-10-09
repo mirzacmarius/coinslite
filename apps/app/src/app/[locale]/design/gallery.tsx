@@ -1,6 +1,7 @@
 "use client";
 
 import { AppShell } from "@/components/shell/app-shell";
+import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useFormatters } from "@/locales/use-formatters";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
@@ -57,6 +58,7 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
+  Sparkles,
   Stamp,
   Trash2,
   Wallet,
@@ -739,6 +741,21 @@ export function DesignGallery() {
 
           <Section title="Item photos and viewer">
             <ItemPhotosSample />
+          </Section>
+
+          <Section title="Unseen marker">
+            <div className="flex w-[220px] flex-col rounded-lg border bg-popover p-1">
+              <div className="flex h-7 items-center gap-2 rounded-md px-2 text-[13px]">
+                <Sparkles
+                  className="size-4 text-muted-foreground"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+                Updates
+                <UnseenMarker className="ml-auto" />
+                <span className="sr-only">New release</span>
+              </div>
+            </div>
           </Section>
         </div>
       </div>

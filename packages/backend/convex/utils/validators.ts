@@ -34,3 +34,20 @@ export const strike = literalUnion(strikes);
 export const material = literalUnion(materials);
 /** Which side of an Item a photo shows: front or back. */
 export const photoSide = literalUnion(photoSides);
+
+/**
+ * What one US dollar buys: units of each Home currency, and troy ounces of
+ * gold (XAU) and silver (XAG). See spotPrices/rates.ts.
+ */
+export const perDollar = v.object({
+  NOK: v.number(),
+  SEK: v.number(),
+  DKK: v.number(),
+  EUR: v.number(),
+  RON: v.number(),
+  GBP: v.number(),
+  USD: v.number(),
+  CHF: v.number(),
+  XAU: v.number(),
+  XAG: v.number(),
+});

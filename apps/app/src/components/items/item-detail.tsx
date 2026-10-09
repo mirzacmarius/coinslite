@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  isItemLimitError,
+  upgradeHref,
+  useItemLimitMessage,
+} from "@/components/plans/plan-usage";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -35,6 +40,7 @@ export function ItemDetail() {
   const [deleting, setDeleting] = useState(false);
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
+  const itemLimitMessage = useItemLimitMessage();
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
       {t("nav.collection")}
@@ -128,8 +134,17 @@ export function ItemDetail() {
       const copyId = await duplicateItem({ itemId: item._id });
       toast.success(t("items.duplicated"));
       router.push(`/collection/${copyId}`);
-    } catch {
-      toast.error(t("items.errors.duplicateFailed"));
+    } catch (failure) {
+      if (isItemLimitError(failure)) {
+        toast.error(itemLimitMessage, {
+          action: {
+            label: t("plans.upgradeToPremium"),
+            onClick: () => router.push(upgradeHref),
+          },
+        });
+      } else {
+        toast.error(t("items.errors.duplicateFailed"));
+      }
     } finally {
       setDuplicating(false);
     }

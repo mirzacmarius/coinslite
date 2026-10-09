@@ -513,3 +513,31 @@ test("duplicating leaves the photos behind, and editing keeps them", async () =>
   expect(await ada.as.query(api.photos.ofItem, { itemId })).toEqual(photos);
   expect(await storedFiles(t)).toBe(2);
 });
+
+test("deleting an Item frees its place on the Free plan", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const [first] = await t.run(async (ctx) => {
+    const ids: Id<"items">[] = [];
+    for (let n = 1; n <= 50; n++) {
+      ids.push(
+        await ctx.db.insert("items", {
+          ownerId: ada.userId,
+          type: "coin",
+          title: `Krone ${n}`,
+          quantity: 1,
+        }),
+      );
+    }
+    return ids;
+  });
+  await expect(ada.as.mutation(api.items.add, morgan)).rejects.toThrow(
+    "ITEM_LIMIT_REACHED",
+  );
+
+  await ada.as.mutation(api.items.remove, { itemId: first! });
+
+  await expect(ada.as.mutation(api.items.add, morgan)).resolves.toEqual(
+    expect.any(String),
+  );
+});

@@ -1,5 +1,7 @@
 "use client";
 
+import { UnseenMarker } from "@/components/updates/unseen-marker";
+import { useUpdatesStatus } from "@/components/updates/use-updates-status";
 import { useI18n } from "@/locales/client";
 import { SkipLink } from "@coinslite/ui/skip-link";
 import { cn } from "@coinslite/ui/utils";
@@ -18,6 +20,7 @@ function NavLinks({
 }) {
   const t = useI18n();
   const pathname = usePathname();
+  const unseen = useUpdatesStatus()?.unseen === true;
   return (
     <ul
       className={
@@ -26,6 +29,15 @@ function NavLinks({
     >
       {items.map(({ key, href, icon: Icon }) => {
         const current = isCurrent(pathname, href);
+        // On phones the Account tab is where Updates are reached from.
+        const marked = layout === "tabs" && key === "account" && unseen;
+        const icon = (
+          <Icon
+            className={layout === "sidebar" ? "size-4" : "size-5"}
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+        );
         return (
           <li key={key}>
             <Link
@@ -45,12 +57,16 @@ function NavLinks({
                     )
               }
             >
-              <Icon
-                className={layout === "sidebar" ? "size-4" : "size-5"}
-                strokeWidth={1.75}
-                aria-hidden="true"
-              />
+              {marked ? (
+                <span className="relative flex">
+                  {icon}
+                  <UnseenMarker className="absolute -right-0.5 -top-0.5 size-2 ring-2 ring-card" />
+                </span>
+              ) : (
+                icon
+              )}
               {t(`nav.${key}`)}
+              {marked && <span className="sr-only">{t("updates.unseen")}</span>}
             </Link>
           </li>
         );
@@ -83,7 +99,7 @@ export function AppShell({
 
       <div className="sticky top-0 hidden h-dvh flex-col justify-between gap-2 border-r bg-sidebar p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
         <div className="flex flex-col gap-3">
-          <WorkspaceMenu className="h-8 w-full" />
+          <WorkspaceMenu className="h-8 w-full" markUnseen />
           {quickActions && (
             <div className="flex flex-col gap-1">{quickActions}</div>
           )}
