@@ -19,6 +19,10 @@ import type * as accounts_linking from "../accounts/linking.js";
 import type * as accounts_profile from "../accounts/profile.js";
 import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as auth from "../auth.js";
+import type * as billing from "../billing.js";
+import type * as billing_polar from "../billing/polar.js";
+import type * as billing_rules from "../billing/rules.js";
+import type * as billing_webhook from "../billing/webhook.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
 import type * as feedback from "../feedback.js";
@@ -30,7 +34,6 @@ import type * as items_grades from "../items/grades.js";
 import type * as items_rules from "../items/rules.js";
 import type * as plans from "../plans.js";
 import type * as plans_rules from "../plans/rules.js";
-import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_validators from "../utils/validators.js";
@@ -53,6 +56,10 @@ declare const fullApi: ApiFromModules<{
   "accounts/profile": typeof accounts_profile;
   "accounts/signUpProfile": typeof accounts_signUpProfile;
   auth: typeof auth;
+  billing: typeof billing;
+  "billing/polar": typeof billing_polar;
+  "billing/rules": typeof billing_rules;
+  "billing/webhook": typeof billing_webhook;
   "email/index": typeof email_index;
   env: typeof env;
   feedback: typeof feedback;
@@ -64,7 +71,6 @@ declare const fullApi: ApiFromModules<{
   "items/rules": typeof items_rules;
   plans: typeof plans;
   "plans/rules": typeof plans_rules;
-  subscriptions: typeof subscriptions;
   users: typeof users;
   "utils/auth": typeof utils_auth;
   "utils/validators": typeof utils_validators;
@@ -97,6 +103,5 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
-  polar: import("@convex-dev/polar/_generated/component.js").ComponentApi<"polar">;
   rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };
