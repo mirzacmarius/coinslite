@@ -45,7 +45,7 @@ export function resolveLocale({
 }
 
 /** The tags of an Accept-Language header, best first. */
-function preferredTags(acceptLanguage: string): string[] {
+export function preferredTags(acceptLanguage: string): string[] {
   return acceptLanguage
     .split(",")
     .map((part, index) => {

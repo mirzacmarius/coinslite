@@ -11,8 +11,8 @@ export function generateImageMetadata() {
   }));
 }
 
-export default function Icon({ id }: { id: string }) {
-  const size = Number(id);
+export default async function Icon({ id }: { id: Promise<string | number> }) {
+  const size = Number(await id);
   return new ImageResponse(<AppIcon size={size} />, {
     width: size,
     height: size,

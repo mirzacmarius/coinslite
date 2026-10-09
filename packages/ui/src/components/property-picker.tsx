@@ -38,6 +38,7 @@ export function PropertyPicker<T extends string>({
   placeholder,
   noResults,
   id,
+  "aria-describedby": describedBy,
   align = "start",
   className,
 }: {
@@ -51,6 +52,8 @@ export function PropertyPicker<T extends string>({
   placeholder?: string;
   noResults: string;
   id?: string;
+  /** Links a hint or error, e.g. when the pill sits in a labelled Field. */
+  "aria-describedby"?: string;
   align?: "start" | "end";
   className?: string;
 }) {
@@ -67,7 +70,8 @@ export function PropertyPicker<T extends string>({
           variant={selected ? "subtle" : "ghost"}
           size="xs"
           aria-label={`${label}: ${shown}`}
-          className={cn("max-w-full justify-start", className)}
+          aria-describedby={describedBy}
+          className={cn("max-w-full self-start justify-start", className)}
         >
           {selected?.icon ?? (
             <Icon

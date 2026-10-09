@@ -37,5 +37,8 @@
   "dependencies": {
     "@auth/core": "0.37.0"
   },
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "patchedDependencies": {
+    "@xixixao/uploadstuff@0.0.5": "patches/@xixixao%2Fuploadstuff@0.0.5.patch"
+  }
 }

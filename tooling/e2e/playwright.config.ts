@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { appUrl, isRemote, webUrl } from "./urls";
+import { appUrl, backendDir, hasLocalBackend, isRemote, webUrl } from "./urls";
 
 const isCI = !!process.env.CI;
 
@@ -11,6 +11,8 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? [["github"], ["list"]] : "list",
+  // CI's dev servers compile each page on its first visit.
+  expect: { timeout: isCI ? 15_000 : 5_000 },
   use: {
     trace: "retain-on-failure",
     // Lets the suite through Vercel's deployment protection on previews.
@@ -39,5 +41,17 @@ export default defineConfig({
           reuseExistingServer: !isCI,
           timeout: 120_000,
         },
+        ...(hasLocalBackend
+          ? [
+              {
+                command: "npx convex dev --tail-logs disable",
+                cwd: backendDir,
+                env: { CONVEX_AGENT_MODE: "anonymous" },
+                url: "http://127.0.0.1:3210/version",
+                reuseExistingServer: !isCI,
+                timeout: 120_000,
+              },
+            ]
+          : []),
       ],
 });

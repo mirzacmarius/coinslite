@@ -1,6 +1,7 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { homeCurrency, language } from "./utils/validators";
 
 export default defineSchema({
   ...authTables,
@@ -14,8 +15,25 @@ export default defineSchema({
     phoneVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
 
-    // custom fields
+    // Profile, set at sign-up
+    displayName: v.optional(v.string()),
+    language: v.optional(language),
+    homeCurrency: v.optional(homeCurrency),
+    termsAcceptedAt: v.optional(v.number()),
+
+    // Template fields, superseded by the profile in MUS-686
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
   }).index("email", ["email"]),
+
+  /**
+   * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox
+   * (local and CI test runs). Never used in production.
+   */
+  devOutbox: defineTable({
+    to: v.string(),
+    subject: v.string(),
+    text: v.string(),
+    code: v.optional(v.string()),
+  }).index("by_to", ["to"]),
 });

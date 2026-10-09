@@ -1,12 +1,13 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { asyncMap } from "convex-helpers";
+import { getAuthUserId, invalidateSessions } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import { polar } from "./subscriptions";
+import { requireUserId } from "./utils/auth";
 import { username } from "./utils/validators";
 
 export const getUser = query({
+  args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
@@ -21,7 +22,7 @@ export const getUser = query({
     });
     return {
       ...user,
-      name: user.username || user.name,
+      name: user.displayName ?? user.username ?? user.name,
       subscription,
       avatarUrl: user.imageId
         ? await ctx.storage.getUrl(user.imageId)
@@ -35,10 +36,7 @@ export const updateUsername = mutation({
     username: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
+    const userId = await requireUserId(ctx);
     const validatedUsername = username.safeParse(args.username);
 
     if (!validatedUsername.success) {
@@ -51,10 +49,7 @@ export const updateUsername = mutation({
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("User not found");
-    }
+    await requireUserId(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -64,22 +59,16 @@ export const updateUserImage = mutation({
     imageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
-    ctx.db.patch(userId, { imageId: args.imageId });
+    const userId = await requireUserId(ctx);
+    await ctx.db.patch(userId, { imageId: args.imageId });
   },
 });
 
 export const removeUserImage = mutation({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
-    ctx.db.patch(userId, { imageId: undefined, image: undefined });
+    const userId = await requireUserId(ctx);
+    await ctx.db.patch(userId, { imageId: undefined, image: undefined });
   },
 });
 
@@ -87,33 +76,29 @@ export const deleteUserAccount = internalMutation({
   args: {
     userId: v.id("users"),
   },
-  handler: async (ctx, args) => {
-    await asyncMap(
-      ["google" /* add other providers as needed */],
-      async (provider) => {
-        const authAccount = await ctx.db
-          .query("authAccounts")
-          .withIndex("userIdAndProvider", (q) =>
-            q.eq("userId", args.userId).eq("provider", provider),
-          )
-          .unique();
-        if (!authAccount) {
-          return;
-        }
-        await ctx.db.delete(authAccount._id);
-      },
-    );
-    await ctx.db.delete(args.userId);
+  handler: async (ctx, { userId }) => {
+    // Every sign-in method and its pending codes, so the email can be used again.
+    const accounts = await ctx.db
+      .query("authAccounts")
+      .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
+      .take(20);
+    for (const account of accounts) {
+      const codes = await ctx.db
+        .query("authVerificationCodes")
+        .withIndex("accountId", (q) => q.eq("accountId", account._id))
+        .take(20);
+      for (const code of codes) await ctx.db.delete(code._id);
+      await ctx.db.delete(account._id);
+    }
+    await ctx.db.delete(userId);
   },
 });
 
 export const deleteCurrentUserAccount = action({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return;
-    }
+    const userId = await requireUserId(ctx);
+    await invalidateSessions(ctx, { userId });
     // The alpha Polar component predates Convex 1.46's action context type.
     // Runtime is compatible; drop this when billing moves to @convex-dev/polar.
     const polarCtx = ctx as unknown as Parameters<

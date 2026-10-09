@@ -16,11 +16,14 @@
   "license": "ISC",
   "dependencies": {
     "@auth/core": "0.37.0",
+    "@coinslite/i18n": "workspace:*",
     "@convex-dev/auth": "^0.0.80",
     "@convex-dev/polar": "npm:@erquhart/convex-polar@0.2.0-alpha.5",
+    "@convex-dev/rate-limiter": "^0.4.1",
     "@polar-sh/sdk": "^0.26.1",
     "convex": "^1.46.0",
     "convex-helpers": "^0.1.63",
+    "oslo": "^1.1.2",
     "standardwebhooks": "^1.0.0"
   },
   "devDependencies": {

@@ -1,7 +1,9 @@
 import "@coinslite/ui/globals.css";
 import { brand } from "@/lib/brand";
-import { I18nProviderClient } from "@/locales/client";
+import { I18nProvider } from "@/locales/client";
+import { loaders } from "@/locales/loaders";
 import { getI18n } from "@/locales/server";
+import { defaultLocale, isLocale } from "@coinslite/i18n";
 import { Toaster } from "@coinslite/ui/toaster";
 import { TooltipProvider } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
@@ -24,13 +26,16 @@ export const viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  params: { locale },
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
+  const requested = (await params).locale;
+  const locale = isLocale(requested) ? requested : defaultLocale;
+  const dictionary = (await loaders[locale]()).default;
   return (
     <ConvexAuthNextjsServerProvider>
       <html lang={locale} suppressHydrationWarning>
@@ -48,9 +53,9 @@ export default function RootLayout({
           >
             <TooltipProvider delayDuration={0}>
               <ConvexClientProvider>
-                <I18nProviderClient locale={locale}>
+                <I18nProvider locale={locale} dictionary={dictionary}>
                   {children}
-                </I18nProviderClient>
+                </I18nProvider>
               </ConvexClientProvider>
             </TooltipProvider>
             <Toaster />
