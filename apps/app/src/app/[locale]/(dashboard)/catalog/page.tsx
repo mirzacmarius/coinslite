@@ -1,7 +1,5 @@
-import {
-  PlaceholderPage,
-  placeholderMetadata,
-} from "@/components/shell/placeholder-page";
+import { placeholderMetadata } from "@/components/shell/placeholder-metadata";
+import { PlaceholderPage } from "@/components/shell/placeholder-page";
 
 export const generateMetadata = () => placeholderMetadata("catalog");
 

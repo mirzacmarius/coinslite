@@ -2,7 +2,7 @@ import "@coinslite/ui/globals.css";
 import { brand } from "@/lib/brand";
 import { I18nProvider } from "@/locales/client";
 import { loaders } from "@/locales/loaders";
-import { getI18n } from "@/locales/server";
+import { getI18n, getStaticParams } from "@/locales/server";
 import { defaultLocale, isLocale } from "@coinslite/i18n";
 import { Toaster } from "@coinslite/ui/toaster";
 import { TooltipProvider } from "@coinslite/ui/tooltip";
@@ -11,7 +11,14 @@ import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { ConvexClientProvider } from "../convex-client-provider";
+
+/** Every language is prerendered, so each page has a static shell to serve. */
+export function generateStaticParams() {
+  return getStaticParams();
+}
 
 export async function generateMetadata() {
   const t = await getI18n();
@@ -26,6 +33,20 @@ export const viewport = {
   ],
 };
 
+/**
+ * The session is read from cookies and stamped with the current time, so it is
+ * rendered per request, never into a prerendered shell. On a page load it
+ * streams in after the static frame; moving between pages never re-renders it.
+ */
+async function Session({ children }: { children: React.ReactNode }) {
+  await connection();
+  return (
+    <ConvexAuthNextjsServerProvider>
+      <ConvexClientProvider>{children}</ConvexClientProvider>
+    </ConvexAuthNextjsServerProvider>
+  );
+}
+
 export default async function RootLayout({
   children,
   params,
@@ -37,31 +58,29 @@ export default async function RootLayout({
   const locale = isLocale(requested) ? requested : defaultLocale;
   const dictionary = (await loaders[locale]()).default;
   return (
-    <ConvexAuthNextjsServerProvider>
-      <html lang={locale} suppressHydrationWarning>
-        <body
-          className={cn(
-            `${GeistSans.variable} ${GeistMono.variable}`,
-            "font-sans antialiased",
-          )}
+    <html lang={locale} suppressHydrationWarning>
+      <body
+        className={cn(
+          `${GeistSans.variable} ${GeistMono.variable}`,
+          "font-sans antialiased",
+        )}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <TooltipProvider delayDuration={0}>
-              <ConvexClientProvider>
-                <I18nProvider locale={locale} dictionary={dictionary}>
-                  {children}
-                </I18nProvider>
-              </ConvexClientProvider>
-            </TooltipProvider>
-            <Toaster />
-          </ThemeProvider>
-        </body>
-      </html>
-    </ConvexAuthNextjsServerProvider>
+          <TooltipProvider delayDuration={0}>
+            <I18nProvider locale={locale} dictionary={dictionary}>
+              <Suspense>
+                <Session>{children}</Session>
+              </Suspense>
+            </I18nProvider>
+          </TooltipProvider>
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

@@ -1,11 +1,16 @@
-import { getI18n } from "@/locales/server";
+"use client";
+
+import { useI18n } from "@/locales/client";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { type NavKey, navItems } from "./navigation";
 
-/** Stands in for a section that a later release fills in. */
-export async function PlaceholderPage({ section }: { section: NavKey }) {
-  const t = await getI18n();
+/**
+ * Stands in for a section that a later release fills in. Rendered in the
+ * browser from the loaded dictionary, so it appears the moment a link is clicked.
+ */
+export function PlaceholderPage({ section }: { section: NavKey }) {
+  const t = useI18n();
   const Icon = navItems.find(({ key }) => key === section)?.icon;
   return (
     <>
@@ -23,9 +28,4 @@ export async function PlaceholderPage({ section }: { section: NavKey }) {
       </div>
     </>
   );
-}
-
-export async function placeholderMetadata(section: NavKey) {
-  const t = await getI18n();
-  return { title: t(`nav.${section}`) };
 }
