@@ -18,6 +18,7 @@ import {
   setLimits,
 } from "@coinslite/backend/convex/catalog/setRules";
 import { Button } from "@coinslite/ui/button";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Switch } from "@coinslite/ui/switch";
 import { toast } from "@coinslite/ui/toaster";
@@ -166,15 +167,13 @@ export function BulkAddBar({
           <span className="font-medium tabular-nums">
             {t("sets.selected", { count })}
           </span>
-          <Button
+          <IconButton
             type="button"
-            variant="ghost"
-            size="icon-xs"
-            aria-label={t("sets.clearSelection")}
+            label={t("sets.clearSelection")}
             onClick={onClear}
           >
             <X />
-          </Button>
+          </IconButton>
         </span>
       )}
       <AlbumPicker

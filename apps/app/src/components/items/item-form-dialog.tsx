@@ -47,6 +47,7 @@ import {
   DialogTitle,
 } from "@coinslite/ui/dialog";
 import { CheckboxField, Field } from "@coinslite/ui/field";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Input } from "@coinslite/ui/input";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
@@ -552,14 +553,9 @@ export function ItemFormDialog({
               </DialogTitle>
             </div>
             <DialogClose asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                aria-label={t("items.close")}
-              >
+              <IconButton type="button" label={t("items.close")} shortcut="Esc">
                 <X />
-              </Button>
+              </IconButton>
             </DialogClose>
           </DialogHeader>
           <DialogDescription className="sr-only">

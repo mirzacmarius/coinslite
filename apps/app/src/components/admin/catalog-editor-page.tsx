@@ -22,6 +22,7 @@ import {
 } from "@coinslite/ui/dropdown-menu";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import { usePaginatedQuery, useQuery } from "convex/react";
@@ -299,12 +300,10 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
         {isEntry ? (
           <span className="size-6 shrink-0" />
         ) : (
-          <Button
-            variant="ghost"
-            size="icon-xs"
+          <IconButton
             className="size-6"
             aria-expanded={expanded}
-            aria-label={toggleLabel}
+            label={toggleLabel}
             onClick={() => setExpanded((open) => !open)}
           >
             <ChevronRight
@@ -313,7 +312,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
                 expanded && "rotate-90",
               )}
             />
-          </Button>
+          </IconButton>
         )}
         <Icon
           className="size-4 shrink-0 text-muted-foreground"

@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coinslite/ui/dialog";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Input } from "@coinslite/ui/input";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
@@ -187,14 +188,9 @@ function QuickAddDialog({
             </DialogTitle>
           </div>
           <DialogClose asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              aria-label={t("items.close")}
-            >
+            <IconButton type="button" label={t("items.close")} shortcut="Esc">
               <X />
-            </Button>
+            </IconButton>
           </DialogClose>
         </DialogHeader>
         <DialogDescription className="sr-only">

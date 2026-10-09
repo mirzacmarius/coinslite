@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coinslite/ui/dialog";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
 import { useForm } from "@tanstack/react-form";
@@ -172,14 +173,13 @@ export function AlbumFormDialog({
               </DialogTitle>
             </div>
             <DialogClose asChild>
-              <Button
+              <IconButton
                 type="button"
-                variant="ghost"
-                size="icon-xs"
-                aria-label={t("albums.close")}
+                label={t("albums.close")}
+                shortcut="Esc"
               >
                 <X />
-              </Button>
+              </IconButton>
             </DialogClose>
           </DialogHeader>
           <DialogDescription className="sr-only">

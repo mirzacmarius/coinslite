@@ -35,6 +35,7 @@
     "./filter-chip": "./src/components/filter-chip.tsx",
     "./globals.css": "./src/globals.css",
     "./header-bar": "./src/components/header-bar.tsx",
+    "./icon-button": "./src/components/icon-button.tsx",
     "./icons": "./src/components/icons.tsx",
     "./input": "./src/components/input.tsx",
     "./item-type-icon": "./src/components/item-type-icon.tsx",

@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from "@coinslite/ui/dialog";
 import { Field } from "@coinslite/ui/field";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Input } from "@coinslite/ui/input";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
@@ -254,14 +255,13 @@ export function CatalogImageDialog({
               </DialogTitle>
             </div>
             <DialogClose asChild>
-              <Button
+              <IconButton
                 type="button"
-                variant="ghost"
-                size="icon-xs"
-                aria-label={t("catalogImages.close")}
+                label={t("catalogImages.close")}
+                shortcut="Esc"
               >
                 <X />
-              </Button>
+              </IconButton>
             </DialogClose>
           </DialogHeader>
           <DialogDescription className="sr-only">
