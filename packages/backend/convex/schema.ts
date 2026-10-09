@@ -3,6 +3,8 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
   albumColour,
+  catalogItemType,
+  catalogKind,
   gradingScale,
   homeCurrency,
   itemType,
@@ -10,6 +12,8 @@ import {
   material,
   metal,
   perDollar,
+  preciousMetal,
+  provenance,
   strike,
 } from "./utils/validators";
 
@@ -39,6 +43,9 @@ export default defineSchema({
     country: v.optional(v.string()),
     // Not `phone`: Convex Auth keeps that one for phone sign-in.
     contactPhone: v.optional(v.string()),
+
+    /** Admins maintain the Catalog; everyone else has no role. Granted with admin/roles:grant. */
+    role: v.optional(v.literal("admin")),
 
     // Updates (updates/releases.ts): the version of the newest release they've
     // seen in the list (new accounts start at the current one), and of the
@@ -129,6 +136,67 @@ export default defineSchema({
     colour: albumColour,
     itemCount: v.number(),
   }).index("by_ownerId", ["ownerId"]),
+
+  /**
+   * The Catalog: a tree of country and Theme roots, grouping nodes and, as
+   * leaves, Catalog entries (kind "entry"), the only nodes Items can be created
+   * from ("addable"). CoinsLite's own data (ADR 0003):
+   * each group of facts records where it comes from. catalog/tree.ts keeps
+   * `path` and `searchText` in step with the rest.
+   */
+  catalogNodes: defineTable({
+    /** The node's id in Catalog CSV files, stable across deployments: "us-morgan-dollar-1881-s". */
+    key: v.string(),
+    /** Absent on roots. */
+    parentId: v.optional(v.id("catalogNodes")),
+    /** The keys from the root down to this node, joined by "/": every node below starts with `${path}/`. */
+    path: v.string(),
+    kind: catalogKind,
+    title: v.string(),
+    /** Order among siblings, ascending. */
+    sortOrder: v.number(),
+    itemType: v.optional(catalogItemType),
+    /** ISO 3166-1 alpha-2. */
+    country: v.optional(v.string()),
+
+    // Facts, from the source in factsProvenance
+    denomination: v.optional(v.string()),
+    series: v.optional(v.string()),
+    material: v.optional(material),
+    strike: v.optional(strike),
+    metal: v.optional(preciousMetal),
+    /** Grams. */
+    weight: v.optional(v.number()),
+    /** Share of the weight that is `metal`, from 0 to 1 (0.9 for 900/1000). */
+    fineness: v.optional(v.number()),
+    /** Millimetres. */
+    diameter: v.optional(v.number()),
+    yearFrom: v.optional(v.number()),
+    yearTo: v.optional(v.number()),
+    factsProvenance: v.optional(provenance),
+
+    // Notes, from the source in notesProvenance
+    technicalDetails: v.optional(v.string()),
+    historicalNotes: v.optional(v.string()),
+    notesProvenance: v.optional(provenance),
+
+    imageUrl: v.optional(v.string()),
+    imageProvenance: v.optional(provenance),
+
+    /** A cross-reference only: no Numista data is ever stored (ADR 0003). */
+    numistaId: v.optional(v.number()),
+
+    /** Title, denomination, series and country, for the search index. */
+    searchText: v.string(),
+  })
+    .index("by_key", ["key"])
+    .index("by_parentId_and_sortOrder", ["parentId", "sortOrder"])
+    .index("by_path", ["path"])
+    .index("by_kind_and_path", ["kind", "path"])
+    .searchIndex("search_searchText", {
+      searchField: "searchText",
+      filterFields: ["kind", "itemType", "country"],
+    }),
 
   /**
    * The latest Spot prices and exchange rates (spotPrices.ts): one document,

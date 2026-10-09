@@ -570,4 +570,85 @@ export default {
     close: "Lukk",
     workspaceMenuUnseen: "Konto og innstillinger, ny versjon",
   },
+  catalogAdmin: {
+    menu: "Import og eksport av katalog",
+    title: "Import og eksport av katalog",
+    notAvailable: "Denne siden er ikke tilgjengelig",
+    notAvailableDescription:
+      "Bare administratorer kan importere og eksportere katalogen.",
+    exportTitle: "Eksport",
+    exportDescription:
+      "Last ned hele katalogen som en CSV-fil. Rediger den i et regneark og importer den igjen.",
+    exportAction: "Eksporter CSV",
+    exportFailed: "Katalogen kunne ikke eksporteres. Prøv igjen.",
+    importTitle: "Import",
+    importDescription:
+      "Rader med en id som allerede finnes i katalogen, oppdaterer den noden, og de andre legges til. En parent_id kan vise til en annen rad i samme fil. Hver gruppe med fakta, notater og bilder trenger en kilde.",
+    chooseFile: "Velg CSV-fil",
+    chooseAnother: "Velg en annen fil",
+    clearFile: "Fjern filen",
+    readFailed: "Filen kunne ikke leses. Velg en CSV-fil.",
+    checking: "Sjekker filen …",
+    inserts: "Legges til",
+    updates: "Oppdateres",
+    unchanged: "Uendret",
+    upToDate: "Katalogen stemmer allerede med denne filen.",
+    problemsTitle: "Feil som må rettes",
+    problemsDescription:
+      "Ingenting importeres før alle radene er riktige. Rett disse, og velg filen på nytt.",
+    showingFirst: "Viser de første {shown} av {total}.",
+    row: "Rad",
+    column: "Kolonne",
+    problem: "Feil",
+    importAction: "Importer",
+    confirmTitle: "Importere «{file}»?",
+    confirmDescription:
+      "Endringene gjelder med en gang i katalogen alle blar i. Rader som allerede stemmer, blir som de er.",
+    cancel: "Avbryt",
+    imported:
+      "Katalogen er oppdatert: {inserts} lagt til, {updates} oppdatert.",
+    importBlocked:
+      "Katalogen er endret siden sjekken, og filen har nå feil. Ingenting ble importert.",
+    importFailed: "Filen kunne ikke importeres. Prøv igjen.",
+    errors: {
+      EMPTY_FILE: "Filen har ingen rader under overskriftsraden.",
+      UNCLOSED_QUOTE: "Et anførselstegn som åpnes i denne raden, lukkes aldri.",
+      MISSING_COLUMN: "Filen må ha denne kolonnen.",
+      UNKNOWN_COLUMN: "Dette er ikke en katalogkolonne. Sjekk stavemåten.",
+      DUPLICATE_COLUMN: "Denne kolonnen finnes mer enn én gang.",
+      TOO_MANY_ROWS:
+        "Filen er for stor. Del den opp i filer med opptil 3 000 rader.",
+      ID_REQUIRED: "Gi raden en id.",
+      INVALID_ID:
+        "Bruk opptil 64 små bokstaver, sifre, punktum, bindestreker og understreker.",
+      DUPLICATE_ID: "En rad lenger opp har allerede denne id-en.",
+      TITLE_REQUIRED: "Gi raden en tittel.",
+      TOO_LONG: "Verdien er for lang.",
+      INVALID_VALUE: "Dette er ikke en av verdiene kolonnen tillater.",
+      INVALID_COUNTRY: "Bruk en landkode på to bokstaver, som US eller NO.",
+      INVALID_NUMBER:
+        "Skriv et tall innenfor det kolonnen tillater, med punktum som desimaltegn.",
+      INVALID_YEAR:
+        "Skriv et helt årstall, med år før Kristus som negative tall.",
+      INVALID_URL:
+        "Skriv en fullstendig nettadresse som begynner med https://.",
+      NUMISTA_DATA:
+        "Ingen data fra Numista kan lagres. Behold bare Numista-nummeret, i numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "En katalogoppføring trenger en objekttype: mynt eller seddel.",
+      FIELD_NOT_FOR_TYPE: "Sedler har verken metall eller størrelse.",
+      YEARS_REVERSED: "Siste år kommer før det første.",
+      SOURCE_REQUIRED:
+        "Oppgi kilden til disse faktaene, notatene eller bildet.",
+      ROOT_NOT_ADDABLE:
+        "Et land eller et tema kan ikke være en katalogoppføring. Gi raden en parent_id.",
+      PARENT_NOT_FOUND: "Ingen rad i filen eller katalogen har denne id-en.",
+      PARENT_IS_ENTRY:
+        "Denne forelderen er en katalogoppføring, så ingenting kan ligge under den.",
+      PARENT_CYCLE: "Foreldrene fører tilbake til denne raden.",
+      TOO_DEEP: "Katalogen har maks 8 nivåer.",
+      ENTRY_HAS_CHILDREN:
+        "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
+    },
+  },
 } as const satisfies Dictionary;

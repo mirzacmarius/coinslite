@@ -565,4 +565,80 @@ export default {
     close: "Close",
     workspaceMenuUnseen: "Account and preferences, new release",
   },
+  catalogAdmin: {
+    menu: "Catalog import and export",
+    title: "Catalog import and export",
+    notAvailable: "This page isn't available",
+    notAvailableDescription: "Only admins can import and export the Catalog.",
+    exportTitle: "Export",
+    exportDescription:
+      "Download the whole Catalog as a CSV file. Edit it in a spreadsheet and import it again.",
+    exportAction: "Export CSV",
+    exportFailed: "Couldn't export the Catalog. Try again.",
+    importTitle: "Import",
+    importDescription:
+      "Rows whose id is already in the Catalog update that node, and the others are added. A parent_id can name another row in the same file. Every group of facts, notes and images needs its source.",
+    chooseFile: "Choose CSV file",
+    chooseAnother: "Choose another file",
+    clearFile: "Clear file",
+    readFailed: "Couldn't read that file. Choose a CSV file.",
+    checking: "Checking the file…",
+    inserts: "To add",
+    updates: "To update",
+    unchanged: "Unchanged",
+    upToDate: "The Catalog already matches this file.",
+    problemsTitle: "Problems to fix",
+    problemsDescription:
+      "Nothing is imported until every row is right. Fix these, then choose the file again.",
+    showingFirst: "Showing the first {shown} of {total}.",
+    row: "Row",
+    column: "Column",
+    problem: "Problem",
+    importAction: "Import",
+    confirmTitle: "Import “{file}”?",
+    confirmDescription:
+      "The changes apply to the Catalog everyone browses, right away. Rows that already match stay as they are.",
+    cancel: "Cancel",
+    imported: "Catalog updated: {inserts} added, {updates} updated.",
+    importBlocked:
+      "The Catalog changed since the check, and the file now has problems. Nothing was imported.",
+    importFailed: "Couldn't import the file. Try again.",
+    errors: {
+      EMPTY_FILE: "The file has no rows below the header.",
+      UNCLOSED_QUOTE: "A quote that opens in this row is never closed.",
+      MISSING_COLUMN: "The file needs this column.",
+      UNKNOWN_COLUMN: "This isn't a Catalog column. Check its spelling.",
+      DUPLICATE_COLUMN: "This column appears more than once.",
+      TOO_MANY_ROWS:
+        "The file is too big. Split it into files of up to 3,000 rows.",
+      ID_REQUIRED: "Give the row an id.",
+      INVALID_ID:
+        "Use up to 64 lowercase letters, digits, dots, dashes and underscores.",
+      DUPLICATE_ID: "A row above already has this id.",
+      TITLE_REQUIRED: "Give the row a title.",
+      TOO_LONG: "This value is too long.",
+      INVALID_VALUE: "This isn't one of the values this column allows.",
+      INVALID_COUNTRY: "Use a two-letter country code, such as US or NO.",
+      INVALID_NUMBER:
+        "Enter a number within this column's range, with a dot for decimals.",
+      INVALID_YEAR: "Enter a whole year, with years BC as negative numbers.",
+      INVALID_URL: "Enter a full web address that starts with https://.",
+      NUMISTA_DATA:
+        "No Numista data may be stored. Keep only the Numista number, in numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "A Catalog entry needs an Item type: coin or banknote.",
+      FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
+      YEARS_REVERSED: "The last year comes before the first.",
+      SOURCE_REQUIRED: "Name the source of these facts, notes or image.",
+      ROOT_NOT_ADDABLE:
+        "A country or Theme can't be a Catalog entry. Give the row a parent_id.",
+      PARENT_NOT_FOUND: "No row in the file or the Catalog has this id.",
+      PARENT_IS_ENTRY:
+        "This parent is a Catalog entry, so nothing can go below it.",
+      PARENT_CYCLE: "Following the parents leads back to this row.",
+      TOO_DEEP: "The Catalog goes at most 8 levels deep.",
+      ENTRY_HAS_CHILDREN:
+        "Nodes sit below this one, so it can't become a Catalog entry.",
+    },
+  },
 } as const;

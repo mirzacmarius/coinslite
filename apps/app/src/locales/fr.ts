@@ -582,4 +582,86 @@ export default {
     close: "Fermer",
     workspaceMenuUnseen: "Compte et préférences, nouvelle version",
   },
+  catalogAdmin: {
+    menu: "Import et export du catalogue",
+    title: "Import et export du catalogue",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent importer et exporter le catalogue.",
+    exportTitle: "Export",
+    exportDescription:
+      "Téléchargez tout le catalogue dans un fichier CSV. Modifiez-le dans un tableur, puis importez-le à nouveau.",
+    exportAction: "Exporter en CSV",
+    exportFailed: "Impossible d’exporter le catalogue. Réessayez.",
+    importTitle: "Import",
+    importDescription:
+      "Les lignes dont l’id existe déjà dans le catalogue mettent à jour ce nœud, les autres sont ajoutées. Un parent_id peut désigner une autre ligne du même fichier. Chaque groupe de faits, de notes et d’images doit indiquer sa source.",
+    chooseFile: "Choisir un fichier CSV",
+    chooseAnother: "Choisir un autre fichier",
+    clearFile: "Retirer le fichier",
+    readFailed: "Impossible de lire ce fichier. Choisissez un fichier CSV.",
+    checking: "Vérification du fichier…",
+    inserts: "À ajouter",
+    updates: "À mettre à jour",
+    unchanged: "Inchangées",
+    upToDate: "Le catalogue correspond déjà à ce fichier.",
+    problemsTitle: "Erreurs à corriger",
+    problemsDescription:
+      "Rien n’est importé tant que toutes les lignes ne sont pas correctes. Corrigez ces erreurs, puis choisissez à nouveau le fichier.",
+    showingFirst: "Affichage des {shown} premières sur {total}.",
+    row: "Ligne",
+    column: "Colonne",
+    problem: "Erreur",
+    importAction: "Importer",
+    confirmTitle: "Importer « {file} » ?",
+    confirmDescription:
+      "Les modifications s’appliquent tout de suite au catalogue que tout le monde consulte. Les lignes déjà à jour restent telles quelles.",
+    cancel: "Annuler",
+    imported: "Catalogue mis à jour : {inserts} ajoutés, {updates} mis à jour.",
+    importBlocked:
+      "Le catalogue a changé depuis la vérification et le fichier contient maintenant des erreurs. Rien n’a été importé.",
+    importFailed: "Impossible d’importer le fichier. Réessayez.",
+    errors: {
+      EMPTY_FILE: "Le fichier n’a aucune ligne sous l’en-tête.",
+      UNCLOSED_QUOTE:
+        "Un guillemet ouvert dans cette ligne n’est jamais fermé.",
+      MISSING_COLUMN: "Le fichier doit contenir cette colonne.",
+      UNKNOWN_COLUMN:
+        "Ce n’est pas une colonne du catalogue. Vérifiez son orthographe.",
+      DUPLICATE_COLUMN: "Cette colonne apparaît plusieurs fois.",
+      TOO_MANY_ROWS:
+        "Le fichier est trop volumineux. Divisez-le en fichiers de 3 000 lignes au plus.",
+      ID_REQUIRED: "Donnez un id à la ligne.",
+      INVALID_ID:
+        "Utilisez jusqu’à 64 lettres minuscules, chiffres, points, tirets et tirets bas.",
+      DUPLICATE_ID: "Une ligne plus haut a déjà cet id.",
+      TITLE_REQUIRED: "Donnez un titre à la ligne.",
+      TOO_LONG: "Cette valeur est trop longue.",
+      INVALID_VALUE: "Cette valeur n’est pas autorisée dans cette colonne.",
+      INVALID_COUNTRY: "Utilisez un code pays à deux lettres, comme US ou NO.",
+      INVALID_NUMBER:
+        "Saisissez un nombre dans la plage de cette colonne, avec un point comme séparateur décimal.",
+      INVALID_YEAR:
+        "Saisissez une année entière, les années av. J.-C. en nombres négatifs.",
+      INVALID_URL:
+        "Saisissez une adresse web complète commençant par https://.",
+      NUMISTA_DATA:
+        "Aucune donnée de Numista ne peut être stockée. Gardez seulement le numéro Numista, dans numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "Une entrée du catalogue doit avoir un type d’objet : pièce ou billet.",
+      FIELD_NOT_FOR_TYPE: "Les billets n’ont ni métal ni dimensions.",
+      YEARS_REVERSED: "La dernière année précède la première.",
+      SOURCE_REQUIRED:
+        "Indiquez la source de ces faits, de ces notes ou de cette image.",
+      ROOT_NOT_ADDABLE:
+        "Un pays ou un thème ne peut pas être une entrée du catalogue. Donnez un parent_id à la ligne.",
+      PARENT_NOT_FOUND: "Aucune ligne du fichier ni du catalogue n’a cet id.",
+      PARENT_IS_ENTRY:
+        "Ce parent est une entrée du catalogue : rien ne peut se trouver en dessous.",
+      PARENT_CYCLE: "Les parents ramènent à cette ligne.",
+      TOO_DEEP: "Le catalogue compte au plus 8 niveaux.",
+      ENTRY_HAS_CHILDREN:
+        "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
+    },
+  },
 } as const satisfies Dictionary;

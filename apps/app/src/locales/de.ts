@@ -591,4 +591,90 @@ export default {
     close: "Schließen",
     workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
   },
+  catalogAdmin: {
+    menu: "Katalog importieren und exportieren",
+    title: "Katalog importieren und exportieren",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription:
+      "Nur Admins können den Katalog importieren und exportieren.",
+    exportTitle: "Export",
+    exportDescription:
+      "Lade den ganzen Katalog als CSV-Datei herunter. Bearbeite sie in einer Tabellenkalkulation und importiere sie wieder.",
+    exportAction: "CSV exportieren",
+    exportFailed:
+      "Der Katalog konnte nicht exportiert werden. Versuche es noch einmal.",
+    importTitle: "Import",
+    importDescription:
+      "Zeilen, deren ID schon im Katalog steht, aktualisieren diesen Knoten, die übrigen werden hinzugefügt. Eine parent_id kann auf eine andere Zeile derselben Datei verweisen. Jede Gruppe von Fakten, Notizen und Bildern braucht ihre Quelle.",
+    chooseFile: "CSV-Datei auswählen",
+    chooseAnother: "Andere Datei auswählen",
+    clearFile: "Datei entfernen",
+    readFailed: "Die Datei konnte nicht gelesen werden. Wähle eine CSV-Datei.",
+    checking: "Datei wird geprüft …",
+    inserts: "Neu",
+    updates: "Geändert",
+    unchanged: "Unverändert",
+    upToDate: "Der Katalog entspricht dieser Datei bereits.",
+    problemsTitle: "Zu behebende Fehler",
+    problemsDescription:
+      "Es wird nichts importiert, bis alle Zeilen stimmen. Behebe diese Fehler und wähle die Datei erneut.",
+    showingFirst: "Die ersten {shown} von {total}.",
+    row: "Zeile",
+    column: "Spalte",
+    problem: "Fehler",
+    importAction: "Importieren",
+    confirmTitle: "„{file}“ importieren?",
+    confirmDescription:
+      "Die Änderungen gelten sofort für den Katalog, den alle durchsuchen. Zeilen, die schon stimmen, bleiben, wie sie sind.",
+    cancel: "Abbrechen",
+    imported:
+      "Katalog aktualisiert: {inserts} hinzugefügt, {updates} geändert.",
+    importBlocked:
+      "Der Katalog hat sich seit der Prüfung geändert, und die Datei hat jetzt Fehler. Es wurde nichts importiert.",
+    importFailed:
+      "Die Datei konnte nicht importiert werden. Versuche es noch einmal.",
+    errors: {
+      EMPTY_FILE: "Unter der Kopfzeile stehen keine Zeilen.",
+      UNCLOSED_QUOTE:
+        "Ein Anführungszeichen, das in dieser Zeile beginnt, wird nie geschlossen.",
+      MISSING_COLUMN: "Die Datei braucht diese Spalte.",
+      UNKNOWN_COLUMN: "Das ist keine Katalogspalte. Prüfe die Schreibweise.",
+      DUPLICATE_COLUMN: "Diese Spalte kommt mehr als einmal vor.",
+      TOO_MANY_ROWS:
+        "Die Datei ist zu groß. Teile sie in Dateien mit höchstens 3.000 Zeilen auf.",
+      ID_REQUIRED: "Gib der Zeile eine ID.",
+      INVALID_ID:
+        "Verwende bis zu 64 Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
+      DUPLICATE_ID: "Eine Zeile weiter oben hat schon diese ID.",
+      TITLE_REQUIRED: "Gib der Zeile einen Titel.",
+      TOO_LONG: "Dieser Wert ist zu lang.",
+      INVALID_VALUE: "Dieser Wert ist in dieser Spalte nicht erlaubt.",
+      INVALID_COUNTRY:
+        "Verwende einen zweistelligen Ländercode wie US oder NO.",
+      INVALID_NUMBER:
+        "Gib eine Zahl im erlaubten Bereich dieser Spalte ein, mit Punkt als Dezimaltrennzeichen.",
+      INVALID_YEAR:
+        "Gib ein ganzes Jahr ein, Jahre v. Chr. als negative Zahlen.",
+      INVALID_URL:
+        "Gib eine vollständige Webadresse ein, die mit https:// beginnt.",
+      NUMISTA_DATA:
+        "Daten von Numista dürfen nicht gespeichert werden. Behalte nur die Numista-Nummer, in numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "Ein Katalogeintrag braucht eine Objektart: Münze oder Banknote.",
+      FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Größe.",
+      YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
+      SOURCE_REQUIRED:
+        "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
+      ROOT_NOT_ADDABLE:
+        "Ein Land oder Thema kann kein Katalogeintrag sein. Gib der Zeile eine parent_id.",
+      PARENT_NOT_FOUND:
+        "Keine Zeile der Datei und kein Knoten im Katalog hat diese ID.",
+      PARENT_IS_ENTRY:
+        "Dieses Elternelement ist ein Katalogeintrag, darunter kann nichts stehen.",
+      PARENT_CYCLE: "Die Elternelemente führen zurück zu dieser Zeile.",
+      TOO_DEEP: "Der Katalog hat höchstens 8 Ebenen.",
+      ENTRY_HAS_CHILDREN:
+        "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
+    },
+  },
 } as const satisfies Dictionary;
