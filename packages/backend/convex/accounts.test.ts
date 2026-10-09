@@ -292,8 +292,16 @@ test("a deleted account's email can sign up again", async () => {
   const t = newTest();
   await signUpAndVerify(t);
   const [user] = await users(t);
+  const session = await t.run((ctx) =>
+    ctx.db
+      .query("authSessions")
+      .withIndex("userId", (q) => q.eq("userId", user._id))
+      .first(),
+  );
 
-  await t.mutation(internal.users.deleteUserAccount, { userId: user._id });
+  await t
+    .withIdentity({ subject: `${user._id}|${session?._id}` })
+    .action(api.account.deletion.deleteAccount, {});
 
   expect(await users(t)).toEqual([]);
   expect(await t.run((ctx) => ctx.db.query("authAccounts").collect())).toEqual(

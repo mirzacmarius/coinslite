@@ -691,7 +691,7 @@ test("deleting an account stops its Premium subscription at Polar and removes th
   const ada = await person(t, "ada@example.com");
   await deliver(t, subscriptionEvent("subscription.created", ada.userId));
 
-  await ada.as.action(api.users.deleteCurrentUserAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
 
   expect(polar).toHaveBeenCalledTimes(1);
   expect(request()).toMatchObject({
@@ -717,9 +717,56 @@ test("a subscription already set to end needs nothing from Polar when the accoun
     }),
   );
 
-  await ada.as.action(api.users.deleteCurrentUserAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
 
   expect(polar).not.toHaveBeenCalled();
+  expect(await t.run((ctx) => ctx.db.query("subscriptions").take(5))).toEqual(
+    [],
+  );
+});
+
+test("while Polar can't end a renewing subscription, nothing of the account is deleted", async () => {
+  configurePolar();
+  const { polar } = fakePolar({ fail: true });
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+  await ada.as.mutation(api.items.add, krone);
+
+  await expect(
+    ada.as.action(api.account.deletion.deleteAccount, {}),
+  ).rejects.toThrow();
+
+  expect(polar).toHaveBeenCalledTimes(1);
+  expect(await t.run((ctx) => ctx.db.get(ada.userId))).not.toBeNull();
+  expect(await ada.as.query(api.plans.usage, {})).toEqual({
+    plan: "premium",
+  });
+  expect(
+    await ada.as.query(api.items.list, {
+      paginationOpts: { numItems: 5, cursor: null },
+    }),
+  ).toMatchObject({ page: [{ title: "1 krone 1875" }] });
+});
+
+test("Polar's news about a deleted account's subscription brings nothing back", async () => {
+  configurePolar();
+  fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await deliver(t, subscriptionEvent("subscription.created", ada.userId));
+
+  await ada.as.action(api.account.deletion.deleteAccount, {});
+  await deliver(
+    t,
+    subscriptionEvent("subscription.revoked", ada.userId, {
+      status: "canceled",
+      ended_at: iso(Date.now()),
+      modified_at: iso(Date.now() + 1000),
+    }),
+  );
+
   expect(await t.run((ctx) => ctx.db.query("subscriptions").take(5))).toEqual(
     [],
   );
