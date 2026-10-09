@@ -31,6 +31,7 @@ import { Input } from "@coinslite/ui/input";
 import { type ItemType, ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Label } from "@coinslite/ui/label";
+import { PhotoViewer } from "@coinslite/ui/photo-viewer";
 import { Progress } from "@coinslite/ui/progress";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
@@ -333,6 +334,52 @@ function ItemMenu() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+const coinPicture = (text: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="78" fill="#c9a227" stroke="#8a6d12" stroke-width="6"/><text x="100" y="111" font-family="sans-serif" font-size="30" text-anchor="middle" fill="#5c4708">${text}</text></svg>`,
+  )}`;
+const samplePhotos = [
+  { src: coinPicture("1881"), caption: "Obverse" },
+  { src: coinPicture("ONE $"), caption: "Reverse" },
+];
+
+function ItemPhotosSample() {
+  const [index, setIndex] = useState<number | null>(null);
+  return (
+    <>
+      <div className="grid max-w-sm grid-cols-2 gap-3">
+        {samplePhotos.map((photo, at) => (
+          <div key={photo.caption} className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={() => setIndex(at)}
+              aria-label={`${photo.caption}, view full screen`}
+              className="aspect-square overflow-hidden rounded-lg border bg-muted"
+            >
+              <img
+                src={photo.src}
+                alt=""
+                className="size-full object-contain"
+              />
+            </button>
+            <span className="flex h-7 items-center text-xs text-muted-foreground">
+              {photo.caption}
+            </span>
+          </div>
+        ))}
+      </div>
+      <PhotoViewer
+        index={index}
+        onIndexChange={setIndex}
+        photos={samplePhotos}
+        closeLabel="Close"
+        previousLabel="Previous photo"
+        nextLabel="Next photo"
+      />
+    </>
   );
 }
 
@@ -690,6 +737,10 @@ export function DesignGallery() {
               description="Add your first coin, banknote or stamp to see it here."
               action={<Button>Add Item</Button>}
             />
+          </Section>
+
+          <Section title="Item photos and viewer">
+            <ItemPhotosSample />
           </Section>
 
           <Section title="Unseen marker">

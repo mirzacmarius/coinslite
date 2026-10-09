@@ -350,6 +350,53 @@ export default {
       tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
+  photos: {
+    title: "Photos",
+    sides: {
+      front: "Recto",
+      back: "Verso",
+      obverse: "Avers",
+      reverse: "Revers",
+    },
+    add: "Ajouter une photo",
+    formats: "JPEG, PNG, WebP ou GIF, jusqu’à 10 Mo",
+    uploading: "Envoi de la photo",
+    view: "Voir en plein écran",
+    actions: "Actions sur la photo",
+    replace: "Remplacer la photo",
+    remove: "Retirer la photo",
+    removeTitles: {
+      front: "Retirer la photo du recto ?",
+      back: "Retirer la photo du verso ?",
+      obverse: "Retirer la photo de l’avers ?",
+      reverse: "Retirer la photo du revers ?",
+    },
+    removeBody:
+      "La photo est supprimée définitivement. Vous pouvez en ajouter une nouvelle à tout moment.",
+    cancel: "Annuler",
+    close: "Fermer",
+    previous: "Photo précédente",
+    next: "Photo suivante",
+    errors: {
+      tooLarge: "Ce fichier dépasse 10 Mo. Choisissez une photo plus légère.",
+      notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
+      failed: "Impossible d’enregistrer la photo. Réessayez.",
+      removeFailed: "Impossible de retirer la photo. Réessayez.",
+    },
+  },
+  deleteItem: {
+    delete: "Supprimer",
+    title: "Supprimer « {title} » ?",
+    body: "L’objet est supprimé définitivement. Cette action est irréversible.",
+    bodyOnePhoto:
+      "L’objet et sa photo sont supprimés définitivement. Cette action est irréversible.",
+    bodyTwoPhotos:
+      "L’objet et ses 2 photos sont supprimés définitivement. Cette action est irréversible.",
+    confirm: "Supprimer l’objet",
+    cancel: "Annuler",
+    deleted: "Objet supprimé",
+    failed: "Impossible de supprimer l’objet. Réessayez.",
+  },
   feedback: {
     title: "Votre avis",
     description:

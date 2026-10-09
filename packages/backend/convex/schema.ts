@@ -93,7 +93,15 @@ export default defineSchema({
     purchaseDate: v.optional(v.string()),
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
-  }).index("by_ownerId", ["ownerId"]),
+
+    // Photos, one file per side, private to the owner (photos.ts). The
+    // indexes keep each stored file on at most one Item side.
+    frontPhoto: v.optional(v.id("_storage")),
+    backPhoto: v.optional(v.id("_storage")),
+  })
+    .index("by_ownerId", ["ownerId"])
+    .index("by_frontPhoto", ["frontPhoto"])
+    .index("by_backPhoto", ["backPhoto"]),
 
   /**
    * The latest Spot prices and exchange rates (spotPrices.ts): one document,

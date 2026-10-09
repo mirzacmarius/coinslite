@@ -15,13 +15,15 @@ import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
-import { Copy, Pencil, SearchX } from "lucide-react";
+import { Copy, Pencil, SearchX, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type * as React from "react";
 import { useState } from "react";
+import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
+import { ItemPhotos } from "./item-photos";
 
 /** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
 export function ItemDetail() {
@@ -35,6 +37,9 @@ export function ItemDetail() {
   // Each opening starts the form afresh from the Item as it is now.
   const [editing, setEditing] = useState({ open: false, key: 0 });
   const [duplicating, setDuplicating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  // Once deleted, the Item reads as missing while the page goes back.
+  const [leaving, setLeaving] = useState(false);
   const itemLimitMessage = useItemLimitMessage();
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
@@ -42,7 +47,7 @@ export function ItemDetail() {
     </Link>
   );
 
-  if (item === undefined) {
+  if (item === undefined || (item === null && leaving)) {
     return <HeaderBar parent={parent} title="" />;
   }
   if (item === null) {
@@ -171,6 +176,10 @@ export function ItemDetail() {
               <Pencil aria-hidden="true" />
               {t("items.edit")}
             </Button>
+            <Button variant="ghost" size="xs" onClick={() => setDeleting(true)}>
+              <Trash2 aria-hidden="true" />
+              {t("deleteItem.delete")}
+            </Button>
           </>
         }
       />
@@ -180,8 +189,15 @@ export function ItemDetail() {
         open={editing.open}
         onOpenChange={(open) => setEditing(({ key }) => ({ open, key }))}
       />
+      <DeleteItemDialog
+        item={item}
+        open={deleting}
+        onOpenChange={setDeleting}
+        onLeaving={setLeaving}
+      />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
+          <ItemPhotos item={item} />
           <div className="flex items-center gap-3">
             <ItemTypeIcon type={item.type} />
             <h2 className="text-base font-medium">{item.title}</h2>
