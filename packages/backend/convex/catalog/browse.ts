@@ -100,22 +100,37 @@ export const roots = query({
   },
 });
 
-/** How many pieces of a Catalog entry a person holds: the Quantity of every Item made from it. */
+/**
+ * How many of a person's Items made from one Catalog entry are counted for
+ * how many pieces of it they hold; past that it's "at least" (`heldMore`).
+ */
+export const heldItemLimit = 100;
+
+/**
+ * How many pieces of a Catalog entry a person holds: the Quantity of the
+ * Items made from it, over at most `heldItemLimit` of them. `heldMore` says
+ * there are more Items than were counted, so they hold at least `held`.
+ */
 export async function heldCount(
   ctx: QueryCtx,
   ownerId: Id<"users">,
   entryId: Id<"catalogNodes">,
 ) {
-  let held = 0;
-  for await (const item of ctx.db
+  const items = await ctx.db
     .query("items")
     .withIndex("by_ownerId_and_catalogEntryId", (q) =>
       q.eq("ownerId", ownerId).eq("catalogEntryId", entryId),
-    )) {
-    held += item.quantity;
-  }
-  return held;
+    )
+    .take(heldItemLimit + 1);
+  return {
+    held: items
+      .slice(0, heldItemLimit)
+      .reduce((pieces, item) => pieces + item.quantity, 0),
+    heldMore: items.length > heldItemLimit,
+  };
 }
+
+export type Held = Awaited<ReturnType<typeof heldCount>>;
 
 export async function nodeByKey(ctx: QueryCtx, key: string) {
   return await ctx.db
@@ -171,8 +186,9 @@ const entryFields = {
   imageUrl: v.optional(v.string()),
   /** The image at thumbnail size, for rows; a linked image has only one size. */
   thumbnailUrl: v.optional(v.string()),
-  /** How many pieces of it the person holds. */
+  /** How many pieces of it the person holds; at least that many with `heldMore`. */
   held: v.number(),
+  heldMore: v.boolean(),
 };
 
 const entryDetail = v.object({
@@ -251,13 +267,13 @@ async function imageOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
 const entryRowOf = async (
   ctx: QueryCtx,
   node: Doc<"catalogNodes">,
-  held: number,
+  held: Held,
 ) => ({
   key: node.key,
   title: node.title,
   ...pick(node, rowFieldNames),
   ...(await imageOf(ctx, node)),
-  held,
+  ...held,
 });
 
 /**
@@ -320,7 +336,7 @@ type EntryRow = typeof entryRow.type;
 export async function creditedEntryRow(
   ctx: QueryCtx,
   node: Doc<"catalogNodes">,
-  held: number,
+  held: Held,
 ): Promise<EntryRow> {
   const row = await entryRowOf(ctx, node, held);
   const credit = node.imageProvenance;

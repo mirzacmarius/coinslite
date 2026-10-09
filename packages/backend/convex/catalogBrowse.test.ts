@@ -4,6 +4,7 @@ import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { heldItemLimit } from "./catalog/browse";
 import { formatCsvRecord } from "./catalog/csvText";
 import { catalogPageSize } from "./catalog/fields";
 import schema from "./schema";
@@ -403,6 +404,7 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     },
     numistaId: 1492,
     held: 3,
+    heldMore: false,
     ancestors: [
       { key: "us", title: "United States", country: "US", countryNode: true },
       { key: "us-morgan", title: "Morgan dollar", countryNode: false },
@@ -771,4 +773,27 @@ test("a root that becomes a country once it gets a country code is browsed by de
   expect(
     await ada.as.query(api.catalog.browse.node, { key: "de" }),
   ).toMatchObject({ kind: "country", countryNode: true, entryCount: 1 });
+});
+
+test("how many someone holds is counted over a bounded number of Items, and says when there are more", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const ada = await person(t, "ada@example.com");
+  await importRows(admin.as, [
+    country("us", "United States", "US"),
+    entry("us-morgan-1881-s", "us"),
+  ]);
+  const held = async () => {
+    const node = await ada.as.query(api.catalog.browse.node, {
+      key: "us-morgan-1881-s",
+    });
+    return node?.kind === "entry" ? [node.held, node.heldMore] : null;
+  };
+
+  for (let n = 0; n < heldItemLimit; n++)
+    await holdItem(t, ada.userId, "us-morgan-1881-s", 2);
+  expect(await held()).toEqual([2 * heldItemLimit, false]);
+
+  await holdItem(t, ada.userId, "us-morgan-1881-s", 2);
+  expect(await held()).toEqual([2 * heldItemLimit, true]);
 });

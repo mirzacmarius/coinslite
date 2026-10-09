@@ -310,7 +310,7 @@ export const heldCounts = query({
       keys.map(async (key) => {
         const node = await nodeByKey(ctx, key);
         return node?.kind === "entry"
-          ? [{ key, held: await heldCount(ctx, user._id, node._id) }]
+          ? [{ key, held: (await heldCount(ctx, user._id, node._id)).held }]
           : [];
       }),
     );
