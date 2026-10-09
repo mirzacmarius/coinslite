@@ -717,4 +717,55 @@ export default {
     seePlan: "Se planen din",
     backToPlans: "Tilbake til abonnement",
   },
+  adminStats: {
+    menu: "Statistikk",
+    title: "Statistikk",
+    notAvailable: "Denne siden er ikke tilgjengelig",
+    notAvailableDescription: "Bare administratorer kan se statistikken.",
+    refresh: "Tell på nytt",
+    counting: "Teller…",
+    countedAt: "Talt {time}",
+    hourly: "Telles på nytt hver time.",
+    refreshFailed: "Kunne ikke starte tellingen. Prøv igjen.",
+    emptyTitle: "Ikke talt ennå",
+    emptyDescription:
+      "Statistikken telles hver time. Tell nå for å se den med en gang.",
+    countNow: "Tell nå",
+    countingTitle: "Teller statistikken",
+    countingDescription:
+      "Dette tar noen sekunder. Tallene vises så snart det er ferdig.",
+    users: {
+      title: "Brukere",
+      description:
+        "Kontoer som har bekreftet e-postadressen og fullført registreringen.",
+      total: "Alle brukere",
+      newLast30Days: "Nye siste 30 dager",
+      premium: "Premium",
+      free: "Gratisplan",
+    },
+    subscriptions: {
+      title: "Abonnementer",
+      description:
+        "Aktive gir Premium nå. De som avsluttes, blir ikke fornyet.",
+      active: "Aktive",
+      endingWithin30Days: "Avsluttes innen 30 dager",
+      ended: "Avsluttet",
+    },
+    collection: {
+      title: "Innhold i samlingene",
+      description: "Alt i alles samlinger.",
+      items: "Objekter",
+      coins: "Mynter",
+      banknotes: "Sedler",
+      stamps: "Frimerker",
+      albums: "Album",
+    },
+    activity: {
+      title: "Aktivitet",
+      description: "Objekter og album lagt til nylig som fortsatt finnes.",
+      itemsAddedLast24Hours: "Objekter lagt til siste 24 timer",
+      itemsAddedLast7Days: "Objekter lagt til siste 7 dager",
+      albumsCreatedLast30Days: "Album opprettet siste 30 dager",
+    },
+  },
 } as const satisfies Dictionary;

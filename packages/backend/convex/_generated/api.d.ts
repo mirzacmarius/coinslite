@@ -19,6 +19,8 @@ import type * as accounts_linking from "../accounts/linking.js";
 import type * as accounts_profile from "../accounts/profile.js";
 import type * as accounts_signUpProfile from "../accounts/signUpProfile.js";
 import type * as admin_roles from "../admin/roles.js";
+import type * as admin_stats from "../admin/stats.js";
+import type * as admin_statsFigures from "../admin/statsFigures.js";
 import type * as albums from "../albums.js";
 import type * as albums_membership from "../albums/membership.js";
 import type * as albums_rules from "../albums/rules.js";
@@ -33,6 +35,7 @@ import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSi
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_tree from "../catalog/tree.js";
+import type * as collectionCounts from "../collectionCounts.js";
 import type * as crons from "../crons.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
@@ -80,6 +83,8 @@ declare const fullApi: ApiFromModules<{
   "accounts/profile": typeof accounts_profile;
   "accounts/signUpProfile": typeof accounts_signUpProfile;
   "admin/roles": typeof admin_roles;
+  "admin/stats": typeof admin_stats;
+  "admin/statsFigures": typeof admin_statsFigures;
   albums: typeof albums;
   "albums/membership": typeof albums_membership;
   "albums/rules": typeof albums_rules;
@@ -94,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/fields": typeof catalog_fields;
   "catalog/seed": typeof catalog_seed;
   "catalog/tree": typeof catalog_tree;
+  collectionCounts: typeof collectionCounts;
   crons: typeof crons;
   "email/index": typeof email_index;
   env: typeof env;

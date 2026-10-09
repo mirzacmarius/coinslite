@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import { action, internalMutation, query } from "./_generated/server";
 import { deleteUserAndSignInMethods } from "./accounts/linking";
 import { deleteSubscriptionsOf, stopBilling } from "./billing";
+import { deleteCollectionCountsOf } from "./collectionCounts";
 import { requireUserId } from "./utils/auth";
 
 export const getUser = query({
@@ -30,6 +31,7 @@ export const deleteUserAccount = internalMutation({
   },
   handler: async (ctx, { userId }) => {
     await deleteSubscriptionsOf(ctx, userId);
+    await deleteCollectionCountsOf(ctx, userId);
     await deleteUserAndSignInMethods(ctx, userId);
   },
 });

@@ -8,6 +8,7 @@ import {
   query,
 } from "./_generated/server";
 import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
+import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { deleteItem } from "./items/deletion";
 import { checkItem } from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
@@ -87,6 +88,7 @@ export const add = mutation({
       ...(album && { albumId: album }),
     });
     await moveBetweenAlbums(ctx, undefined, album);
+    await countItemAdded(ctx, { ownerId: owner._id, type: fields.type });
     return itemId;
   },
 });
@@ -107,6 +109,7 @@ export const update = mutation({
       albumId: album,
     });
     await moveBetweenAlbums(ctx, item.albumId, album);
+    await countItemRetyped(ctx, item.ownerId, item.type, fields.type);
     return null;
   },
 });
@@ -134,6 +137,7 @@ export const duplicate = mutation({
       ...(album && { albumId: album }),
     });
     await moveBetweenAlbums(ctx, undefined, album);
+    await countItemAdded(ctx, item);
     return copyId;
   },
 });

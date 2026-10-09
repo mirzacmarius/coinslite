@@ -722,4 +722,55 @@ export default {
     seePlan: "Vezi planul",
     backToPlans: "Înapoi la planuri",
   },
+  adminStats: {
+    menu: "Statistici",
+    title: "Statistici",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription: "Doar administratorii pot vedea statisticile.",
+    refresh: "Numără din nou",
+    counting: "Se numără…",
+    countedAt: "Numărate la {time}",
+    hourly: "Se renumără în fiecare oră.",
+    refreshFailed: "Numărarea nu a putut porni. Încearcă din nou.",
+    emptyTitle: "Încă nenumărate",
+    emptyDescription:
+      "Statisticile se numără în fiecare oră. Numără-le acum ca să le vezi imediat.",
+    countNow: "Numără acum",
+    countingTitle: "Se numără statisticile",
+    countingDescription:
+      "Durează câteva secunde. Cifrele apar imediat ce s-a terminat.",
+    users: {
+      title: "Utilizatori",
+      description:
+        "Conturi care și-au confirmat e-mailul și au terminat înregistrarea.",
+      total: "Toți utilizatorii",
+      newLast30Days: "Noi în ultimele 30 de zile",
+      premium: "Premium",
+      free: "Plan gratuit",
+    },
+    subscriptions: {
+      title: "Abonamente",
+      description:
+        "Cele active oferă Premium acum. Cele care se încheie nu se reînnoiesc.",
+      active: "Active",
+      endingWithin30Days: "Se încheie în 30 de zile",
+      ended: "Încheiate",
+    },
+    collection: {
+      title: "Conținutul colecțiilor",
+      description: "Tot ce se află în colecțiile tuturor.",
+      items: "Obiecte",
+      coins: "Monede",
+      banknotes: "Bancnote",
+      stamps: "Timbre",
+      albums: "Albume",
+    },
+    activity: {
+      title: "Activitate",
+      description: "Obiecte și albume adăugate recent care încă există.",
+      itemsAddedLast24Hours: "Obiecte adăugate în ultimele 24 de ore",
+      itemsAddedLast7Days: "Obiecte adăugate în ultimele 7 zile",
+      albumsCreatedLast30Days: "Albume create în ultimele 30 de zile",
+    },
+  },
 } as const satisfies Dictionary;
