@@ -4,6 +4,7 @@ import {
   PlanLink,
   SubscriptionSummary,
 } from "@/components/billing/account-plan";
+import { InsuranceReportLink } from "@/components/insurance-report/insurance-report-link";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
@@ -67,6 +68,7 @@ export function AccountPage() {
       <PlanLink plan={account.plan} />
       <PhoneAccountLinks />
       <UpdatesLink />
+      <InsuranceReportLink premium={account.plan === "premium"} />
       <ContactSection account={account} />
       <PreferencesSection account={account} />
       <EmailSection account={account} />

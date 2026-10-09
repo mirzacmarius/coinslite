@@ -14,6 +14,7 @@ import {
   checkAlbum,
   nextColour,
 } from "./albums/rules";
+import { countAlbumCreated, countAlbumDeleted } from "./collectionCounts";
 import { itemNotFound } from "./items";
 import { deleteItem } from "./items/deletion";
 import { withThumbnail } from "./items/thumbnail";
@@ -56,11 +57,13 @@ export const create = mutation({
     });
     if (albums.length >= albumLimits.count)
       throw new ConvexError(albumErrors.tooMany);
-    return await ctx.db.insert("albums", {
+    const albumId = await ctx.db.insert("albums", {
       ownerId: owner._id,
       ...album,
       itemCount: 0,
     });
+    await countAlbumCreated(ctx, { ownerId: owner._id });
+    return albumId;
   },
 });
 
@@ -143,6 +146,7 @@ export const remove = mutation({
       await deleteItem(ctx, item);
     }
     await ctx.db.delete(albumId);
+    await countAlbumDeleted(ctx, album);
     await releaseItems(ctx, album.ownerId, albumId);
     return null;
   },

@@ -271,8 +271,6 @@ export default {
   dashboard: {
     headerTitle: "Prezentare generală",
     headerDescription: "Colecția ta dintr-o privire.",
-    bodyTitle: "Bun venit la CoinsLite",
-    bodyDescription: "Colecția ta va apărea aici.",
   },
   account: {
     pageTitle: "Cont",
@@ -953,6 +951,154 @@ export default {
       WEBP_UNSUPPORTED:
         "Acest browser nu poate salva imagini WebP. Încearcă altul, de exemplu Chrome sau Firefox.",
       NOT_ADMIN: "Doar administratorii pot modifica imaginile din catalog.",
+    },
+  },
+  featureFlags: {
+    menu: "Activarea funcționalităților",
+    title: "Activarea funcționalităților",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription:
+      "Doar administratorii pot activa și dezactiva funcționalități.",
+    description: "Modificările se aplică imediat tuturor.",
+    catalog: "Afișează catalogul",
+    catalogDescription:
+      "Când este dezactivat, doar administratorii văd catalogul. Ceilalți nu îl mai găsesc în navigare, la răsfoire sau în căutare.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Cine poate fotografia o monedă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
+    scannerOptions: {
+      off: "Dezactivat",
+      admins: "Doar administratori",
+      premiumBeta: "Beta Premium",
+    },
+    saved: "Setare actualizată",
+    saveFailed: "Setarea nu a putut fi actualizată. Încearcă din nou.",
+    catalogHiddenTitle: "Catalogul nu este disponibil",
+    catalogHiddenDescription:
+      "Este dezactivat deocamdată. Obiectele tale nu sunt afectate.",
+  },
+  overview: {
+    addShortcuts: "Adaugă în colecție",
+    add: {
+      coin: "Adaugă monedă",
+      banknote: "Adaugă bancnotă",
+      stamp: "Adaugă timbru",
+    },
+    latestItems: "Cele mai noi obiecte",
+    viewCollection: "Vezi colecția",
+    firstRunTitle: "Începe-ți colecția",
+    firstRunDescription:
+      "Adaugă o monedă, o bancnotă sau un timbru pe care îl deții. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
+  },
+  adminStats: {
+    menu: "Statistici",
+    title: "Statistici",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription: "Doar administratorii pot vedea statisticile.",
+    refresh: "Numără din nou",
+    counting: "Se numără…",
+    countedAt: "Numărate la {time}",
+    hourly: "Se renumără în fiecare oră.",
+    refreshFailed: "Numărarea nu a putut porni. Încearcă din nou.",
+    emptyTitle: "Încă nenumărate",
+    emptyDescription:
+      "Statisticile se numără în fiecare oră. Numără-le acum ca să le vezi imediat.",
+    countNow: "Numără acum",
+    countingTitle: "Se numără statisticile",
+    countingDescription:
+      "Durează câteva secunde. Cifrele apar imediat ce s-a terminat.",
+    users: {
+      title: "Utilizatori",
+      description:
+        "Conturi care și-au confirmat e-mailul și au terminat înregistrarea.",
+      total: "Toți utilizatorii",
+      newLast30Days: "Noi în ultimele 30 de zile",
+      premium: "Premium",
+      free: "Plan gratuit",
+    },
+    subscriptions: {
+      title: "Abonamente",
+      description:
+        "Cele active oferă Premium acum. Cele care se încheie nu se reînnoiesc.",
+      active: "Active",
+      endingWithin30Days: "Se încheie în 30 de zile",
+      ended: "Încheiate",
+    },
+    collection: {
+      title: "Conținutul colecțiilor",
+      description: "Tot ce se află în colecțiile tuturor.",
+      items: "Obiecte",
+      coins: "Monede",
+      banknotes: "Bancnote",
+      stamps: "Timbre",
+      albums: "Albume",
+    },
+    activity: {
+      title: "Activitate",
+      description: "Obiecte și albume adăugate recent care încă există.",
+      itemsAddedLast24Hours: "Obiecte adăugate în ultimele 24 de ore",
+      itemsAddedLast7Days: "Obiecte adăugate în ultimele 7 zile",
+      albumsCreatedLast30Days: "Albume create în ultimele 30 de zile",
+    },
+  },
+  collectionExport: {
+    export: "Exportă",
+    "inView#zero": "Niciun obiect în această vizualizare",
+    "inView#one": "1 obiect în această vizualizare",
+    "inView#few": "{count} obiecte în această vizualizare",
+    "inView#other": "{count} de obiecte în această vizualizare",
+    csv: "Exportă ca CSV",
+    premiumOnly: "Exportul colecției face parte din Premium.",
+    failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
+    fileName: "coinslite-colectie-{date}.csv",
+  },
+  insuranceReport: {
+    title: "Raport de asigurare",
+    lockedTitle: "Raportul de asigurare face parte din Premium",
+    lockedDescription:
+      "Un PDF pentru asigurător cu obiectele alese, valorile lor, datele tale de contact și totalurile.",
+    scopeTitle: "Obiecte",
+    scopeDescription: "Alege ce obiecte acoperă raportul.",
+    scope: "Acoperire",
+    wholeCollection: "Toată colecția",
+    albums: "Albume",
+    withoutAlbum: "Obiecte fără album",
+    noAlbums: "Încă nu ai albume.",
+    chooseScope: "Alege cel puțin un album sau obiectele fără album.",
+    valuesTitle: "Valori",
+    valuesDescription:
+      "Valoarea asigurată este cea mai mare dintre valorile alese pentru fiecare obiect.",
+    keepOne:
+      "Păstrează cel puțin una dintre prețul de achiziție, valoarea de piață și valoarea metalului.",
+    columns: {
+      purchasePrice: "Preț de achiziție",
+      marketValue: "Valoare de piață",
+      metalValue: "Valoarea metalului",
+      insuredValue: "Valoare asigurată",
+    },
+    previewTitle: "Previzualizare",
+    previewDescription: "Fiecare total acoperă toate bucățile fiecărui obiect.",
+    items: "Obiecte",
+    pieces: "Bucăți",
+    noSpotPrices:
+      "Încă nu există prețuri spot, așa că niciun obiect nu are valoarea metalului.",
+    staleSpotPrices: "Prețurile spot pot fi depășite.",
+    tooLarge:
+      "Un raport cuprinde cel mult {limit} obiecte. Alege mai puține albume.",
+    nothingToReport: "Aici nu există obiecte de raportat.",
+    ownerTitle: "Proprietar",
+    ownerDescription: "Apare în raport, din contul tău.",
+    editContact: "Editează în cont",
+    missingContact:
+      "Adaugă în cont numele complet, telefonul și adresa, ca asigurătorul să te poată contacta.",
+    download: "Descarcă PDF",
+    downloaded: "Raportul de asigurare a fost descărcat",
+    failed: "Raportul nu a putut fi creat. Încearcă din nou.",
+    errors: {
+      PREMIUM_REQUIRED: "Raportul de asigurare face parte din Premium.",
+      REPORT_TOO_LARGE:
+        "Raportul are prea multe obiecte. Alege mai puține albume.",
+      ALBUM_NOT_FOUND: "Unul dintre albumele alese nu mai există.",
     },
   },
 } as const satisfies Dictionary;

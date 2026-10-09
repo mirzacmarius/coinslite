@@ -1,10 +1,12 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { statsFigures, statsTable } from "./admin/statsFigures";
 import {
   albumColour,
   catalogItemType,
   catalogKind,
+  featureFlag,
   gradingScale,
   homeCurrency,
   itemType,
@@ -229,17 +231,14 @@ export default defineSchema({
       "yearFrom",
       "sortOrder",
     ])
-    .index(
-      "by_kind_and_countryNodeKey_and_denomination_and_series_and_yearFrom_and_sortOrder",
-      [
-        "kind",
-        "countryNodeKey",
-        "denomination",
-        "series",
-        "yearFrom",
-        "sortOrder",
-      ],
-    )
+    .index("by_kind_countryNodeKey_denomination_series_yearFrom_sortOrder", [
+      "kind",
+      "countryNodeKey",
+      "denomination",
+      "series",
+      "yearFrom",
+      "sortOrder",
+    ])
     // So each stored file is on at most one entry (utils/files.ts).
     .index("by_imageFiles_full", ["imageFiles.full"])
     .index("by_imageFiles_thumbnail", ["imageFiles.thumbnail"])
@@ -294,6 +293,50 @@ export default defineSchema({
   })
     .index("by_polarId", ["polarId"])
     .index("by_userId_and_premium", ["userId", "premium"]),
+
+  /**
+   * Feature flags admins switch in the app (featureFlags.ts): one document per
+   * flag that has been set; a flag without one holds its default.
+   */
+  featureFlags: defineTable(featureFlag).index("by_key", ["key"]),
+
+  /**
+   * How many Items (in all and of each Item type) and Albums each person has:
+   * one document per person, kept by every write that adds, removes or
+   * retypes their Items or Albums (collectionCounts.ts), so figures across
+   * everyone never count Items one by one. The `items` and `albums` indexes
+   * list people by how much they hold.
+   */
+  collectionCounts: defineTable({
+    userId: v.id("users"),
+    items: v.number(),
+    coins: v.number(),
+    banknotes: v.number(),
+    stamps: v.number(),
+    albums: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_items", ["items"])
+    .index("by_albums", ["albums"]),
+
+  /**
+   * Admin stats (admin/stats.ts): figures across everyone, counted in the
+   * background a batch per transaction. Admins see the newest finished count;
+   * one in progress has no `finishedAt` yet and carries where it has got to.
+   */
+  adminStats: defineTable({
+    /** When the count began; "the last 30 days" and the like count back from here. */
+    startedAt: v.number(),
+    finishedAt: v.optional(v.number()),
+    /** The table being counted and the cursor into it; unset once finished. */
+    progress: v.optional(
+      v.object({
+        table: statsTable,
+        cursor: v.union(v.string(), v.null()),
+      }),
+    ),
+    figures: statsFigures,
+  }).index("by_finishedAt", ["finishedAt"]),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

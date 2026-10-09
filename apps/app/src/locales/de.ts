@@ -279,8 +279,6 @@ export default {
   dashboard: {
     headerTitle: "Übersicht",
     headerDescription: "Deine Sammlung auf einen Blick.",
-    bodyTitle: "Willkommen bei CoinsLite",
-    bodyDescription: "Deine Sammlung wird hier angezeigt.",
   },
   account: {
     pageTitle: "Konto",
@@ -977,6 +975,157 @@ export default {
       WEBP_UNSUPPORTED:
         "Dieser Browser kann keine WebP-Bilder speichern. Versuche es mit einem anderen, etwa Chrome oder Firefox.",
       NOT_ADMIN: "Nur Admins können Katalogbilder ändern.",
+    },
+  },
+  featureFlags: {
+    menu: "Funktionsschalter",
+    title: "Funktionsschalter",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription:
+      "Nur Admins können Funktionen ein- und ausschalten.",
+    description: "Änderungen gelten sofort für alle.",
+    catalog: "Katalog anzeigen",
+    catalogDescription:
+      "Wenn aus, sehen nur Admins den Katalog. Alle anderen finden ihn nicht mehr in der Navigation, beim Stöbern oder in der Suche.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Wer eine Münze fotografieren kann, um einen passenden Katalogeintrag vorgeschlagen zu bekommen. Admins können es, solange er nicht aus ist.",
+    scannerOptions: {
+      off: "Aus",
+      admins: "Nur Admins",
+      premiumBeta: "Premium-Beta",
+    },
+    saved: "Funktionsschalter aktualisiert",
+    saveFailed:
+      "Der Funktionsschalter konnte nicht aktualisiert werden. Versuche es noch einmal.",
+    catalogHiddenTitle: "Der Katalog ist nicht verfügbar",
+    catalogHiddenDescription:
+      "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
+  },
+  overview: {
+    addShortcuts: "Zur Sammlung hinzufügen",
+    add: {
+      coin: "Münze hinzufügen",
+      banknote: "Banknote hinzufügen",
+      stamp: "Briefmarke hinzufügen",
+    },
+    latestItems: "Neueste Objekte",
+    viewCollection: "Sammlung ansehen",
+    firstRunTitle: "Beginne deine Sammlung",
+    firstRunDescription:
+      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
+  },
+  adminStats: {
+    menu: "Statistik",
+    title: "Statistik",
+    notAvailable: "Diese Seite ist nicht verfügbar",
+    notAvailableDescription: "Nur Admins können die Statistik sehen.",
+    refresh: "Neu zählen",
+    counting: "Wird gezählt…",
+    countedAt: "Gezählt am {time}",
+    hourly: "Wird jede Stunde neu gezählt.",
+    refreshFailed:
+      "Die Zählung konnte nicht gestartet werden. Versuch es noch einmal.",
+    emptyTitle: "Noch nicht gezählt",
+    emptyDescription:
+      "Die Statistik wird jede Stunde gezählt. Zähl jetzt, um sie sofort zu sehen.",
+    countNow: "Jetzt zählen",
+    countingTitle: "Statistik wird gezählt",
+    countingDescription:
+      "Das dauert ein paar Sekunden. Die Zahlen erscheinen, sobald es fertig ist.",
+    users: {
+      title: "Nutzer",
+      description:
+        "Konten, die ihre E-Mail-Adresse bestätigt und die Registrierung abgeschlossen haben.",
+      total: "Alle Nutzer",
+      newLast30Days: "Neu in den letzten 30 Tagen",
+      premium: "Premium",
+      free: "Gratis-Tarif",
+    },
+    subscriptions: {
+      title: "Abos",
+      description:
+        "Aktive geben jetzt Premium. Endende werden nicht verlängert.",
+      active: "Aktiv",
+      endingWithin30Days: "Enden in den nächsten 30 Tagen",
+      ended: "Beendet",
+    },
+    collection: {
+      title: "Inhalt der Sammlungen",
+      description: "Alles in allen Sammlungen.",
+      items: "Objekte",
+      coins: "Münzen",
+      banknotes: "Banknoten",
+      stamps: "Briefmarken",
+      albums: "Alben",
+    },
+    activity: {
+      title: "Aktivität",
+      description: "Kürzlich hinzugefügte Objekte und Alben, die es noch gibt.",
+      itemsAddedLast24Hours: "Objekte, hinzugefügt in den letzten 24 Stunden",
+      itemsAddedLast7Days: "Objekte, hinzugefügt in den letzten 7 Tagen",
+      albumsCreatedLast30Days: "Alben, erstellt in den letzten 30 Tagen",
+    },
+  },
+  collectionExport: {
+    export: "Exportieren",
+    "inView#zero": "Keine Objekte in dieser Ansicht",
+    "inView#one": "1 Objekt in dieser Ansicht",
+    "inView#few": "{count} Objekte in dieser Ansicht",
+    "inView#other": "{count} Objekte in dieser Ansicht",
+    csv: "Als CSV exportieren",
+    premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
+    failed:
+      "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
+    fileName: "coinslite-sammlung-{date}.csv",
+  },
+  insuranceReport: {
+    title: "Versicherungsbericht",
+    lockedTitle: "Der Versicherungsbericht gehört zu Premium",
+    lockedDescription:
+      "Ein PDF für deine Versicherung mit den Objekten deiner Wahl, ihren Werten, deinen Kontaktdaten und den Summen.",
+    scopeTitle: "Objekte",
+    scopeDescription: "Wähle, welche Objekte der Bericht umfasst.",
+    scope: "Umfang",
+    wholeCollection: "Gesamte Sammlung",
+    albums: "Alben",
+    withoutAlbum: "Objekte ohne Album",
+    noAlbums: "Du hast noch keine Alben.",
+    chooseScope: "Wähle mindestens ein Album oder die Objekte ohne Album.",
+    valuesTitle: "Werte",
+    valuesDescription:
+      "Der Versicherungswert ist der höchste der gewählten Werte je Objekt.",
+    keepOne:
+      "Behalte mindestens einen von Kaufpreis, Marktwert oder Metallwert.",
+    columns: {
+      purchasePrice: "Kaufpreis",
+      marketValue: "Marktwert",
+      metalValue: "Metallwert",
+      insuredValue: "Versicherungswert",
+    },
+    previewTitle: "Vorschau",
+    previewDescription: "Jede Summe umfasst alle Stücke jedes Objekts.",
+    items: "Objekte",
+    pieces: "Stück",
+    noSpotPrices:
+      "Noch keine Spotpreise, daher hat kein Objekt einen Metallwert.",
+    staleSpotPrices: "Die Spotpreise sind möglicherweise veraltet.",
+    tooLarge:
+      "Ein Bericht umfasst höchstens {limit} Objekte. Wähle weniger Alben.",
+    nothingToReport: "Hier gibt es keine Objekte für den Bericht.",
+    ownerTitle: "Eigentümer",
+    ownerDescription: "Steht im Bericht, aus deinem Konto.",
+    editContact: "Im Konto bearbeiten",
+    missingContact:
+      "Trage im Konto deinen vollständigen Namen, deine Telefonnummer und Adresse ein, damit deine Versicherung dich erreicht.",
+    download: "PDF herunterladen",
+    downloaded: "Versicherungsbericht heruntergeladen",
+    failed: "Der Bericht konnte nicht erstellt werden. Versuche es erneut.",
+    errors: {
+      PREMIUM_REQUIRED: "Der Versicherungsbericht gehört zu Premium.",
+      REPORT_TOO_LARGE:
+        "Dieser Bericht hat zu viele Objekte. Wähle weniger Alben.",
+      ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
     },
   },
 } as const satisfies Dictionary;

@@ -2,14 +2,32 @@
 
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
+import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd } from "@coinslite/ui/kbd";
 import { Plus } from "lucide-react";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { ItemFormDialog } from "./item-form-dialog";
 
-const AddItemContext = createContext<() => void>(() => {});
+/** What the "New Item" dialog opens with. */
+export type NewItemPreset = {
+  /** The Item type already chosen, as the Overview's "Add banknote" does. */
+  type?: ItemType;
+};
 
-/** Opens the "New Item" dialog from anywhere in the app. */
+const AddItemContext = createContext<(preset?: NewItemPreset) => void>(
+  () => {},
+);
+
+/**
+ * Opens the "New Item" dialog from anywhere in the app, optionally with its
+ * Item type already chosen: `addItem()` or `addItem({ type: "stamp" })`.
+ */
 export const useAddItem = () => useContext(AddItemContext);
 
 /** Whether a key press lands in a text field, so single-key shortcuts leave it alone. */
@@ -21,6 +39,11 @@ export const isTyping = (target: EventTarget | null) =>
 /** Holds the one "New Item" dialog; C opens it unless someone is typing. */
 export function AddItemProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [preset, setPreset] = useState<NewItemPreset>({});
+  const addItem = useCallback((next: NewItemPreset = {}) => {
+    setPreset(next);
+    setOpen(true);
+  }, []);
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (
@@ -33,16 +56,20 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
         !document.querySelector('[role=dialog][data-state="open"]')
       ) {
         event.preventDefault();
-        setOpen(true);
+        addItem();
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [addItem]);
   return (
-    <AddItemContext.Provider value={() => setOpen(true)}>
+    <AddItemContext.Provider value={addItem}>
       {children}
-      <ItemFormDialog open={open} onOpenChange={setOpen} />
+      <ItemFormDialog
+        open={open}
+        onOpenChange={setOpen}
+        newItemType={preset.type}
+      />
     </AddItemContext.Provider>
   );
 }
@@ -52,7 +79,11 @@ export function AddItemQuickAction() {
   const t = useI18n();
   const addItem = useAddItem();
   return (
-    <Button variant="subtle" className="w-full justify-start" onClick={addItem}>
+    <Button
+      variant="subtle"
+      className="w-full justify-start"
+      onClick={() => addItem()}
+    >
       <Plus aria-hidden="true" />
       {t("items.add")}
       <Kbd className="ml-auto">C</Kbd>

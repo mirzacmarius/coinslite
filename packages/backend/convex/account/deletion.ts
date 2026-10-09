@@ -14,6 +14,7 @@ import { deleteSignInMethods } from "../accounts/linking";
 import { albumLimits } from "../albums/rules";
 import { deleteSubscriptionsOf, stopBilling } from "../billing";
 import { chargesAgain } from "../billing/rules";
+import { deleteCollectionCountsOf } from "../collectionCounts";
 import { rateLimiter as feedbackLimits } from "../feedback";
 import { deleteItem } from "../items/deletion";
 import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
@@ -54,10 +55,14 @@ export const accountDataByTable = {
     "deleted: the Items, with their stored photos and their links to Catalog entries",
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
+  collectionCounts:
+    "deleted at once: how many Items and Albums the Collection holds",
+  adminStats: "kept: figures across everyone, which name no one",
   devOutbox:
     "deleted: emails sent to the account's address (local and CI deployments only)",
   catalogNodes: "kept: the Catalog everyone shares",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",
+  featureFlags: "kept: the feature flags that apply to everyone",
 } as const satisfies Record<TableNames, `${"deleted" | "kept"}${string}`>;
 
 /** How many Items the confirmation counts before it says there are more. */
@@ -306,6 +311,7 @@ export const closeAccount = internalMutation({
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError(NOT_SIGNED_IN);
     await deleteSubscriptionsOf(ctx, userId);
+    await deleteCollectionCountsOf(ctx, userId);
     await deleteSignInMethods(ctx, userId);
     await forgetPerson(ctx, user);
     // A profile picture from before CoinsLite, still on some old accounts.

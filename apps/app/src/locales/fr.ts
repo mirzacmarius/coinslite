@@ -274,8 +274,6 @@ export default {
   dashboard: {
     headerTitle: "Aperçu",
     headerDescription: "Votre collection en un coup d’œil.",
-    bodyTitle: "Bienvenue sur CoinsLite",
-    bodyDescription: "Votre collection apparaîtra ici.",
   },
   account: {
     pageTitle: "Compte",
@@ -962,6 +960,156 @@ export default {
         "Ce navigateur ne peut pas enregistrer d’images WebP. Essayez-en un autre, comme Chrome ou Firefox.",
       NOT_ADMIN:
         "Seuls les administrateurs peuvent modifier les images du catalogue.",
+    },
+  },
+  featureFlags: {
+    menu: "Activation des fonctionnalités",
+    title: "Activation des fonctionnalités",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent activer et désactiver des fonctionnalités.",
+    description: "Les changements s’appliquent immédiatement à tout le monde.",
+    catalog: "Afficher le catalogue",
+    catalogDescription:
+      "Désactivé, le catalogue n’est visible que par les administrateurs. Les autres ne le trouvent plus dans la navigation, en parcourant ni en cherchant.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Qui peut photographier une pièce pour obtenir une entrée du catalogue suggérée. Les administrateurs le peuvent tant qu’il n’est pas désactivé.",
+    scannerOptions: {
+      off: "Désactivé",
+      admins: "Administrateurs uniquement",
+      premiumBeta: "Bêta Premium",
+    },
+    saved: "Réglage mis à jour",
+    saveFailed: "Impossible de mettre à jour le réglage. Réessayez.",
+    catalogHiddenTitle: "Le catalogue n’est pas disponible",
+    catalogHiddenDescription:
+      "Il est désactivé pour le moment. Vos objets ne sont pas concernés.",
+  },
+  overview: {
+    addShortcuts: "Ajouter à votre collection",
+    add: {
+      coin: "Ajouter une pièce",
+      banknote: "Ajouter un billet",
+      stamp: "Ajouter un timbre",
+    },
+    latestItems: "Derniers objets ajoutés",
+    viewCollection: "Voir la collection",
+    firstRunTitle: "Commencez votre collection",
+    firstRunDescription:
+      "Ajoutez une pièce, un billet ou un timbre que vous possédez. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
+  },
+  adminStats: {
+    menu: "Statistiques",
+    title: "Statistiques",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent voir les statistiques.",
+    refresh: "Recompter",
+    counting: "Comptage…",
+    countedAt: "Comptées le {time}",
+    hourly: "Recomptées toutes les heures.",
+    refreshFailed: "Impossible de lancer le comptage. Réessayez.",
+    emptyTitle: "Pas encore comptées",
+    emptyDescription:
+      "Les statistiques sont comptées toutes les heures. Comptez-les maintenant pour les voir tout de suite.",
+    countNow: "Compter maintenant",
+    countingTitle: "Comptage des statistiques",
+    countingDescription:
+      "Cela prend quelques secondes. Les chiffres s’affichent dès que c’est terminé.",
+    users: {
+      title: "Utilisateurs",
+      description:
+        "Comptes dont l’e-mail est confirmé et l’inscription terminée.",
+      total: "Tous les utilisateurs",
+      newLast30Days: "Nouveaux ces 30 derniers jours",
+      premium: "Premium",
+      free: "Formule gratuite",
+    },
+    subscriptions: {
+      title: "Abonnements",
+      description:
+        "Les actifs donnent Premium maintenant. Ceux qui se terminent ne seront pas renouvelés.",
+      active: "Actifs",
+      endingWithin30Days: "Se terminent d’ici 30 jours",
+      ended: "Terminés",
+    },
+    collection: {
+      title: "Contenu des collections",
+      description: "Tout ce que contiennent les collections de chacun.",
+      items: "Objets",
+      coins: "Pièces",
+      banknotes: "Billets",
+      stamps: "Timbres",
+      albums: "Albums",
+    },
+    activity: {
+      title: "Activité",
+      description: "Objets et albums ajoutés récemment et toujours présents.",
+      itemsAddedLast24Hours: "Objets ajoutés ces dernières 24 heures",
+      itemsAddedLast7Days: "Objets ajoutés ces 7 derniers jours",
+      albumsCreatedLast30Days: "Albums créés ces 30 derniers jours",
+    },
+  },
+  collectionExport: {
+    export: "Exporter",
+    "inView#zero": "Aucun objet dans cette vue",
+    "inView#one": "1 objet dans cette vue",
+    "inView#few": "{count} objets dans cette vue",
+    "inView#other": "{count} objets dans cette vue",
+    csv: "Exporter en CSV",
+    premiumOnly: "L’export de votre collection fait partie de Premium.",
+    failed: "Impossible d’exporter la collection. Réessayez.",
+    fileName: "coinslite-collection-{date}.csv",
+  },
+  insuranceReport: {
+    title: "Rapport d’assurance",
+    lockedTitle: "Le rapport d’assurance fait partie de Premium",
+    lockedDescription:
+      "Un PDF pour votre assureur avec les objets de votre choix, leurs valeurs, vos coordonnées et les totaux.",
+    scopeTitle: "Objets",
+    scopeDescription: "Choisissez les objets couverts par le rapport.",
+    scope: "Périmètre",
+    wholeCollection: "Toute la collection",
+    albums: "Albums",
+    withoutAlbum: "Objets sans album",
+    noAlbums: "Vous n’avez pas encore d’album.",
+    chooseScope: "Choisissez au moins un album, ou les objets sans album.",
+    valuesTitle: "Valeurs",
+    valuesDescription:
+      "La valeur assurée est la plus élevée des valeurs choisies pour chaque objet.",
+    keepOne:
+      "Gardez au moins le prix d’achat, la valeur de marché ou la valeur du métal.",
+    columns: {
+      purchasePrice: "Prix d’achat",
+      marketValue: "Valeur de marché",
+      metalValue: "Valeur du métal",
+      insuredValue: "Valeur assurée",
+    },
+    previewTitle: "Aperçu",
+    previewDescription:
+      "Chaque total couvre tous les exemplaires de chaque objet.",
+    items: "Objets",
+    pieces: "Exemplaires",
+    noSpotPrices:
+      "Pas encore de cours spot : aucun objet n’a donc de valeur du métal.",
+    staleSpotPrices: "Les cours spot sont peut-être dépassés.",
+    tooLarge:
+      "Un rapport compte au plus {limit} objets. Choisissez moins d’albums.",
+    nothingToReport: "Il n’y a aucun objet à inclure ici.",
+    ownerTitle: "Propriétaire",
+    ownerDescription: "Figure sur le rapport, depuis votre compte.",
+    editContact: "Modifier dans le compte",
+    missingContact:
+      "Ajoutez votre nom complet, votre téléphone et votre adresse dans le compte pour que votre assureur puisse vous joindre.",
+    download: "Télécharger le PDF",
+    downloaded: "Rapport d’assurance téléchargé",
+    failed: "Impossible de créer le rapport. Réessayez.",
+    errors: {
+      PREMIUM_REQUIRED: "Le rapport d’assurance fait partie de Premium.",
+      REPORT_TOO_LARGE:
+        "Ce rapport compte trop d’objets. Choisissez moins d’albums.",
+      ALBUM_NOT_FOUND: "L’un des albums choisis n’existe plus.",
     },
   },
 } as const satisfies Dictionary;
