@@ -32,7 +32,9 @@ export function latestCode(email: string): string {
  * The page on screen. After a link click the previous page stays in the DOM,
  * hidden, so that going back is instant; locators must not match its fields.
  */
-export const visiblePage = (page: Page) => page.locator("main:visible");
+export const visiblePage = (page: Page) =>
+  // The hidden page can sit inside the same <main>, so take main's visible children.
+  page.locator("main:visible > :visible");
 
 export async function signUp(page: Page, email: string) {
   const main = visiblePage(page);
