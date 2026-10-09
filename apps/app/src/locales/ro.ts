@@ -347,4 +347,86 @@ export default {
       tryAgain: "Confirmarea nu a reușit acum. Încearcă din nou.",
     },
   },
+  catalogAdmin: {
+    menu: "Import și export catalog",
+    title: "Import și export catalog",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription:
+      "Doar administratorii pot importa și exporta catalogul.",
+    exportTitle: "Export",
+    exportDescription:
+      "Descarcă tot catalogul ca fișier CSV. Editează-l într-un tabel și importă-l din nou.",
+    exportAction: "Exportă CSV",
+    exportFailed: "Catalogul nu a putut fi exportat. Încearcă din nou.",
+    importTitle: "Import",
+    importDescription:
+      "Rândurile al căror id există deja în catalog actualizează acel nod, iar celelalte sunt adăugate. Un parent_id poate indica un alt rând din același fișier. Fiecare grup de date, note și imagini are nevoie de sursa sa.",
+    chooseFile: "Alege fișierul CSV",
+    chooseAnother: "Alege alt fișier",
+    clearFile: "Elimină fișierul",
+    readFailed: "Fișierul nu a putut fi citit. Alege un fișier CSV.",
+    checking: "Se verifică fișierul…",
+    inserts: "De adăugat",
+    updates: "De actualizat",
+    unchanged: "Neschimbate",
+    upToDate: "Catalogul corespunde deja acestui fișier.",
+    problemsTitle: "Erori de corectat",
+    problemsDescription:
+      "Nu se importă nimic până când toate rândurile sunt corecte. Corectează-le, apoi alege din nou fișierul.",
+    showingFirst: "Se afișează primele {shown} din {total}.",
+    row: "Rând",
+    column: "Coloană",
+    problem: "Eroare",
+    importAction: "Importă",
+    confirmTitle: "Imporți „{file}”?",
+    confirmDescription:
+      "Modificările se aplică imediat catalogului pe care îl răsfoiește toată lumea. Rândurile care corespund deja rămân neschimbate.",
+    cancel: "Anulează",
+    imported: "Catalog actualizat: {inserts} adăugate, {updates} actualizate.",
+    importBlocked:
+      "Catalogul s-a schimbat de la verificare, iar fișierul are acum erori. Nu s-a importat nimic.",
+    importFailed: "Fișierul nu a putut fi importat. Încearcă din nou.",
+    errors: {
+      EMPTY_FILE: "Fișierul nu are rânduri sub antet.",
+      UNCLOSED_QUOTE:
+        "Ghilimelele deschise în acest rând nu se închid niciodată.",
+      MISSING_COLUMN: "Fișierul are nevoie de această coloană.",
+      UNKNOWN_COLUMN:
+        "Aceasta nu este o coloană a catalogului. Verifică ortografia.",
+      DUPLICATE_COLUMN: "Această coloană apare de mai multe ori.",
+      TOO_MANY_ROWS:
+        "Fișierul este prea mare. Împarte-l în fișiere de cel mult 3.000 de rânduri.",
+      ID_REQUIRED: "Dă-i rândului un id.",
+      INVALID_ID:
+        "Folosește cel mult 64 de litere mici, cifre, puncte, cratime și liniuțe jos.",
+      DUPLICATE_ID: "Un rând de mai sus are deja acest id.",
+      TITLE_REQUIRED: "Dă-i rândului un titlu.",
+      TOO_LONG: "Valoarea este prea lungă.",
+      INVALID_VALUE: "Această valoare nu este permisă în această coloană.",
+      INVALID_COUNTRY:
+        "Folosește un cod de țară din două litere, de ex. US sau NO.",
+      INVALID_NUMBER:
+        "Introdu un număr din intervalul acestei coloane, cu punct pentru zecimale.",
+      INVALID_YEAR: "Introdu un an întreg, cu anii î.Hr. ca numere negative.",
+      INVALID_URL: "Introdu o adresă web completă care începe cu https://.",
+      NUMISTA_DATA:
+        "Nu se pot stoca date de la Numista. Păstrează doar numărul Numista, în numista_id.",
+      ITEM_TYPE_REQUIRED:
+        "O intrare de catalog are nevoie de un tip de obiect: monedă sau bancnotă.",
+      FIELD_NOT_FOR_TYPE: "Bancnotele nu au metal sau dimensiuni.",
+      YEARS_REVERSED: "Ultimul an este înaintea primului.",
+      SOURCE_REQUIRED:
+        "Precizează sursa acestor date, note sau a acestei imagini.",
+      ROOT_NOT_ADDABLE:
+        "O țară sau o temă nu poate fi intrare de catalog. Dă-i rândului un parent_id.",
+      PARENT_NOT_FOUND:
+        "Niciun rând din fișier sau din catalog nu are acest id.",
+      PARENT_IS_ENTRY:
+        "Acest părinte este o intrare de catalog, deci nimic nu poate sta sub el.",
+      PARENT_CYCLE: "Părinții duc înapoi la acest rând.",
+      TOO_DEEP: "Catalogul are cel mult 8 niveluri.",
+      ENTRY_HAS_CHILDREN:
+        "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
+    },
+  },
 } as const satisfies Dictionary;

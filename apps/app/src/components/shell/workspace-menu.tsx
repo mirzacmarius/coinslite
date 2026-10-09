@@ -7,6 +7,7 @@ import {
 } from "@/components/preferences";
 import { useSignOut } from "@/components/sign-out";
 import { useI18n } from "@/locales/client";
+import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import {
   DropdownMenu,
@@ -19,9 +20,11 @@ import {
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
 import { cn } from "@coinslite/ui/utils";
+import { useQuery } from "convex/react";
 import {
   ChevronDown,
   CreditCard,
+  FileSpreadsheet,
   Languages,
   LogOut,
   SunMoon,
@@ -33,6 +36,8 @@ import Link from "next/link";
 export function WorkspaceMenu({ className }: { className?: string }) {
   const t = useI18n();
   const signOut = useSignOut();
+  // Admin areas stay out of sight for everyone else.
+  const isAdmin = useQuery(api.admin.roles.isAdmin);
 
   return (
     <DropdownMenu>
@@ -62,6 +67,14 @@ export function WorkspaceMenu({ className }: { className?: string }) {
             {t("shell.plans")}
           </Link>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/catalog">
+              <FileSpreadsheet strokeWidth={1.75} />
+              {t("catalogAdmin.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

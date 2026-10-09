@@ -1,5 +1,10 @@
 import { homeCurrencies, locales } from "@coinslite/i18n";
 import { v } from "convex/values";
+import {
+  catalogItemTypes,
+  catalogKinds,
+  preciousMetals,
+} from "../catalog/fields";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
 
@@ -31,3 +36,17 @@ export const gradingScale = literalUnion(
 export const strike = literalUnion(strikes);
 /** One of the coin materials in items/rules.ts. */
 export const material = literalUnion(materials);
+
+/** A Catalog node: a country or Theme root, a grouping, or a Catalog entry. */
+export const catalogKind = literalUnion(catalogKinds);
+/** The Catalog holds coins and banknotes, no stamps. */
+export const catalogItemType = literalUnion(catalogItemTypes);
+/** A metal with a Spot price, for Metal value. */
+export const preciousMetal = literalUnion(preciousMetals);
+/** Where a group of Catalog facts, its notes or its image come from. */
+export const provenance = v.object({
+  source: v.string(),
+  author: v.optional(v.string()),
+  licence: v.optional(v.string()),
+  link: v.optional(v.string()),
+});
