@@ -16,6 +16,7 @@ import {
   reportContents,
 } from "./insuranceReport/validators";
 import { metalValue } from "./items/preciousMetal";
+import { resolveItems } from "./items/resolve";
 import { requirePremium } from "./plans";
 import { latestRates } from "./spotPrices";
 import { type Metal, TROY_OUNCE_GRAMS } from "./spotPrices/rates";
@@ -30,9 +31,10 @@ import { homeCurrency, reportValues } from "./utils/validators";
 type Owner = Awaited<ReturnType<typeof requirePremium>>;
 
 /**
- * The Items a report covers, and the chosen Albums. Albums must be the
- * owner's; each is read once however often it's chosen. More Items than a
- * report holds turn the request away rather than leaving some out.
+ * The Items a report covers, their facts resolved (items/resolve.ts), and
+ * the chosen Albums. Albums must be the owner's; each is read once however
+ * often it's chosen. More Items than a report holds turn the request away
+ * rather than leaving some out.
  */
 async function itemsInScope(ctx: QueryCtx, owner: Owner, scope: ReportScope) {
   const limit = insuranceReportLimits.items;
@@ -57,7 +59,7 @@ async function itemsInScope(ctx: QueryCtx, owner: Owner, scope: ReportScope) {
 
   if (scope.kind === "collection") {
     await read();
-    return { items, albums: [] };
+    return { items: await resolveItems(ctx, items), albums: [] };
   }
   const albumIds = [...new Set(scope.albumIds)];
   if (albumIds.length === 0 && !scope.withoutAlbum)
@@ -71,7 +73,7 @@ async function itemsInScope(ctx: QueryCtx, owner: Owner, scope: ReportScope) {
     await read(albumId);
   }
   if (scope.withoutAlbum) await read(undefined);
-  return { items, albums };
+  return { items: await resolveItems(ctx, items), albums };
 }
 
 /**

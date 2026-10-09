@@ -679,3 +679,42 @@ test("the Overview's latest Items show a linked Item's year and denomination fro
     { title: "Morgan dollar 1881-CC", year: 1881, denomination: "1 dollar" },
   ]);
 });
+
+test("the Insurance report values and lists a linked Item with its entry's facts", async () => {
+  const t = newTest();
+  const { ada } = await withCatalog(t);
+  await t.run((ctx) =>
+    ctx.db.insert("subscriptions", {
+      userId: ada.userId,
+      polarId: "sub_ada",
+      polarCustomerId: "cus_ada",
+      productId: "prod_premium_monthly",
+      status: "active",
+      interval: "month",
+      currency: "NOK",
+      amount: 3900,
+      cancelAtPeriodEnd: false,
+      modifiedAt: Date.now(),
+      premium: true,
+    }),
+  );
+  await storeSpotPrices(t);
+  await ada.as.mutation(api.items.quickAdd, {
+    catalogEntryKey: "us-morgan-1881-cc",
+    quantity: 2,
+  });
+
+  const report = await ada.as.query(internal.insuranceReport.contents, {
+    scope: { kind: "collection" },
+    columns: ["metalValue"],
+  });
+  expect(report.rows).toMatchObject([
+    {
+      title: "Morgan dollar 1881-CC",
+      year: 1881,
+      denomination: "1 dollar",
+      strike: "circulation",
+      values: { metalValue: 46407 },
+    },
+  ]);
+});
