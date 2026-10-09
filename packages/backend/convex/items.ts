@@ -1,11 +1,25 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
-import { type MutationCtx, mutation, query } from "./_generated/server";
+import {
+  type MutationCtx,
+  type QueryCtx,
+  mutation,
+  query,
+} from "./_generated/server";
+import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
+import { deleteItem } from "./items/deletion";
 import { checkItem } from "./items/rules";
+import { withThumbnail } from "./items/thumbnail";
 import { requireRoomForItems } from "./plans";
 import { requireSetUpUser } from "./utils/auth";
-import { gradingScale, itemType, material, strike } from "./utils/validators";
+import {
+  gradingScale,
+  itemType,
+  material,
+  metal,
+  strike,
+} from "./utils/validators";
 
 /** Every field a person sets on an Item, as the Item form sends them. */
 const itemFields = {
@@ -24,6 +38,10 @@ const itemFields = {
   diameter: v.optional(v.number()),
   thickness: v.optional(v.number()),
   numistaNumber: v.optional(v.number()),
+  bullion: v.optional(v.boolean()),
+  metal: v.optional(metal),
+  weight: v.optional(v.number()),
+  purity: v.optional(v.number()),
   grade: v.optional(v.string()),
   gradingScale: v.optional(gradingScale),
   gradeNote: v.optional(v.string()),
@@ -34,6 +52,7 @@ const itemFields = {
   purchaseDate: v.optional(v.string()),
   source: v.optional(v.string()),
   notes: v.optional(v.string()),
+  albumId: v.optional(v.id("albums")),
 };
 const fieldNames = Object.keys(itemFields) as Array<keyof typeof itemFields>;
 
@@ -44,7 +63,10 @@ const latestPurchaseDate = () =>
   new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 /** One of the signed-in person's Items; anyone else's is reported as not found. */
-async function requireOwnItem(ctx: MutationCtx, itemId: Id<"items">) {
+export async function requireOwnItem(
+  ctx: QueryCtx | MutationCtx,
+  itemId: Id<"items">,
+) {
   const owner = await requireSetUpUser(ctx);
   const item = await ctx.db.get(itemId);
   if (!item || item.ownerId !== owner._id) throw new ConvexError(itemNotFound);
@@ -55,13 +77,17 @@ async function requireOwnItem(ctx: MutationCtx, itemId: Id<"items">) {
 export const add = mutation({
   args: itemFields,
   returns: v.id("items"),
-  handler: async (ctx, fields) => {
+  handler: async (ctx, { albumId, ...fields }) => {
     const owner = await requireSetUpUser(ctx);
     await requireRoomForItems(ctx, owner._id);
-    return await ctx.db.insert("items", {
+    const album = await ownAlbumId(ctx, owner._id, albumId);
+    const itemId = await ctx.db.insert("items", {
       ownerId: owner._id,
       ...checkItem(fields, latestPurchaseDate()),
+      ...(album && { albumId: album }),
     });
+    await moveBetweenAlbums(ctx, undefined, album);
+    return itemId;
   },
 });
 
@@ -69,15 +95,18 @@ export const add = mutation({
 export const update = mutation({
   args: { itemId: v.id("items"), ...itemFields },
   returns: v.null(),
-  handler: async (ctx, { itemId, ...fields }) => {
-    await requireOwnItem(ctx, itemId);
+  handler: async (ctx, { itemId, albumId, ...fields }) => {
+    const item = await requireOwnItem(ctx, itemId);
+    const album = await ownAlbumId(ctx, item.ownerId, albumId);
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
     await ctx.db.patch(itemId, {
       ...cleared,
       ...checkItem(fields, latestPurchaseDate()),
+      albumId: album,
     });
+    await moveBetweenAlbums(ctx, item.albumId, album);
     return null;
   },
 });
@@ -92,25 +121,52 @@ export const duplicate = mutation({
   handler: async (ctx, { itemId }) => {
     const item = await requireOwnItem(ctx, itemId);
     await requireRoomForItems(ctx, item.ownerId);
-    const copy = Object.fromEntries(
+    const { albumId, ...copy } = Object.fromEntries(
       fieldNames.flatMap((name) =>
         item[name] === undefined ? [] : [[name, item[name]]],
       ),
-    ) as Pick<Doc<"items">, "type" | "title" | "quantity">;
-    return await ctx.db.insert("items", { ownerId: item.ownerId, ...copy });
+    ) as Pick<Doc<"items">, "type" | "title" | "quantity" | "albumId">;
+    // An Album deleted a moment ago may not have let go of the Item yet.
+    const album = albumId && (await ctx.db.get(albumId)) ? albumId : undefined;
+    const copyId = await ctx.db.insert("items", {
+      ownerId: item.ownerId,
+      ...copy,
+      ...(album && { albumId: album }),
+    });
+    await moveBetweenAlbums(ctx, undefined, album);
+    return copyId;
   },
 });
 
-/** The signed-in person's Items, newest first, a page at a time. */
+/** Deletes one of the signed-in person's Items, and its photos, for good. */
+export const remove = mutation({
+  args: { itemId: v.id("items") },
+  returns: v.null(),
+  handler: async (ctx, { itemId }) => {
+    await deleteItem(ctx, await requireOwnItem(ctx, itemId));
+    return null;
+  },
+});
+
+/**
+ * The signed-in person's Items, newest first, a page at a time. Each comes
+ * with its thumbnail: the front photo, else the back photo, else null.
+ */
 export const list = query({
   args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, { paginationOpts }) => {
     const owner = await requireSetUpUser(ctx);
-    return await ctx.db
+    const items = await ctx.db
       .query("items")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
       .order("desc")
       .paginate(paginationOpts);
+    return {
+      ...items,
+      page: await Promise.all(
+        items.page.map((item) => withThumbnail(ctx, item)),
+      ),
+    };
   },
 });
 
