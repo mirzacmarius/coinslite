@@ -19,6 +19,16 @@ import {
 
 export default defineSchema({
   ...authTables,
+  /**
+   * Convex Auth's, plus an index so deleting an account (account/deletion.ts)
+   * finds the Google sign-ins its sessions started.
+   */
+  authVerifiers: defineTable({
+    sessionId: v.optional(v.id("authSessions")),
+    signature: v.optional(v.string()),
+  })
+    .index("signature", ["signature"])
+    .index("by_sessionId", ["sessionId"]),
   users: defineTable({
     // Convex Auth fields
     name: v.optional(v.string()),

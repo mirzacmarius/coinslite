@@ -6,7 +6,7 @@ import { checkMessage, feedbackErrors } from "./feedback/rules";
 import { requireSetUpUser } from "./utils/auth";
 
 /** Five messages an hour per person; one more becomes available every 12 minutes. */
-const rateLimiter = new RateLimiter(components.rateLimiter, {
+export const rateLimiter = new RateLimiter(components.rateLimiter, {
   feedback: { kind: "token bucket", rate: 5, period: HOUR, capacity: 5 },
 });
 

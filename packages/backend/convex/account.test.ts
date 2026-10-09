@@ -3,7 +3,7 @@ import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
 import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from "vitest";
-import { api, internal } from "./_generated/api";
+import { api } from "./_generated/api";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -311,7 +311,7 @@ test("deleting the account drops a pending email change", async () => {
     newEmail: "ada@lovelace.dev",
   });
 
-  await t.mutation(internal.users.deleteUserAccount, { userId: user._id });
+  await as.mutation(api.account.deletion.deleteAccount, {});
 
   expect(await t.run((ctx) => ctx.db.query("emailChanges").collect())).toEqual(
     [],
