@@ -59,8 +59,9 @@ const premiumCurrency = v.union(
  * The Premium page: the person's plan, Premium's prices in the currency they
  * would pay (`country` is where the request comes from, when the host knows
  * it), whether checkout works on this deployment and whether it's Polar's
- * sandbox. A Premium member also gets their subscription: interval, price,
- * and the end of the current period, which renews unless `cancelAtPeriodEnd`.
+ * sandbox, and whether Polar's customer portal can be opened on it. A
+ * Premium member also gets their subscription: interval, price, and the end
+ * of the current period, which renews unless `cancelAtPeriodEnd`.
  * Null for someone signed out or not set up.
  */
 export const status = query({
@@ -75,6 +76,7 @@ export const status = query({
         year: v.number(),
       }),
       checkoutAvailable: v.boolean(),
+      portalAvailable: v.boolean(),
       testMode: v.boolean(),
       subscription: v.union(
         v.null(),
@@ -101,6 +103,7 @@ export const status = query({
       plan: subscription ? ("premium" as const) : ("free" as const),
       prices: { currency, ...premiumPrices[currency] },
       checkoutAvailable: canSellPremium(),
+      portalAvailable: polarApi() !== null,
       testMode: isPolarSandbox(),
       subscription: subscription && {
         interval: isBillingInterval(subscription.interval)
@@ -149,6 +152,49 @@ export const checkout = action({
       console.error("Polar didn't open a checkout", error);
       throw new ConvexError(billingErrors.checkoutFailed);
     }
+  },
+});
+
+/**
+ * Opens Polar's customer portal, where a member switches between monthly and
+ * yearly, updates their card or cancels, and returns the page to send them
+ * to. Only ever for the signed-in person's own Polar customer, looked up here
+ * from their subscription. The portal leads back to Plans.
+ */
+export const customerPortal = action({
+  args: {},
+  returns: v.object({ url: v.string() }),
+  handler: async (ctx) => {
+    const customerId = await ctx.runQuery(internal.billing.customer, {});
+    if (!customerId) throw new ConvexError(billingErrors.noSubscription);
+    const polar = polarApi();
+    if (!polar) throw new ConvexError(billingErrors.unavailable);
+    try {
+      const url = await polar.createCustomerPortal({
+        customerId,
+        returnUrl: env.SITE_URL
+          ? `${env.SITE_URL}/settings/billing`
+          : undefined,
+      });
+      return { url };
+    } catch (error) {
+      console.error("Polar didn't open the customer portal", error);
+      throw new ConvexError(billingErrors.portalFailed);
+    }
+  },
+});
+
+/**
+ * The Polar customer behind the signed-in, set-up person's Premium
+ * subscription; null when they aren't on Premium.
+ */
+export const customer = internalQuery({
+  args: {},
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx) => {
+    const user = await requireSetUpUser(ctx);
+    const subscription = await premiumSubscriptionOf(ctx, user._id);
+    return subscription?.polarCustomerId ?? null;
   },
 });
 

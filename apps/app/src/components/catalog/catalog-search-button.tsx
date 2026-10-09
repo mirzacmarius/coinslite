@@ -6,10 +6,11 @@ import { Kbd } from "@coinslite/ui/kbd";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { catalogNodeHref } from "./catalog-levels";
 import { CatalogSearchDialog } from "./catalog-search";
 
-/** Where a Catalog node is browsed: every level has its own page. */
-export const catalogNodeHref = (key: string) => `/catalog/${key}`;
+/** Where a Catalog node is browsed: every level has its own page (catalog-levels.ts). */
+export { catalogNodeHref };
 
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&

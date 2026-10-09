@@ -129,11 +129,16 @@ export default defineSchema({
     // Album: at most one. Moving an Item in or out keeps the Album's itemCount
     // right (albums/membership.ts).
     albumId: v.optional(v.id("albums")),
+
+    // The Catalog entry the Item was created from (ADR 0001), if any. The
+    // Catalog shows how many of each entry a person holds from this link.
+    catalogEntryId: v.optional(v.id("catalogNodes")),
   })
     .index("by_ownerId", ["ownerId"])
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
-    .index("by_ownerId_and_albumId", ["ownerId", "albumId"]),
+    .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` is kept by every
@@ -198,11 +203,37 @@ export default defineSchema({
 
     /** Title, denomination, series and country, for the search index. */
     searchText: v.string(),
+
+    // For browsing (catalog/browse.ts), kept by catalog/tree.ts:
+    /** Roots and groupings: how many Catalog entries sit anywhere below. */
+    entryCount: v.optional(v.number()),
+    /**
+     * The key of the country the node is browsed under: its country root, or
+     * below a Theme, the Theme's child. Absent on Theme roots.
+     */
+    countryNodeKey: v.optional(v.string()),
   })
     .index("by_key", ["key"])
     .index("by_parentId_and_sortOrder", ["parentId", "sortOrder"])
     .index("by_path", ["path"])
     .index("by_kind_and_path", ["kind", "path"])
+    .index("by_parentId_and_kind_and_yearFrom_and_sortOrder", [
+      "parentId",
+      "kind",
+      "yearFrom",
+      "sortOrder",
+    ])
+    .index(
+      "by_kind_and_countryNodeKey_and_denomination_and_series_and_yearFrom_and_sortOrder",
+      [
+        "kind",
+        "countryNodeKey",
+        "denomination",
+        "series",
+        "yearFrom",
+        "sortOrder",
+      ],
+    )
     .searchIndex("search_searchText", {
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
