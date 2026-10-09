@@ -33,7 +33,7 @@ const LINK_LIFETIME_MS = 60 * 60 * 1000;
 const RECENT_SIGN_IN_MS = 15 * 60 * 1000;
 
 /** No more than five email-change requests an hour per person. */
-const rateLimiter = new RateLimiter(components.rateLimiter, {
+export const rateLimiter = new RateLimiter(components.rateLimiter, {
   emailChange: { kind: "token bucket", rate: 5, period: HOUR, capacity: 5 },
 });
 

@@ -237,7 +237,7 @@ test("deleting an account deletes its counts, and clearing up its Collection doe
   await ada.as.mutation(api.albums.create, { name: "Travel" });
   expect(await stored(t, ada.userId)).toBe(true);
 
-  await ada.as.action(api.users.deleteCurrentUserAccount, {});
+  await ada.as.action(api.account.deletion.deleteAccount, {});
   expect(await stored(t, ada.userId)).toBe(false);
 
   // The Collection goes through the one way Items are deleted, possibly later.

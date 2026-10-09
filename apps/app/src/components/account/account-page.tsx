@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  PlanLink,
+  SubscriptionSummary,
+} from "@/components/billing/account-plan";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
@@ -15,15 +19,15 @@ import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { toast } from "@coinslite/ui/toaster";
-import { useDoubleCheck } from "@coinslite/ui/utils";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Globe, Loader2 } from "lucide-react";
 import type * as React from "react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
+import { DeleteAccountDialog } from "./delete-account-dialog";
 import { HomeCurrencySetting } from "./home-currency-setting";
 import { LanguagePicker } from "./language-picker";
 import { SendFeedback } from "./send-feedback";
@@ -58,7 +62,9 @@ export function AccountPage() {
         {account.displayName && (
           <p className="text-[13px] text-muted-foreground">{account.email}</p>
         )}
+        <SubscriptionSummary />
       </header>
+      <PlanLink plan={account.plan} />
       <PhoneAccountLinks />
       <UpdatesLink />
       <ContactSection account={account} />
@@ -425,8 +431,7 @@ function FeedbackSection() {
 function LeaveSection() {
   const t = useI18n();
   const signOut = useSignOut();
-  const deleteAccount = useAction(api.users.deleteCurrentUserAccount);
-  const { doubleCheck, getButtonProps } = useDoubleCheck();
+  const [deleting, setDeleting] = useState(false);
   return (
     <Section
       title={t("account.danger.title")}
@@ -436,22 +441,11 @@ function LeaveSection() {
         <Button variant="outline" onClick={() => void signOut()}>
           {t("account.danger.signOut")}
         </Button>
-        <Button
-          variant="destructive"
-          {...getButtonProps({
-            onClick: doubleCheck
-              ? async () => {
-                  await deleteAccount();
-                  await signOut();
-                }
-              : undefined,
-          })}
-        >
-          {doubleCheck
-            ? t("account.danger.deleteConfirm")
-            : t("account.danger.delete")}
+        <Button variant="destructive" onClick={() => setDeleting(true)}>
+          {t("account.danger.delete")}
         </Button>
       </div>
+      <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
     </Section>
   );
 }

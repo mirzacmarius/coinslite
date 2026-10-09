@@ -75,7 +75,7 @@ function splitLanguage(path: string): { language?: Locale; path: string } {
 }
 
 /** No more than five code emails an hour to any one address. */
-const rateLimiter = new RateLimiter(components.rateLimiter, {
+export const rateLimiter = new RateLimiter(components.rateLimiter, {
   codeEmail: { kind: "token bucket", rate: 5, period: HOUR, capacity: 5 },
 });
 export const tooManyCodeEmails = "TOO_MANY_CODE_EMAILS";
