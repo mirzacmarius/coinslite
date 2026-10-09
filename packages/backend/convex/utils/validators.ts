@@ -6,6 +6,7 @@ import {
   catalogKinds,
   preciousMetals,
 } from "../catalog/fields";
+import { reportColumns } from "../insuranceReport/rules";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
 import { photoSides } from "../photos/rules";
@@ -78,3 +79,14 @@ export const perDollar = v.object({
 
 /** A precious metal with a Spot price: gold or silver. */
 export const metal = literalUnion(metals);
+
+/** A value column of the Insurance report (insuranceReport/rules.ts). */
+export const reportColumn = literalUnion(reportColumns);
+
+/** An amount in each value column of the Insurance report; a missing value is absent. */
+export const reportValues = v.object({
+  purchasePrice: v.optional(v.number()),
+  marketValue: v.optional(v.number()),
+  metalValue: v.optional(v.number()),
+  insuredValue: v.optional(v.number()),
+});

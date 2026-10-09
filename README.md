@@ -49,6 +49,8 @@ bash packages/backend/scripts/setup-e2e-backend.sh   # emails land in the dev ou
 E2E_LOCAL_BACKEND=1 bun run test:e2e                 # also starts the local backend
 ```
 
+On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment; the Insurance report journey uses it. Any deployment that sends real email refuses it.
+
 CI runs all four on every push and pull request.
 
 ## Deployments

@@ -722,4 +722,53 @@ export default {
     seePlan: "Vezi planul",
     backToPlans: "Înapoi la planuri",
   },
+  insuranceReport: {
+    title: "Raport de asigurare",
+    lockedTitle: "Raportul de asigurare face parte din Premium",
+    lockedDescription:
+      "Un PDF pentru asigurător cu obiectele alese, valorile lor, datele tale de contact și totalurile.",
+    scopeTitle: "Obiecte",
+    scopeDescription: "Alege ce obiecte acoperă raportul.",
+    scope: "Acoperire",
+    wholeCollection: "Toată colecția",
+    albums: "Albume",
+    withoutAlbum: "Obiecte fără album",
+    noAlbums: "Încă nu ai albume.",
+    chooseScope: "Alege cel puțin un album sau obiectele fără album.",
+    valuesTitle: "Valori",
+    valuesDescription:
+      "Valoarea asigurată este cea mai mare dintre valorile alese pentru fiecare obiect.",
+    keepOne:
+      "Păstrează cel puțin una dintre prețul de achiziție, valoarea de piață și valoarea metalului.",
+    columns: {
+      purchasePrice: "Preț de achiziție",
+      marketValue: "Valoare de piață",
+      metalValue: "Valoarea metalului",
+      insuredValue: "Valoare asigurată",
+    },
+    previewTitle: "Previzualizare",
+    previewDescription: "Fiecare total acoperă toate bucățile fiecărui obiect.",
+    items: "Obiecte",
+    pieces: "Bucăți",
+    noSpotPrices:
+      "Încă nu există prețuri spot, așa că niciun obiect nu are valoarea metalului.",
+    staleSpotPrices: "Prețurile spot pot fi depășite.",
+    tooLarge:
+      "Un raport cuprinde cel mult {limit} obiecte. Alege mai puține albume.",
+    nothingToReport: "Aici nu există obiecte de raportat.",
+    ownerTitle: "Proprietar",
+    ownerDescription: "Apare în raport, din contul tău.",
+    editContact: "Editează în cont",
+    missingContact:
+      "Adaugă în cont numele complet, telefonul și adresa, ca asigurătorul să te poată contacta.",
+    download: "Descarcă PDF",
+    downloaded: "Raportul de asigurare a fost descărcat",
+    failed: "Raportul nu a putut fi creat. Încearcă din nou.",
+    errors: {
+      PREMIUM_REQUIRED: "Raportul de asigurare face parte din Premium.",
+      REPORT_TOO_LARGE:
+        "Raportul are prea multe obiecte. Alege mai puține albume.",
+      ALBUM_NOT_FOUND: "Unul dintre albumele alese nu mai există.",
+    },
+  },
 } as const satisfies Dictionary;
