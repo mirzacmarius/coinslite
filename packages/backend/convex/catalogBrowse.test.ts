@@ -319,6 +319,8 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     },
     notesProvenance: { source: "CoinsLite editorial" },
     imageUrl: "https://images.example.com/morgan-1881-s.jpg",
+    // A linked image has one size.
+    thumbnailUrl: "https://images.example.com/morgan-1881-s.jpg",
     imageProvenance: {
       source: "Example Museum",
       author: "A. Photographer",

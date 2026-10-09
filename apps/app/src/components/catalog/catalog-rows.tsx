@@ -12,13 +12,17 @@ import type * as React from "react";
 import { catalogNodeHref } from "./catalog-levels";
 import { type CatalogEntryRow, useCatalogFormat } from "./use-catalog-format";
 
-/** One clickable row of a Catalog list: a tile, a title over its facts, and a figure on the right. */
+/**
+ * One clickable row of a Catalog list: a tile, a title over its facts (and
+ * its image's credit, when it needs one), and a figure on the right.
+ */
 export function CatalogRow({
   href,
   tile,
   title,
   suffix,
   facts,
+  credit,
   end,
 }: {
   href: string;
@@ -27,6 +31,8 @@ export function CatalogRow({
   /** Muted words after the title, such as a Strike. */
   suffix?: string;
   facts?: string;
+  /** Who the tile's image is credited to. */
+  credit?: string;
   end?: React.ReactNode;
 }) {
   return (
@@ -49,6 +55,11 @@ export function CatalogRow({
           {facts && (
             <span className="truncate text-xs text-muted-foreground">
               {facts}
+            </span>
+          )}
+          {credit && (
+            <span className="truncate text-xs text-muted-foreground">
+              {credit}
             </span>
           )}
         </span>
@@ -98,22 +109,22 @@ export function HeldCount({ held }: { held: number }) {
   );
 }
 
-/** An entry's picture as a row tile, or its Item type's icon until it has one. */
+/** An entry's thumbnail as a row tile, or its Item type's icon until it has an image. */
 export function EntryTile({
   entry,
   className,
 }: {
-  entry: Pick<CatalogEntryRow, "imageUrl" | "itemType">;
+  entry: Pick<CatalogEntryRow, "thumbnailUrl" | "itemType">;
   className?: string;
 }) {
-  if (!entry.imageUrl) {
+  if (!entry.thumbnailUrl) {
     return (
       <ItemTypeIcon type={entry.itemType ?? "coin"} className={className} />
     );
   }
   return (
     <img
-      src={entry.imageUrl}
+      src={entry.thumbnailUrl}
       alt=""
       loading="lazy"
       decoding="async"
@@ -131,8 +142,12 @@ export function useOwnCountry() {
   return useQuery(api.users.getUser)?.country;
 }
 
-/** Catalog entries as rows: picture, title and Strike, facts, and how many the person holds. */
+/**
+ * Catalog entries as rows: picture, title and Strike, facts, the picture's
+ * credit when its licence asks for one, and how many the person holds.
+ */
 export function EntryRows({ entries }: { entries: CatalogEntryRow[] }) {
+  const t = useI18n();
   const catalogFormat = useCatalogFormat();
   const ownCountry = useOwnCountry();
   return entries.map((entry) => (
@@ -143,6 +158,10 @@ export function EntryRows({ entries }: { entries: CatalogEntryRow[] }) {
       title={entry.title}
       suffix={catalogFormat.strikeSuffix(entry)}
       facts={catalogFormat.rowFacts(entry, ownCountry).join(" · ")}
+      credit={
+        entry.imageCredit &&
+        `${t("catalog.imageCredit")} · ${catalogFormat.credit(entry.imageCredit)}`
+      }
       end={<HeldCount held={entry.held} />}
     />
   ));
