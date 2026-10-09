@@ -43,7 +43,7 @@ export const releases: Release[] = [
         ],
         features: [
           "Add coins, banknotes and stamps to your Collection as Items: title, country, year, denomination, Quantity, Purchase price, Market value and more. Press C anywhere to add one.",
-          "Grade each Item on a scale that suits it: Sheldon (1–70) or European for coins, international for banknotes, Norwegian (0–3) for both, and a condition scale for stamps. The Strike (circulation, BU or proof) is recorded separately.",
+          "Grade each Item on a scale that suits it: Sheldon (1–70) or European for coins, international for banknotes, Norwegian (0–3) for both, and a stamp grading scale. The Strike (circulation, BU or proof) is recorded separately.",
           "Edit and duplicate Items, browse your Collection and open any Item to see all its details.",
           "Amounts are entered and shown in your Home currency: NOK, SEK, DKK, EUR, RON, GBP, USD or CHF.",
           "Gold and silver Spot prices on the Overview, in your Home currency per gram and per troy ounce, refreshed every 15 minutes.",
@@ -62,7 +62,7 @@ export const releases: Release[] = [
         ],
         features: [
           "Legg til mynter, sedler og frimerker i samlingen din som objekter: tittel, land, år, pålydende, antall, innkjøpspris, markedsverdi og mer. Trykk C hvor som helst for å legge til ett.",
-          "Sett kvalitet på hvert objekt etter en skala som passer: Sheldon (1–70) eller europeisk for mynter, internasjonal for sedler, norsk (0–3) for begge, og en tilstandsskala for frimerker. Pregingen (omløp, BU eller proof) registreres for seg.",
+          "Sett kvalitet på hvert objekt etter en skala som passer: Sheldon (1–70) eller europeisk for mynter, internasjonal for sedler, norsk (0–3) for begge, og en kvalitetsskala for frimerker. Pregingen (omløp, BU eller proof) registreres for seg.",
           "Rediger og dupliser objekter, bla gjennom samlingen og åpne et objekt for å se alle detaljene.",
           "Beløp føres inn og vises i hjemmevalutaen din: NOK, SEK, DKK, EUR, RON, GBP, USD eller CHF.",
           "Spotpriser for gull og sølv i oversikten, i hjemmevalutaen din per gram og per troy unse, oppdatert hvert 15. minutt.",

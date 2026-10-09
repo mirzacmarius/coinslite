@@ -137,7 +137,7 @@ export default {
       norwegian: "Norsk (0–3)",
       european: "Europeisk (UNC–G)",
       international: "Internasjonal (UNC–PR)",
-      stamp: "Tilstand (frimerker)",
+      stamp: "Kvalitet (frimerker)",
     },
     strikes: {
       circulation: "Omløp",

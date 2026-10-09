@@ -134,7 +134,7 @@ export default {
       norwegian: "Norwegian (0–3)",
       european: "European (UNC–G)",
       international: "International (UNC–PR)",
-      stamp: "Stamp condition",
+      stamp: "Stamp grades",
     },
     strikes: {
       circulation: "Circulation",

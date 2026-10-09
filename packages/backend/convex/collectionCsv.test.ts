@@ -351,7 +351,7 @@ test("headings and names are in the person's language, or the one asked for; num
       "",
       "",
       "Postfrisk",
-      "Tilstand (frimerker)",
+      "Kvalitet (frimerker)",
       "",
       "",
       "Sverige",

@@ -14,7 +14,7 @@ import type { PdfContents } from "./exports";
 import { collectionPdfMessages } from "./pdfMessages";
 import { defaultSort, withoutAlbum } from "./view";
 
-/** A Grade as the PDF prints it: "PF-65", "1−", or a stamp's condition in words. */
+/** A Grade as the PDF prints it: "PF-65", "1−", or a stamp's Grade in words. */
 function gradeText(
   labels: ExportLabels,
   scale: GradingScale | undefined,
