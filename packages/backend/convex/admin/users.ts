@@ -189,11 +189,11 @@ export const list = query({
 
 /**
  * The people whose name or email matches what the admin typed: a whole
- * email, or words of a name or an email or the start of them. Everyone, or
- * one plan's people. Search indexes find the best `userSearchMatches`
- * matches, so a search reads about that many people however many there are;
- * those are sorted here in the chosen order. `more` says there were others.
- * Admins only.
+ * email finds just that person; otherwise words of a name or an email or the
+ * start of them. Everyone, or one plan's people. Search indexes find the
+ * best `userSearchMatches` matches, so a search reads about that many people
+ * however many there are; those are sorted here in the chosen order. `more`
+ * says there were others. Admins only.
  */
 export const search = query({
   args: { ...listArgs, text: v.string() },
@@ -217,16 +217,28 @@ export const search = query({
           },
         )
         .take(userSearchMatches + 1);
+
+    // A whole email belongs to one account (ADR 0005), so it finds just
+    // that one. The search indexes split it into words ("ada", "example",
+    // "com") and match any of them, which would bring in everyone at the
+    // same domain too.
     const exact = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", normalizeEmail(words)))
       .first();
+    if (exact) {
+      return {
+        users: onPlan(exact)
+          ? [listed(exact, await collectionCountsOf(ctx, exact._id))]
+          : [],
+        more: false,
+      };
+    }
+
+    // The best of each search in turn.
     const byName = await bestMatches("displayName");
     const byEmail = await bestMatches("email");
-
-    // The whole email first, then the best of each search in turn.
     const found = new Map<Id<"users">, Doc<"users">>();
-    if (exact && onPlan(exact)) found.set(exact._id, exact);
     for (let rank = 0; rank < Math.max(byName.length, byEmail.length); rank++) {
       for (const user of [byName[rank], byEmail[rank]]) {
         if (user && !found.has(user._id)) found.set(user._id, user);

@@ -22,9 +22,18 @@ test("an admin finds a user by email and opens their details", async ({
 
   await page.goto(`${appUrl}/admin/users`);
   const main = visiblePage(page);
+  // The list shows once the page knows it's an admin's.
+  const users = main.getByRole("table", { name: "Users" });
+  await expect(users).toBeVisible();
   await main.getByRole("searchbox", { name: "Search users" }).fill(email);
+  // The search lands in the URL after a pause; a link clicked before then
+  // would lose its navigation to that URL change.
+  await expect(page).toHaveURL(/[?&]q=/);
+  // A whole email finds just that account: the header row and theirs.
+  await expect(users.getByRole("row")).toHaveCount(2);
+  await expect(users.getByRole("row").nth(1)).toContainText(email);
   // A new account's name is the start of its email.
-  await main
+  await users
     .getByRole("link", {
       name: email.slice(0, email.indexOf("@")),
       exact: true,

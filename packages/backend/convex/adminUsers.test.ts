@@ -561,6 +561,27 @@ test("search finds people by their name or email, on one plan if asked", async (
   expect(await search(ada.as, "  ")).toEqual({ users: [], more: false });
 });
 
+test("a whole email finds just that person", async () => {
+  const t = newTest();
+  const ada = await namedAdmin(t);
+  const cy = await named(t, "cy@example.com", "Cy");
+  // Convex's search splits emails into words, so most people share some of
+  // them with any email; here it's the start of one.
+  await named(t, "cy@example.com.au", "Cy Jones");
+
+  expect(emailsOf(await search(ada.as, " CY@example.com "))).toEqual([
+    "cy@example.com",
+  ]);
+  expect(await search(ada.as, "cy@example.com", { plan: "premium" })).toEqual({
+    users: [],
+    more: false,
+  });
+  await premium(t, cy.userId);
+  expect(
+    emailsOf(await search(ada.as, "cy@example.com", { plan: "premium" })),
+  ).toEqual(["cy@example.com"]);
+});
+
 /**
  * A signed-in admin with a name. convex-test's search can't skip people
  * without one, as Convex does, so searches here name everyone.
