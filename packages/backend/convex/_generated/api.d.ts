@@ -26,6 +26,8 @@ import type * as init from "../init.js";
 import type * as items from "../items.js";
 import type * as items_grades from "../items/grades.js";
 import type * as items_rules from "../items/rules.js";
+import type * as plans from "../plans.js";
+import type * as plans_rules from "../plans/rules.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
@@ -56,6 +58,8 @@ declare const fullApi: ApiFromModules<{
   items: typeof items;
   "items/grades": typeof items_grades;
   "items/rules": typeof items_rules;
+  plans: typeof plans;
+  "plans/rules": typeof plans_rules;
   subscriptions: typeof subscriptions;
   users: typeof users;
   "utils/auth": typeof utils_auth;

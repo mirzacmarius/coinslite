@@ -343,4 +343,22 @@ export default {
       tryAgain: "Kunne ikke bekrefte akkurat nå. Prøv igjen.",
     },
   },
+  plans: {
+    freePlan: "Gratisplan",
+    itemsUsed: "{used} / {limit} objekter",
+    overLimit: "Over {limit} objekter",
+    usageLabel: "Objekter brukt på gratisplanen",
+    nearLimit: "Nær grensen",
+    full: "Grensen er nådd",
+    upgrade: "Oppgrader",
+    upgradeToPremium: "Oppgrader til Premium",
+    usedOf: "{used} av {limit} objekter brukt",
+    premiumPitch: "Premium har ingen grense for antall objekter.",
+    nearLimitNotice: "Du har brukt {used} av gratisplanens {limit} objekter.",
+    fullNotice: "Samlingen din har nådd gratisplanens {limit} objekter.",
+    keepItems:
+      "Du kan fortsatt se og redigere alle objektene dine. Oppgrader for å legge til flere.",
+    limitError:
+      "Gratisplanen har plass til {limit} objekter, så ingenting ble lagt til. Oppgrader til Premium for å legge til flere.",
+  },
 } as const satisfies Dictionary;

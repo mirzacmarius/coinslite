@@ -356,4 +356,24 @@ export default {
         "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
+  plans: {
+    freePlan: "Gratis-Tarif",
+    itemsUsed: "{used} / {limit} Objekte",
+    overLimit: "Über {limit} Objekte",
+    usageLabel: "Genutzte Objekte im Gratis-Tarif",
+    nearLimit: "Fast ausgeschöpft",
+    full: "Grenze erreicht",
+    upgrade: "Upgraden",
+    upgradeToPremium: "Auf Premium upgraden",
+    usedOf: "{used} von {limit} Objekten genutzt",
+    premiumPitch: "Premium hat keine Begrenzung bei Objekten.",
+    nearLimitNotice:
+      "Du hast {used} von {limit} Objekten des Gratis-Tarifs genutzt.",
+    fullNotice:
+      "Deine Sammlung hat die {limit} Objekte des Gratis-Tarifs erreicht.",
+    keepItems:
+      "Alle deine Objekte bleiben sichtbar und bearbeitbar. Mit einem Upgrade kannst du weitere hinzufügen.",
+    limitError:
+      "Der Gratis-Tarif umfasst {limit} Objekte, daher wurde nichts hinzugefügt. Mit Premium kannst du weitere hinzufügen.",
+  },
 } as const satisfies Dictionary;
