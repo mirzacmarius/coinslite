@@ -357,4 +357,21 @@ export default {
       "You've sent several messages in a short time. Try again in a few minutes.",
     failed: "Couldn't send your feedback. Try again.",
   },
+  plans: {
+    freePlan: "Free plan",
+    itemsUsed: "{used} / {limit} Items",
+    overLimit: "Over {limit} Items",
+    usageLabel: "Items used on the Free plan",
+    nearLimit: "Close to the limit",
+    full: "Item limit reached",
+    upgrade: "Upgrade",
+    upgradeToPremium: "Upgrade to Premium",
+    usedOf: "{used} of {limit} Items used",
+    premiumPitch: "Premium has no limit on Items.",
+    nearLimitNotice: "You've used {used} of the Free plan's {limit} Items.",
+    fullNotice: "Your Collection has reached the Free plan's {limit} Items.",
+    keepItems: "Every Item stays yours to view and edit. Upgrade to add more.",
+    limitError:
+      "The Free plan holds {limit} Items, so nothing was added. Upgrade to Premium to add more.",
+  },
 } as const;

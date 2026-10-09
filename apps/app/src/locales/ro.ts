@@ -366,4 +366,24 @@ export default {
       "Ai trimis mai multe mesaje într-un timp scurt. Încearcă din nou peste câteva minute.",
     failed: "Feedbackul nu a putut fi trimis. Încearcă din nou.",
   },
+  plans: {
+    freePlan: "Plan gratuit",
+    itemsUsed: "{used} / {limit} obiecte",
+    overLimit: "Peste {limit} obiecte",
+    usageLabel: "Obiecte folosite în planul gratuit",
+    nearLimit: "Aproape de limită",
+    full: "Limită atinsă",
+    upgrade: "Treci la Premium",
+    upgradeToPremium: "Treci la Premium",
+    usedOf: "{used} din {limit} obiecte folosite",
+    premiumPitch: "Premium nu are limită de obiecte.",
+    nearLimitNotice:
+      "Ai folosit {used} din cele {limit} obiecte ale planului gratuit.",
+    fullNotice:
+      "Colecția ta a atins cele {limit} obiecte ale planului gratuit.",
+    keepItems:
+      "Toate obiectele tale rămân vizibile și editabile. Treci la Premium ca să adaugi mai multe.",
+    limitError:
+      "Planul gratuit are cel mult {limit} obiecte, așa că nu s-a adăugat nimic. Treci la Premium ca să adaugi mai multe.",
+  },
 } as const satisfies Dictionary;

@@ -370,4 +370,24 @@ export default {
       "Vous avez envoyé plusieurs messages en peu de temps. Réessayez dans quelques minutes.",
     failed: "Impossible d’envoyer votre avis. Réessayez.",
   },
+  plans: {
+    freePlan: "Formule gratuite",
+    itemsUsed: "{used} / {limit} objets",
+    overLimit: "Plus de {limit} objets",
+    usageLabel: "Objets utilisés dans la formule gratuite",
+    nearLimit: "Limite proche",
+    full: "Limite atteinte",
+    upgrade: "Passer à Premium",
+    upgradeToPremium: "Passer à Premium",
+    usedOf: "{used} objets utilisés sur {limit}",
+    premiumPitch: "Premium n’a pas de limite d’objets.",
+    nearLimitNotice:
+      "Vous avez utilisé {used} des {limit} objets de la formule gratuite.",
+    fullNotice:
+      "Votre collection a atteint les {limit} objets de la formule gratuite.",
+    keepItems:
+      "Tous vos objets restent visibles et modifiables. Passez à Premium pour en ajouter d’autres.",
+    limitError:
+      "La formule gratuite est limitée à {limit} objets, rien n’a donc été ajouté. Passez à Premium pour en ajouter d’autres.",
+  },
 } as const satisfies Dictionary;
