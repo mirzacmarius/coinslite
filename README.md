@@ -59,7 +59,7 @@ CI runs all four on every push and pull request.
 
 ## Deployments
 
-- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Every push gets a preview, and `main` deploys to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`).
+- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Every push gets a preview of the product app, and `main` deploys both to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`). The marketing site deploys only from `main` (`apps/web/vercel.json`): the team's plan allows 100 deployments a day, and a second preview per push used them up.
 - **Backend:** Convex project `coinslite` (team museumlite).
   - Production deploys use the production deploy key.
   - Each preview branch gets its own preview deployment, through the preview deploy key. Both keys are stored as `CONVEX_DEPLOY_KEY` in Vercel.
