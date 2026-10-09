@@ -4,6 +4,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { type MutationCtx, mutation, query } from "./_generated/server";
 import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
 import { checkItem } from "./items/rules";
+import { requireRoomForItems } from "./plans";
 import { requireSetUpUser } from "./utils/auth";
 import { gradingScale, itemType, material, strike } from "./utils/validators";
 
@@ -58,6 +59,7 @@ export const add = mutation({
   returns: v.id("items"),
   handler: async (ctx, { albumId, ...fields }) => {
     const owner = await requireSetUpUser(ctx);
+    await requireRoomForItems(ctx, owner._id);
     const album = await ownAlbumId(ctx, owner._id, albumId);
     const itemId = await ctx.db.insert("items", {
       ownerId: owner._id,
@@ -98,6 +100,7 @@ export const duplicate = mutation({
   returns: v.id("items"),
   handler: async (ctx, { itemId }) => {
     const item = await requireOwnItem(ctx, itemId);
+    await requireRoomForItems(ctx, item.ownerId);
     const { albumId, ...copy } = Object.fromEntries(
       fieldNames.flatMap((name) =>
         item[name] === undefined ? [] : [[name, item[name]]],

@@ -75,6 +75,19 @@ export function formatDate(
   }).format(new Date(value));
 }
 
+/** Formats a moment with its time of day, in `timeZone` (default: the runtime's own). */
+export function formatDateTime(
+  value: number | Date,
+  locale: Locale,
+  { timeZone }: { timeZone?: string } = {},
+): string {
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone,
+  }).format(new Date(value));
+}
+
 /** Shows an ISO 3166 alpha-2 country code as its name in the given language. */
 export function formatCountry(code: string, locale: Locale): string {
   if (!/^[A-Za-z]{2}$/.test(code)) return code;
@@ -97,6 +110,8 @@ export function formattersFor(
       formatNumber(value, locale, options),
     date: (value: string | number | Date) =>
       formatDate(value, locale, { timeZone }),
+    dateTime: (value: number | Date) =>
+      formatDateTime(value, locale, { timeZone }),
     country: (code: string) => formatCountry(code, locale),
   };
 }

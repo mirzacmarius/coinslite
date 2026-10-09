@@ -2,6 +2,7 @@
 
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
+import { UpdatesLink } from "@/components/updates/updates-link";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -24,6 +25,7 @@ import type * as React from "react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { LanguagePicker } from "./language-picker";
+import { SendFeedback } from "./send-feedback";
 
 type Account = NonNullable<ReturnType<typeof useAccount>>;
 const useAccount = () => useQuery(api.account.get);
@@ -53,9 +55,11 @@ export function AccountPage() {
         )}
       </header>
       <PhoneAccountLinks />
+      <UpdatesLink />
       <ContactSection account={account} />
       <PreferencesSection account={account} />
       <EmailSection account={account} />
+      <FeedbackSection />
       <LeaveSection />
     </>
   );
@@ -393,6 +397,18 @@ function EmailSection({ account }: { account: Account }) {
           {t("account.email.signInAgainAction")}
         </Button>
       )}
+    </Section>
+  );
+}
+
+function FeedbackSection() {
+  const t = useI18n();
+  return (
+    <Section
+      title={t("feedback.title")}
+      description={t("feedback.description")}
+    >
+      <SendFeedback />
     </Section>
   );
 }

@@ -427,4 +427,74 @@ export default {
         "Das Album konnte nicht gelöscht werden. Versuche es noch einmal.",
     },
   },
+  feedback: {
+    title: "Feedback",
+    description:
+      "Eine Idee, ein Problem oder etwas, das dir gefällt? Sag es dem CoinsLite-Team. Wir lesen jede Nachricht.",
+    open: "Feedback senden",
+    dialogTitle: "Feedback senden",
+    message: "Nachricht",
+    placeholder: "Was funktioniert für dich, was nicht, was wünschst du dir…",
+    note: "Wir senden die E-Mail-Adresse deines Kontos mit, damit wir antworten können.",
+    cancel: "Abbrechen",
+    send: "Senden",
+    close: "Schließen",
+    sent: "Danke! Dein Feedback wurde gesendet.",
+    required: "Schreib zuerst eine Nachricht.",
+    tooLong: "Höchstens {limit} Zeichen.",
+    tooMany:
+      "Du hast in kurzer Zeit mehrere Nachrichten gesendet. Versuche es in ein paar Minuten noch einmal.",
+    failed:
+      "Dein Feedback konnte nicht gesendet werden. Versuche es noch einmal.",
+  },
+  plans: {
+    freePlan: "Gratis-Tarif",
+    itemsUsed: "{used} / {limit} Objekte",
+    overLimit: "Über {limit} Objekte",
+    usageLabel: "Genutzte Objekte im Gratis-Tarif",
+    nearLimit: "Fast ausgeschöpft",
+    full: "Grenze erreicht",
+    upgrade: "Upgraden",
+    upgradeToPremium: "Auf Premium upgraden",
+    usedOf: "{used} von {limit} Objekten genutzt",
+    premiumPitch: "Premium hat keine Begrenzung bei Objekten.",
+    nearLimitNotice:
+      "Du hast {used} von {limit} Objekten des Gratis-Tarifs genutzt.",
+    fullNotice:
+      "Deine Sammlung hat die {limit} Objekte des Gratis-Tarifs erreicht.",
+    keepItems:
+      "Alle deine Objekte bleiben sichtbar und bearbeitbar. Mit einem Upgrade kannst du weitere hinzufügen.",
+    limitError:
+      "Der Gratis-Tarif umfasst {limit} Objekte, daher wurde nichts hinzugefügt. Mit Premium kannst du weitere hinzufügen.",
+  },
+  spotPrices: {
+    title: "Spotpreise",
+    metal: "Metall",
+    perGram: "Pro Gramm",
+    perOunce: "Pro Feinunze",
+    updated: "Aktualisiert am {time}",
+    stale:
+      "Diese Preise wurden seit über einer Stunde nicht aktualisiert und sind möglicherweise veraltet.",
+    emptyTitle: "Noch keine Spotpreise",
+    emptyDescription:
+      "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
+  },
+  updates: {
+    title: "Neuigkeiten",
+    unseen: "Neue Version",
+    new: "Neu",
+    version: "Version {version}",
+    latest: "Aktuell",
+    groups: {
+      catalog: "Neu im Katalog",
+      features: "Neue Funktionen",
+      improvements: "Verbesserungen",
+      fixes: "Fehlerbehebungen",
+    },
+    highlightsTitle: "Neu in CoinsLite {version}",
+    seeAll: "Alle Neuigkeiten ansehen",
+    gotIt: "Verstanden",
+    close: "Schließen",
+    workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
+  },
 } as const satisfies Dictionary;

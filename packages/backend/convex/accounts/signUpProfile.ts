@@ -1,5 +1,6 @@
 import { defaultLocale, isHomeCurrency, isLocale } from "@coinslite/i18n";
 import { ConvexError, type Value } from "convex/values";
+import { latestRelease } from "../updates/releases";
 import { localPart, requireNormalizedEmail } from "./credentials";
 
 /** Why a sign-up was refused; the backend tests assert on these. */
@@ -31,5 +32,7 @@ export function passwordProfile(params: Record<string, Value | undefined>): {
     language: isLocale(params.language) ? params.language : defaultLocale,
     homeCurrency: params.homeCurrency,
     termsAcceptedAt: Date.now(),
+    // New accounts see no Updates prompt until the next release.
+    lastSeenRelease: latestRelease().version,
   };
 }

@@ -2,6 +2,11 @@
 
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
+import {
+  isItemLimitError,
+  upgradeHref,
+  useItemLimitMessage,
+} from "@/components/plans/plan-usage";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -33,6 +38,7 @@ export function ItemDetail() {
   // Each opening starts the form afresh from the Item as it is now.
   const [editing, setEditing] = useState({ open: false, key: 0 });
   const [duplicating, setDuplicating] = useState(false);
+  const itemLimitMessage = useItemLimitMessage();
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
       {t("nav.collection")}
@@ -127,8 +133,17 @@ export function ItemDetail() {
       const copyId = await duplicateItem({ itemId: item._id });
       toast.success(t("items.duplicated"));
       router.push(`/collection/${copyId}`);
-    } catch {
-      toast.error(t("items.errors.duplicateFailed"));
+    } catch (failure) {
+      if (isItemLimitError(failure)) {
+        toast.error(itemLimitMessage, {
+          action: {
+            label: t("plans.upgradeToPremium"),
+            onClick: () => router.push(upgradeHref),
+          },
+        });
+      } else {
+        toast.error(t("items.errors.duplicateFailed"));
+      }
     } finally {
       setDuplicating(false);
     }

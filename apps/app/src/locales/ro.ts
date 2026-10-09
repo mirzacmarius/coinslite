@@ -415,4 +415,73 @@ export default {
       deleteFailed: "Albumul nu a putut fi șters. Încearcă din nou.",
     },
   },
+  feedback: {
+    title: "Feedback",
+    description:
+      "Ai o idee, o problemă sau ceva ce îți place? Spune-i echipei CoinsLite. Citim fiecare mesaj.",
+    open: "Trimite feedback",
+    dialogTitle: "Trimite feedback",
+    message: "Mesaj",
+    placeholder: "Ce funcționează pentru tine, ce nu, ce ți-ai dori…",
+    note: "Includem adresa de e-mail a contului tău, ca să-ți putem răspunde.",
+    cancel: "Anulează",
+    send: "Trimite",
+    close: "Închide",
+    sent: "Mulțumim! Feedbackul tău a fost trimis.",
+    required: "Scrie mai întâi un mesaj.",
+    tooLong: "Cel mult {limit} de caractere.",
+    tooMany:
+      "Ai trimis mai multe mesaje într-un timp scurt. Încearcă din nou peste câteva minute.",
+    failed: "Feedbackul nu a putut fi trimis. Încearcă din nou.",
+  },
+  plans: {
+    freePlan: "Plan gratuit",
+    itemsUsed: "{used} / {limit} obiecte",
+    overLimit: "Peste {limit} obiecte",
+    usageLabel: "Obiecte folosite în planul gratuit",
+    nearLimit: "Aproape de limită",
+    full: "Limită atinsă",
+    upgrade: "Treci la Premium",
+    upgradeToPremium: "Treci la Premium",
+    usedOf: "{used} din {limit} obiecte folosite",
+    premiumPitch: "Premium nu are limită de obiecte.",
+    nearLimitNotice:
+      "Ai folosit {used} din cele {limit} obiecte ale planului gratuit.",
+    fullNotice:
+      "Colecția ta a atins cele {limit} obiecte ale planului gratuit.",
+    keepItems:
+      "Toate obiectele tale rămân vizibile și editabile. Treci la Premium ca să adaugi mai multe.",
+    limitError:
+      "Planul gratuit are cel mult {limit} obiecte, așa că nu s-a adăugat nimic. Treci la Premium ca să adaugi mai multe.",
+  },
+  spotPrices: {
+    title: "Prețuri spot",
+    metal: "Metal",
+    perGram: "Pe gram",
+    perOunce: "Pe uncie troy",
+    updated: "Actualizat la {time}",
+    stale:
+      "Aceste prețuri nu au mai fost actualizate de peste o oră și pot fi depășite.",
+    emptyTitle: "Încă nu există prețuri spot",
+    emptyDescription:
+      "Prețurile aurului și argintului apar aici după ce sunt preluate. Se actualizează la fiecare 15 minute.",
+  },
+  updates: {
+    title: "Noutăți",
+    unseen: "Versiune nouă",
+    new: "Nou",
+    version: "Versiunea {version}",
+    latest: "Actuală",
+    groups: {
+      catalog: "Nou în catalog",
+      features: "Funcții noi",
+      improvements: "Îmbunătățiri",
+      fixes: "Remedieri",
+    },
+    highlightsTitle: "Noutăți în CoinsLite {version}",
+    seeAll: "Vezi toate noutățile",
+    gotIt: "Am înțeles",
+    close: "Închide",
+    workspaceMenuUnseen: "Cont și preferințe, versiune nouă",
+  },
 } as const satisfies Dictionary;

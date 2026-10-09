@@ -2,6 +2,11 @@
 
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useAlbums } from "@/components/albums/use-albums";
+import {
+  ItemLimitNotice,
+  isItemLimitError,
+  useItemLimitMessage,
+} from "@/components/plans/plan-usage";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
@@ -123,6 +128,7 @@ export function ItemFormDialog({
   const [createMore, setCreateMore] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(() => hasDetails(defaults));
   const [failed, setFailed] = useState<string>();
+  const itemLimitMessage = useItemLimitMessage();
 
   const rules = useMemo(() => {
     const optional = (check: (text: string) => boolean, message: string) =>
@@ -205,8 +211,12 @@ export function ItemFormDialog({
       try {
         if (item) await updateItem({ itemId: item._id, ...args });
         else await addItem(args);
-      } catch {
-        setFailed(t(item ? "items.errors.saveFailed" : "items.errors.failed"));
+      } catch (failure) {
+        setFailed(
+          isItemLimitError(failure)
+            ? itemLimitMessage
+            : t(item ? "items.errors.saveFailed" : "items.errors.failed"),
+        );
         return;
       }
       toast.success(t(item ? "items.saved" : "items.added"));
@@ -376,6 +386,7 @@ export function ItemFormDialog({
           </DialogDescription>
 
           <div className="flex flex-col gap-2 overflow-y-auto px-4 pb-3 pt-1">
+            {!item && <ItemLimitNotice />}
             <form.Field name="title" validators={{ onChange: rules.title }}>
               {(field) => {
                 const error = errorOf(field.state.meta.errors);

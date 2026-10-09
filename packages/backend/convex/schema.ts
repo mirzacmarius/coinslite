@@ -8,6 +8,7 @@ import {
   itemType,
   language,
   material,
+  perDollar,
   strike,
 } from "./utils/validators";
 
@@ -37,6 +38,12 @@ export default defineSchema({
     country: v.optional(v.string()),
     // Not `phone`: Convex Auth keeps that one for phone sign-in.
     contactPhone: v.optional(v.string()),
+
+    // Updates (updates/releases.ts): the version of the newest release they've
+    // seen in the list (new accounts start at the current one), and of the
+    // newest whose highlights they've been shown.
+    lastSeenRelease: v.optional(v.string()),
+    lastShownHighlights: v.optional(v.string()),
 
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
@@ -106,6 +113,20 @@ export default defineSchema({
     colour: albumColour,
     itemCount: v.number(),
   }).index("by_ownerId", ["ownerId"]),
+
+  /**
+   * The latest Spot prices and exchange rates (spotPrices.ts): one document,
+   * replaced by each successful refresh and kept when a refresh fails.
+   */
+  spotPriceSnapshots: defineTable({
+    /** When the provider quoted the prices. */
+    quotedAt: v.number(),
+    /** When CoinsLite stored them. */
+    fetchedAt: v.number(),
+    /** The latest refresh attempt, whether or not it succeeded. */
+    checkedAt: v.number(),
+    perDollar,
+  }),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

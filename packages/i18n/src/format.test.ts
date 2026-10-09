@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   formatCountry,
   formatDate,
+  formatDateTime,
   formatMoney,
   formatNumber,
   formattersFor,
@@ -75,6 +76,18 @@ describe("formatDate", () => {
   });
 });
 
+describe("formatDateTime", () => {
+  test("shows a moment's date and time in the viewer's time zone", () => {
+    const noonUtc = Date.UTC(2026, 9, 9, 12, 5);
+    expect(formatDateTime(noonUtc, "de", { timeZone: "Europe/Berlin" })).toBe(
+      "09.10.2026, 14:05",
+    );
+    expect(formatDateTime(noonUtc, "nb", { timeZone: "Europe/Oslo" })).toBe(
+      "9. okt. 2026, 14:05",
+    );
+  });
+});
+
 describe("formatCountry", () => {
   test("shows an ISO country code as a translated name", () => {
     expect(formatCountry("NO", "de")).toBe("Norwegen");
@@ -95,6 +108,7 @@ describe("formattersFor", () => {
     expect(plain(de.money(123456, "EUR"))).toBe("1.234,56 €");
     expect(plain(de.number(1234.5))).toBe("1.234,5");
     expect(de.date("2026-10-08")).toBe("08.10.2026");
+    expect(de.dateTime(Date.UTC(2026, 9, 8, 9, 30))).toBe("08.10.2026, 09:30");
     expect(de.country("NO")).toBe("Norwegen");
   });
 });
