@@ -24,6 +24,7 @@ import type * as env from "../env.js";
 import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as items from "../items.js";
+import type * as items_grades from "../items/grades.js";
 import type * as items_rules from "../items/rules.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   init: typeof init;
   items: typeof items;
+  "items/grades": typeof items_grades;
   "items/rules": typeof items_rules;
   subscriptions: typeof subscriptions;
   users: typeof users;

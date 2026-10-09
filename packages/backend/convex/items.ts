@@ -3,7 +3,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { checkItem } from "./items/rules";
 import { requireSetUpUser } from "./utils/auth";
-import { itemType } from "./utils/validators";
+import { gradingScale, itemType, strike } from "./utils/validators";
 
 /** Adds an Item to the signed-in person's Collection. */
 export const add = mutation({
@@ -13,6 +13,10 @@ export const add = mutation({
     country: v.optional(v.string()),
     year: v.optional(v.number()),
     denomination: v.optional(v.string()),
+    grade: v.optional(v.string()),
+    gradingScale: v.optional(gradingScale),
+    gradeNote: v.optional(v.string()),
+    strike: v.optional(strike),
     quantity: v.optional(v.number()),
     purchasePrice: v.optional(v.number()),
     marketValue: v.optional(v.number()),
@@ -21,7 +25,7 @@ export const add = mutation({
     notes: v.optional(v.string()),
   },
   returns: v.id("items"),
-  handler: async (ctx, { type, ...fields }) => {
+  handler: async (ctx, fields) => {
     const owner = await requireSetUpUser(ctx);
     // A day of slack, so a purchase made "today" anywhere on Earth is accepted.
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
@@ -29,7 +33,6 @@ export const add = mutation({
       .slice(0, 10);
     return await ctx.db.insert("items", {
       ownerId: owner._id,
-      type,
       ...checkItem(fields, tomorrow),
     });
   },
