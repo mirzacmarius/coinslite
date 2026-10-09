@@ -291,8 +291,6 @@ export default {
       title: "Preferences",
       language: "Language",
       homeCurrency: "Home currency",
-      homeCurrencyNote:
-        "Changing it, with every amount converted, is coming soon.",
       languageNotSaved:
         "Couldn't save the language to your account, so it changed on this device only.",
     },
@@ -313,7 +311,6 @@ export default {
       title: "Sign out or delete",
       signOut: "Sign out",
       delete: "Delete account",
-      deleteConfirm: "Click again to delete everything",
       deleteWarning:
         "Deleting your account removes it and everything in it. This can't be undone.",
     },
@@ -501,6 +498,35 @@ export default {
     emptyDescription:
       "Gold and silver prices show here once they've been fetched. They're refreshed every 15 minutes.",
   },
+  homeCurrency: {
+    hint: "Changing it converts every Purchase price and Market value in your Collection.",
+    confirmTitle: "Change Home currency to {currency}?",
+    confirm: "Change to {currency}",
+    cancel: "Cancel",
+    checking: "Counting the amounts to convert…",
+    willConvert:
+      "Every Purchase price and Market value in your Collection will be converted from {from} to {to} at this exchange rate.",
+    nothingToConvert:
+      "None of your Items has a Purchase price or Market value, so there's nothing to convert.",
+    noRate:
+      "There's no exchange rate to convert your amounts with yet. Try again in a few minutes.",
+    tooLarge:
+      "Your Collection has more than {limit} Items, too many to convert in one change. Send feedback and we'll help.",
+    amounts: "Amounts to convert",
+    rate: "Exchange rate",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Rate as of",
+    stale:
+      "This rate hasn't been updated for over an hour and may be out of date.",
+    changed: "Your Home currency is now {currency}.",
+    rateChanged:
+      "The exchange rate was just updated. Check the new rate and confirm again.",
+    amountTooLarge:
+      "One of your amounts would be too large in the new currency, so nothing was changed.",
+    sameCurrency: "That's already your Home currency.",
+    failed:
+      "Couldn't change your Home currency, and nothing was converted. Try again.",
+  },
   preciousMetal: {
     title: "Precious metal",
     metal: "Metal",
@@ -640,6 +666,133 @@ export default {
       ENTRY_HAS_CHILDREN:
         "Nodes sit below this one, so it can't become a Catalog entry.",
     },
+  },
+  collection: {
+    search: "Search the Collection",
+    searchPlaceholder: "Search title, denomination, country",
+    clearSearch: "Clear search",
+    filter: "Filter",
+    filterBy: "Filter by…",
+    back: "Back",
+    nothingToFilter: "None of your Items has one yet.",
+    filters: {
+      type: "Item type",
+      origin: "Origin",
+      country: "Country",
+      denomination: "Denomination",
+      grade: "Grade",
+      album: "Album",
+    },
+    bullionCoins: "Bullion coins",
+    origins: {
+      own: "Domestic ({country})",
+      foreign: "Foreign",
+    },
+    withoutAlbum: "Without an Album",
+    unknownAlbum: "Unknown Album",
+    activeFilters: "Active filters",
+    removeFilter: "Remove filter: {name}",
+    clear: "Clear",
+    clearFilters: "Clear filters",
+    noMatchesTitle: "No Items match these filters",
+    display: "Display",
+    layout: "View",
+    layouts: {
+      list: "List",
+      grid: "Grid",
+    },
+    sort: "Sort",
+    sorts: {
+      year: "Year, oldest first",
+      newest: "Newest added",
+      oldest: "Oldest added",
+      price: "Highest Purchase price",
+      denomination: "Denomination",
+      grade: "Grade, best first",
+    },
+    pageSize: "Items per page",
+    pagination: "Pages",
+    range: "{from}–{to} of {total}",
+    pageOf: "Page {page} of {pages}",
+    previousPage: "Previous page",
+    nextPage: "Next page",
+    incomplete:
+      "Your Collection is too large to search at once, so this view covers the first {count} Items you added.",
+    showInCollection: "Show in Collection",
+  },
+  billing: {
+    currentPlan: "Your plan",
+    freeDescription: "Up to {limit} Items, whatever their Quantity.",
+    premium: "Premium",
+    premiumDescription:
+      "Unlimited Items, the Insurance report, and CSV and PDF export.",
+    billingPeriod: "Billing period",
+    monthly: "Monthly",
+    yearly: "Yearly",
+    perMonth: "{price} / month",
+    perYear: "{price} / year",
+    save: "Save {percent}%",
+    currencyHint:
+      "Prices in {currency}. Checkout charges in the currency of where you live, or in euros, and shows the final price.",
+    testMode:
+      "Test mode: no real payments are taken. Pay with the test card 4242 4242 4242 4242.",
+    unavailable:
+      "Premium can't be bought here yet: billing isn't set up on this deployment.",
+    alreadyPremium: "You're on Premium already.",
+    checkoutFailed: "Couldn't open checkout. Try again.",
+    price: "Price",
+    renews: "Renews",
+    ends: "Ends",
+    endingNotice:
+      "Premium stays until {date}. After that you're on the Free plan, and every Item stays yours to view and edit.",
+    confirmationTitle: "Checkout",
+    confirmingTitle: "Confirming your payment",
+    confirmingDescription:
+      "This usually takes a few seconds. Premium starts as soon as the payment is confirmed.",
+    slowDescription:
+      "This is taking longer than usual. Premium starts by itself once the payment is confirmed, so you can carry on meanwhile.",
+    welcomeTitle: "Welcome to Premium",
+    welcomeDescription: "Your Collection has no Item limit any more.",
+    toCollection: "Go to Collection",
+    seePlan: "See your plan",
+    backToPlans: "Back to Plans",
+    manage: "Manage subscription",
+    manageHint:
+      "On Polar you can switch between monthly and yearly, update your card or cancel. If you cancel, Premium stays until the end of the period you've paid for.",
+    portalUnavailable:
+      "The subscription can't be managed here: billing isn't set up on this deployment.",
+    portalUnavailableShort: "Billing isn't set up here",
+    portalFailed: "Couldn't open the subscription page. Try again.",
+    noSubscription: "There's no Premium subscription to manage.",
+    renewsOn: "Renews on {date}",
+    endsOn: "Ends on {date}",
+  },
+  catalogSearch: {
+    open: "Search",
+    title: "Search the Catalog",
+    placeholder: "Search by title, denomination, series or country…",
+    minLength: "Type at least 2 characters to search.",
+    noResults: "Nothing in the Catalog matches “{text}”.",
+    capped: "Showing the first {count}. Add a word to narrow the search.",
+    themes: "Themes",
+    moveHint: "to move",
+    openHint: "to open",
+    closeHint: "to close",
+  },
+  deleteAccount: {
+    title: "Delete your account?",
+    description:
+      "Your profile, contact details and sign-in methods are deleted for good, with everything in your Collection. This can't be undone.",
+    endsSubscription:
+      "Your Premium subscription ends now and won't be charged again.",
+    items: "Items",
+    photos: "Photos",
+    albums: "Albums",
+    atLeast: "{value}+",
+    confirm: "Delete account",
+    cancel: "Cancel",
+    failed:
+      "Your account couldn't be deleted, and nothing was removed. Try again.",
   },
   collectionTotals: {
     title: "Collection totals",

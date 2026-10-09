@@ -302,8 +302,6 @@ export default {
       title: "Préférences",
       language: "Langue",
       homeCurrency: "Devise de référence",
-      homeCurrencyNote:
-        "Bientôt, vous pourrez la changer et tous les montants seront convertis.",
       languageNotSaved:
         "Impossible d’enregistrer la langue dans votre compte : elle n’a changé que sur cet appareil.",
     },
@@ -325,7 +323,6 @@ export default {
       title: "Se déconnecter ou supprimer",
       signOut: "Se déconnecter",
       delete: "Supprimer le compte",
-      deleteConfirm: "Cliquez à nouveau pour tout supprimer",
       deleteWarning:
         "Supprimer votre compte l’efface avec tout son contenu. Cette action est irréversible.",
     },
@@ -517,6 +514,35 @@ export default {
     emptyDescription:
       "Les cours de l’or et de l’argent s’afficheront ici dès qu’ils auront été récupérés. Ils sont actualisés toutes les 15 minutes.",
   },
+  homeCurrency: {
+    hint: "La changer convertit tous les prix d’achat et valeurs de marché de votre collection.",
+    confirmTitle: "Passer la devise de référence en {currency} ?",
+    confirm: "Passer en {currency}",
+    cancel: "Annuler",
+    checking: "Décompte des montants à convertir…",
+    willConvert:
+      "Tous les prix d’achat et valeurs de marché de votre collection seront convertis de {from} en {to} à ce taux de change.",
+    nothingToConvert:
+      "Aucun de vos objets n’a de prix d’achat ni de valeur de marché : il n’y a rien à convertir.",
+    noRate:
+      "Nous n’avons pas encore de taux de change pour convertir vos montants. Réessayez dans quelques minutes.",
+    tooLarge:
+      "Votre collection compte plus de {limit} objets, trop pour les convertir en une seule fois. Donnez-nous votre avis et nous vous aiderons.",
+    amounts: "Montants à convertir",
+    rate: "Taux de change",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Taux au",
+    stale:
+      "Ce taux n’a pas été mis à jour depuis plus d’une heure et peut être dépassé.",
+    changed: "Votre devise de référence est désormais {currency}.",
+    rateChanged:
+      "Le taux de change vient d’être mis à jour. Vérifiez le nouveau taux et confirmez à nouveau.",
+    amountTooLarge:
+      "L’un de vos montants serait trop élevé dans la nouvelle devise : rien n’a été modifié.",
+    sameCurrency: "C’est déjà votre devise de référence.",
+    failed:
+      "Impossible de changer la devise de référence ; aucun montant n’a été converti. Réessayez.",
+  },
   preciousMetal: {
     title: "Métal précieux",
     metal: "Métal précieux",
@@ -663,6 +689,134 @@ export default {
       ENTRY_HAS_CHILDREN:
         "D’autres nœuds se trouvent sous celui-ci : il ne peut pas devenir une entrée du catalogue.",
     },
+  },
+  collection: {
+    search: "Rechercher dans la collection",
+    searchPlaceholder: "Titre, valeur faciale, pays",
+    clearSearch: "Effacer la recherche",
+    filter: "Filtrer",
+    filterBy: "Filtrer par…",
+    back: "Retour",
+    nothingToFilter: "Aucun de vos objets n’a encore cette information.",
+    filters: {
+      type: "Type d’objet",
+      origin: "Origine",
+      country: "Pays",
+      denomination: "Valeur faciale",
+      grade: "État",
+      album: "Album",
+    },
+    bullionCoins: "Pièces d’investissement",
+    origins: {
+      own: "Nationaux ({country})",
+      foreign: "Étrangers",
+    },
+    withoutAlbum: "Sans album",
+    unknownAlbum: "Album inconnu",
+    activeFilters: "Filtres actifs",
+    removeFilter: "Retirer le filtre : {name}",
+    clear: "Effacer",
+    clearFilters: "Effacer les filtres",
+    noMatchesTitle: "Aucun objet ne correspond à ces filtres",
+    display: "Affichage",
+    layout: "Vue",
+    layouts: {
+      list: "Liste",
+      grid: "Grille",
+    },
+    sort: "Tri",
+    sorts: {
+      year: "Année, la plus ancienne d’abord",
+      newest: "Ajoutés récemment",
+      oldest: "Ajoutés en premier",
+      price: "Prix d’achat le plus élevé",
+      denomination: "Valeur faciale",
+      grade: "État, le meilleur d’abord",
+    },
+    pageSize: "Objets par page",
+    pagination: "Pages",
+    range: "{from}–{to} sur {total}",
+    pageOf: "Page {page} sur {pages}",
+    previousPage: "Page précédente",
+    nextPage: "Page suivante",
+    incomplete:
+      "Votre collection est trop grande pour être parcourue en une fois : cette vue porte sur les {count} premiers objets que vous avez ajoutés.",
+    showInCollection: "Afficher dans la collection",
+  },
+  billing: {
+    currentPlan: "Votre formule",
+    freeDescription: "Jusqu’à {limit} objets, quelle que soit leur quantité.",
+    premium: "Premium",
+    premiumDescription:
+      "Objets illimités, le rapport d’assurance et l’export CSV et PDF.",
+    billingPeriod: "Période de facturation",
+    monthly: "Mensuel",
+    yearly: "Annuel",
+    perMonth: "{price} / mois",
+    perYear: "{price} / an",
+    save: "{percent} % d’économie",
+    currencyHint:
+      "Prix en {currency}. Le paiement se fait dans la devise de votre lieu de résidence, sinon en euros, et affiche le prix final.",
+    testMode:
+      "Mode test : aucun paiement réel n’est prélevé. Payez avec la carte de test 4242 4242 4242 4242.",
+    unavailable:
+      "Premium ne peut pas encore être acheté ici : la facturation n’est pas configurée sur cet environnement.",
+    alreadyPremium: "Vous avez déjà Premium.",
+    checkoutFailed: "Impossible d’ouvrir la page de paiement. Réessayez.",
+    price: "Prix",
+    renews: "Renouvellement le",
+    ends: "Fin le",
+    endingNotice:
+      "Premium reste actif jusqu’au {date}. Ensuite, vous passez à la formule gratuite et tous vos objets restent visibles et modifiables.",
+    confirmationTitle: "Paiement",
+    confirmingTitle: "Confirmation du paiement",
+    confirmingDescription:
+      "Cela prend généralement quelques secondes. Premium démarre dès que le paiement est confirmé.",
+    slowDescription:
+      "Cela prend plus de temps que d’habitude. Premium démarrera tout seul une fois le paiement confirmé ; vous pouvez continuer en attendant.",
+    welcomeTitle: "Bienvenue dans Premium",
+    welcomeDescription: "Votre collection n’a plus de limite d’objets.",
+    toCollection: "Aller à la collection",
+    seePlan: "Voir votre formule",
+    backToPlans: "Retour aux formules",
+    manage: "Gérer l’abonnement",
+    manageHint:
+      "Sur Polar, vous pouvez passer du mensuel à l’annuel, mettre à jour votre carte ou résilier. Après une résiliation, Premium reste actif jusqu’à la fin de la période payée.",
+    portalUnavailable:
+      "L’abonnement ne peut pas être géré ici : la facturation n’est pas configurée sur cet environnement.",
+    portalUnavailableShort: "Facturation non configurée ici",
+    portalFailed: "Impossible d’ouvrir la page d’abonnement. Réessayez.",
+    noSubscription: "Aucun abonnement Premium à gérer.",
+    renewsOn: "Renouvellement le {date}",
+    endsOn: "Fin le {date}",
+  },
+  catalogSearch: {
+    open: "Rechercher",
+    title: "Rechercher dans le catalogue",
+    placeholder: "Rechercher par titre, valeur faciale, série ou pays…",
+    minLength: "Saisissez au moins 2 caractères pour rechercher.",
+    noResults: "Rien dans le catalogue ne correspond à « {text} ».",
+    capped:
+      "Affichage des {count} premiers. Ajoutez un mot pour affiner la recherche.",
+    themes: "Thèmes",
+    moveHint: "pour se déplacer",
+    openHint: "pour ouvrir",
+    closeHint: "pour fermer",
+  },
+  deleteAccount: {
+    title: "Supprimer votre compte ?",
+    description:
+      "Votre profil, vos coordonnées et vos moyens de connexion sont supprimés définitivement, avec tout le contenu de votre collection. Cette action est irréversible.",
+    endsSubscription:
+      "Votre abonnement Premium prend fin maintenant et ne sera plus facturé.",
+    items: "Objets",
+    photos: "Photos",
+    albums: "Albums",
+    atLeast: "{value}+",
+    confirm: "Supprimer le compte",
+    cancel: "Annuler",
+    failed:
+      "Votre compte n’a pas pu être supprimé, et rien n’a été effacé. Réessayez.",
   },
   collectionTotals: {
     title: "Totaux de la collection",

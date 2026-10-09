@@ -307,8 +307,6 @@ export default {
       title: "Einstellungen",
       language: "Sprache",
       homeCurrency: "Heimatwährung",
-      homeCurrencyNote:
-        "Bald kannst du sie ändern, und alle Beträge werden umgerechnet.",
       languageNotSaved:
         "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },
@@ -330,7 +328,6 @@ export default {
       title: "Abmelden oder löschen",
       signOut: "Abmelden",
       delete: "Konto löschen",
-      deleteConfirm: "Zum Löschen von allem erneut klicken",
       deleteWarning:
         "Beim Löschen deines Kontos wird es mit allem darin entfernt. Das lässt sich nicht rückgängig machen.",
     },
@@ -527,6 +524,35 @@ export default {
     emptyDescription:
       "Gold- und Silberpreise erscheinen hier, sobald sie abgerufen wurden. Sie werden alle 15 Minuten aktualisiert.",
   },
+  homeCurrency: {
+    hint: "Wenn du sie änderst, werden alle Kaufpreise und Marktwerte in deiner Sammlung umgerechnet.",
+    confirmTitle: "Heimatwährung zu {currency} ändern?",
+    confirm: "Zu {currency} wechseln",
+    cancel: "Abbrechen",
+    checking: "Die umzurechnenden Beträge werden gezählt…",
+    willConvert:
+      "Alle Kaufpreise und Marktwerte in deiner Sammlung werden zu diesem Wechselkurs von {from} in {to} umgerechnet.",
+    nothingToConvert:
+      "Keines deiner Objekte hat einen Kaufpreis oder Marktwert, es gibt also nichts umzurechnen.",
+    noRate:
+      "Es gibt noch keinen Wechselkurs, um deine Beträge umzurechnen. Versuche es in ein paar Minuten noch einmal.",
+    tooLarge:
+      "Deine Sammlung hat mehr als {limit} Objekte, zu viele für eine einzige Umrechnung. Schick uns Feedback, dann helfen wir dir.",
+    amounts: "Umzurechnende Beträge",
+    rate: "Wechselkurs",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Stand",
+    stale:
+      "Dieser Kurs wurde seit über einer Stunde nicht aktualisiert und ist möglicherweise veraltet.",
+    changed: "Deine Heimatwährung ist jetzt {currency}.",
+    rateChanged:
+      "Der Wechselkurs wurde gerade aktualisiert. Prüfe den neuen Kurs und bestätige noch einmal.",
+    amountTooLarge:
+      "Ein Betrag wäre in der neuen Währung zu groß, daher wurde nichts geändert.",
+    sameCurrency: "Das ist bereits deine Heimatwährung.",
+    failed:
+      "Die Heimatwährung konnte nicht geändert werden, und nichts wurde umgerechnet. Versuche es noch einmal.",
+  },
   preciousMetal: {
     title: "Edelmetall",
     metal: "Metall",
@@ -676,6 +702,137 @@ export default {
       ENTRY_HAS_CHILDREN:
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
     },
+  },
+  collection: {
+    search: "Sammlung durchsuchen",
+    searchPlaceholder: "Titel, Nennwert, Land suchen",
+    clearSearch: "Suche leeren",
+    filter: "Filter",
+    filterBy: "Filtern nach…",
+    back: "Zurück",
+    nothingToFilter: "Noch keines deiner Objekte hat diese Angabe.",
+    filters: {
+      type: "Objektart",
+      origin: "Herkunft",
+      country: "Land",
+      denomination: "Nennwert",
+      grade: "Erhaltung",
+      album: "Album",
+    },
+    bullionCoins: "Anlagemünzen",
+    origins: {
+      own: "Inländisch ({country})",
+      foreign: "Ausländisch",
+    },
+    withoutAlbum: "Ohne Album",
+    unknownAlbum: "Unbekanntes Album",
+    activeFilters: "Aktive Filter",
+    removeFilter: "Filter entfernen: {name}",
+    clear: "Leeren",
+    clearFilters: "Filter entfernen",
+    noMatchesTitle: "Keine Objekte passen zu diesen Filtern",
+    display: "Anzeige",
+    layout: "Ansicht",
+    layouts: {
+      list: "Liste",
+      grid: "Raster",
+    },
+    sort: "Sortierung",
+    sorts: {
+      year: "Jahr, älteste zuerst",
+      newest: "Zuletzt hinzugefügt",
+      oldest: "Zuerst hinzugefügt",
+      price: "Höchster Kaufpreis",
+      denomination: "Nennwert",
+      grade: "Erhaltung, beste zuerst",
+    },
+    pageSize: "Objekte pro Seite",
+    pagination: "Seiten",
+    range: "{from}–{to} von {total}",
+    pageOf: "Seite {page} von {pages}",
+    previousPage: "Vorherige Seite",
+    nextPage: "Nächste Seite",
+    incomplete:
+      "Deine Sammlung ist zu groß, um sie auf einmal zu durchsuchen. Diese Ansicht umfasst die ersten {count} Objekte, die du hinzugefügt hast.",
+    showInCollection: "In der Sammlung zeigen",
+  },
+  billing: {
+    currentPlan: "Dein Tarif",
+    freeDescription: "Bis zu {limit} Objekte, unabhängig von ihrer Anzahl.",
+    premium: "Premium",
+    premiumDescription:
+      "Unbegrenzt viele Objekte, der Versicherungsbericht und Export als CSV und PDF.",
+    billingPeriod: "Abrechnungszeitraum",
+    monthly: "Monatlich",
+    yearly: "Jährlich",
+    perMonth: "{price} / Monat",
+    perYear: "{price} / Jahr",
+    save: "{percent} % sparen",
+    currencyHint:
+      "Preise in {currency}. Beim Bezahlen wird in der Währung deines Wohnorts abgerechnet, sonst in Euro, und der Endpreis angezeigt.",
+    testMode:
+      "Testmodus: Es werden keine echten Zahlungen abgebucht. Bezahle mit der Testkarte 4242 4242 4242 4242.",
+    unavailable:
+      "Premium kann hier noch nicht gekauft werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
+    alreadyPremium: "Du hast bereits Premium.",
+    checkoutFailed:
+      "Die Bezahlseite konnte nicht geöffnet werden. Versuche es noch einmal.",
+    price: "Preis",
+    renews: "Verlängert sich am",
+    ends: "Endet am",
+    endingNotice:
+      "Premium bleibt bis {date}. Danach bist du im Gratis-Tarif, und alle deine Objekte bleiben sichtbar und bearbeitbar.",
+    confirmationTitle: "Bezahlung",
+    confirmingTitle: "Zahlung wird bestätigt",
+    confirmingDescription:
+      "Das dauert meist nur ein paar Sekunden. Premium beginnt, sobald die Zahlung bestätigt ist.",
+    slowDescription:
+      "Das dauert länger als üblich. Premium beginnt von selbst, sobald die Zahlung bestätigt ist; du kannst inzwischen weitermachen.",
+    welcomeTitle: "Willkommen bei Premium",
+    welcomeDescription:
+      "Deine Sammlung hat jetzt keine Begrenzung bei Objekten mehr.",
+    toCollection: "Zur Sammlung",
+    seePlan: "Tarif ansehen",
+    backToPlans: "Zurück zu den Tarifen",
+    manage: "Abo verwalten",
+    manageHint:
+      "Bei Polar kannst du zwischen monatlich und jährlich wechseln, deine Karte aktualisieren oder kündigen. Nach einer Kündigung bleibt Premium bis zum Ende des bezahlten Zeitraums.",
+    portalUnavailable:
+      "Das Abo kann hier nicht verwaltet werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
+    portalUnavailableShort: "Abrechnung hier nicht eingerichtet",
+    portalFailed:
+      "Die Abo-Seite konnte nicht geöffnet werden. Versuche es noch einmal.",
+    noSubscription: "Es gibt kein Premium-Abo zu verwalten.",
+    renewsOn: "Verlängert sich am {date}",
+    endsOn: "Endet am {date}",
+  },
+  catalogSearch: {
+    open: "Suchen",
+    title: "Im Katalog suchen",
+    placeholder: "Nach Titel, Nennwert, Serie oder Land suchen…",
+    minLength: "Gib mindestens 2 Zeichen ein, um zu suchen.",
+    noResults: "Nichts im Katalog passt zu „{text}“.",
+    capped:
+      "Die ersten {count} werden angezeigt. Füge ein Wort hinzu, um die Suche einzugrenzen.",
+    themes: "Themen",
+    moveHint: "zum Bewegen",
+    openHint: "zum Öffnen",
+    closeHint: "zum Schließen",
+  },
+  deleteAccount: {
+    title: "Konto löschen?",
+    description:
+      "Dein Profil, deine Kontaktdaten und deine Anmeldemethoden werden endgültig gelöscht, zusammen mit allem in deiner Sammlung. Das lässt sich nicht rückgängig machen.",
+    endsSubscription:
+      "Dein Premium-Abo endet sofort und wird nicht mehr abgerechnet.",
+    items: "Objekte",
+    photos: "Fotos",
+    albums: "Alben",
+    atLeast: "{value}+",
+    confirm: "Konto löschen",
+    cancel: "Abbrechen",
+    failed:
+      "Dein Konto konnte nicht gelöscht werden, und es wurde nichts entfernt. Versuch es noch einmal.",
   },
   collectionTotals: {
     title: "Summen der Sammlung",

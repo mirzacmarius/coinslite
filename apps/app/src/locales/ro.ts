@@ -299,8 +299,6 @@ export default {
       title: "Preferințe",
       language: "Limbă",
       homeCurrency: "Moneda de bază",
-      homeCurrencyNote:
-        "În curând o vei putea schimba, iar toate sumele vor fi convertite.",
       languageNotSaved:
         "Limba nu a putut fi salvată în cont, așa că s-a schimbat doar pe acest dispozitiv.",
     },
@@ -322,7 +320,6 @@ export default {
       title: "Deconectare sau ștergere",
       signOut: "Deconectează-te",
       delete: "Șterge contul",
-      deleteConfirm: "Apasă din nou ca să ștergi tot",
       deleteWarning:
         "Ștergerea contului îl elimină împreună cu tot conținutul. Acțiunea nu poate fi anulată.",
     },
@@ -512,6 +509,35 @@ export default {
     emptyDescription:
       "Prețurile aurului și argintului apar aici după ce sunt preluate. Se actualizează la fiecare 15 minute.",
   },
+  homeCurrency: {
+    hint: "Dacă o schimbi, toate prețurile de achiziție și valorile de piață din colecție sunt convertite.",
+    confirmTitle: "Schimbi moneda de bază în {currency}?",
+    confirm: "Schimbă în {currency}",
+    cancel: "Anulează",
+    checking: "Se numără sumele de convertit…",
+    willConvert:
+      "Toate prețurile de achiziție și valorile de piață din colecția ta vor fi convertite din {from} în {to} la acest curs de schimb.",
+    nothingToConvert:
+      "Niciunul dintre obiectele tale nu are preț de achiziție sau valoare de piață, deci nu e nimic de convertit.",
+    noRate:
+      "Încă nu avem un curs de schimb cu care să convertim sumele. Încearcă din nou peste câteva minute.",
+    tooLarge:
+      "Colecția ta are peste {limit} obiecte, prea multe pentru a fi convertite într-o singură schimbare. Trimite-ne feedback și te ajutăm.",
+    amounts: "Sume de convertit",
+    rate: "Curs de schimb",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Curs la",
+    stale:
+      "Acest curs nu a mai fost actualizat de peste o oră și poate fi depășit.",
+    changed: "Moneda ta de bază este acum {currency}.",
+    rateChanged:
+      "Cursul de schimb tocmai a fost actualizat. Verifică noul curs și confirmă din nou.",
+    amountTooLarge:
+      "Una dintre sume ar fi prea mare în noua monedă, așa că nu s-a schimbat nimic.",
+    sameCurrency: "Aceasta este deja moneda ta de bază.",
+    failed:
+      "Moneda de bază nu a putut fi schimbată și nu s-a convertit nimic. Încearcă din nou.",
+  },
   preciousMetal: {
     title: "Metal prețios",
     metal: "Metal",
@@ -657,6 +683,135 @@ export default {
       ENTRY_HAS_CHILDREN:
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
     },
+  },
+  collection: {
+    search: "Caută în colecție",
+    searchPlaceholder: "Caută titlu, valoare nominală, țară",
+    clearSearch: "Șterge căutarea",
+    filter: "Filtrează",
+    filterBy: "Filtrează după…",
+    back: "Înapoi",
+    nothingToFilter: "Niciunul dintre obiectele tale nu are încă așa ceva.",
+    filters: {
+      type: "Tip de obiect",
+      origin: "Proveniență",
+      country: "Țară",
+      denomination: "Valoare nominală",
+      grade: "Stare",
+      album: "Album",
+    },
+    bullionCoins: "Monede de investiție",
+    origins: {
+      own: "Autohtone ({country})",
+      foreign: "Străine",
+    },
+    withoutAlbum: "Fără album",
+    unknownAlbum: "Album necunoscut",
+    activeFilters: "Filtre active",
+    removeFilter: "Elimină filtrul: {name}",
+    clear: "Șterge",
+    clearFilters: "Șterge filtrele",
+    noMatchesTitle: "Niciun obiect nu se potrivește acestor filtre",
+    display: "Afișare",
+    layout: "Vizualizare",
+    layouts: {
+      list: "Listă",
+      grid: "Grilă",
+    },
+    sort: "Sortare",
+    sorts: {
+      year: "An, cele mai vechi întâi",
+      newest: "Adăugate recent",
+      oldest: "Adăugate primele",
+      price: "Cel mai mare preț de achiziție",
+      denomination: "Valoare nominală",
+      grade: "Stare, cea mai bună întâi",
+    },
+    pageSize: "Obiecte pe pagină",
+    pagination: "Pagini",
+    range: "{from}–{to} din {total}",
+    pageOf: "Pagina {page} din {pages}",
+    previousPage: "Pagina anterioară",
+    nextPage: "Pagina următoare",
+    incomplete:
+      "Colecția ta e prea mare pentru a fi căutată dintr-odată, așa că această vizualizare cuprinde primele {count} obiecte pe care le-ai adăugat.",
+    showInCollection: "Arată în colecție",
+  },
+  billing: {
+    currentPlan: "Planul tău",
+    freeDescription: "Până la {limit} obiecte, indiferent de cantitate.",
+    premium: "Premium",
+    premiumDescription:
+      "Obiecte nelimitate, raportul de asigurare și export CSV și PDF.",
+    billingPeriod: "Perioada de facturare",
+    monthly: "Lunar",
+    yearly: "Anual",
+    perMonth: "{price} / lună",
+    perYear: "{price} / an",
+    save: "Economisești {percent}%",
+    currencyHint:
+      "Prețuri în {currency}. La plată se încasează în moneda țării în care locuiești, altfel în euro, iar prețul final apare acolo.",
+    testMode:
+      "Mod de test: nu se fac plăți reale. Plătește cu cardul de test 4242 4242 4242 4242.",
+    unavailable:
+      "Premium nu poate fi cumpărat aici încă: facturarea nu este configurată în acest mediu.",
+    alreadyPremium: "Ai deja Premium.",
+    checkoutFailed: "Pagina de plată nu s-a putut deschide. Încearcă din nou.",
+    price: "Preț",
+    renews: "Se reînnoiește",
+    ends: "Se încheie",
+    endingNotice:
+      "Premium rămâne activ până la {date}. După aceea treci la planul gratuit, iar toate obiectele tale rămân vizibile și editabile.",
+    confirmationTitle: "Plată",
+    confirmingTitle: "Se confirmă plata",
+    confirmingDescription:
+      "De obicei durează câteva secunde. Premium pornește imediat ce plata este confirmată.",
+    slowDescription:
+      "Durează mai mult decât de obicei. Premium pornește singur după confirmarea plății, așa că poți continua între timp.",
+    welcomeTitle: "Bun venit în Premium",
+    welcomeDescription: "Colecția ta nu mai are limită de obiecte.",
+    toCollection: "Mergi la colecție",
+    seePlan: "Vezi planul",
+    backToPlans: "Înapoi la planuri",
+    manage: "Gestionează abonamentul",
+    manageHint:
+      "Pe Polar poți trece de la lunar la anual, îți poți actualiza cardul sau poți anula. Dacă anulezi, Premium rămâne activ până la sfârșitul perioadei plătite.",
+    portalUnavailable:
+      "Abonamentul nu poate fi gestionat aici: facturarea nu este configurată în acest mediu.",
+    portalUnavailableShort: "Facturarea nu e configurată aici",
+    portalFailed:
+      "Pagina abonamentului nu s-a putut deschide. Încearcă din nou.",
+    noSubscription: "Nu ai niciun abonament Premium de gestionat.",
+    renewsOn: "Se reînnoiește pe {date}",
+    endsOn: "Se încheie pe {date}",
+  },
+  catalogSearch: {
+    open: "Caută",
+    title: "Caută în catalog",
+    placeholder: "Caută după titlu, valoare nominală, serie sau țară…",
+    minLength: "Scrie cel puțin 2 caractere pentru a căuta.",
+    noResults: "Nimic din catalog nu se potrivește cu „{text}”.",
+    capped:
+      "Se afișează primele {count}. Adaugă un cuvânt pentru a restrânge căutarea.",
+    themes: "Teme",
+    moveHint: "pentru a te deplasa",
+    openHint: "pentru a deschide",
+    closeHint: "pentru a închide",
+  },
+  deleteAccount: {
+    title: "Ștergi contul?",
+    description:
+      "Profilul, datele de contact și metodele de conectare se șterg definitiv, împreună cu tot ce este în colecția ta. Acțiunea nu poate fi anulată.",
+    endsSubscription:
+      "Abonamentul Premium se încheie acum și nu va mai fi facturat.",
+    items: "Obiecte",
+    photos: "Fotografii",
+    albums: "Albume",
+    atLeast: "{value}+",
+    confirm: "Șterge contul",
+    cancel: "Anulează",
+    failed:
+      "Contul nu a putut fi șters și nu s-a eliminat nimic. Încearcă din nou.",
   },
   collectionTotals: {
     title: "Totalurile colecției",

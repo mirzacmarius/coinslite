@@ -12,7 +12,8 @@ const AddItemContext = createContext<() => void>(() => {});
 /** Opens the "New Item" dialog from anywhere in the app. */
 export const useAddItem = () => useContext(AddItemContext);
 
-const isTyping = (target: EventTarget | null) =>
+/** Whether a key press lands in a text field, so single-key shortcuts leave it alone. */
+export const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable ||
     ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));

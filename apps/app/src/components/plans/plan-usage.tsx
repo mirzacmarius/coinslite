@@ -1,5 +1,6 @@
 "use client";
 
+import { useHydrated } from "@/lib/use-hydrated";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { freePlan, planErrors } from "@coinslite/backend/convex/plans/rules";
@@ -11,7 +12,7 @@ import { ConvexError } from "convex/values";
 import Link from "next/link";
 import type * as React from "react";
 
-/** Where to upgrade: the Plans page (a placeholder until billing exists). */
+/** Where to upgrade: the Plans page, with Premium's prices and checkout. */
 export const upgradeHref = "/settings/billing";
 
 /** True when adding or duplicating was turned away by the Free plan's limit. */
@@ -28,7 +29,9 @@ export function useItemLimitMessage() {
 /** The Free plan's usage; undefined while loading, on Premium, or signed out. */
 function useFreePlanUsage() {
   const usage = useQuery(api.plans.usage);
-  return usage?.plan === "free" ? usage : undefined;
+  // The sidebar subscribes too, so the Overview could otherwise hydrate with data its server HTML lacked.
+  const hydrated = useHydrated();
+  return hydrated && usage?.plan === "free" ? usage : undefined;
 }
 
 type Usage = NonNullable<ReturnType<typeof useFreePlanUsage>>;

@@ -296,7 +296,6 @@ export default {
       title: "Innstillinger",
       language: "Språk",
       homeCurrency: "Hjemmevaluta",
-      homeCurrencyNote: "Snart kan du endre den, og alle beløp regnes om.",
       languageNotSaved:
         "Kunne ikke lagre språket på kontoen din, så det er bare endret på denne enheten.",
     },
@@ -318,7 +317,6 @@ export default {
       title: "Logg ut eller slett",
       signOut: "Logg ut",
       delete: "Slett kontoen",
-      deleteConfirm: "Klikk igjen for å slette alt",
       deleteWarning:
         "Når du sletter kontoen, fjernes den og alt i den. Dette kan ikke angres.",
     },
@@ -506,6 +504,35 @@ export default {
     emptyDescription:
       "Gull- og sølvprisene vises her når de er hentet. De oppdateres hvert 15. minutt.",
   },
+  homeCurrency: {
+    hint: "Når du endrer den, regnes alle innkjøpspriser og markedsverdier i samlingen om.",
+    confirmTitle: "Endre hjemmevaluta til {currency}?",
+    confirm: "Endre til {currency}",
+    cancel: "Avbryt",
+    checking: "Teller beløpene som skal regnes om…",
+    willConvert:
+      "Alle innkjøpspriser og markedsverdier i samlingen regnes om fra {from} til {to} med denne vekslingskursen.",
+    nothingToConvert:
+      "Ingen av objektene dine har innkjøpspris eller markedsverdi, så det er ingenting å regne om.",
+    noRate:
+      "Vi har ingen vekslingskurs å regne om beløpene med ennå. Prøv igjen om noen minutter.",
+    tooLarge:
+      "Samlingen din har mer enn {limit} objekter, for mange til å regne om i én endring. Send oss en tilbakemelding, så hjelper vi deg.",
+    amounts: "Beløp som regnes om",
+    rate: "Vekslingskurs",
+    rateValue: "1 {from} = {rate} {to}",
+    rateFrom: "Kurs per",
+    stale:
+      "Denne kursen er ikke oppdatert på over en time og kan være utdatert.",
+    changed: "Hjemmevalutaen din er nå {currency}.",
+    rateChanged:
+      "Vekslingskursen ble nettopp oppdatert. Se over den nye kursen og bekreft på nytt.",
+    amountTooLarge:
+      "Et av beløpene ville blitt for stort i den nye valutaen, så ingenting ble endret.",
+    sameCurrency: "Det er allerede hjemmevalutaen din.",
+    failed:
+      "Kunne ikke endre hjemmevalutaen, og ingenting ble regnet om. Prøv igjen.",
+  },
   preciousMetal: {
     title: "Edelmetall",
     metal: "Metall",
@@ -650,6 +677,133 @@ export default {
       ENTRY_HAS_CHILDREN:
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
     },
+  },
+  collection: {
+    search: "Søk i samlingen",
+    searchPlaceholder: "Søk etter tittel, pålydende, land",
+    clearSearch: "Tøm søket",
+    filter: "Filter",
+    filterBy: "Filtrer etter…",
+    back: "Tilbake",
+    nothingToFilter: "Ingen av objektene dine har dette ennå.",
+    filters: {
+      type: "Objekttype",
+      origin: "Opprinnelse",
+      country: "Land",
+      denomination: "Pålydende",
+      grade: "Kvalitet",
+      album: "Album",
+    },
+    bullionCoins: "Investeringsmynter",
+    origins: {
+      own: "Innenlandske ({country})",
+      foreign: "Utenlandske",
+    },
+    withoutAlbum: "Uten album",
+    unknownAlbum: "Ukjent album",
+    activeFilters: "Aktive filtre",
+    removeFilter: "Fjern filteret: {name}",
+    clear: "Tøm",
+    clearFilters: "Fjern filtrene",
+    noMatchesTitle: "Ingen objekter passer til disse filtrene",
+    display: "Visning",
+    layout: "Vis som",
+    layouts: {
+      list: "Liste",
+      grid: "Rutenett",
+    },
+    sort: "Sorter",
+    sorts: {
+      year: "År, eldste først",
+      newest: "Sist lagt til",
+      oldest: "Først lagt til",
+      price: "Høyeste innkjøpspris",
+      denomination: "Pålydende",
+      grade: "Kvalitet, beste først",
+    },
+    pageSize: "Objekter per side",
+    pagination: "Sider",
+    range: "{from}–{to} av {total}",
+    pageOf: "Side {page} av {pages}",
+    previousPage: "Forrige side",
+    nextPage: "Neste side",
+    incomplete:
+      "Samlingen er for stor til å søke i på én gang, så denne visningen gjelder de første {count} objektene du la til.",
+    showInCollection: "Vis i samlingen",
+  },
+  billing: {
+    currentPlan: "Din plan",
+    freeDescription: "Opptil {limit} objekter, uansett antall.",
+    premium: "Premium",
+    premiumDescription:
+      "Ubegrenset antall objekter, forsikringsrapporten og eksport til CSV og PDF.",
+    billingPeriod: "Faktureringsperiode",
+    monthly: "Månedlig",
+    yearly: "Årlig",
+    perMonth: "{price} / måned",
+    perYear: "{price} / år",
+    save: "Spar {percent} %",
+    currencyHint:
+      "Prisene er i {currency}. I kassen betaler du i valutaen der du bor, ellers i euro, og ser den endelige prisen.",
+    testMode:
+      "Testmodus: ingen ekte betalinger. Betal med testkortet 4242 4242 4242 4242.",
+    unavailable:
+      "Premium kan ikke kjøpes her ennå: betaling er ikke satt opp i dette miljøet.",
+    alreadyPremium: "Du har allerede Premium.",
+    checkoutFailed: "Kunne ikke åpne kassen. Prøv igjen.",
+    price: "Pris",
+    renews: "Fornyes",
+    ends: "Slutter",
+    endingNotice:
+      "Premium varer til {date}. Etter det er du på gratisplanen, og alle objektene dine kan fortsatt ses og redigeres.",
+    confirmationTitle: "Kasse",
+    confirmingTitle: "Bekrefter betalingen",
+    confirmingDescription:
+      "Dette tar vanligvis noen sekunder. Premium starter så snart betalingen er bekreftet.",
+    slowDescription:
+      "Dette tar lengre tid enn vanlig. Premium starter av seg selv når betalingen er bekreftet, så du kan fortsette i mellomtiden.",
+    welcomeTitle: "Velkommen til Premium",
+    welcomeDescription:
+      "Samlingen din har ikke lenger noen grense for antall objekter.",
+    toCollection: "Gå til samlingen",
+    seePlan: "Se planen din",
+    backToPlans: "Tilbake til abonnement",
+    manage: "Administrer abonnementet",
+    manageHint:
+      "Hos Polar kan du bytte mellom månedlig og årlig, oppdatere kortet eller si opp. Sier du opp, varer Premium ut perioden du har betalt for.",
+    portalUnavailable:
+      "Abonnementet kan ikke administreres her: betaling er ikke satt opp i dette miljøet.",
+    portalUnavailableShort: "Betaling er ikke satt opp her",
+    portalFailed: "Kunne ikke åpne abonnementssiden. Prøv igjen.",
+    noSubscription: "Du har ikke noe Premium-abonnement å administrere.",
+    renewsOn: "Fornyes {date}",
+    endsOn: "Slutter {date}",
+  },
+  catalogSearch: {
+    open: "Søk",
+    title: "Søk i katalogen",
+    placeholder: "Søk etter tittel, pålydende, serie eller land…",
+    minLength: "Skriv minst 2 tegn for å søke.",
+    noResults: "Ingenting i katalogen passer til «{text}».",
+    capped: "Viser de første {count}. Legg til et ord for å snevre inn søket.",
+    themes: "Temaer",
+    moveHint: "for å flytte",
+    openHint: "for å åpne",
+    closeHint: "for å lukke",
+  },
+  deleteAccount: {
+    title: "Slette kontoen?",
+    description:
+      "Profilen, kontaktopplysningene og innloggingsmåtene dine slettes for godt, sammen med alt i samlingen din. Dette kan ikke angres.",
+    endsSubscription:
+      "Premium-abonnementet ditt avsluttes nå og blir ikke belastet igjen.",
+    items: "Objekter",
+    photos: "Bilder",
+    albums: "Album",
+    atLeast: "{value}+",
+    confirm: "Slett kontoen",
+    cancel: "Avbryt",
+    failed: "Kontoen kunne ikke slettes, og ingenting ble fjernet. Prøv igjen.",
   },
   collectionTotals: {
     title: "Totaler for samlingen",
