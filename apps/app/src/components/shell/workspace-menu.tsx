@@ -34,6 +34,7 @@ import {
   Sparkles,
   SunMoon,
   UserRound,
+  UsersRound,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -110,6 +111,14 @@ export function WorkspaceMenu({
             <Link href="/admin/stats">
               <ChartColumn strokeWidth={1.75} />
               {t("adminStats.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/users">
+              <UsersRound strokeWidth={1.75} />
+              {t("adminUsers.menu")}
             </Link>
           </DropdownMenuItem>
         )}
