@@ -975,4 +975,32 @@ export default {
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",
   },
+  catalogPicker: {
+    title: "Velg fra katalogen",
+    placeholder: {
+      coin: "Søk blant mynter etter tittel, pålydende, serie eller land…",
+      banknote: "Søk blant sedler etter tittel, pålydende, serie eller land…",
+    },
+    pickHint: "for å velge",
+    manual: "Legg til manuelt",
+    recent: "Nylig valgt",
+    browse: "Bla i katalogen",
+    back: "Tilbake",
+    empty: "Katalogen har ingenting å velge ennå.",
+    failed:
+      "Katalogoppføringen kunne ikke lastes. Velg den på nytt, eller legg til objektet manuelt.",
+    entry: "Katalogoppføring",
+    pick: "Velg fra katalogen",
+    factsHint:
+      "Disse opplysningene kommer fra katalogoppføringen og følger rettelsene i den. Endrer du en, beholdes din verdi; tømmer du feltet, brukes oppføringens verdi igjen.",
+  },
+  quickAdd: {
+    add: "Legg til i samlingen",
+    title: "Legg til i samlingen",
+    description:
+      "Legg til denne katalogoppføringen i samlingen som ett objekt.",
+    added: "Objektet er lagt til i samlingen",
+    open: "Åpne",
+    failed: "Objektet kunne ikke legges til. Prøv igjen.",
+  },
 } as const satisfies Dictionary;

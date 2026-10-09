@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { type QueryCtx, query } from "./_generated/server";
+import { itemResolver } from "./items/resolve";
 import { withThumbnail } from "./items/thumbnail";
 import { requireSetUpUser } from "./utils/auth";
 import { itemType } from "./utils/validators";
@@ -29,7 +30,8 @@ const latestItem = v.object({
  * show the entry's facts where it has no overrides (ADR 0001) by resolving
  * them here.
  */
-async function latestItemOf(ctx: QueryCtx, item: Doc<"items">) {
+async function latestItemOf(ctx: QueryCtx, stored: Doc<"items">) {
+  const item = await itemResolver(ctx).resolve(stored);
   const { thumbnailUrl } = await withThumbnail(ctx, item);
   return {
     _id: item._id,

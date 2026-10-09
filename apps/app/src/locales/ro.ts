@@ -984,4 +984,32 @@ export default {
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
   },
+  catalogPicker: {
+    title: "Alege din catalog",
+    placeholder: {
+      coin: "Caută monede după titlu, valoare nominală, serie sau țară…",
+      banknote: "Caută bancnote după titlu, valoare nominală, serie sau țară…",
+    },
+    pickHint: "pentru a alege",
+    manual: "Adaugă manual",
+    recent: "Alese recent",
+    browse: "Răsfoiește catalogul",
+    back: "Înapoi",
+    empty: "Catalogul nu are încă nimic de ales.",
+    failed:
+      "Intrarea de catalog nu a putut fi încărcată. Alege-o din nou sau adaugă obiectul manual.",
+    entry: "Intrare de catalog",
+    pick: "Alege din catalog",
+    factsHint:
+      "Aceste date vin din intrarea de catalog și preiau corecturile ei. Dacă schimbi una, se păstrează valoarea ta; dacă golești câmpul, se folosește din nou valoarea intrării.",
+  },
+  quickAdd: {
+    add: "Adaugă în colecție",
+    title: "Adaugă în colecție",
+    description:
+      "Adaugă această intrare de catalog în colecție ca un singur obiect.",
+    added: "Obiect adăugat în colecție",
+    open: "Deschide",
+    failed: "Obiectul nu a putut fi adăugat. Încearcă din nou.",
+  },
 } as const satisfies Dictionary;

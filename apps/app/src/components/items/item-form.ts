@@ -1,6 +1,11 @@
 import type { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import {
+  type CatalogFactName,
+  type CatalogFacts,
+  catalogFactNames,
+} from "@coinslite/backend/convex/items/catalogFacts";
+import {
   type GradingScale,
   type Strike,
   defaultScale,
@@ -122,8 +127,27 @@ export const detailFields = [
   "source",
 ] as const satisfies ReadonlyArray<keyof ItemFormValues>;
 
-export const hasDetails = (values: ItemFormValues) =>
-  detailFields.some((name) => Boolean(values[name]));
+/** Whether a fact as typed says the same as the Catalog entry's. */
+const sameFact = (typed: unknown, fromEntry: unknown) => {
+  const text = (value: unknown) =>
+    typeof value === "string" ? value.trim() : value ?? "";
+  return text(typed) === text(fromEntry);
+};
+
+/** Whether "More details" holds anything; with a Catalog entry, anything besides the entry's own facts. */
+export const hasDetails = (
+  values: ItemFormValues,
+  fromEntry?: Partial<ItemFormValues>,
+) =>
+  detailFields.some(
+    (name) =>
+      Boolean(values[name]) &&
+      !(
+        fromEntry &&
+        name in fromEntry &&
+        sameFact(values[name], fromEntry[name])
+      ),
+  );
 
 /** The scale an Item's Grade is on: the one picked, if it suits the type, or the country's default. */
 export function scaleOf({
@@ -148,20 +172,54 @@ export function parseDecimal(text: string) {
   return /^\d+(\.\d+)?$/.test(value) ? Number(value) : null;
 }
 
+/** How the form writes numbers in the person's language. */
+function numberText(locale: Locale) {
+  return {
+    whole: (value?: number) =>
+      value === undefined ? "" : formatNumber(value, locale),
+    decimal: (value?: number, maximumFractionDigits = 2) =>
+      value === undefined
+        ? ""
+        : formatNumber(value, locale, {
+            useGrouping: false,
+            maximumFractionDigits,
+          }),
+  };
+}
+
+/** The form fields a Catalog entry can fill (items/catalogFacts.ts). */
+type FactValues = Pick<ItemFormValues, CatalogFactName>;
+
+/**
+ * Descriptive facts as form values: an Item's own, or a Catalog entry's.
+ * Both are written the same way, so the form can tell which ones the person
+ * changed.
+ */
+export function factValues(facts: CatalogFacts, locale: Locale): FactValues {
+  const { decimal } = numberText(locale);
+  return {
+    country:
+      facts.country && isCountryCode(facts.country) ? facts.country : undefined,
+    year: facts.year === undefined ? "" : String(facts.year),
+    denomination: facts.denomination ?? "",
+    series: facts.series ?? "",
+    material: facts.material,
+    strike: facts.strike,
+    diameter: decimal(facts.diameter),
+    numistaNumber:
+      facts.numistaNumber === undefined ? "" : String(facts.numistaNumber),
+    metal: facts.metal,
+    weight: decimal(facts.weight, 3),
+    purity: decimal(facts.purity, 5),
+  };
+}
+
 /** An existing Item as form values, written the way the person's language writes numbers. */
 export function valuesFromItem(
   item: Doc<"items">,
   locale: Locale,
 ): ItemFormValues {
-  const whole = (value?: number) =>
-    value === undefined ? "" : formatNumber(value, locale);
-  const decimal = (value?: number, maximumFractionDigits = 2) =>
-    value === undefined
-      ? ""
-      : formatNumber(value, locale, {
-          useGrouping: false,
-          maximumFractionDigits,
-        });
+  const { whole, decimal } = numberText(locale);
   const money = (minor?: number) =>
     minor === undefined
       ? ""
@@ -170,39 +228,44 @@ export function valuesFromItem(
           minimumFractionDigits: 2,
         });
   return {
+    ...factValues(item, locale),
     title: item.title,
     notes: item.notes ?? "",
     type: item.type,
-    country:
-      item.country && isCountryCode(item.country) ? item.country : undefined,
     grade: item.grade,
     gradingScale: item.gradingScale,
     gradeNote: item.gradeNote ?? "",
-    strike: item.strike,
     quantity: String(item.quantity),
-    year: item.year === undefined ? "" : String(item.year),
-    denomination: item.denomination ?? "",
-    series: item.series ?? "",
     category: item.category ?? "",
     ruler: item.ruler ?? "",
     mintMark: item.mintMark ?? "",
     mintage: whole(item.mintage),
-    numistaNumber:
-      item.numistaNumber === undefined ? "" : String(item.numistaNumber),
-    material: item.material,
     materialNote: item.materialNote ?? "",
-    diameter: decimal(item.diameter),
     thickness: decimal(item.thickness),
     bullion: item.bullion ?? false,
-    metal: item.metal,
-    weight: decimal(item.weight, 3),
-    purity: decimal(item.purity, 5),
     purchasePrice: money(item.purchasePrice),
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
     source: item.source ?? "",
     albumId: item.albumId,
   };
+}
+
+/**
+ * What a form linked to a Catalog entry sends: only the facts the person
+ * changed. A fact left as the entry has it, or cleared, isn't sent, so the
+ * Item keeps following the entry (ADR 0001).
+ */
+export function changedFactsOnly(
+  args: ItemArgs,
+  values: ItemFormValues,
+  fromEntry: FactValues,
+): ItemArgs {
+  const changed = { ...args };
+  for (const name of catalogFactNames) {
+    if (sameFact(values[name], fromEntry[name])) changed[name] = undefined;
+  }
+  return changed;
 }
 
 /**

@@ -991,4 +991,33 @@ export default {
     failed: "Impossible d’exporter la collection. Réessayez.",
     fileName: "coinslite-collection-{date}.csv",
   },
+  catalogPicker: {
+    title: "Choisir dans le catalogue",
+    placeholder: {
+      coin: "Rechercher des pièces par titre, valeur faciale, série ou pays…",
+      banknote:
+        "Rechercher des billets par titre, valeur faciale, série ou pays…",
+    },
+    pickHint: "pour choisir",
+    manual: "Ajouter manuellement",
+    recent: "Choisis récemment",
+    browse: "Parcourir le catalogue",
+    back: "Retour",
+    empty: "Le catalogue n'a encore rien à proposer.",
+    failed:
+      "Cette entrée du catalogue n'a pas pu être chargée. Choisissez-la de nouveau ou ajoutez l'objet manuellement.",
+    entry: "Entrée du catalogue",
+    pick: "Choisir dans le catalogue",
+    factsHint:
+      "Ces informations viennent de l'entrée du catalogue et suivent ses corrections. Modifiez-en une pour garder votre valeur ; videz le champ pour reprendre celle de l'entrée.",
+  },
+  quickAdd: {
+    add: "Ajouter à la collection",
+    title: "Ajouter à la collection",
+    description:
+      "Ajoutez cette entrée du catalogue à votre collection sous la forme d'un objet.",
+    added: "Objet ajouté à votre collection",
+    open: "Ouvrir",
+    failed: "L'objet n'a pas pu être ajouté. Réessayez.",
+  },
 } as const satisfies Dictionary;

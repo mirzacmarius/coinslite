@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
+import { addManually, catalogPicker } from "../support/items";
 import { hasLocalBackend } from "../urls";
 
 test.skip(
@@ -16,12 +17,19 @@ test("after adding an Item, the Overview shows it among the latest and in the to
   const main = visiblePage(page);
   await expect(main.getByText("Start your Collection")).toBeVisible();
 
-  // A click before the page has hydrated does nothing; try until the dialog opens.
+  // A click before the page has hydrated does nothing; try until the
+  // dialog opens, on the Catalog picker as for every banknote.
   const dialog = page.getByRole("dialog", { name: "New Item" });
   await expect(async () => {
     await main.getByRole("button", { name: "Add banknote" }).click();
-    await expect(dialog).toBeVisible({ timeout: 1000 });
+    await expect(catalogPicker(page)).toBeVisible({ timeout: 1000 });
   }).toPass();
+  await expect(
+    catalogPicker(page).getByPlaceholder(
+      "Search banknotes by title, denomination, series or country…",
+    ),
+  ).toBeVisible();
+  await addManually(page);
   await expect(
     dialog.getByRole("button", { name: "Item type: Banknote" }),
   ).toBeVisible();

@@ -15,6 +15,7 @@ import type { FunctionReturnType } from "convex/server";
 import { Banknote, Coins } from "lucide-react";
 import type * as React from "react";
 import { CatalogHeader, type Crumb } from "./catalog-header";
+import { QuickAdd } from "./quick-add";
 import { useCatalogFormat } from "./use-catalog-format";
 
 type CatalogEntry = Extract<
@@ -87,7 +88,16 @@ export function CatalogEntryDetail({
 
   return (
     <>
-      <CatalogHeader crumbs={crumbs} title={entry.title} actions={actions} />
+      <CatalogHeader
+        crumbs={crumbs}
+        title={entry.title}
+        actions={
+          <>
+            <QuickAdd entry={entry} />
+            {actions}
+          </>
+        }
+      />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
           <EntryImage entry={entry} />

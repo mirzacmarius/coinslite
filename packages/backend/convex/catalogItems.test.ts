@@ -667,3 +667,15 @@ test("while the Catalog is hidden, only admins add from it; linked Items keep th
     catalogEntryKey: "us-morgan-1881-cc",
   });
 });
+
+test("the Overview's latest Items show a linked Item's year and denomination from its entry", async () => {
+  const t = newTest();
+  const { ada } = await withCatalog(t);
+  await ada.as.mutation(api.items.quickAdd, {
+    catalogEntryKey: "us-morgan-1881-cc",
+  });
+
+  expect(await ada.as.query(api.overview.latestItems, {})).toMatchObject([
+    { title: "Morgan dollar 1881-CC", year: 1881, denomination: "1 dollar" },
+  ]);
+});

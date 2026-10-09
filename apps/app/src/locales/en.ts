@@ -964,4 +964,31 @@ export default {
     failed: "Couldn't export the Collection. Try again.",
     fileName: "coinslite-collection-{date}.csv",
   },
+  catalogPicker: {
+    title: "Pick from the Catalog",
+    placeholder: {
+      coin: "Search coins by title, denomination, series or country…",
+      banknote: "Search banknotes by title, denomination, series or country…",
+    },
+    pickHint: "to pick",
+    manual: "Add manually",
+    recent: "Recently picked",
+    browse: "Browse the Catalog",
+    back: "Back",
+    empty: "The Catalog has nothing to pick yet.",
+    failed:
+      "That Catalog entry couldn't be loaded. Pick it again, or add the Item manually.",
+    entry: "Catalog entry",
+    pick: "Pick from the Catalog",
+    factsHint:
+      "These facts come from the Catalog entry and follow its corrections. Change one to keep your own; clear it to use the entry's again.",
+  },
+  quickAdd: {
+    add: "Add to Collection",
+    title: "Add to Collection",
+    description: "Add this Catalog entry to your Collection as one Item.",
+    added: "Item added to your Collection",
+    open: "Open",
+    failed: "The Item couldn't be added. Try again.",
+  },
 } as const;
