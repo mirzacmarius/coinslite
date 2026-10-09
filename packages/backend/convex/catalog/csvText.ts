@@ -1,6 +1,7 @@
 /**
  * Comma-separated values as RFC 4180 has them: a field may be quoted, with ""
- * for a quote inside, and may then hold commas and line breaks. Pure.
+ * for a quote inside, and may then hold commas and line breaks. Pure. Both the
+ * Catalog CSV and the Collection CSV are read and written with it.
  */
 
 export type ParsedCsv =
@@ -66,4 +67,12 @@ export function formatCsvRecord(cells: readonly string[]) {
       /[",\r\n]/.test(cell) ? `"${cell.replaceAll('"', '""')}"` : cell,
     )
     .join(",")}\r\n`;
+}
+
+/** The text spreadsheets take as a sign the file is UTF-8. */
+export const byteOrderMark = "\uFEFF";
+
+/** A whole file: the byte order mark, then one CRLF-terminated line per record. */
+export function formatCsvFile(records: readonly (readonly string[])[]) {
+  return byteOrderMark + records.map(formatCsvRecord).join("");
 }

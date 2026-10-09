@@ -25,6 +25,7 @@ import {
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
 import {
+  ChartColumn,
   ChevronDown,
   CreditCard,
   FileSpreadsheet,
@@ -102,6 +103,14 @@ export function WorkspaceMenu({
             <Link href="/admin/catalog">
               <FileSpreadsheet strokeWidth={1.75} />
               {t("catalogAdmin.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/stats">
+              <ChartColumn strokeWidth={1.75} />
+              {t("adminStats.menu")}
             </Link>
           </DropdownMenuItem>
         )}

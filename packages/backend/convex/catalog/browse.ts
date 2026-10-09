@@ -309,7 +309,7 @@ export const entries = query({
  * index, so they cost as many reads as there are groups, not entries.
  */
 const byDenomination =
-  "by_kind_and_countryNodeKey_and_denomination_and_series_and_yearFrom_and_sortOrder";
+  "by_kind_countryNodeKey_denomination_series_yearFrom_sortOrder";
 
 /** "No denomination" and "no series" travel as null; stored, they are absent. */
 const nullable = v.union(v.string(), v.null());
