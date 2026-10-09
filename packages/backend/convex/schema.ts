@@ -2,6 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
+  albumColour,
   gradingScale,
   homeCurrency,
   itemType,
@@ -86,6 +87,24 @@ export default defineSchema({
     purchaseDate: v.optional(v.string()),
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
+
+    // Album: at most one. Moving an Item in or out keeps the Album's itemCount
+    // right (albums/membership.ts).
+    albumId: v.optional(v.id("albums")),
+  })
+    .index("by_ownerId", ["ownerId"])
+    .index("by_ownerId_and_albumId", ["ownerId", "albumId"]),
+
+  /**
+   * A named group of Items within a Collection. `itemCount` is kept by every
+   * write that moves an Item in or out, so lists never count Items one by one.
+   */
+  albums: defineTable({
+    ownerId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    colour: albumColour,
+    itemCount: v.number(),
   }).index("by_ownerId", ["ownerId"]),
 
   /**

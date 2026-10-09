@@ -1,5 +1,7 @@
 "use client";
 
+import { AlbumPicker } from "@/components/albums/album-picker";
+import { useAlbums } from "@/components/albums/use-albums";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
@@ -49,7 +51,7 @@ import {
   X,
 } from "lucide-react";
 import type * as React from "react";
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useGradeLabels } from "./grade-labels";
 import { itemTypeIcons, itemTypes, localToday } from "./item-fields";
@@ -112,6 +114,8 @@ export function ItemFormDialog({
   const titleRef = useRef<HTMLInputElement>(null);
   const baseId = useId();
   const labels = useGradeLabels();
+  // Only while open: the "New Item" dialog is mounted on every page.
+  const albums = useAlbums(open);
   // One object for the dialog's life: the form resets when it sees new defaults.
   const [defaults] = useState(() =>
     item ? valuesFromItem(item, locale) : blankItem(),
@@ -195,6 +199,9 @@ export function ItemFormDialog({
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       const args = argsFromValues(value, locale);
+      // An Album deleted since the form opened can't take the Item.
+      if (albums && !albums.some((album) => album._id === args.albumId))
+        args.albumId = undefined;
       try {
         if (item) await updateItem({ itemId: item._id, ...args });
         else await addItem(args);
@@ -213,12 +220,24 @@ export function ItemFormDialog({
         // "Create more" keeps the pills for the next Item.
         form.setFieldValue("type", value.type);
         form.setFieldValue("country", value.country);
+        form.setFieldValue("albumId", value.albumId);
         titleRef.current?.focus();
       } else {
         onOpenChange(false);
       }
     },
   });
+  // With exactly one Album, a new Item goes into it unless the person picks otherwise.
+  const onlyAlbum = !item && albums?.length === 1 ? albums[0]?._id : undefined;
+  useEffect(() => {
+    if (
+      open &&
+      onlyAlbum &&
+      form.getFieldValue("albumId") === undefined &&
+      !form.getFieldMeta("albumId")?.isTouched
+    )
+      form.setFieldValue("albumId", onlyAlbum, { dontUpdateMeta: true });
+  }, [open, onlyAlbum, form]);
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
@@ -414,6 +433,15 @@ export function ItemFormDialog({
                     options={typeOptions}
                     onChange={field.handleChange}
                     noResults={t("items.noMatches")}
+                  />
+                )}
+              </form.Field>
+              <form.Field name="albumId">
+                {(field) => (
+                  <AlbumPicker
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    onCreateFailed={setFailed}
                   />
                 )}
               </form.Field>

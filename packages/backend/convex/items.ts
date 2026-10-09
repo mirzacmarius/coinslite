@@ -2,6 +2,7 @@ import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { type MutationCtx, mutation, query } from "./_generated/server";
+import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
 import { checkItem } from "./items/rules";
 import { requireSetUpUser } from "./utils/auth";
 import { gradingScale, itemType, material, strike } from "./utils/validators";
@@ -33,6 +34,7 @@ const itemFields = {
   purchaseDate: v.optional(v.string()),
   source: v.optional(v.string()),
   notes: v.optional(v.string()),
+  albumId: v.optional(v.id("albums")),
 };
 const fieldNames = Object.keys(itemFields) as Array<keyof typeof itemFields>;
 
@@ -54,12 +56,16 @@ async function requireOwnItem(ctx: MutationCtx, itemId: Id<"items">) {
 export const add = mutation({
   args: itemFields,
   returns: v.id("items"),
-  handler: async (ctx, fields) => {
+  handler: async (ctx, { albumId, ...fields }) => {
     const owner = await requireSetUpUser(ctx);
-    return await ctx.db.insert("items", {
+    const album = await ownAlbumId(ctx, owner._id, albumId);
+    const itemId = await ctx.db.insert("items", {
       ownerId: owner._id,
       ...checkItem(fields, latestPurchaseDate()),
+      ...(album && { albumId: album }),
     });
+    await moveBetweenAlbums(ctx, undefined, album);
+    return itemId;
   },
 });
 
@@ -67,15 +73,18 @@ export const add = mutation({
 export const update = mutation({
   args: { itemId: v.id("items"), ...itemFields },
   returns: v.null(),
-  handler: async (ctx, { itemId, ...fields }) => {
-    await requireOwnItem(ctx, itemId);
+  handler: async (ctx, { itemId, albumId, ...fields }) => {
+    const item = await requireOwnItem(ctx, itemId);
+    const album = await ownAlbumId(ctx, item.ownerId, albumId);
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
     await ctx.db.patch(itemId, {
       ...cleared,
       ...checkItem(fields, latestPurchaseDate()),
+      albumId: album,
     });
+    await moveBetweenAlbums(ctx, item.albumId, album);
     return null;
   },
 });
@@ -89,12 +98,20 @@ export const duplicate = mutation({
   returns: v.id("items"),
   handler: async (ctx, { itemId }) => {
     const item = await requireOwnItem(ctx, itemId);
-    const copy = Object.fromEntries(
+    const { albumId, ...copy } = Object.fromEntries(
       fieldNames.flatMap((name) =>
         item[name] === undefined ? [] : [[name, item[name]]],
       ),
-    ) as Pick<Doc<"items">, "type" | "title" | "quantity">;
-    return await ctx.db.insert("items", { ownerId: item.ownerId, ...copy });
+    ) as Pick<Doc<"items">, "type" | "title" | "quantity" | "albumId">;
+    // An Album deleted a moment ago may not have let go of the Item yet.
+    const album = albumId && (await ctx.db.get(albumId)) ? albumId : undefined;
+    const copyId = await ctx.db.insert("items", {
+      ownerId: item.ownerId,
+      ...copy,
+      ...(album && { albumId: album }),
+    });
+    await moveBetweenAlbums(ctx, undefined, album);
+    return copyId;
   },
 });
 
