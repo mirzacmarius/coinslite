@@ -30,6 +30,7 @@ import {
   CreditCard,
   FileSpreadsheet,
   Languages,
+  ListTree,
   LogOut,
   Sparkles,
   SunMoon,
@@ -99,6 +100,14 @@ export function WorkspaceMenu({
             )}
           </Link>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/catalog/editor">
+              <ListTree strokeWidth={1.75} />
+              {t("catalogEditor.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
         {isAdmin && (
           <DropdownMenuItem asChild>
             <Link href="/admin/catalog">

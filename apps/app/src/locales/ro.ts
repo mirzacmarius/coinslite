@@ -681,6 +681,10 @@ export default {
       TOO_DEEP: "Catalogul are cel mult 8 niveluri.",
       ENTRY_HAS_CHILDREN:
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
+      ENTRY_HAS_ITEMS:
+        "De această intrare de catalog sunt legate obiecte, deci rămâne intrare. Păstrează is_addable pe true.",
+      TOO_MANY_LINKED_ITEMS:
+        "Peste 1.000 de obiecte sunt legate de intrările al căror tip de obiect se schimbă. Modifică mai puține odată.",
     },
   },
   collection: {
@@ -1130,6 +1134,134 @@ export default {
       REPORT_TOO_LARGE:
         "Raportul are prea multe obiecte. Alege mai puține albume.",
       ALBUM_NOT_FOUND: "Unul dintre albumele alese nu mai există.",
+    },
+  },
+  catalogEditor: {
+    menu: "Editor de catalog",
+    title: "Editor de catalog",
+    description:
+      "Toate țările, temele, grupările și intrările de catalog. Modificările se aplică imediat catalogului pe care îl răsfoiește toată lumea și obiectelor legate de el.",
+    notAvailable: "Această pagină nu este disponibilă",
+    notAvailableDescription: "Doar administratorii pot edita catalogul.",
+    addRoot: "Adaugă o țară sau o temă",
+    importExport: "Import și export",
+    emptyTitle: "Catalogul este gol",
+    emptyDescription:
+      "Adaugă o țară sau o temă ca să începi, sau importă un fișier CSV.",
+    nothingBelow: "Încă nimic dedesubt",
+    showMore: "Arată mai multe",
+    expand: "Arată ce se află sub {title}",
+    collapse: "Ascunde ce se află sub {title}",
+    actions: "Acțiuni pentru {title}",
+    moreActions: "Mai multe acțiuni",
+    addBelow: "Adaugă dedesubt",
+    addBelowNamed: "Adaugă sub {title}",
+    edit: "Editează",
+    editEntry: "Editează",
+    openInCatalog: "Deschide în catalog",
+    delete: "Șterge",
+    kinds: {
+      country: "Țară",
+      theme: "Temă",
+      grouping: "Grupare",
+      entry: "Intrare de catalog",
+    },
+    kindHints: {
+      country: "O țară în vârful catalogului.",
+      theme:
+        "Un grup care cuprinde mai multe țări, cum ar fi monedele comemorative de 2 euro. Adaugă-i țările dedesubt.",
+      grouping:
+        "Grupează ce se află dedesubt, cum ar fi o valoare nominală sau o serie.",
+      entry: "O emisiune anume. Doar intrările de catalog pot deveni obiecte.",
+    },
+    "entryCount#zero": "Nicio intrare de catalog",
+    "entryCount#one": "1 intrare de catalog",
+    "entryCount#few": "{count} intrări de catalog",
+    "entryCount#other": "{count} de intrări de catalog",
+    newNode: "Nod nou",
+    editNode: "Editează nodul",
+    sheetDescription:
+      "Valorile nodului și de unde provin datele și notele lui.",
+    close: "Închide",
+    kind: "Fel",
+    id: "ID",
+    idHint:
+      "ID-ul lui în fișierele CSV, care nu se mai poate schimba. Litere mici, cifre, puncte, cratime și liniuțe de subliniere.",
+    idFixedHint: "ID-ul lui în fișierele CSV.",
+    sortOrder: "Ordine",
+    sortOrderHint: "Numerele mai mici vin primele printre nodurile vecine.",
+    setItemType: "Alege tipul de obiect",
+    noItemType: "Fără tip de obiect",
+    noCountry: "Fără țară",
+    yearFrom: "Primul an",
+    yearTo: "Ultimul an",
+    yearHint: "Anii î.Hr. ca numere negative.",
+    yearToHint: "Lasă gol pentru o emisiune dintr-un singur an.",
+    weightHint: "Grame",
+    finenessHint: "Partea care este metal, de ex. 0,9 pentru 900/1000.",
+    factsSources: "De unde provin datele",
+    notesSources: "De unde provin notele",
+    sourcesHint:
+      "Datele și notele au nevoie de sursa lor. Datele de catalog cu origine necunoscută nu se păstrează.",
+    numistaId: "Număr Numista",
+    numistaHint: "Doar o trimitere: nu se păstrează date de la Numista.",
+    image: "Imagine",
+    imageHint: "Încă nicio imagine. Adaug-o împreună cu atribuirea ei.",
+    add: "Adaugă nodul",
+    added: "„{title}” a fost adăugat în catalog",
+    saved: "„{title}” a fost salvat",
+    deleteTitle: "Ștergi „{title}”?",
+    deleteCounting: "Se numără ce se șterge odată cu el…",
+    deleteTooLarge:
+      "Odată cu el s-ar șterge peste {nodes} noduri sau {items} obiecte legate. Șterge mai întâi nodurile de dedesubt.",
+    "deleteBelow#zero": "Nimic de dedesubt nu se șterge odată cu el.",
+    "deleteBelow#one": "1 nod de dedesubt se șterge odată cu el.",
+    "deleteBelow#few": "{count} noduri de dedesubt se șterg odată cu el.",
+    "deleteBelow#other": "{count} de noduri de dedesubt se șterg odată cu el.",
+    "deleteItems#zero": "Niciun obiect nu este legat de el.",
+    "deleteItems#one":
+      "1 obiect este legat de o intrare de catalog de aici și îi păstrează datele ca fiind ale lui.",
+    "deleteItems#few":
+      "{count} obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
+    "deleteItems#other":
+      "{count} de obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
+    deleted: "„{title}” a fost șters",
+    deleteFailed: "Nu s-a putut șterge. Încearcă din nou.",
+    errors: {
+      TITLE_REQUIRED: "Dă-i un titlu.",
+      TOO_LONG: "Este prea lung.",
+      INVALID_VALUE: "Alege una dintre valorile oferite.",
+      INVALID_COUNTRY: "Alege o țară.",
+      INVALID_NUMBER: "Introdu un număr din intervalul permis.",
+      INVALID_YEAR: "Introdu un an întreg, cu anii î.Hr. ca numere negative.",
+      INVALID_URL: "Introdu o adresă web completă care începe cu https://.",
+      NUMISTA_DATA:
+        "Nu se pot păstra date de la Numista. Păstrează doar numărul Numista.",
+      ITEM_TYPE_REQUIRED:
+        "O intrare de catalog are nevoie de un tip de obiect.",
+      FIELD_NOT_FOR_TYPE: "Bancnotele nu au metal sau dimensiuni.",
+      YEARS_REVERSED: "Ultimul an este înaintea primului.",
+      SOURCE_REQUIRED: "Precizează sursa acestor date sau note.",
+      CREDIT_REQUIRED: "Imaginea are nevoie de sursă, autor, licență și link.",
+      ROOT_NOT_ADDABLE: "O țară sau o temă nu poate fi intrare de catalog.",
+      PARENT_NOT_FOUND:
+        "Nodul de deasupra nu mai există. Închide asta și încearcă din nou.",
+      PARENT_IS_ENTRY: "Nimic nu poate sta sub o intrare de catalog.",
+      TOO_DEEP: "Catalogul are cel mult 8 niveluri.",
+      ENTRY_HAS_CHILDREN:
+        "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
+      ENTRY_HAS_ITEMS:
+        "De această intrare de catalog sunt legate obiecte, deci rămâne intrare.",
+      TOO_MANY_LINKED_ITEMS:
+        "Peste 1.000 de obiecte sunt legate de această intrare, prea multe ca să le schimbi tipul de obiect deodată.",
+      ID_REQUIRED: "Dă-i un ID.",
+      INVALID_ID:
+        "Folosește până la 64 de litere mici, cifre, puncte, cratime și liniuțe de subliniere.",
+      DUPLICATE_ID: "Alt nod are deja acest ID.",
+      COUNTRY_REQUIRED: "Alege țara sau transform-o în temă.",
+      CATALOG_NODE_NOT_FOUND: "Acest nod nu mai este în catalog.",
+      NOT_ADMIN: "Doar administratorii pot edita catalogul.",
+      failed: "Nu s-a putut salva. Încearcă din nou.",
     },
   },
   adminUsers: {

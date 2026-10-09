@@ -169,7 +169,11 @@ export default defineSchema({
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
     .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
-    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"]),
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
+    // Everyone's Items linked to one Catalog entry, for the admins' Catalog
+    // editor: a new Item type reaches them, and deleting the entry leaves them
+    // its facts (catalog/linkedItems.ts).
+    .index("by_catalogEntryId", ["catalogEntryId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` is kept by every
