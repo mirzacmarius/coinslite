@@ -25,3 +25,10 @@ function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
 
 export const language = literalUnion(locales);
 export const homeCurrency = literalUnion(homeCurrencies);
+
+/** Coin, banknote or stamp. */
+export const itemType = v.union(
+  v.literal("coin"),
+  v.literal("banknote"),
+  v.literal("stamp"),
+);

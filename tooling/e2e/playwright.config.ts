@@ -1,5 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
-import { appUrl, backendDir, hasLocalBackend, isRemote, webUrl } from "./urls";
+import {
+  appPort,
+  appUrl,
+  backendDir,
+  hasLocalBackend,
+  isRemote,
+  webPort,
+  webUrl,
+} from "./urls";
 
 const isCI = !!process.env.CI;
 
@@ -28,15 +36,17 @@ export default defineConfig({
     ? undefined
     : [
         {
-          command: "bun run dev",
+          command: `bunx next dev -p ${appPort}`,
           cwd: "../../apps/app",
+          env: { NEXT_PUBLIC_WEB_URL: webUrl },
           url: appUrl,
           reuseExistingServer: !isCI,
           timeout: 120_000,
         },
         {
-          command: "bun run dev",
+          command: `bunx next dev -p ${webPort}`,
           cwd: "../../apps/web",
+          env: { NEXT_PUBLIC_APP_URL: appUrl },
           url: webUrl,
           reuseExistingServer: !isCI,
           timeout: 120_000,

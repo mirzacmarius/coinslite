@@ -66,9 +66,12 @@ function NavLinks({
  */
 export function AppShell({
   children,
+  quickActions,
   sidebarFooter,
 }: {
   children: React.ReactNode;
+  /** Above the navigation: the things people do most, such as adding an Item. */
+  quickActions?: React.ReactNode;
   /** The bottom of the sidebar: plan usage, nothing else. */
   sidebarFooter?: React.ReactNode;
 }) {
@@ -81,6 +84,9 @@ export function AppShell({
       <div className="sticky top-0 hidden h-dvh flex-col justify-between gap-2 border-r bg-sidebar p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
         <div className="flex flex-col gap-3">
           <WorkspaceMenu className="h-8 w-full" />
+          {quickActions && (
+            <div className="flex flex-col gap-1">{quickActions}</div>
+          )}
           <nav aria-label={t("shell.primaryNavigation")}>
             <NavLinks items={navItems} layout="sidebar" />
           </nav>

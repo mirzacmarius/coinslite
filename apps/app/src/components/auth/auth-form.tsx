@@ -1,15 +1,10 @@
 "use client";
 
+import { type SubmittableForm, submitForm } from "@/lib/submit-form";
 import { Button } from "@coinslite/ui/button";
 import { Loader2 } from "lucide-react";
 import type * as React from "react";
 import { useEffect, useState } from "react";
-
-/** The parts of a TanStack form that submitting uses. */
-type SubmittableForm = {
-  validateAllFields: (cause: "submit") => Promise<unknown>;
-  handleSubmit: () => Promise<void>;
-};
 
 /**
  * The form around each auth step. Its fields stay disabled until the page is
@@ -29,12 +24,9 @@ export function AuthForm({
     <form
       method="post"
       noValidate
-      onSubmit={async (event) => {
+      onSubmit={(event) => {
         event.preventDefault();
-        // TanStack skips validating untouched fields once any field has an
-        // error; validate them all so every problem shows at once.
-        await form.validateAllFields("submit");
-        await form.handleSubmit();
+        void submitForm(form);
       }}
     >
       <fieldset disabled={!interactive} className="flex min-w-0 flex-col gap-4">

@@ -10,7 +10,9 @@ export function Toaster() {
   return (
     <Sonner
       theme={resolvedTheme === "dark" ? "dark" : "light"}
-      position="top-center"
+      // Bottom right, clear of the header bar and its actions; lifted above the
+      // phone tabs in globals.css.
+      position="bottom-right"
       toastOptions={{
         classNames: {
           toast:
