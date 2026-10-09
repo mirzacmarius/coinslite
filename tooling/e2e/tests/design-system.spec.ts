@@ -116,6 +116,11 @@ test.describe("on a desktop screen", () => {
 
   test("keyboard users can skip straight to the content", async ({ page }) => {
     await page.goto(galleryUrl);
+    // The shell streams in after the page loads; until it shows, Tab has
+    // nothing of the app's to land on.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Design system" }),
+    ).toBeVisible();
     await page.keyboard.press("Tab");
     const skip = page.getByRole("link", { name: "Skip to content" });
     await expect(skip).toBeFocused();
