@@ -25,13 +25,35 @@ export function useCatalogFormat() {
      * it (titles and series are kept in the issuing country's language).
      */
     const nodeTitle = (node: {
+      key?: string;
       title: string;
+      kind?: string;
       country?: string;
       countryNode?: boolean;
-    }) =>
-      node.countryNode && node.country
+      denomination?: string;
+      itemType?: string;
+      series?: string;
+    }) => {
+      if (node.key === "eur2-commemoratives")
+        return t("catalog.themes.euroCommemoratives");
+      if (node.country === "NO" && node.key?.endsWith("-comm"))
+        return t("catalog.groupings.commemorativeCoins");
+      if (
+        node.country === "NO" &&
+        node.kind === "grouping" &&
+        node.denomination &&
+        node.series === undefined
+      )
+        return t(
+          node.itemType === "banknote"
+            ? "catalog.groupings.denominationBanknotes"
+            : "catalog.groupings.denominationCoins",
+          { denomination: node.denomination },
+        );
+      return node.countryNode && node.country
         ? format.country(node.country)
         : node.title;
+    };
     /** "1881", or "1878–1904" for an issue over several years. */
     const years = (from?: number, to?: number) => {
       if (from === undefined) return to === undefined ? undefined : `–${to}`;

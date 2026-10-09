@@ -136,6 +136,31 @@ const keepEnglish = new Set([
   "2021 VA The 700th anniversary of the death of Dante Alighieri",
 ]);
 
+/** Short subject names where the ECB feature is an explanatory sentence. */
+const conciseTitles: Record<string, { title: string; language: string }> = {
+  "2005 LU": { title: "Grand Dukes Henri and Adolphe", language: "en" },
+  "2011 NL": { title: "Erasmus and In Praise of Folly", language: "en" },
+  "2013 FR": { title: "Pierre de Coubertin", language: "fr" },
+  "2013 BE": { title: "Royal Meteorological Institute", language: "en" },
+  "2015 PT": { title: "Portugal and Timor-Leste", language: "pt" },
+  "2018 EE": { title: "Balti riigid", language: "et" },
+  "2018 LV": { title: "Baltijas valstis", language: "lv" },
+  "2018 LT": { title: "Baltijos valstybės", language: "lt" },
+  "2019 PT": {
+    title: "Primeira circum-navegação de Fernão de Magalhães",
+    language: "pt",
+  },
+  "2019 LT": { title: "Sutartinės", language: "lt" },
+  "2021 BE": { title: "Charles V's second coinage period", language: "en" },
+  "2024 LU": { title: "Feierstéppler", language: "de" },
+  "2024 DE": { title: "Frankfurter Verfassung", language: "de" },
+  "2024 ES": { title: "Sevilla y el Patrimonio Mundial", language: "es" },
+  "2024 LT": {
+    title: "Lietuvos šiaudinių sodų rišimo tradicija",
+    language: "lt",
+  },
+};
+
 type Box = {
   images: string[];
   country: string;
@@ -391,12 +416,13 @@ for (const year of years) {
     for (const { country, image } of issuers) {
       if (!country) throw new Error(`${year}: unknown country ${box.country}`);
       const englishTitle = featureOf(box, "en");
+      const national = languages[country];
+      const keyTitle = englishTitle ?? featureOf(box, national ?? "en") ?? "";
       const fromJournal = image
         ? titlesFromTheOfficialJournal[image]
         : undefined;
       let title = englishTitle ?? fromJournal?.title;
       let language = "en";
-      const national = languages[country];
       if (national && !keepEnglish.has(`${year} ${country} ${englishTitle}`)) {
         const localTitle = featureOf(
           localBox(box, country, national, image as string),
@@ -409,6 +435,11 @@ for (const year of years) {
           report.push(`${year} ${country}: no ${national} title, kept English`);
         }
       }
+      const concise = conciseTitles[`${year} ${country}`];
+      if (concise) {
+        title = concise.title;
+        language = concise.language;
+      }
       const description = facts.get("Description");
       const volume = facts.get("Issuing volume");
       const issued = facts.get("Issuing date");
@@ -418,7 +449,7 @@ for (const year of years) {
         );
       const prefix = `eur2-${country.toLowerCase()}-${year}-`;
       yearCoins.push({
-        key: prefix + slug(englishTitle ?? title, 64 - prefix.length),
+        key: prefix + slug(keyTitle || title, 64 - prefix.length),
         country,
         year,
         title,

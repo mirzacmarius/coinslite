@@ -250,6 +250,8 @@ export default {
       submit: "Trimite-mi un link",
       sentTitle: "Verifică-ți e-mailul",
       sent: "Am trimis un link de conectare la {email}. Funcționează o singură dată și expiră în 15 minute.",
+      resend: "Trimite din nou linkul de conectare",
+      resent: "Am trimis din nou un link de conectare la {email}.",
       usePassword: "Folosește o parolă",
       failed:
         "Linkul de conectare a expirat sau a fost deja folosit. Cere unul nou.",
@@ -829,6 +831,12 @@ export default {
     emptyDescription:
       "Țările și temele apar aici după ce se adaugă intrări de catalog.",
     theme: "Temă",
+    themes: { euroCommemoratives: "Monede comemorative de 2 euro" },
+    groupings: {
+      commemorativeCoins: "Monede comemorative",
+      denominationCoins: "{denomination} monede",
+      denominationBanknotes: "{denomination} bancnote",
+    },
     entryCount: "Intrări de catalog",
     browseBy: "Răsfoiește după",
     byGroup: "Grupuri",

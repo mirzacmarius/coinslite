@@ -233,6 +233,19 @@ test("titles stay in the issuing country's language where the ECB gives them, ot
   );
 });
 
+test("2-euro Catalog entry titles stay concise instead of containing descriptions", async () => {
+  const { entries } = await seeded();
+
+  expect(entries.filter((entry) => entry.title.length > 120)).toEqual([]);
+  expect(
+    entries.find(
+      (entry) =>
+        entry.id ===
+        "eur2-ee-2018-estonia-latvia-and-lithuania-jointly-issued-a",
+    )?.title,
+  ).toBe("Balti riigid");
+});
+
 test("every entry credits where its facts and notes come from, as the reuse terms ask", async () => {
   const { entries, entry } = await seeded();
   const ecbLicence =

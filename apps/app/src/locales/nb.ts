@@ -248,6 +248,8 @@ export default {
       submit: "Send meg en lenke",
       sentTitle: "Sjekk e-posten din",
       sent: "Vi har sendt en innloggingslenke til {email}. Den virker én gang og utløper om 15 minutter.",
+      resend: "Send innloggingslenken på nytt",
+      resent: "Vi har sendt en ny innloggingslenke til {email}.",
       usePassword: "Bruk passord i stedet",
       failed: "Innloggingslenken er utløpt eller allerede brukt. Be om en ny.",
       confirmTitle: "Logg inn på CoinsLite",
@@ -821,6 +823,12 @@ export default {
     emptyDescription:
       "Land og temaer vises her når det er lagt til katalogoppføringer.",
     theme: "Tema",
+    themes: { euroCommemoratives: "2-euro-minnemynter" },
+    groupings: {
+      commemorativeCoins: "Minnemynter",
+      denominationCoins: "{denomination}-mynter",
+      denominationBanknotes: "{denomination}-sedler",
+    },
     entryCount: "Katalogoppføringer",
     browseBy: "Bla etter",
     byGroup: "Grupper",

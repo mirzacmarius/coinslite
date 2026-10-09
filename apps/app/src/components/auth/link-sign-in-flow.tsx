@@ -70,6 +70,7 @@ export function LinkSignInFlow({ next }: { next: string }) {
           email={sentTo}
           resend={() => send(sentTo)}
           onResult={setMessage}
+          isLink
         />
       </AuthPanel>
     );
