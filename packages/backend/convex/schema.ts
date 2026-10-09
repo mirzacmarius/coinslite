@@ -2,6 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import {
+  albumColour,
   catalogItemType,
   catalogKind,
   gradingScale,
@@ -9,6 +10,7 @@ import {
   itemType,
   language,
   material,
+  perDollar,
   preciousMetal,
   provenance,
   strike,
@@ -43,6 +45,12 @@ export default defineSchema({
 
     /** Admins maintain the Catalog; everyone else has no role. Granted with admin/roles:grant. */
     role: v.optional(v.literal("admin")),
+
+    // Updates (updates/releases.ts): the version of the newest release they've
+    // seen in the list (new accounts start at the current one), and of the
+    // newest whose highlights they've been shown.
+    lastSeenRelease: v.optional(v.string()),
+    lastShownHighlights: v.optional(v.string()),
 
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
@@ -93,6 +101,31 @@ export default defineSchema({
     purchaseDate: v.optional(v.string()),
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
+
+    // Photos, one file per side, private to the owner (photos.ts). The
+    // indexes keep each stored file on at most one Item side.
+    frontPhoto: v.optional(v.id("_storage")),
+    backPhoto: v.optional(v.id("_storage")),
+
+    // Album: at most one. Moving an Item in or out keeps the Album's itemCount
+    // right (albums/membership.ts).
+    albumId: v.optional(v.id("albums")),
+  })
+    .index("by_ownerId", ["ownerId"])
+    .index("by_frontPhoto", ["frontPhoto"])
+    .index("by_backPhoto", ["backPhoto"])
+    .index("by_ownerId_and_albumId", ["ownerId", "albumId"]),
+
+  /**
+   * A named group of Items within a Collection. `itemCount` is kept by every
+   * write that moves an Item in or out, so lists never count Items one by one.
+   */
+  albums: defineTable({
+    ownerId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    colour: albumColour,
+    itemCount: v.number(),
   }).index("by_ownerId", ["ownerId"]),
 
   /**
@@ -155,6 +188,20 @@ export default defineSchema({
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
     }),
+
+  /**
+   * The latest Spot prices and exchange rates (spotPrices.ts): one document,
+   * replaced by each successful refresh and kept when a refresh fails.
+   */
+  spotPriceSnapshots: defineTable({
+    /** When the provider quoted the prices. */
+    quotedAt: v.number(),
+    /** When CoinsLite stored them. */
+    fetchedAt: v.number(),
+    /** The latest refresh attempt, whether or not it succeeded. */
+    checkedAt: v.number(),
+    perDollar,
+  }),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox

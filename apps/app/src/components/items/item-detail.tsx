@@ -1,5 +1,12 @@
 "use client";
 
+import { AlbumDot } from "@/components/albums/album-colours";
+import { useAlbums } from "@/components/albums/use-albums";
+import {
+  isItemLimitError,
+  upgradeHref,
+  useItemLimitMessage,
+} from "@/components/plans/plan-usage";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -10,13 +17,15 @@ import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
-import { Copy, Pencil, SearchX } from "lucide-react";
+import { Copy, Pencil, SearchX, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type * as React from "react";
 import { useState } from "react";
+import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
+import { ItemPhotos } from "./item-photos";
 
 /** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
 export function ItemDetail() {
@@ -25,18 +34,23 @@ export function ItemDetail() {
   const item = useQuery(api.items.get, { itemId });
   const format = useFormatters();
   const labels = useGradeLabels();
+  const albums = useAlbums();
   const router = useRouter();
   const duplicateItem = useMutation(api.items.duplicate);
   // Each opening starts the form afresh from the Item as it is now.
   const [editing, setEditing] = useState({ open: false, key: 0 });
   const [duplicating, setDuplicating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  // Once deleted, the Item reads as missing while the page goes back.
+  const [leaving, setLeaving] = useState(false);
+  const itemLimitMessage = useItemLimitMessage();
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
       {t("nav.collection")}
     </Link>
   );
 
-  if (item === undefined) {
+  if (item === undefined || (item === null && leaving)) {
     return <HeaderBar parent={parent} title="" />;
   }
   if (item === null) {
@@ -68,6 +82,7 @@ export function ItemDetail() {
     );
   }
 
+  const album = albums?.find(({ _id }) => _id === item.albumId);
   const money = (amount: number | undefined) =>
     amount === undefined ? undefined : format.money(amount, item.currency);
   const millimetres = (value: number | undefined) =>
@@ -123,8 +138,17 @@ export function ItemDetail() {
       const copyId = await duplicateItem({ itemId: item._id });
       toast.success(t("items.duplicated"));
       router.push(`/collection/${copyId}`);
-    } catch {
-      toast.error(t("items.errors.duplicateFailed"));
+    } catch (failure) {
+      if (isItemLimitError(failure)) {
+        toast.error(itemLimitMessage, {
+          action: {
+            label: t("plans.upgradeToPremium"),
+            onClick: () => router.push(upgradeHref),
+          },
+        });
+      } else {
+        toast.error(t("items.errors.duplicateFailed"));
+      }
     } finally {
       setDuplicating(false);
     }
@@ -156,6 +180,10 @@ export function ItemDetail() {
               <Pencil aria-hidden="true" />
               {t("items.edit")}
             </Button>
+            <Button variant="ghost" size="xs" onClick={() => setDeleting(true)}>
+              <Trash2 aria-hidden="true" />
+              {t("deleteItem.delete")}
+            </Button>
           </>
         }
       />
@@ -165,8 +193,15 @@ export function ItemDetail() {
         open={editing.open}
         onOpenChange={(open) => setEditing(({ key }) => ({ open, key }))}
       />
+      <DeleteItemDialog
+        item={item}
+        open={deleting}
+        onOpenChange={setDeleting}
+        onLeaving={setLeaving}
+      />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
+          <ItemPhotos item={item} />
           <div className="flex items-center gap-3">
             <ItemTypeIcon type={item.type} />
             <h2 className="text-base font-medium">{item.title}</h2>
@@ -194,6 +229,17 @@ export function ItemDetail() {
           <PanelSection title={t("items.details")}>
             <PropertyRow label={t("items.type")}>
               {t(`items.types.${item.type}`)}
+            </PropertyRow>
+            <PropertyRow label={t("albums.album")}>
+              {album && (
+                <Link
+                  href={`/albums/${album._id}`}
+                  className="inline-flex max-w-full items-center gap-1.5 hover:underline"
+                >
+                  <AlbumDot colour={album.colour} />
+                  <span className="truncate">{album.name}</span>
+                </Link>
+              )}
             </PropertyRow>
             <PropertyRow label={t("items.grade")}>
               {item.grade && item.gradingScale && (

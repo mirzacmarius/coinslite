@@ -1,6 +1,7 @@
 "use client";
 
 import { AppShell } from "@/components/shell/app-shell";
+import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useFormatters } from "@/locales/use-formatters";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
@@ -30,6 +31,7 @@ import { Input } from "@coinslite/ui/input";
 import { type ItemType, ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Label } from "@coinslite/ui/label";
+import { PhotoViewer } from "@coinslite/ui/photo-viewer";
 import { Progress } from "@coinslite/ui/progress";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
@@ -56,6 +58,7 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
+  Sparkles,
   Stamp,
   Trash2,
   Wallet,
@@ -334,10 +337,57 @@ function ItemMenu() {
   );
 }
 
+const coinPicture = (text: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="78" fill="#c9a227" stroke="#8a6d12" stroke-width="6"/><text x="100" y="111" font-family="sans-serif" font-size="30" text-anchor="middle" fill="#5c4708">${text}</text></svg>`,
+  )}`;
+const samplePhotos = [
+  { src: coinPicture("1881"), caption: "Obverse" },
+  { src: coinPicture("ONE $"), caption: "Reverse" },
+];
+
+function ItemPhotosSample() {
+  const [index, setIndex] = useState<number | null>(null);
+  return (
+    <>
+      <div className="grid max-w-sm grid-cols-2 gap-3">
+        {samplePhotos.map((photo, at) => (
+          <div key={photo.caption} className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={() => setIndex(at)}
+              aria-label={`${photo.caption}, view full screen`}
+              className="aspect-square overflow-hidden rounded-lg border bg-muted"
+            >
+              <img
+                src={photo.src}
+                alt=""
+                className="size-full object-contain"
+              />
+            </button>
+            <span className="flex h-7 items-center text-xs text-muted-foreground">
+              {photo.caption}
+            </span>
+          </div>
+        ))}
+      </div>
+      <PhotoViewer
+        index={index}
+        onIndexChange={setIndex}
+        photos={samplePhotos}
+        closeLabel="Close"
+        previousLabel="Previous photo"
+        nextLabel="Next photo"
+      />
+    </>
+  );
+}
+
 export function DesignGallery() {
   const { money } = useFormatters();
   const [itemType, setItemType] = useState<ItemType>("coin");
   const [album, setAlbum] = useState<string | undefined>("travel");
+  const [newAlbums, setNewAlbums] = useState<string[]>([]);
   const [grade, setGrade] = useState<string>();
   const [currency, setCurrency] = useState("NOK");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -484,8 +534,23 @@ export function DesignGallery() {
                   label="Album"
                   placeholder="Add to Album"
                   value={album}
-                  options={albumOptions}
+                  options={[
+                    ...albumOptions,
+                    ...newAlbums.map((name) => ({
+                      value: name,
+                      label: name,
+                      icon: albumDot("#64748b"),
+                      count: 0,
+                    })),
+                  ]}
                   onChange={setAlbum}
+                  onClear={() => setAlbum(undefined)}
+                  clearLabel="No Album"
+                  createLabel={(name) => `Create Album “${name}”`}
+                  onCreate={(name) => {
+                    setNewAlbums((names) => [...names, name]);
+                    setAlbum(name);
+                  }}
                   noResults="No matches"
                 />
               </PropertyRow>
@@ -688,6 +753,25 @@ export function DesignGallery() {
               description="Add your first coin, banknote or stamp to see it here."
               action={<Button>Add Item</Button>}
             />
+          </Section>
+
+          <Section title="Item photos and viewer">
+            <ItemPhotosSample />
+          </Section>
+
+          <Section title="Unseen marker">
+            <div className="flex w-[220px] flex-col rounded-lg border bg-popover p-1">
+              <div className="flex h-7 items-center gap-2 rounded-md px-2 text-[13px]">
+                <Sparkles
+                  className="size-4 text-muted-foreground"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+                Updates
+                <UnseenMarker className="ml-auto" />
+                <span className="sr-only">New release</span>
+              </div>
+            </div>
           </Section>
         </div>
       </div>

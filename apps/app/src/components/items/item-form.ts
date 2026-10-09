@@ -1,5 +1,5 @@
 import type { api } from "@coinslite/backend/convex/_generated/api";
-import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import {
   type GradingScale,
   type Strike,
@@ -51,6 +51,7 @@ export type ItemFormValues = {
   marketValue: string;
   purchaseDate: string;
   source: string;
+  albumId: Id<"albums"> | undefined;
 };
 
 export type ItemArgs = FunctionArgs<typeof api.items.add>;
@@ -81,6 +82,7 @@ export const blankItem = (): ItemFormValues => ({
   marketValue: "",
   purchaseDate: "",
   source: "",
+  albumId: undefined,
 });
 
 /** The fields under "More details": the group opens when any of them holds a value. */
@@ -180,6 +182,7 @@ export function valuesFromItem(
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
     source: item.source ?? "",
+    albumId: item.albumId,
   };
 }
 
@@ -229,5 +232,6 @@ export function argsFromValues(
     marketValue: money(values.marketValue),
     purchaseDate: values.purchaseDate || undefined,
     source: values.source,
+    albumId: values.albumId,
   };
 }

@@ -68,6 +68,8 @@ export function ConfirmDialog({
               try {
                 await onConfirm();
                 onOpenChange(false);
+              } catch {
+                // Stays open; the caller shows what went wrong.
               } finally {
                 setPending(false);
               }

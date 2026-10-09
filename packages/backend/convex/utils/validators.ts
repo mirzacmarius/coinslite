@@ -1,5 +1,6 @@
 import { homeCurrencies, locales } from "@coinslite/i18n";
 import { v } from "convex/values";
+import { albumColours } from "../albums/rules";
 import {
   catalogItemTypes,
   catalogKinds,
@@ -7,6 +8,7 @@ import {
 } from "../catalog/fields";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
+import { photoSides } from "../photos/rules";
 
 /** A validator accepting exactly the given strings, e.g. the supported locales. */
 function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
@@ -49,4 +51,26 @@ export const provenance = v.object({
   author: v.optional(v.string()),
   licence: v.optional(v.string()),
   link: v.optional(v.string()),
+});
+
+/** One of the Album colours in albums/rules.ts. */
+export const albumColour = literalUnion(albumColours);
+/** Which side of an Item a photo shows: front or back. */
+export const photoSide = literalUnion(photoSides);
+
+/**
+ * What one US dollar buys: units of each Home currency, and troy ounces of
+ * gold (XAU) and silver (XAG). See spotPrices/rates.ts.
+ */
+export const perDollar = v.object({
+  NOK: v.number(),
+  SEK: v.number(),
+  DKK: v.number(),
+  EUR: v.number(),
+  RON: v.number(),
+  GBP: v.number(),
+  USD: v.number(),
+  CHF: v.number(),
+  XAU: v.number(),
+  XAG: v.number(),
 });
