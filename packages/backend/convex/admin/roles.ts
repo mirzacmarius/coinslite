@@ -32,7 +32,7 @@ async function userByEmail(ctx: MutationCtx, email: string) {
   const user = await ctx.db
     .query("users")
     .withIndex("email", (q) => q.eq("email", normalizeEmail(email)))
-    .first();
+    .unique();
   if (!user) throw new ConvexError(USER_NOT_FOUND);
   return user;
 }

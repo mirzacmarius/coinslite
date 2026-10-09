@@ -225,7 +225,7 @@ export const search = query({
     const exact = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", normalizeEmail(words)))
-      .first();
+      .unique();
     if (exact) {
       return {
         users: onPlan(exact)

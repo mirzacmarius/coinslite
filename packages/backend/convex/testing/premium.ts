@@ -29,7 +29,7 @@ export const grant = internalMutation({
     const user = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", normalizeEmail(email)))
-      .first();
+      .unique();
     if (!user) throw new ConvexError(testingErrors.userNotFound);
     const now = Date.now();
     await ctx.runMutation(internal.billing.recordSubscription, {
