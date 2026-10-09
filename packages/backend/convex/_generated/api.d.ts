@@ -33,6 +33,8 @@ import type * as catalog_csv from "../catalog/csv.js";
 import type * as catalog_csvText from "../catalog/csvText.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
 import type * as catalog_fields from "../catalog/fields.js";
+import type * as catalog_imageRules from "../catalog/imageRules.js";
+import type * as catalog_images from "../catalog/images.js";
 import type * as catalog_search from "../catalog/search.js";
 import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
@@ -70,6 +72,7 @@ import type * as updates from "../updates.js";
 import type * as updates_releases from "../updates/releases.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
+import type * as utils_files from "../utils/files.js";
 import type * as utils_validators from "../utils/validators.js";
 
 import type {
@@ -104,6 +107,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/csvText": typeof catalog_csvText;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
   "catalog/fields": typeof catalog_fields;
+  "catalog/imageRules": typeof catalog_imageRules;
+  "catalog/images": typeof catalog_images;
   "catalog/search": typeof catalog_search;
   "catalog/searchWords": typeof catalog_searchWords;
   "catalog/seed": typeof catalog_seed;
@@ -141,6 +146,7 @@ declare const fullApi: ApiFromModules<{
   "updates/releases": typeof updates_releases;
   users: typeof users;
   "utils/auth": typeof utils_auth;
+  "utils/files": typeof utils_files;
   "utils/validators": typeof utils_validators;
 }>;
 
