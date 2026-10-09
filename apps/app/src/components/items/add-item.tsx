@@ -5,7 +5,7 @@ import { Button } from "@coinslite/ui/button";
 import { Kbd } from "@coinslite/ui/kbd";
 import { Plus } from "lucide-react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { AddItemDialog } from "./add-item-dialog";
+import { ItemFormDialog } from "./item-form-dialog";
 
 const AddItemContext = createContext<() => void>(() => {});
 
@@ -41,7 +41,7 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
   return (
     <AddItemContext.Provider value={() => setOpen(true)}>
       {children}
-      <AddItemDialog open={open} onOpenChange={setOpen} />
+      <ItemFormDialog open={open} onOpenChange={setOpen} />
     </AddItemContext.Provider>
   );
 }

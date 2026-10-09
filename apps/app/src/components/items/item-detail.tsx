@@ -3,16 +3,20 @@
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
+import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
-import { useQuery } from "convex/react";
-import { SearchX } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import { Copy, Pencil, SearchX } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import type * as React from "react";
+import { useState } from "react";
 import { useGradeLabels } from "./grade-labels";
+import { ItemFormDialog } from "./item-form-dialog";
 
 /** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
 export function ItemDetail() {
@@ -21,6 +25,11 @@ export function ItemDetail() {
   const item = useQuery(api.items.get, { itemId });
   const format = useFormatters();
   const labels = useGradeLabels();
+  const router = useRouter();
+  const duplicateItem = useMutation(api.items.duplicate);
+  // Each opening starts the form afresh from the Item as it is now.
+  const [editing, setEditing] = useState({ open: false, key: 0 });
+  const [duplicating, setDuplicating] = useState(false);
   const parent = (
     <Link href="/collection" className="hover:text-foreground">
       {t("nav.collection")}
@@ -61,32 +70,115 @@ export function ItemDetail() {
 
   const money = (amount: number | undefined) =>
     amount === undefined ? undefined : format.money(amount, item.currency);
-  const facts = [
+  const millimetres = (value: number | undefined) =>
+    value === undefined
+      ? undefined
+      : `${format.number(value)} ${t("items.millimetres")}`;
+  const facts: Array<[string, React.ReactNode]> = [
     [t("items.country"), item.country && format.country(item.country)],
     [t("items.year"), item.year],
     [t("items.denomination"), item.denomination],
-  ] as const;
+    [t("items.series"), item.series],
+    [t("items.category"), item.category],
+    [t("items.ruler"), item.ruler],
+    [t("items.mintMark"), item.mintMark],
+    [
+      t("items.mintage"),
+      item.mintage === undefined ? undefined : format.number(item.mintage),
+    ],
+    [
+      t("items.numistaNumber"),
+      item.numistaNumber !== undefined && (
+        <a
+          href={`https://en.numista.com/catalogue/pieces${item.numistaNumber}.html`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-primary hover:underline"
+        >
+          N# {item.numistaNumber}
+        </a>
+      ),
+    ],
+  ];
+  const physical: Array<[string, React.ReactNode]> = [
+    [
+      t("items.material"),
+      [
+        item.material && t(`items.materials.${item.material}`),
+        item.materialNote,
+      ]
+        .filter(Boolean)
+        .join(" · ") || undefined,
+    ],
+    [t("items.diameter"), millimetres(item.diameter)],
+    [t("items.thickness"), millimetres(item.thickness)],
+  ];
+  const filled = (rows: Array<[string, React.ReactNode]>) =>
+    rows.filter(([, value]) => value !== undefined && value !== false);
+  const shownFacts = filled(facts);
+  const shownPhysical = filled(physical);
+  const duplicate = async () => {
+    setDuplicating(true);
+    try {
+      const copyId = await duplicateItem({ itemId: item._id });
+      toast.success(t("items.duplicated"));
+      router.push(`/collection/${copyId}`);
+    } catch {
+      toast.error(t("items.errors.duplicateFailed"));
+    } finally {
+      setDuplicating(false);
+    }
+  };
 
   return (
     <>
-      <HeaderBar parent={parent} title={item.title} />
+      <HeaderBar
+        parent={parent}
+        title={item.title}
+        actions={
+          <>
+            <Button
+              variant="ghost"
+              size="xs"
+              disabled={duplicating}
+              onClick={() => void duplicate()}
+            >
+              <Copy aria-hidden="true" />
+              {t("items.duplicate")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() =>
+                setEditing(({ key }) => ({ open: true, key: key + 1 }))
+              }
+            >
+              <Pencil aria-hidden="true" />
+              {t("items.edit")}
+            </Button>
+          </>
+        }
+      />
+      <ItemFormDialog
+        key={editing.key}
+        item={item}
+        open={editing.open}
+        onOpenChange={(open) => setEditing(({ key }) => ({ open, key }))}
+      />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
           <div className="flex items-center gap-3">
             <ItemTypeIcon type={item.type} />
             <h2 className="text-base font-medium">{item.title}</h2>
           </div>
-          {facts.some(([, value]) => value !== undefined) && (
+          {shownFacts.length > 0 && (
             <dl className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3 text-sm">
-              {facts.map(
-                ([label, value]) =>
-                  value !== undefined && (
-                    <div key={label} className="flex flex-col gap-0.5">
-                      <dt className="text-xs text-muted-foreground">{label}</dt>
-                      <dd>{value}</dd>
-                    </div>
-                  ),
-              )}
+              {shownFacts.map(([label, value]) => (
+                <div key={label} className="flex flex-col gap-0.5">
+                  <dt className="text-xs text-muted-foreground">{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
             </dl>
           )}
           {item.notes && (
@@ -135,6 +227,15 @@ export function ItemDetail() {
               {format.number(item.quantity)}
             </PropertyRow>
           </PanelSection>
+          {shownPhysical.length > 0 && (
+            <PanelSection title={t("items.physical")}>
+              {shownPhysical.map(([label, value]) => (
+                <PropertyRow key={label} label={label}>
+                  {value}
+                </PropertyRow>
+              ))}
+            </PanelSection>
+          )}
           <PanelSection title={t("items.purchase")}>
             <PropertyRow label={t("items.purchasePrice")}>
               {money(item.purchasePrice)}
