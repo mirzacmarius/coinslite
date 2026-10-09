@@ -680,6 +680,8 @@ export default {
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
       ENTRY_HAS_ITEMS:
         "Objekter er knyttet til denne katalogoppføringen, så den forblir én. Behold is_addable som true.",
+      TOO_MANY_NODES_BELOW:
+        "Mer enn 2 000 noder ligger under dem denne filen flytter. Flytt færre om gangen.",
       TOO_MANY_LINKED_ITEMS:
         "Over 1 000 objekter er knyttet til oppføringene som får ny objekttype. Endre færre om gangen.",
     },
@@ -1317,6 +1319,8 @@ export default {
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
       ENTRY_HAS_ITEMS:
         "Objekter er knyttet til denne katalogoppføringen, så den forblir én.",
+      TOO_MANY_NODES_BELOW:
+        "Mer enn 2 000 noder ligger under denne, for mange til å flyttes på én gang.",
       TOO_MANY_LINKED_ITEMS:
         "Over 1 000 objekter er knyttet til denne oppføringen, for mange til å endre objekttypen deres på én gang.",
       ID_REQUIRED: "Gi den en ID.",

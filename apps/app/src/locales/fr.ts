@@ -693,6 +693,8 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci\u00a0: il ne peut pas devenir une entrée du catalogue.",
       ENTRY_HAS_ITEMS:
         "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste. Gardez is_addable à true.",
+      TOO_MANY_NODES_BELOW:
+        "Plus de 2 000 nœuds se trouvent sous ceux que ce fichier déplace. Déplacez-en moins à la fois.",
       TOO_MANY_LINKED_ITEMS:
         "Plus de 1 000 objets sont liés aux entrées dont le type d’objet change. Modifiez-en moins à la fois.",
     },
@@ -1352,6 +1354,8 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci\u00a0: il ne peut pas devenir une entrée du catalogue.",
       ENTRY_HAS_ITEMS:
         "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste.",
+      TOO_MANY_NODES_BELOW:
+        "Plus de 2 000 nœuds se trouvent sous celui-ci, trop pour les déplacer en une fois.",
       TOO_MANY_LINKED_ITEMS:
         "Plus de 1 000 objets sont liés à cette entrée, trop pour changer leur type d’objet d’un coup.",
       ID_REQUIRED: "Donnez-lui un identifiant.",

@@ -668,6 +668,8 @@ export default {
         "Nodes sit below this one, so it can't become a Catalog entry.",
       ENTRY_HAS_ITEMS:
         "Items link to this Catalog entry, so it stays one. Keep is_addable true.",
+      TOO_MANY_NODES_BELOW:
+        "More than 2,000 nodes are below the ones this file moves. Move fewer at a time.",
       TOO_MANY_LINKED_ITEMS:
         "More than 1,000 Items link to the entries whose Item type changes. Change fewer at a time.",
     },
@@ -1297,6 +1299,8 @@ export default {
       ENTRY_HAS_CHILDREN:
         "Nodes sit below this one, so it can't become a Catalog entry.",
       ENTRY_HAS_ITEMS: "Items link to this Catalog entry, so it stays one.",
+      TOO_MANY_NODES_BELOW:
+        "More than 2,000 nodes are below this one, too many to move at once.",
       TOO_MANY_LINKED_ITEMS:
         "More than 1,000 Items link to this entry, too many to change their Item type at once.",
       ID_REQUIRED: "Give it an ID.",

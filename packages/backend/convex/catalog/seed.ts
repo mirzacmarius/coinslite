@@ -1,8 +1,9 @@
 import { ConvexError, v } from "convex/values";
+import { internal } from "../_generated/api";
 import { internalMutation } from "../_generated/server";
 import { euroCommemoratives } from "./datasets/euroCommemoratives";
 import { usSilverDollars } from "./datasets/usSilverDollars";
-import { importCatalogFile, refreshBrowseFields } from "./tree";
+import { importCatalogFile } from "./tree";
 
 /**
  * The Catalog datasets that ship with CoinsLite, as Catalog CSV files, in the
@@ -14,7 +15,8 @@ const datasets = { usSilverDollars, euroCommemoratives };
 /**
  * Loads every bundled dataset through the CSV import, so loading again only
  * updates what changed, then fills in browsing (entry counts, countries) for
- * any Catalog data stored before it existed. Run it on a deployment with
+ * any Catalog data stored before it existed, in the background a batch at a
+ * time. Run it on a deployment with
  * `npx convex run catalog/seed:load`.
  */
 export const load = internalMutation({
@@ -39,7 +41,11 @@ export const load = internalMutation({
       }
       loaded.push({ dataset, inserts, updates, unchanged });
     }
-    await refreshBrowseFields(ctx);
+    await ctx.scheduler.runAfter(
+      0,
+      internal.catalog.tree.refreshBrowseFields,
+      {},
+    );
     return loaded;
   },
 });

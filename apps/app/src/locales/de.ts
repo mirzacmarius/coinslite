@@ -706,6 +706,8 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
       ENTRY_HAS_ITEMS:
         "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer. Lass is_addable auf true.",
+      TOO_MANY_NODES_BELOW:
+        "Unter den Knoten, die diese Datei verschiebt, liegen mehr als 2.000 Knoten. Verschiebe weniger auf einmal.",
       TOO_MANY_LINKED_ITEMS:
         "Mit den Einträgen, deren Objektart sich ändert, sind über 1.000 Objekte verknüpft. Ändere weniger auf einmal.",
     },
@@ -1366,6 +1368,8 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
       ENTRY_HAS_ITEMS:
         "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer.",
+      TOO_MANY_NODES_BELOW:
+        "Unter diesem Knoten liegen mehr als 2.000 Knoten, zu viele, um sie auf einmal zu verschieben.",
       TOO_MANY_LINKED_ITEMS:
         "Mit diesem Eintrag sind über 1.000 Objekte verknüpft, zu viele, um ihre Objektart auf einmal zu ändern.",
       ID_REQUIRED: "Gib eine ID ein.",

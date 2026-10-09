@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { heldItemLimit } from "./catalog/browse";
@@ -722,7 +722,8 @@ test("the bundled US silver dollars browse by series grouping and by denominatio
   ]);
 });
 
-test("loading the bundled datasets fills in browsing for Catalog data stored before it existed", async () => {
+test("loading the bundled datasets fills in browsing for Catalog data stored before it existed, a batch at a time", async () => {
+  vi.useFakeTimers();
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   await t.mutation(internal.catalog.seed.load, {});
@@ -740,12 +741,21 @@ test("loading the bundled datasets fills in browsing for Catalog data stored bef
   );
 
   await t.mutation(internal.catalog.seed.load, {});
+  await t.finishAllScheduledFunctions(vi.runAllTimers);
   expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 120 }),
   );
   expect(
     await ada.as.query(api.catalog.browse.denominations, { key: "us" }),
   ).toEqual([{ denomination: "1 dollar", seriesCount: 2 }]);
+  // Over 700 nodes: more than one transaction refreshes.
+  const refreshes = await t.run(async (ctx) =>
+    (await ctx.db.system.query("_scheduled_functions").collect()).filter(
+      (job) => job.name.includes("refreshBrowseFields"),
+    ),
+  );
+  expect(refreshes.length).toBeGreaterThan(1);
+  vi.useRealTimers();
 });
 
 test("a root that becomes a country once it gets a country code is browsed by denomination from then on", async () => {

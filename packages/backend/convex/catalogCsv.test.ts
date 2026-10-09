@@ -6,6 +6,7 @@ import { expect, test } from "vitest";
 import vercelBuildScript from "../scripts/vercel-build-app.sh?raw";
 import { api, internal } from "./_generated/api";
 import { parseCsv } from "./catalog/csvText";
+import { catalogLimits } from "./catalog/fields";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -713,3 +714,37 @@ test("every preview build loads the bundled Catalog through the function it name
   ]);
   expect((await search()).groups).not.toEqual([]);
 });
+
+test("moving a grouping with more nodes below it than one import may move is refused", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const below = catalogLimits.moveNodes;
+  const file = (parent: string) =>
+    [
+      "id,parent_id,title",
+      "us,,United States",
+      "silver,,Silver dollars",
+      `big,${parent},Big grouping`,
+      ...Array.from({ length: below }, (_, n) => `n${n},big,Node ${n}`),
+    ].join("\n");
+  await admin.as.mutation(api.catalog.csv.importFile, { csv: file("us") });
+
+  // Exactly as many as one import may move: the move goes ahead.
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: "id,parent_id,title\nbig,silver,Big grouping",
+    }),
+  ).toMatchObject({ applied: true, updates: 1 });
+
+  await admin.as.mutation(api.catalog.csv.importFile, {
+    csv: "id,parent_id,title\nn-extra,big,One more",
+  });
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: "id,parent_id,title\nbig,us,Big grouping",
+    }),
+  ).toMatchObject({
+    applied: false,
+    errors: [{ row: 2, column: "parent_id", code: "TOO_MANY_NODES_BELOW" }],
+  });
+}, 60_000);

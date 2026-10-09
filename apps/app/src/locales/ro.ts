@@ -686,6 +686,8 @@ export default {
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
       ENTRY_HAS_ITEMS:
         "De această intrare de catalog sunt legate obiecte, deci rămâne intrare. Păstrează is_addable pe true.",
+      TOO_MANY_NODES_BELOW:
+        "Sub nodurile pe care le mută acest fișier se află peste 2.000 de noduri. Mută mai puține odată.",
       TOO_MANY_LINKED_ITEMS:
         "Peste 1.000 de obiecte sunt legate de intrările al căror tip de obiect se schimbă. Modifică mai puține odată.",
     },
@@ -1328,6 +1330,8 @@ export default {
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
       ENTRY_HAS_ITEMS:
         "De această intrare de catalog sunt legate obiecte, deci rămâne intrare.",
+      TOO_MANY_NODES_BELOW:
+        "Sub acest nod se află peste 2.000 de noduri, prea multe pentru a fi mutate deodată.",
       TOO_MANY_LINKED_ITEMS:
         "Peste 1.000 de obiecte sunt legate de această intrare, prea multe ca să le schimbi tipul de obiect deodată.",
       ID_REQUIRED: "Dă-i un ID.",

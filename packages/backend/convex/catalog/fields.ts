@@ -65,6 +65,8 @@ export const catalogErrors = {
   entryHasItems: "ENTRY_HAS_ITEMS",
   /** More Items link to the entries changed than one save can update. */
   tooManyLinkedItems: "TOO_MANY_LINKED_ITEMS",
+  /** A move takes more nodes below along than one save can update. */
+  tooManyNodesBelow: "TOO_MANY_NODES_BELOW",
 } as const;
 export type CatalogError = (typeof catalogErrors)[keyof typeof catalogErrors];
 
@@ -91,6 +93,8 @@ export const catalogLimits = {
   linkedItems: 1000,
   /** Nodes one delete removes, the node and everything below it. */
   deleteNodes: 2000,
+  /** Nodes below that one save moves along with the nodes it moves. */
+  moveNodes: 2000,
   /** Years are whole numbers, BC as negatives. */
   earliestYear: -3000,
   latestYear: 3000,
