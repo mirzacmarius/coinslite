@@ -11,4 +11,12 @@ crons.interval(
   {},
 );
 
+/** Admin stats: figures across everyone, counted in the background (admin/stats.ts). */
+crons.interval(
+  "count admin stats",
+  { hours: 1 },
+  internal.admin.stats.hourly,
+  {},
+);
+
 export default crons;

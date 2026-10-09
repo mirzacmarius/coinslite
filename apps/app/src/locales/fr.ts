@@ -893,4 +893,56 @@ export default {
       "Par type d’objet, plus la valeur du métal pour l’or et l’argent",
     part: "Type d’objet ou métal",
   },
+  adminStats: {
+    menu: "Statistiques",
+    title: "Statistiques",
+    notAvailable: "Cette page n’est pas disponible",
+    notAvailableDescription:
+      "Seuls les administrateurs peuvent voir les statistiques.",
+    refresh: "Recompter",
+    counting: "Comptage…",
+    countedAt: "Comptées le {time}",
+    hourly: "Recomptées toutes les heures.",
+    refreshFailed: "Impossible de lancer le comptage. Réessayez.",
+    emptyTitle: "Pas encore comptées",
+    emptyDescription:
+      "Les statistiques sont comptées toutes les heures. Comptez-les maintenant pour les voir tout de suite.",
+    countNow: "Compter maintenant",
+    countingTitle: "Comptage des statistiques",
+    countingDescription:
+      "Cela prend quelques secondes. Les chiffres s’affichent dès que c’est terminé.",
+    users: {
+      title: "Utilisateurs",
+      description:
+        "Comptes dont l’e-mail est confirmé et l’inscription terminée.",
+      total: "Tous les utilisateurs",
+      newLast30Days: "Nouveaux ces 30 derniers jours",
+      premium: "Premium",
+      free: "Formule gratuite",
+    },
+    subscriptions: {
+      title: "Abonnements",
+      description:
+        "Les actifs donnent Premium maintenant. Ceux qui se terminent ne seront pas renouvelés.",
+      active: "Actifs",
+      endingWithin30Days: "Se terminent d’ici 30 jours",
+      ended: "Terminés",
+    },
+    collection: {
+      title: "Contenu des collections",
+      description: "Tout ce que contiennent les collections de chacun.",
+      items: "Objets",
+      coins: "Pièces",
+      banknotes: "Billets",
+      stamps: "Timbres",
+      albums: "Albums",
+    },
+    activity: {
+      title: "Activité",
+      description: "Objets et albums ajoutés récemment et toujours présents.",
+      itemsAddedLast24Hours: "Objets ajoutés ces dernières 24 heures",
+      itemsAddedLast7Days: "Objets ajoutés ces 7 derniers jours",
+      albumsCreatedLast30Days: "Albums créés ces 30 derniers jours",
+    },
+  },
 } as const satisfies Dictionary;
