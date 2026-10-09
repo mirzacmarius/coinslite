@@ -124,6 +124,8 @@ async function entriesBelow(ctx: QueryCtx, node: Doc<"catalogNodes">) {
       });
     }
     for (const child of children.groupings) {
+      // Nothing below it to show, however many groupings it holds.
+      if (child.entryCount === 0) continue;
       const inCountry =
         country ?? (isCountryNode(child) ? child.country : undefined);
       if (!(await walk(child, [...titles, child.title], inCountry)))

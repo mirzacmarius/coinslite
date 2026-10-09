@@ -314,6 +314,26 @@ test("a grouping with more entries than a Set may have says so instead", async (
   });
 });
 
+test("a Set within the entry limit opens however many groupings lie between its entries, and empty groupings don't count", async () => {
+  const t = newTest();
+  const { admin, ada } = await withCatalog(t);
+  // Each entry two groupings down, plus as many empty groupings: more
+  // Catalog nodes in all than entries a Set may have, twice over.
+  const count = 600;
+  await importRows(admin.as, [
+    grouping("no-deep", "no", "Deep"),
+    ...Array.from({ length: count }, (_, n) => [
+      grouping(`no-deep-${n}`, "no-deep", `Group ${n}`),
+      grouping(`no-deep-${n}-a`, `no-deep-${n}`, `Group ${n} A`),
+      grouping(`no-deep-${n}-b`, `no-deep-${n}`, `Group ${n} B`),
+      entry(`no-deep-${n}-a-1`, `no-deep-${n}-a`, 1900),
+    ]).flat(),
+  ]);
+
+  const set = await openSet(ada.as, { key: "no-deep" });
+  expect(set?.total).toBe(count);
+}, 60_000);
+
 test("Sets are for set-up people, and hidden with the Catalog", async () => {
   const t = newTest();
   const { admin, ada } = await withCatalog(t);
