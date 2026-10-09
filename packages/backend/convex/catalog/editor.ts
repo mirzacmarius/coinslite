@@ -14,6 +14,7 @@ import {
   provenance,
   strike,
 } from "../utils/validators";
+import { ancestorNodesOf, nodeByKey } from "./browse";
 import {
   type CatalogError,
   type EditorValues,
@@ -76,13 +77,6 @@ export const catalogEditorErrors = {
   deleteTooLarge: "DELETE_TOO_LARGE",
 } as const;
 
-async function nodeByKey(ctx: QueryCtx, key: string) {
-  return await ctx.db
-    .query("catalogNodes")
-    .withIndex("by_key", (q) => q.eq("key", key))
-    .unique();
-}
-
 async function requireNode(ctx: QueryCtx, key: string) {
   const node = await nodeByKey(ctx, key);
   if (!node) throw new ConvexError(catalogEditorErrors.nodeNotFound);
@@ -99,15 +93,9 @@ function editorValuesOf(node: Doc<"catalogNodes">): EditorValues {
   return shown as EditorValues;
 }
 
-/** The nodes above one, root first. */
-async function ancestorsOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
-  const ancestors = [];
-  for (const key of node.path.split("/").slice(0, -1)) {
-    const ancestor = await nodeByKey(ctx, key);
-    if (ancestor) ancestors.push({ key: ancestor.key, title: ancestor.title });
-  }
-  return ancestors;
-}
+/** The nodes above one, root first, by key and title. */
+const ancestorsOf = async (ctx: QueryCtx, node: Doc<"catalogNodes">) =>
+  (await ancestorNodesOf(ctx, node)).map(({ key, title }) => ({ key, title }));
 
 /**
  * Saves one node through the import's plan: the values as given (one left

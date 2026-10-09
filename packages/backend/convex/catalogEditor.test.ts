@@ -55,12 +55,20 @@ test("an admin adds a country root, and the tree lists it", async () => {
 
 type Caller = Awaited<ReturnType<typeof person>>["as"];
 
+/** Credit for facts from Norges Bank, in full. */
+const norgesBank = {
+  factsSource: "Norges Bank",
+  factsAuthor: "Norges Bank",
+  factsLicence: "Public domain",
+  factsLink: "https://www.norges-bank.no/",
+};
+
 /** A coin Catalog entry's values, its facts credited to a source. */
 const coinValues = (title: string, extra: Partial<EditorValues> = {}) => ({
   title,
   sortOrder: 0,
   itemType: "coin" as const,
-  factsSource: "Norges Bank",
+  ...norgesBank,
   ...extra,
 });
 
@@ -312,7 +320,7 @@ test("an entry's Item type reaches its linked Items, which drop what the new typ
       itemType: "banknote",
       country: "NO",
       yearFrom: 1949,
-      factsSource: "Norges Bank",
+      ...norgesBank,
     },
   });
 

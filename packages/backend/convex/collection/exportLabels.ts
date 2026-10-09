@@ -90,7 +90,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       norwegian: "Norwegian (0–3)",
       european: "European (UNC–G)",
       international: "International (UNC–PR)",
-      stamp: "Stamp condition",
+      stamp: "Stamp grades",
     },
     strikes: {
       circulation: "Circulation",
@@ -143,7 +143,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       norwegian: "Norsk (0–3)",
       european: "Europeisk (UNC–G)",
       international: "Internasjonal (UNC–PR)",
-      stamp: "Tilstand (frimerker)",
+      stamp: "Kvalitet (frimerker)",
     },
     strikes: {
       circulation: "Omløp",

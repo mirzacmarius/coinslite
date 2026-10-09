@@ -40,6 +40,7 @@ import { EmptyState } from "@coinslite/ui/empty-state";
 import { CheckboxField, Field } from "@coinslite/ui/field";
 import { FilterChip } from "@coinslite/ui/filter-chip";
 import { HeaderBar } from "@coinslite/ui/header-bar";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Input } from "@coinslite/ui/input";
 import { type ItemType, ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
@@ -58,7 +59,6 @@ import {
   TableRow,
 } from "@coinslite/ui/table";
 import { toast } from "@coinslite/ui/toaster";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import {
   Award,
@@ -460,19 +460,10 @@ export function DesignGallery() {
           title="Design system"
           actions={
             <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon-xs" aria-label="Filter">
-                    <ListFilter strokeWidth={1.75} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="flex items-center gap-2">
-                  Filter{" "}
-                  <Kbd className="border-background/20 bg-background/10 text-background">
-                    F
-                  </Kbd>
-                </TooltipContent>
-              </Tooltip>
+              {/* Icon-only buttons: label in the tooltip, with the shortcut. */}
+              <IconButton label="Filter" shortcut="F">
+                <ListFilter strokeWidth={1.75} />
+              </IconButton>
               <Button
                 size="xs"
                 onClick={() => toast.success("Item added to your Collection")}

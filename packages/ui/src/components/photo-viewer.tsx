@@ -4,8 +4,8 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type * as React from "react";
 import { useRef } from "react";
 import { cn } from "../utils";
-import { Button } from "./button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "./dialog";
+import { IconButton } from "./icon-button";
 
 export type ViewerPhoto = { src: string; caption: string };
 
@@ -74,21 +74,21 @@ export function PhotoViewer({
           </>
         )}
         <DialogClose asChild>
-          <Button
-            variant="ghost"
+          <IconButton
             size="icon"
-            aria-label={closeLabel}
+            label={closeLabel}
+            shortcut="Esc"
             className={cn("absolute right-3 top-3", overlayButton)}
           >
             <X />
-          </Button>
+          </IconButton>
         </DialogClose>
         {count > 1 && (
           <>
-            <Button
-              variant="ghost"
+            <IconButton
               size="icon"
-              aria-label={previousLabel}
+              label={previousLabel}
+              shortcut="←"
               onClick={() => step(-1)}
               className={cn(
                 "absolute left-3 top-1/2 -translate-y-1/2",
@@ -96,11 +96,11 @@ export function PhotoViewer({
               )}
             >
               <ChevronLeft />
-            </Button>
-            <Button
-              variant="ghost"
+            </IconButton>
+            <IconButton
               size="icon"
-              aria-label={nextLabel}
+              label={nextLabel}
+              shortcut="→"
               onClick={() => step(1)}
               className={cn(
                 "absolute right-3 top-1/2 -translate-y-1/2",
@@ -108,7 +108,7 @@ export function PhotoViewer({
               )}
             >
               <ChevronRight />
-            </Button>
+            </IconButton>
           </>
         )}
       </DialogContent>

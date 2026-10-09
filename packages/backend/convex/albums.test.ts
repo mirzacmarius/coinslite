@@ -4,6 +4,7 @@ import { convexTest } from "convex-test";
 import { expect, test, vi } from "vitest";
 import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { albumDeleteBatch } from "./albums";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -516,6 +517,67 @@ async function addPhoto(
   const storageId = await t.run((ctx) => ctx.storage.store(new Blob([jpeg])));
   await who.as.action(api.photos.attach, { itemId, side, storageId });
 }
+
+test("many ticked Items go with their Album a batch at a time; the rest stay, without an Album", async () => {
+  vi.useFakeTimers();
+  try {
+    const t = newTest();
+    const ada = await person(t, "ada@example.com");
+    const travel = await ada.as.mutation(api.albums.create, {
+      name: "Travel",
+      colour: "blue",
+    });
+    const ticked = albumDeleteBatch * 2 + 10;
+    const kept = 15;
+    const ids = await t.run(async (ctx) => {
+      const ids = [];
+      for (let n = 0; n < ticked + kept; n++)
+        ids.push(
+          await ctx.db.insert("items", {
+            ownerId: ada.userId,
+            type: "coin",
+            title: `Coin ${n}`,
+            quantity: 1,
+            albumId: travel,
+          }),
+        );
+      await ctx.db.patch(travel, { itemCount: ticked + kept });
+      return ids;
+    });
+    const count = () =>
+      t.run(
+        async (ctx) =>
+          (
+            await ctx.db
+              .query("items")
+              .withIndex("by_ownerId", (q) => q.eq("ownerId", ada.userId))
+              .collect()
+          ).length,
+      );
+
+    await ada.as.mutation(api.albums.remove, {
+      albumId: travel,
+      deleteItemIds: ids.slice(0, ticked),
+    });
+    // The first batch goes at once; the Album is gone from the list.
+    expect(await count()).toBe(ticked + kept - albumDeleteBatch);
+    expect(await ada.as.query(api.albums.list, {})).toEqual([]);
+
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+    const left = await t.run((ctx) =>
+      ctx.db
+        .query("items")
+        .withIndex("by_ownerId", (q) => q.eq("ownerId", ada.userId))
+        .collect(),
+    );
+    expect(left.map((item) => item._id).sort()).toEqual(
+      ids.slice(ticked).sort(),
+    );
+    expect(left.every((item) => item.albumId === undefined)).toBe(true);
+  } finally {
+    vi.useRealTimers();
+  }
+});
 
 test("Items deleted with their Album take their stored photos with them", async () => {
   const t = newTest();

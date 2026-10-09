@@ -17,8 +17,14 @@ export const setLimits = {
    * 600; a grouping larger than this is viewed through the Sets below it.
    */
   entries: 1000,
-  /** Catalog nodes (entries and the groupings between them) one Set view reads, at most. */
-  nodes: 2000,
+  /**
+   * Catalog nodes (entries and the groupings between them) one Set view
+   * reads, at most. Empty groupings are passed over, so every grouping
+   * walked has an entry below it, at most 7 levels up (catalogLimits.depth):
+   * a Set within `entries` never needs more than 8 nodes per entry, leaving
+   * room for as many empty groupings as entries besides.
+   */
+  nodes: 9000,
 } as const;
 
 export const setErrors = {

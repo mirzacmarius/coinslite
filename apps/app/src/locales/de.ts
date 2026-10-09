@@ -452,6 +452,8 @@ export default {
     errors: {
       tooLarge: "Die Datei ist größer als 10 MB. Wähle ein kleineres Foto.",
       notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
+      tooMany:
+        "Zu viele Uploads in kurzer Zeit. Versuche es in ein paar Minuten erneut.",
       failed:
         "Das Foto konnte nicht gespeichert werden. Versuche es noch einmal.",
       removeFailed:
@@ -690,7 +692,8 @@ export default {
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED:
         "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
-      CREDIT_REQUIRED: "Ein Bild braucht Quelle, Urheber, Lizenz und Link.",
+      CREDIT_REQUIRED:
+        "Fakten, Hinweise und Bilder brauchen jeweils Quelle, Urheber, Lizenz und Link.",
       ROOT_NOT_ADDABLE:
         "Ein Land oder Thema kann kein Katalogeintrag sein. Gib der Zeile eine parent_id.",
       PARENT_NOT_FOUND:
@@ -703,6 +706,8 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
       ENTRY_HAS_ITEMS:
         "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer. Lass is_addable auf true.",
+      TOO_MANY_NODES_BELOW:
+        "Unter den Knoten, die diese Datei verschiebt, liegen mehr als 2.000 Knoten. Verschiebe weniger auf einmal.",
       TOO_MANY_LINKED_ITEMS:
         "Mit den Einträgen, deren Objektart sich ändert, sind über 1.000 Objekte verknüpft. Ändere weniger auf einmal.",
     },
@@ -779,6 +784,9 @@ export default {
     unavailable:
       "Premium kann hier noch nicht gekauft werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
     alreadyPremium: "Du hast bereits Premium.",
+    checkoutPending:
+      "Eine Bezahlseite für den anderen Tarif ist noch offen. Schließe sie dort ab oder versuche es in einer Stunde erneut.",
+    accountClosing: "Dein Konto wird gerade gelöscht.",
     checkoutFailed:
       "Die Bezahlseite konnte nicht geöffnet werden. Versuche es noch einmal.",
     price: "Preis",
@@ -961,6 +969,8 @@ export default {
       removeFailed:
         "Das Bild konnte nicht entfernt werden. Versuche es noch einmal.",
       CATALOG_ENTRY_NOT_FOUND: "Diesen Katalogeintrag gibt es nicht mehr.",
+      TOO_MANY_UPLOADS:
+        "Zu viele Uploads in kurzer Zeit. Versuche es in ein paar Minuten erneut.",
       IMAGE_NOT_FOUND:
         "Der Upload ist nicht angekommen. Versuche es noch einmal.",
       IMAGE_NOT_WEBP:
@@ -1084,6 +1094,8 @@ export default {
     pdf: "Als PDF exportieren",
     pdfTooLarge:
       "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
+    tooLarge:
+      "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
     premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
@@ -1345,7 +1357,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Maße.",
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED: "Nenne die Quelle dieser Fakten oder Hinweise.",
-      CREDIT_REQUIRED: "Das Bild braucht Quelle, Urheber, Lizenz und Link.",
+      CREDIT_REQUIRED:
+        "Fakten, Hinweise und das Bild brauchen jeweils Quelle, Urheber, Lizenz und Link.",
       ROOT_NOT_ADDABLE: "Ein Land oder Thema kann kein Katalogeintrag sein.",
       PARENT_NOT_FOUND:
         "Der Knoten darüber ist weg. Schließe dies und versuche es noch einmal.",
@@ -1355,6 +1368,8 @@ export default {
         "Unter diesem Knoten stehen weitere, deshalb kann er kein Katalogeintrag werden.",
       ENTRY_HAS_ITEMS:
         "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer.",
+      TOO_MANY_NODES_BELOW:
+        "Unter diesem Knoten liegen mehr als 2.000 Knoten, zu viele, um sie auf einmal zu verschieben.",
       TOO_MANY_LINKED_ITEMS:
         "Mit diesem Eintrag sind über 1.000 Objekte verknüpft, zu viele, um ihre Objektart auf einmal zu ändern.",
       ID_REQUIRED: "Gib eine ID ein.",

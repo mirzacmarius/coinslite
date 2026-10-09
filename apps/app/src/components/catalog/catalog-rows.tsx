@@ -90,10 +90,18 @@ export function RowCount({ label, count }: { label: string; count: number }) {
 }
 
 /** How many of an entry the person holds; nothing when none. */
-export function HeldCount({ held }: { held: number }) {
+export function HeldCount({
+  held,
+  more = false,
+}: {
+  held: number;
+  /** Counted over some of the Items only: they hold at least `held`. */
+  more?: boolean;
+}) {
   const t = useI18n();
   const format = useFormatters();
   if (held === 0) return null;
+  const count = `${format.number(held)}${more ? "+" : ""}`;
   return (
     <span className="inline-flex shrink-0 items-center gap-1 text-xs tabular-nums">
       <Check
@@ -101,10 +109,8 @@ export function HeldCount({ held }: { held: number }) {
         strokeWidth={2}
         aria-hidden="true"
       />
-      <span className="sr-only">
-        {t("catalog.youHold", { count: format.number(held) })}
-      </span>
-      <span aria-hidden="true">{format.number(held)}</span>
+      <span className="sr-only">{t("catalog.youHold", { count })}</span>
+      <span aria-hidden="true">{count}</span>
     </span>
   );
 }
@@ -162,7 +168,7 @@ export function EntryRows({ entries }: { entries: CatalogEntryRow[] }) {
         entry.imageCredit &&
         `${t("catalog.imageCredit")} · ${catalogFormat.credit(entry.imageCredit)}`
       }
-      end={<HeldCount held={entry.held} />}
+      end={<HeldCount held={entry.held} more={entry.heldMore} />}
     />
   ));
 }

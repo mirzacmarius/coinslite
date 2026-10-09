@@ -34,6 +34,12 @@ const app = defineApp({
     POLAR_SERVER: v.optional(v.string()),
     POLAR_PREMIUM_MONTHLY_PRODUCT_ID: v.optional(v.string()),
     POLAR_PREMIUM_YEARLY_PRODUCT_ID: v.optional(v.string()),
+    /**
+     * Signs the links to Item photos (photos/links.ts). Without it the
+     * deployment signs with a random secret it keeps in its database, which
+     * works as well; set it on production so the secret lives outside the data.
+     */
+    PHOTO_LINK_SECRET: v.optional(v.string()),
   },
 });
 app.use(rateLimiter);

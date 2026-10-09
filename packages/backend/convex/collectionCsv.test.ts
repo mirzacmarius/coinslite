@@ -351,7 +351,7 @@ test("headings and names are in the person's language, or the one asked for; num
       "",
       "",
       "Postfrisk",
-      "Tilstand (frimerker)",
+      "Kvalitet (frimerker)",
       "",
       "",
       "Sverige",
@@ -383,4 +383,34 @@ test("headings and names are in the person's language, or the one asked for; num
     "Silber · 0.800",
     "Norwegen",
   ]);
+});
+
+/** A Collection of `count` coins for `ownerId`, put straight into the database. */
+async function fillCollection(t: Test, ownerId: Id<"users">, count: number) {
+  await t.run(async (ctx) => {
+    for (let index = 0; index < count; index++)
+      await ctx.db.insert("items", {
+        ownerId,
+        type: "coin",
+        title: `Coin ${index}`,
+        quantity: 1,
+      });
+  });
+}
+
+test("a Collection too large to read whole isn't exported, rather than exported in part", async () => {
+  // Convex caps what one query may read; this deployment's cap is lowered so
+  // a modest Collection runs into it.
+  const t = convexTest({
+    schema,
+    modules,
+    transactionLimits: { documentsRead: 700 },
+  });
+  rateLimiter.register(t);
+  const ada = await premiumMember(t, "ada@example.com");
+  await fillCollection(t, ada.userId, 1000);
+
+  await expect(
+    ada.as.query(api.collection.exports.csv, { view: {} }),
+  ).rejects.toThrow("COLLECTION_TOO_LARGE_TO_EXPORT");
 });

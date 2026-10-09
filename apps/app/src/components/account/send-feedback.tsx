@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coinslite/ui/dialog";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
 import { useMutation } from "convex/react";
@@ -131,14 +132,13 @@ export function SendFeedback() {
               </DialogTitle>
             </div>
             <DialogClose asChild>
-              <Button
+              <IconButton
                 type="button"
-                variant="ghost"
-                size="icon-xs"
-                aria-label={t("feedback.close")}
+                label={t("feedback.close")}
+                shortcut="Esc"
               >
                 <X />
-              </Button>
+              </IconButton>
             </DialogClose>
           </DialogHeader>
 

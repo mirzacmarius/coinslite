@@ -443,6 +443,8 @@ export default {
     errors: {
       tooLarge: "Ce fichier dépasse 10 Mo. Choisissez une photo plus légère.",
       notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
+      tooMany:
+        "Trop de téléversements en peu de temps. Réessayez dans quelques minutes.",
       failed: "Impossible d’enregistrer la photo. Réessayez.",
       removeFailed: "Impossible de retirer la photo. Réessayez.",
     },
@@ -679,7 +681,7 @@ export default {
       SOURCE_REQUIRED:
         "Indiquez la source de ces faits, de ces notes ou de cette image.",
       CREDIT_REQUIRED:
-        "Une image doit indiquer sa source, son auteur, sa licence et son lien.",
+        "Les données, les notes et les images doivent chacune indiquer leur source, leur auteur, leur licence et leur lien.",
       ROOT_NOT_ADDABLE:
         "Un pays ou un thème ne peut pas être une entrée du catalogue. Donnez un parent_id à la ligne.",
       PARENT_NOT_FOUND: "Aucune ligne du fichier ni du catalogue n’a cet id.",
@@ -691,6 +693,8 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci\u00a0: il ne peut pas devenir une entrée du catalogue.",
       ENTRY_HAS_ITEMS:
         "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste. Gardez is_addable à true.",
+      TOO_MANY_NODES_BELOW:
+        "Plus de 2 000 nœuds se trouvent sous ceux que ce fichier déplace. Déplacez-en moins à la fois.",
       TOO_MANY_LINKED_ITEMS:
         "Plus de 1 000 objets sont liés aux entrées dont le type d’objet change. Modifiez-en moins à la fois.",
     },
@@ -767,6 +771,9 @@ export default {
     unavailable:
       "Premium ne peut pas encore être acheté ici\u00a0: la facturation n’est pas configurée sur cet environnement.",
     alreadyPremium: "Vous avez déjà Premium.",
+    checkoutPending:
+      "Un paiement pour l’autre formule est encore ouvert. Terminez-le, ou réessayez dans une heure.",
+    accountClosing: "Votre compte est en cours de suppression.",
     checkoutFailed: "Impossible d’ouvrir la page de paiement. Réessayez.",
     price: "Prix",
     renews: "Renouvellement le",
@@ -946,6 +953,8 @@ export default {
       failed: "Impossible d’enregistrer l’image. Réessayez.",
       removeFailed: "Impossible de retirer l’image. Réessayez.",
       CATALOG_ENTRY_NOT_FOUND: "Cette entrée du catalogue n’existe plus.",
+      TOO_MANY_UPLOADS:
+        "Trop de téléversements en peu de temps. Réessayez dans quelques minutes.",
       IMAGE_NOT_FOUND: "Le téléversement n’est pas arrivé. Réessayez.",
       IMAGE_NOT_WEBP: "L’image n’a pas été enregistrée en WebP. Réessayez.",
       IMAGE_TOO_LARGE:
@@ -1066,6 +1075,8 @@ export default {
     pdf: "Exporter en PDF",
     pdfTooLarge:
       "Un PDF contient jusqu’à {limit} objets. Affinez la vue pour l’exporter.",
+    tooLarge:
+      "Votre collection est trop volumineuse pour être exportée d’un coup\u00a0: plutôt que d’omettre des objets, elle n’est pas exportée.",
     premiumOnly: "L’export de votre collection fait partie de Premium.",
     failed: "Impossible d’exporter la collection. Réessayez.",
     fileName: "coinslite-collection-{date}.csv",
@@ -1332,7 +1343,7 @@ export default {
       YEARS_REVERSED: "La dernière année précède la première.",
       SOURCE_REQUIRED: "Indiquez la source de ces données ou de ces notes.",
       CREDIT_REQUIRED:
-        "L’image doit indiquer sa source, son auteur, sa licence et son lien.",
+        "Les données, les notes et l’image doivent chacune indiquer leur source, leur auteur, leur licence et leur lien.",
       ROOT_NOT_ADDABLE:
         "Un pays ou un thème ne peut pas être une entrée du catalogue.",
       PARENT_NOT_FOUND:
@@ -1343,6 +1354,8 @@ export default {
         "D’autres nœuds se trouvent sous celui-ci\u00a0: il ne peut pas devenir une entrée du catalogue.",
       ENTRY_HAS_ITEMS:
         "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste.",
+      TOO_MANY_NODES_BELOW:
+        "Plus de 2 000 nœuds se trouvent sous celui-ci, trop pour les déplacer en une fois.",
       TOO_MANY_LINKED_ITEMS:
         "Plus de 1 000 objets sont liés à cette entrée, trop pour changer leur type d’objet d’un coup.",
       ID_REQUIRED: "Donnez-lui un identifiant.",

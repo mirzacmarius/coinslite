@@ -34,9 +34,12 @@ beforeAll(async () => {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(NOW);
+  // The Premium product the subscriptions below are for.
+  vi.stubEnv("POLAR_PREMIUM_MONTHLY_PRODUCT_ID", "prod_premium_monthly");
 });
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllEnvs();
 });
 
 const newTest = () => {

@@ -61,6 +61,9 @@ async function morganDollars(admin: Caller) {
       is_addable: "true",
       year_from: year,
       facts_source: "United States Mint",
+      facts_author: "United States Mint",
+      facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
     })),
   ]);
 }
@@ -633,6 +636,57 @@ test("an image's files are fresh uploads that no Item or other entry uses", asyn
   expect(await urlOf(t, photo)).not.toBeNull();
 });
 
+test("an upload is registered for one admin and one use: another admin, or an Item photo, can't take it", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const other = await person(t, "other@example.com", { admin: true });
+  await morganDollars(admin.as);
+  const itemId = await admin.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  const files = await uploads(t);
+  for (const storageId of [files.full, files.thumbnail])
+    await admin.as.mutation(api.catalog.images.register, { storageId });
+  const photo = await upload(t, webp(800, 600, "lossy", 7));
+  await admin.as.mutation(api.photos.register, { storageId: photo });
+
+  await expect(
+    other.as.action(api.catalog.images.attach, {
+      key: "us-morgan-1881",
+      ...files,
+      credit,
+    }),
+  ).rejects.toThrow("IMAGE_NOT_FOUND");
+  await expect(
+    admin.as.action(api.photos.attach, {
+      itemId,
+      side: "front",
+      storageId: files.full,
+    }),
+  ).rejects.toThrow("PHOTO_NOT_FOUND");
+  await expect(
+    admin.as.action(api.catalog.images.attach, {
+      key: "us-morgan-1881",
+      full: photo,
+      thumbnail: files.thumbnail,
+      credit,
+    }),
+  ).rejects.toThrow("IMAGE_NOT_FOUND");
+  expect(await stored(t)).toBe(3);
+
+  await admin.as.action(api.catalog.images.attach, {
+    key: "us-morgan-1881",
+    ...files,
+    credit,
+  });
+  await admin.as.action(api.photos.attach, {
+    itemId,
+    side: "front",
+    storageId: photo,
+  });
+});
+
 test("uploads older than an hour don't become an image, and are left alone", async () => {
   vi.useFakeTimers({ toFake: ["Date"] });
   const t = newTest();
@@ -694,6 +748,9 @@ test("Catalog CSV imports keep an uploaded image and its credit, unless the file
       title: "Morgan dollar 1881",
       year_from: "1881",
       facts_source: "US Mint",
+      facts_author: "US Mint",
+      facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
     },
   ]);
   expect(await detail()).toMatchObject({

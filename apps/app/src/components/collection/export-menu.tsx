@@ -39,15 +39,19 @@ import { useState } from "react";
  * The Collection toolbar's Export menu. On Premium it downloads the view on
  * screen (its search, filters and sort) as a file the server makes; on the
  * Free plan it shows the way to Premium instead. One entry per file format:
- * CSV for spreadsheets, PDF for printing.
+ * CSV for spreadsheets, PDF for printing. A Collection too large to read
+ * whole isn't exported at all, rather than with Items missing.
  */
 export function ExportMenu({
   view,
   count,
+  complete,
 }: {
   view: CollectionView;
   /** How many Items the view shows. */
   count: number;
+  /** False when the Collection was too large to read whole. */
+  complete: boolean;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -80,6 +84,8 @@ export function ExportMenu({
         });
       } else if (code === collectionExportErrors.tooManyItems) {
         toast.error(t("collectionExport.pdfTooLarge", { limit: pdfLimit }));
+      } else if (code === collectionExportErrors.incomplete) {
+        toast.error(t("collectionExport.tooLarge"));
       } else {
         toast.error(t("collectionExport.failed"));
       }
@@ -148,23 +154,31 @@ export function ExportMenu({
               {t("collectionExport.inView", { count })}
             </DropdownMenuLabel>
             <DropdownMenuItem
-              disabled={plan !== "premium" || count === 0}
+              disabled={plan !== "premium" || count === 0 || !complete}
               onSelect={() => void exportCsv()}
             >
               <FileSpreadsheet strokeWidth={1.75} />
               {t("collectionExport.csv")}
             </DropdownMenuItem>
             <DropdownMenuItem
-              disabled={plan !== "premium" || count === 0 || tooLargeForPdf}
+              disabled={
+                plan !== "premium" || count === 0 || tooLargeForPdf || !complete
+              }
               onSelect={() => void exportPdf()}
             >
               <FileText strokeWidth={1.75} />
               {t("collectionExport.pdf")}
             </DropdownMenuItem>
-            {tooLargeForPdf && (
+            {!complete ? (
               <p className="px-2 py-1.5 text-xs text-muted-foreground">
-                {t("collectionExport.pdfTooLarge", { limit: pdfLimit })}
+                {t("collectionExport.tooLarge")}
               </p>
+            ) : (
+              tooLargeForPdf && (
+                <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                  {t("collectionExport.pdfTooLarge", { limit: pdfLimit })}
+                </p>
+              )
             )}
           </>
         )}

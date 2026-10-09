@@ -3,43 +3,51 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import {
   type ActionCtx,
-  type MutationCtx,
   type QueryCtx,
   action,
   internalMutation,
-  internalQuery,
   mutation,
   query,
 } from "./_generated/server";
 import { requireOwnItem } from "./items";
+import { ensurePhotoLinks, photoLink } from "./photos/links";
 import {
   photoErrors,
   photoLimits,
   photoSignatureLength,
   photoType,
 } from "./photos/rules";
+import { limitUploads } from "./uploads";
 import { requireSetUpUser } from "./utils/auth";
-import { freshUpload } from "./utils/files";
+import {
+  claimUpload,
+  discardUpload,
+  ownUpload,
+  settleUpload,
+} from "./utils/files";
 import { photoSide } from "./utils/validators";
 
 /** Where each side's photo is kept on the Item. */
 const photoFields = { front: "frontPhoto", back: "backPhoto" } as const;
 
-const urlOf = async (ctx: QueryCtx, photo: Id<"_storage"> | undefined) =>
-  photo ? await ctx.storage.getUrl(photo) : null;
+const linkOf = async (
+  ctx: QueryCtx,
+  ownerId: Id<"users">,
+  photo: Id<"_storage"> | undefined,
+) => (photo ? await photoLink(ctx, ownerId, photo) : null);
 
 /**
  * One of the caller's Items, and a file they may put on it: a fresh upload
- * that isn't already a photo of any Item or a Catalog image. A file id alone
- * is no key to a file someone else stored.
+ * registered to them for a photo (utils/files.ts), that isn't already a photo
+ * of any Item or a Catalog image.
  */
 async function checkUpload(
-  ctx: QueryCtx | MutationCtx,
+  ctx: QueryCtx,
   { itemId, storageId }: { itemId: Id<"items">; storageId: Id<"_storage"> },
   now: number,
 ) {
   const item = await requireOwnItem(ctx, itemId);
-  const file = await freshUpload(ctx, storageId, now);
+  const file = await ownUpload(ctx, storageId, item.ownerId, "photo", now);
   if (!file) throw new ConvexError(photoErrors.notFound);
   return { item, file };
 }
@@ -57,13 +65,33 @@ async function photoProblem(
   return photoType(new Uint8Array(head)) ? undefined : photoErrors.notAnImage;
 }
 
-/** A one-time address the browser sends a photo file to before `attach`. */
+/**
+ * A one-time address the browser sends a photo file to before `register`,
+ * at most a few dozen an hour per person.
+ */
 export const generateUploadUrl = mutation({
   args: {},
   returns: v.string(),
   handler: async (ctx) => {
-    await requireSetUpUser(ctx);
+    const user = await requireSetUpUser(ctx);
+    await limitUploads(ctx, user._id);
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+/**
+ * Registers a file the caller just uploaded as their photo upload, so nobody
+ * else can use it or have it thrown away. `attach` registers one that isn't
+ * yet; the app registers right after uploading.
+ */
+export const register = mutation({
+  args: { storageId: v.id("_storage") },
+  returns: v.null(),
+  handler: async (ctx, { storageId }) => {
+    const user = await requireSetUpUser(ctx);
+    if (!(await claimUpload(ctx, storageId, user._id, "photo", Date.now())))
+      throw new ConvexError(photoErrors.notFound);
+    return null;
   },
 });
 
@@ -78,9 +106,9 @@ export const attach = action({
   args: { ...uploadArgs, side: photoSide },
   returns: v.null(),
   handler: async (ctx, { itemId, side, storageId }) => {
-    const { size }: { size: number } = await ctx.runQuery(
-      internal.photos.upload,
-      { itemId, storageId, now: Date.now() },
+    const { size }: { size: number } = await ctx.runMutation(
+      internal.photos.claim,
+      { itemId, storageId },
     );
     const problem = await photoProblem(ctx, storageId, size);
     if (problem) {
@@ -92,23 +120,29 @@ export const attach = action({
   },
 });
 
-/** The size of an upload the caller may put on their Item. */
-export const upload = internalQuery({
-  args: { ...uploadArgs, now: v.number() },
+/**
+ * Registers the upload to the caller if nobody has yet, and returns the size
+ * of this upload they may put on their Item.
+ */
+export const claim = internalMutation({
+  args: uploadArgs,
   returns: v.object({ size: v.number() }),
-  handler: async (ctx, { now, ...upload }) => {
+  handler: async (ctx, upload) => {
+    const item = await requireOwnItem(ctx, upload.itemId);
+    const now = Date.now();
+    await claimUpload(ctx, upload.storageId, item.ownerId, "photo", now);
     const { file } = await checkUpload(ctx, upload, now);
     return { size: file.size };
   },
 });
 
-/** Throws away an upload that was rejected. */
+/** Throws away an upload of the caller's that was rejected. */
 export const discard = internalMutation({
   args: uploadArgs,
   returns: v.null(),
   handler: async (ctx, upload) => {
     await checkUpload(ctx, upload, Date.now());
-    await ctx.storage.delete(upload.storageId);
+    await discardUpload(ctx, upload.storageId);
     return null;
   },
 });
@@ -123,6 +157,8 @@ export const save = internalMutation({
     const replaced = item[field];
     if (replaced) await ctx.storage.delete(replaced);
     await ctx.db.patch(item._id, { [field]: upload.storageId });
+    await settleUpload(ctx, upload.storageId);
+    await ensurePhotoLinks(ctx);
     return null;
   },
 });
@@ -143,7 +179,10 @@ export const remove = mutation({
   },
 });
 
-/** Links to an Item's photos, for its owner only; null for anyone else's Item. */
+/**
+ * Links to an Item's photos, for its owner only; null for anyone else's Item.
+ * Each works for an hour at most; this query hands out fresh ones in time.
+ */
 export const ofItem = query({
   args: { itemId: v.id("items") },
   returns: v.union(
@@ -158,8 +197,8 @@ export const ofItem = query({
     const item = await ctx.db.get(itemId);
     if (!item || item.ownerId !== owner._id) return null;
     return {
-      front: await urlOf(ctx, item.frontPhoto),
-      back: await urlOf(ctx, item.backPhoto),
+      front: await linkOf(ctx, owner._id, item.frontPhoto),
+      back: await linkOf(ctx, owner._id, item.backPhoto),
     };
   },
 });

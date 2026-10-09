@@ -1,11 +1,17 @@
 /// <reference types="vite/client" />
 import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
-import { afterEach, expect, test, vi } from "vitest";
-import { api } from "./_generated/api";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { api, internal } from "./_generated/api";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
+
+const SITE = "https://coinslite-test.convex.site";
+beforeEach(() => {
+  vi.stubEnv("CONVEX_SITE_URL", SITE);
+  vi.stubEnv("PHOTO_LINK_SECRET", "a-secret-only-the-backend-knows");
+});
 
 type Test = ReturnType<typeof convexTest>;
 
@@ -311,6 +317,180 @@ test("only a fresh upload becomes a photo; older stored files are left alone", a
     front: null,
     back: null,
   });
+});
+
+test("an upload belongs to whoever registers it first: nobody else can use it or have it thrown away", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  const adasItem = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  const bobsItem = await bob.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Mine",
+  });
+  const photo = await upload(t);
+  const notAnImage = await upload(t, file(ascii("%PDF-1.7")));
+  for (const storageId of [photo, notAnImage])
+    await ada.as.mutation(api.photos.register, { storageId });
+
+  for (const storageId of [photo, notAnImage]) {
+    await expect(
+      bob.as.mutation(api.photos.register, { storageId }),
+    ).rejects.toThrow("PHOTO_NOT_FOUND");
+    await expect(
+      bob.as.action(api.photos.attach, {
+        itemId: bobsItem,
+        side: "front",
+        storageId,
+      }),
+    ).rejects.toThrow("PHOTO_NOT_FOUND");
+  }
+  // Bob's tries threw nothing of Ada's away.
+  expect(await stored(t)).toBe(2);
+
+  await ada.as.action(api.photos.attach, {
+    itemId: adasItem,
+    side: "front",
+    storageId: photo,
+  });
+  expect(await ada.as.query(api.photos.ofItem, { itemId: adasItem })).toEqual({
+    front: expect.any(String),
+    back: null,
+  });
+});
+
+test("uploads never put to use are deleted after an hour, whether registered or not", async () => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  const kept = await upload(t);
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "front",
+    storageId: kept,
+  });
+  const registered = await upload(t);
+  await ada.as.mutation(api.photos.register, { storageId: registered });
+  await upload(t);
+
+  vi.setSystemTime(Date.now() + 30 * 60 * 1000);
+  await t.mutation(internal.uploads.sweep, {});
+  expect(await stored(t)).toBe(3);
+
+  vi.setSystemTime(Date.now() + 31 * 60 * 1000);
+  await t.mutation(internal.uploads.sweep, {});
+  expect(await stored(t)).toBe(1);
+  expect(await ada.as.query(api.photos.ofItem, { itemId })).toEqual({
+    front: expect.any(String),
+    back: null,
+  });
+});
+
+test("deleting the account deletes uploads it registered but never used", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  await ada.as.mutation(api.photos.register, { storageId: await upload(t) });
+  await bob.as.mutation(api.photos.register, { storageId: await upload(t) });
+
+  await ada.as.action(api.account.deletion.deleteAccount, {});
+
+  expect(await stored(t)).toBe(1);
+});
+
+test("upload addresses are handed out at a steady pace, not without limit", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  let handedOut = 0;
+  await expect(
+    (async () => {
+      for (; handedOut < 1000; handedOut++)
+        await ada.as.mutation(api.photos.generateUploadUrl, {});
+    })(),
+  ).rejects.toThrow("TOO_MANY_UPLOADS");
+  expect(handedOut).toBeGreaterThanOrEqual(20);
+  expect(handedOut).toBeLessThan(1000);
+  // Someone else's pace is their own.
+  await bob.as.mutation(api.photos.generateUploadUrl, {});
+});
+
+/** Opens a photo link the way a browser does: no session, just the link. */
+const open = (t: Test, link: string) => t.fetch(link.slice(SITE.length));
+
+test("photo links lead to CoinsLite, which serves the photo only for a signed, fresh link", async () => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  const photo = file(images.png, 4096);
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "front",
+    storageId: await upload(t, photo),
+  });
+  const link = (await ada.as.query(api.photos.ofItem, { itemId }))!.front!;
+
+  expect(link.startsWith(`${SITE}/photos?`)).toBe(true);
+  const served = await open(t, link);
+  expect(served.status).toBe(200);
+  expect(served.headers.get("content-type")).toBe("image/png");
+  expect(served.headers.get("cache-control")).toMatch(/^private/);
+  expect(new Uint8Array(await served.arrayBuffer())).toEqual(
+    new Uint8Array(await photo.arrayBuffer()),
+  );
+
+  // A link someone changed, or made up, opens nothing.
+  const url = new URL(link);
+  const forged = new URL(link);
+  forged.searchParams.set("signature", "0".repeat(64));
+  const longer = new URL(link);
+  longer.searchParams.set("issued", String(Date.now() + 24 * 60 * 60 * 1000));
+  for (const changed of [forged, longer])
+    expect((await open(t, changed.toString())).status).toBe(403);
+  expect(
+    (await open(t, `${SITE}/photos?file=${url.searchParams.get("file")}`))
+      .status,
+  ).toBe(403);
+
+  // A link is good for an hour at most; the app gets fresh ones before then.
+  vi.setSystemTime(Date.now() + 61 * 60 * 1000);
+  expect((await open(t, link)).status).toBe(403);
+  await t.mutation(internal.photos.links.renew, {});
+  const fresh = (await ada.as.query(api.photos.ofItem, { itemId }))!.front!;
+  expect(fresh).not.toBe(link);
+  expect((await open(t, fresh)).status).toBe(200);
+});
+
+test("without a secret on the deployment, photo links still work, signed with one the backend keeps", async () => {
+  vi.stubEnv("PHOTO_LINK_SECRET", "");
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "Krone",
+  });
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "back",
+    storageId: await upload(t),
+  });
+  const link = (await ada.as.query(api.photos.ofItem, { itemId }))!.back!;
+
+  expect((await open(t, link)).status).toBe(200);
+  const forged = new URL(link);
+  forged.searchParams.set("signature", "0".repeat(64));
+  expect((await open(t, forged.toString())).status).toBe(403);
 });
 
 afterEach(() => {

@@ -439,6 +439,8 @@ export default {
     errors: {
       tooLarge: "Fișierul are peste 10 MB. Alege o fotografie mai mică.",
       notAnImage: "Fișierul nu este o imagine JPEG, PNG, WebP sau GIF.",
+      tooMany:
+        "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
       failed: "Fotografia nu a putut fi salvată. Încearcă din nou.",
       removeFailed: "Fotografia nu a putut fi eliminată. Încearcă din nou.",
     },
@@ -670,7 +672,8 @@ export default {
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED:
         "Precizează sursa acestor date, note sau a acestei imagini.",
-      CREDIT_REQUIRED: "O imagine are nevoie de sursă, autor, licență și link.",
+      CREDIT_REQUIRED:
+        "Datele, notele și imaginile au nevoie fiecare de sursă, autor, licență și link.",
       ROOT_NOT_ADDABLE:
         "O țară sau o temă nu poate fi intrare de catalog. Dă-i rândului un parent_id.",
       PARENT_NOT_FOUND:
@@ -683,6 +686,8 @@ export default {
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
       ENTRY_HAS_ITEMS:
         "De această intrare de catalog sunt legate obiecte, deci rămâne intrare. Păstrează is_addable pe true.",
+      TOO_MANY_NODES_BELOW:
+        "Sub nodurile pe care le mută acest fișier se află peste 2.000 de noduri. Mută mai puține odată.",
       TOO_MANY_LINKED_ITEMS:
         "Peste 1.000 de obiecte sunt legate de intrările al căror tip de obiect se schimbă. Modifică mai puține odată.",
     },
@@ -759,6 +764,9 @@ export default {
     unavailable:
       "Premium nu poate fi cumpărat aici încă: facturarea nu este configurată în acest mediu.",
     alreadyPremium: "Ai deja Premium.",
+    checkoutPending:
+      "O plată pentru celălalt abonament este încă deschisă. Finalizeaz-o acolo sau încearcă din nou peste o oră.",
+    accountClosing: "Contul tău este în curs de ștergere.",
     checkoutFailed: "Pagina de plată nu s-a putut deschide. Încearcă din nou.",
     price: "Preț",
     renews: "Se reînnoiește",
@@ -937,6 +945,8 @@ export default {
       failed: "Imaginea nu a putut fi salvată. Încearcă din nou.",
       removeFailed: "Imaginea nu a putut fi eliminată. Încearcă din nou.",
       CATALOG_ENTRY_NOT_FOUND: "Această intrare de catalog nu mai există.",
+      TOO_MANY_UPLOADS:
+        "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
       IMAGE_NOT_FOUND: "Încărcarea nu a ajuns. Încearcă din nou.",
       IMAGE_NOT_WEBP: "Imaginea nu a fost salvată ca WebP. Încearcă din nou.",
       IMAGE_TOO_LARGE:
@@ -1055,6 +1065,8 @@ export default {
     pdf: "Exportă ca PDF",
     pdfTooLarge:
       "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o exporta.",
+    tooLarge:
+      "Colecția ta este prea mare pentru a fi exportată dintr-odată, așa că nu este exportată în loc să lipsească obiecte.",
     premiumOnly: "Exportul colecției face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
@@ -1307,7 +1319,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Bancnotele nu au metal sau dimensiuni.",
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED: "Precizează sursa acestor date sau note.",
-      CREDIT_REQUIRED: "Imaginea are nevoie de sursă, autor, licență și link.",
+      CREDIT_REQUIRED:
+        "Datele, notele și imaginea au nevoie fiecare de sursă, autor, licență și link.",
       ROOT_NOT_ADDABLE: "O țară sau o temă nu poate fi intrare de catalog.",
       PARENT_NOT_FOUND:
         "Nodul de deasupra nu mai există. Închide asta și încearcă din nou.",
@@ -1317,6 +1330,8 @@ export default {
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
       ENTRY_HAS_ITEMS:
         "De această intrare de catalog sunt legate obiecte, deci rămâne intrare.",
+      TOO_MANY_NODES_BELOW:
+        "Sub acest nod se află peste 2.000 de noduri, prea multe pentru a fi mutate deodată.",
       TOO_MANY_LINKED_ITEMS:
         "Peste 1.000 de obiecte sunt legate de această intrare, prea multe ca să le schimbi tipul de obiect deodată.",
       ID_REQUIRED: "Dă-i un ID.",

@@ -43,8 +43,6 @@ export type CollectionPdfMessages = {
     perItem: (currency: string) => string;
     gainLoss: string;
     ownerStated: string;
-    /** When the Collection was too large to read whole. */
-    incomplete: (count: string) => string;
   };
 };
 
@@ -95,8 +93,6 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
         "Gain/loss is Market value minus Purchase price, for Items that have both.",
       ownerStated:
         "Purchase prices and Market values are stated by the owner, not appraised.",
-      incomplete: (count) =>
-        `The Collection is too large to read at once, so this covers only the first ${count} Items added.`,
     },
   },
   nb: {
@@ -145,8 +141,6 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
         "Gevinst/tap er markedsverdi minus innkjøpspris, for objekter som har begge.",
       ownerStated:
         "Innkjøpspriser og markedsverdier er oppgitt av eieren, ikke taksert.",
-      incomplete: (count) =>
-        `Samlingen er for stor til å leses på én gang, så denne dekker bare de første ${count} objektene som ble lagt til.`,
     },
   },
   de: {
@@ -195,8 +189,6 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
         "Gewinn/Verlust ist Marktwert minus Kaufpreis, für Objekte, die beides haben.",
       ownerStated:
         "Kaufpreise und Marktwerte sind Angaben des Eigentümers, keine Schätzung.",
-      incomplete: (count) =>
-        `Die Sammlung ist zu groß, um sie auf einmal zu lesen; dies umfasst nur die ersten ${count} hinzugefügten Objekte.`,
     },
   },
   fr: {
@@ -245,8 +237,6 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
         "Le gain/perte est la valeur de marché moins le prix d’achat, pour les objets qui ont les deux.",
       ownerStated:
         "Les prix d’achat et les valeurs de marché sont déclarés par le propriétaire, sans expertise.",
-      incomplete: (count) =>
-        `La collection est trop grande pour être lue d’un coup\u00a0: ce document ne couvre que les ${count} premiers objets ajoutés.`,
     },
   },
   ro: {
@@ -295,8 +285,6 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
         "Câștigul/pierderea este valoarea de piață minus prețul de achiziție, pentru obiectele care le au pe amândouă.",
       ownerStated:
         "Prețurile de achiziție și valorile de piață sunt declarate de proprietar, nu evaluate.",
-      incomplete: (count) =>
-        `Colecția este prea mare pentru a fi citită dintr-odată, așa că aceasta cuprinde doar primele ${count} de obiecte adăugate.`,
     },
   },
 };

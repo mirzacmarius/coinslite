@@ -739,3 +739,43 @@ test("a Collection read in full says so", async () => {
     }),
   ).toMatchObject({ complete: true, collectionSize: 5, currency: "NOK" });
 });
+
+test("a Collection linked to many Catalog entries stops at the query's allowance of lookups too, and says so", async () => {
+  // Each distinct Catalog entry is one more lookup; the deployment's cap on
+  // them is lowered so a modest Collection runs into it.
+  const t = convexTest({
+    schema,
+    modules,
+    transactionLimits: { databaseQueries: 300 },
+  });
+  rateLimiter.register(t);
+  const ada = await person(t, "ada@example.com");
+  await t.run(async (ctx) => {
+    for (let index = 0; index < 500; index++) {
+      const entry = await ctx.db.insert("catalogNodes", {
+        key: `entry-${index}`,
+        path: `entry-${index}`,
+        kind: "entry",
+        title: `Entry ${index}`,
+        sortOrder: index,
+        searchText: `Entry ${index}`,
+      });
+      await ctx.db.insert("items", {
+        ownerId: ada.userId,
+        type: "coin",
+        title: `Coin ${index}`,
+        quantity: 1,
+        catalogEntryId: entry,
+      });
+    }
+  });
+
+  const result = await ada.as.query(api.collection.browse, {
+    view: {},
+    page: 1,
+    pageSize: 15,
+  });
+  expect(result.complete).toBe(false);
+  expect(result.collectionSize).toBeLessThan(500);
+  expect(result.items).toHaveLength(15);
+});

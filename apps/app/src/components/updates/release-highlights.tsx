@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coinslite/ui/dialog";
+import { IconButton } from "@coinslite/ui/icon-button";
 import { useMutation } from "convex/react";
 import { X } from "lucide-react";
 import Link from "next/link";
@@ -69,13 +70,9 @@ export function ReleaseHighlights() {
             </DialogDescription>
           </div>
           <DialogClose asChild>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              aria-label={t("updates.close")}
-            >
+            <IconButton type="button" label={t("updates.close")} shortcut="Esc">
               <X strokeWidth={1.75} />
-            </Button>
+            </IconButton>
           </DialogClose>
         </DialogHeader>
         <ul className="flex list-disc flex-col gap-2 pb-4 pl-8 pr-4 text-sm marker:text-muted-foreground">

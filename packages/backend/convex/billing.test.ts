@@ -19,6 +19,8 @@ beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date("2026-10-09T12:00:00Z"));
   vi.stubEnv("POLAR_WEBHOOK_SECRET", SECRET);
+  vi.stubEnv("POLAR_PREMIUM_MONTHLY_PRODUCT_ID", MONTHLY);
+  vi.stubEnv("POLAR_PREMIUM_YEARLY_PRODUCT_ID", YEARLY);
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -322,9 +324,11 @@ test("a renewal keeps Premium going; a period that ends with no renewal ends it"
     }),
   );
 
-  // Renewals take a moment to come through: Premium doesn't flicker meanwhile.
-  await wait(t, 30 * DAY + 60 * 60 * 1000);
+  // Premium lasts as long as the paid period; a renewal reported after it ends brings it back.
+  await wait(t, 30 * DAY - 60_000);
   expect(await planOfPerson(ada)).toBe("premium");
+  await wait(t, 60_000 + 60 * 60 * 1000);
+  expect(await planOfPerson(ada)).toBe("free");
   await deliver(
     t,
     subscriptionEvent("subscription.updated", ada.userId, {
@@ -332,13 +336,12 @@ test("a renewal keeps Premium going; a period that ends with no renewal ends it"
       current_period_end: iso(firstEnd + 30 * DAY),
     }),
   );
-  await wait(t, 2 * DAY);
   expect(await planOfPerson(ada)).toBe("premium");
 
-  // No renewal reported for the second period: a day after it ends, Premium does.
-  await wait(t, 28 * DAY);
+  // No renewal reported for the second period: Premium ends with it.
+  await wait(t, 30 * DAY - 2 * 60 * 60 * 1000);
   expect(await planOfPerson(ada)).toBe("premium");
-  await wait(t, DAY);
+  await wait(t, 60 * 60 * 1000);
   expect(await planOfPerson(ada)).toBe("free");
 });
 
@@ -547,17 +550,39 @@ test("someone signed out, or not set up yet, has no Premium page to show", async
 const portalUrl = (customerId: string) =>
   `https://sandbox.polar.sh/coinslite/portal?customer_session_token=polar_cst_${customerId}`;
 
+/** A subscription as Polar's API lists it. */
+type ListedSubscription = {
+  id: string;
+  status: string;
+  cancel_at_period_end: boolean;
+  ended_at: string | null;
+};
+
 /**
- * Polar's API, faked at the network: answers checkouts, customer sessions
- * and subscription updates.
+ * Polar's API, faked at the network: answers checkouts, customer sessions,
+ * the subscriptions it lists for a customer (`subscriptions`) and
+ * subscription updates. `whileListing` runs while Polar is being asked for
+ * the list, as if someone did something in the meantime.
  */
-function fakePolar({ fail = false } = {}) {
+function fakePolar({
+  fail = false,
+  failRevoke = false,
+  subscriptions = [],
+  whileListing,
+}: {
+  fail?: boolean;
+  failRevoke?: boolean;
+  subscriptions?: ListedSubscription[];
+  whileListing?: () => Promise<void>;
+} = {}) {
+  let checkouts = 0;
   const polar = vi.fn(async (url: string, init?: RequestInit) => {
     if (fail) return new Response('{"detail":"nope"}', { status: 422 });
     const path = new URL(url).pathname;
     if (init?.method === "POST" && path === "/v1/checkouts/") {
+      const id = `chk_${++checkouts}`;
       return Response.json(
-        { id: "chk_1", url: "https://sandbox.polar.sh/checkout/chk_1" },
+        { id, url: `https://sandbox.polar.sh/checkout/${id}` },
         { status: 201 },
       );
     }
@@ -573,23 +598,36 @@ function fakePolar({ fail = false } = {}) {
         { status: 201 },
       );
     }
+    if (init?.method === "GET" && path === "/v1/subscriptions/") {
+      await whileListing?.();
+      return Response.json({
+        items: subscriptions,
+        pagination: { total_count: subscriptions.length, max_page: 1 },
+      });
+    }
     if (init?.method === "PATCH" && path.startsWith("/v1/subscriptions/")) {
+      if (failRevoke) return new Response('{"detail":"nope"}', { status: 500 });
       return Response.json({ id: path.split("/").pop(), status: "canceled" });
     }
     return new Response("not found", { status: 404 });
   });
   vi.stubGlobal("fetch", polar);
+  const requests = () =>
+    polar.mock.calls.map(([url, init]) => ({
+      url,
+      method: init?.method,
+      headers: new Headers(init?.headers),
+      body: init?.body ? JSON.parse(String(init.body)) : undefined,
+    }));
   return {
     polar,
-    request: (n = 0) => {
-      const [url, init] = polar.mock.calls[n] as [string, RequestInit];
-      return {
-        url,
-        method: init.method,
-        headers: new Headers(init.headers),
-        body: init.body ? JSON.parse(String(init.body)) : undefined,
-      };
-    },
+    requests,
+    request: (n = 0) => requests()[n]!,
+    /** The subscriptions CoinsLite asked Polar to end. */
+    revoked: () =>
+      requests()
+        .filter((sent) => sent.method === "PATCH")
+        .map((sent) => sent.url.split("/").pop()),
   };
 }
 
@@ -686,17 +724,16 @@ test("when Polar can't open a checkout, the buyer is told it failed", async () =
 
 test("deleting an account stops its Premium subscription at Polar and removes the subscription link", async () => {
   configurePolar();
-  const { polar, request } = fakePolar();
+  const { requests, revoked } = fakePolar();
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   await deliver(t, subscriptionEvent("subscription.created", ada.userId));
 
   await ada.as.action(api.account.deletion.deleteAccount, {});
 
-  expect(polar).toHaveBeenCalledTimes(1);
-  expect(request()).toMatchObject({
+  expect(revoked()).toEqual(["sub_1"]);
+  expect(requests().find((sent) => sent.method === "PATCH")).toMatchObject({
     url: "https://sandbox-api.polar.sh/v1/subscriptions/sub_1",
-    method: "PATCH",
     body: { revoke: true },
   });
   expect(await t.run((ctx) => ctx.db.query("subscriptions").take(5))).toEqual(
@@ -705,9 +742,18 @@ test("deleting an account stops its Premium subscription at Polar and removes th
   expect(await t.run((ctx) => ctx.db.get(ada.userId))).toBeNull();
 });
 
-test("a subscription already set to end needs nothing from Polar when the account is deleted", async () => {
+test("a subscription already set to end needs nothing ended at Polar when the account is deleted", async () => {
   configurePolar();
-  const { polar } = fakePolar();
+  const { revoked } = fakePolar({
+    subscriptions: [
+      {
+        id: "sub_1",
+        status: "active",
+        cancel_at_period_end: true,
+        ended_at: null,
+      },
+    ],
+  });
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   await deliver(
@@ -719,7 +765,7 @@ test("a subscription already set to end needs nothing from Polar when the accoun
 
   await ada.as.action(api.account.deletion.deleteAccount, {});
 
-  expect(polar).not.toHaveBeenCalled();
+  expect(revoked()).toEqual([]);
   expect(await t.run((ctx) => ctx.db.query("subscriptions").take(5))).toEqual(
     [],
   );
@@ -727,7 +773,7 @@ test("a subscription already set to end needs nothing from Polar when the accoun
 
 test("while Polar can't end a renewing subscription, nothing of the account is deleted", async () => {
   configurePolar();
-  const { polar } = fakePolar({ fail: true });
+  const { revoked } = fakePolar({ failRevoke: true });
   vi.spyOn(console, "error").mockImplementation(() => {});
   const t = newTest();
   const ada = await person(t, "ada@example.com");
@@ -738,7 +784,7 @@ test("while Polar can't end a renewing subscription, nothing of the account is d
     ada.as.action(api.account.deletion.deleteAccount, {}),
   ).rejects.toThrow();
 
-  expect(polar).toHaveBeenCalledTimes(1);
+  expect(revoked()).toEqual(["sub_1"]);
   expect(await t.run((ctx) => ctx.db.get(ada.userId))).not.toBeNull();
   expect(await ada.as.query(api.plans.usage, {})).toEqual({
     plan: "premium",
@@ -902,8 +948,17 @@ test("cancelling and then resuming before the period ends keeps Premium going, a
     plan: "premium",
     subscription: { currentPeriodEnd: periodEnd, cancelAtPeriodEnd: false },
   });
-  // Past the cancelled end, inside the renewal's grace: still Premium.
-  await wait(t, 5 * DAY + 60 * 60 * 1000);
+  // It renews again: Premium lasts to the period's end, and on with the renewal.
+  await wait(t, 5 * DAY - 60_000);
+  expect(await planOfPerson(ada)).toBe("premium");
+  await deliver(
+    t,
+    subscriptionEvent("subscription.updated", ada.userId, {
+      current_period_end: iso(periodEnd + 30 * DAY),
+      modified_at: iso(Date.now()),
+    }),
+  );
+  await wait(t, 2 * 60_000);
   expect(await planOfPerson(ada)).toBe("premium");
 });
 
@@ -999,4 +1054,154 @@ test("after Premium ends, every Item stays visible and editable, and the Free pl
   await expect(ada.as.mutation(api.items.add, krone)).rejects.toThrow(
     "ITEM_LIMIT_REACHED",
   );
+});
+
+test("only the Premium products make anyone Premium", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+
+  await deliver(
+    t,
+    subscriptionEvent("subscription.created", ada.userId, {
+      product_id: "prod_something_else",
+    }),
+  );
+  expect(await planOfPerson(ada)).toBe("free");
+
+  await deliver(
+    t,
+    subscriptionEvent("subscription.updated", ada.userId, {
+      product_id: YEARLY,
+      modified_at: iso(Date.now() + 1),
+    }),
+  );
+  expect(await planOfPerson(ada)).toBe("premium");
+});
+
+test("asking for the same checkout again sends the buyer back to the one already open", async () => {
+  configurePolar();
+  const { requests } = fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+
+  const first = await ada.as.action(api.billing.checkout, { interval: "year" });
+  const again = await ada.as.action(api.billing.checkout, { interval: "year" });
+
+  expect(again).toEqual(first);
+  expect(requests().filter((sent) => sent.method === "POST")).toHaveLength(1);
+});
+
+test("while a checkout is open, one for the other plan is refused until it expires", async () => {
+  configurePolar();
+  const { requests } = fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await ada.as.action(api.billing.checkout, { interval: "year" });
+
+  await expect(
+    ada.as.action(api.billing.checkout, { interval: "month" }),
+  ).rejects.toThrow("CHECKOUT_PENDING");
+
+  await wait(t, 60 * 60 * 1000);
+  expect(
+    await ada.as.action(api.billing.checkout, { interval: "month" }),
+  ).toEqual({ url: "https://sandbox.polar.sh/checkout/chk_2" });
+  expect(requests().filter((sent) => sent.method === "POST")).toHaveLength(2);
+});
+
+test("when Polar fails to open a checkout, the next try isn't held up", async () => {
+  configurePolar();
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  fakePolar({ fail: true });
+  await expect(
+    ada.as.action(api.billing.checkout, { interval: "month" }),
+  ).rejects.toThrow("CHECKOUT_FAILED");
+
+  fakePolar();
+  expect(
+    await ada.as.action(api.billing.checkout, { interval: "year" }),
+  ).toEqual({ url: "https://sandbox.polar.sh/checkout/chk_1" });
+});
+
+test("deleting an account also ends a subscription Polar has but CoinsLite hasn't heard about yet", async () => {
+  configurePolar();
+  const { requests, revoked } = fakePolar({
+    subscriptions: [
+      {
+        id: "sub_9",
+        status: "active",
+        cancel_at_period_end: false,
+        ended_at: null,
+      },
+    ],
+  });
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+
+  await ada.as.action(api.account.deletion.deleteAccount, {});
+
+  const listed = requests().find((sent) => sent.method === "GET");
+  expect(new URL(listed!.url).searchParams.get("external_customer_id")).toBe(
+    ada.userId,
+  );
+  expect(revoked()).toEqual(["sub_9"]);
+  expect(await t.run((ctx) => ctx.db.get(ada.userId))).toBeNull();
+});
+
+test("a subscription Polar reports after the account is deleted is ended at Polar", async () => {
+  configurePolar();
+  const { revoked } = fakePolar();
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  await ada.as.action(api.account.deletion.deleteAccount, {});
+
+  // Paid in a checkout left open before the deletion; Polar's event comes late.
+  const response = await deliver(
+    t,
+    subscriptionEvent("subscription.created", ada.userId),
+  );
+  await wait(t, 1);
+
+  expect(response.status).toBe(202);
+  expect(revoked()).toEqual(["sub_1"]);
+  expect(await t.run((ctx) => ctx.db.query("subscriptions").take(5))).toEqual(
+    [],
+  );
+  expect(await t.run((ctx) => ctx.db.get(ada.userId))).toBeNull();
+});
+
+test("no checkout opens while the account is being deleted, and one that fails to delete can check out again", async () => {
+  configurePolar();
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  let duringDeletion: unknown;
+  fakePolar({
+    failRevoke: true,
+    subscriptions: [
+      {
+        id: "sub_9",
+        status: "active",
+        cancel_at_period_end: false,
+        ended_at: null,
+      },
+    ],
+    whileListing: async () => {
+      duringDeletion = await ada.as
+        .action(api.billing.checkout, { interval: "month" })
+        .catch((error: unknown) => error);
+    },
+  });
+
+  await expect(
+    ada.as.action(api.account.deletion.deleteAccount, {}),
+  ).rejects.toThrow();
+
+  expect(String(duringDeletion)).toContain("ACCOUNT_CLOSING");
+  fakePolar();
+  expect(
+    await ada.as.action(api.billing.checkout, { interval: "month" }),
+  ).toEqual({ url: "https://sandbox.polar.sh/checkout/chk_1" });
 });

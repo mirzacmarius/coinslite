@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
 import { env, internalMutation } from "../_generated/server";
 import { normalizeEmail } from "../accounts/credentials";
+import { testPremiumProduct } from "../billing/polar";
 
 export const testingErrors = {
   /** Asked of a deployment that sends real email, i.e. not a test backend. */
@@ -28,13 +29,13 @@ export const grant = internalMutation({
     const user = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", normalizeEmail(email)))
-      .first();
+      .unique();
     if (!user) throw new ConvexError(testingErrors.userNotFound);
     const now = Date.now();
     await ctx.runMutation(internal.billing.recordSubscription, {
       polarId: `test_${user._id}`,
       polarCustomerId: `test_${user._id}`,
-      productId: "test_premium_monthly",
+      productId: testPremiumProduct,
       status: "active",
       interval: "month",
       currency: "EUR",

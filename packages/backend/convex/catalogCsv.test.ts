@@ -6,6 +6,7 @@ import { expect, test } from "vitest";
 import vercelBuildScript from "../scripts/vercel-build-app.sh?raw";
 import { api, internal } from "./_generated/api";
 import { parseCsv } from "./catalog/csvText";
+import { catalogLimits } from "./catalog/fields";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -87,9 +88,9 @@ function records(csv: string) {
 }
 
 const morganFile = [
-  "id,parent_id,item_type,title,country,denomination,series,material,strike,metal,weight_g,fineness,diameter_mm,year_from,year_to,sort_order,is_addable,facts_source,facts_licence",
-  "us,,,United States,US,,,,,,,,,,,1,,,",
-  "us-morgan-1881-s,us,coin,Morgan dollar 1881-S,US,1 dollar,Morgan dollar,silver,circulation,silver,26.73,0.9,38.1,1881,1881,5,true,United States Mint,Public domain",
+  "id,parent_id,item_type,title,country,denomination,series,material,strike,metal,weight_g,fineness,diameter_mm,year_from,year_to,sort_order,is_addable,facts_source,facts_author,facts_licence,facts_link",
+  "us,,,United States,US,,,,,,,,,,,1,,,,,",
+  "us-morgan-1881-s,us,coin,Morgan dollar 1881-S,US,1 dollar,Morgan dollar,silver,circulation,silver,26.73,0.9,38.1,1881,1881,5,true,United States Mint,United States Mint,Public domain,https://www.usmint.gov/",
 ].join("\n");
 
 test("an admin sees what an import will insert, then imports it with parents resolved within the file", async () => {
@@ -146,7 +147,9 @@ test("an admin sees what an import will insert, then imports it with parents res
       sort_order: "5",
       is_addable: "true",
       facts_source: "United States Mint",
+      facts_author: "United States Mint",
       facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
     }),
   ]);
 });
@@ -232,9 +235,9 @@ test("parent_id may name a node already in the Catalog, and a child may come bef
   await admin.as.mutation(api.catalog.csv.importFile, { csv: morganFile });
 
   const peace = [
-    "id,parent_id,item_type,title,series,is_addable,facts_source",
-    "us-peace-1922,us-peace,coin,Peace dollar 1922,Peace dollar,true,United States Mint",
-    "us-peace,us,coin,Peace dollar,,false,",
+    "id,parent_id,item_type,title,series,is_addable,facts_source,facts_author,facts_licence,facts_link",
+    "us-peace-1922,us-peace,coin,Peace dollar 1922,Peace dollar,true,United States Mint,United States Mint,Public domain,https://www.usmint.gov/",
+    "us-peace,us,coin,Peace dollar,,false,,,,",
   ].join("\n");
   expect(
     await admin.as.mutation(api.catalog.csv.importFile, { csv: peace }),
@@ -369,16 +372,30 @@ const entry = (id: string, cells: Record<string, string> = {}) => ({
   ...cells,
 });
 
+/** A group's author, licence and link: the credit besides its source. */
+const creditBesidesSource = (group: "facts" | "notes") => ({
+  [`${group}_author`]: "A. Writer",
+  [`${group}_licence`]: "Public domain",
+  [`${group}_link`]: "https://example.org/source",
+});
+
 test("every group of facts, notes and images names its source, and none may come from Numista", async () => {
   const t = newTest();
   const admin = await person(t, "admin@example.com", { admin: true });
   const file = csvOf([
     us,
-    entry("a", { weight_g: "26.73" }),
-    entry("b", { technical_details: "Reeded edge" }),
+    entry("a", { weight_g: "26.73", ...creditBesidesSource("facts") }),
+    entry("b", {
+      technical_details: "Reeded edge",
+      ...creditBesidesSource("notes"),
+    }),
     entry("c", { image_url: "https://example.org/c.jpg" }),
     entry("d", { facts_author: "A. Writer" }),
-    entry("e", { weight_g: "26.73", facts_source: "Numista" }),
+    entry("e", {
+      weight_g: "26.73",
+      facts_source: "Numista",
+      ...creditBesidesSource("facts"),
+    }),
     entry("f", {
       image_url: "https://en.numista.com/f.jpg",
       image_source: "Someone",
@@ -391,8 +408,10 @@ test("every group of facts, notes and images names its source, and none may come
     entry("i", {
       weight_g: "26.73",
       facts_source: "United States Mint",
+      ...creditBesidesSource("facts"),
       technical_details: "Reeded edge",
       notes_source: "CoinsLite editorial",
+      ...creditBesidesSource("notes"),
       image_url: "https://example.org/i.jpg",
       image_source: "Wikimedia Commons",
       image_author: "A. Photographer",
@@ -421,24 +440,88 @@ test("every group of facts, notes and images names its source, and none may come
   });
 });
 
+test("facts and notes are credited in full, as images are: source, author, licence and link", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const file = csvOf([
+    us,
+    entry("a", { weight_g: "26.73", facts_source: "United States Mint" }),
+    entry("b", {
+      technical_details: "Reeded edge",
+      notes_source: "CoinsLite editorial",
+      notes_author: "CoinsLite",
+    }),
+    entry("c", {
+      weight_g: "26.73",
+      facts_source: "United States Mint",
+      facts_author: "United States Mint",
+      facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
+    }),
+  ]);
+
+  expect(
+    await admin.as.query(api.catalog.csv.preview, { csv: file }),
+  ).toMatchObject({
+    inserts: 2,
+    errors: [
+      { row: 3, column: "facts_author", code: "CREDIT_REQUIRED" },
+      { row: 3, column: "facts_licence", code: "CREDIT_REQUIRED" },
+      { row: 3, column: "facts_link", code: "CREDIT_REQUIRED" },
+      { row: 4, column: "notes_licence", code: "CREDIT_REQUIRED" },
+      { row: 4, column: "notes_link", code: "CREDIT_REQUIRED" },
+    ],
+  });
+});
+
 test("each cell is checked against what its column holds", async () => {
   const t = newTest();
   const admin = await person(t, "admin@example.com", { admin: true });
   const file = csvOf([
     { ...us, country: "USA" },
     entry("a", { item_type: "stamp" }),
-    entry("b", { material: "wood", facts_source: "Mint" }),
-    entry("c", { strike: "shiny", facts_source: "Mint" }),
-    entry("d", { metal: "copper", facts_source: "Mint" }),
-    entry("e", { weight_g: "-1", facts_source: "Mint" }),
-    entry("f", { fineness: "1.5", facts_source: "Mint" }),
-    entry("g", { year_from: "1881", year_to: "1880", facts_source: "Mint" }),
-    entry("h", { year_from: "18x1", facts_source: "Mint" }),
+    entry("b", {
+      material: "wood",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("c", {
+      strike: "shiny",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("d", {
+      metal: "copper",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("e", {
+      weight_g: "-1",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("f", {
+      fineness: "1.5",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("g", {
+      year_from: "1881",
+      year_to: "1880",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("h", {
+      year_from: "18x1",
+      facts_source: "Mint",
+      ...creditBesidesSource("facts"),
+    }),
     entry("i", { image_url: "ftp://example.org/i.jpg", image_source: "Mint" }),
     entry("j", {
       item_type: "banknote",
       diameter_mm: "38.1",
       facts_source: "Mint",
+      ...creditBesidesSource("facts"),
     }),
     entry("k", { item_type: "" }),
     entry("l", { is_addable: "maybe" }),
@@ -458,6 +541,7 @@ test("each cell is checked against what its column holds", async () => {
       year_to: "1921",
       sort_order: "-2.5",
       facts_source: "Mint",
+      ...creditBesidesSource("facts"),
     }),
   ]);
 
@@ -521,8 +605,8 @@ test("quoted cells may hold commas, quotes and line breaks, and come back the sa
   const t = newTest();
   const admin = await person(t, "admin@example.com", { admin: true });
   const file = [
-    "﻿id,parent_id,title,historical_notes,notes_source",
-    'us,,"United States, the","Struck ""in"" 1878,\r\nand later.",CoinsLite editorial',
+    "﻿id,parent_id,title,historical_notes,notes_source,notes_author,notes_licence,notes_link",
+    'us,,"United States, the","Struck ""in"" 1878,\r\nand later.",CoinsLite editorial,CoinsLite,CoinsLite,https://example.org/notes',
   ].join("\r\n");
 
   expect(
@@ -630,3 +714,37 @@ test("every preview build loads the bundled Catalog through the function it name
   ]);
   expect((await search()).groups).not.toEqual([]);
 });
+
+test("moving a grouping with more nodes below it than one import may move is refused", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const below = catalogLimits.moveNodes;
+  const file = (parent: string) =>
+    [
+      "id,parent_id,title",
+      "us,,United States",
+      "silver,,Silver dollars",
+      `big,${parent},Big grouping`,
+      ...Array.from({ length: below }, (_, n) => `n${n},big,Node ${n}`),
+    ].join("\n");
+  await admin.as.mutation(api.catalog.csv.importFile, { csv: file("us") });
+
+  // Exactly as many as one import may move: the move goes ahead.
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: "id,parent_id,title\nbig,silver,Big grouping",
+    }),
+  ).toMatchObject({ applied: true, updates: 1 });
+
+  await admin.as.mutation(api.catalog.csv.importFile, {
+    csv: "id,parent_id,title\nn-extra,big,One more",
+  });
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: "id,parent_id,title\nbig,us,Big grouping",
+    }),
+  ).toMatchObject({
+    applied: false,
+    errors: [{ row: 2, column: "parent_id", code: "TOO_MANY_NODES_BELOW" }],
+  });
+}, 60_000);

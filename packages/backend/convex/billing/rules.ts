@@ -13,6 +13,10 @@ export const billingErrors = {
   noSubscription: "NO_SUBSCRIPTION",
   /** Polar didn't open its customer portal. */
   portalFailed: "PORTAL_FAILED",
+  /** A checkout for the other billing interval is still open. */
+  checkoutPending: "CHECKOUT_PENDING",
+  /** The account is being deleted. */
+  accountClosing: "ACCOUNT_CLOSING",
 } as const;
 
 export const billingIntervals = ["month", "year"] as const;
@@ -92,17 +96,11 @@ export type SubscriptionState = {
 const payingStatuses = new Set(["active", "trialing", "past_due"]);
 
 /**
- * How long a subscription that renews stays Premium past its period's end
- * while Polar reports the renewal, so members don't drop to the Free plan for
- * the minutes a renewal takes. One that's set to end gets no grace.
- */
-export const RENEWAL_GRACE_MS = 24 * 60 * 60 * 1000;
-
-/**
  * The Premium status rule: until when this subscription makes its owner
  * Premium. Active, trialing and past-due subscriptions count until their
- * period ends; a cancelled one (or one set to cancel) until the end of the
- * period that was paid for; one that has ended (revoked), not at all.
+ * period ends, when Polar's report of a renewal carries them into the next;
+ * a cancelled one (or one set to cancel) until the end of the period that was
+ * paid for; one that has ended (revoked), not at all.
  *
  * Returns the end in ms, "open" for Premium with no end known, or null for
  * not Premium.
@@ -110,17 +108,12 @@ export const RENEWAL_GRACE_MS = 24 * 60 * 60 * 1000;
 export function premiumUntil(
   subscription: SubscriptionState,
 ): number | "open" | null {
-  const { status, currentPeriodEnd, cancelAtPeriodEnd, endedAt } = subscription;
+  const { status, currentPeriodEnd, endedAt } = subscription;
   let end: number | "open" | null;
   if (status === "canceled") {
     end = currentPeriodEnd ?? null;
   } else if (payingStatuses.has(status)) {
-    end =
-      currentPeriodEnd === undefined
-        ? "open"
-        : cancelAtPeriodEnd
-          ? currentPeriodEnd
-          : currentPeriodEnd + RENEWAL_GRACE_MS;
+    end = currentPeriodEnd ?? "open";
   } else {
     end = null;
   }

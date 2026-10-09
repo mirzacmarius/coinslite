@@ -12,11 +12,18 @@ import { rateLimiter as emailChangeLimits } from "../account";
 import { rateLimiter as codeEmailLimits } from "../accounts/codeEmails";
 import { deleteSignInMethods } from "../accounts/linking";
 import { albumLimits } from "../albums/rules";
-import { deleteSubscriptionsOf, stopBilling } from "../billing";
+import {
+  beginClosing,
+  cancelClosing,
+  deleteSubscriptionsOf,
+  markClosed,
+  stopBilling,
+} from "../billing";
 import { chargesAgain } from "../billing/rules";
 import { deleteCollectionCountsOf } from "../collectionCounts";
 import { rateLimiter as feedbackLimits } from "../feedback";
 import { deleteItem } from "../items/deletion";
+import { deleteUploadsOf, rateLimiter as uploadLimits } from "../uploads";
 import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
 
 /**
@@ -24,8 +31,10 @@ import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
  * their subscription link and every way to sign in as them, for good. It
  * happens in three stages:
  *
- * 1. Billing: a subscription that would charge again is ended at Polar. If
- *    that fails, nothing is deleted, so no deleted account is still billed.
+ * 1. Billing: the account is marked as closing, so no checkout opens, and
+ *    every subscription that would charge again (recorded here or only known
+ *    to Polar so far) is ended at Polar. If that fails, nothing is deleted
+ *    and the mark is lifted, so no deleted account is still billed.
  * 2. At once, in one transaction: the subscription link, the profile, the
  *    sign-in methods and whatever is keyed on the email address go, so nobody
  *    can use or sign in to the account any more and the address is free for a
@@ -33,6 +42,9 @@ import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
  *    all of it).
  * 3. In the background, a batch per transaction: whatever didn't fit, so a
  *    Collection of any size can go.
+ *
+ * A record that the account id was deleted stays, so a subscription Polar
+ * reports for it afterwards is ended there too.
  */
 
 /**
@@ -56,12 +68,18 @@ export const accountDataByTable = {
     "deleted: the Items, with their stored photos and their links to Catalog entries",
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
+  pendingCheckouts: "deleted at once: the checkout left open, if any",
+  uploads: "deleted: files they uploaded but never made a photo or an image",
+  accountClosures:
+    "kept: that the account id was deleted, naming no one, so Polar's late events about it end the subscription they report",
   collectionCounts:
     "deleted at once: how many Items and Albums the Collection holds, with a copy of the plan",
   adminStats: "kept: figures across everyone, which name no one",
   devOutbox:
     "deleted: emails sent to the account's address (local and CI deployments only)",
   catalogNodes: "kept: the Catalog everyone shares",
+  photoLinkKeys:
+    "kept: when photo links are issued and the deployment's own signing secret, which name no one",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",
   featureFlags: "kept: the feature flags that apply to everyone",
 } as const satisfies Record<TableNames, `${"deleted" | "kept"}${string}`>;
@@ -138,6 +156,7 @@ type Remainder = Infer<typeof remainder>;
 async function forgetPerson(ctx: MutationCtx, user: Doc<"users">) {
   await feedbackLimits.reset(ctx, "feedback", { key: user._id });
   await emailChangeLimits.reset(ctx, "emailChange", { key: user._id });
+  await uploadLimits.reset(ctx, "upload", { key: user._id });
   const { email } = user;
   if (email === undefined) return;
   await codeEmailLimits.reset(ctx, "codeEmail", { key: email });
@@ -250,10 +269,14 @@ const deleteOutbox: Step = async (ctx, { outbox }, budget) => {
   );
 };
 
+const deleteUploads: Step = (ctx, { userId }, budget) =>
+  deleteUploadsOf(ctx, userId, budget);
+
 /** In order: sessions first, so every device is signed out at once. */
 const steps: Step[] = [
   deleteSessions,
   deleteEmailChanges,
+  deleteUploads,
   deleteAlbums,
   deleteItems,
   deleteOutbox,
@@ -295,8 +318,39 @@ export const deleteAccount = action({
   handler: async (ctx) => {
     const userId = await requireUserId(ctx);
     // First, so a deleted account is never charged again.
-    await stopBilling(ctx, userId);
+    await ctx.runMutation(internal.account.deletion.beginClosingAccount, {
+      userId,
+    });
+    try {
+      await stopBilling(ctx, userId);
+    } catch (error) {
+      await ctx.runMutation(internal.account.deletion.cancelClosingAccount, {
+        userId,
+      });
+      throw error;
+    }
     await ctx.runMutation(internal.account.deletion.closeAccount, { userId });
+    return null;
+  },
+});
+
+/** Marks the account as being deleted, so no checkout opens while billing stops. */
+export const beginClosingAccount = internalMutation({
+  args: { userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, { userId }) => {
+    if (!(await ctx.db.get(userId))) throw new ConvexError(NOT_SIGNED_IN);
+    await beginClosing(ctx, userId);
+    return null;
+  },
+});
+
+/** Lifts the mark when billing couldn't be stopped and nothing was deleted. */
+export const cancelClosingAccount = internalMutation({
+  args: { userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, { userId }) => {
+    await cancelClosing(ctx, userId);
     return null;
   },
 });
@@ -312,6 +366,7 @@ export const closeAccount = internalMutation({
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError(NOT_SIGNED_IN);
     await deleteSubscriptionsOf(ctx, userId);
+    await markClosed(ctx, userId);
     await deleteCollectionCountsOf(ctx, userId);
     await deleteSignInMethods(ctx, userId);
     await forgetPerson(ctx, user);

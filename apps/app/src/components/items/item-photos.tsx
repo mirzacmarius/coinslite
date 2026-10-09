@@ -10,6 +10,7 @@ import {
   photoSides,
   photoSignatureLength,
   photoType,
+  uploadErrors,
 } from "@coinslite/backend/convex/photos/rules";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
@@ -61,6 +62,7 @@ async function checkFile(file: File) {
 /** Uploads a file to storage, then has the server check it and put it on the Item. */
 function usePhotoUpload(itemId: Id<"items">) {
   const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
+  const register = useMutation(api.photos.register);
   const attach = useAction(api.photos.attach);
   return async (side: PhotoSide, file: File) => {
     const type = await checkFile(file);
@@ -73,6 +75,8 @@ function usePhotoUpload(itemId: Id<"items">) {
     const { storageId } = (await response.json()) as {
       storageId: Id<"_storage">;
     };
+    // At once, so the upload is ours before anything else can use it.
+    await register({ storageId });
     await attach({ itemId, side, storageId });
   };
 }
@@ -113,7 +117,9 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           ? t("photos.errors.tooLarge")
           : code === photoErrors.notAnImage
             ? t("photos.errors.notAnImage")
-            : t("photos.errors.failed"),
+            : code === uploadErrors.tooMany
+              ? t("photos.errors.tooMany")
+              : t("photos.errors.failed"),
       );
     } finally {
       setBusy((sides) => ({ ...sides, [side]: false }));

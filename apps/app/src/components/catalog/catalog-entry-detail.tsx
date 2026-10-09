@@ -131,6 +131,7 @@ export function CatalogEntryDetail({
           <PanelSection title={t("catalog.yourCollection")}>
             <PropertyRow label={t("catalog.held")}>
               {format.number(entry.held)}
+              {entry.heldMore && "+"}
             </PropertyRow>
           </PanelSection>
           {physical.length > 0 && (

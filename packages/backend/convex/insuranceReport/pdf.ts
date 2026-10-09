@@ -17,7 +17,7 @@ const typeOrder: readonly ItemType[] = ["coin", "banknote", "stamp"];
 
 type Row = ReportContents["rows"][number];
 
-/** A Grade as the report prints it: "PF-65", "1−", or a stamp's condition in words. */
+/** A Grade as the report prints it: "PF-65", "1−", or a stamp's Grade in words. */
 function gradeText(row: Row, messages: ReportMessages) {
   if (!row.gradingScale || !row.grade) return "";
   if (row.gradingScale === "stamp")

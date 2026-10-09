@@ -105,14 +105,26 @@ export function withCatalogFacts<T extends CatalogFacts>(
  * What a linked Item stores from a saved form: the facts that differ from
  * its Catalog entry's. A fact set to what the entry says isn't an override,
  * so it keeps following the entry.
+ *
+ * When an Item is edited, `stored` is what it held before. Only the facts
+ * the person changed in this save are judged again; one the form sends back
+ * as the Item showed it stays as it was stored, so an override is kept even
+ * while the entry happens to say the same. A fact cleared in the form
+ * follows the entry again.
  */
 export function overridesOnly<T extends CatalogFacts>(
   fields: T,
   facts: CatalogFacts,
+  stored?: CatalogFacts,
 ): T {
   const kept: CatalogFacts = { ...fields };
+  const shown = stored && withCatalogFacts(stored, facts);
   for (const name of catalogFactNames) {
-    if (kept[name] !== undefined && kept[name] === facts[name]) {
+    if (shown && kept[name] === shown[name]) {
+      // Unchanged in this save: keep what was stored, override or not.
+      if (stored[name] === undefined) delete kept[name];
+      else (kept as Record<CatalogFactName, unknown>)[name] = stored[name];
+    } else if (kept[name] !== undefined && kept[name] === facts[name]) {
       delete kept[name];
     }
   }

@@ -1,6 +1,12 @@
 import type { PaginationOptions } from "convex/server";
+import { v } from "convex/values";
+import { internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
-import type { MutationCtx, QueryCtx } from "../_generated/server";
+import {
+  type MutationCtx,
+  type QueryCtx,
+  internalMutation,
+} from "../_generated/server";
 import {
   type CatalogItemType,
   type CatalogKind,
@@ -88,35 +94,84 @@ const browseFieldsChanged = (node: Doc<"catalogNodes">, fields: BrowseFields) =>
   node.entryCount !== fields.entryCount ||
   node.countryNodeKey !== fields.countryNodeKey;
 
+/** How many nodes one transaction refreshes at most; the rest follow in the next. */
+const browseRefreshBatch = 200;
+/** What a refresh transaction leaves of its read allowance: one more grouping's entries. */
+const refreshDocumentsKept = 5000;
+const refreshBytesKept = 4 * 1024 * 1024;
+
 /**
- * Works out every node's browse fields afresh from the whole Catalog and
- * stores the ones that differ. Imports keep them in step as they go; this
- * fills them in for Catalog data stored before they existed.
+ * Works out every node's browse fields afresh, in path order a batch per
+ * transaction, and stores the ones that differ: a grouping's entry count is
+ * the entries below it, read through the entries' own index. Imports keep
+ * these fields in step as they go; this fills them in for Catalog data
+ * stored before they existed (catalog/seed.ts schedules it).
  */
-export async function refreshBrowseFields(ctx: MutationCtx) {
-  const nodes: Doc<"catalogNodes">[] = [];
-  for await (const node of ctx.db.query("catalogNodes").withIndex("by_path")) {
-    nodes.push(node);
-  }
-  const kinds = new Map(nodes.map((node) => [node.key, node.kind]));
-  const entryCounts = new Map<string, number>();
-  for (const node of nodes) {
-    if (node.kind !== "entry") continue;
-    for (const key of ancestorKeysOf(node.path)) {
-      entryCounts.set(key, (entryCounts.get(key) ?? 0) + 1);
+export const refreshBrowseFields = internalMutation({
+  args: { after: v.optional(v.string()) },
+  returns: v.null(),
+  handler: async (ctx, { after }) => {
+    const nodes = await ctx.db
+      .query("catalogNodes")
+      .withIndex("by_path", (q) =>
+        after === undefined ? q : q.gt("path", after),
+      )
+      .take(browseRefreshBatch);
+    const rootKinds = new Map<string, Doc<"catalogNodes">["kind"]>();
+    let last: string | undefined;
+    for (const node of nodes) {
+      const rootKey = segments(node.path)[0] as string;
+      let rootKind = rootKinds.get(rootKey);
+      if (rootKind === undefined) {
+        rootKind =
+          rootKey === node.key
+            ? node.kind
+            : (await nodeByKey(ctx, rootKey))?.kind ?? node.kind;
+        rootKinds.set(rootKey, rootKind);
+      }
+      const fields: BrowseFields = {
+        entryCount:
+          node.kind === "entry"
+            ? undefined
+            : await entriesBelow(ctx, node.path),
+        countryNodeKey: countryNodeKeyOf(node.path, rootKind),
+      };
+      if (browseFieldsChanged(node, fields)) {
+        await ctx.db.patch("catalogNodes", node._id, fields);
+      }
+      last = node.path;
+      const { documentsRead, bytesRead } =
+        await ctx.meta.getTransactionMetrics();
+      if (
+        documentsRead.remaining < refreshDocumentsKept ||
+        bytesRead.remaining < refreshBytesKept
+      )
+        break;
     }
-  }
-  for (const node of nodes) {
-    const rootKind = kinds.get(segments(node.path)[0] as string) ?? node.kind;
-    const fields: BrowseFields = {
-      entryCount:
-        node.kind === "entry" ? undefined : entryCounts.get(node.key) ?? 0,
-      countryNodeKey: countryNodeKeyOf(node.path, rootKind),
-    };
-    if (browseFieldsChanged(node, fields)) {
-      await ctx.db.patch("catalogNodes", node._id, fields);
+    const more =
+      last !== nodes.at(-1)?.path || nodes.length === browseRefreshBatch;
+    if (last !== undefined && more) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.catalog.tree.refreshBrowseFields,
+        { after: last },
+      );
     }
+    return null;
+  },
+});
+
+/** How many Catalog entries are below the node at `path`. */
+async function entriesBelow(ctx: QueryCtx, path: string) {
+  let count = 0;
+  for await (const _entry of ctx.db
+    .query("catalogNodes")
+    .withIndex("by_kind_and_path", (q) =>
+      q.eq("kind", "entry").gt("path", `${path}/`).lt("path", `${path}0`),
+    )) {
+    count++;
   }
+  return count;
 }
 
 async function nodeByKey(ctx: QueryCtx, key: string) {
@@ -203,6 +258,8 @@ export async function planRows(
   /** Entries whose Item type changes, for their linked Items to follow. */
   const retyped: Plan["retyped"] = [];
   let linkedItemsToRetype = 0;
+  /** Nodes below moved nodes (or roots that change kind), which follow them. */
+  let nodesToMove = 0;
   for (const node of planned.values()) {
     // One problem per cell: a cell that couldn't be read isn't reported again.
     const fail = (code: RowError["code"], column?: string) => {
@@ -227,6 +284,28 @@ export async function planRows(
     if (inCycle.has(node.key)) fail(catalogErrors.parentCycle, "parent_id");
     else if (segments(pathOf(node.key)).length > catalogLimits.depth)
       fail(catalogErrors.tooDeep, "parent_id");
+
+    // What's below a moved node, or a root that changes kind, follows it,
+    // as many nodes as one save can update.
+    const moves = node.existing && node.existing.path !== pathOf(node.key);
+    const rootChangesKind =
+      node.existing &&
+      node.parentKey === null &&
+      node.existing.kind !== node.kind;
+    if (node.existing && (moves || rootChangesKind)) {
+      const oldPath = node.existing.path;
+      const room = catalogLimits.moveNodes - nodesToMove;
+      nodesToMove += (
+        await ctx.db
+          .query("catalogNodes")
+          .withIndex("by_path", (q) =>
+            q.gt("path", `${oldPath}/`).lt("path", `${oldPath}0`),
+          )
+          .take(Math.max(0, room) + 1)
+      ).length;
+      if (nodesToMove > catalogLimits.moveNodes)
+        fail(catalogErrors.tooManyNodesBelow, moves ? "parent_id" : "country");
+    }
 
     for (const problem of checkNode(node.values, node.kind, {
       uploadedImage: keepsUploadedImage(node),

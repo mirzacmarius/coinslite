@@ -137,7 +137,7 @@ export default {
       norwegian: "Norsk (0–3)",
       european: "Europeisk (UNC–G)",
       international: "Internasjonal (UNC–PR)",
-      stamp: "Tilstand (frimerker)",
+      stamp: "Kvalitet (frimerker)",
     },
     strikes: {
       circulation: "Omløp",
@@ -437,6 +437,8 @@ export default {
     errors: {
       tooLarge: "Filen er større enn 10 MB. Velg et mindre bilde.",
       notAnImage: "Filen er ikke et JPEG-, PNG-, WebP- eller GIF-bilde.",
+      tooMany:
+        "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
       failed: "Bildet kunne ikke lagres. Prøv igjen.",
       removeFailed: "Bildet kunne ikke fjernes. Prøv igjen.",
     },
@@ -666,7 +668,7 @@ export default {
       SOURCE_REQUIRED:
         "Oppgi kilden til disse faktaene, notatene eller bildet.",
       CREDIT_REQUIRED:
-        "Et bilde trenger kilde, opphavsperson, lisens og lenke.",
+        "Fakta, notater og bilder trenger hver sin kilde, opphavsperson, lisens og lenke.",
       ROOT_NOT_ADDABLE:
         "Et land eller et tema kan ikke være en katalogoppføring. Gi raden en parent_id.",
       PARENT_NOT_FOUND: "Ingen rad i filen eller katalogen har denne id-en.",
@@ -678,6 +680,8 @@ export default {
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
       ENTRY_HAS_ITEMS:
         "Objekter er knyttet til denne katalogoppføringen, så den forblir én. Behold is_addable som true.",
+      TOO_MANY_NODES_BELOW:
+        "Mer enn 2 000 noder ligger under dem denne filen flytter. Flytt færre om gangen.",
       TOO_MANY_LINKED_ITEMS:
         "Over 1 000 objekter er knyttet til oppføringene som får ny objekttype. Endre færre om gangen.",
     },
@@ -754,6 +758,9 @@ export default {
     unavailable:
       "Premium kan ikke kjøpes her ennå: betaling er ikke satt opp i dette miljøet.",
     alreadyPremium: "Du har allerede Premium.",
+    checkoutPending:
+      "En betaling for den andre planen er fortsatt åpen. Fullfør den der, eller prøv igjen om en time.",
+    accountClosing: "Kontoen din blir slettet.",
     checkoutFailed: "Kunne ikke åpne kassen. Prøv igjen.",
     price: "Pris",
     renews: "Fornyes",
@@ -930,6 +937,8 @@ export default {
       failed: "Bildet kunne ikke lagres. Prøv igjen.",
       removeFailed: "Bildet kunne ikke fjernes. Prøv igjen.",
       CATALOG_ENTRY_NOT_FOUND: "Denne katalogoppføringen finnes ikke lenger.",
+      TOO_MANY_UPLOADS:
+        "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
       IMAGE_NOT_FOUND: "Opplastingen kom ikke frem. Prøv igjen.",
       IMAGE_NOT_WEBP: "Bildet ble ikke lagret som WebP. Prøv igjen.",
       IMAGE_TOO_LARGE:
@@ -1049,6 +1058,8 @@ export default {
     pdf: "Eksporter som PDF",
     pdfTooLarge:
       "En PDF viser opptil {limit} objekter. Snevre inn visningen for å eksportere den.",
+    tooLarge:
+      "Samlingen din er for stor til å eksporteres på én gang, så den eksporteres ikke i stedet for å mangle objekter.",
     premiumOnly: "Eksport av samlingen er en del av Premium.",
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",
@@ -1297,7 +1308,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Sedler har verken metall eller mål.",
       YEARS_REVERSED: "Siste år kommer før det første.",
       SOURCE_REQUIRED: "Oppgi kilden til disse faktaene eller notatene.",
-      CREDIT_REQUIRED: "Bildet trenger kilde, opphavsperson, lisens og lenke.",
+      CREDIT_REQUIRED:
+        "Fakta, notater og bildet trenger hver sin kilde, opphavsperson, lisens og lenke.",
       ROOT_NOT_ADDABLE:
         "Et land eller et tema kan ikke være en katalogoppføring.",
       PARENT_NOT_FOUND: "Noden over er borte. Lukk dette og prøv igjen.",
@@ -1307,6 +1319,8 @@ export default {
         "Det ligger noder under denne, så den kan ikke bli en katalogoppføring.",
       ENTRY_HAS_ITEMS:
         "Objekter er knyttet til denne katalogoppføringen, så den forblir én.",
+      TOO_MANY_NODES_BELOW:
+        "Mer enn 2 000 noder ligger under denne, for mange til å flyttes på én gang.",
       TOO_MANY_LINKED_ITEMS:
         "Over 1 000 objekter er knyttet til denne oppføringen, for mange til å endre objekttypen deres på én gang.",
       ID_REQUIRED: "Gi den en ID.",

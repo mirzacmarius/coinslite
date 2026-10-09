@@ -105,7 +105,11 @@ function UpgradeToPremium({ status }: { status: Status }) {
             ? "billing.unavailable"
             : code === billingErrors.alreadyPremium
               ? "billing.alreadyPremium"
-              : "billing.checkoutFailed",
+              : code === billingErrors.checkoutPending
+                ? "billing.checkoutPending"
+                : code === billingErrors.accountClosing
+                  ? "billing.accountClosing"
+                  : "billing.checkoutFailed",
         ),
       );
     }

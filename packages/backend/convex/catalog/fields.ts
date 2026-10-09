@@ -52,7 +52,7 @@ export const catalogErrors = {
   notForType: "FIELD_NOT_FOR_TYPE",
   yearsReversed: "YEARS_REVERSED",
   sourceRequired: "SOURCE_REQUIRED",
-  /** An image needs its source, author, licence and link. */
+  /** Facts, notes and images each need their source, author, licence and link. */
   creditRequired: "CREDIT_REQUIRED",
   rootNotAddable: "ROOT_NOT_ADDABLE",
   // Its place in the tree
@@ -65,6 +65,8 @@ export const catalogErrors = {
   entryHasItems: "ENTRY_HAS_ITEMS",
   /** More Items link to the entries changed than one save can update. */
   tooManyLinkedItems: "TOO_MANY_LINKED_ITEMS",
+  /** A move takes more nodes below along than one save can update. */
+  tooManyNodesBelow: "TOO_MANY_NODES_BELOW",
 } as const;
 export type CatalogError = (typeof catalogErrors)[keyof typeof catalogErrors];
 
@@ -91,6 +93,8 @@ export const catalogLimits = {
   linkedItems: 1000,
   /** Nodes one delete removes, the node and everything below it. */
   deleteNodes: 2000,
+  /** Nodes below that one save moves along with the nodes it moves. */
+  moveNodes: 2000,
   /** Years are whole numbers, BC as negatives. */
   earliestYear: -3000,
   latestYear: 3000,
@@ -534,7 +538,9 @@ export function checkNode(
     values.yearTo < values.yearFrom
   )
     problems.push({ column: "year_to", code: catalogErrors.yearsReversed });
-  // Catalog data of unknown origin is never stored (ADR 0003).
+  // Catalog data of unknown origin is never stored (ADR 0003), and each
+  // group of facts, notes and images is credited in full: source, author,
+  // licence and link.
   for (const group of provenanceGroups) {
     const hasData =
       groupValues[group].some((value) => values[value] !== undefined) ||
@@ -542,21 +548,18 @@ export function checkNode(
     const credited = provenanceParts.some(
       (part) => values[provenanceKey(group, part)] !== undefined,
     );
-    if (
-      (hasData || credited) &&
-      values[provenanceKey(group, "source")] === undefined
-    )
+    if (!hasData && !credited) continue;
+    if (values[provenanceKey(group, "source")] === undefined)
       problems.push({
         column: `${group}_source`,
         code: catalogErrors.sourceRequired,
       });
-  }
-  // Every image is credited in full: source, author, licence and link.
-  if (values.imageUrl !== undefined || uploadedImage) {
+    // Credit for data that isn't there yet needs only its source.
+    if (!hasData) continue;
     for (const part of ["author", "licence", "link"] as const) {
-      if (values[provenanceKey("image", part)] === undefined)
+      if (values[provenanceKey(group, part)] === undefined)
         problems.push({
-          column: `image_${part}`,
+          column: `${group}_${part}`,
           code: catalogErrors.creditRequired,
         });
     }

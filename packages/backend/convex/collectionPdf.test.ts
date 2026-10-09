@@ -392,8 +392,11 @@ test("an Item added from the Catalog shows its Catalog entry's facts in the PDF"
       "denomination",
       "year_from",
       "facts_source",
+      "facts_author",
+      "facts_licence",
+      "facts_link",
     ],
-    ["us", "", "United States", "", "", "US", "", "", ""],
+    ["us", "", "United States", "", "", "US", "", "", "", "", "", ""],
     [
       "us-morgan-1881-cc",
       "us",
@@ -404,6 +407,9 @@ test("an Item added from the Catalog shows its Catalog entry's facts in the PDF"
       "1 dollar",
       "1881",
       "United States Mint",
+      "United States Mint",
+      "Public domain",
+      "https://www.usmint.gov/",
     ],
   ]
     .map((row) => formatCsvRecord(row))
@@ -423,4 +429,27 @@ test("an Item added from the Catalog shows its Catalog entry's facts in the PDF"
 
   expect(all).toContain("Country: United States");
   expect(all).toContain("Coin Morgan dollar 1881-CC 1881 1 dollar 2");
+});
+
+test("a Collection too large to read whole isn't made into a PDF, rather than one that leaves Items out", async () => {
+  const t = convexTest({
+    schema,
+    modules,
+    transactionLimits: { documentsRead: 700 },
+  });
+  rateLimiter.register(t);
+  const ada = await person(t, "ada@example.com");
+  await t.run(async (ctx) => {
+    for (let n = 0; n < 1000; n++)
+      await ctx.db.insert("items", {
+        ownerId: ada.userId,
+        type: "coin",
+        title: `Coin ${n}`,
+        quantity: 1,
+      });
+  });
+
+  await expect(
+    ada.as.action(api.collectionPdf.download, { view: {} }),
+  ).rejects.toThrow("COLLECTION_TOO_LARGE_TO_EXPORT");
 });

@@ -1,9 +1,10 @@
 /// <reference types="vite/client" />
 import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import { heldItemLimit } from "./catalog/browse";
 import { formatCsvRecord } from "./catalog/csvText";
 import { catalogPageSize } from "./catalog/fields";
 import schema from "./schema";
@@ -104,6 +105,9 @@ const entry = (id: string, parent: string, extra: Row = {}): Row => ({
   item_type: "coin",
   is_addable: "true",
   facts_source: "Test source",
+  facts_author: "Test source",
+  facts_licence: "Public domain",
+  facts_link: "https://example.org/facts",
   ...extra,
 });
 
@@ -330,10 +334,15 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
       year_from: "1881",
       year_to: "1881",
       facts_source: "United States Mint",
+      facts_author: "United States Mint",
       facts_licence: "Public domain",
+      facts_link: "https://www.usmint.gov/",
       technical_details: "Mint: San Francisco.",
       historical_notes: "Struck under the Bland-Allison Act.",
       notes_source: "CoinsLite editorial",
+      notes_author: "CoinsLite",
+      notes_licence: "CoinsLite",
+      notes_link: "https://www.usmint.gov/",
       image_url: "https://images.example.com/morgan-1881-s.jpg",
       image_source: "Example Museum",
       image_author: "A. Photographer",
@@ -374,9 +383,16 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     historicalNotes: "Struck under the Bland-Allison Act.",
     factsProvenance: {
       source: "United States Mint",
+      author: "United States Mint",
       licence: "Public domain",
+      link: "https://www.usmint.gov/",
     },
-    notesProvenance: { source: "CoinsLite editorial" },
+    notesProvenance: {
+      source: "CoinsLite editorial",
+      author: "CoinsLite",
+      licence: "CoinsLite",
+      link: "https://www.usmint.gov/",
+    },
     imageUrl: "https://images.example.com/morgan-1881-s.jpg",
     // A linked image has one size.
     thumbnailUrl: "https://images.example.com/morgan-1881-s.jpg",
@@ -388,6 +404,7 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     },
     numistaId: 1492,
     held: 3,
+    heldMore: false,
     ancestors: [
       { key: "us", title: "United States", country: "US", countryNode: true },
       { key: "us-morgan", title: "Morgan dollar", countryNode: false },
@@ -705,7 +722,8 @@ test("the bundled US silver dollars browse by series grouping and by denominatio
   ]);
 });
 
-test("loading the bundled datasets fills in browsing for Catalog data stored before it existed", async () => {
+test("loading the bundled datasets fills in browsing for Catalog data stored before it existed, a batch at a time", async () => {
+  vi.useFakeTimers();
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   await t.mutation(internal.catalog.seed.load, {});
@@ -723,12 +741,21 @@ test("loading the bundled datasets fills in browsing for Catalog data stored bef
   );
 
   await t.mutation(internal.catalog.seed.load, {});
+  await t.finishAllScheduledFunctions(vi.runAllTimers);
   expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 120 }),
   );
   expect(
     await ada.as.query(api.catalog.browse.denominations, { key: "us" }),
   ).toEqual([{ denomination: "1 dollar", seriesCount: 2 }]);
+  // Over 700 nodes: more than one transaction refreshes.
+  const refreshes = await t.run(async (ctx) =>
+    (await ctx.db.system.query("_scheduled_functions").collect()).filter(
+      (job) => job.name.includes("refreshBrowseFields"),
+    ),
+  );
+  expect(refreshes.length).toBeGreaterThan(1);
+  vi.useRealTimers();
 });
 
 test("a root that becomes a country once it gets a country code is browsed by denomination from then on", async () => {
@@ -756,4 +783,27 @@ test("a root that becomes a country once it gets a country code is browsed by de
   expect(
     await ada.as.query(api.catalog.browse.node, { key: "de" }),
   ).toMatchObject({ kind: "country", countryNode: true, entryCount: 1 });
+});
+
+test("how many someone holds is counted over a bounded number of Items, and says when there are more", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const ada = await person(t, "ada@example.com");
+  await importRows(admin.as, [
+    country("us", "United States", "US"),
+    entry("us-morgan-1881-s", "us"),
+  ]);
+  const held = async () => {
+    const node = await ada.as.query(api.catalog.browse.node, {
+      key: "us-morgan-1881-s",
+    });
+    return node?.kind === "entry" ? [node.held, node.heldMore] : null;
+  };
+
+  for (let n = 0; n < heldItemLimit; n++)
+    await holdItem(t, ada.userId, "us-morgan-1881-s", 2);
+  expect(await held()).toEqual([2 * heldItemLimit, false]);
+
+  await holdItem(t, ada.userId, "us-morgan-1881-s", 2);
+  expect(await held()).toEqual([2 * heldItemLimit, true]);
 });

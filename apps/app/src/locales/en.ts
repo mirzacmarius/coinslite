@@ -134,7 +134,7 @@ export default {
       norwegian: "Norwegian (0–3)",
       european: "European (UNC–G)",
       international: "International (UNC–PR)",
-      stamp: "Stamp condition",
+      stamp: "Stamp grades",
     },
     strikes: {
       circulation: "Circulation",
@@ -431,6 +431,7 @@ export default {
     errors: {
       tooLarge: "That file is larger than 10 MB. Pick a smaller photo.",
       notAnImage: "That file isn't a JPEG, PNG, WebP or GIF image.",
+      tooMany: "Too many uploads in a short time. Try again in a few minutes.",
       failed: "The photo couldn't be saved. Try again.",
       removeFailed: "The photo couldn't be removed. Try again.",
     },
@@ -654,7 +655,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
       YEARS_REVERSED: "The last year comes before the first.",
       SOURCE_REQUIRED: "Name the source of these facts, notes or image.",
-      CREDIT_REQUIRED: "An image needs its source, author, licence and link.",
+      CREDIT_REQUIRED:
+        "Facts, notes and images each need their source, author, licence and link.",
       ROOT_NOT_ADDABLE:
         "A country or Theme can't be a Catalog entry. Give the row a parent_id.",
       PARENT_NOT_FOUND: "No row in the file or the Catalog has this id.",
@@ -666,6 +668,8 @@ export default {
         "Nodes sit below this one, so it can't become a Catalog entry.",
       ENTRY_HAS_ITEMS:
         "Items link to this Catalog entry, so it stays one. Keep is_addable true.",
+      TOO_MANY_NODES_BELOW:
+        "More than 2,000 nodes are below the ones this file moves. Move fewer at a time.",
       TOO_MANY_LINKED_ITEMS:
         "More than 1,000 Items link to the entries whose Item type changes. Change fewer at a time.",
     },
@@ -742,6 +746,9 @@ export default {
     unavailable:
       "Premium can't be bought here yet: billing isn't set up on this deployment.",
     alreadyPremium: "You're on Premium already.",
+    checkoutPending:
+      "A checkout for the other plan is still open. Finish it there, or try again in an hour.",
+    accountClosing: "Your account is being deleted.",
     checkoutFailed: "Couldn't open checkout. Try again.",
     price: "Price",
     renews: "Renews",
@@ -919,6 +926,8 @@ export default {
       failed: "Couldn't save the image. Try again.",
       removeFailed: "Couldn't remove the image. Try again.",
       CATALOG_ENTRY_NOT_FOUND: "This Catalog entry no longer exists.",
+      TOO_MANY_UPLOADS:
+        "Too many uploads in a short time. Try again in a few minutes.",
       IMAGE_NOT_FOUND: "The upload didn't arrive. Try again.",
       IMAGE_NOT_WEBP: "The image wasn't saved as WebP. Try again.",
       IMAGE_TOO_LARGE:
@@ -1033,6 +1042,8 @@ export default {
     pdf: "Export as PDF",
     pdfTooLarge:
       "A PDF lists up to {limit} Items. Narrow the view to export it.",
+    tooLarge:
+      "Your Collection is too large to export in one go. Rather than leave Items out, it isn't exported.",
     premiumOnly: "Exporting your Collection is part of Premium.",
     failed: "Couldn't export the Collection. Try again.",
     fileName: "coinslite-collection-{date}.csv",
@@ -1279,7 +1290,8 @@ export default {
       FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
       YEARS_REVERSED: "The last year comes before the first.",
       SOURCE_REQUIRED: "Name the source of these facts or notes.",
-      CREDIT_REQUIRED: "The image needs its source, author, licence and link.",
+      CREDIT_REQUIRED:
+        "Facts, notes and the image each need their source, author, licence and link.",
       ROOT_NOT_ADDABLE: "A country or Theme can't be a Catalog entry.",
       PARENT_NOT_FOUND: "The node above it is gone. Close this and try again.",
       PARENT_IS_ENTRY: "Nothing can go below a Catalog entry.",
@@ -1287,6 +1299,8 @@ export default {
       ENTRY_HAS_CHILDREN:
         "Nodes sit below this one, so it can't become a Catalog entry.",
       ENTRY_HAS_ITEMS: "Items link to this Catalog entry, so it stays one.",
+      TOO_MANY_NODES_BELOW:
+        "More than 2,000 nodes are below this one, too many to move at once.",
       TOO_MANY_LINKED_ITEMS:
         "More than 1,000 Items link to this entry, too many to change their Item type at once.",
       ID_REQUIRED: "Give it an ID.",
