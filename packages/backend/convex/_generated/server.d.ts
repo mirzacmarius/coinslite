@@ -28,6 +28,7 @@ import type { DataModel } from "./dataModel.js";
  * `convex.config.ts`.
  */
 type Env = {
+  readonly ANTHROPIC_API_KEY: string | undefined;
   readonly CONVEX_CLOUD_URL: string;
   readonly CONVEX_SITE_URL: string;
   readonly EMAIL_DELIVERY: "outbox" | undefined;
@@ -39,6 +40,7 @@ type Env = {
   readonly POLAR_PREMIUM_YEARLY_PRODUCT_ID: string | undefined;
   readonly POLAR_SERVER: string | undefined;
   readonly POLAR_WEBHOOK_SECRET: string | undefined;
+  readonly SCANNER_MODEL: string | undefined;
   readonly SITE_URL: string | undefined;
 };
 

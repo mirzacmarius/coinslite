@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@auth/core": "0.37.0",
     "@coinslite/i18n": "workspace:*",
     "@convex-dev/auth": "^0.0.80",
