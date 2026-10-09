@@ -32,6 +32,7 @@ import {
   LogOut,
   Sparkles,
   SunMoon,
+  ToggleRight,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -101,6 +102,14 @@ export function WorkspaceMenu({
             <Link href="/admin/catalog">
               <FileSpreadsheet strokeWidth={1.75} />
               {t("catalogAdmin.menu")}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/flags">
+              <ToggleRight strokeWidth={1.75} />
+              {t("featureFlags.menu")}
             </Link>
           </DropdownMenuItem>
         )}

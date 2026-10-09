@@ -44,6 +44,8 @@ import type * as collectionTotals from "../collectionTotals.js";
 import type * as crons from "../crons.js";
 import type * as email_index from "../email/index.js";
 import type * as env from "../env.js";
+import type * as featureFlags from "../featureFlags.js";
+import type * as featureFlags_rules from "../featureFlags/rules.js";
 import type * as feedback from "../feedback.js";
 import type * as feedback_rules from "../feedback/rules.js";
 import type * as homeCurrency from "../homeCurrency.js";
@@ -115,6 +117,8 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   "email/index": typeof email_index;
   env: typeof env;
+  featureFlags: typeof featureFlags;
+  "featureFlags/rules": typeof featureFlags_rules;
   feedback: typeof feedback;
   "feedback/rules": typeof feedback_rules;
   homeCurrency: typeof homeCurrency;

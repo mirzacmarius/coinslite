@@ -869,4 +869,27 @@ export default {
       "By Item type, plus the Metal value of gold and silver",
     part: "Item type or metal",
   },
+  featureFlags: {
+    menu: "Feature flags",
+    title: "Feature flags",
+    notAvailable: "This page isn't available",
+    notAvailableDescription: "Only admins can switch features on and off.",
+    description: "Changes apply to everyone at once.",
+    catalog: "Show the Catalog",
+    catalogDescription:
+      "When off, only admins see the Catalog. Everyone else no longer finds it in navigation, browsing or search.",
+    scanner: "Scanner",
+    scannerDescription:
+      "Who can photograph a coin to get a suggested Catalog entry. Admins can whenever it isn't off.",
+    scannerOptions: {
+      off: "Off",
+      admins: "Admins only",
+      premiumBeta: "Premium beta",
+    },
+    saved: "Feature flag updated",
+    saveFailed: "Couldn't update the feature flag. Try again.",
+    catalogHiddenTitle: "The Catalog isn't available",
+    catalogHiddenDescription:
+      "It's switched off for now. Your Items aren't affected.",
+  },
 } as const;

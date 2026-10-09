@@ -6,6 +6,7 @@ import {
   catalogKinds,
   preciousMetals,
 } from "../catalog/fields";
+import { scannerAvailabilities } from "../featureFlags/rules";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
 import { photoSides } from "../photos/rules";
@@ -78,3 +79,14 @@ export const perDollar = v.object({
 
 /** A precious metal with a Spot price: gold or silver. */
 export const metal = literalUnion(metals);
+
+/** Who may use the scanner: off, admins only, or Premium beta. */
+export const scannerAvailability = literalUnion(scannerAvailabilities);
+/** A feature flag (featureFlags.ts): its key and a value of that flag's type. */
+export const featureFlag = v.union(
+  v.object({ key: v.literal("catalogVisible"), value: v.boolean() }),
+  v.object({
+    key: v.literal("scannerAvailability"),
+    value: scannerAvailability,
+  }),
+);

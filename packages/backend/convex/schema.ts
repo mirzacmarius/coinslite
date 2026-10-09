@@ -5,6 +5,7 @@ import {
   albumColour,
   catalogItemType,
   catalogKind,
+  featureFlag,
   gradingScale,
   homeCurrency,
   itemType,
@@ -285,6 +286,12 @@ export default defineSchema({
   })
     .index("by_polarId", ["polarId"])
     .index("by_userId_and_premium", ["userId", "premium"]),
+
+  /**
+   * Feature flags admins switch in the app (featureFlags.ts): one document per
+   * flag that has been set; a flag without one holds its default.
+   */
+  featureFlags: defineTable(featureFlag).index("by_key", ["key"]),
 
   /**
    * Emails captured instead of sent, on deployments with EMAIL_DELIVERY=outbox
