@@ -68,6 +68,7 @@ import type * as items_rules from "../items/rules.js";
 import type * as items_thumbnail from "../items/thumbnail.js";
 import type * as items_totals from "../items/totals.js";
 import type * as metalValues from "../metalValues.js";
+import type * as overview from "../overview.js";
 import type * as photos from "../photos.js";
 import type * as photos_rules from "../photos/rules.js";
 import type * as plans from "../plans.js";
@@ -148,6 +149,7 @@ declare const fullApi: ApiFromModules<{
   "items/thumbnail": typeof items_thumbnail;
   "items/totals": typeof items_totals;
   metalValues: typeof metalValues;
+  overview: typeof overview;
   photos: typeof photos;
   "photos/rules": typeof photos_rules;
   plans: typeof plans;

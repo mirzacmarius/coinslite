@@ -263,8 +263,6 @@ export default {
   dashboard: {
     headerTitle: "Overview",
     headerDescription: "Your collection at a glance.",
-    bodyTitle: "Welcome to CoinsLite",
-    bodyDescription: "Your collection will appear here.",
   },
   account: {
     pageTitle: "Account",
@@ -891,6 +889,19 @@ export default {
     catalogHiddenTitle: "The Catalog isn't available",
     catalogHiddenDescription:
       "It's switched off for now. Your Items aren't affected.",
+  },
+  overview: {
+    addShortcuts: "Add to your Collection",
+    add: {
+      coin: "Add coin",
+      banknote: "Add banknote",
+      stamp: "Add stamp",
+    },
+    latestItems: "Latest Items",
+    viewCollection: "View Collection",
+    firstRunTitle: "Start your Collection",
+    firstRunDescription:
+      "Add a coin, banknote or stamp you own. Your totals and latest Items then show here.",
   },
   adminStats: {
     menu: "Stats",
