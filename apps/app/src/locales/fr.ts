@@ -203,6 +203,7 @@ export default {
       city: "Ville",
       country: "Pays",
       setCountry: "Choisir le pays",
+      noCountry: "Aucun pays",
       phone: "Téléphone",
       save: "Enregistrer",
       saved: "Enregistré",
@@ -216,6 +217,8 @@ export default {
       homeCurrency: "Devise de référence",
       homeCurrencyNote:
         "Bientôt, vous pourrez la changer et tous les montants seront convertis.",
+      languageNotSaved:
+        "Impossible d’enregistrer la langue dans votre compte : elle n’a changé que sur cet appareil.",
     },
     email: {
       title: "E-mail",
@@ -225,8 +228,10 @@ export default {
       sent: "Nous avons envoyé un lien à {email}. Ouvrez-le depuis cette adresse pour terminer le changement.",
       invalid: "Saisissez une adresse e-mail, par exemple nom@exemple.fr.",
       same: "C’est déjà votre adresse e-mail.",
-      inUse: "Cette adresse e-mail appartient à un autre compte.",
       tooMany: "Trop de demandes. Réessayez dans une heure.",
+      signInAgain:
+        "Par sécurité, reconnectez-vous avant de changer votre adresse e-mail.",
+      signInAgainAction: "Se reconnecter",
       failed: "Impossible d’envoyer le lien. Réessayez.",
     },
     danger: {
@@ -249,6 +254,13 @@ export default {
         "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau depuis votre compte.",
       inUse: "Cette adresse e-mail appartient désormais à un autre compte.",
       noLink: "Ouvrez le lien de l’e-mail envoyé à votre nouvelle adresse.",
+      signInFirst:
+        "Pour confirmer, connectez-vous avec le compte qui a demandé ce changement.",
+      signIn: "Se connecter pour confirmer",
+      otherAccount:
+        "Ce lien concerne un autre compte. Connectez-vous avec le compte qui a demandé le changement.",
+      switchAccount: "Se connecter avec un autre compte",
+      tryAgain: "La confirmation n’a pas abouti. Réessayez.",
     },
   },
 } as const satisfies Dictionary;

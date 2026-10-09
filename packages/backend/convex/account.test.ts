@@ -3,7 +3,7 @@ import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
 import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from "vitest";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -50,18 +50,21 @@ async function ada(t: Test) {
       (await ctx.db.query("devOutbox").order("desc").first())?.code ?? "",
   );
   await signIn({ flow: "email-verification", email: "ada@example.com", code });
-  const user = await t.run(
-    async (ctx) => (await ctx.db.query("users").first())!,
-  );
+  const { user, session } = await t.run(async (ctx) => ({
+    user: (await ctx.db.query("users").first())!,
+    session: (await ctx.db.query("authSessions").first())!,
+  }));
   return {
     user,
-    as: t.withIdentity({ subject: `${user._id}|session` }),
+    as: t.withIdentity({ subject: `${user._id}|${session._id}` }),
     signIn,
   };
 }
 
 const sentTo = async (t: Test, to: string) => {
-  await t.finishAllScheduledFunctions(vi.runAllTimers);
+  // Runs the emails due now; a link's expiry, an hour on, stays scheduled.
+  vi.advanceTimersByTime(1);
+  await t.finishInProgressScheduledFunctions();
   return t.run(async (ctx) =>
     (await ctx.db.query("devOutbox").collect()).filter(
       (email) => email.to === to,
@@ -154,13 +157,25 @@ test("changing email: a link goes to the new address, and nothing changes until 
   expect(link.subject).toBe("Confirm your new CoinsLite email");
   expect(link.text).toContain("http://localhost:3000/confirm-email#token=");
 
-  // The link works without a session, once.
-  const confirmed = await t.mutation(api.account.confirmEmailChange, {
-    token: tokenIn(link.text),
+  // Only Ada can use the link, and only once.
+  const token = tokenIn(link.text);
+  await expect(
+    t.mutation(api.account.confirmEmailChange, { token }),
+  ).rejects.toThrow("NOT_SIGNED_IN");
+  const eve = await t.run((ctx) =>
+    ctx.db.insert("users", { email: "eve@example.com" }),
+  );
+  await expect(
+    t
+      .withIdentity({ subject: `${eve}|session` })
+      .mutation(api.account.confirmEmailChange, { token }),
+  ).rejects.toThrow("OTHER_ACCOUNT");
+  const confirmed = await as.mutation(api.account.confirmEmailChange, {
+    token,
   });
   expect(confirmed).toEqual({ email: "ada@lovelace.dev" });
   await expect(
-    t.mutation(api.account.confirmEmailChange, { token: tokenIn(link.text) }),
+    as.mutation(api.account.confirmEmailChange, { token }),
   ).rejects.toThrow("INVALID_LINK");
 
   expect(await as.query(api.account.get, {}))?.toMatchObject({
@@ -201,17 +216,22 @@ test("a newer email change replaces an older one, and links expire after an hour
   const [second] = await sentTo(t, "second@example.com");
 
   await expect(
-    t.mutation(api.account.confirmEmailChange, { token: tokenIn(first.text) }),
+    as.mutation(api.account.confirmEmailChange, { token: tokenIn(first.text) }),
   ).rejects.toThrow("INVALID_LINK");
 
   vi.advanceTimersByTime(61 * 60 * 1000);
+  await t.finishInProgressScheduledFunctions();
   await expect(
-    t.mutation(api.account.confirmEmailChange, { token: tokenIn(second.text) }),
+    as.mutation(api.account.confirmEmailChange, {
+      token: tokenIn(second.text),
+    }),
   ).rejects.toThrow("INVALID_LINK");
-  expect((await as.query(api.account.get, {}))?.email).toBe("ada@example.com");
+  const account = await as.query(api.account.get, {});
+  expect(account?.email).toBe("ada@example.com");
+  expect(account?.pendingEmail).toBeUndefined();
 });
 
-test("an email change is refused for the same address, an address in use, or too often", async () => {
+test("an email change is refused for the same address, or too often", async () => {
   const t = newTest();
   const { as } = await ada(t);
   await t.run((ctx) =>
@@ -224,13 +244,77 @@ test("an email change is refused for the same address, an address in use, or too
     as.mutation(api.account.requestEmailChange, { newEmail });
 
   await expect(request("ada@example.com")).rejects.toThrow("SAME_EMAIL");
-  await expect(request("bob@example.com")).rejects.toThrow("EMAIL_IN_USE");
   await expect(request("Ada@Lovelace.dev")).rejects.toThrow("INVALID_EMAIL");
-  // Five go out (refused requests roll back and don't count); the sixth waits.
-  for (let attempt = 0; attempt < 5; attempt++)
+  // Bob's address is asked for like any other: the answer comes only to his
+  // inbox, so nobody learns who has an account by asking.
+  await request("bob@example.com");
+  const [link] = await sentTo(t, "bob@example.com");
+  await expect(
+    as.mutation(api.account.confirmEmailChange, { token: tokenIn(link.text) }),
+  ).rejects.toThrow("EMAIL_IN_USE");
+  // Five go out an hour (refused requests roll back and don't count); the sixth waits.
+  for (let attempt = 1; attempt < 5; attempt++)
     await request(`ada${attempt}@example.org`);
   await expect(request("ada5@example.org")).rejects.toThrow(
     "TOO_MANY_REQUESTS",
+  );
+});
+
+test("changing email needs a recent sign-in", async () => {
+  const t = newTest();
+  const { as } = await ada(t);
+  vi.advanceTimersByTime(16 * 60 * 1000);
+
+  await expect(
+    as.mutation(api.account.requestEmailChange, {
+      newEmail: "ada@lovelace.dev",
+    }),
+  ).rejects.toThrow("SIGN_IN_AGAIN");
+});
+
+test("a sign-up that never proved the address gives way to the email change", async () => {
+  const t = newTest();
+  const { as, user } = await ada(t);
+  // Someone asks for a sign-in link to the address and never opens it.
+  await t.action(api.auth.signIn, {
+    provider: "magic-link",
+    params: { email: "ada@lovelace.dev" },
+  });
+
+  await as.mutation(api.account.requestEmailChange, {
+    newEmail: "ada@lovelace.dev",
+  });
+  const [link] = (await sentTo(t, "ada@lovelace.dev")).filter(({ subject }) =>
+    subject.startsWith("Confirm your new"),
+  );
+  await as.mutation(api.account.confirmEmailChange, {
+    token: tokenIn(link.text),
+  });
+
+  const { owners, accounts } = await t.run(async (ctx) => ({
+    owners: await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", "ada@lovelace.dev"))
+      .collect(),
+    accounts: (await ctx.db.query("authAccounts").collect()).filter(
+      ({ providerAccountId }) => providerAccountId === "ada@lovelace.dev",
+    ),
+  }));
+  expect(owners.map(({ _id }) => _id)).toEqual([user._id]);
+  expect(accounts.map(({ userId }) => userId)).toEqual([user._id]);
+});
+
+test("deleting the account drops a pending email change", async () => {
+  const t = newTest();
+  const { as, user } = await ada(t);
+  await as.mutation(api.account.requestEmailChange, {
+    newEmail: "ada@lovelace.dev",
+  });
+
+  await t.mutation(internal.users.deleteUserAccount, { userId: user._id });
+
+  expect(await t.run((ctx) => ctx.db.query("emailChanges").collect())).toEqual(
+    [],
   );
 });
 
@@ -249,7 +333,7 @@ test("an address taken between the request and the link is not handed over", asy
   );
 
   await expect(
-    t.mutation(api.account.confirmEmailChange, { token: tokenIn(link.text) }),
+    as.mutation(api.account.confirmEmailChange, { token: tokenIn(link.text) }),
   ).rejects.toThrow("EMAIL_IN_USE");
   expect((await as.query(api.account.get, {}))?.email).toBe("ada@example.com");
 });

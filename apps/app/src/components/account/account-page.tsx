@@ -219,6 +219,8 @@ function ContactSection({ account }: { account: Account }) {
                   value={field.state.value}
                   options={countryOptions}
                   onChange={field.handleChange}
+                  onClear={() => field.handleChange(undefined)}
+                  clearLabel={t("account.contact.noCountry")}
                   noResults={t("items.noMatches")}
                 />
               )}
@@ -280,24 +282,28 @@ function PreferencesSection({ account }: { account: Account }) {
 const emailErrorKeys = {
   INVALID_EMAIL: "account.email.invalid",
   SAME_EMAIL: "account.email.same",
-  EMAIL_IN_USE: "account.email.inUse",
+  SIGN_IN_AGAIN: "account.email.signInAgain",
   TOO_MANY_REQUESTS: "account.email.tooMany",
 } as const;
 
 function EmailSection({ account }: { account: Account }) {
   const t = useI18n();
   const requestEmailChange = useMutation(api.account.requestEmailChange);
+  const signOut = useSignOut();
   const [error, setError] = useState<string>();
+  const [needsSignIn, setNeedsSignIn] = useState(false);
   const form = useForm({
     defaultValues: { newEmail: "" },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setError(undefined);
+      setNeedsSignIn(false);
       try {
         await requestEmailChange({ newEmail: normalizeEmail(value.newEmail) });
         form.reset();
       } catch (failure) {
         const code = failure instanceof ConvexError ? String(failure.data) : "";
+        setNeedsSignIn(code === "SIGN_IN_AGAIN");
         setError(
           t(
             code in emailErrorKeys
@@ -377,6 +383,16 @@ function EmailSection({ account }: { account: Account }) {
           {t("account.email.send")}
         </Button>
       </form>
+      {needsSignIn && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="self-start"
+          onClick={() => void signOut("/settings")}
+        >
+          {t("account.email.signInAgainAction")}
+        </Button>
+      )}
     </Section>
   );
 }

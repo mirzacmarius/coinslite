@@ -12,6 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
+import { toast } from "@coinslite/ui/toaster";
 import { useConvexAuth, useMutation } from "convex/react";
 import { ChevronDown, Languages } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -22,17 +23,22 @@ import { useCallback } from "react";
  * in, on the profile, so every device the person signs in on uses it.
  */
 export function useChooseLanguage() {
+  const t = useI18n();
   const changeLocale = useChangeLocale();
   const { isAuthenticated } = useConvexAuth();
   const setLanguage = useMutation(api.account.setLanguage);
   return useCallback(
     async (locale: Locale) => {
       rememberLanguage(locale);
-      if (isAuthenticated)
-        await setLanguage({ language: locale }).catch(() => undefined);
+      if (isAuthenticated) {
+        // This browser switches anyway; other devices keep the old language.
+        await setLanguage({ language: locale }).catch(() =>
+          toast.error(t("account.preferences.languageNotSaved")),
+        );
+      }
       changeLocale(locale);
     },
-    [changeLocale, isAuthenticated, setLanguage],
+    [changeLocale, isAuthenticated, setLanguage, t],
   );
 }
 

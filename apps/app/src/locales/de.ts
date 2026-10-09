@@ -206,6 +206,7 @@ export default {
       city: "Ort",
       country: "Land",
       setCountry: "Land wählen",
+      noCountry: "Kein Land",
       phone: "Telefon",
       save: "Speichern",
       saved: "Gespeichert",
@@ -219,6 +220,8 @@ export default {
       homeCurrency: "Heimatwährung",
       homeCurrencyNote:
         "Bald kannst du sie ändern, und alle Beträge werden umgerechnet.",
+      languageNotSaved:
+        "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },
     email: {
       title: "E-Mail",
@@ -228,8 +231,10 @@ export default {
       sent: "Wir haben einen Link an {email} gesendet. Öffne ihn dort, um die Änderung abzuschließen.",
       invalid: "Gib eine E-Mail-Adresse ein, z. B. name@beispiel.de.",
       same: "Das ist bereits deine E-Mail-Adresse.",
-      inUse: "Diese E-Mail-Adresse gehört zu einem anderen Konto.",
       tooMany: "Zu viele Anfragen. Versuche es in einer Stunde noch einmal.",
+      signInAgain:
+        "Melde dich zu deiner Sicherheit erneut an, bevor du deine E-Mail-Adresse änderst.",
+      signInAgainAction: "Erneut anmelden",
       failed: "Der Link konnte nicht gesendet werden. Versuche es noch einmal.",
     },
     danger: {
@@ -252,6 +257,14 @@ export default {
         "Dieser Link ist abgelaufen oder wurde schon verwendet. Fordere in deinem Konto einen neuen an.",
       inUse: "Diese E-Mail-Adresse gehört inzwischen zu einem anderen Konto.",
       noLink: "Öffne den Link aus der E-Mail an deine neue Adresse.",
+      signInFirst:
+        "Melde dich zum Bestätigen mit dem Konto an, das diese Änderung angefordert hat.",
+      signIn: "Zum Bestätigen anmelden",
+      otherAccount:
+        "Dieser Link gehört zu einem anderen Konto. Melde dich mit dem Konto an, das die Änderung angefordert hat.",
+      switchAccount: "Mit einem anderen Konto anmelden",
+      tryAgain:
+        "Die Bestätigung hat gerade nicht geklappt. Versuche es noch einmal.",
     },
   },
 } as const satisfies Dictionary;

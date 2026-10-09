@@ -200,6 +200,7 @@ export default {
       city: "Oraș",
       country: "Țară",
       setCountry: "Alege țara",
+      noCountry: "Nicio țară",
       phone: "Telefon",
       save: "Salvează",
       saved: "Salvat",
@@ -213,6 +214,8 @@ export default {
       homeCurrency: "Moneda de bază",
       homeCurrencyNote:
         "În curând o vei putea schimba, iar toate sumele vor fi convertite.",
+      languageNotSaved:
+        "Limba nu a putut fi salvată în cont, așa că s-a schimbat doar pe acest dispozitiv.",
     },
     email: {
       title: "E-mail",
@@ -222,8 +225,10 @@ export default {
       sent: "Am trimis un link la {email}. Deschide-l de acolo ca să termini schimbarea.",
       invalid: "Introdu o adresă de e-mail, de exemplu nume@exemplu.ro.",
       same: "Aceasta este deja adresa ta.",
-      inUse: "Această adresă aparține altui cont.",
       tooMany: "Prea multe cereri. Încearcă din nou peste o oră.",
+      signInAgain:
+        "Pentru siguranța ta, conectează-te din nou înainte de a schimba adresa.",
+      signInAgainAction: "Conectează-te din nou",
       failed: "Linkul nu a putut fi trimis. Încearcă din nou.",
     },
     danger: {
@@ -246,6 +251,13 @@ export default {
         "Linkul a expirat sau a fost deja folosit. Cere unul nou din cont.",
       inUse: "Această adresă aparține acum altui cont.",
       noLink: "Deschide linkul din e-mailul trimis la noua ta adresă.",
+      signInFirst:
+        "Ca să confirmi, conectează-te cu contul care a cerut această schimbare.",
+      signIn: "Conectează-te pentru a confirma",
+      otherAccount:
+        "Acest link este pentru alt cont. Conectează-te cu contul care a cerut schimbarea.",
+      switchAccount: "Conectează-te cu alt cont",
+      tryAgain: "Confirmarea nu a reușit acum. Încearcă din nou.",
     },
   },
 } as const satisfies Dictionary;

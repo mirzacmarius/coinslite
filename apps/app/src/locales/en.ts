@@ -192,6 +192,7 @@ export default {
       city: "City",
       country: "Country",
       setCountry: "Set country",
+      noCountry: "No country",
       phone: "Phone",
       save: "Save",
       saved: "Saved",
@@ -205,6 +206,8 @@ export default {
       homeCurrency: "Home currency",
       homeCurrencyNote:
         "Changing it, with every amount converted, is coming soon.",
+      languageNotSaved:
+        "Couldn't save the language to your account, so it changed on this device only.",
     },
     email: {
       title: "Email",
@@ -214,8 +217,9 @@ export default {
       sent: "We sent a link to {email}. Open it there to finish the change.",
       invalid: "Enter an email address, like name@example.com.",
       same: "That's already your email.",
-      inUse: "That email belongs to another account.",
       tooMany: "Too many requests. Try again in an hour.",
+      signInAgain: "For your safety, sign in again before changing your email.",
+      signInAgainAction: "Sign in again",
       failed: "Couldn't send the link. Try again.",
     },
     danger: {
@@ -238,6 +242,13 @@ export default {
         "This link has expired or was already used. Ask for a new one from your Account.",
       inUse: "That email now belongs to another account.",
       noLink: "Open the link from the email we sent to your new address.",
+      signInFirst:
+        "To confirm, sign in with the account that asked for this change.",
+      signIn: "Sign in to confirm",
+      otherAccount:
+        "This link is for another account. Sign in with the account that asked for the change.",
+      switchAccount: "Sign in with another account",
+      tryAgain: "Couldn't confirm just now. Try again.",
     },
   },
 } as const;

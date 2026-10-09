@@ -35,6 +35,8 @@ export function PropertyPicker<T extends string>({
   value,
   options,
   onChange,
+  onClear,
+  clearLabel,
   placeholder,
   noResults,
   id,
@@ -48,6 +50,10 @@ export function PropertyPicker<T extends string>({
   value: T | undefined;
   options: PropertyOption<T>[];
   onChange: (value: T) => void;
+  /** Offers "No …" at the top of the list, for a property that may be empty. */
+  onClear?: () => void;
+  /** The "No …" item's text, e.g. "No country". */
+  clearLabel?: string;
   /** Shown in muted text when there is no value, e.g. "Set Grade". */
   placeholder?: string;
   noResults: string;
@@ -93,6 +99,25 @@ export function PropertyPicker<T extends string>({
           <CommandList>
             <CommandEmpty>{noResults}</CommandEmpty>
             <CommandGroup>
+              {onClear && clearLabel && (
+                <CommandItem
+                  value={clearLabel}
+                  onSelect={() => {
+                    onClear();
+                    setOpen(false);
+                  }}
+                >
+                  <span className="truncate text-muted-foreground">
+                    {clearLabel}
+                  </span>
+                  {value === undefined && (
+                    <Check
+                      className="ml-auto text-primary"
+                      aria-hidden="true"
+                    />
+                  )}
+                </CommandItem>
+              )}
               {options.map((option) => (
                 <CommandItem
                   key={option.value}

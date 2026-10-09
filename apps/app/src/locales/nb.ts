@@ -197,6 +197,7 @@ export default {
       city: "Sted",
       country: "Land",
       setCountry: "Velg land",
+      noCountry: "Ingen land",
       phone: "Telefon",
       save: "Lagre",
       saved: "Lagret",
@@ -209,6 +210,8 @@ export default {
       language: "Språk",
       homeCurrency: "Hjemmevaluta",
       homeCurrencyNote: "Snart kan du endre den, og alle beløp regnes om.",
+      languageNotSaved:
+        "Kunne ikke lagre språket på kontoen din, så det er bare endret på denne enheten.",
     },
     email: {
       title: "E-post",
@@ -218,8 +221,10 @@ export default {
       sent: "Vi har sendt en lenke til {email}. Åpne den der for å fullføre endringen.",
       invalid: "Skriv inn en e-postadresse, for eksempel navn@eksempel.no.",
       same: "Det er allerede e-postadressen din.",
-      inUse: "Den e-postadressen tilhører en annen konto.",
       tooMany: "For mange forespørsler. Prøv igjen om en time.",
+      signInAgain:
+        "Av hensyn til sikkerheten må du logge inn på nytt før du endrer e-postadressen.",
+      signInAgainAction: "Logg inn på nytt",
       failed: "Kunne ikke sende lenken. Prøv igjen.",
     },
     danger: {
@@ -242,6 +247,13 @@ export default {
         "Lenken er utløpt eller allerede brukt. Be om en ny fra kontoen din.",
       inUse: "Den e-postadressen tilhører nå en annen konto.",
       noLink: "Åpne lenken fra e-posten vi sendte til den nye adressen din.",
+      signInFirst:
+        "For å bekrefte, logg inn med kontoen som ba om denne endringen.",
+      signIn: "Logg inn for å bekrefte",
+      otherAccount:
+        "Denne lenken gjelder en annen konto. Logg inn med kontoen som ba om endringen.",
+      switchAccount: "Logg inn med en annen konto",
+      tryAgain: "Kunne ikke bekrefte akkurat nå. Prøv igjen.",
     },
   },
 } as const satisfies Dictionary;

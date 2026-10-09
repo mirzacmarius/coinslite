@@ -41,8 +41,10 @@ test("the Account screen shows the plan and keeps contact details", async ({
 
 test("a new email takes over once the link sent to it is opened", async ({
   page,
+  browser,
 }) => {
-  await signUpAndVerify(page, newEmail());
+  const email = newEmail();
+  await signUpAndVerify(page, email);
   await page.goto(`${appUrl}/settings`);
   const main = visiblePage(page);
   const replacement = newEmail();
@@ -53,13 +55,24 @@ test("a new email takes over once the link sent to it is opened", async ({
     main.getByText(`We sent a link to ${replacement}.`, { exact: false }),
   ).toBeVisible();
 
-  await page.goto(latestLink(replacement));
-  await visiblePage(page)
+  // Opened where nobody is signed in: the link waits while its owner signs in.
+  const phone = await browser.newContext({ locale: "en-US" });
+  const other = await phone.newPage();
+  await other.goto(latestLink(replacement));
+  await visiblePage(other)
+    .getByRole("link", { name: "Sign in to confirm" })
+    .click();
+  const login = visiblePage(other);
+  await login.getByLabel("Email", { exact: true }).fill(email);
+  await login.getByLabel("Password", { exact: true }).fill(password);
+  await login.getByRole("button", { name: "Sign in", exact: true }).click();
+  await visiblePage(other)
     .getByRole("button", { name: "Confirm new email" })
     .click();
   await expect(
-    visiblePage(page).getByText(`Your email is now ${replacement}.`),
+    visiblePage(other).getByText(`Your email is now ${replacement}.`),
   ).toBeVisible();
+  await phone.close();
 
   await page.goto(`${appUrl}/settings`);
   await expect(

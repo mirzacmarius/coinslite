@@ -1,12 +1,20 @@
 import { defaultLocale } from "@coinslite/i18n";
+import { getAuthSessionId } from "@convex-dev/auth/server";
 import { HOUR, RateLimiter } from "@convex-dev/rate-limiter";
 import { ConvexError, v } from "convex/values";
 import { components, internal } from "./_generated/api";
-import type { Id } from "./_generated/dataModel";
-import { type MutationCtx, env, mutation, query } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import {
+  type MutationCtx,
+  env,
+  internalMutation,
+  mutation,
+  query,
+} from "./_generated/server";
 import { emailChangeMessages } from "./account/emailChangeMessages";
 import { checkContact } from "./account/rules";
 import { requireNormalizedEmail } from "./accounts/credentials";
+import { deleteUserAndSignInMethods } from "./accounts/linking";
 import { requireSetUpUser, requireUserId } from "./utils/auth";
 import { language } from "./utils/validators";
 
@@ -15,9 +23,13 @@ export const emailChangeErrors = {
   emailInUse: "EMAIL_IN_USE",
   invalidLink: "INVALID_LINK",
   tooManyRequests: "TOO_MANY_REQUESTS",
+  signInAgain: "SIGN_IN_AGAIN",
+  otherAccount: "OTHER_ACCOUNT",
 } as const;
 
 const LINK_LIFETIME_MS = 60 * 60 * 1000;
+/** Changing the email needs a sign-in this recent, so a session left open elsewhere can't. */
+const RECENT_SIGN_IN_MS = 15 * 60 * 1000;
 
 /** No more than five email-change requests an hour per person. */
 const rateLimiter = new RateLimiter(components.rateLimiter, {
@@ -50,10 +62,8 @@ export const get = query({
       homeCurrency: user.homeCurrency,
       // Every account is on the Free plan until billing exists (MUS-709).
       plan: "free" as const,
-      pendingEmail:
-        pending && pending.expiresAt > Date.now()
-          ? pending.newEmail
-          : undefined,
+      // An expired change is deleted when it expires (expireEmailChange).
+      pendingEmail: pending?.newEmail,
     };
   },
 });
@@ -90,7 +100,9 @@ export const setLanguage = mutation({
 
 /**
  * Starts an email change: a link goes to the new address, and nothing changes
- * until it's opened. A newer request replaces an older one.
+ * until it's opened. A newer request replaces an older one. Whether the address
+ * is free is only decided when the link is opened, so asking can't be used to
+ * find out who has an account.
  */
 export const requestEmailChange = mutation({
   args: { newEmail: v.string() },
@@ -100,23 +112,25 @@ export const requestEmailChange = mutation({
     const email = requireNormalizedEmail(newEmail);
     if (email === user.email)
       throw new ConvexError(emailChangeErrors.sameEmail);
+    await requireRecentSignIn(ctx);
     const { ok } = await rateLimiter.limit(ctx, "emailChange", {
       key: user._id,
     });
     if (!ok) throw new ConvexError(emailChangeErrors.tooManyRequests);
-    if (await emailTakenByOther(ctx, email, user._id)) {
-      throw new ConvexError(emailChangeErrors.emailInUse);
-    }
     if (!env.SITE_URL)
       throw new Error("SITE_URL is not set on this deployment");
 
     await clearPendingChanges(ctx, user._id);
     const token = newToken();
-    await ctx.db.insert("emailChanges", {
+    const expiresAt = Date.now() + LINK_LIFETIME_MS;
+    const changeId = await ctx.db.insert("emailChanges", {
       userId: user._id,
       newEmail: email,
       tokenHash: await sha256(token),
-      expiresAt: Date.now() + LINK_LIFETIME_MS,
+      expiresAt,
+    });
+    await ctx.scheduler.runAt(expiresAt, internal.account.expireEmailChange, {
+      changeId,
     });
     const message = emailChangeMessages[user.language ?? defaultLocale].confirm;
     await ctx.scheduler.runAfter(0, internal.accounts.emails.send, {
@@ -132,31 +146,47 @@ export const requestEmailChange = mutation({
   },
 });
 
+export const expireEmailChange = internalMutation({
+  args: { changeId: v.id("emailChanges") },
+  returns: v.null(),
+  handler: async (ctx, { changeId }) => {
+    if (await ctx.db.get(changeId)) await ctx.db.delete(changeId);
+    return null;
+  },
+});
+
 /**
  * Applies an email change from the link sent to the new address. The link
- * proves the inbox; it works signed in or not, once, for 60 minutes.
+ * proves the inbox; it works once, for 60 minutes, and only for the account
+ * that asked, so a link opened by whoever got a mistyped address does nothing.
  */
 export const confirmEmailChange = mutation({
   args: { token: v.string() },
   returns: v.object({ email: v.string() }),
   handler: async (ctx, { token }) => {
+    const userId = await requireUserId(ctx);
     const tokenHash = await sha256(token);
     const change = await ctx.db
       .query("emailChanges")
       .withIndex("by_tokenHash", (q) => q.eq("tokenHash", tokenHash))
-      .first();
-    const user =
-      change && change.expiresAt > Date.now()
-        ? await ctx.db.get(change.userId)
-        : null;
-    if (!change || !user) {
-      if (change) await ctx.db.delete(change._id);
+      .unique();
+    if (!change || change.expiresAt <= Date.now()) {
       throw new ConvexError(emailChangeErrors.invalidLink);
     }
+    if (change.userId !== userId) {
+      throw new ConvexError(emailChangeErrors.otherAccount);
+    }
+    const user = await ctx.db.get(userId);
+    if (!user) throw new ConvexError(emailChangeErrors.invalidLink);
     const email = change.newEmail;
-    if (await emailTakenByOther(ctx, email, user._id)) {
+    // Proof wins (ADR 0005): sign-ups that never proved the address give way
+    // to the person who just did; someone who proved it keeps it.
+    const others = await othersWithEmail(ctx, email, user._id);
+    if (others.some((other) => other.emailVerificationTime !== undefined)) {
       throw new ConvexError(emailChangeErrors.emailInUse);
     }
+    for (const other of others)
+      await deleteUserAndSignInMethods(ctx, other._id);
 
     const oldEmail = user.email;
     await ctx.db.patch(user._id, { email, emailVerificationTime: Date.now() });
@@ -196,27 +226,39 @@ export const confirmEmailChange = mutation({
 /** Sign-in methods whose account is the email address itself. */
 const EMAIL_KEYED = ["password", "magic-link"];
 
-/** Whether another person already uses the address, as their email or a sign-in method. */
-async function emailTakenByOther(
+/** The other people with the address, as their email or a sign-in method. */
+async function othersWithEmail(
   ctx: MutationCtx,
   email: string,
   userId: Id<"users">,
 ) {
-  const owner = await ctx.db
+  const ids = new Set<Id<"users">>();
+  const owners = await ctx.db
     .query("users")
     .withIndex("email", (q) => q.eq("email", email))
-    .first();
-  if (owner !== null && owner._id !== userId) return true;
+    .take(10);
+  for (const owner of owners) ids.add(owner._id);
   for (const provider of EMAIL_KEYED) {
     const account = await ctx.db
       .query("authAccounts")
       .withIndex("providerAndAccountId", (q) =>
         q.eq("provider", provider).eq("providerAccountId", email),
       )
-      .first();
-    if (account && account.userId !== userId) return true;
+      .unique();
+    if (account) ids.add(account.userId);
   }
-  return false;
+  ids.delete(userId);
+  const others = await Promise.all([...ids].map((id) => ctx.db.get(id)));
+  return others.filter((other): other is Doc<"users"> => other !== null);
+}
+
+/** A sign-in within the last few minutes, by session start; refreshing a session doesn't count. */
+async function requireRecentSignIn(ctx: MutationCtx) {
+  const sessionId = await getAuthSessionId(ctx);
+  const session = sessionId && (await ctx.db.get(sessionId));
+  if (!session || Date.now() - session._creationTime > RECENT_SIGN_IN_MS) {
+    throw new ConvexError(emailChangeErrors.signInAgain);
+  }
 }
 
 async function clearPendingChanges(ctx: MutationCtx, userId: Id<"users">) {

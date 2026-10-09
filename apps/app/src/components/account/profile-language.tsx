@@ -1,6 +1,6 @@
 "use client";
 
-import { rememberLanguage } from "@/lib/language-cookie";
+import { rememberLanguage, rememberedLanguage } from "@/lib/language-cookie";
 import { useChangeLocale, useCurrentLocale } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -17,7 +17,12 @@ export function ProfileLanguage() {
   const preferred = user?.language;
   // biome-ignore lint/correctness/useExhaustiveDependencies: follow the profile, not every switch on this device
   useEffect(() => {
-    if (preferred && preferred !== locale) {
+    // Already this browser's choice: the language menu that set it is switching.
+    if (
+      preferred &&
+      preferred !== locale &&
+      preferred !== rememberedLanguage()
+    ) {
       rememberLanguage(preferred);
       changeLocale(preferred);
     }

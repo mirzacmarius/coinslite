@@ -162,13 +162,18 @@ async function deleteAccount(ctx: MutationCtx, account: Doc<"authAccounts">) {
   await ctx.db.delete(account._id);
 }
 
-/** Removes a user with every sign-in method and pending code, so the email is free again. */
+/** Removes a user with every sign-in method, pending code and email change, so the email is free again. */
 export async function deleteUserAndSignInMethods(
   ctx: MutationCtx,
   userId: Id<"users">,
 ) {
   for (const account of await accountsOf(ctx, userId))
     await deleteAccount(ctx, account);
+  const changes = await ctx.db
+    .query("emailChanges")
+    .withIndex("by_userId", (q) => q.eq("userId", userId))
+    .take(20);
+  for (const change of changes) await ctx.db.delete(change._id);
   await ctx.db.delete(userId);
 }
 
