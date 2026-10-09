@@ -685,4 +685,41 @@ export default {
         "Sub acest nod se află alte noduri, deci nu poate deveni intrare de catalog.",
     },
   },
+  billing: {
+    currentPlan: "Planul tău",
+    freeDescription: "Până la {limit} obiecte, indiferent de cantitate.",
+    premium: "Premium",
+    premiumDescription:
+      "Obiecte nelimitate, raportul de asigurare și export CSV și PDF.",
+    billingPeriod: "Perioada de facturare",
+    monthly: "Lunar",
+    yearly: "Anual",
+    perMonth: "{price} / lună",
+    perYear: "{price} / an",
+    save: "Economisești {percent}%",
+    currencyHint:
+      "Prețuri în {currency}. La plată se încasează în moneda țării în care locuiești, altfel în euro, iar prețul final apare acolo.",
+    testMode:
+      "Mod de test: nu se fac plăți reale. Plătește cu cardul de test 4242 4242 4242 4242.",
+    unavailable:
+      "Premium nu poate fi cumpărat aici încă: facturarea nu este configurată în acest mediu.",
+    alreadyPremium: "Ai deja Premium.",
+    checkoutFailed: "Pagina de plată nu s-a putut deschide. Încearcă din nou.",
+    price: "Preț",
+    renews: "Se reînnoiește",
+    ends: "Se încheie",
+    endingNotice:
+      "Premium rămâne activ până la {date}. După aceea treci la planul gratuit, iar toate obiectele tale rămân vizibile și editabile.",
+    confirmationTitle: "Plată",
+    confirmingTitle: "Se confirmă plata",
+    confirmingDescription:
+      "De obicei durează câteva secunde. Premium pornește imediat ce plata este confirmată.",
+    slowDescription:
+      "Durează mai mult decât de obicei. Premium pornește singur după confirmarea plății, așa că poți continua între timp.",
+    welcomeTitle: "Bun venit în Premium",
+    welcomeDescription: "Colecția ta nu mai are limită de obiecte.",
+    toCollection: "Mergi la colecție",
+    seePlan: "Vezi planul",
+    backToPlans: "Înapoi la planuri",
+  },
 } as const satisfies Dictionary;
