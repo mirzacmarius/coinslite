@@ -2,6 +2,7 @@ import { homeCurrencies, locales } from "@coinslite/i18n";
 import { v } from "convex/values";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { materials } from "../items/rules";
+import { metals } from "../spotPrices/rates";
 
 /** A validator accepting exactly the given strings, e.g. the supported locales. */
 function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
@@ -48,3 +49,6 @@ export const perDollar = v.object({
   XAU: v.number(),
   XAG: v.number(),
 });
+
+/** A precious metal with a Spot price: gold or silver. */
+export const metal = literalUnion(metals);

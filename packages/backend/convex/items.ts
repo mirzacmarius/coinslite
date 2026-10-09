@@ -5,7 +5,13 @@ import { type MutationCtx, mutation, query } from "./_generated/server";
 import { checkItem } from "./items/rules";
 import { requireRoomForItems } from "./plans";
 import { requireSetUpUser } from "./utils/auth";
-import { gradingScale, itemType, material, strike } from "./utils/validators";
+import {
+  gradingScale,
+  itemType,
+  material,
+  metal,
+  strike,
+} from "./utils/validators";
 
 /** Every field a person sets on an Item, as the Item form sends them. */
 const itemFields = {
@@ -24,6 +30,10 @@ const itemFields = {
   diameter: v.optional(v.number()),
   thickness: v.optional(v.number()),
   numistaNumber: v.optional(v.number()),
+  bullion: v.optional(v.boolean()),
+  metal: v.optional(metal),
+  weight: v.optional(v.number()),
+  purity: v.optional(v.number()),
   grade: v.optional(v.string()),
   gradingScale: v.optional(gradingScale),
   gradeNote: v.optional(v.string()),
