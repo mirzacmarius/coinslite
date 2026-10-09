@@ -24,7 +24,7 @@ import {
   readEditorValues,
   valuesFromFields,
 } from "./fields";
-import { applyPlan, planRows } from "./tree";
+import { applyPlan, deleteSubtree, planDeletion, planRows } from "./tree";
 
 /**
  * The admins' Catalog editor: the whole tree, node by node, where they add
@@ -72,6 +72,8 @@ const editorRow = 2;
 export const catalogEditorErrors = {
   /** No Catalog node has the key. */
   nodeNotFound: "CATALOG_NODE_NOT_FOUND",
+  /** The node takes more nodes or Items with it than one delete may. */
+  deleteTooLarge: "DELETE_TOO_LARGE",
 } as const;
 
 async function nodeByKey(ctx: QueryCtx, key: string) {
@@ -250,5 +252,49 @@ export const node = query({
       ...(imageUrl && { imageUrl }),
       ...(node.imageProvenance && { imageProvenance: node.imageProvenance }),
     };
+  },
+});
+
+/**
+ * What deleting a node would take with it, for the admin to see first: how
+ * many nodes below it go too, and how many Items link to it or to entries
+ * below (they keep those entries' facts as their own). Null when no node has
+ * the key.
+ */
+export const deletion = query({
+  args: { key: v.string() },
+  returns: v.union(
+    v.null(),
+    v.object({
+      nodesBelow: v.number(),
+      linkedItems: v.number(),
+      /** More than one delete may take: delete what's below first. */
+      tooLarge: v.boolean(),
+    }),
+  ),
+  handler: async (ctx, { key }) => {
+    await requireAdmin(ctx);
+    const node = await nodeByKey(ctx, key);
+    if (!node) return null;
+    const { below, linkedItems, tooLarge } = await planDeletion(ctx, node);
+    return { nodesBelow: below.length, linkedItems, tooLarge };
+  },
+});
+
+/**
+ * Deletes a node and everything below it. Items linked to entries there
+ * keep those entries' facts as their own, so nobody's Item loses a fact.
+ */
+export const remove = mutation({
+  args: { key: v.string() },
+  returns: v.null(),
+  handler: async (ctx, { key }) => {
+    await requireAdmin(ctx);
+    const node = await requireNode(ctx, key);
+    const planned = await planDeletion(ctx, node);
+    if (planned.tooLarge)
+      throw new ConvexError(catalogEditorErrors.deleteTooLarge);
+    await deleteSubtree(ctx, node, planned);
+    return null;
   },
 });

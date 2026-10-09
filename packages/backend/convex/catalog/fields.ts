@@ -61,6 +61,10 @@ export const catalogErrors = {
   parentCycle: "PARENT_CYCLE",
   tooDeep: "TOO_DEEP",
   entryHasChildren: "ENTRY_HAS_CHILDREN",
+  /** Items link to this entry, so it stays a Catalog entry. */
+  entryHasItems: "ENTRY_HAS_ITEMS",
+  /** More Items link to the entries changed than one save can update. */
+  tooManyLinkedItems: "TOO_MANY_LINKED_ITEMS",
 } as const;
 export type CatalogError = (typeof catalogErrors)[keyof typeof catalogErrors];
 
@@ -83,6 +87,10 @@ export const catalogLimits = {
   /** Millimetres. */
   diameter: 500,
   sortOrder: 1_000_000_000,
+  /** Items one save or delete updates: those linked to the entries it changes. */
+  linkedItems: 1000,
+  /** Nodes one delete removes, the node and everything below it. */
+  deleteNodes: 2000,
   /** Years are whole numbers, BC as negatives. */
   earliestYear: -3000,
   latestYear: 3000,

@@ -40,6 +40,7 @@ import type * as catalog_editor from "../catalog/editor.js";
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_imageRules from "../catalog/imageRules.js";
 import type * as catalog_images from "../catalog/images.js";
+import type * as catalog_linkedItems from "../catalog/linkedItems.js";
 import type * as catalog_search from "../catalog/search.js";
 import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
@@ -134,6 +135,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/fields": typeof catalog_fields;
   "catalog/imageRules": typeof catalog_imageRules;
   "catalog/images": typeof catalog_images;
+  "catalog/linkedItems": typeof catalog_linkedItems;
   "catalog/search": typeof catalog_search;
   "catalog/searchWords": typeof catalog_searchWords;
   "catalog/seed": typeof catalog_seed;
