@@ -1,7 +1,9 @@
 /// <reference types="vite/client" />
 import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
+import { makeFunctionReference } from "convex/server";
 import { expect, test } from "vitest";
+import vercelBuildScript from "../scripts/vercel-build-app.sh?raw";
 import { api, internal } from "./_generated/api";
 import { parseCsv } from "./catalog/csvText";
 import schema from "./schema";
@@ -578,4 +580,16 @@ test("the bundled US Morgan and Peace dollars load once, with their sources, and
     expect(node.facts_source).toBe("United States Mint");
     expect(node.image_url).toBe("");
   }
+});
+
+test("a new preview deployment loads the bundled Catalog through the function its build names", async () => {
+  // `convex deploy --preview-run` calls the function by name, with no args.
+  const previewRun = /^\s*--preview-run\s+(\S+)/m.exec(vercelBuildScript)?.[1];
+  expect(previewRun).toBe("catalog/seed:load");
+
+  const t = newTest();
+  const seed = makeFunctionReference<"mutation">(previewRun ?? "");
+  expect(await t.mutation(seed, {})).toEqual([
+    { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
+  ]);
 });

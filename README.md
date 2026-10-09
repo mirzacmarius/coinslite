@@ -58,6 +58,7 @@ CI runs all four on every push and pull request.
   - Production deploys use the production deploy key.
   - Each preview branch gets its own preview deployment, through the preview deploy key. Both keys are stored as `CONVEX_DEPLOY_KEY` in Vercel.
 - **Preview settings:** previews take their sign-in keys from the Convex project's default preview variables. The build sets each preview's `SITE_URL` to its branch URL (`packages/backend/scripts/vercel-build-app.sh`).
+- **Catalog data:** a newly created preview deployment loads the bundled Catalog datasets (`--preview-run catalog/seed:load` in the same script). Production stays empty until someone runs `npx convex run catalog/seed:load --prod` in `packages/backend`; loading again only updates what changed.
 - **New deployment's sign-in keys:** `bun scripts/set-auth-keys.ts <app-url> [--prod]` in `packages/backend`.
 - **Links between the sites:** the app's `NEXT_PUBLIC_WEB_URL` (privacy policy, terms) and the marketing site's `NEXT_PUBLIC_APP_URL` point at each other's production URL, previews included.
 - **Signed-in visitors skip the marketing site** once both sites share a parent domain. Set `SIGNED_IN_HINT_DOMAIN` (for example `.coinslite.app`) on the app. On `*.vercel.app` the two sites can't share cookies.
