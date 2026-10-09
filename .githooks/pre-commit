@@ -1,0 +1,4 @@
+#!/bin/sh
+# Formats and lints the staged files the way CI checks them; fixes are re-staged.
+bunx biome check --write --staged --no-errors-on-unmatched --files-ignore-unknown=true || exit 1
+git update-index --again
