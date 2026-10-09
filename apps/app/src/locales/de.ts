@@ -1074,6 +1074,9 @@ export default {
     "inView#few": "{count} Objekte in dieser Ansicht",
     "inView#other": "{count} Objekte in dieser Ansicht",
     csv: "Als CSV exportieren",
+    pdf: "Als PDF exportieren",
+    pdfTooLarge:
+      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
     premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
