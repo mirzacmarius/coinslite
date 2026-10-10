@@ -213,8 +213,6 @@ async function chooseLanguage(page: Page, name: string, code: string) {
 for (const { code, name, t, unitedStates, highRelief } of languages) {
   test(`the key screens read in ${name}`, async ({ page }) => {
     test.setTimeout(180_000);
-    // The bundled Catalog, so it has a country to name. Loading it again changes nothing.
-    runInBackend("catalog/seed:load", {});
     const email = newEmail();
     await signUpAndVerify(page, email);
     const itemPath = await addStamp(page);
