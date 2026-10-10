@@ -153,12 +153,22 @@ function QuickAddDialog({
             : albumId,
       });
       onOpenChange(false);
-      toast.success(t("quickAdd.added"), {
-        action: {
-          label: t("quickAdd.open"),
-          onClick: () => router.push(`/collection/${itemId}`),
+      // The only Album, filed into without being picked: say so.
+      const filedInto =
+        album === undefined && onlyAlbum !== undefined
+          ? albums?.find(({ _id }) => _id === onlyAlbum)
+          : undefined;
+      toast.success(
+        filedInto
+          ? t("quickAdd.addedToAlbum", { album: filedInto.name })
+          : t("quickAdd.added"),
+        {
+          action: {
+            label: t("quickAdd.open"),
+            onClick: () => router.push(`/collection/${itemId}`),
+          },
         },
-      });
+      );
     } catch (failure) {
       setFailed(
         isItemLimitError(failure) ? itemLimitMessage : t("quickAdd.failed"),

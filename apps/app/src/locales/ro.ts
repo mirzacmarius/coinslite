@@ -59,6 +59,7 @@ export default {
     cancel: "Anulează",
     close: "Închide",
     added: "Obiect adăugat în colecție",
+    addedToAlbum: "Obiect adăugat în {album}",
     emptyTitle: "Colecția ta e goală",
     emptyDescription:
       "Adaugă prima monedă, bancnotă sau primul timbru ca să-l vezi aici.",
@@ -1151,6 +1152,7 @@ export default {
     description:
       "Adaugă această intrare de catalog în colecție ca un singur obiect.",
     added: "Obiect adăugat în colecție",
+    addedToAlbum: "Obiect adăugat în {album}",
     open: "Deschide",
     failed: "Obiectul nu a putut fi adăugat. Încearcă din nou.",
   },

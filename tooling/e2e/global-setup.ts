@@ -1,14 +1,22 @@
 import { runInBackend } from "./support/accounts";
 import { hasLocalBackend } from "./urls";
 
-/** Seed timeouts are retried this many times in all. */
-const attempts = 3;
+/** How often loading is tried, and how long to wait between tries. */
+const attempts = 10;
+const pauseMs = 3_000;
+
+/**
+ * Failures worth trying again: one dataset's import passing the local
+ * backend's one-second limit on a busy runner, or the functions not pushed
+ * yet when Playwright has only just started `convex dev`.
+ */
+const isPassing = (error: unknown) =>
+  /timed out|Could not find function/.test(String(error));
 
 /**
  * Loads the bundled Catalog once per run, after the web servers (including
  * the local backend) are up, so every Catalog journey finds it. Loading is
- * idempotent; on a busy runner one dataset's import can pass the local
- * backend's one-second limit, so a timeout is tried again.
+ * idempotent, so a passing failure is simply tried again.
  */
 export default async function globalSetup() {
   if (!hasLocalBackend) return;
@@ -17,9 +25,8 @@ export default async function globalSetup() {
       runInBackend("catalog/seed:load", {});
       return;
     } catch (error) {
-      const timedOut = String(error).includes("timed out");
-      if (!timedOut || attempt === attempts) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 2_000));
+      if (!isPassing(error) || attempt === attempts) throw error;
+      await new Promise((resolve) => setTimeout(resolve, pauseMs));
     }
   }
 }

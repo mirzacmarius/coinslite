@@ -60,6 +60,7 @@ export default {
     cancel: "Abbrechen",
     close: "Schließen",
     added: "Objekt zur Sammlung hinzugefügt",
+    addedToAlbum: "Objekt zu {album} hinzugefügt",
     emptyTitle: "Deine Sammlung ist leer",
     emptyDescription:
       "Füge deine erste Münze, Banknote oder Briefmarke hinzu, um sie hier zu sehen.",
@@ -1182,6 +1183,7 @@ export default {
     description:
       "Füge diesen Katalogeintrag deiner Sammlung als ein Objekt hinzu.",
     added: "Objekt zur Sammlung hinzugefügt",
+    addedToAlbum: "Objekt zu {album} hinzugefügt",
     open: "Öffnen",
     failed:
       "Das Objekt konnte nicht hinzugefügt werden. Versuche es noch einmal.",

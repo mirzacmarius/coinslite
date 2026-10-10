@@ -335,7 +335,25 @@ export function ItemFormDialog({
         );
         return;
       }
-      toast.success(t(item ? "items.saved" : "items.added"));
+      // The only Album, filed into without being picked: say so, so the
+      // Item doesn't land there unnoticed.
+      const preselected =
+        !item &&
+        !copyOf &&
+        onlyAlbum !== undefined &&
+        value.albumId === onlyAlbum &&
+        // Submitting marks every field touched; only a pick makes it dirty.
+        !form.getFieldMeta("albumId")?.isDirty;
+      const filedInto = preselected
+        ? albums?.find(({ _id }) => _id === onlyAlbum)
+        : undefined;
+      toast.success(
+        item
+          ? t("items.saved")
+          : filedInto
+            ? t("items.addedToAlbum", { album: filedInto.name })
+            : t("items.added"),
+      );
       if (added && scanned) {
         const photos = scanned.photos;
         setScanned(undefined);
@@ -352,10 +370,10 @@ export function ItemFormDialog({
       if (createMore) {
         // "Create more" keeps the pills for the next Item, and starts it
         // on the Catalog picker like the first.
-        fillForm(form, {
-          type: value.type,
-          country: value.country,
-          albumId: value.albumId,
+        fillForm(form, { type: value.type, country: value.country });
+        // A preselected Album stays preselected for the next Item.
+        form.setFieldValue("albumId", value.albumId, {
+          dontUpdateMeta: preselected,
         });
         if (catalogVisible && isCatalogType(value.type)) openPicker(true);
         else titleRef.current?.focus();
