@@ -193,6 +193,9 @@ for (const width of [1280, 375]) {
   test(`select Items and move them into an Album, at ${width}px`, async ({
     page,
   }) => {
+    // Sign-up, two Albums, three Items and two moves: longer than the
+    // default 30s on a slow CI runner.
+    test.setTimeout(90_000);
     await page.setViewportSize({ width, height: 900 });
     await signUpAndVerify(page, newEmail());
     await createAlbum(page, "Silver");
