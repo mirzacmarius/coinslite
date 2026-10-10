@@ -60,6 +60,7 @@ export default {
     cancel: "Annuler",
     close: "Fermer",
     added: "Objet ajouté à votre collection",
+    addedToAlbum: "Objet ajouté à {album}",
     emptyTitle: "Votre collection est vide",
     emptyDescription:
       "Ajoutez votre première pièce, votre premier billet ou timbre pour le voir ici.",
@@ -1164,6 +1165,7 @@ export default {
     description:
       "Ajoutez cette entrée du catalogue à votre collection sous la forme d’un objet.",
     added: "Objet ajouté à votre collection",
+    addedToAlbum: "Objet ajouté à {album}",
     open: "Ouvrir",
     failed: "L’objet n’a pas pu être ajouté. Réessayez.",
   },

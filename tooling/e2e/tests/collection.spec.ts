@@ -253,3 +253,27 @@ for (const width of [1280, 375]) {
     await expect(bar).toBeHidden();
   });
 }
+
+test("with one Album, the toast names it when a new Item goes in by default", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await createAlbum(page, "Silver");
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+
+  // The pill is left as preselected: the toast says where the Item went.
+  await addItem(page, main, "Krone 1875", "Coin");
+  await expect(page.getByText("Item added to Silver")).toBeVisible();
+
+  // Taking the Item out of the Album on the form: the usual toast.
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
+  const dialog = page.getByRole("dialog", { name: "New Item" });
+  await dialog.getByLabel("Title").fill("Krone 1876");
+  await dialog.getByRole("button", { name: /^Album/ }).click();
+  await page.getByRole("option", { name: "No Album" }).click();
+  await dialog.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText("Item added to your Collection")).toBeVisible();
+});

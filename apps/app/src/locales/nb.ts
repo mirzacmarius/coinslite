@@ -58,6 +58,7 @@ export default {
     cancel: "Avbryt",
     close: "Lukk",
     added: "Objektet er lagt til i samlingen",
+    addedToAlbum: "Objekt lagt til i {album}",
     emptyTitle: "Samlingen er tom",
     emptyDescription:
       "Legg til din første mynt, seddel eller ditt første frimerke for å se det her.",
@@ -1145,6 +1146,7 @@ export default {
     description:
       "Legg til denne katalogoppføringen i samlingen som ett objekt.",
     added: "Objektet er lagt til i samlingen",
+    addedToAlbum: "Objekt lagt til i {album}",
     open: "Åpne",
     failed: "Objektet kunne ikke legges til. Prøv igjen.",
   },
