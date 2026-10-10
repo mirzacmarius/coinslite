@@ -1051,7 +1051,7 @@ export function ItemFormDialog({
                     )}
                   </form.Field>
                   {textField("gradeNote", t("items.gradeNote"), {
-                    placeholder: t("items.gradeNotePlaceholder"),
+                    placeholder: t(`items.gradeNotePlaceholder.${values.type}`),
                     maxLength: itemLimits.gradeNote,
                   })}
                 </DetailGroup>
