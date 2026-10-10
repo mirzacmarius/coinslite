@@ -127,6 +127,26 @@ async function embedFace(document: Document, base64: string): Promise<Face> {
 }
 
 /**
+ * Where a word too wide for a line breaks: before an email address's "@" when
+ * the domain then fits on one line, else at the last place that fits before a
+ * "." or "@" or after a "-", else after the last character that fits.
+ */
+function breakPoint(face: Face, word: string, at: number, maxWidth: number) {
+  const fits = (text: string) => face.width(text, at) <= maxWidth;
+  const sign = word.lastIndexOf("@");
+  if (sign > 0 && fits(word.slice(0, sign)) && fits(word.slice(sign)))
+    return sign;
+  for (let cut = word.length - 1; cut > 0; cut--) {
+    const soft =
+      word[cut] === "." || word[cut] === "@" || word[cut - 1] === "-";
+    if (soft && fits(word.slice(0, cut))) return cut;
+  }
+  let cut = word.length - 1;
+  while (cut > 1 && !fits(word.slice(0, cut))) cut--;
+  return cut;
+}
+
+/**
  * Breaks text into lines no wider than `maxWidth`: at spaces (not no-break
  * spaces, so "1 234 kr" stays whole), at explicit line breaks, and inside a
  * word only when the word alone is too wide.
@@ -144,8 +164,7 @@ function wrap(face: Face, text: string, at: number, maxWidth: number) {
       if (line) lines.push(line);
       line = word;
       while (line.length > 1 && face.width(line, at) > maxWidth) {
-        let cut = line.length - 1;
-        while (cut > 1 && face.width(line.slice(0, cut), at) > maxWidth) cut--;
+        const cut = breakPoint(face, line, at, maxWidth);
         lines.push(line.slice(0, cut));
         line = line.slice(cut);
       }

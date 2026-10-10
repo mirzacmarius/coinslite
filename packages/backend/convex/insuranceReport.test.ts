@@ -480,6 +480,22 @@ test("the PDF is in the language asked for, every character included", async () 
   );
 });
 
+test("a long email address breaks before its @, not inside the domain", async () => {
+  const t = newTest();
+  const owners = [
+    "firstname.lastname@company-domain.no",
+    "qa-insurance-owner+release@example.com",
+  ];
+  for (const email of owners) {
+    const owner = await person(t, email);
+    await add(owner, kroner);
+
+    const report = await download(owner, { columns: ["marketValue"] });
+
+    expect(report.all).toContain(`Email ${email.replace("@", " @")}`);
+  }
+});
+
 test("a long report runs over several pages, each with the column headings and a page number, and totals at the end", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
