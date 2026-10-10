@@ -8,7 +8,7 @@ import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
-import { HeaderBar } from "@coinslite/ui/header-bar";
+import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
@@ -141,7 +141,7 @@ export function ItemDetail() {
               }
             >
               <Copy aria-hidden="true" />
-              {t("items.duplicate")}
+              <ActionLabel>{t("items.duplicate")}</ActionLabel>
             </Button>
             <Button
               variant="ghost"
@@ -151,11 +151,11 @@ export function ItemDetail() {
               }
             >
               <Pencil aria-hidden="true" />
-              {t("items.edit")}
+              <ActionLabel>{t("items.edit")}</ActionLabel>
             </Button>
             <Button variant="ghost" size="xs" onClick={() => setDeleting(true)}>
               <Trash2 aria-hidden="true" />
-              {t("deleteItem.delete")}
+              <ActionLabel>{t("deleteItem.delete")}</ActionLabel>
             </Button>
           </>
         }

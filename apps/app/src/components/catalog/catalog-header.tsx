@@ -42,7 +42,7 @@ export function CatalogHeader({
               href={crumb.href}
               className={
                 nearest
-                  ? "max-w-48 truncate hover:text-foreground"
+                  ? "max-w-24 truncate hover:text-foreground md:max-w-48"
                   : "hidden max-w-40 truncate hover:text-foreground md:inline"
               }
             >

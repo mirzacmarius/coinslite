@@ -4,7 +4,7 @@ import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
-import { HeaderBar } from "@coinslite/ui/header-bar";
+import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
 import { useQuery } from "convex/react";
 import { ListFilter, Pencil, SearchX, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -74,7 +74,7 @@ export function AlbumDetail() {
             <Button variant="ghost" size="xs" asChild>
               <Link href={`/collection?album=${album._id}`}>
                 <ListFilter strokeWidth={1.75} aria-hidden="true" />
-                {t("collection.showInCollection")}
+                <ActionLabel>{t("collection.showInCollection")}</ActionLabel>
               </Link>
             </Button>
             <Button
@@ -85,7 +85,7 @@ export function AlbumDetail() {
               }
             >
               <Pencil aria-hidden="true" />
-              {t("albums.edit")}
+              <ActionLabel>{t("albums.edit")}</ActionLabel>
             </Button>
             <Button
               variant="ghost"
@@ -96,7 +96,7 @@ export function AlbumDetail() {
               }
             >
               <Trash2 aria-hidden="true" />
-              {t("albums.delete")}
+              <ActionLabel>{t("albums.delete")}</ActionLabel>
             </Button>
           </>
         }

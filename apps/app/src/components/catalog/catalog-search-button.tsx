@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
+import { ActionLabel } from "@coinslite/ui/header-bar";
 import { Kbd } from "@coinslite/ui/kbd";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -48,7 +49,7 @@ export function CatalogSearchButton() {
     <>
       <Button variant="ghost" size="xs" onClick={() => setOpen(true)}>
         <Search strokeWidth={1.75} aria-hidden="true" />
-        {t("catalogSearch.open")}
+        <ActionLabel>{t("catalogSearch.open")}</ActionLabel>
         <Kbd className="hidden sm:inline-flex" aria-hidden="true">
           /
         </Kbd>
