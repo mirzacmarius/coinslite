@@ -12,10 +12,9 @@ import {
 import { requireOwnItem } from "./items";
 import { ensurePhotoLinks, photoLink } from "./photos/links";
 import {
-  type PhotoSide,
+  isPhotoSide,
   photoErrors,
   photoLimits,
-  photoSides,
   photoSignatureLength,
   photoType,
 } from "./photos/rules";
@@ -31,9 +30,6 @@ import { photoSide } from "./utils/validators";
 
 /** Where each side's photo is kept on the Item. */
 const photoFields = { front: "frontPhoto", back: "backPhoto" } as const;
-
-const isSide = (photo: PhotoSide | Id<"itemPhotos">): photo is PhotoSide =>
-  photoSides.some((side) => side === photo);
 
 /** An Item's more photos, in the order they were added. */
 const morePhotosOf = (ctx: QueryCtx, itemId: Id<"items">) =>
@@ -132,7 +128,13 @@ export const attach = action({
       await ctx.runMutation(internal.photos.discard, { itemId, storageId });
       throw new ConvexError(problem);
     }
-    await ctx.runMutation(internal.photos.save, { itemId, side, storageId });
+    try {
+      await ctx.runMutation(internal.photos.save, { itemId, side, storageId });
+    } catch (failure) {
+      // Another photo got in between the room check and the save.
+      await ctx.runMutation(internal.photos.discard, { itemId, storageId });
+      throw failure;
+    }
     return null;
   },
 });
@@ -219,7 +221,7 @@ export const remove = mutation({
   returns: v.null(),
   handler: async (ctx, { itemId, photo }) => {
     const item = await requireOwnItem(ctx, itemId);
-    if (isSide(photo)) {
+    if (isPhotoSide(photo)) {
       const field = photoFields[photo];
       const stored = item[field];
       if (stored) {

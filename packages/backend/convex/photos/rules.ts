@@ -12,6 +12,10 @@
 export const photoSides = ["front", "back"] as const;
 export type PhotoSide = (typeof photoSides)[number];
 
+/** Whether a photo's place is one of the sides, rather than one more photo's id. */
+export const isPhotoSide = (place: string): place is PhotoSide =>
+  photoSides.some((side) => side === place);
+
 export const photoLimits = {
   /** 10 MB. */
   bytes: 10 * 1024 * 1024,

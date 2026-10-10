@@ -35,7 +35,8 @@ export function DeleteAccountDialog({
     },
     {
       label: t("deleteAccount.photos"),
-      value: summary && count(summary.photos, summary.more),
+      value:
+        summary && count(summary.photos, summary.more || summary.morePhotos),
     },
     {
       label: t("deleteAccount.albums"),

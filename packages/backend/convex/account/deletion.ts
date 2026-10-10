@@ -104,7 +104,10 @@ export const summary = query({
       items: v.number(),
       photos: v.number(),
       albums: v.number(),
+      /** The Items (and the photos on them) are counted up to a limit only. */
       more: v.boolean(),
+      /** The more photos are counted up to a limit only. */
+      morePhotos: v.boolean(),
       endsSubscription: v.boolean(),
     }),
   ),
@@ -138,8 +141,8 @@ export const summary = query({
           0,
         ) + Math.min(morePhotos.length, summaryItemLimit),
       albums: albums.length,
-      more:
-        items.length > summaryItemLimit || morePhotos.length > summaryItemLimit,
+      more: items.length > summaryItemLimit,
+      morePhotos: morePhotos.length > summaryItemLimit,
       endsSubscription: subscriptions.some(chargesAgain),
     };
   },
@@ -249,14 +252,22 @@ const deleteAlbums: Step = async (ctx, { userId }, budget) =>
       .take(budget),
   );
 
-/** Items go the one way Items are deleted, which takes their stored photos too. */
+/**
+ * Items go the one way Items are deleted, which takes their stored photos
+ * too. Each more photo counts against the budget like a document of its own,
+ * so a batch stays about the planned size however many photos Items carry.
+ */
 const deleteItems: Step = async (ctx, { userId }, budget) => {
   const items = await ctx.db
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
     .take(budget);
-  for (const item of items) await deleteItem(ctx, item);
-  return items.length;
+  let deleted = 0;
+  for (const item of items) {
+    deleted += 1 + (await deleteItem(ctx, item));
+    if (deleted >= budget) break;
+  }
+  return Math.min(deleted, budget);
 };
 
 /**

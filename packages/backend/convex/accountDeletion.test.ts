@@ -503,6 +503,7 @@ test("the confirmation counts the Items, photos and Albums that will go", async 
     photos: 4,
     albums: 2,
     more: false,
+    morePhotos: false,
     endsSubscription: false,
   });
   expect(await t.query(api.account.deletion.summary, {})).toBeNull();
@@ -526,6 +527,7 @@ test("past its limit the confirmation counts Items no further and says there are
     photos: 0,
     albums: 0,
     more: true,
+    morePhotos: false,
     endsSubscription: false,
   });
 });

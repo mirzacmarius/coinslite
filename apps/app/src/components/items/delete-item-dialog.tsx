@@ -27,8 +27,12 @@ export function DeleteItemDialog({
   const t = useI18n();
   const router = useRouter();
   const removeItem = useMutation(api.items.remove);
-  // The sides are on the Item; its more photos come with the photo links.
-  const photos = useQuery(api.photos.ofItem, { itemId: item._id });
+  // The sides are on the Item; its more photos come with the photo links,
+  // which the photos section already holds, so this resolves at once.
+  const photos = useQuery(
+    api.photos.ofItem,
+    open ? { itemId: item._id } : "skip",
+  );
   const count =
     [item.frontPhoto, item.backPhoto].filter(Boolean).length +
     (photos?.more.length ?? 0);

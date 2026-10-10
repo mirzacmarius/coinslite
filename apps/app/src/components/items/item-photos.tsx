@@ -5,6 +5,7 @@ import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import {
   type PhotoSide,
+  isPhotoSide,
   photoErrors,
   photoLimits,
   photoSides,
@@ -47,8 +48,6 @@ const sideNames = {
 
 /** A photo to remove: one side, or one of the more photos by its id. */
 type Target = PhotoSide | Id<"itemPhotos">;
-const isSide = (target: Target): target is PhotoSide =>
-  photoSides.some((side) => side === target);
 
 /**
  * The server's checks, made first in the browser so a wrong file is turned
@@ -158,7 +157,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
       setBusy((slots) => ({ ...slots, [slot]: false }));
     }
   };
-  const removalTitle = isSide(removal.target)
+  const removalTitle = isPhotoSide(removal.target)
     ? t(`photos.removeTitles.${names[removal.target]}`)
     : t("photos.more.removeTitle");
 
@@ -212,8 +211,6 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
                 url={null}
                 busy={busy.more}
                 onFile={(file) => void add(undefined, file)}
-                onView={() => {}}
-                onRemove={() => {}}
               />
             )}
           </div>
@@ -250,9 +247,10 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
 /**
  * One photo slot: the photo (click to view, menu to replace or remove), or a
  * tile to add one. A file can also be dropped on the tile. `url` is undefined
- * while loading. Without `onFile` the photo can only be viewed or removed.
- * `small` tiles (the more photos) show the add tile without its hint, and
- * `labelId` names an element that already labels them.
+ * while loading. Without `onFile` the photo can only be viewed or removed;
+ * without `onView` and `onRemove` the slot only adds. `small` tiles (the more
+ * photos) show the add tile without its hint, and `labelId` names an element
+ * that already labels them.
  */
 function PhotoSlot({
   label,
@@ -270,8 +268,8 @@ function PhotoSlot({
   busy: boolean;
   small?: boolean;
   onFile?: (file: File) => void;
-  onView: () => void;
-  onRemove: () => void;
+  onView?: () => void;
+  onRemove?: () => void;
 }) {
   const t = useI18n();
   const id = useId();
