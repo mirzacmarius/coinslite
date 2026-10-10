@@ -444,6 +444,7 @@ test("deleting an Item removes it and its stored photos, and nothing else", asyn
   expect(await ada.as.query(api.photos.ofItem, { itemId: kept })).toEqual({
     front: expect.any(String),
     back: null,
+    more: [],
   });
   await expect(ada.as.mutation(api.items.remove, { itemId })).rejects.toThrow(
     "ITEM_NOT_FOUND",

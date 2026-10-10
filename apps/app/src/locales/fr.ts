@@ -428,6 +428,13 @@ export default {
       back: "Verso",
       obverse: "Avers",
       reverse: "Revers",
+      stamp: "Timbre",
+    },
+    more: {
+      title: "Autres photos",
+      hint: "Jusqu’à {limit} de plus\u00a0: détails, tranche, certificat ou emballage.",
+      label: "Photo {n}",
+      removeTitle: "Retirer cette photo\u00a0?",
     },
     add: "Ajouter une photo",
     formats: "JPEG, PNG, WebP ou GIF, jusqu’à 10 Mo",
@@ -441,6 +448,7 @@ export default {
       back: "Retirer la photo du verso\u00a0?",
       obverse: "Retirer la photo de l’avers\u00a0?",
       reverse: "Retirer la photo du revers\u00a0?",
+      stamp: "Retirer la photo du timbre\u00a0?",
     },
     removeBody:
       "La photo est supprimée définitivement. Vous pouvez en ajouter une nouvelle à tout moment.",
@@ -453,6 +461,8 @@ export default {
       notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
       tooMany:
         "Trop de téléversements en peu de temps. Réessayez dans quelques minutes.",
+      tooManyPhotos:
+        "Cet objet a déjà {limit} autres photos. Retirez-en une pour en ajouter une autre.",
       failed: "Impossible d’enregistrer la photo. Réessayez.",
       removeFailed: "Impossible de retirer la photo. Réessayez.",
     },
@@ -461,10 +471,12 @@ export default {
     delete: "Supprimer",
     title: "Supprimer «\u00a0{title}\u00a0»\u00a0?",
     body: "L’objet est supprimé définitivement. Cette action est irréversible.",
-    bodyOnePhoto:
+    "bodyPhotos#one":
       "L’objet et sa photo sont supprimés définitivement. Cette action est irréversible.",
-    bodyTwoPhotos:
-      "L’objet et ses 2 photos sont supprimés définitivement. Cette action est irréversible.",
+    "bodyPhotos#few":
+      "L’objet et ses {count} photos sont supprimés définitivement. Cette action est irréversible.",
+    "bodyPhotos#other":
+      "L’objet et ses {count} photos sont supprimés définitivement. Cette action est irréversible.",
     confirm: "Supprimer l’objet",
     cancel: "Annuler",
     deleted: "Objet supprimé",

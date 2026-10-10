@@ -4,13 +4,23 @@
  * get an answer before a large file finishes uploading.
  */
 
-/** An Item has one photo per side: front and back (obverse and reverse for coins). */
+/**
+ * An Item has one photo per side: front and back (obverse and reverse for
+ * coins; the stamp and its back for stamps), and up to `photoLimits.more`
+ * more photos after them.
+ */
 export const photoSides = ["front", "back"] as const;
 export type PhotoSide = (typeof photoSides)[number];
+
+/** Whether a photo's place is one of the sides, rather than one more photo's id. */
+export const isPhotoSide = (place: string): place is PhotoSide =>
+  photoSides.some((side) => side === place);
 
 export const photoLimits = {
   /** 10 MB. */
   bytes: 10 * 1024 * 1024,
+  /** How many more photos an Item can have besides its sides. */
+  more: 6,
 };
 
 /** Error codes the photo functions throw (ConvexError data). */
@@ -19,6 +29,8 @@ export const photoErrors = {
   notFound: "PHOTO_NOT_FOUND",
   tooLarge: "PHOTO_TOO_LARGE",
   notAnImage: "PHOTO_NOT_AN_IMAGE",
+  /** The Item already has as many more photos as it can hold. */
+  tooManyPhotos: "TOO_MANY_PHOTOS",
 } as const;
 
 /** Error codes for uploads of any kind, photos and Catalog images alike. */

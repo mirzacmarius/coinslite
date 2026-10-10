@@ -73,7 +73,7 @@ test("a front photo shows on its Item and as the Item's list thumbnail", async (
   await ada.as.action(api.photos.attach, { itemId, side: "front", storageId });
 
   const photos = await ada.as.query(api.photos.ofItem, { itemId });
-  expect(photos).toEqual({ front: expect.any(String), back: null });
+  expect(photos).toEqual({ front: expect.any(String), back: null, more: [] });
   const { page } = await ada.as.query(api.items.list, {
     paginationOpts: firstPage,
   });
@@ -203,13 +203,21 @@ test("each side can be replaced or removed on its own, and the old file goes", a
   expect(replaced.back).toBe(before.back);
   expect(await stored(t)).toBe(2);
 
-  await ada.as.mutation(api.photos.remove, { itemId, side: "back" });
-  expect(await photos()).toEqual({ front: replaced.front, back: null });
+  await ada.as.mutation(api.photos.remove, { itemId, photo: "back" });
+  expect(await photos()).toEqual({
+    front: replaced.front,
+    back: null,
+    more: [],
+  });
   expect(await stored(t)).toBe(1);
 
   // Removing a side that has no photo changes nothing.
-  await ada.as.mutation(api.photos.remove, { itemId, side: "back" });
-  expect(await photos()).toEqual({ front: replaced.front, back: null });
+  await ada.as.mutation(api.photos.remove, { itemId, photo: "back" });
+  expect(await photos()).toEqual({
+    front: replaced.front,
+    back: null,
+    more: [],
+  });
 });
 
 test("photos are private: nobody else sees, changes or takes over someone's photos", async () => {
@@ -240,7 +248,7 @@ test("photos are private: nobody else sees, changes or takes over someone's phot
     }),
   ).rejects.toThrow("ITEM_NOT_FOUND");
   await expect(
-    bob.as.mutation(api.photos.remove, { itemId, side: "front" }),
+    bob.as.mutation(api.photos.remove, { itemId, photo: "front" }),
   ).rejects.toThrow("ITEM_NOT_FOUND");
   // A file that's already someone's photo can't be put on another Item.
   for (const [who, target] of [
@@ -259,9 +267,10 @@ test("photos are private: nobody else sees, changes or takes over someone's phot
   expect(await bob.as.query(api.photos.ofItem, { itemId: bobsItem })).toEqual({
     front: null,
     back: null,
+    more: [],
   });
   const adas = await ada.as.query(api.photos.ofItem, { itemId });
-  expect(adas).toEqual({ front: expect.any(String), back: null });
+  expect(adas).toEqual({ front: expect.any(String), back: null, more: [] });
   const { page } = await ada.as.query(api.items.list, {
     paginationOpts: firstPage,
   });
@@ -291,7 +300,7 @@ test("signed-out callers, and people who haven't finished signing up, get no pho
     "NOT_SIGNED_IN",
   );
   await expect(
-    t.mutation(api.photos.remove, { itemId, side: "front" }),
+    t.mutation(api.photos.remove, { itemId, photo: "front" }),
   ).rejects.toThrow("NOT_SIGNED_IN");
   expect(await ada.as.mutation(api.photos.generateUploadUrl, {})).toEqual(
     expect.stringMatching(/^https:\/\//),
@@ -316,6 +325,7 @@ test("only a fresh upload becomes a photo; older stored files are left alone", a
   expect(await ada.as.query(api.photos.ofItem, { itemId })).toEqual({
     front: null,
     back: null,
+    more: [],
   });
 });
 
@@ -359,6 +369,7 @@ test("an upload belongs to whoever registers it first: nobody else can use it or
   expect(await ada.as.query(api.photos.ofItem, { itemId: adasItem })).toEqual({
     front: expect.any(String),
     back: null,
+    more: [],
   });
 });
 
@@ -390,6 +401,7 @@ test("uploads never put to use are deleted after an hour, whether registered or 
   expect(await ada.as.query(api.photos.ofItem, { itemId })).toEqual({
     front: expect.any(String),
     back: null,
+    more: [],
   });
 });
 
@@ -495,4 +507,158 @@ test("without a secret on the deployment, photo links still work, signed with on
 
 afterEach(() => {
   vi.useRealTimers();
+});
+
+/** Puts a file on the Item as one more photo, after its sides. */
+const addMore = async (
+  t: Test,
+  who: Awaited<ReturnType<typeof person>>,
+  itemId: Awaited<ReturnType<typeof addItem>>,
+  blob: Blob = file(images.jpeg),
+) => {
+  const storageId = await upload(t, blob);
+  await who.as.action(api.photos.attach, { itemId, storageId });
+  return storageId;
+};
+const addItem = (who: Awaited<ReturnType<typeof person>>, title = "Krone") =>
+  who.as.mutation(api.items.add, { type: "coin", title });
+
+test("an Item can have up to 6 more photos besides its sides, in the order added", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await addItem(ada);
+
+  for (let n = 0; n < 6; n++) await addMore(t, ada, itemId);
+  const photos = (await ada.as.query(api.photos.ofItem, { itemId }))!;
+  expect(photos.front).toBeNull();
+  expect(photos.more).toHaveLength(6);
+  expect(photos.more.map((photo) => photo.url)).toEqual(
+    photos.more.map(() => expect.stringMatching(/^https:\/\//)),
+  );
+  expect(new Set(photos.more.map((photo) => photo.id)).size).toBe(6);
+  // The sides are separate from the extra photos.
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "front",
+    storageId: await upload(t, file(images.png)),
+  });
+  expect(await stored(t)).toBe(7);
+
+  await expect(addMore(t, ada, itemId)).rejects.toThrow("TOO_MANY_PHOTOS");
+  // The rejected upload is thrown away; the six stay as they were.
+  expect(await stored(t)).toBe(7);
+  const after = (await ada.as.query(api.photos.ofItem, { itemId }))!;
+  expect(after.more.map((photo) => photo.id)).toEqual(
+    photos.more.map((photo) => photo.id),
+  );
+});
+
+test("an extra photo can be removed on its own, file and all", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await addItem(ada);
+  await addMore(t, ada, itemId, file(images.jpeg));
+  await addMore(t, ada, itemId, file(images.png));
+  await addMore(t, ada, itemId, file(images.gif));
+  const before = (await ada.as.query(api.photos.ofItem, { itemId }))!;
+  const [first, second, third] = before.more;
+
+  await ada.as.mutation(api.photos.remove, { itemId, photo: second!.id });
+
+  const after = (await ada.as.query(api.photos.ofItem, { itemId }))!;
+  expect(after.more.map((photo) => photo.id)).toEqual([first!.id, third!.id]);
+  expect(await stored(t)).toBe(2);
+  // Removing it again changes nothing.
+  await ada.as.mutation(api.photos.remove, { itemId, photo: second!.id });
+  expect(await stored(t)).toBe(2);
+});
+
+test("the list thumbnail falls back to the first extra photo when no side has one", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await addItem(ada);
+  await addMore(t, ada, itemId, file(images.jpeg));
+  await addMore(t, ada, itemId, file(images.png));
+
+  const photos = (await ada.as.query(api.photos.ofItem, { itemId }))!;
+  const { page } = await ada.as.query(api.items.list, {
+    paginationOpts: firstPage,
+  });
+  expect(page[0]?.thumbnailUrl).toBe(photos.more[0]?.url);
+
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "back",
+    storageId: await upload(t, file(images.webp)),
+  });
+  const withBack = (await ada.as.query(api.photos.ofItem, { itemId }))!;
+  const listed = await ada.as.query(api.items.list, {
+    paginationOpts: firstPage,
+  });
+  expect(listed.page[0]?.thumbnailUrl).toBe(withBack.back);
+});
+
+test("extra photos are private too: nobody else sees, removes or takes them over", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  const adasItem = await addItem(ada);
+  const bobsItem = await addItem(bob, "Mine");
+  const adasFile = await addMore(t, ada, adasItem);
+  const adasPhoto = (await ada.as.query(api.photos.ofItem, {
+    itemId: adasItem,
+  }))!.more[0]!;
+
+  expect(
+    await bob.as.query(api.photos.ofItem, { itemId: adasItem }),
+  ).toBeNull();
+  await expect(
+    bob.as.mutation(api.photos.remove, {
+      itemId: adasItem,
+      photo: adasPhoto.id,
+    }),
+  ).rejects.toThrow("ITEM_NOT_FOUND");
+  // Naming Ada's photo on his own Item removes nothing.
+  await bob.as.mutation(api.photos.remove, {
+    itemId: bobsItem,
+    photo: adasPhoto.id,
+  });
+  await expect(
+    bob.as.action(api.photos.attach, {
+      itemId: bobsItem,
+      storageId: adasFile,
+    }),
+  ).rejects.toThrow("PHOTO_NOT_FOUND");
+  await expect(
+    t.action(api.photos.attach, { itemId: adasItem, storageId: adasFile }),
+  ).rejects.toThrow("NOT_SIGNED_IN");
+
+  expect(await stored(t)).toBe(1);
+  const adas = (await ada.as.query(api.photos.ofItem, { itemId: adasItem }))!;
+  expect(adas.more.map((photo) => photo.id)).toEqual([adasPhoto.id]);
+});
+
+test("deleting an Item deletes its extra photos' files as well", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await addItem(ada);
+  const other = await addItem(ada, "Other");
+  await ada.as.action(api.photos.attach, {
+    itemId,
+    side: "front",
+    storageId: await upload(t),
+  });
+  await addMore(t, ada, itemId);
+  await addMore(t, ada, itemId);
+  const kept = await addMore(t, ada, other);
+
+  await ada.as.mutation(api.items.remove, { itemId });
+
+  expect(await stored(t)).toBe(1);
+  expect(await t.run((ctx) => ctx.db.system.get(kept))).not.toBeNull();
+  expect(
+    await t.run(
+      async (ctx) => (await ctx.db.query("itemPhotos").collect()).length,
+    ),
+  ).toBe(1);
 });

@@ -153,7 +153,7 @@ const pixel = Buffer.from(
   "base64",
 );
 
-test("add a photo, view it full screen, then delete the Item", async ({
+test("add photos, view them full screen, then delete the Item", async ({
   page,
 }) => {
   await signUpAndVerify(page, newEmail());
@@ -192,12 +192,29 @@ test("add a photo, view it full screen, then delete the Item", async ({
   await page.keyboard.press("Escape");
   await expect(viewer).toBeHidden();
 
+  // One more photo after the sides, shown in the viewer with them.
+  const addMore = photos.getByRole("button", { name: "More photos Add photo" });
+  const chooser = page.waitForEvent("filechooser");
+  await addMore.click();
+  await (await chooser).setFiles({
+    name: "edge.png",
+    mimeType: "image/png",
+    buffer: pixel,
+  });
+  await photos
+    .getByRole("button", { name: "Photo 1 View full screen" })
+    .click();
+  const second = page.getByRole("dialog", { name: "Photo 1" });
+  await expect(second.getByText("Photo 1 · 2 / 2")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(second).toBeHidden();
+
   await detail.getByRole("button", { name: "Delete", exact: true }).click();
   const confirm = page.getByRole("alertdialog", {
     name: "Delete “1 krone 1875”?",
   });
   await expect(
-    confirm.getByText("The Item and its photo are deleted for good."),
+    confirm.getByText("The Item and its 2 photos are deleted for good."),
   ).toBeVisible();
   await confirm.getByRole("button", { name: "Delete Item" }).click();
   await expect(page).toHaveURL(/\/collection$/);

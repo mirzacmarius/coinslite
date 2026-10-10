@@ -592,6 +592,7 @@ test("Items deleted with their Album take their stored photos with them", async 
   expect(await ada.as.query(api.photos.ofItem, { itemId: kept })).toEqual({
     front: expect.any(String),
     back: null,
+    more: [],
   });
 });
 

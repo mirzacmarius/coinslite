@@ -435,6 +435,13 @@ export default {
       back: "Rückseite",
       obverse: "Avers",
       reverse: "Revers",
+      stamp: "Briefmarke",
+    },
+    more: {
+      title: "Weitere Fotos",
+      hint: "Bis zu {limit} weitere: Nahaufnahmen, der Rand, ein Zertifikat oder die Verpackung.",
+      label: "Foto {n}",
+      removeTitle: "Dieses Foto entfernen?",
     },
     add: "Foto hinzufügen",
     formats: "JPEG, PNG, WebP oder GIF, bis 10 MB",
@@ -448,6 +455,7 @@ export default {
       back: "Foto der Rückseite entfernen?",
       obverse: "Foto des Avers entfernen?",
       reverse: "Foto des Revers entfernen?",
+      stamp: "Foto der Briefmarke entfernen?",
     },
     removeBody:
       "Das Foto wird endgültig gelöscht. Du kannst jederzeit ein neues hinzufügen.",
@@ -460,6 +468,8 @@ export default {
       notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
       tooMany:
         "Zu viele Uploads in kurzer Zeit. Versuche es in ein paar Minuten erneut.",
+      tooManyPhotos:
+        "Dieses Objekt hat schon {limit} weitere Fotos. Entferne eines, um ein anderes hinzuzufügen.",
       failed:
         "Das Foto konnte nicht gespeichert werden. Versuche es noch einmal.",
       removeFailed:
@@ -470,10 +480,12 @@ export default {
     delete: "Löschen",
     title: "„{title}“ löschen?",
     body: "Das Objekt wird endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
-    bodyOnePhoto:
+    "bodyPhotos#one":
       "Das Objekt und sein Foto werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
-    bodyTwoPhotos:
-      "Das Objekt und seine 2 Fotos werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    "bodyPhotos#few":
+      "Das Objekt und seine {count} Fotos werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    "bodyPhotos#other":
+      "Das Objekt und seine {count} Fotos werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
     confirm: "Objekt löschen",
     cancel: "Abbrechen",
     deleted: "Objekt gelöscht",

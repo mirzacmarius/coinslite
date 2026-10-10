@@ -424,6 +424,13 @@ export default {
       back: "Spate",
       obverse: "Avers",
       reverse: "Revers",
+      stamp: "Timbru",
+    },
+    more: {
+      title: "Alte fotografii",
+      hint: "Până la {limit} în plus: detalii, muchia, un certificat sau ambalajul.",
+      label: "Fotografia {n}",
+      removeTitle: "Elimini această fotografie?",
     },
     add: "Adaugă fotografie",
     formats: "JPEG, PNG, WebP sau GIF, până la 10 MB",
@@ -437,6 +444,7 @@ export default {
       back: "Elimini fotografia spatelui?",
       obverse: "Elimini fotografia aversului?",
       reverse: "Elimini fotografia reversului?",
+      stamp: "Elimini fotografia timbrului?",
     },
     removeBody: "Fotografia se șterge definitiv. Poți adăuga oricând una nouă.",
     cancel: "Anulează",
@@ -448,6 +456,8 @@ export default {
       notAnImage: "Fișierul nu este o imagine JPEG, PNG, WebP sau GIF.",
       tooMany:
         "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
+      tooManyPhotos:
+        "Obiectul are deja {limit} alte fotografii. Elimină una ca să adaugi alta.",
       failed: "Fotografia nu a putut fi salvată. Încearcă din nou.",
       removeFailed: "Fotografia nu a putut fi eliminată. Încearcă din nou.",
     },
@@ -456,10 +466,12 @@ export default {
     delete: "Șterge",
     title: "Ștergi „{title}”?",
     body: "Obiectul se șterge definitiv. Acțiunea nu poate fi anulată.",
-    bodyOnePhoto:
+    "bodyPhotos#one":
       "Obiectul și fotografia lui se șterg definitiv. Acțiunea nu poate fi anulată.",
-    bodyTwoPhotos:
-      "Obiectul și cele 2 fotografii ale lui se șterg definitiv. Acțiunea nu poate fi anulată.",
+    "bodyPhotos#few":
+      "Obiectul și cele {count} fotografii ale lui se șterg definitiv. Acțiunea nu poate fi anulată.",
+    "bodyPhotos#other":
+      "Obiectul și cele {count} de fotografii ale lui se șterg definitiv. Acțiunea nu poate fi anulată.",
     confirm: "Șterge obiectul",
     cancel: "Anulează",
     deleted: "Obiect șters",

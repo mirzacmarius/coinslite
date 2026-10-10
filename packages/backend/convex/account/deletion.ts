@@ -69,6 +69,8 @@ export const accountDataByTable = {
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   pendingCheckouts: "deleted at once: the checkout left open, if any",
+  itemPhotos:
+    "deleted: the Items' more photos, with their stored files, as each Item goes",
   uploads: "deleted: files they uploaded but never made a photo or an image",
   accountClosures:
     "kept: that the account id was deleted, naming no one, so Polar's late events about it end the subscription they report",
@@ -102,7 +104,10 @@ export const summary = query({
       items: v.number(),
       photos: v.number(),
       albums: v.number(),
+      /** The Items (and the photos on them) are counted up to a limit only. */
       more: v.boolean(),
+      /** The more photos are counted up to a limit only. */
+      morePhotos: v.boolean(),
       endsSubscription: v.boolean(),
     }),
   ),
@@ -123,15 +128,21 @@ export const summary = query({
       .query("subscriptions")
       .withIndex("by_userId_and_premium", (q) => q.eq("userId", user._id))
       .take(100);
+    const morePhotos = await ctx.db
+      .query("itemPhotos")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
+      .take(summaryItemLimit + 1);
     return {
       items: counted.length,
-      photos: counted.reduce(
-        (photos, { frontPhoto, backPhoto }) =>
-          photos + (frontPhoto ? 1 : 0) + (backPhoto ? 1 : 0),
-        0,
-      ),
+      photos:
+        counted.reduce(
+          (photos, { frontPhoto, backPhoto }) =>
+            photos + (frontPhoto ? 1 : 0) + (backPhoto ? 1 : 0),
+          0,
+        ) + Math.min(morePhotos.length, summaryItemLimit),
       albums: albums.length,
       more: items.length > summaryItemLimit,
+      morePhotos: morePhotos.length > summaryItemLimit,
       endsSubscription: subscriptions.some(chargesAgain),
     };
   },
@@ -241,14 +252,22 @@ const deleteAlbums: Step = async (ctx, { userId }, budget) =>
       .take(budget),
   );
 
-/** Items go the one way Items are deleted, which takes their stored photos too. */
+/**
+ * Items go the one way Items are deleted, which takes their stored photos
+ * too. Each more photo counts against the budget like a document of its own,
+ * so a batch stays about the planned size however many photos Items carry.
+ */
 const deleteItems: Step = async (ctx, { userId }, budget) => {
   const items = await ctx.db
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
     .take(budget);
-  for (const item of items) await deleteItem(ctx, item);
-  return items.length;
+  let deleted = 0;
+  for (const item of items) {
+    deleted += 1 + (await deleteItem(ctx, item));
+    if (deleted >= budget) break;
+  }
+  return Math.min(deleted, budget);
 };
 
 /**
