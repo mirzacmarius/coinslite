@@ -670,7 +670,12 @@ export default {
         "Ingen data fra Numista kan lagres. Behold bare Numista-nummeret, i numista_id.",
       ITEM_TYPE_REQUIRED:
         "En katalogoppføring trenger en objekttype: mynt eller seddel.",
-      FIELD_NOT_FOR_TYPE: "Sedler har verken metall eller størrelse.",
+      FIELD_NOT_FOR_TYPE:
+        "Sedler har verken metall, myntmål, rand eller myntverk.",
+      INVALID_DATE: "Skriv en dato som ÅÅÅÅ-MM-DD, ÅÅÅÅ-MM eller ÅÅÅÅ.",
+      DATES_REVERSED: "withdrawal_date kommer før issue_date.",
+      SAME_LANGUAGE:
+        "Notatene er allerede på dette språket. Bruk technical_details og historical_notes, eller endre notes_language.",
       YEARS_REVERSED: "Siste år kommer før det første.",
       SOURCE_REQUIRED:
         "Oppgi kilden til disse faktaene, notatene eller bildet.",
@@ -1318,7 +1323,11 @@ export default {
       NUMISTA_DATA:
         "Ingen Numista-data kan lagres. Behold bare Numista-nummeret.",
       ITEM_TYPE_REQUIRED: "En katalogoppføring trenger en objekttype.",
-      FIELD_NOT_FOR_TYPE: "Sedler har verken metall eller mål.",
+      FIELD_NOT_FOR_TYPE:
+        "Sedler har verken metall, myntmål, rand eller myntverk.",
+      INVALID_DATE: "Skriv en dato som 1999-03-15, 1999-03 eller 1999.",
+      DATES_REVERSED: "Den blir ugyldig før den er utgitt.",
+      SAME_LANGUAGE: "Notatene er allerede på dette språket.",
       YEARS_REVERSED: "Siste år kommer før det første.",
       SOURCE_REQUIRED: "Oppgi kilden til disse faktaene eller notatene.",
       CREDIT_REQUIRED:
@@ -1462,5 +1471,48 @@ export default {
     photosHint: "Disse bildene legges til objektet.",
     photosFailed:
       "Objektet ble lagt til, men bildene kunne ikke lagres. Legg dem til på objektets side.",
+  },
+  catalogFacts: {
+    designer: "Kunstner",
+    designers: "Kunstnere",
+    mint: "Myntverk",
+    mintMark: "Myntmerke",
+    noMintMark: "Ingen",
+    issued: "Utgitt",
+    withdrawn: "Ugyldig fra",
+    mintage: "Opplag",
+    numberIssued: "Antall utstedt",
+    composition: "Legering",
+    edge: "Rand",
+    edges: {
+      plain: "Glatt",
+      reeded: "Riflet",
+      interruptedReeding: "Avbrutt rifling",
+      lettered: "Med randskrift",
+    },
+    edgeLettering: "Randskrift",
+    thickness: "Tykkelse",
+    size: "Størrelse",
+    inLanguage: "På {language}",
+    editor: {
+      mintMarkHint: "Skriv «none» for en mynt preget uten myntmerke.",
+      compositionHint:
+        "Hvert metall og andelen, som «copper 75%; nickel 25%», med disse navnene: {metals}.",
+      designersHint: "Skill navnene med semikolon.",
+      dateHint: "For eksempel 1999-03-15, 1999-03 eller 1999.",
+      mintageHint: "Et heltall.",
+      width: "Bredde",
+      height: "Høyde",
+      setEdge: "Velg rand",
+      noEdge: "Fjern rand",
+      notesLanguage: "Språket i notatene",
+      notesLanguageHint: "Språket notatene over er skrevet på.",
+      setNotesLanguage: "Velg språk",
+      translations: "Oversettelser",
+      translationsHint:
+        "Leserne ser notatene på sitt eget språk der det finnes en oversettelse, ellers på notatenes språk.",
+      translationLanguage: "Oversettelsesspråk",
+      translationSources: "Hvor oversettelsen kommer fra",
+    },
   },
 } as const satisfies Dictionary;

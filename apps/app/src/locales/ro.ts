@@ -675,7 +675,12 @@ export default {
         "Nu se pot stoca date de la Numista. Păstrează doar numărul Numista, în numista_id.",
       ITEM_TYPE_REQUIRED:
         "O intrare de catalog are nevoie de un tip de obiect: monedă sau bancnotă.",
-      FIELD_NOT_FOR_TYPE: "Bancnotele nu au metal sau dimensiuni.",
+      FIELD_NOT_FOR_TYPE:
+        "Bancnotele nu au metal, dimensiuni de monedă, muchie sau monetărie.",
+      INVALID_DATE: "Scrie data ca AAAA-LL-ZZ, AAAA-LL sau AAAA.",
+      DATES_REVERSED: "withdrawal_date este înainte de issue_date.",
+      SAME_LANGUAGE:
+        "Notele sunt deja în această limbă. Folosește technical_details și historical_notes sau schimbă notes_language.",
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED:
         "Precizează sursa acestor date, note sau a acestei imagini.",
@@ -1329,7 +1334,11 @@ export default {
         "Nu se pot păstra date de la Numista. Păstrează doar numărul Numista.",
       ITEM_TYPE_REQUIRED:
         "O intrare de catalog are nevoie de un tip de obiect.",
-      FIELD_NOT_FOR_TYPE: "Bancnotele nu au metal sau dimensiuni.",
+      FIELD_NOT_FOR_TYPE:
+        "Bancnotele nu au metal, dimensiuni de monedă, muchie sau monetărie.",
+      INVALID_DATE: "Scrie o dată precum 1999-03-15, 1999-03 sau 1999.",
+      DATES_REVERSED: "Demonetizarea este înaintea emiterii.",
+      SAME_LANGUAGE: "Notele sunt deja în această limbă.",
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
       SOURCE_REQUIRED: "Precizează sursa acestor date sau note.",
       CREDIT_REQUIRED:
@@ -1473,5 +1482,49 @@ export default {
     photosHint: "Aceste fotografii sunt adăugate obiectului.",
     photosFailed:
       "Obiectul a fost adăugat, dar fotografiile nu au putut fi salvate. Adaugă-le pe pagina obiectului.",
+  },
+  catalogFacts: {
+    designer: "Autor",
+    designers: "Autori",
+    mint: "Monetărie",
+    mintMark: "Marca monetăriei",
+    noMintMark: "Niciuna",
+    issued: "Emitere",
+    withdrawn: "Demonetizare",
+    mintage: "Tiraj",
+    numberIssued: "Număr emis",
+    composition: "Compoziție",
+    edge: "Muchie",
+    edges: {
+      plain: "Netedă",
+      reeded: "Zimțată",
+      interruptedReeding: "Zimțată cu întreruperi",
+      lettered: "Cu inscripție",
+    },
+    edgeLettering: "Inscripție pe muchie",
+    thickness: "Grosime",
+    size: "Dimensiuni",
+    inLanguage: "În {language}",
+    editor: {
+      mintMarkHint:
+        "Scrie „none” pentru o monedă bătută fără marca monetăriei.",
+      compositionHint:
+        "Fiecare metal și ponderea lui, de exemplu „copper 75%; nickel 25%”, cu aceste denumiri: {metals}.",
+      designersHint: "Separă numele prin punct și virgulă.",
+      dateHint: "De exemplu 1999-03-15, 1999-03 sau 1999.",
+      mintageHint: "Un număr întreg.",
+      width: "Lățime",
+      height: "Înălțime",
+      setEdge: "Alege muchia",
+      noEdge: "Elimină muchia",
+      notesLanguage: "Limba notelor",
+      notesLanguageHint: "Limba în care sunt scrise notele de mai sus.",
+      setNotesLanguage: "Alege limba",
+      translations: "Traduceri",
+      translationsHint:
+        "Cititorii văd notele în limba lor când există o traducere, altfel în limba notelor.",
+      translationLanguage: "Limba traducerii",
+      translationSources: "De unde provine traducerea",
+    },
   },
 } as const satisfies Dictionary;
