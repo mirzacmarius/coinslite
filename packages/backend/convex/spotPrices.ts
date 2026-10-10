@@ -5,6 +5,7 @@ import {
   env,
   internalAction,
   internalMutation,
+  internalQuery,
   query,
 } from "./_generated/server";
 import { type Quote, fetchQuote } from "./spotPrices/metalPriceApi";
@@ -67,10 +68,47 @@ export const current = query({
   },
 });
 
+/** A month, rounded up to 31 days. */
+const MONTH_MS = 31 * 24 * 60 * 60 * 1000;
+/** Half the refresh schedule's 15 minutes (crons.ts): a run may start a little early. */
+const SCHEDULE_SLACK_MS = 7.5 * 60 * 1000;
+
+/**
+ * How long to wait after a provider request before the next one, so a plan's
+ * monthly quota lasts the month with a tenth to spare. Without a known quota,
+ * every scheduled run asks.
+ */
+function waitBetweenRequests(requestsPerMonth: number | undefined) {
+  if (!requestsPerMonth) return 0;
+  return MONTH_MS / (requestsPerMonth * 0.9) - SCHEDULE_SLACK_MS;
+}
+
+/** When the provider was last asked, and the plan's quota it stated. */
+export const lastRequest = internalQuery({
+  args: {},
+  returns: v.union(
+    v.null(),
+    v.object({
+      checkedAt: v.number(),
+      requestsPerMonth: v.optional(v.number()),
+    }),
+  ),
+  handler: async (ctx) => {
+    const snapshot = await latestSnapshot(ctx);
+    return (
+      snapshot && {
+        checkedAt: snapshot.checkedAt,
+        requestsPerMonth: snapshot.requestsPerMonth,
+      }
+    );
+  },
+});
+
 /**
  * Fetches the latest prices and stores them. Runs every 15 minutes (crons.ts)
- * and makes one provider request however many people use CoinsLite. When the
- * provider fails, or no key is set, the last good snapshot stays in place.
+ * and makes one provider request however many people use CoinsLite, fewer
+ * when the provider's plan allows fewer a month. When the provider fails, or
+ * no key is set, the last good snapshot stays in place.
  */
 export const refresh = internalAction({
   args: {},
@@ -82,6 +120,13 @@ export const refresh = internalAction({
         "Spot prices not refreshed: METALPRICE_API_KEY isn't set. Keeping the last stored prices.",
       );
       await ctx.runMutation(internal.spotPrices.recordFailedRefresh, {});
+      return null;
+    }
+    const last = await ctx.runQuery(internal.spotPrices.lastRequest, {});
+    if (
+      last &&
+      Date.now() - last.checkedAt < waitBetweenRequests(last.requestsPerMonth)
+    ) {
       return null;
     }
     let quote: Quote;
@@ -102,7 +147,11 @@ export const refresh = internalAction({
 
 /** Replaces the stored snapshot with freshly fetched prices. */
 export const record = internalMutation({
-  args: { quotedAt: v.number(), perDollar },
+  args: {
+    quotedAt: v.number(),
+    perDollar,
+    requestsPerMonth: v.optional(v.number()),
+  },
   returns: v.null(),
   handler: async (ctx, quote) => {
     const now = Date.now();

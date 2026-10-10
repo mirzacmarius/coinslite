@@ -12,6 +12,8 @@ export type Quote = {
   /** When the provider quoted them, in milliseconds since the epoch. */
   quotedAt: number;
   perDollar: PerDollar;
+  /** How many requests the plan allows a month, when the provider says. */
+  requestsPerMonth?: number;
 };
 
 /** Fetches gold, silver and the Home currencies, priced per US dollar. Throws when anything is missing. */
@@ -40,7 +42,13 @@ export async function fetchQuote(apiKey: string): Promise<Quote> {
     }
     perDollar[code] = rate;
   }
-  return { quotedAt: body.timestamp * 1000, perDollar };
+  const quota = Number(response.headers.get("x-api-quota"));
+  return {
+    quotedAt: body.timestamp * 1000,
+    perDollar,
+    ...(Number.isSafeInteger(quota) &&
+      quota > 0 && { requestsPerMonth: quota }),
+  };
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {

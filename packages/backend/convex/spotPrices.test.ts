@@ -58,13 +58,18 @@ const quotedAt = Date.UTC(2026, 9, 9, 12, 0);
 
 /**
  * Stands in for the price provider at its HTTP boundary. It answers like the
- * real service: only the requested currencies, prices per US dollar, and an
- * error body for a wrong key.
+ * real service: only the requested currencies, prices per US dollar, an
+ * error body for a wrong key and, when given, the plan's monthly quota.
  */
 function fakeProvider({
   rates = market,
   timestamp = quotedAt / 1000,
-}: { rates?: Record<string, number>; timestamp?: number } = {}) {
+  requestsPerMonth,
+}: {
+  rates?: Record<string, number>;
+  timestamp?: number;
+  requestsPerMonth?: number;
+} = {}) {
   const provider = vi.fn(
     async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input));
@@ -76,16 +81,21 @@ function fakeProvider({
         });
       }
       const wanted = url.searchParams.get("currencies")?.split(",") ?? [];
-      return Response.json({
-        success: true,
-        base: url.searchParams.get("base") ?? "USD",
-        timestamp,
-        rates: Object.fromEntries(
-          wanted
-            .filter((code) => code in rates)
-            .map((code) => [code, rates[code]]),
-        ),
-      });
+      return Response.json(
+        {
+          success: true,
+          base: url.searchParams.get("base") ?? "USD",
+          timestamp,
+          rates: Object.fromEntries(
+            wanted
+              .filter((code) => code in rates)
+              .map((code) => [code, rates[code]]),
+          ),
+        },
+        requestsPerMonth
+          ? { headers: { "x-api-quota": String(requestsPerMonth) } }
+          : {},
+      );
     },
   );
   vi.stubGlobal("fetch", provider);
@@ -328,6 +338,37 @@ test("conversions for other features use the stored snapshot", async () => {
     goldGramInEur: expect.closeTo(6172.94334, 4),
     silverGramInUsd: expect.closeTo(96.45224, 4),
   });
+});
+
+test("a plan's monthly request quota spaces the requests so it lasts a month, with a tenth to spare", async () => {
+  vi.useFakeTimers({ now: quotedAt + MINUTE });
+  const t = newTest();
+  // 100 requests a month: one every 31 days / 90, about 8 hours 16 minutes.
+  const provider = fakeProvider({ requestsPerMonth: 100 });
+  await refresh(t);
+  expect(provider).toHaveBeenCalledTimes(1);
+
+  for (let run = 1; run <= 32; run++) {
+    vi.advanceTimersByTime(15 * MINUTE);
+    await refresh(t);
+  }
+  // 8 hours on: still the one request.
+  expect(provider).toHaveBeenCalledTimes(1);
+
+  vi.advanceTimersByTime(15 * MINUTE);
+  await refresh(t);
+  expect(provider).toHaveBeenCalledTimes(2);
+});
+
+test("on a plan with room for it, every scheduled refresh asks the provider", async () => {
+  vi.useFakeTimers({ now: quotedAt + MINUTE });
+  const t = newTest();
+  const provider = fakeProvider({ requestsPerMonth: 10_000 });
+  for (let run = 0; run < 3; run++) {
+    await refresh(t);
+    vi.advanceTimersByTime(15 * MINUTE);
+  }
+  expect(provider).toHaveBeenCalledTimes(3);
 });
 
 test("the refresh is scheduled every 15 minutes", () => {
