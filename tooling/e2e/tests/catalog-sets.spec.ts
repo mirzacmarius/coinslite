@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  newEmail,
-  runInBackend,
-  signUpAndVerify,
-  visiblePage,
-} from "../support/accounts";
+import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -16,8 +11,6 @@ test.use({ locale: "en-US" });
 test("view a grouping as a Set, select what's missing and add it in one go", async ({
   page,
 }) => {
-  // The bundled Catalog: United States silver dollars. Loading it again changes nothing.
-  runInBackend("catalog/seed:load", {});
   await signUpAndVerify(page, newEmail());
   await page.goto(`${appUrl}/catalog/us-peace-dollar`);
   const main = visiblePage(page);

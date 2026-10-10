@@ -28,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coinslite/ui/dialog";
+import { ActionLabel } from "@coinslite/ui/header-bar";
 import { IconButton } from "@coinslite/ui/icon-button";
 import { Input } from "@coinslite/ui/input";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
@@ -79,7 +80,7 @@ export function QuickAdd({ entry }: { entry: QuickAddEntry }) {
         }}
       >
         <Plus aria-hidden="true" />
-        {t("quickAdd.add")}
+        <ActionLabel>{t("quickAdd.add")}</ActionLabel>
       </Button>
       <QuickAddDialog
         key={opening}
