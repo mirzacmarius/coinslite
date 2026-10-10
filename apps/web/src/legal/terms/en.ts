@@ -71,7 +71,7 @@ export default {
       blocks: [
         [
           "Purchase prices and Market values are your own figures. We don’t check them.",
-          "Spot prices come from a third-party provider, are refreshed every 15 minutes and are indicative only. They may be delayed or wrong, and Metal value is just a calculation from them: weight × purity × Spot price × Quantity.",
+          "Spot prices come from a third-party provider, are updated regularly and are indicative only. They may be delayed or wrong, and Metal value is just a calculation from them: weight × purity × Spot price × Quantity.",
           "The Insurance report and the exports list the values you have chosen. They are not an appraisal or a valuation, and they are not financial advice. Your insurer decides what it accepts.",
         ],
       ],

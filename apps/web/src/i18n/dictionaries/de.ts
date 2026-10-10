@@ -56,8 +56,8 @@ export default {
       text: "Kaufpreis, Marktwert und Gewinn/Verlust über deine ganze Sammlung, alles in der einen Währung, die du wählst.",
     },
     spot: {
-      title: "Aktuelle Spotpreise",
-      text: "Die Spotpreise für Gold und Silber werden alle 15 Minuten aktualisiert, damit der Metallwert deiner Münzen aktuell bleibt.",
+      title: "Spotpreise für Gold und Silber",
+      text: "Die Spotpreise werden regelmäßig aktualisiert, mit dem Zeitpunkt jeder Aktualisierung, und der Metallwert deiner Münzen folgt ihnen.",
     },
     sets: {
       title: "Sets und Vollständigkeit",
@@ -90,7 +90,7 @@ export default {
       features: [
         "Der Katalog, Alben und Fotos",
         "Erhaltung, Prägung und Sets",
-        "Summen und aktuelle Spotpreise",
+        "Summen und Spotpreise",
       ],
       cta: "Kostenloses Konto erstellen",
     },

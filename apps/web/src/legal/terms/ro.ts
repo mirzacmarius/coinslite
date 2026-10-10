@@ -71,7 +71,7 @@ export default {
       blocks: [
         [
           "Prețurile de achiziție și valorile de piață sunt cifrele tale. Nu le verificăm.",
-          "Prețurile spot provin de la un furnizor extern, se actualizează la fiecare 15 minute și sunt doar orientative. Pot fi întârziate sau greșite, iar valoarea metalului este doar un calcul pe baza lor: greutate × titlu × preț spot × cantitate.",
+          "Prețurile spot provin de la un furnizor extern, se actualizează regulat și sunt doar orientative. Pot fi întârziate sau greșite, iar valoarea metalului este doar un calcul pe baza lor: greutate × titlu × preț spot × cantitate.",
           "Raportul de asigurare și exporturile cuprind valorile pe care le-ai ales. Nu sunt o expertiză, o evaluare sau un sfat financiar. Asigurătorul tău decide ce acceptă.",
         ],
       ],

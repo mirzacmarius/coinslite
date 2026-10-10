@@ -71,7 +71,7 @@ export default {
       blocks: [
         [
           "Kaufpreise und Marktwerte sind deine eigenen Zahlen. Wir prüfen sie nicht.",
-          "Spotpreise stammen von einem externen Anbieter, werden alle 15 Minuten aktualisiert und sind nur Richtwerte. Sie können verzögert oder falsch sein, und der Metallwert ist nur eine Berechnung daraus: Gewicht × Feinheit × Spotpreis × Anzahl.",
+          "Spotpreise stammen von einem externen Anbieter, werden regelmäßig aktualisiert und sind nur Richtwerte. Sie können verzögert oder falsch sein, und der Metallwert ist nur eine Berechnung daraus: Gewicht × Feinheit × Spotpreis × Anzahl.",
           "Der Versicherungsbericht und die Exporte führen die Werte auf, die du gewählt hast. Sie sind kein Gutachten und keine Bewertung und keine Finanzberatung. Was deine Versicherung anerkennt, entscheidet sie.",
         ],
       ],

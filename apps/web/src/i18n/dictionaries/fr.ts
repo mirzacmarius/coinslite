@@ -56,8 +56,8 @@ export default {
       text: "Prix d’achat, valeur de marché et gain/perte sur toute votre collection, le tout dans la devise que vous choisissez.",
     },
     spot: {
-      title: "Des cours spot à jour",
-      text: "Les cours spot de l’or et de l’argent sont actualisés toutes les 15 minutes, pour que la valeur du métal de vos pièces reste à jour.",
+      title: "Les cours spot de l’or et de l’argent",
+      text: "Les cours spot sont actualisés régulièrement, avec l’heure de chaque mise à jour, et la valeur du métal de vos pièces les suit.",
     },
     sets: {
       title: "Ensembles et complétion",
@@ -90,7 +90,7 @@ export default {
       features: [
         "Le catalogue, les albums et les photos",
         "L’état, la frappe et les ensembles",
-        "Les totaux et les cours spot à jour",
+        "Les totaux et les cours spot",
       ],
       cta: "Créer un compte gratuit",
     },

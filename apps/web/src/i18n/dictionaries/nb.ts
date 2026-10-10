@@ -55,8 +55,8 @@ export default {
       text: "Innkjøpspris, markedsverdi og gevinst/tap for hele samlingen, alt i den ene valutaen du velger.",
     },
     spot: {
-      title: "Oppdaterte spotpriser",
-      text: "Spotprisene på gull og sølv oppdateres hvert 15. minutt, så metallverdien av myntene dine alltid er aktuell.",
+      title: "Spotpriser på gull og sølv",
+      text: "Spotprisene oppdateres jevnlig, med tidspunktet for hver oppdatering, og metallverdien av myntene dine følger dem.",
     },
     sets: {
       title: "Sett og fullføring",
@@ -89,7 +89,7 @@ export default {
       features: [
         "Katalogen, album og bilder",
         "Kvalitet, preging og sett",
-        "Summer og oppdaterte spotpriser",
+        "Summer og spotpriser",
       ],
       cta: "Opprett en gratis konto",
     },

@@ -71,7 +71,7 @@ export default {
       blocks: [
         [
           "Innkjøpspriser og markedsverdier er dine egne tall. Vi kontrollerer dem ikke.",
-          "Spotpriser kommer fra en ekstern leverandør, oppdateres hvert 15. minutt og er bare veiledende. De kan være forsinket eller feil, og metallverdien er bare en beregning ut fra dem: vekt × finhet × spotpris × antall.",
+          "Spotpriser kommer fra en ekstern leverandør, oppdateres jevnlig og er bare veiledende. De kan være forsinket eller feil, og metallverdien er bare en beregning ut fra dem: vekt × finhet × spotpris × antall.",
           "Forsikringsrapporten og eksportene viser verdiene du har valgt. De er ingen takst eller verdivurdering og ingen finansiell rådgivning. Forsikringsselskapet ditt avgjør hva det godtar.",
         ],
       ],

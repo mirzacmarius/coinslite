@@ -53,8 +53,8 @@ export default {
       text: "Purchase price, Market value and Gain/loss across your whole Collection, all in the one currency you choose.",
     },
     spot: {
-      title: "Live Spot prices",
-      text: "Gold and silver Spot prices are refreshed every 15 minutes, so the Metal value of your coins stays current.",
+      title: "Gold and silver Spot prices",
+      text: "Spot prices are updated regularly, with the time of each update shown, and the Metal value of your coins follows them.",
     },
     sets: {
       title: "Sets and completion",
@@ -87,7 +87,7 @@ export default {
       features: [
         "The Catalog, Albums and photos",
         "Grades, Strike and Sets",
-        "Totals and live Spot prices",
+        "Totals and Spot prices",
       ],
       cta: "Create a free account",
     },

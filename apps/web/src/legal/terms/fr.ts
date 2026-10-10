@@ -71,7 +71,7 @@ export default {
       blocks: [
         [
           "Les prix d’achat et les valeurs de marché sont vos propres chiffres. Nous ne les vérifions pas.",
-          "Les cours spot proviennent d’un fournisseur tiers, sont actualisés toutes les 15 minutes et ne sont donnés qu’à titre indicatif. Ils peuvent être retardés ou erronés, et la valeur du métal n’est qu’un calcul à partir d’eux : poids × titre × cours spot × quantité.",
+          "Les cours spot proviennent d’un fournisseur tiers, sont actualisés régulièrement et ne sont donnés qu’à titre indicatif. Ils peuvent être retardés ou erronés, et la valeur du métal n’est qu’un calcul à partir d’eux : poids × titre × cours spot × quantité.",
           "Le rapport d’assurance et les exports reprennent les valeurs que vous avez choisies. Ils ne constituent ni une expertise, ni une estimation, ni un conseil financier. C’est votre assureur qui décide de ce qu’il accepte.",
         ],
       ],

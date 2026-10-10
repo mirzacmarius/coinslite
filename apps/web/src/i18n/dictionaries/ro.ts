@@ -56,8 +56,8 @@ export default {
       text: "Prețul de achiziție, valoarea de piață și câștigul/pierderea pentru întreaga colecție, toate în moneda pe care o alegi.",
     },
     spot: {
-      title: "Prețuri spot la zi",
-      text: "Prețurile spot ale aurului și argintului se actualizează la fiecare 15 minute, așa că valoarea metalului din monedele tale rămâne la zi.",
+      title: "Prețuri spot pentru aur și argint",
+      text: "Prețurile spot se actualizează regulat, cu ora fiecărei actualizări, iar valoarea metalului din monedele tale le urmează.",
     },
     sets: {
       title: "Seturi și completare",
@@ -90,7 +90,7 @@ export default {
       features: [
         "Catalogul, albumele și fotografiile",
         "Starea, baterea și seturile",
-        "Totaluri și prețuri spot la zi",
+        "Totaluri și prețuri spot",
       ],
       cta: "Creează un cont gratuit",
     },
