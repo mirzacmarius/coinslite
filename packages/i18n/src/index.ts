@@ -16,6 +16,7 @@ export {
   homeCurrencies,
   isHomeCurrency,
   type HomeCurrency,
+  type MoneyFormatOptions,
 } from "./format";
 export { suggestHomeCurrency } from "./home-currency";
 export { parseMoney } from "./parse-money";

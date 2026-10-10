@@ -88,7 +88,12 @@ export default {
     save: "Lagre",
     saved: "Objektet er lagret",
     duplicate: "Dupliser",
-    duplicated: "Kopi opprettet. Endre det som er annerledes.",
+    duplicateTitle: "Dupliser objekt",
+    duplicateDescription:
+      "Et nytt objekt fylt ut fra «{title}». Endre det som er annerledes; bilder kopieres ikke.",
+    newDescription:
+      "Registrer en mynt, en seddel eller et frimerke i samlingen din.",
+    editDescription: "Endre hvilke som helst av objektets detaljer.",
     materials: {
       gold: "Gull",
       silver: "Sølv",
@@ -122,7 +127,6 @@ export default {
       number: "Skriv inn et tall, f.eks. 38,1.",
       wholeNumber: "Bruk et helt tall, f.eks. 1200.",
       saveFailed: "Objektet kunne ikke lagres. Prøv igjen.",
-      duplicateFailed: "Objektet kunne ikke dupliseres. Prøv igjen.",
       titleRequired: "Gi objektet en tittel.",
       quantity: "Bruk et helt tall på 1 eller mer.",
       year: "Skriv inn et årstall, for eksempel 1881.",
@@ -248,6 +252,8 @@ export default {
       submit: "Send meg en lenke",
       sentTitle: "Sjekk e-posten din",
       sent: "Vi har sendt en innloggingslenke til {email}. Den virker én gang og utløper om 15 minutter.",
+      resend: "Send innloggingslenken på nytt",
+      resent: "Vi har sendt en ny innloggingslenke til {email}.",
       usePassword: "Bruk passord i stedet",
       failed: "Innloggingslenken er utløpt eller allerede brukt. Be om en ny.",
       confirmTitle: "Logg inn på CoinsLite",
@@ -343,6 +349,7 @@ export default {
     album: "Album",
     new: "Nytt album",
     editAlbum: "Rediger album",
+    editDescription: "Endre albumets navn, beskrivelse eller farge.",
     edit: "Rediger",
     delete: "Slett",
     name: "Navn",
@@ -821,6 +828,12 @@ export default {
     emptyDescription:
       "Land og temaer vises her når det er lagt til katalogoppføringer.",
     theme: "Tema",
+    themes: { euroCommemoratives: "2-euro-minnemynter" },
+    groupings: {
+      commemorativeCoins: "Minnemynter",
+      denominationCoins: "{denomination}-mynter",
+      denominationBanknotes: "{denomination}-sedler",
+    },
     entryCount: "Katalogoppføringer",
     browseBy: "Bla etter",
     byGroup: "Grupper",

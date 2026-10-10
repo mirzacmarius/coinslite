@@ -83,7 +83,7 @@ export function TotalsFigures({
 
   return (
     <div className="overflow-hidden rounded-lg border bg-card">
-      <dl className="-mb-px -mr-px grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]">
+      <dl className={figuresLayout}>
         {variant === "collection" && (
           <Figure
             label={t("collectionTotals.items")}
@@ -122,10 +122,8 @@ export function TotalsFigures({
                   gainLoss.amount < 0 && "text-destructive",
                 )}
               >
-                {format.number(gainLoss.amount / 100, {
-                  style: "currency",
-                  currency: totals.currency,
-                  signDisplay: "exceptZero",
+                {format.money(gainLoss.amount, totals.currency, {
+                  signed: true,
                 })}
               </span>
             )
@@ -154,7 +152,7 @@ export function TotalsFigures({
                 label={t(`collectionTotals.metalValue.${metal}`)}
                 value={
                   value === null ? (
-                    <span className="text-sm font-normal text-muted-foreground">
+                    <span className="whitespace-normal text-sm font-normal text-muted-foreground">
                       {t("collectionTotals.noSpotPrices")}
                     </span>
                   ) : (
@@ -177,6 +175,15 @@ export function TotalsFigures({
   );
 }
 
+/**
+ * Amounts never wrap: a lone digit or minus sign on its own line reads as a
+ * different amount. On a phone the figures wrap as a row of cards instead, two
+ * to a row, and a figure too wide for half the row takes the whole row.
+ */
+const figuresLayout =
+  "-mb-px -mr-px flex flex-wrap sm:grid sm:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]";
+const figureLayout = "min-w-min flex-[1_1_10rem] sm:min-w-0";
+
 function Figure({
   label,
   value,
@@ -187,9 +194,14 @@ function Figure({
   hint?: string;
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-0.5 border-b border-r px-4 py-3">
+    <div
+      className={cn(
+        figureLayout,
+        "flex flex-col gap-0.5 border-b border-r px-4 py-3",
+      )}
+    >
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="break-words text-lg font-semibold proportional-nums sm:text-xl">
+      <dd className="whitespace-nowrap text-lg font-semibold proportional-nums sm:text-xl">
         {value}
       </dd>
       {hint && <dd className="text-xs text-muted-foreground">{hint}</dd>}
@@ -204,11 +216,14 @@ export function FiguresSkeleton({ figures = 5 }: { figures?: number }) {
       className="overflow-hidden rounded-lg border bg-card"
       aria-hidden="true"
     >
-      <div className="-mb-px -mr-px grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]">
+      <div className={figuresLayout}>
         {[0, 1, 2, 3, 4].slice(0, figures).map((figure) => (
           <div
             key={figure}
-            className="flex flex-col gap-2 border-b border-r px-4 py-3"
+            className={cn(
+              figureLayout,
+              "flex flex-col gap-2 border-b border-r px-4 py-3",
+            )}
           >
             <span className="h-3 w-16 animate-pulse rounded bg-muted" />
             <span className="h-6 w-24 animate-pulse rounded bg-muted" />

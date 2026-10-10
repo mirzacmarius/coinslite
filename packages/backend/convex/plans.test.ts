@@ -64,21 +64,6 @@ test("the Free plan holds 50 Items: the 50th can be added, a 51st can't", async 
   );
 });
 
-test("a duplicate is a new Item: it counts toward the limit and can't be made at 50", async () => {
-  const t = newTest();
-  const ada = await person(t, "ada@example.com");
-  const [first] = await collectionOf(t, ada.userId, 49);
-
-  await ada.as.mutation(api.items.duplicate, { itemId: first });
-
-  await expect(
-    ada.as.mutation(api.items.duplicate, { itemId: first }),
-  ).rejects.toThrow("ITEM_LIMIT_REACHED");
-  await expect(ada.as.mutation(api.items.add, krone)).rejects.toThrow(
-    "ITEM_LIMIT_REACHED",
-  );
-});
-
 test("plan usage counts Items used out of 50, warns from 40 and says when adding is blocked", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
@@ -148,9 +133,6 @@ test("over the limit (say, after leaving Premium) every Item stays visible and e
   await expect(ada.as.mutation(api.items.add, krone)).rejects.toThrow(
     "ITEM_LIMIT_REACHED",
   );
-  await expect(
-    ada.as.mutation(api.items.duplicate, { itemId: oldest }),
-  ).rejects.toThrow("ITEM_LIMIT_REACHED");
   expect(await ada.as.query(api.plans.usage, {})).toMatchObject({
     used: 51,
     limit: 50,

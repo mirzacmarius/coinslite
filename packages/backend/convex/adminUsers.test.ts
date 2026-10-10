@@ -206,7 +206,10 @@ test("each listed user shows their profile, plan, Collection and last sign-in", 
 /** A set-up person with a display name, as they'd set it on the Account screen. */
 async function named(t: Test, email: string, displayName: string) {
   const someone = await person(t, email);
-  await someone.as.mutation(api.account.updateContact, { displayName });
+  await someone.as.mutation(api.account.updateContact, {
+    displayName,
+    fullName: displayName,
+  });
   return someone;
 }
 
@@ -365,6 +368,12 @@ test("the list narrows to one plan and sorts by plan and plan end", async () => 
     "cy@example.com",
     "dan@example.com",
     "ada@example.com",
+  ]);
+  expect(await listed(ada.as, { sort: "planEnd", order: "asc" })).toEqual([
+    "cy@example.com",
+    "bob@example.com",
+    "ada@example.com",
+    "dan@example.com",
   ]);
 
   const { page } = await ada.as.query(api.admin.users.list, {
@@ -537,6 +546,7 @@ test("search finds people by their name or email, on one plan if asked", async (
   const ada = await admin(t, "ada@example.com");
   await ada.as.mutation(api.account.updateContact, {
     displayName: "Ada Lovelace",
+    fullName: "Ada Lovelace",
   });
   const bob = await named(t, "bob@example.com", "Bob");
   await named(t, "robert@coins.no", "bobby");
@@ -562,6 +572,18 @@ test("search finds people by their name or email, on one plan if asked", async (
   ]);
   expect(await search(ada.as, "nobody")).toEqual({ users: [], more: false });
   expect(await search(ada.as, "  ")).toEqual({ users: [], more: false });
+});
+
+test("search finds people by their full name", async () => {
+  const t = newTest();
+  const ada = await namedAdmin(t);
+  const ola = await named(t, "ola@example.com", "Ola");
+  await t.run((ctx) => ctx.db.patch(ola.userId, { fullName: "Ola Nordmann" }));
+
+  expect(emailsOf(await search(ada.as, "Nordmann"))).toEqual([
+    "ola@example.com",
+  ]);
+  expect(emailsOf(await search(ada.as, "Ola"))).toContain("ola@example.com");
 });
 
 test("a whole email finds just that person", async () => {
@@ -591,7 +613,10 @@ test("a whole email finds just that person", async () => {
  */
 async function namedAdmin(t: Test) {
   const ada = await admin(t, "ada@example.com");
-  await ada.as.mutation(api.account.updateContact, { displayName: "Ada" });
+  await ada.as.mutation(api.account.updateContact, {
+    displayName: "Ada",
+    fullName: "Ada Lovelace",
+  });
   return ada;
 }
 

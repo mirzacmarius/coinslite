@@ -61,7 +61,6 @@ test("add an Item from the Catalog, then more of it from the entry's page", asyn
   ).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(picker).toBeHidden();
-  await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
 
   // The Item shows the entry's facts and links back to it.

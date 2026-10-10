@@ -62,7 +62,8 @@ test("C opens the New Item dialog from anywhere in the app", async ({
 }) => {
   await signUpAndVerify(page, newEmail());
 
-  // A coin is picked from the Catalog first; Esc leads to typing it in.
+  // A coin is picked from the Catalog first; Esc closes the picker and,
+  // with it, the New Item dialog, as the picker's "esc to close" says.
   const picker = catalogPicker(page);
   await expect(async () => {
     await page.keyboard.press("c");
@@ -75,8 +76,6 @@ test("C opens the New Item dialog from anywhere in the app", async ({
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(picker).toBeHidden();
-  await expect(page.getByLabel("Title")).toBeFocused();
-  await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "New Item" })).toBeHidden();
 });
 
@@ -121,13 +120,30 @@ test("edit an Item, then duplicate it", async ({ page }) => {
   await expect(detail.getByText("31.5 mm")).toBeVisible();
   await expect(detail.getByText("Silver")).toBeVisible();
 
+  // Duplicate opens the form filled in from the Item; cancelling adds nothing.
   const original = page.url();
+  const duplicate = page.getByRole("dialog", { name: "Duplicate Item" });
   await detail.getByRole("button", { name: "Duplicate", exact: true }).click();
+  await expect(duplicate.getByLabel("Title")).toHaveValue("2 kroner 1910");
+  await expect(duplicate.getByLabel("Diameter")).toHaveValue("31.5");
+  await duplicate.getByRole("button", { name: "Cancel" }).click();
+  await expect(duplicate).toBeHidden();
+  await expect(page).toHaveURL(original);
+
+  // Saving it adds a new Item, with what the person changed.
+  await detail.getByRole("button", { name: "Duplicate", exact: true }).click();
+  await duplicate.getByLabel("Title").fill("2 kroner 1912");
+  await duplicate.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(duplicate).toBeHidden();
   await expect(page).not.toHaveURL(original);
-  await expect(visiblePage(page).getByText("31.5 mm")).toBeVisible();
+  const copy = visiblePage(page);
+  await expect(
+    copy.getByRole("heading", { level: 1, name: "2 kroner 1912" }),
+  ).toBeVisible();
+  await expect(copy.getByText("31.5 mm")).toBeVisible();
   await page.goto(`${appUrl}/collection`);
   await expect(
-    visiblePage(page).getByRole("link", { name: /2 kroner 1910/ }),
+    visiblePage(page).getByRole("link", { name: /2 kroner 19/ }),
   ).toHaveCount(2);
 });
 

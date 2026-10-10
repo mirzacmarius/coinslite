@@ -48,7 +48,7 @@ const krone = { type: "coin" as const, title: "1 krone 1875" };
 const note = { type: "banknote" as const, title: "100 kroner 1949" };
 const stamp = { type: "stamp" as const, title: "Posthorn 1872" };
 
-test("adding and duplicating Items counts them, by Item type", async () => {
+test("adding Items counts them, by Item type", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
 
@@ -60,10 +60,10 @@ test("adding and duplicating Items counts them, by Item type", async () => {
     albums: 0,
   });
 
-  const kroneId = await ada.as.mutation(api.items.add, krone);
+  await ada.as.mutation(api.items.add, krone);
   await ada.as.mutation(api.items.add, note);
   await ada.as.mutation(api.items.add, stamp);
-  await ada.as.mutation(api.items.duplicate, { itemId: kroneId });
+  await ada.as.mutation(api.items.add, krone);
 
   expect(await countsOf(t, ada.userId)).toEqual({
     items: 4,

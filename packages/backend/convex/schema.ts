@@ -94,6 +94,10 @@ export default defineSchema({
       searchField: "displayName",
       filterFields: ["plan"],
     })
+    .searchIndex("search_fullName", {
+      searchField: "fullName",
+      filterFields: ["plan"],
+    })
     .searchIndex("search_email", {
       searchField: "email",
       filterFields: ["plan"],

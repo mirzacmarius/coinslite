@@ -90,7 +90,12 @@ export default {
     save: "Enregistrer",
     saved: "Objet enregistré",
     duplicate: "Dupliquer",
-    duplicated: "Copie créée. Modifiez ce qui diffère.",
+    duplicateTitle: "Dupliquer l’objet",
+    duplicateDescription:
+      "Un nouvel objet rempli à partir de «\u00a0{title}\u00a0». Modifiez ce qui diffère\u00a0; les photos ne sont pas copiées.",
+    newDescription:
+      "Enregistrez une pièce, un billet ou un timbre dans votre collection.",
+    editDescription: "Modifiez n’importe quelle information de cet objet.",
     materials: {
       gold: "Or",
       silver: "Argent",
@@ -124,7 +129,6 @@ export default {
       number: "Saisissez un nombre, p. ex. 38,1.",
       wholeNumber: "Saisissez un nombre entier, p. ex. 1200.",
       saveFailed: "Impossible d’enregistrer l’objet. Réessayez.",
-      duplicateFailed: "Impossible de dupliquer l’objet. Réessayez.",
       titleRequired: "Donnez un titre à l’objet.",
       quantity: "Utilisez un nombre entier supérieur ou égal à 1.",
       year: "Saisissez une année, par ex. 1881.",
@@ -253,6 +257,8 @@ export default {
       submit: "M’envoyer un lien",
       sentTitle: "Consultez vos e-mails",
       sent: "Nous avons envoyé un lien de connexion à {email}. Il ne fonctionne qu’une fois et expire dans 15 minutes.",
+      resend: "Renvoyer le lien de connexion",
+      resent: "Nous avons renvoyé un lien de connexion à {email}.",
       usePassword: "Utiliser un mot de passe",
       failed:
         "Ce lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
@@ -349,6 +355,8 @@ export default {
     album: "Album",
     new: "Nouvel album",
     editAlbum: "Modifier l’album",
+    editDescription:
+      "Modifiez le nom, la description ou la couleur de l’album.",
     edit: "Modifier",
     delete: "Supprimer",
     name: "Nom",
@@ -835,6 +843,12 @@ export default {
     emptyDescription:
       "Les pays et les thèmes apparaissent ici dès que des entrées du catalogue sont ajoutées.",
     theme: "Thème",
+    themes: { euroCommemoratives: "Pièces commémoratives de 2 euros" },
+    groupings: {
+      commemorativeCoins: "Pièces commémoratives",
+      denominationCoins: "{denomination} en pièces",
+      denominationBanknotes: "{denomination} en billets",
+    },
     entryCount: "Entrées du catalogue",
     browseBy: "Parcourir par",
     byGroup: "Groupes",

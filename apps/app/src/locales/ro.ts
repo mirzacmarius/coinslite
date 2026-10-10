@@ -89,7 +89,12 @@ export default {
     save: "Salvează",
     saved: "Obiect salvat",
     duplicate: "Duplică",
-    duplicated: "Copie creată. Schimbă ce diferă.",
+    duplicateTitle: "Duplică obiectul",
+    duplicateDescription:
+      "Un obiect nou completat după „{title}”. Schimbă ce diferă; fotografiile nu se copiază.",
+    newDescription:
+      "Înregistrează o monedă, o bancnotă sau un timbru în colecția ta.",
+    editDescription: "Schimbă oricare dintre detaliile acestui obiect.",
     materials: {
       gold: "Aur",
       silver: "Argint",
@@ -123,7 +128,6 @@ export default {
       number: "Introdu un număr, de ex. 38,1.",
       wholeNumber: "Introdu un număr întreg, de ex. 1200.",
       saveFailed: "Obiectul nu a putut fi salvat. Încearcă din nou.",
-      duplicateFailed: "Obiectul nu a putut fi duplicat. Încearcă din nou.",
       titleRequired: "Dă-i obiectului un titlu.",
       quantity: "Folosește un număr întreg de cel puțin 1.",
       year: "Introdu un an, de ex. 1881.",
@@ -250,6 +254,8 @@ export default {
       submit: "Trimite-mi un link",
       sentTitle: "Verifică-ți e-mailul",
       sent: "Am trimis un link de conectare la {email}. Funcționează o singură dată și expiră în 15 minute.",
+      resend: "Trimite din nou linkul de conectare",
+      resent: "Am trimis din nou un link de conectare la {email}.",
       usePassword: "Folosește o parolă",
       failed:
         "Linkul de conectare a expirat sau a fost deja folosit. Cere unul nou.",
@@ -346,6 +352,7 @@ export default {
     album: "Album",
     new: "Album nou",
     editAlbum: "Editează albumul",
+    editDescription: "Schimbă numele, descrierea sau culoarea albumului.",
     edit: "Editează",
     delete: "Șterge",
     name: "Nume",
@@ -829,6 +836,12 @@ export default {
     emptyDescription:
       "Țările și temele apar aici după ce se adaugă intrări de catalog.",
     theme: "Temă",
+    themes: { euroCommemoratives: "Monede comemorative de 2 euro" },
+    groupings: {
+      commemorativeCoins: "Monede comemorative",
+      denominationCoins: "{denomination} monede",
+      denominationBanknotes: "{denomination} bancnote",
+    },
     entryCount: "Intrări de catalog",
     browseBy: "Răsfoiește după",
     byGroup: "Grupuri",

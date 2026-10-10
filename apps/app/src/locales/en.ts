@@ -85,7 +85,11 @@ export default {
     save: "Save",
     saved: "Item saved",
     duplicate: "Duplicate",
-    duplicated: "Copy created. Change what differs.",
+    duplicateTitle: "Duplicate Item",
+    duplicateDescription:
+      "A new Item filled in from “{title}”. Change what differs; photos aren't copied.",
+    newDescription: "Record a coin, banknote or stamp in your Collection.",
+    editDescription: "Change any of this Item's details.",
     materials: {
       gold: "Gold",
       silver: "Silver",
@@ -119,7 +123,6 @@ export default {
       number: "Enter a number, like 38.1.",
       wholeNumber: "Use a whole number, like 1200.",
       saveFailed: "The Item couldn't be saved. Try again.",
-      duplicateFailed: "The Item couldn't be duplicated. Try again.",
       titleRequired: "Give the Item a title.",
       quantity: "Use a whole number of 1 or more.",
       year: "Enter a year like 1881.",
@@ -242,6 +245,8 @@ export default {
       submit: "Email me a link",
       sentTitle: "Check your email",
       sent: "We sent a sign-in link to {email}. It works once and expires in 15 minutes.",
+      resend: "Resend the sign-in link",
+      resent: "We sent another sign-in link to {email}.",
       usePassword: "Use a password instead",
       failed:
         "This sign-in link has expired or was already used. Ask for a new one.",
@@ -337,6 +342,7 @@ export default {
     album: "Album",
     new: "New Album",
     editAlbum: "Edit Album",
+    editDescription: "Change this Album's name, description or colour.",
     edit: "Edit",
     delete: "Delete",
     name: "Name",
@@ -809,6 +815,12 @@ export default {
     emptyDescription:
       "Countries and Themes show here once Catalog entries are added.",
     theme: "Theme",
+    themes: { euroCommemoratives: "2-euro commemoratives" },
+    groupings: {
+      commemorativeCoins: "Commemorative coins",
+      denominationCoins: "{denomination} coins",
+      denominationBanknotes: "{denomination} banknotes",
+    },
     entryCount: "Catalog entries",
     browseBy: "Browse by",
     byGroup: "Groups",

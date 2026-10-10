@@ -90,7 +90,12 @@ export default {
     save: "Speichern",
     saved: "Objekt gespeichert",
     duplicate: "Duplizieren",
-    duplicated: "Kopie erstellt. Ändere, was abweicht.",
+    duplicateTitle: "Objekt duplizieren",
+    duplicateDescription:
+      "Ein neues Objekt, ausgefüllt nach „{title}“. Ändere, was abweicht; Fotos werden nicht kopiert.",
+    newDescription:
+      "Erfasse eine Münze, Banknote oder Briefmarke in deiner Sammlung.",
+    editDescription: "Ändere beliebige Angaben zu diesem Objekt.",
     materials: {
       gold: "Gold",
       silver: "Silber",
@@ -125,8 +130,6 @@ export default {
       wholeNumber: "Gib eine ganze Zahl ein, z. B. 1200.",
       saveFailed:
         "Das Objekt konnte nicht gespeichert werden. Versuche es noch einmal.",
-      duplicateFailed:
-        "Das Objekt konnte nicht dupliziert werden. Versuche es noch einmal.",
       titleRequired: "Gib dem Objekt einen Titel.",
       quantity: "Verwende eine ganze Zahl ab 1.",
       year: "Gib ein Jahr wie 1881 ein.",
@@ -258,6 +261,8 @@ export default {
       submit: "Link senden",
       sentTitle: "Prüfe dein Postfach",
       sent: "Wir haben einen Anmeldelink an {email} gesendet. Er funktioniert einmal und läuft in 15 Minuten ab.",
+      resend: "Anmeldelink erneut senden",
+      resent: "Wir haben einen neuen Anmeldelink an {email} gesendet.",
       usePassword: "Stattdessen mit Passwort anmelden",
       failed:
         "Dieser Anmeldelink ist abgelaufen oder wurde schon verwendet. Fordere einen neuen an.",
@@ -355,6 +360,7 @@ export default {
     album: "Album",
     new: "Neues Album",
     editAlbum: "Album bearbeiten",
+    editDescription: "Ändere Namen, Beschreibung oder Farbe des Albums.",
     edit: "Bearbeiten",
     delete: "Löschen",
     name: "Name",
@@ -851,6 +857,12 @@ export default {
     emptyDescription:
       "Länder und Themen erscheinen hier, sobald Katalogeinträge hinzugefügt sind.",
     theme: "Thema",
+    themes: { euroCommemoratives: "2-Euro-Gedenkmünzen" },
+    groupings: {
+      commemorativeCoins: "Gedenkmünzen",
+      denominationCoins: "{denomination}-Münzen",
+      denominationBanknotes: "{denomination}-Banknoten",
+    },
     entryCount: "Katalogeinträge",
     browseBy: "Durchsuchen nach",
     byGroup: "Gruppen",

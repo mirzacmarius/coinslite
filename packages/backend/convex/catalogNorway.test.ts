@@ -122,6 +122,7 @@ test("Norway is a country root holding denominations, then series, then entries:
     expect(entry.country).toBe("NO");
   }
   expect(nodes).toHaveLength(nodeCount);
+  expect(nodes.some((node) => node.title === "Commemorative coins")).toBe(true);
   expect(entries.filter((entry) => entry.item_type === "coin")).toHaveLength(
     100,
   );

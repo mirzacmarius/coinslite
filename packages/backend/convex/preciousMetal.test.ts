@@ -352,18 +352,3 @@ test("the bullion presets are the ones in the spec, and each saves as a coin wit
     expect((await metalValueOf(ada.as, itemId))?.amount).toBeGreaterThan(0);
   }
 });
-
-test("duplicating a coin keeps its precious metal", async () => {
-  const t = newTest();
-  const ada = await person(t, "ada@example.com");
-  const itemId = await ada.as.mutation(api.items.add, krugerrand);
-
-  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
-
-  expect(await ada.as.query(api.items.get, { itemId: copyId })).toMatchObject({
-    bullion: true,
-    metal: "gold",
-    weight: 33.93,
-    purity: 0.9167,
-  });
-});

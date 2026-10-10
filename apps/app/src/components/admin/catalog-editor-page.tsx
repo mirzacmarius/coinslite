@@ -265,6 +265,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
   const catalogFormat = useCatalogFormat();
   const actions = useTreeActions();
   const [expanded, setExpanded] = useState(false);
+  const title = catalogFormat.nodeTitle({ ...node });
   const isEntry = node.kind === "entry";
   const Icon =
     node.kind === "entry"
@@ -281,14 +282,14 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
     actions.add({
       key: node.key,
       kind: node.kind,
-      title: node.title,
+      title,
       country: node.country,
       itemType: node.itemType,
     });
   };
   const toggleLabel = t(
     expanded ? "catalogEditor.collapse" : "catalogEditor.expand",
-    { title: node.title },
+    { title },
   );
 
   return (
@@ -324,7 +325,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
           onClick={() => actions.edit(node.key)}
           className="min-w-0 truncate rounded-sm text-left font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {node.title}
+          {title}
         </button>
         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
           {facts.join(" · ")}
@@ -336,7 +337,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
                 variant="ghost"
                 size="icon-xs"
                 aria-label={t("catalogEditor.addBelowNamed", {
-                  title: node.title,
+                  title,
                 })}
                 onClick={addBelow}
                 className="opacity-0 focus-visible:opacity-100 group-hover:opacity-100"
@@ -355,7 +356,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
                   variant="ghost"
                   size="icon-xs"
                   aria-label={t("catalogEditor.actions", {
-                    title: node.title,
+                    title,
                   })}
                   className="opacity-0 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
                 >
@@ -384,9 +385,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onSelect={() =>
-                actions.remove({ key: node.key, title: node.title })
-              }
+              onSelect={() => actions.remove({ key: node.key, title })}
               className="text-destructive focus:text-destructive"
             >
               <Trash2 strokeWidth={1.75} />

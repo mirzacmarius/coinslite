@@ -73,6 +73,81 @@ const listArgs = { plan: planFilter, sort: userSort, order: sortOrder };
 /** How the copies of the plan (billing.ts) mark each plan: the Free plan leaves it unset. */
 const planCopy = { premium: "premium", free: undefined } as const;
 
+type PlanEndCursor = { phase: "ended" | "noEnd"; cursor: string | null };
+const planEndCursorPrefix = "planEnd:";
+const encodePlanEndCursor = (cursor: PlanEndCursor) =>
+  `${planEndCursorPrefix}${encodeURIComponent(JSON.stringify(cursor))}`;
+const decodePlanEndCursor = (cursor: string | null): PlanEndCursor => {
+  if (!cursor?.startsWith(planEndCursorPrefix))
+    return { phase: "ended", cursor };
+  return JSON.parse(
+    decodeURIComponent(cursor.slice(planEndCursorPrefix.length)),
+  ) as PlanEndCursor;
+};
+
+/** Plan ends are ordered before people without an end date, in either direction. */
+async function planEndPage(
+  ctx: QueryCtx,
+  plan: PlanFilter,
+  order: SortOrder,
+  paginationOpts: { cursor: string | null; numItems: number },
+) {
+  const state = decodePlanEndCursor(paginationOpts.cursor);
+  const userTable = ctx.db.query("users");
+  const ended =
+    plan === "all"
+      ? userTable.withIndex("by_planEnd", (q) =>
+          q.gte("planEnd", Number.MIN_SAFE_INTEGER),
+        )
+      : userTable.withIndex("by_plan_and_planEnd", (q) =>
+          q.eq("plan", planCopy[plan]).gte("planEnd", Number.MIN_SAFE_INTEGER),
+        );
+  const noEnd =
+    plan === "all"
+      ? userTable.withIndex("by_planEnd", (q) => q.eq("planEnd", undefined))
+      : userTable.withIndex("by_plan_and_planEnd", (q) =>
+          q.eq("plan", planCopy[plan]).eq("planEnd", undefined),
+        );
+
+  if (state.phase === "noEnd") {
+    const page = await noEnd.order(order).paginate({
+      ...paginationOpts,
+      cursor: state.cursor,
+    });
+    return {
+      ...page,
+      continueCursor: page.isDone
+        ? page.continueCursor
+        : encodePlanEndCursor({ phase: "noEnd", cursor: page.continueCursor }),
+    };
+  }
+
+  const first = await ended.order(order).paginate({
+    ...paginationOpts,
+    cursor: state.cursor,
+  });
+  if (!first.isDone) {
+    return {
+      ...first,
+      continueCursor: encodePlanEndCursor({
+        phase: "ended",
+        cursor: first.continueCursor,
+      }),
+    };
+  }
+
+  // Switch streams on the next page. One Convex query may paginate only once,
+  // so this page can be shorter when the dated users run out.
+  const hasMore = (await noEnd.order(order).take(1)).length > 0;
+  return {
+    page: first.page,
+    isDone: !hasMore,
+    continueCursor: hasMore
+      ? encodePlanEndCursor({ phase: "noEnd", cursor: null })
+      : first.continueCursor,
+  };
+}
+
 /** The people with one sort and plan filter, through the users index that holds them in that order. */
 function usersInOrder(
   ctx: QueryCtx,
@@ -158,6 +233,17 @@ export const list = query({
   returns: paginationResultValidator(listedUser),
   handler: async (ctx, { plan, sort, order, paginationOpts }) => {
     await requireAdmin(ctx);
+    if (sort === "planEnd") {
+      const page = await planEndPage(ctx, plan, order, paginationOpts);
+      return {
+        ...page,
+        page: await Promise.all(
+          page.page.map(async (user) =>
+            listed(user, await collectionCountsOf(ctx, user._id)),
+          ),
+        ),
+      };
+    }
     if (sort === "items" || sort === "albums") {
       const page = await countsInOrder(ctx, sort, plan, order).paginate(
         paginationOpts,
@@ -204,11 +290,15 @@ export const search = query({
     if (!words) return { users: [], more: false };
     const onPlan = (user: Doc<"users">) =>
       plan === "all" || user.plan === planCopy[plan];
-    const bestMatches = (field: "displayName" | "email") =>
+    const bestMatches = (field: "displayName" | "fullName" | "email") =>
       ctx.db
         .query("users")
         .withSearchIndex(
-          field === "email" ? "search_email" : "search_displayName",
+          field === "email"
+            ? "search_email"
+            : field === "fullName"
+              ? "search_fullName"
+              : "search_displayName",
           (q) => {
             const matches = q.search(field, words);
             return plan === "all"
@@ -237,10 +327,15 @@ export const search = query({
 
     // The best of each search in turn.
     const byName = await bestMatches("displayName");
+    const byFullName = await bestMatches("fullName");
     const byEmail = await bestMatches("email");
     const found = new Map<Id<"users">, Doc<"users">>();
-    for (let rank = 0; rank < Math.max(byName.length, byEmail.length); rank++) {
-      for (const user of [byName[rank], byEmail[rank]]) {
+    for (
+      let rank = 0;
+      rank < Math.max(byName.length, byFullName.length, byEmail.length);
+      rank++
+    ) {
+      for (const user of [byName[rank], byFullName[rank], byEmail[rank]]) {
         if (user && !found.has(user._id)) found.set(user._id, user);
       }
     }

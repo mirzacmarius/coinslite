@@ -390,28 +390,7 @@ test("any field can be edited, and a field left empty is cleared", async () => {
   expect(item?.purchasePrice).toBeUndefined();
 });
 
-test("duplicating copies what the person set into a new Item", async () => {
-  const t = newTest();
-  const ada = await person(t, "ada@example.com");
-  const itemId = await ada.as.mutation(api.items.add, fullCoin);
-
-  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
-
-  expect(copyId).not.toBe(itemId);
-  const { _id, _creationTime, ...original } = (await ada.as.query(
-    api.items.get,
-    { itemId },
-  ))!;
-  expect(await ada.as.query(api.items.get, { itemId: copyId })).toMatchObject(
-    original,
-  );
-  const { page } = await ada.as.query(api.items.list, {
-    paginationOpts: firstPage,
-  });
-  expect(page).toHaveLength(2);
-});
-
-test("nobody edits or duplicates someone else's Item", async () => {
+test("nobody edits someone else's Item", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   const bob = await person(t, "bob@example.com");
@@ -419,9 +398,6 @@ test("nobody edits or duplicates someone else's Item", async () => {
 
   await expect(
     bob.as.mutation(api.items.update, { itemId, ...morgan, title: "Mine" }),
-  ).rejects.toThrow("ITEM_NOT_FOUND");
-  await expect(
-    bob.as.mutation(api.items.duplicate, { itemId }),
   ).rejects.toThrow("ITEM_NOT_FOUND");
   expect((await ada.as.query(api.items.get, { itemId }))?.title).toBe(
     "Morgan dollar 1881-S",
@@ -491,7 +467,7 @@ test("nobody deletes someone else's Item", async () => {
   expect(await storedFiles(t)).toBe(1);
 });
 
-test("duplicating leaves the photos behind, and editing keeps them", async () => {
+test("editing keeps the photos", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   const itemId = await ada.as.mutation(api.items.add, morgan);
@@ -499,17 +475,12 @@ test("duplicating leaves the photos behind, and editing keeps them", async () =>
   await addPhoto(t, ada, itemId, "back");
   const photos = await ada.as.query(api.photos.ofItem, { itemId });
 
-  const copyId = await ada.as.mutation(api.items.duplicate, { itemId });
   await ada.as.mutation(api.items.update, {
     itemId,
     ...morgan,
     title: "Morgan dollar 1881-O",
   });
 
-  expect(await ada.as.query(api.photos.ofItem, { itemId: copyId })).toEqual({
-    front: null,
-    back: null,
-  });
   expect(await ada.as.query(api.photos.ofItem, { itemId })).toEqual(photos);
   expect(await storedFiles(t)).toBe(2);
 });
