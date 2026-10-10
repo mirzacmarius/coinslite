@@ -1,3 +1,4 @@
+import { legalTexts } from "@/legal";
 import {
   type Locale,
   englishFallbacks,
@@ -17,7 +18,13 @@ const otherLanguages = locales.filter(
   (locale): locale is Exclude<Locale, "en"> => locale !== "en",
 );
 
-const textsIn = (locale: Locale) => keyedTexts(dictionaries[locale]);
+/** Every text a language shows; section ids are anchors, the same in all. */
+const textsIn = (locale: Locale) =>
+  [
+    ...keyedTexts(dictionaries[locale]),
+    ...keyedTexts(legalTexts.privacy[locale], "privacy"),
+    ...keyedTexts(legalTexts.terms[locale], "terms"),
+  ].filter(([key]) => !key.endsWith(".id"));
 const english = textsIn("en");
 const englishText = new Map(english);
 const placeholders = (text = "") =>
@@ -54,4 +61,14 @@ describe.each(otherLanguages)("%s", (locale) => {
       );
     },
   );
+});
+
+test("the legal texts have the same sections, in the same order, in every language", () => {
+  for (const document of ["privacy", "terms"] as const) {
+    const ids = (locale: Locale) =>
+      legalTexts[document][locale].sections.map((section) => section.id);
+    for (const locale of otherLanguages) {
+      expect(ids(locale)).toEqual(ids("en"));
+    }
+  }
 });

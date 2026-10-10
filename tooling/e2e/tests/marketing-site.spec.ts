@@ -19,6 +19,22 @@ test.describe("with a German browser", () => {
     await expectNoAccessibilityViolations(page);
   });
 
+  test("the old privacy policy and terms addresses open in German", async ({
+    page,
+  }) => {
+    await page.goto(`${webUrl}/privacy`);
+    await expect(page).toHaveURL(`${webUrl}/de/privacy`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Datenschutzerklärung" }),
+    ).toBeVisible();
+
+    await page.goto(`${webUrl}/terms`);
+    await expect(page).toHaveURL(`${webUrl}/de/terms`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Nutzungsbedingungen" }),
+    ).toBeVisible();
+  });
+
   test("an address the site doesn't have says so in German", async ({
     page,
   }) => {
@@ -81,5 +97,17 @@ test.describe("with an English browser", () => {
 
     await page.goto(webUrl);
     await expect(page).toHaveURL(`${webUrl}/ro`);
+  });
+
+  test("the legal pages are drafts until the operator's details are in", async ({
+    page,
+  }) => {
+    await page.goto(`${webUrl}/en/terms`);
+
+    await expect(page.getByText(/^Draft:/)).toBeVisible();
+    await expect(
+      page.getByText("[operator’s legal name]").first(),
+    ).toBeVisible();
+    await expectNoAccessibilityViolations(page);
   });
 });
