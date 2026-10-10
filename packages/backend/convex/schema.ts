@@ -296,6 +296,8 @@ export default defineSchema({
     /** The latest refresh attempt, whether or not it succeeded. */
     checkedAt: v.number(),
     perDollar,
+    /** The provider plan's monthly request quota, when it states one; refreshes are spaced to fit it. */
+    requestsPerMonth: v.optional(v.number()),
   }),
 
   /**
