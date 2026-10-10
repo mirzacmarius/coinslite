@@ -33,6 +33,31 @@ export async function moveBetweenAlbums(
   if (to !== undefined) await addToCount(ctx, to, 1);
 }
 
+/**
+ * Keeps the Item counts right as many Items move at once: each Album's count
+ * changes once, by its net change.
+ */
+export async function moveManyBetweenAlbums(
+  ctx: MutationCtx,
+  moves: ReadonlyArray<{
+    from: Id<"albums"> | undefined;
+    to: Id<"albums"> | undefined;
+  }>,
+) {
+  const changes = new Map<Id<"albums">, number>();
+  const change = (albumId: Id<"albums"> | undefined, by: number) => {
+    if (albumId !== undefined)
+      changes.set(albumId, (changes.get(albumId) ?? 0) + by);
+  };
+  for (const { from, to } of moves) {
+    if (from === to) continue;
+    change(from, -1);
+    change(to, 1);
+  }
+  for (const [albumId, by] of changes)
+    if (by !== 0) await addToCount(ctx, albumId, by);
+}
+
 async function addToCount(
   ctx: MutationCtx,
   albumId: Id<"albums">,

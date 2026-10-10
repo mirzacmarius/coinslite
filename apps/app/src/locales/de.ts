@@ -793,6 +793,27 @@ export default {
     incomplete:
       "Deine Sammlung ist zu groß, um sie auf einmal zu durchsuchen. Diese Ansicht umfasst die ersten {count} Objekte, die du hinzugefügt hast.",
     showInCollection: "In der Sammlung zeigen",
+    select: "Auswählen",
+    selectionBar: "Ausgewählte Objekte",
+    selectHint: "Wähle Objekte aus, um sie in ein Album zu verschieben.",
+    selectPage: "Seite auswählen",
+    "selectAll#one": "1 Objekt auswählen",
+    "selectAll#few": "Alle {count} Objekte auswählen",
+    "selectAll#other": "Alle {count} Objekte auswählen",
+    selectedFirst:
+      "Die ersten {limit} Objekte dieser Ansicht sind ausgewählt. Verschiebe sie, dann wähle den Rest aus.",
+    done: "Fertig",
+    moveTo: "Nach {album} verschieben",
+    takeOut: "Aus Alben nehmen",
+    "inOtherAlbum#one": "1 liegt gerade in einem anderen Album",
+    "inOtherAlbum#few": "{count} liegen gerade in einem anderen Album",
+    "inOtherAlbum#other": "{count} liegen gerade in einem anderen Album",
+    movedTo: "Nach {album} verschoben",
+    "takenOut#one": "1 Objekt aus seinem Album genommen",
+    "takenOut#few": "{count} Objekte aus ihren Alben genommen",
+    "takenOut#other": "{count} Objekte aus ihren Alben genommen",
+    moveFailed:
+      "Die Objekte konnten nicht verschoben werden. Versuche es noch einmal.",
   },
   billing: {
     currentPlan: "Dein Tarif",

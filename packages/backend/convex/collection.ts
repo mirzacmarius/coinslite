@@ -1,7 +1,12 @@
 import { defaultLocale } from "@coinslite/i18n";
 import { v } from "convex/values";
 import { query } from "./_generated/server";
-import { browseCollection, collectionView } from "./collection/browse";
+import {
+  browseCollection,
+  collectionView,
+  findItems,
+} from "./collection/browse";
+import { bulkLimits } from "./items/bulkRules";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
 import { gradingScale, homeCurrency, language } from "./utils/validators";
@@ -65,5 +70,38 @@ export const browse = query({
       locale: locale ?? owner.language ?? defaultLocale,
     });
     return { ...found, currency: owner.homeCurrency };
+  },
+});
+
+/**
+ * The Items a view shows, in its order, for selecting all of them at once:
+ * the first `bulkLimits.items`, each with its Album, and how many the view
+ * holds in all.
+ */
+export const selectable = query({
+  args: { view: collectionView, locale: v.optional(language) },
+  returns: v.object({
+    items: v.array(
+      v.object({
+        _id: v.id("items"),
+        albumId: v.union(v.id("albums"), v.null()),
+      }),
+    ),
+    total: v.number(),
+  }),
+  handler: async (ctx, { view, locale }) => {
+    const owner = await requireSetUpUser(ctx);
+    const { items } = await findItems(
+      ctx,
+      owner,
+      view,
+      locale ?? owner.language ?? defaultLocale,
+    );
+    return {
+      items: items
+        .slice(0, bulkLimits.items)
+        .map((item) => ({ _id: item._id, albumId: item.albumId ?? null })),
+      total: items.length,
+    };
   },
 });

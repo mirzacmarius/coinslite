@@ -8,10 +8,12 @@ import { useFormatters } from "@/locales/use-formatters";
 import { Button } from "@coinslite/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import type * as React from "react";
 import type { BrowseResult } from "./filter-options";
 import type { CollectionLayout } from "./use-collection-display";
+import type { ItemSelection } from "./use-item-selection";
 
 type Item = BrowseResult["items"][number];
 
@@ -45,22 +47,91 @@ function useItemFacts(currency: BrowseResult["currency"]) {
   });
 }
 
-/** One page of Items as rows or as cards, each opening its Item detail. */
+/** While select mode is on: the selection rows and cards toggle. */
+type Selecting = ItemSelection | undefined;
+
+/**
+ * One page of Items as rows or as cards, each opening its Item detail; in
+ * select mode, each selects its Item instead.
+ */
 export function CollectionResults({
   result,
   layout,
+  selection,
 }: {
   result: BrowseResult;
   layout: CollectionLayout;
+  selection?: ItemSelection;
 }) {
   return layout === "grid" ? (
-    <ItemGrid result={result} />
+    <ItemGrid result={result} selection={selection} />
   ) : (
-    <ItemList result={result} />
+    <ItemList result={result} selection={selection} />
   );
 }
 
-function ItemList({ result }: { result: BrowseResult }) {
+/**
+ * A row or card: a link to the Item, or in select mode a checkbox for it.
+ * Shift-click selects every Item from the one clicked last.
+ */
+function ItemTarget({
+  item,
+  items,
+  selection,
+  className,
+  children,
+}: {
+  item: Item;
+  items: readonly Item[];
+  selection: Selecting;
+  className: string;
+  children: React.ReactNode;
+}) {
+  if (!selection)
+    return (
+      <Link href={`/collection/${item._id}`} className={className}>
+        {children}
+      </Link>
+    );
+  const checked = selection.isSelected(item._id);
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      aria-label={item.title}
+      onClick={(event) => selection.toggle(item, items, event.shiftKey)}
+      className={cn(className, "w-full text-left", checked && "bg-muted/60")}
+    >
+      {children}
+    </button>
+  );
+}
+
+/** The box a row or card shows in select mode. */
+function SelectBox({ checked }: { checked: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "flex size-4 shrink-0 items-center justify-center rounded border",
+        checked
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-input bg-card",
+      )}
+    >
+      {checked && <Check className="size-3.5" strokeWidth={2.5} />}
+    </span>
+  );
+}
+
+function ItemList({
+  result,
+  selection,
+}: {
+  result: BrowseResult;
+  selection: Selecting;
+}) {
   const t = useI18n();
   const describe = useItemFacts(result.currency);
   return (
@@ -85,10 +156,15 @@ function ItemList({ result }: { result: BrowseResult }) {
           const about = describe(item);
           return (
             <li key={item._id}>
-              <Link
-                href={`/collection/${item._id}`}
+              <ItemTarget
+                item={item}
+                items={result.items}
+                selection={selection}
                 className="flex min-h-11 items-center gap-3 px-4 py-1.5 outline-none transition-colors duration-100 hover:bg-muted/60 focus-visible:bg-muted"
               >
+                {selection && (
+                  <SelectBox checked={selection.isSelected(item._id)} />
+                )}
                 <ItemThumbnail type={item.type} url={item.thumbnailUrl} />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate text-[13px] font-medium">
@@ -128,7 +204,7 @@ function ItemList({ result }: { result: BrowseResult }) {
                 <Amount label={t("items.marketValue")}>
                   {about.marketValue}
                 </Amount>
-              </Link>
+              </ItemTarget>
             </li>
           );
         })}
@@ -150,7 +226,13 @@ function Amount({ label, children }: { label: string; children?: string }) {
   );
 }
 
-function ItemGrid({ result }: { result: BrowseResult }) {
+function ItemGrid({
+  result,
+  selection,
+}: {
+  result: BrowseResult;
+  selection: Selecting;
+}) {
   const t = useI18n();
   const describe = useItemFacts(result.currency);
   return (
@@ -160,10 +242,17 @@ function ItemGrid({ result }: { result: BrowseResult }) {
         const TypeIcon = itemTypeIcons[item.type];
         return (
           <li key={item._id} className="min-w-0">
-            <Link
-              href={`/collection/${item._id}`}
-              className="flex h-full flex-col overflow-hidden rounded-lg border bg-card outline-none transition-colors duration-100 hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
+            <ItemTarget
+              item={item}
+              items={result.items}
+              selection={selection}
+              className="relative flex h-full flex-col overflow-hidden rounded-lg border bg-card outline-none transition-colors duration-100 hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
             >
+              {selection && (
+                <span className="absolute left-2 top-2">
+                  <SelectBox checked={selection.isSelected(item._id)} />
+                </span>
+              )}
               {item.thumbnailUrl ? (
                 <img
                   src={item.thumbnailUrl}
@@ -207,7 +296,7 @@ function ItemGrid({ result }: { result: BrowseResult }) {
                   )}
                 </span>
               </span>
-            </Link>
+            </ItemTarget>
           </li>
         );
       })}
