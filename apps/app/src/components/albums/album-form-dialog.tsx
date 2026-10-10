@@ -146,7 +146,7 @@ export function AlbumFormDialog({
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
-            void submitForm(form);
+            void submitForm(form, t("common.saveFailed"));
           }
         }}
       >
@@ -155,7 +155,7 @@ export function AlbumFormDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form);
+            void submitForm(form, t("common.saveFailed"));
           }}
           className="flex min-h-0 flex-col"
         >

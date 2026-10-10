@@ -3,6 +3,8 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Sprache",
+    saveFailed:
+      "Etwas ist schiefgelaufen, daher wurde nichts gespeichert. Versuche es noch einmal.",
     appDescription:
       "Erfasse die Münzen, Banknoten und Briefmarken, die du besitzt.",
   },

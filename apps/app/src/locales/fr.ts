@@ -3,6 +3,8 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Langue",
+    saveFailed:
+      "Une erreur s’est produite, rien n’a été enregistré. Réessayez.",
     appDescription:
       "Enregistrez les pièces, billets et timbres que vous possédez.",
   },

@@ -1,6 +1,7 @@
 export default {
   common: {
     language: "Language",
+    saveFailed: "Something went wrong, so nothing was saved. Try again.",
     appDescription: "Record the coins, banknotes and stamps you own.",
   },
   nav: {
