@@ -694,7 +694,12 @@ export default {
         "Daten von Numista dürfen nicht gespeichert werden. Behalte nur die Numista-Nummer, in numista_id.",
       ITEM_TYPE_REQUIRED:
         "Ein Katalogeintrag braucht eine Objektart: Münze oder Banknote.",
-      FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Größe.",
+      FIELD_NOT_FOR_TYPE:
+        "Banknoten haben weder Metall noch Münzmaße, Rand oder Prägestätte.",
+      INVALID_DATE: "Gib ein Datum als JJJJ-MM-TT, JJJJ-MM oder JJJJ ein.",
+      DATES_REVERSED: "withdrawal_date liegt vor issue_date.",
+      SAME_LANGUAGE:
+        "Die Hinweise sind bereits in dieser Sprache. Verwende technical_details und historical_notes oder ändere notes_language.",
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED:
         "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
@@ -1366,7 +1371,11 @@ export default {
       NUMISTA_DATA:
         "Numista-Daten dürfen nicht gespeichert werden. Behalte nur die Numista-Nummer.",
       ITEM_TYPE_REQUIRED: "Ein Katalogeintrag braucht eine Objektart.",
-      FIELD_NOT_FOR_TYPE: "Banknoten haben weder Metall noch Maße.",
+      FIELD_NOT_FOR_TYPE:
+        "Banknoten haben weder Metall noch Münzmaße, Rand oder Prägestätte.",
+      INVALID_DATE: "Gib ein Datum wie 1999-03-15, 1999-03 oder 1999 ein.",
+      DATES_REVERSED: "Sie wird außer Kurs gesetzt, bevor sie ausgegeben wird.",
+      SAME_LANGUAGE: "Die Hinweise sind bereits in dieser Sprache.",
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
       SOURCE_REQUIRED: "Nenne die Quelle dieser Fakten oder Hinweise.",
       CREDIT_REQUIRED:
@@ -1510,5 +1519,50 @@ export default {
     photosHint: "Diese Fotos werden dem Objekt hinzugefügt.",
     photosFailed:
       "Das Objekt wurde hinzugefügt, aber seine Fotos konnten nicht gespeichert werden. Füge sie auf der Seite des Objekts hinzu.",
+  },
+  catalogFacts: {
+    designer: "Gestaltung",
+    designers: "Gestaltung",
+    mint: "Prägestätte",
+    mintMark: "Münzzeichen",
+    noMintMark: "Keines",
+    issued: "Ausgabe",
+    withdrawn: "Außer Kurs seit",
+    mintage: "Auflage",
+    numberIssued: "Ausgegebene Stückzahl",
+    composition: "Legierung",
+    edge: "Rand",
+    edges: {
+      plain: "Glatt",
+      reeded: "Geriffelt",
+      interruptedReeding: "Unterbrochen geriffelt",
+      lettered: "Mit Randschrift",
+    },
+    edgeLettering: "Randschrift",
+    thickness: "Dicke",
+    size: "Format",
+    inLanguage: "Auf {language}",
+    editor: {
+      mintMarkHint:
+        "Gib „none“ ein, wenn die Münze ohne Münzzeichen geprägt wurde.",
+      compositionHint:
+        "Jedes Metall mit seinem Anteil, etwa „copper 75%; nickel 25%“, mit diesen Namen: {metals}.",
+      designersHint: "Trenne Namen mit Semikolons.",
+      dateHint: "Etwa 1999-03-15, 1999-03 oder 1999.",
+      mintageHint: "Eine ganze Zahl.",
+      width: "Breite",
+      height: "Höhe",
+      setEdge: "Rand wählen",
+      noEdge: "Rand entfernen",
+      notesLanguage: "Sprache der Hinweise",
+      notesLanguageHint:
+        "Die Sprache, in der die Hinweise oben geschrieben sind.",
+      setNotesLanguage: "Sprache wählen",
+      translations: "Übersetzungen",
+      translationsHint:
+        "Wo es eine Übersetzung gibt, sehen Lesende die Hinweise in ihrer Sprache, sonst in der Sprache der Hinweise.",
+      translationLanguage: "Sprache der Übersetzung",
+      translationSources: "Woher die Übersetzung stammt",
+    },
   },
 } as const satisfies Dictionary;

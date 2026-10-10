@@ -30,14 +30,33 @@ test.use({ locale: "en-US" });
 type Text = (t: Dictionary) => string;
 
 const languages = [
-  { code: "nb", name: "Norsk bokmål", t: nb, unitedStates: "USA" },
-  { code: "de", name: "Deutsch", t: de, unitedStates: "Vereinigte Staaten" },
-  { code: "fr", name: "Français", t: fr, unitedStates: "États-Unis" },
+  {
+    code: "nb",
+    name: "Norsk bokmål",
+    t: nb,
+    unitedStates: "USA",
+    highRelief: "Preget i høyt relieff, senket fra 1922.",
+  },
+  {
+    code: "de",
+    name: "Deutsch",
+    t: de,
+    unitedStates: "Vereinigte Staaten",
+    highRelief: "In Hochrelief geprägt, ab 1922 flacher.",
+  },
+  {
+    code: "fr",
+    name: "Français",
+    t: fr,
+    unitedStates: "États-Unis",
+    highRelief: "Frappé en haut relief, abaissé à partir de 1922.",
+  },
   {
     code: "ro",
     name: "Română",
     t: ro,
     unitedStates: "Statele Unite ale Americii",
+    highRelief: "Bătut în relief înalt, coborât începând din 1922.",
   },
 ] as const;
 
@@ -191,7 +210,7 @@ async function chooseLanguage(page: Page, name: string, code: string) {
   await expect(page.locator("html")).toHaveAttribute("lang", code);
 }
 
-for (const { code, name, t, unitedStates } of languages) {
+for (const { code, name, t, unitedStates, highRelief } of languages) {
   test(`the key screens read in ${name}`, async ({ page }) => {
     test.setTimeout(180_000);
     // The bundled Catalog, so it has a country to name. Loading it again changes nothing.
@@ -234,6 +253,25 @@ for (const { code, name, t, unitedStates } of languages) {
     await expect(
       visiblePage(page).getByRole("link", { name: new RegExp(unitedStates) }),
     ).toBeVisible();
+
+    // A Catalog entry's notes read in the reader's language where translated,
+    // otherwise in their source's, marked so screen readers pronounce them right.
+    await page.goto(`${appUrl}/catalog/us-peace-dollar-1921`);
+    await expect(visiblePage(page).getByText(highRelief)).toBeVisible();
+    await page.goto(
+      `${appUrl}/catalog/eur2-gr-2004-olympic-games-in-athens-2004`,
+    );
+    await expect(
+      visiblePage(page).getByRole("heading", {
+        level: 1,
+        name: "Ολυμπιακοί Αγώνες «Αθήνα 2004»",
+      }),
+    ).toBeVisible();
+    await expect(
+      visiblePage(page).locator('p[lang="en"]', {
+        hasText: /^The twelve stars/,
+      }),
+    ).toHaveCount(code === "nb" ? 1 : 0);
 
     // The navigation, on every screen.
     await expectTranslated(

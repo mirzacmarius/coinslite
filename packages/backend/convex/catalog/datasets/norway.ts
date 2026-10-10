@@ -11,8 +11,9 @@ import { catalogCsvColumns } from "../fields";
  * Facts: Norges Bank's pages on its current, withdrawn and commemorative notes
  * and coins, and its overview of the commemorative coins from 1906 to 2004.
  * Norges Bank lets anyone copy its website's material with Norges Bank quoted
- * as the source, and the dates, sizes, alloys and mintages are facts. Notes
- * are CoinsLite's own summary of the same pages.
+ * as the source, and the dates, sizes, alloys and mintages are facts, kept in
+ * their own fields. Notes, and the descriptions in the technical details,
+ * are CoinsLite's own summary of the same pages, in English.
  *
  * Not yet: circulation coins from 1875 to 1957, and an entry per year struck,
  * which need a source listing every year (docs/research/catalog-data-sources.md).
@@ -51,19 +52,19 @@ const credit = (group: "facts" | "notes", from: Provenance) => ({
 
 type Row = Record<string, string>;
 
-/** The alloys Norges Bank names, as Catalog materials and in words. */
+/** The alloys Norges Bank names, as Catalog materials and compositions. */
 const alloys = {
   cupronickel: {
     material: "cupronickel",
-    words: "Alloy: 75% copper, 25% nickel.",
+    composition: "copper 75%; nickel 25%",
   },
   bronze: {
     material: "bronze",
-    words: "Alloy: 97% copper, 2.5% zinc, 0.5% tin.",
+    composition: "copper 97%; zinc 2.5%; tin 0.5%",
   },
   nickelSilver: {
     material: "nickelBrass",
-    words: "Alloy: 81% copper, 10% zinc, 9% nickel (nickel silver).",
+    composition: "copper 81%; zinc 10%; nickel 9%",
   },
 } as const;
 type Alloy = keyof typeof alloys;
@@ -2001,6 +2002,123 @@ const noteDenominations: NoteDenomination[] = [
 
 const root = "no";
 
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const dayMonthYear = `(\\d{1,2}) (${months.join("|")}) (\\d{4})`;
+const monthYear = `(${months.join("|")}) (\\d{4})`;
+/** "8 May 2008" as 2008-05-08, "May 1964" as 1964-05. */
+const isoDate = (day: string | undefined, month: string, year: string) => {
+  const mm = String(months.indexOf(month) + 1).padStart(2, "0");
+  return day === undefined
+    ? `${year}-${mm}`
+    : `${year}-${mm}-${day.padStart(2, "0")}`;
+};
+const alloyPart = "\\d+(?:\\.\\d+)?(?:%|/1000) [a-z]+";
+
+/**
+ * The facts in a coin's or note's details that have Catalog fields of their
+ * own (alloy, edge, designers, mintage, dates, sizes), as CSV cells, and the
+ * words left over: descriptions of the design and anything with more to it.
+ */
+function factsIn(details: string[]) {
+  const facts: Row = {};
+  let rest = details.join(" ");
+  const take = (
+    pattern: string,
+    read: (...groups: string[]) => Row,
+    keep = "",
+  ) => {
+    rest = rest.replace(
+      new RegExp(`(?<=^| )${pattern}(?= |$)`, "u"),
+      (_, ...groups: string[]) => {
+        Object.assign(facts, read(...groups));
+        return keep;
+      },
+    );
+  };
+  take(
+    `Alloy: (${alloyPart}(?:, ${alloyPart})*)(?: \\(nickel silver\\))?\\.`,
+    (parts) => ({
+      composition: parts
+        .split(", ")
+        .map((part) => {
+          const [, amount = "", unit, metal] =
+            /^([\d.]+)(%|\/1000) ([a-z]+)$/.exec(part) ?? [];
+          const percent = unit === "%" ? Number(amount) : Number(amount) / 10;
+          return `${metal} ${percent}%`;
+        })
+        .join("; "),
+    }),
+  );
+  take("Plain edge\\.", () => ({ edge: "plain" }));
+  take("Reeded edge\\.", () => ({ edge: "reeded" }));
+  take("Interrupted reeding on the edge\\.", () => ({
+    edge: "interruptedReeding",
+  }));
+  take("Edge: ([A-ZÆØÅ0-9 ]+)\\.", (lettering) => ({
+    edge: "lettered",
+    edge_lettering: lettering,
+  }));
+  take("Designers?: ([^.,;:]+)\\.", (names) => ({
+    designers: names.split(" and ").join("; "),
+  }));
+  take("(?:Mintage|Number issued): ([\\d ]+)\\.", (count) => ({
+    mintage: count.replace(/ /g, ""),
+  }));
+  take("Size: (\\d+) × (\\d+) mm\\.", (width, height) => ({
+    width_mm: width,
+    height_mm: height,
+  }));
+  take("Thickness ([\\d.]+) mm\\.", (thickness) => ({
+    thickness_mm: thickness,
+  }));
+  take(
+    `Issued on ${dayMonthYear}; no longer legal tender from ${dayMonthYear}\\.`,
+    (day, month, year, endDay, endMonth, endYear) => ({
+      issue_date: isoDate(day, month as string, year as string),
+      withdrawal_date: isoDate(endDay, endMonth as string, endYear as string),
+    }),
+  );
+  take(
+    `No longer legal tender from ${dayMonthYear}(?:\\.|;)`,
+    (day, month, year) => ({
+      withdrawal_date: isoDate(day, month as string, year as string),
+    }),
+  );
+  take(
+    `(?:Issued on|In circulation from|Legal tender from) ${dayMonthYear}\\.`,
+    (day, month, year) => ({
+      issue_date: isoDate(day, month as string, year as string),
+    }),
+  );
+  take(`Issued in ${monthYear}\\.`, (month, year) => ({
+    issue_date: isoDate(undefined, month as string, year as string),
+  }));
+  return { facts, words: rest.replace(/\s+/g, " ").trim() };
+}
+
+/** CoinsLite's notes on a node, credited, when it has any. */
+const notesOf = (link: string, technical: string, historical = "") =>
+  technical || historical
+    ? {
+        technical_details: technical,
+        historical_notes: historical,
+        ...credit("notes", editorial(link)),
+      }
+    : {};
+
 const yearsOf = (spans: Array<{ yearFrom: number; yearTo?: number }>) => {
   const open = spans.some(({ yearTo }) => yearTo === undefined);
   return {
@@ -2054,6 +2172,7 @@ function coinRows(denomination: CoinDenomination, sortOrder: number): Row[] {
         },
         ...series.coins.map((coin, index) => {
           const alloy = coin.alloy && alloys[coin.alloy];
+          const { facts, words } = factsIn(coin.details);
           return {
             id: `${seriesKey}-${coin.key}`,
             parent_id: seriesKey,
@@ -2072,12 +2191,10 @@ function coinRows(denomination: CoinDenomination, sortOrder: number): Row[] {
             diameter_mm: coin.diameter ?? "",
             year_from: String(coin.yearFrom),
             year_to: coin.yearTo === undefined ? "" : String(coin.yearTo),
+            ...(alloy && { composition: alloy.composition }),
+            ...facts,
             ...credit("facts", norgesBank(coin.link)),
-            technical_details: [alloy?.words, ...coin.details]
-              .filter(Boolean)
-              .join(" "),
-            historical_notes: coin.note ?? "",
-            ...credit("notes", editorial(coin.link)),
+            ...notesOf(coin.link, words, coin.note),
           };
         }),
       ];
@@ -2107,6 +2224,7 @@ function noteRows(denomination: NoteDenomination, sortOrder: number): Row[] {
         note.yearTo === undefined
           ? `${note.yearFrom}–`
           : `${note.yearFrom}–${note.yearTo}`;
+      const { facts, words } = factsIn(note.details);
       return [
         {
           id: seriesKey,
@@ -2133,9 +2251,9 @@ function noteRows(denomination: NoteDenomination, sortOrder: number): Row[] {
           ...shared,
           year_from: String(note.yearFrom),
           year_to: note.yearTo === undefined ? "" : String(note.yearTo),
+          ...facts,
           ...credit("facts", norgesBank(series.link)),
-          technical_details: note.details.join(" "),
-          ...credit("notes", editorial(series.link)),
+          ...notesOf(series.link, words),
         },
       ];
     }),

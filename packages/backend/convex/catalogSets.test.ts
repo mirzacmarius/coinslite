@@ -270,7 +270,7 @@ test("only countries, Themes and groupings with more than one entry below them a
 test("a Theme is a Set of its countries' entries: the bundled 2-euro commemoratives fit in one query", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
 
   const set = await openSet(ada.as, { key: "eur2-commemoratives" });
 
@@ -566,7 +566,7 @@ test("up to 200 entries go in one add, within a mutation's limits; 201 are refus
   const t = newTest();
   const ada = await person(t, "ada@example.com");
   await makePremium(t, ada.userId);
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
   const keys = (
     keysOf(await openSet(ada.as, { key: "eur2-commemoratives" })) ?? []
   ).flat();

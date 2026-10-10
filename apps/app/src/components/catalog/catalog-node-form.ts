@@ -3,8 +3,10 @@ import {
   type CatalogError,
   type CatalogItemType,
   type CatalogKind,
+  type CoinEdge,
   type EditorValues,
   type PreciousMetal,
+  type TranslationValueKey,
   catalogErrors,
   checkNode,
   coinOnlyValues,
@@ -12,10 +14,11 @@ import {
   editorValueKeys,
   readCatalogKey,
   readEditorValues,
+  translationValuesOf,
 } from "@coinslite/backend/convex/catalog/fields";
 import type { Strike } from "@coinslite/backend/convex/items/grades";
 import type { Material } from "@coinslite/backend/convex/items/rules";
-import { type Locale, formatNumber } from "@coinslite/i18n";
+import { type Locale, formatNumber, locales } from "@coinslite/i18n";
 
 /**
  * The Catalog editor's form for one node: its values as typed, and the rules
@@ -35,6 +38,17 @@ type TextValue =
   | "diameter"
   | "yearFrom"
   | "yearTo"
+  | "mint"
+  | "mintMark"
+  | "composition"
+  | "edgeLettering"
+  | "thickness"
+  | "width"
+  | "height"
+  | "designers"
+  | "mintage"
+  | "issueDate"
+  | "withdrawalDate"
   | "technicalDetails"
   | "historicalNotes"
   | "numistaId"
@@ -45,7 +59,8 @@ type TextValue =
   | "notesSource"
   | "notesAuthor"
   | "notesLicence"
-  | "notesLink";
+  | "notesLink"
+  | TranslationValueKey;
 
 export type NodeFormValues = Record<TextValue, string> & {
   /** A root is a country or a Theme; below one, a grouping or a Catalog entry. */
@@ -55,8 +70,14 @@ export type NodeFormValues = Record<TextValue, string> & {
   material?: Material;
   strike?: Strike;
   metal?: PreciousMetal;
+  edge?: CoinEdge;
+  /** The language the notes are written in. */
+  notesLanguage: string;
 };
 export type NodeFormField = keyof NodeFormValues;
+
+/** Every translation's values, in each of the app's languages. */
+export const translationFields = translationValuesOf(locales);
 
 /** Problems the form finds that the backend has no code for. */
 export const formErrors = {
@@ -66,6 +87,9 @@ export const formErrors = {
 export type NodeFormProblem =
   | CatalogError
   | (typeof formErrors)[keyof typeof formErrors];
+
+/** The language notes are written in unless the admin says otherwise. */
+const defaultLanguage = "en";
 
 /** The node a new one goes below, as the tree knows it. */
 export type ParentNode = {
@@ -87,6 +111,17 @@ const blankText: Record<TextValue, string> = {
   diameter: "",
   yearFrom: "",
   yearTo: "",
+  mint: "",
+  mintMark: "",
+  composition: "",
+  edgeLettering: "",
+  thickness: "",
+  width: "",
+  height: "",
+  designers: "",
+  mintage: "",
+  issueDate: "",
+  withdrawalDate: "",
   technicalDetails: "",
   historicalNotes: "",
   numistaId: "",
@@ -98,6 +133,10 @@ const blankText: Record<TextValue, string> = {
   notesAuthor: "",
   notesLicence: "",
   notesLink: "",
+  ...(Object.fromEntries(translationFields.map((key) => [key, ""])) as Record<
+    TranslationValueKey,
+    string
+  >),
 };
 
 /**
@@ -105,9 +144,11 @@ const blankText: Record<TextValue, string> = {
  * grouping a Catalog entry, taking the parent's country and Item type.
  */
 export function blankNode(parent: ParentNode | null): NodeFormValues {
-  if (!parent) return { ...blankText, kind: "country" };
+  if (!parent)
+    return { ...blankText, kind: "country", notesLanguage: defaultLanguage };
   return {
     ...blankText,
+    notesLanguage: defaultLanguage,
     kind: parent.kind === "grouping" ? "entry" : "grouping",
     country: parent.country,
     itemType: parent.itemType,
@@ -146,6 +187,19 @@ export function valuesFromNode(
     diameter: decimal(values.diameter),
     yearFrom: whole(values.yearFrom),
     yearTo: whole(values.yearTo),
+    mint: text(values.mint),
+    mintMark: text(values.mintMark),
+    composition: text(values.composition),
+    edge: values.edge,
+    edgeLettering: text(values.edgeLettering),
+    thickness: decimal(values.thickness),
+    width: decimal(values.width),
+    height: decimal(values.height),
+    designers: text(values.designers),
+    mintage: whole(values.mintage),
+    issueDate: text(values.issueDate),
+    withdrawalDate: text(values.withdrawalDate),
+    notesLanguage: values.notesLanguage ?? defaultLanguage,
     technicalDetails: text(values.technicalDetails),
     historicalNotes: text(values.historicalNotes),
     numistaId: whole(values.numistaId),
@@ -157,6 +211,9 @@ export function valuesFromNode(
     notesAuthor: text(values.notesAuthor),
     notesLicence: text(values.notesLicence),
     notesLink: text(values.notesLink),
+    ...(Object.fromEntries(
+      translationFields.map((key) => [key, text(values[key])]),
+    ) as Record<TranslationValueKey, string>),
   };
 }
 
@@ -224,6 +281,23 @@ export function editorArgsFrom(form: NodeFormValues) {
       wholeNumber(/^-?\d+$/),
       catalogErrors.invalidYear,
     ),
+    mint: coin ? optionalText(form.mint) : undefined,
+    mintMark: coin ? optionalText(form.mintMark) : undefined,
+    composition: coin ? optionalText(form.composition) : undefined,
+    edge: coin ? form.edge : undefined,
+    edgeLettering: coin ? optionalText(form.edgeLettering) : undefined,
+    thickness: coin
+      ? number("thickness", form.thickness, parseDecimal)
+      : undefined,
+    width: number("width", form.width, parseDecimal),
+    height: number("height", form.height, parseDecimal),
+    designers: optionalText(form.designers),
+    mintage: number("mintage", form.mintage, wholeNumber(/^\d+$/)),
+    issueDate: optionalText(form.issueDate),
+    withdrawalDate: optionalText(form.withdrawalDate),
+    // English is the default, so it isn't stored.
+    notesLanguage:
+      form.notesLanguage === defaultLanguage ? undefined : form.notesLanguage,
     technicalDetails: optionalText(form.technicalDetails),
     historicalNotes: optionalText(form.historicalNotes),
     numistaId: number("numistaId", form.numistaId, wholeNumber(/^\d+$/)),
@@ -235,6 +309,9 @@ export function editorArgsFrom(form: NodeFormValues) {
     notesAuthor: optionalText(form.notesAuthor),
     notesLicence: optionalText(form.notesLicence),
     notesLink: optionalText(form.notesLink),
+    ...Object.fromEntries(
+      translationFields.map((key) => [key, optionalText(form[key])]),
+    ),
   };
   for (const key of coinOnlyValues) {
     if (!coin) delete problems[key];

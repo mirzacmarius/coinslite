@@ -1,6 +1,6 @@
-import { ConvexError, v } from "convex/values";
+import { ConvexError, type Infer, v } from "convex/values";
 import { internal } from "../_generated/api";
-import { internalMutation } from "../_generated/server";
+import { internalAction, internalMutation } from "../_generated/server";
 import { euroCommemoratives } from "./datasets/euroCommemoratives";
 import { norway } from "./datasets/norway";
 import { usSilverDollars } from "./datasets/usSilverDollars";
@@ -13,34 +13,53 @@ import { importCatalogFile } from "./tree";
  */
 const datasets = { usSilverDollars, euroCommemoratives, norway };
 
+const loadReport = v.object({
+  dataset: v.string(),
+  inserts: v.number(),
+  updates: v.number(),
+  unchanged: v.number(),
+});
+
+/** Loads one bundled dataset through the CSV import; a dataset with any problem changes nothing. */
+export const loadDataset = internalMutation({
+  args: {
+    dataset: v.union(
+      v.literal("usSilverDollars"),
+      v.literal("euroCommemoratives"),
+      v.literal("norway"),
+    ),
+  },
+  returns: loadReport,
+  handler: async (ctx, { dataset }) => {
+    const { inserts, updates, unchanged, errors, applied } =
+      await importCatalogFile(ctx, datasets[dataset]);
+    if (!applied) {
+      throw new ConvexError(
+        `Dataset ${dataset} has problems: ${JSON.stringify(errors)}`,
+      );
+    }
+    return { dataset, inserts, updates, unchanged };
+  },
+});
+
 /**
- * Loads every bundled dataset through the CSV import, so loading again only
- * updates what changed, then fills in browsing (entry counts, countries) for
- * any Catalog data stored before it existed, in the background a batch at a
- * time. Run it on a deployment with
+ * Loads every bundled dataset through the CSV import, each in a transaction
+ * of its own, so loading again only updates what changed, then fills in
+ * browsing (entry counts, countries) for any Catalog data stored before it
+ * existed, in the background a batch at a time. Run it on a deployment with
  * `npx convex run catalog/seed:load`.
  */
-export const load = internalMutation({
+export const load = internalAction({
   args: {},
-  returns: v.array(
-    v.object({
-      dataset: v.string(),
-      inserts: v.number(),
-      updates: v.number(),
-      unchanged: v.number(),
-    }),
-  ),
+  returns: v.array(loadReport),
   handler: async (ctx) => {
-    const loaded = [];
-    for (const [dataset, csv] of Object.entries(datasets)) {
-      const { inserts, updates, unchanged, errors, applied } =
-        await importCatalogFile(ctx, csv);
-      if (!applied) {
-        throw new ConvexError(
-          `Dataset ${dataset} has problems: ${JSON.stringify(errors)}`,
-        );
-      }
-      loaded.push({ dataset, inserts, updates, unchanged });
+    const loaded: Array<Infer<typeof loadReport>> = [];
+    for (const dataset of Object.keys(datasets) as Array<
+      keyof typeof datasets
+    >) {
+      loaded.push(
+        await ctx.runMutation(internal.catalog.seed.loadDataset, { dataset }),
+      );
     }
     await ctx.scheduler.runAfter(
       0,

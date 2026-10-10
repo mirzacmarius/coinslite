@@ -167,8 +167,29 @@ test("an admin edits every value of a Catalog entry; a value left out is cleared
     diameter: 21,
     yearFrom: 1999,
     yearTo: 2001,
-    technicalDetails: "Hole in the middle.",
-    historicalNotes: "Struck at Kongsberg.",
+    mint: "Royal Norwegian Mint",
+    mintMark: "none",
+    composition: "copper 75%; nickel 25%",
+    edge: "lettered" as const,
+    edgeLettering: "ALT FOR NORGE",
+    thickness: 1.7,
+    designers: "Ingrid Austlid Rise; Øivind Hansen",
+    mintage: 120000,
+    issueDate: "1999-03",
+    withdrawalDate: "2001-12-31",
+    notesLanguage: "nb",
+    technicalDetails: "Hull i midten.",
+    historicalNotes: "Preget på Kongsberg.",
+    historicalNotesEn: "Struck at Kongsberg.",
+    technicalDetailsDe: "Loch in der Mitte.",
+    notesEnSource: "CoinsLite editorial translation",
+    notesEnAuthor: "CoinsLite",
+    notesEnLicence: "CoinsLite",
+    notesEnLink: "https://coinslite.example/",
+    notesDeSource: "CoinsLite editorial translation",
+    notesDeAuthor: "CoinsLite",
+    notesDeLicence: "CoinsLite",
+    notesDeLink: "https://coinslite.example/",
     numistaId: 1234,
     factsSource: "Norges Bank",
     factsAuthor: "Norges Bank",
@@ -200,8 +221,42 @@ test("an admin edits every value of a Catalog entry; a value left out is cleared
   expect(await found(ada.as, "olav")).toEqual(["no-1-krone-1999"]);
   expect(await rootCounts(ada.as)).toEqual({ no: 1 });
 
-  // Saved again without its series and notes: those are cleared.
-  const { series, historicalNotes, technicalDetails, ...kept } = edited;
+  expect(
+    await ada.as.query(api.catalog.browse.node, {
+      key: "no-1-krone-1999",
+      language: "de",
+    }),
+  ).toMatchObject({
+    mintMark: "none",
+    composition: [
+      { metal: "copper", percent: 75 },
+      { metal: "nickel", percent: 25 },
+    ],
+    designers: ["Ingrid Austlid Rise", "Øivind Hansen"],
+    notes: {
+      technical: { text: "Loch in der Mitte.", language: "de" },
+      historical: { text: "Preget på Kongsberg.", language: "nb" },
+    },
+  });
+
+  // Saved again without its series, notes and translations: those are cleared.
+  const {
+    series,
+    historicalNotes,
+    technicalDetails,
+    notesLanguage,
+    historicalNotesEn,
+    technicalDetailsDe,
+    notesEnSource,
+    notesEnAuthor,
+    notesEnLicence,
+    notesEnLink,
+    notesDeSource,
+    notesDeAuthor,
+    notesDeLicence,
+    notesDeLink,
+    ...kept
+  } = edited;
   const { notesSource, notesAuthor, notesLicence, notesLink, ...rest } = kept;
   await admin.as.mutation(api.catalog.editor.update, {
     key: "no-1-krone-1999",
@@ -563,6 +618,43 @@ test("a save meets the same rules as an imported row, and changes nothing when i
   await expect(
     add("no-coins", "no-2", { ...coin, country: "XX" }),
   ).rejects.toThrow("INVALID_COUNTRY");
+  await expect(
+    add("no-coins", "no-2", { ...coin, composition: "copper 75%; zinc 50%" }),
+  ).rejects.toThrow("INVALID_VALUE");
+  await expect(
+    add("no-coins", "no-2", { ...coin, issueDate: "1999-02-30" }),
+  ).rejects.toThrow("INVALID_DATE");
+  await expect(
+    add("no-coins", "no-2", {
+      ...coin,
+      issueDate: "1999",
+      withdrawalDate: "1998",
+    }),
+  ).rejects.toThrow("DATES_REVERSED");
+  await expect(
+    add("no-coins", "no-2", { ...coin, itemType: "banknote", mint: "Oslo" }),
+  ).rejects.toThrow("FIELD_NOT_FOR_TYPE");
+  await expect(
+    add("no-coins", "no-2", {
+      ...coin,
+      historicalNotesFr: "Une pièce.",
+    }),
+  ).rejects.toThrow("SOURCE_REQUIRED");
+  await expect(
+    add("no-coins", "no-2", {
+      ...coin,
+      historicalNotes: "A coin.",
+      notesSource: "CoinsLite",
+      notesAuthor: "CoinsLite",
+      notesLicence: "CoinsLite",
+      notesLink: "https://coinslite.example/",
+      historicalNotesEn: "A coin, again.",
+      notesEnSource: "CoinsLite",
+      notesEnAuthor: "CoinsLite",
+      notesEnLicence: "CoinsLite",
+      notesEnLink: "https://coinslite.example/",
+    }),
+  ).rejects.toThrow("SAME_LANGUAGE");
   await expect(add("no-coins", "No 2!", coin)).rejects.toThrow("INVALID_ID");
   await expect(add("no-coins", " ", coin)).rejects.toThrow("ID_REQUIRED");
   await expect(add("no-coins", "no-coins", coin)).rejects.toThrow(

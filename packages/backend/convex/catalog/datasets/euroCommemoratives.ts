@@ -1,6 +1,14 @@
 import { formatCsvRecord } from "../csvText";
 import { catalogCsvColumns } from "../fields";
-import { euroCommemorativeCoins } from "./euroCommemorativeCoins";
+import {
+  type EuroCommemorativeCoin,
+  type EuroCommemorativeTranslation,
+  euroCommemorativeCoins,
+  euroCommemorativesIntro,
+} from "./euroCommemorativeCoins";
+import { de } from "./euroCommemorativeCoinsDe";
+import { fr } from "./euroCommemorativeCoinsFr";
+import { ro } from "./euroCommemorativeCoinsRo";
 
 /**
  * The 2-euro commemoratives Theme, as a Catalog CSV file: one node per issuing
@@ -15,6 +23,11 @@ import { euroCommemorativeCoins } from "./euroCommemorativeCoins";
  * any change must be stated. Each entry's provenance says all three. A title
  * the ECB's list leaves out comes from the coin's notice in the Official
  * Journal of the European Union, credited on that entry.
+ *
+ * The ECB publishes its list in German, French and Romanian too, so each
+ * coin's description comes in those languages, credited to that page.
+ * Issuing volumes and dates that are plain figures become facts; others
+ * ("varies from country to country", "autumn 2021") stay in the ECB's words.
  *
  * No images: the national sides' designs belong to each issuing country, and
  * the ECB's terms don't cover showing them, so entries show the placeholder.
@@ -44,6 +57,123 @@ const credit = (group: "facts" | "notes", from: Provenance) => ({
   [`${group}_licence`]: from.licence,
   [`${group}_link`]: from.link,
 });
+
+/** The app's languages besides English that the ECB publishes in, with its pages in each. */
+const translations = { de, fr, ro } as const;
+type Translation = keyof typeof translations;
+const translationLanguages = Object.keys(translations) as Translation[];
+
+/** Notes in one of those languages, credited to the ECB's page in it. */
+const translated = (
+  language: Translation,
+  notes: { technical_details?: string; historical_notes?: string },
+  link: string,
+) => {
+  const from = ecb(link);
+  return {
+    ...(notes.technical_details && {
+      [`technical_details_${language}`]: notes.technical_details,
+    }),
+    ...(notes.historical_notes && {
+      [`historical_notes_${language}`]: notes.historical_notes,
+    }),
+    [`notes_source_${language}`]: from.source,
+    [`notes_author_${language}`]: from.author,
+    [`notes_licence_${language}`]: from.licence,
+    [`notes_link_${language}`]: from.link,
+  };
+};
+
+/** How the ECB's pages label a coin's issuing volume and date, in each language. */
+const factLabels: Record<"en" | Translation, [string, string]> = {
+  en: ["Issuing volume", "Issuing date"],
+  de: ["Ausgabevolumen", "Ausgabedatum"],
+  fr: ["Volume d’émission", "Date d’émission"],
+  ro: ["Tirajul emisiunii", "Data emiterii"],
+};
+/** French sets a colon apart. */
+const colon = (language: string) => (language === "fr" ? "\u00a0: " : ": ");
+
+/** "50 million coins", "1,4 million coins", "100,000 coins" or "1 000 000 coins" as a number. */
+function mintageOf(volume: string) {
+  const match = /^(\d[\d ,.]*?)\s*(millions?)?(?: coins)?$/.exec(volume.trim());
+  if (!match) return undefined;
+  const [, figure = "", million] = match;
+  if (million) {
+    const value = Number(figure.replace(",", "."));
+    return Number.isFinite(value) ? Math.round(value * 1_000_000) : undefined;
+  }
+  const digits = figure.replace(/[ ,]/g, "");
+  return /^\d+$/.test(digits) ? Number(digits) : undefined;
+}
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+/** "March 2004" as 2004-03 and "1 July 2022" as 2022-07-01; a quarter or a season isn't a date. */
+function issueDateOf(issued: string) {
+  const match = new RegExp(
+    `^(?:(\\d{1,2}) )?(${months.join("|")}) (\\d{4})$`,
+  ).exec(issued.trim());
+  if (!match) return undefined;
+  const [, day, month = "", year] = match;
+  const mm = String(months.indexOf(month) + 1).padStart(2, "0");
+  return day ? `${year}-${mm}-${day.padStart(2, "0")}` : `${year}-${mm}`;
+}
+
+/**
+ * A coin's issuing volume and date: as facts where they are plain figures,
+ * else as the ECB words them, in English and in each language it publishes.
+ */
+function issueOf(
+  coin: EuroCommemorativeCoin,
+  pages: Partial<Record<Translation, EuroCommemorativeTranslation>>,
+) {
+  // A coin whose facts the Official Journal credits keeps the ECB's figures as words.
+  const mintage = coin.titleFrom ? undefined : mintageOf(coin.volume);
+  const issueDate = coin.titleFrom ? undefined : issueDateOf(coin.issued);
+  const words = (
+    language: "en" | Translation,
+    volume?: string,
+    issued?: string,
+  ) => {
+    const [volumeLabel, issuedLabel] = factLabels[language];
+    const line = (label: string, value?: string) =>
+      value && `${label}${colon(language)}${value.replace(/\.$/, "")}.`;
+    return [
+      mintage === undefined && line(volumeLabel, volume),
+      issueDate === undefined && line(issuedLabel, issued),
+    ]
+      .filter(Boolean)
+      .join(" ");
+  };
+  return {
+    facts: {
+      ...(mintage !== undefined && { mintage: String(mintage) }),
+      ...(issueDate !== undefined && { issue_date: issueDate }),
+    },
+    technical: {
+      en: words("en", coin.volume, coin.issued),
+      ...Object.fromEntries(
+        Object.entries(pages).map(([language, page]) => [
+          language,
+          words(language as Translation, page?.volume, page?.issued),
+        ]),
+      ),
+    } as Partial<Record<"en" | Translation, string>>,
+  };
+}
 
 const yearPage = (year: number, language: string) =>
   `${ecbPages}/comm/html/comm_${year}.${language}.html`;
@@ -108,9 +238,18 @@ const theme = {
   ...twoEuro,
   ...yearsOf(euroCommemorativeCoins),
   ...credit("facts", ecb(`${ecbPages}/common/html/index.en.html`)),
-  historical_notes:
-    "Each country that uses the euro as its official currency may issue two commemorative coins per year. These coins have the same features, properties and common side as normal €2 coins. What makes them different is the commemorative design on their national side. Only the €2 denomination can be used for commemorative coins. €2 commemorative coins are legal tender throughout the euro area. Exceptionally, a third coin may be issued, provided it is issued jointly by all euro area countries and commemorates an event of Europe-wide importance.",
+  historical_notes: euroCommemorativesIntro.en,
   ...credit("notes", ecb(`${ecbPages}/comm/html/index.en.html`)),
+  ...Object.assign(
+    {},
+    ...translationLanguages.map((language) =>
+      translated(
+        language,
+        { historical_notes: euroCommemorativesIntro[language] },
+        `${ecbPages}/comm/html/index.${language}.html`,
+      ),
+    ),
+  ),
 };
 
 const rows: Array<Record<string, string>> = [
@@ -133,26 +272,49 @@ const rows: Array<Record<string, string>> = [
         ...yearsOf(coins),
         ...credit("facts", ecb(`${ecbPages}/comm/html/index.en.html`)),
       },
-      ...coins.map((coin, index) => ({
-        id: coin.key,
-        parent_id: countryKey(country),
-        title: coin.title,
-        country,
-        year_from: String(coin.year),
-        year_to: String(coin.year),
-        sort_order: String(index + 1),
-        is_addable: "true",
-        ...twoEuro,
-        ...credit(
-          "facts",
-          coin.titleFrom
-            ? officialJournal(coin.titleFrom.notice, coin.titleFrom.link)
-            : ecb(yearPage(coin.year, coin.language)),
-        ),
-        technical_details: `Issuing volume: ${coin.volume}. Issuing date: ${coin.issued}.`,
-        historical_notes: coin.description,
-        ...credit("notes", ecb(yearPage(coin.year, "en"))),
-      })),
+      ...coins.map((coin, index) => {
+        const pages = Object.fromEntries(
+          translationLanguages.flatMap((language) => {
+            const page = translations[language][coin.key];
+            return page ? [[language, page]] : [];
+          }),
+        ) as Partial<Record<Translation, EuroCommemorativeTranslation>>;
+        const issue = issueOf(coin, pages);
+        return {
+          id: coin.key,
+          parent_id: countryKey(country),
+          title: coin.title,
+          country,
+          year_from: String(coin.year),
+          year_to: String(coin.year),
+          sort_order: String(index + 1),
+          is_addable: "true",
+          ...twoEuro,
+          ...credit(
+            "facts",
+            coin.titleFrom
+              ? officialJournal(coin.titleFrom.notice, coin.titleFrom.link)
+              : ecb(yearPage(coin.year, coin.language)),
+          ),
+          ...issue.facts,
+          technical_details: issue.technical.en ?? "",
+          historical_notes: coin.description,
+          ...credit("notes", ecb(yearPage(coin.year, "en"))),
+          ...Object.assign(
+            {},
+            ...Object.entries(pages).map(([language, page]) =>
+              translated(
+                language as Translation,
+                {
+                  technical_details: issue.technical[language as Translation],
+                  historical_notes: page?.description,
+                },
+                yearPage(coin.year, language),
+              ),
+            ),
+          ),
+        };
+      }),
     ];
   }),
 ];

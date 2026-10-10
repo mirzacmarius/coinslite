@@ -31,6 +31,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Language choice:** the user's stored choice, else the browser language, else English. It can be switched from anywhere in the app.
 - **Translated:** UI text, country names, Item types, metals, Grading scale labels, Strike labels.
 - **Kept in the issuing country's language:** Catalog entry titles and series names.
+- **Catalog notes** (technical details, historical notes) show in the reader's language where translated, otherwise in the language of their source, marked with that language.
 - **Numbers and dates:** formatted for the active language.
 - **Countries are stored as ISO codes** and shown translated.
 
@@ -132,7 +133,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Item type, title, country, denomination, series, material, Strike
   - metal, weight, fineness, diameter
   - year from and year to
-  - technical details, historical notes
+  - technical facts: mint, mint mark (or none), composition, edge and its lettering, thickness, a banknote's width and height, designers, mintage, issue date, and the date it stopped being legal tender
+  - technical details, historical notes: in the language of their source, plus translations into the app's languages, each translation credited on its own
   - an image
   - a sort order
 - **Every Catalog image and note records** its source, author, licence and link. Attribution is shown wherever the licence requires it.
@@ -169,7 +171,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Search:** across all nodes.
 - **Each row shows:** image, title, key facts or child count, country (when it differs from the user's), and how many the user holds.
 - **Entry detail:**
-  - Image (with attribution), country, denomination, years, series, Strike, material, metal facts, historical notes and technical details.
+  - Image (with attribution), country, denomination, years, series, Strike, material, metal facts, technical facts, historical notes and technical details.
   - How many the user holds.
   - **Quick add:** choose a Quantity and a Grade, then create **one** Item with that Quantity. It respects the Free plan limit and lets the user pick an Album.
 - **Admins** can edit an entry directly from its detail view.
@@ -303,6 +305,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - **Images** are converted to WebP: full size (longest side ≤ 800 px) and a thumbnail (≤ 128 px), never upscaled.
 - **Catalog CSV export/import:**
   - **Columns:** `id, parent_id, item_type, title, country, denomination, series, material, strike, metal, weight_g, fineness, diameter_mm, year_from, year_to, technical_details, historical_notes, image_url, image_source, image_author, image_licence, sort_order, is_addable`.
+  - **Further columns**, all optional: `numista_id`, `image_link`, the source, author, licence and link of the facts and notes (`facts_source` … `notes_link`), the technical facts (`mint, mint_mark, composition, edge, edge_lettering, thickness_mm, width_mm, height_mm, designers, mintage, issue_date, withdrawal_date`), `notes_language` (English when empty), and per app language `technical_details_<lang>, historical_notes_<lang>` with `notes_source_<lang>, notes_author_<lang>, notes_licence_<lang>, notes_link_<lang>`. A file without a column leaves that value as it is.
   - **Import:**
     - Shows how many rows will be inserted or updated before confirming.
     - Updates existing ids, inserts new ones, and allows parent references to other rows in the same file.

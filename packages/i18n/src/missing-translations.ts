@@ -77,6 +77,7 @@ const ownWords: Record<Exclude<Locale, "en">, string[]> = {
     "Circulation",
     "Code",
     "Collection",
+    "Composition",
     "Cupronickel",
     "Description",
     "Export",

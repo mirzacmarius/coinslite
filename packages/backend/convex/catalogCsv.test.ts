@@ -620,18 +620,271 @@ test("quoted cells may hold commas, quotes and line breaks, and come back the sa
   ).toMatchObject({ applied: true, unchanged: 1 });
 });
 
+test("technical facts are columns of their own, read loosely and exported the same way every time", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const file = csvOf([
+    us,
+    entry("us-morgan-1878-cc", {
+      mint: " Carson City ",
+      mint_mark: "CC",
+      composition: "Silver 90 %; copper 10",
+      edge: "Reeded",
+      thickness_mm: "2.4",
+      designers: "George T. Morgan",
+      mintage: "2212000",
+      issue_date: "1878-04",
+      withdrawal_date: "",
+      facts_source: "United States Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    entry("us-morgan-1878", {
+      mint: "Philadelphia",
+      mint_mark: "NONE",
+      edge: "lettered",
+      edge_lettering: "E PLURIBUS UNUM",
+      designers: "George T. Morgan;  William Barber ",
+      issue_date: "1878-03-11",
+      withdrawal_date: "1878",
+      facts_source: "United States Mint",
+      ...creditBesidesSource("facts"),
+    }),
+    {
+      id: "us-note-1",
+      parent_id: "us",
+      item_type: "banknote",
+      title: "One dollar note",
+      is_addable: "true",
+      width_mm: "156",
+      height_mm: "66.3",
+      mintage: "0",
+      facts_source: "Bureau of Engraving and Printing",
+      ...creditBesidesSource("facts"),
+    },
+  ]);
+
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, { csv: file }),
+  ).toMatchObject({ applied: true, inserts: 4, errorCount: 0 });
+  const nodes = records(await exportAll(admin.as));
+  expect(nodes.find((node) => node.id === "us-morgan-1878-cc")).toMatchObject({
+    mint: "Carson City",
+    mint_mark: "CC",
+    composition: "silver 90%; copper 10%",
+    edge: "reeded",
+    edge_lettering: "",
+    thickness_mm: "2.4",
+    designers: "George T. Morgan",
+    mintage: "2212000",
+    issue_date: "1878-04",
+    withdrawal_date: "",
+  });
+  expect(nodes.find((node) => node.id === "us-morgan-1878")).toMatchObject({
+    mint_mark: "none",
+    edge: "lettered",
+    edge_lettering: "E PLURIBUS UNUM",
+    designers: "George T. Morgan; William Barber",
+    issue_date: "1878-03-11",
+    withdrawal_date: "1878",
+  });
+  expect(nodes.find((node) => node.id === "us-note-1")).toMatchObject({
+    width_mm: "156",
+    height_mm: "66.3",
+    mintage: "0",
+  });
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: await exportAll(admin.as),
+    }),
+  ).toMatchObject({ applied: true, updates: 0, unchanged: 4 });
+});
+
+test("technical facts are checked against what their columns hold, and coins' own facts stay off banknotes", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const credited = {
+    facts_source: "Mint",
+    ...creditBesidesSource("facts"),
+  };
+  const file = csvOf([
+    us,
+    entry("a", { composition: "silver", ...credited }),
+    entry("b", { composition: "unobtainium 50%", ...credited }),
+    entry("c", { composition: "silver 90%; copper 20%", ...credited }),
+    entry("d", { composition: "silver 90%; silver 10%", ...credited }),
+    entry("e", { edge: "wavy", ...credited }),
+    entry("f", { mintage: "1.5", ...credited }),
+    entry("g", { issue_date: "1878-13", ...credited }),
+    entry("h", { withdrawal_date: "11 March 1878", ...credited }),
+    entry("i", {
+      issue_date: "1904",
+      withdrawal_date: "1903-12-31",
+      ...credited,
+    }),
+    entry("j", { thickness_mm: "0", ...credited }),
+    entry("k", { designers: "A;;B", ...credited }),
+    entry("l", { item_type: "banknote", mint_mark: "S", ...credited }),
+    entry("m", { item_type: "banknote", edge: "plain", ...credited }),
+    entry("n", { mint: "Philadelphia", ...creditBesidesSource("facts") }),
+    entry("o", { issue_date: "1878-02-30", ...credited }),
+  ]);
+
+  expect(
+    (await admin.as.query(api.catalog.csv.preview, { csv: file })).errors,
+  ).toEqual([
+    { row: 3, column: "composition", code: "INVALID_VALUE" },
+    { row: 4, column: "composition", code: "INVALID_VALUE" },
+    { row: 5, column: "composition", code: "INVALID_VALUE" },
+    { row: 6, column: "composition", code: "INVALID_VALUE" },
+    { row: 7, column: "edge", code: "INVALID_VALUE" },
+    { row: 8, column: "mintage", code: "INVALID_NUMBER" },
+    { row: 9, column: "issue_date", code: "INVALID_DATE" },
+    { row: 10, column: "withdrawal_date", code: "INVALID_DATE" },
+    { row: 11, column: "withdrawal_date", code: "DATES_REVERSED" },
+    { row: 12, column: "thickness_mm", code: "INVALID_NUMBER" },
+    { row: 13, column: "designers", code: "INVALID_VALUE" },
+    { row: 14, column: "mint_mark", code: "FIELD_NOT_FOR_TYPE" },
+    { row: 15, column: "edge", code: "FIELD_NOT_FOR_TYPE" },
+    { row: 16, column: "facts_source", code: "SOURCE_REQUIRED" },
+    { row: 17, column: "issue_date", code: "INVALID_DATE" },
+  ]);
+});
+
+/** A translation's credit in one language, besides its source. */
+const translationCredit = (language: string) => ({
+  [`notes_author_${language}`]: "CoinsLite",
+  [`notes_licence_${language}`]: "CoinsLite",
+  [`notes_link_${language}`]: "https://example.org/notes",
+});
+
+test("notes come in the language of their source and in translations, each with its own credit", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const file = csvOf([
+    {
+      ...us,
+      notes_language: "EN",
+      historical_notes: "The dollar of 1792.",
+      notes_source: "CoinsLite editorial",
+      ...creditBesidesSource("notes"),
+      historical_notes_de: "Der Dollar von 1792.",
+      notes_source_de: "CoinsLite editorial translation",
+      ...translationCredit("de"),
+      technical_details_nb: "Preget i sølv.",
+      historical_notes_nb: "Dollaren fra 1792.",
+      notes_source_nb: "CoinsLite editorial translation",
+      ...translationCredit("nb"),
+    },
+  ]);
+
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, { csv: file }),
+  ).toMatchObject({ applied: true, inserts: 1, errorCount: 0 });
+  const [root] = records(await exportAll(admin.as));
+  expect(root).toMatchObject({
+    notes_language: "en",
+    historical_notes: "The dollar of 1792.",
+    historical_notes_de: "Der Dollar von 1792.",
+    technical_details_de: "",
+    notes_source_de: "CoinsLite editorial translation",
+    notes_author_de: "CoinsLite",
+    notes_licence_de: "CoinsLite",
+    notes_link_de: "https://example.org/notes",
+    technical_details_nb: "Preget i sølv.",
+    historical_notes_nb: "Dollaren fra 1792.",
+    historical_notes_fr: "",
+    notes_source_fr: "",
+  });
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: await exportAll(admin.as),
+    }),
+  ).toMatchObject({ applied: true, unchanged: 1 });
+
+  // A file without the translation columns keeps the translations.
+  expect(
+    await admin.as.mutation(api.catalog.csv.importFile, {
+      csv: "id,title,historical_notes\nus,United States,The dollar of 1792.",
+    }),
+  ).toMatchObject({ applied: true, unchanged: 1 });
+});
+
+test("each translation is credited in full, can't come from Numista, and isn't in the notes' own language", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const source = {
+    historical_notes: "The dollar.",
+    notes_source: "CoinsLite editorial",
+    ...creditBesidesSource("notes"),
+  };
+  const file = csvOf([
+    us,
+    entry("a", { ...source, historical_notes_fr: "Le dollar." }),
+    entry("b", {
+      ...source,
+      historical_notes_fr: "Le dollar.",
+      notes_source_fr: "CoinsLite editorial translation",
+    }),
+    entry("c", {
+      ...source,
+      technical_details_ro: "Argint.",
+      notes_source_ro: "CoinsLite editorial translation",
+      ...translationCredit("ro"),
+      notes_link_ro: "https://en.numista.com/catalogue/pieces1.html",
+    }),
+    entry("d", {
+      ...source,
+      historical_notes_en: "The dollar again.",
+      notes_source_en: "CoinsLite editorial",
+      ...translationCredit("en"),
+    }),
+    entry("e", {
+      ...source,
+      notes_language: "nb",
+      historical_notes_nb: "Dollaren.",
+      notes_source_nb: "CoinsLite editorial",
+      ...translationCredit("nb"),
+    }),
+    entry("f", { ...source, notes_language: "English" }),
+    entry("g", {
+      ...source,
+      notes_language: "de",
+      historical_notes_en: "The dollar in English.",
+      notes_source_en: "CoinsLite editorial translation",
+      ...translationCredit("en"),
+    }),
+  ]);
+
+  expect(
+    (await admin.as.query(api.catalog.csv.preview, { csv: file })).errors,
+  ).toEqual([
+    { row: 3, column: "notes_source_fr", code: "SOURCE_REQUIRED" },
+    { row: 3, column: "notes_author_fr", code: "CREDIT_REQUIRED" },
+    { row: 3, column: "notes_licence_fr", code: "CREDIT_REQUIRED" },
+    { row: 3, column: "notes_link_fr", code: "CREDIT_REQUIRED" },
+    { row: 4, column: "notes_author_fr", code: "CREDIT_REQUIRED" },
+    { row: 4, column: "notes_licence_fr", code: "CREDIT_REQUIRED" },
+    { row: 4, column: "notes_link_fr", code: "CREDIT_REQUIRED" },
+    { row: 5, column: "notes_link_ro", code: "NUMISTA_DATA" },
+    // English is the notes' language unless the file says otherwise.
+    { row: 6, column: "historical_notes_en", code: "SAME_LANGUAGE" },
+    { row: 7, column: "historical_notes_nb", code: "SAME_LANGUAGE" },
+    { row: 8, column: "notes_language", code: "INVALID_VALUE" },
+  ]);
+});
+
 test("the bundled US Morgan and Peace dollars load once, with their sources, and loading again changes nothing", async () => {
   const t = newTest();
   const admin = await person(t, "admin@example.com", { admin: true });
 
   // 1 country, 2 series, 96 Morgan and 24 Peace dollar dates and mints.
-  expect(await t.mutation(internal.catalog.seed.load, {})).toContainEqual({
+  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
     dataset: "usSilverDollars",
     inserts: 123,
     updates: 0,
     unchanged: 0,
   });
-  expect(await t.mutation(internal.catalog.seed.load, {})).toContainEqual({
+  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
     dataset: "usSilverDollars",
     inserts: 0,
     updates: 0,
@@ -678,6 +931,98 @@ test("the bundled US Morgan and Peace dollars load once, with their sources, and
   }
 });
 
+test("the US silver dollars' technical facts are structured, and their notes come translated by CoinsLite", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  await t.action(internal.catalog.seed.load, {});
+  const nodes = records(await exportAll(admin.as));
+  const node = (id: string) => nodes.find((each) => each.id === id);
+
+  const coinFacts = {
+    composition: "silver 90%; copper 10%",
+    edge: "reeded",
+    designers: "George T. Morgan",
+  };
+  expect(node("us-morgan-dollar-1893-cc")).toMatchObject({
+    ...coinFacts,
+    mint: "Carson City",
+    mint_mark: "CC",
+    technical_details: "",
+  });
+  expect(node("us-morgan-dollar-1893")).toMatchObject({
+    mint: "Philadelphia",
+    mint_mark: "none",
+  });
+  expect(node("us-peace-dollar-1934-d")).toMatchObject({
+    designers: "Anthony de Francisci",
+    mint: "Denver",
+    mint_mark: "D",
+  });
+  // Only what isn't a fact stays as words, in English and in every other language.
+  for (const id of ["us-morgan-dollar-1895", "us-peace-dollar-1921"]) {
+    const entry = node(id) ?? {};
+    expect(entry.technical_details).not.toBe("");
+    for (const language of ["nb", "de", "fr", "ro"]) {
+      expect(entry[`technical_details_${language}`]).not.toBe("");
+      expect(entry[`notes_source_${language}`]).toBe(
+        "CoinsLite editorial translation",
+      );
+      expect(entry[`notes_author_${language}`]).toBe("CoinsLite");
+    }
+  }
+  for (const id of ["us-morgan-dollar", "us-peace-dollar"]) {
+    const series = node(id) ?? {};
+    expect(series.technical_details).toBe("");
+    for (const language of ["nb", "de", "fr", "ro"])
+      expect(series[`historical_notes_${language}`]).not.toBe("");
+  }
+  expect(node("us-peace-dollar-1921")?.technical_details_de).toBe(
+    "In Hochrelief geprägt, ab 1922 flacher.",
+  );
+});
+
+test("loading the bundled datasets again brings Catalog data stored in the earlier shape to the current one", async () => {
+  const t = newTest();
+  await t.action(internal.catalog.seed.load, {});
+  // As production stored it before facts had fields of their own.
+  await t.run(async (ctx) => {
+    const node = await ctx.db
+      .query("catalogNodes")
+      .withIndex("by_key", (q) => q.eq("key", "us-morgan-dollar-1893-cc"))
+      .unique();
+    if (!node) throw new Error("No Morgan dollar 1893-CC");
+    const {
+      _id,
+      _creationTime,
+      mint,
+      mintMark,
+      composition,
+      edge,
+      designers,
+      ...earlier
+    } = node;
+    await ctx.db.replace("catalogNodes", _id, {
+      ...earlier,
+      technicalDetails: "Mint: Carson City.",
+    });
+  });
+
+  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
+    dataset: "usSilverDollars",
+    inserts: 0,
+    updates: 1,
+    unchanged: 122,
+  });
+  const node = await t.run((ctx) =>
+    ctx.db
+      .query("catalogNodes")
+      .withIndex("by_key", (q) => q.eq("key", "us-morgan-dollar-1893-cc"))
+      .unique(),
+  );
+  expect(node).toMatchObject({ mint: "Carson City", mintMark: "CC" });
+  expect(node?.technicalDetails).toBeUndefined();
+});
+
 test("every preview build loads the bundled Catalog through the function it names, bringing search words up to date", async () => {
   // The build runs `convex run <function>` on the branch's preview deployment:
   // by name, with no args.
@@ -690,8 +1035,8 @@ test("every preview build loads the bundled Catalog through the function it name
   expect(functionName).toBe("catalog/seed:load");
 
   const t = newTest();
-  const seed = makeFunctionReference<"mutation">(functionName ?? "");
-  expect(await t.mutation(seed, {})).toEqual([
+  const seed = makeFunctionReference<"action">(functionName ?? "");
+  expect(await t.action(seed, {})).toEqual([
     { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
     { dataset: "euroCommemoratives", inserts: 609, updates: 0, unchanged: 0 },
     { dataset: "norway", inserts: 246, updates: 0, unchanged: 0 },
@@ -709,7 +1054,7 @@ test("every preview build loads the bundled Catalog through the function it name
   expect((await search()).groups).toEqual([]);
 
   // ...until its next build loads the Catalog again.
-  expect(await t.mutation(seed, {})).toEqual([
+  expect(await t.action(seed, {})).toEqual([
     { dataset: "usSilverDollars", inserts: 0, updates: 0, unchanged: 123 },
     { dataset: "euroCommemoratives", inserts: 0, updates: 0, unchanged: 609 },
     { dataset: "norway", inserts: 0, updates: 0, unchanged: 246 },
