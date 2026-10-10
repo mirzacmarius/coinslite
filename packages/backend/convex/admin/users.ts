@@ -85,14 +85,20 @@ const decodePlanEndCursor = (cursor: string | null): PlanEndCursor => {
   ) as PlanEndCursor;
 };
 
-/** Plan ends are ordered before people without an end date, in either direction. */
+/**
+ * Plan ends are ordered before people without an end date, in either
+ * direction. The cursors are this function's own, so its pages offer the
+ * client no split cursor (a split would send an inner cursor back) and ignore
+ * an end cursor.
+ */
 async function planEndPage(
   ctx: QueryCtx,
   plan: PlanFilter,
   order: SortOrder,
-  paginationOpts: { cursor: string | null; numItems: number },
+  { numItems, cursor }: { cursor: string | null; numItems: number },
 ) {
-  const state = decodePlanEndCursor(paginationOpts.cursor);
+  const state = decodePlanEndCursor(cursor);
+  const options = { numItems, cursor: state.cursor };
   const userTable = ctx.db.query("users");
   const ended =
     plan === "all"
@@ -110,28 +116,28 @@ async function planEndPage(
         );
 
   if (state.phase === "noEnd") {
-    const page = await noEnd.order(order).paginate({
-      ...paginationOpts,
-      cursor: state.cursor,
-    });
+    const { page, isDone, continueCursor } = await noEnd
+      .order(order)
+      .paginate(options);
     return {
-      ...page,
-      continueCursor: page.isDone
-        ? page.continueCursor
-        : encodePlanEndCursor({ phase: "noEnd", cursor: page.continueCursor }),
+      page,
+      isDone,
+      continueCursor: isDone
+        ? continueCursor
+        : encodePlanEndCursor({ phase: "noEnd", cursor: continueCursor }),
     };
   }
 
-  const first = await ended.order(order).paginate({
-    ...paginationOpts,
-    cursor: state.cursor,
-  });
-  if (!first.isDone) {
+  const { page, isDone, continueCursor } = await ended
+    .order(order)
+    .paginate(options);
+  if (!isDone) {
     return {
-      ...first,
+      page,
+      isDone,
       continueCursor: encodePlanEndCursor({
         phase: "ended",
-        cursor: first.continueCursor,
+        cursor: continueCursor,
       }),
     };
   }
@@ -140,11 +146,11 @@ async function planEndPage(
   // so this page can be shorter when the dated users run out.
   const hasMore = (await noEnd.order(order).take(1)).length > 0;
   return {
-    page: first.page,
+    page,
     isDone: !hasMore,
     continueCursor: hasMore
       ? encodePlanEndCursor({ phase: "noEnd", cursor: null })
-      : first.continueCursor,
+      : continueCursor,
   };
 }
 

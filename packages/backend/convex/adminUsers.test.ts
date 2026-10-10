@@ -390,6 +390,53 @@ test("the list narrows to one plan and sorts by plan and plan end", async () => 
   ]);
 });
 
+test("sorted by plan end, pages can't be split, and an end cursor from a split is ignored", async () => {
+  const t = newTest();
+  const { ada } = await subscribers(t);
+  const list = { sort: "planEnd", order: "asc", plan: "all" } as const;
+  const everyone = [
+    "cy@example.com",
+    "bob@example.com",
+    "ada@example.com",
+    "dan@example.com",
+  ];
+
+  // Pages that read more than they may: the client splits a page it's given
+  // a split cursor for, sending back cursors these pages don't use.
+  const emails: (string | null)[] = [];
+  let cursor: string | null = null;
+  for (;;) {
+    const result: {
+      page: { email: string | null }[];
+      isDone: boolean;
+      continueCursor: string;
+      splitCursor?: string | null;
+    } = await ada.as.query(api.admin.users.list, {
+      ...list,
+      paginationOpts: { numItems: 50, cursor, maximumRowsRead: 2 },
+    });
+    expect(result.splitCursor ?? null).toBeNull();
+    emails.push(...result.page.map((user) => user.email));
+    if (result.isDone) break;
+    cursor = result.continueCursor;
+  }
+  expect(emails).toEqual(everyone);
+
+  const first = await ada.as.query(api.admin.users.list, {
+    ...list,
+    paginationOpts: { numItems: 2, cursor: null },
+  });
+  const again = await ada.as.query(api.admin.users.list, {
+    ...list,
+    paginationOpts: {
+      numItems: 2,
+      cursor: null,
+      endCursor: first.continueCursor,
+    },
+  });
+  expect(again.page).toEqual(first.page);
+});
+
 test("every sort, either way, lists everyone on the chosen plan once", async () => {
   const t = newTest();
   const { ada } = await subscribers(t);
