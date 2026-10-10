@@ -3,6 +3,7 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Limbă",
+    saveFailed: "Ceva nu a mers, așa că nu s-a salvat nimic. Încearcă din nou.",
     appDescription:
       "Înregistrează monedele, bancnotele și timbrele pe care le deții.",
   },

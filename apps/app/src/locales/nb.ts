@@ -3,6 +3,7 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Språk",
+    saveFailed: "Noe gikk galt, så ingenting ble lagret. Prøv igjen.",
     appDescription: "Registrer myntene, sedlene og frimerkene du eier.",
   },
   nav: {

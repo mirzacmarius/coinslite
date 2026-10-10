@@ -201,7 +201,7 @@ function ContactSection({ account }: { account: Account }) {
         className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
-          void submitForm(form);
+          void submitForm(form, t("common.saveFailed"));
         }}
       >
         {text("displayName", t("account.contact.displayName"), {
@@ -361,7 +361,7 @@ function EmailSection({ account }: { account: Account }) {
         className="flex flex-col gap-3 sm:flex-row sm:items-start"
         onSubmit={(event) => {
           event.preventDefault();
-          void submitForm(form);
+          void submitForm(form, t("common.saveFailed"));
         }}
       >
         <form.Field
