@@ -21,6 +21,16 @@ test("a language the app doesn't have is dropped from the address", () => {
   });
 });
 
+test("a link can't send the visitor to another site", () => {
+  expect(link("https://app.example//evil.example/x?lang=de")).toEqual({
+    locale: "de",
+    path: "/",
+  });
+  expect(link("https://app.example/%09/evil.example?lang=de")?.path).toBe(
+    "/%09/evil.example",
+  );
+});
+
 test("a link without a language is left alone", () => {
   expect(link("https://app.example/signup")).toBeNull();
   expect(link("https://app.example/collection?q=krone")).toBeNull();

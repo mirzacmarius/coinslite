@@ -1,12 +1,13 @@
 import { type Locale, isLocale } from "@coinslite/i18n";
+import { safeNextPath } from "./next-path";
 
 /** The parameter the marketing site adds to its links: /signup?lang=de. */
 export const LANGUAGE_PARAMETER = "lang";
 
 /**
  * A link that names the language to open the app in, as the marketing site's
- * do: the language (if the app has it) and the path and query without it.
- * Null for any other link.
+ * do: the language (if the app has it) and the path and query without it, on
+ * this site only ("//evil.example" would leave it). Null for any other link.
  */
 export function languageFromLink(
   url: URL,
@@ -18,6 +19,6 @@ export function languageFromLink(
   const search = query.size > 0 ? `?${query}` : "";
   return {
     locale: isLocale(value) ? value : undefined,
-    path: url.pathname + search,
+    path: safeNextPath(url.pathname + search),
   };
 }
