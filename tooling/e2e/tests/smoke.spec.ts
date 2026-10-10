@@ -4,9 +4,13 @@ import { appUrl, webUrl } from "../urls";
 test("the marketing site loads", async ({ page }) => {
   await page.goto(webUrl);
 
-  await expect(page).toHaveTitle("CoinsLite");
+  await expect(page).toHaveURL(`${webUrl}/en`);
+  await expect(page).toHaveTitle(/^CoinsLite/);
   await expect(
-    page.getByRole("heading", { level: 1, name: "CoinsLite" }),
+    page.getByRole("heading", {
+      level: 1,
+      name: "Your Collection, recorded properly and valued in your currency",
+    }),
   ).toBeVisible();
 });
 
