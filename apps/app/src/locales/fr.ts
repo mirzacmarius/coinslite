@@ -123,7 +123,11 @@ export default {
     noGrade: "Aucun état",
     gradingScale: "Échelle de notation",
     gradeNote: "Note sur l’état",
-    gradeNotePlaceholder: "p. ex. légère patine, choc sur la tranche",
+    gradeNotePlaceholder: {
+      coin: "p. ex. légère patine, choc sur la tranche",
+      banknote: "p. ex. léger pli, trou d’épingle",
+      stamp: "p. ex. dent courte, aminci",
+    },
     strike: "Frappe",
     setStrike: "Choisir la frappe",
     noStrike: "Aucune frappe",

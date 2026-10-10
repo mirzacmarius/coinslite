@@ -123,7 +123,11 @@ export default {
     noGrade: "Keine Erhaltung",
     gradingScale: "Bewertungsskala",
     gradeNote: "Notiz zur Erhaltung",
-    gradeNotePlaceholder: "z. B. leichte Patina, Randfehler",
+    gradeNotePlaceholder: {
+      coin: "z. B. leichte Patina, Randfehler",
+      banknote: "z. B. leichter Knick, Nadelloch",
+      stamp: "z. B. kurzer Zahn, dünne Stelle",
+    },
     strike: "Prägung",
     setStrike: "Prägung wählen",
     noStrike: "Keine Prägung",

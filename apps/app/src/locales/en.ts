@@ -116,7 +116,11 @@ export default {
     noGrade: "No grade",
     gradingScale: "Grading scale",
     gradeNote: "Grade note",
-    gradeNotePlaceholder: "e.g. light toning, rim nick",
+    gradeNotePlaceholder: {
+      coin: "e.g. light toning, rim nick",
+      banknote: "e.g. light fold, pinhole",
+      stamp: "e.g. short perforation, thin",
+    },
     strike: "Strike",
     setStrike: "Set strike",
     noStrike: "No strike",
