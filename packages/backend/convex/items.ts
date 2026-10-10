@@ -10,10 +10,15 @@ import {
   mutation,
   query,
 } from "./_generated/server";
-import { moveBetweenAlbums, ownAlbumId } from "./albums/membership";
+import {
+  moveBetweenAlbums,
+  moveManyBetweenAlbums,
+  ownAlbumId,
+} from "./albums/membership";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
+import { bulkErrors, bulkLimits } from "./items/bulkRules";
 import { overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
 import {
@@ -301,6 +306,41 @@ export const update = mutation({
     });
     await moveBetweenAlbums(ctx, item.albumId, album);
     await countItemRetyped(ctx, item.ownerId, item.type, checked.type);
+    return null;
+  },
+});
+
+/**
+ * Moves several of the signed-in person's Items into one of their Albums, or
+ * out of any Album. Every Item is checked before anything is written, so the
+ * move happens to all of them or to none.
+ */
+export const moveToAlbum = mutation({
+  args: {
+    itemIds: v.array(v.id("items")),
+    albumId: v.optional(v.id("albums")),
+  },
+  returns: v.null(),
+  handler: async (ctx, { itemIds, albumId }) => {
+    const owner = await requireSetUpUser(ctx);
+    const ids = [...new Set(itemIds)];
+    if (ids.length > bulkLimits.items)
+      throw new ConvexError(bulkErrors.tooManyItems);
+    const album = await ownAlbumId(ctx, owner._id, albumId);
+    const items = await Promise.all(
+      ids.map(async (id) => {
+        const item = await ctx.db.get(id);
+        if (!item || item.ownerId !== owner._id)
+          throw new ConvexError(itemNotFound);
+        return item;
+      }),
+    );
+    const moving = items.filter((item) => item.albumId !== album);
+    for (const item of moving) await ctx.db.patch(item._id, { albumId: album });
+    await moveManyBetweenAlbums(
+      ctx,
+      moving.map((item) => ({ from: item.albumId, to: album })),
+    );
     return null;
   },
 });

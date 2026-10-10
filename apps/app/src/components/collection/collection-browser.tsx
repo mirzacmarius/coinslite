@@ -9,7 +9,7 @@ import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
-import { Coins } from "lucide-react";
+import { Coins, ListChecks } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   CollectionResults,
@@ -22,7 +22,9 @@ import { DisplayMenu } from "./display-menu";
 import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
 import { type BrowseResult, useFilters } from "./filter-options";
+import { MoveToAlbumBar } from "./move-to-album-bar";
 import { useCollectionDisplay } from "./use-collection-display";
+import { useItemSelection } from "./use-item-selection";
 
 /**
  * The latest result, kept on screen while the next one loads, so changing
@@ -53,6 +55,35 @@ export function CollectionBrowser() {
   const filters = useFilters(result, view);
   const [filterOpen, setFilterOpen] = useState(false);
   const search = useRef<HTMLInputElement>(null);
+  const selection = useItemSelection();
+  const { selecting, stop: stopSelecting, add: selectItems } = selection;
+  const pageItems = result?.items;
+
+  // In select mode, Esc leaves it and Cmd/Ctrl+A selects the page.
+  useEffect(() => {
+    if (!selecting) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        isTyping(event.target) ||
+        document.querySelector('[role=dialog][data-state="open"]') ||
+        document.querySelector('[role=menu][data-state="open"]')
+      )
+        return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        stopSelecting();
+      } else if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "a" &&
+        pageItems
+      ) {
+        event.preventDefault();
+        selectItems(pageItems);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selecting, stopSelecting, selectItems, pageItems]);
 
   // "/" finds, "F" filters, unless someone is typing or a dialog is open.
   useEffect(() => {
@@ -142,6 +173,16 @@ export function CollectionBrowser() {
             count={result.total}
             complete={result.complete}
           />
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            aria-pressed={selecting}
+            onClick={selecting ? stopSelecting : selection.start}
+          >
+            <ListChecks strokeWidth={1.75} aria-hidden="true" />
+            {selecting ? t("collection.done") : t("collection.select")}
+          </Button>
         </div>
       </div>
       <FilterChips filters={filters} onChange={update} onClearAll={clearAll} />
@@ -174,7 +215,11 @@ export function CollectionBrowser() {
           </div>
         ) : (
           <>
-            <CollectionResults result={result} layout={display.layout} />
+            <CollectionResults
+              result={result}
+              layout={display.layout}
+              selection={selecting ? selection : undefined}
+            />
             <Pagination
               result={result}
               pageSize={display.pageSize}
@@ -186,6 +231,9 @@ export function CollectionBrowser() {
           </>
         )}
       </div>
+      {selecting && (
+        <MoveToAlbumBar selection={selection} result={result} view={view} />
+      )}
     </>
   );
 }

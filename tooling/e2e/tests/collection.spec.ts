@@ -175,3 +175,78 @@ test("a Premium member exports the Collection view as a PDF and as a CSV", async
   expect(csvText).toContain("Krone 1875");
   expect(csvText).not.toContain("Posthorn");
 });
+
+/** Creates an Album from the Albums page. */
+async function createAlbum(page: Page, name: string) {
+  await page.goto(`${appUrl}/albums`);
+  await visiblePage(page)
+    .getByRole("button", { name: "New Album" })
+    .first()
+    .click();
+  const form = page.getByRole("dialog", { name: "New Album" });
+  await form.getByLabel("Name").fill(name);
+  await form.getByRole("button", { name: /^Create Album/ }).click();
+  await expect(form).toBeHidden();
+}
+
+for (const width of [1280, 375]) {
+  test(`select Items and move them into an Album, at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await signUpAndVerify(page, newEmail());
+    await createAlbum(page, "Silver");
+    await createAlbum(page, "Gold");
+    await page.goto(`${appUrl}/collection`);
+    const main = visiblePage(page);
+    await addItem(page, main, "Krone 1875", "Coin");
+    await addItem(page, main, "Krone 1876", "Coin");
+    await addItem(page, main, "Posthorn", "Stamp");
+
+    await main.getByRole("button", { name: "Select", exact: true }).click();
+    const bar = page.getByRole("region", { name: "Selected Items" });
+    await expect(bar).toContainText("Select Items to move them to an Album.");
+    await main.getByRole("checkbox", { name: "Krone 1875" }).click();
+    await main.getByRole("checkbox", { name: "Krone 1876" }).click();
+    await expect(bar).toContainText("2 selected");
+
+    await bar.getByRole("button", { name: /^Album/ }).click();
+    await page.getByRole("option", { name: /Silver/ }).click();
+    await bar.getByRole("button", { name: "Move to Silver" }).click();
+    await expect(page.getByText("Moved to Silver")).toBeVisible();
+    await expect(bar).toBeHidden();
+
+    // The Album lists them; the stamp stays out.
+    await page.goto(`${appUrl}/albums`);
+    await main.getByRole("link", { name: /Silver/ }).click();
+    await expect(main.getByRole("link", { name: /Krone 1875/ })).toBeVisible();
+    await expect(main.getByRole("link", { name: /Krone 1876/ })).toBeVisible();
+    await expect(main.getByRole("link", { name: /Posthorn/ })).toHaveCount(0);
+
+    // Moving the page into Gold says one Album is being emptied, then takes
+    // everything out of any Album.
+    await page.goto(`${appUrl}/collection`);
+    await main.getByRole("button", { name: "Select", exact: true }).click();
+    await bar.getByRole("button", { name: "Select page" }).click();
+    await expect(bar).toContainText("3 selected");
+    await bar.getByRole("button", { name: /^Album/ }).click();
+    await page.getByRole("option", { name: /Gold/ }).click();
+    await expect(bar).toContainText("2 are in another Album now");
+    await bar.getByRole("button", { name: /^Album/ }).click();
+    await page.getByRole("option", { name: "No Album" }).click();
+    await bar.getByRole("button", { name: "Take out of Albums" }).click();
+    await expect(
+      page.getByText("3 Items taken out of their Albums"),
+    ).toBeVisible();
+
+    // Shift-click selects a run of rows; Esc leaves select mode.
+    await main.getByRole("button", { name: "Select", exact: true }).click();
+    const boxes = main.getByRole("checkbox");
+    await boxes.first().click();
+    await boxes.last().click({ modifiers: ["Shift"] });
+    await expect(bar).toContainText("3 selected");
+    await page.screenshot({ path: `test-results/select-${width}.png` });
+    await page.keyboard.press("Escape");
+    await expect(bar).toBeHidden();
+  });
+}

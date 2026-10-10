@@ -82,6 +82,7 @@ import type * as insuranceReport_rules from "../insuranceReport/rules.js";
 import type * as insuranceReport_validators from "../insuranceReport/validators.js";
 import type * as insuranceReportPdf from "../insuranceReportPdf.js";
 import type * as items from "../items.js";
+import type * as items_bulkRules from "../items/bulkRules.js";
 import type * as items_catalogFacts from "../items/catalogFacts.js";
 import type * as items_deletion from "../items/deletion.js";
 import type * as items_denominations from "../items/denominations.js";
@@ -199,6 +200,7 @@ declare const fullApi: ApiFromModules<{
   "insuranceReport/validators": typeof insuranceReport_validators;
   insuranceReportPdf: typeof insuranceReportPdf;
   items: typeof items;
+  "items/bulkRules": typeof items_bulkRules;
   "items/catalogFacts": typeof items_catalogFacts;
   "items/deletion": typeof items_deletion;
   "items/denominations": typeof items_denominations;
