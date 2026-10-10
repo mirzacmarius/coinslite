@@ -177,12 +177,13 @@ export function TotalsFigures({
 
 /**
  * Amounts never wrap: a lone digit or minus sign on its own line reads as a
- * different amount. On a phone the figures wrap as a row of cards instead, two
- * to a row, and a figure too wide for half the row takes the whole row.
+ * different amount. The figures wrap as rows of cards instead, two to a row on
+ * a phone, and a figure too wide for its share takes the whole row. Every row
+ * shares out its full width, so however many figures there are (four on the
+ * Overview, up to seven on the Collection page) no row ends in an empty cell.
  */
-const figuresLayout =
-  "-mb-px -mr-px flex flex-wrap sm:grid sm:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))]";
-const figureLayout = "min-w-min flex-[1_1_10rem] sm:min-w-0";
+const figuresLayout = "-mb-px -mr-px flex flex-wrap";
+const figureLayout = "min-w-min flex-[1_1_10rem] sm:flex-[1_1_12.5rem]";
 
 function Figure({
   label,

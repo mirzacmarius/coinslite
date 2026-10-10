@@ -121,7 +121,11 @@ export default {
     noGrade: "Fără stare",
     gradingScale: "Scară de evaluare",
     gradeNote: "Notă despre stare",
-    gradeNotePlaceholder: "ex. patină ușoară, lovitură pe margine",
+    gradeNotePlaceholder: {
+      coin: "ex. patină ușoară, lovitură pe margine",
+      banknote: "ex. îndoitură ușoară, gaură de ac",
+      stamp: "ex. dinte scurt, subțiere",
+    },
     strike: "Batere",
     setStrike: "Alege baterea",
     noStrike: "Fără batere",

@@ -120,7 +120,11 @@ export default {
     noGrade: "Ingen kvalitet",
     gradingScale: "Kvalitetsskala",
     gradeNote: "Merknad om kvalitet",
-    gradeNotePlaceholder: "f.eks. lett patina, kanthakk",
+    gradeNotePlaceholder: {
+      coin: "f.eks. lett patina, kanthakk",
+      banknote: "f.eks. lett brett, nålehull",
+      stamp: "f.eks. kort tagg, tynt sted",
+    },
     strike: "Preging",
     setStrike: "Velg preging",
     noStrike: "Ingen preging",
