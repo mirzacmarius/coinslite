@@ -98,7 +98,7 @@ async function addPhoto(
   t: Test,
   person: Person,
   itemId: Id<"items">,
-  side: "front" | "back",
+  side?: "front" | "back",
 ) {
   const storageId = await t.run((ctx) => ctx.storage.store(jpeg()));
   await person.as.action(api.photos.attach, { itemId, side, storageId });
@@ -107,7 +107,7 @@ async function addPhoto(
 
 /**
  * A Collection like a real one: Items in two Albums and one without, with
- * photos on both sides of one Item and on the front of another.
+ * photos on both sides of one Item plus one more, and on the front of another.
  */
 async function fillCollection(t: Test, person: Person) {
   const travel = await person.as.mutation(api.albums.create, {
@@ -135,6 +135,7 @@ async function fillCollection(t: Test, person: Person) {
   const photos = [
     await addPhoto(t, person, krone, "front"),
     await addPhoto(t, person, krone, "back"),
+    await addPhoto(t, person, krone),
     await addPhoto(t, person, dollar, "front"),
   ];
   return { albums: [travel, silver], photos };
@@ -383,6 +384,7 @@ test("nothing of the person remains afterwards, and nobody else's data changes",
       "devOutbox",
       "emailChanges",
       "files",
+      "itemPhotos",
       "items",
       "subscriptions",
       "users",
@@ -498,7 +500,7 @@ test("the confirmation counts the Items, photos and Albums that will go", async 
 
   expect(await ada.as.query(api.account.deletion.summary, {})).toEqual({
     items: 3,
-    photos: 3,
+    photos: 4,
     albums: 2,
     more: false,
     endsSubscription: false,

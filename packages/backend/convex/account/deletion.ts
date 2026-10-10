@@ -69,6 +69,8 @@ export const accountDataByTable = {
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   pendingCheckouts: "deleted at once: the checkout left open, if any",
+  itemPhotos:
+    "deleted: the Items' more photos, with their stored files, as each Item goes",
   uploads: "deleted: files they uploaded but never made a photo or an image",
   accountClosures:
     "kept: that the account id was deleted, naming no one, so Polar's late events about it end the subscription they report",
@@ -123,15 +125,21 @@ export const summary = query({
       .query("subscriptions")
       .withIndex("by_userId_and_premium", (q) => q.eq("userId", user._id))
       .take(100);
+    const morePhotos = await ctx.db
+      .query("itemPhotos")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
+      .take(summaryItemLimit + 1);
     return {
       items: counted.length,
-      photos: counted.reduce(
-        (photos, { frontPhoto, backPhoto }) =>
-          photos + (frontPhoto ? 1 : 0) + (backPhoto ? 1 : 0),
-        0,
-      ),
+      photos:
+        counted.reduce(
+          (photos, { frontPhoto, backPhoto }) =>
+            photos + (frontPhoto ? 1 : 0) + (backPhoto ? 1 : 0),
+          0,
+        ) + Math.min(morePhotos.length, summaryItemLimit),
       albums: albums.length,
-      more: items.length > summaryItemLimit,
+      more:
+        items.length > summaryItemLimit || morePhotos.length > summaryItemLimit,
       endsSubscription: subscriptions.some(chargesAgain),
     };
   },

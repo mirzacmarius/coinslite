@@ -12,8 +12,10 @@ import {
 import { requireOwnItem } from "./items";
 import { ensurePhotoLinks, photoLink } from "./photos/links";
 import {
+  type PhotoSide,
   photoErrors,
   photoLimits,
+  photoSides,
   photoSignatureLength,
   photoType,
 } from "./photos/rules";
@@ -29,6 +31,16 @@ import { photoSide } from "./utils/validators";
 
 /** Where each side's photo is kept on the Item. */
 const photoFields = { front: "frontPhoto", back: "backPhoto" } as const;
+
+const isSide = (photo: PhotoSide | Id<"itemPhotos">): photo is PhotoSide =>
+  photoSides.some((side) => side === photo);
+
+/** An Item's more photos, in the order they were added. */
+const morePhotosOf = (ctx: QueryCtx, itemId: Id<"items">) =>
+  ctx.db
+    .query("itemPhotos")
+    .withIndex("by_itemId", (q) => q.eq("itemId", itemId))
+    .take(photoLimits.more);
 
 const linkOf = async (
   ctx: QueryCtx,
@@ -96,21 +108,26 @@ export const register = mutation({
 });
 
 const uploadArgs = { itemId: v.id("items"), storageId: v.id("_storage") };
+/** A side of the Item, or, left out, one more photo after the sides. */
+const placeArgs = { side: v.optional(photoSide) };
 
 /**
- * Puts an uploaded file on one side of one of the caller's Items, replacing
- * the photo that was there. The file must be a JPEG, PNG, WebP or GIF (judged
- * by its content) of at most 10 MB; anything else is thrown away.
+ * Puts an uploaded file on one of the caller's Items: on one side, replacing
+ * the photo that was there, or, without a side, as one more photo after the
+ * sides (at most `photoLimits.more` of those). The file must be a JPEG, PNG,
+ * WebP or GIF (judged by its content) of at most 10 MB; anything else is
+ * thrown away.
  */
 export const attach = action({
-  args: { ...uploadArgs, side: photoSide },
+  args: { ...uploadArgs, ...placeArgs },
   returns: v.null(),
   handler: async (ctx, { itemId, side, storageId }) => {
-    const { size }: { size: number } = await ctx.runMutation(
+    const claimed: { size: number; problem?: string } = await ctx.runMutation(
       internal.photos.claim,
-      { itemId, storageId },
+      { itemId, side, storageId },
     );
-    const problem = await photoProblem(ctx, storageId, size);
+    const problem =
+      claimed.problem ?? (await photoProblem(ctx, storageId, claimed.size));
     if (problem) {
       await ctx.runMutation(internal.photos.discard, { itemId, storageId });
       throw new ConvexError(problem);
@@ -120,19 +137,33 @@ export const attach = action({
   },
 });
 
+/** Whether the Item can take one more photo after its sides. */
+async function hasRoomForMore(ctx: QueryCtx, itemId: Id<"items">) {
+  const more = await morePhotosOf(ctx, itemId);
+  return more.length < photoLimits.more;
+}
+
 /**
  * Registers the upload to the caller if nobody has yet, and returns the size
- * of this upload they may put on their Item.
+ * of this upload they may put on their Item, with the problem when the Item
+ * has no room for one more photo (the action then throws the upload away).
  */
 export const claim = internalMutation({
-  args: uploadArgs,
-  returns: v.object({ size: v.number() }),
-  handler: async (ctx, upload) => {
+  args: { ...uploadArgs, ...placeArgs },
+  returns: v.object({
+    size: v.number(),
+    problem: v.optional(v.literal(photoErrors.tooManyPhotos)),
+  }),
+  handler: async (ctx, { side, ...upload }) => {
     const item = await requireOwnItem(ctx, upload.itemId);
     const now = Date.now();
     await claimUpload(ctx, upload.storageId, item.ownerId, "photo", now);
     const { file } = await checkUpload(ctx, upload, now);
-    return { size: file.size };
+    const full = !side && !(await hasRoomForMore(ctx, item._id));
+    return {
+      size: file.size,
+      ...(full && { problem: photoErrors.tooManyPhotos }),
+    };
   },
 });
 
@@ -147,41 +178,69 @@ export const discard = internalMutation({
   },
 });
 
-/** Makes a checked upload the photo of one side, deleting the one it replaces. */
+/**
+ * Makes a checked upload the photo of one side, deleting the one it replaces,
+ * or, without a side, one more photo of the Item.
+ */
 export const save = internalMutation({
-  args: { ...uploadArgs, side: photoSide },
+  args: { ...uploadArgs, ...placeArgs },
   returns: v.null(),
   handler: async (ctx, { side, ...upload }) => {
     const { item } = await checkUpload(ctx, upload, Date.now());
-    const field = photoFields[side];
-    const replaced = item[field];
-    if (replaced) await ctx.storage.delete(replaced);
-    await ctx.db.patch(item._id, { [field]: upload.storageId });
+    if (side) {
+      const field = photoFields[side];
+      const replaced = item[field];
+      if (replaced) await ctx.storage.delete(replaced);
+      await ctx.db.patch(item._id, { [field]: upload.storageId });
+    } else {
+      if (!(await hasRoomForMore(ctx, item._id)))
+        throw new ConvexError(photoErrors.tooManyPhotos);
+      await ctx.db.insert("itemPhotos", {
+        itemId: item._id,
+        ownerId: item.ownerId,
+        storageId: upload.storageId,
+      });
+    }
     await settleUpload(ctx, upload.storageId);
     await ensurePhotoLinks(ctx);
     return null;
   },
 });
 
-/** Removes the photo of one side of the caller's Item, file and all. */
+/**
+ * Removes a photo of the caller's Item, file and all: the one on a side, or
+ * one of its more photos. A photo that isn't on this Item any more is left be.
+ */
 export const remove = mutation({
-  args: { itemId: v.id("items"), side: photoSide },
+  args: {
+    itemId: v.id("items"),
+    photo: v.union(photoSide, v.id("itemPhotos")),
+  },
   returns: v.null(),
-  handler: async (ctx, { itemId, side }) => {
+  handler: async (ctx, { itemId, photo }) => {
     const item = await requireOwnItem(ctx, itemId);
-    const field = photoFields[side];
-    const photo = item[field];
-    if (photo) {
-      await ctx.storage.delete(photo);
-      await ctx.db.patch(itemId, { [field]: undefined });
+    if (isSide(photo)) {
+      const field = photoFields[photo];
+      const stored = item[field];
+      if (stored) {
+        await ctx.storage.delete(stored);
+        await ctx.db.patch(itemId, { [field]: undefined });
+      }
+      return null;
+    }
+    const more = await ctx.db.get(photo);
+    if (more && more.itemId === item._id) {
+      await ctx.storage.delete(more.storageId);
+      await ctx.db.delete(more._id);
     }
     return null;
   },
 });
 
 /**
- * Links to an Item's photos, for its owner only; null for anyone else's Item.
- * Each works for an hour at most; this query hands out fresh ones in time.
+ * Links to an Item's photos, for its owner only; null for anyone else's Item:
+ * the two sides, then its more photos in the order added. Each link works for
+ * an hour at most; this query hands out fresh ones in time.
  */
 export const ofItem = query({
   args: { itemId: v.id("items") },
@@ -190,15 +249,22 @@ export const ofItem = query({
     v.object({
       front: v.union(v.string(), v.null()),
       back: v.union(v.string(), v.null()),
+      more: v.array(v.object({ id: v.id("itemPhotos"), url: v.string() })),
     }),
   ),
   handler: async (ctx, { itemId }) => {
     const owner = await requireSetUpUser(ctx);
     const item = await ctx.db.get(itemId);
     if (!item || item.ownerId !== owner._id) return null;
+    const more = [];
+    for (const photo of await morePhotosOf(ctx, item._id)) {
+      const url = await photoLink(ctx, owner._id, photo.storageId);
+      if (url) more.push({ id: photo._id, url });
+    }
     return {
       front: await linkOf(ctx, owner._id, item.frontPhoto),
       back: await linkOf(ctx, owner._id, item.backPhoto),
+      more,
     };
   },
 });

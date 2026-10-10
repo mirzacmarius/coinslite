@@ -421,6 +421,13 @@ export default {
       back: "Bakside",
       obverse: "Advers",
       reverse: "Revers",
+      stamp: "Frimerke",
+    },
+    more: {
+      title: "Flere bilder",
+      hint: "Opptil {limit} til: detaljer, randen, et sertifikat eller emballasjen.",
+      label: "Bilde {n}",
+      removeTitle: "Fjerne dette bildet?",
     },
     add: "Legg til bilde",
     formats: "JPEG, PNG, WebP eller GIF, opptil 10 MB",
@@ -434,6 +441,7 @@ export default {
       back: "Fjerne bildet av baksiden?",
       obverse: "Fjerne bildet av adversen?",
       reverse: "Fjerne bildet av reversen?",
+      stamp: "Fjerne bildet av frimerket?",
     },
     removeBody:
       "Bildet slettes for godt. Du kan legge til et nytt når som helst.",
@@ -446,6 +454,8 @@ export default {
       notAnImage: "Filen er ikke et JPEG-, PNG-, WebP- eller GIF-bilde.",
       tooMany:
         "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
+      tooManyPhotos:
+        "Objektet har allerede {limit} bilder til. Fjern ett for å legge til et annet.",
       failed: "Bildet kunne ikke lagres. Prøv igjen.",
       removeFailed: "Bildet kunne ikke fjernes. Prøv igjen.",
     },
@@ -454,9 +464,12 @@ export default {
     delete: "Slett",
     title: "Slette «{title}»?",
     body: "Objektet slettes for godt. Dette kan ikke angres.",
-    bodyOnePhoto: "Objektet og bildet slettes for godt. Dette kan ikke angres.",
-    bodyTwoPhotos:
-      "Objektet og de 2 bildene slettes for godt. Dette kan ikke angres.",
+    "bodyPhotos#one":
+      "Objektet og bildet slettes for godt. Dette kan ikke angres.",
+    "bodyPhotos#few":
+      "Objektet og de {count} bildene slettes for godt. Dette kan ikke angres.",
+    "bodyPhotos#other":
+      "Objektet og de {count} bildene slettes for godt. Dette kan ikke angres.",
     confirm: "Slett objekt",
     cancel: "Avbryt",
     deleted: "Objektet er slettet",

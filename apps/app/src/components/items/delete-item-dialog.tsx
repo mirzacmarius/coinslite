@@ -5,7 +5,7 @@ import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { toast } from "@coinslite/ui/toaster";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 
 /**
@@ -27,7 +27,11 @@ export function DeleteItemDialog({
   const t = useI18n();
   const router = useRouter();
   const removeItem = useMutation(api.items.remove);
-  const photoCount = [item.frontPhoto, item.backPhoto].filter(Boolean).length;
+  // The sides are on the Item; its more photos come with the photo links.
+  const photos = useQuery(api.photos.ofItem, { itemId: item._id });
+  const count =
+    [item.frontPhoto, item.backPhoto].filter(Boolean).length +
+    (photos?.more.length ?? 0);
 
   return (
     <ConfirmDialog
@@ -35,11 +39,7 @@ export function DeleteItemDialog({
       onOpenChange={onOpenChange}
       title={t("deleteItem.title", { title: item.title })}
       description={
-        photoCount === 2
-          ? t("deleteItem.bodyTwoPhotos")
-          : photoCount === 1
-            ? t("deleteItem.bodyOnePhoto")
-            : t("deleteItem.body")
+        count > 0 ? t("deleteItem.bodyPhotos", { count }) : t("deleteItem.body")
       }
       confirmLabel={t("deleteItem.confirm")}
       cancelLabel={t("deleteItem.cancel")}

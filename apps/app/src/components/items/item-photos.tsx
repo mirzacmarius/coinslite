@@ -38,12 +38,17 @@ import { useId, useRef, useState } from "react";
 
 const accept = "image/jpeg,image/png,image/webp,image/gif";
 
-/** Coins call their sides obverse and reverse. */
+/** Coins call their sides obverse and reverse; a stamp has the stamp and its back. */
 const sideNames = {
   coin: { front: "obverse", back: "reverse" },
   banknote: { front: "front", back: "back" },
-  stamp: { front: "front", back: "back" },
+  stamp: { front: "stamp", back: "back" },
 } as const;
+
+/** A photo to remove: one side, or one of the more photos by its id. */
+type Target = PhotoSide | Id<"itemPhotos">;
+const isSide = (target: Target): target is PhotoSide =>
+  photoSides.some((side) => side === target);
 
 /**
  * The server's checks, made first in the browser so a wrong file is turned
@@ -59,12 +64,15 @@ async function checkFile(file: File) {
   return type;
 }
 
-/** Uploads a file to storage, then has the server check it and put it on the Item. */
+/**
+ * Uploads a file to storage, then has the server check it and put it on the
+ * Item: on `side`, or as one more photo when no side is given.
+ */
 function usePhotoUpload(itemId: Id<"items">) {
   const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
   const register = useMutation(api.photos.register);
   const attach = useAction(api.photos.attach);
-  return async (side: PhotoSide, file: File) => {
+  return async (side: PhotoSide | undefined, file: File) => {
     const type = await checkFile(file);
     const response = await fetch(await generateUploadUrl(), {
       method: "POST",
@@ -81,33 +89,56 @@ function usePhotoUpload(itemId: Id<"items">) {
   };
 }
 
-/** An Item's front and back photos: add, replace, remove, view full screen. */
+/**
+ * An Item's photos: its two sides, then up to `photoLimits.more` more. Each
+ * can be added, replaced (sides) or removed, and viewed full screen.
+ */
 export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   const t = useI18n();
   const photos = useQuery(api.photos.ofItem, { itemId: item._id });
   const upload = usePhotoUpload(item._id);
   const removePhoto = useMutation(api.photos.remove);
-  const [busy, setBusy] = useState<Record<PhotoSide, boolean>>({
+  const moreId = useId();
+  const [busy, setBusy] = useState<Record<PhotoSide | "more", boolean>>({
     front: false,
     back: false,
+    more: false,
   });
   const [viewing, setViewing] = useState<number | null>(null);
-  const [removal, setRemoval] = useState<{ open: boolean; side: PhotoSide }>({
+  const [removal, setRemoval] = useState<{ open: boolean; target: Target }>({
     open: false,
-    side: "front",
+    target: "front",
   });
   const names = sideNames[item.type];
+  const more = photos?.more ?? [];
   const urlOf = (side: PhotoSide) =>
     photos === undefined ? undefined : photos?.[side] ?? null;
-  const shown = photoSides.flatMap((side) => {
-    const src = urlOf(side);
-    return src
-      ? [{ side, src, caption: t(`photos.sides.${names[side]}`) }]
-      : [];
-  });
+  const moreLabel = (n: number) => t("photos.more.label", { n });
+  const shown = [
+    ...photoSides.flatMap((side) => {
+      const src = urlOf(side);
+      return src
+        ? [
+            {
+              key: side as Target,
+              src,
+              caption: t(`photos.sides.${names[side]}`),
+            },
+          ]
+        : [];
+    }),
+    ...more.map((photo, at) => ({
+      key: photo.id as Target,
+      src: photo.url,
+      caption: moreLabel(at + 1),
+    })),
+  ];
+  const view = (key: Target) =>
+    setViewing(shown.findIndex((photo) => photo.key === key));
 
-  const add = async (side: PhotoSide, file: File) => {
-    setBusy((sides) => ({ ...sides, [side]: true }));
+  const add = async (side: PhotoSide | undefined, file: File) => {
+    const slot = side ?? "more";
+    setBusy((slots) => ({ ...slots, [slot]: true }));
     try {
       await upload(side, file);
     } catch (failure) {
@@ -117,33 +148,77 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           ? t("photos.errors.tooLarge")
           : code === photoErrors.notAnImage
             ? t("photos.errors.notAnImage")
-            : code === uploadErrors.tooMany
-              ? t("photos.errors.tooMany")
-              : t("photos.errors.failed"),
+            : code === photoErrors.tooManyPhotos
+              ? t("photos.errors.tooManyPhotos", { limit: photoLimits.more })
+              : code === uploadErrors.tooMany
+                ? t("photos.errors.tooMany")
+                : t("photos.errors.failed"),
       );
     } finally {
-      setBusy((sides) => ({ ...sides, [side]: false }));
+      setBusy((slots) => ({ ...slots, [slot]: false }));
     }
   };
+  const removalTitle = isSide(removal.target)
+    ? t(`photos.removeTitles.${names[removal.target]}`)
+    : t("photos.more.removeTitle");
 
   return (
     <section
       aria-label={t("photos.title")}
-      className="grid max-w-sm grid-cols-2 gap-3"
+      className="flex max-w-sm flex-col gap-4"
     >
-      {photoSides.map((side) => (
-        <PhotoSlot
-          key={side}
-          label={t(`photos.sides.${names[side]}`)}
-          url={urlOf(side)}
-          busy={busy[side]}
-          onFile={(file) => void add(side, file)}
-          onView={() =>
-            setViewing(shown.findIndex((photo) => photo.side === side))
-          }
-          onRemove={() => setRemoval({ open: true, side })}
-        />
-      ))}
+      <div className="grid grid-cols-2 gap-3">
+        {photoSides.map((side) => (
+          <PhotoSlot
+            key={side}
+            label={t(`photos.sides.${names[side]}`)}
+            url={urlOf(side)}
+            busy={busy[side]}
+            onFile={(file) => void add(side, file)}
+            onView={() => view(side)}
+            onRemove={() => setRemoval({ open: true, target: side })}
+          />
+        ))}
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-0.5">
+          <h3 id={moreId} className="text-xs font-medium text-muted-foreground">
+            {t("photos.more.title")}
+          </h3>
+          {photos !== undefined && more.length === 0 && (
+            <p className="text-xs text-muted-foreground">
+              {t("photos.more.hint", { limit: photoLimits.more })}
+            </p>
+          )}
+        </div>
+        {photos !== undefined && (
+          <div className="grid grid-cols-3 gap-2">
+            {more.map((photo, at) => (
+              <PhotoSlot
+                key={photo.id}
+                small
+                label={moreLabel(at + 1)}
+                url={photo.url}
+                busy={false}
+                onView={() => view(photo.id)}
+                onRemove={() => setRemoval({ open: true, target: photo.id })}
+              />
+            ))}
+            {more.length < photoLimits.more && (
+              <PhotoSlot
+                small
+                label={t("photos.more.title")}
+                labelId={moreId}
+                url={null}
+                busy={busy.more}
+                onFile={(file) => void add(undefined, file)}
+                onView={() => {}}
+                onRemove={() => {}}
+              />
+            )}
+          </div>
+        )}
+      </div>
       <PhotoViewer
         index={viewing}
         onIndexChange={setViewing}
@@ -155,14 +230,14 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
       <ConfirmDialog
         open={removal.open}
         onOpenChange={(open) => setRemoval((current) => ({ ...current, open }))}
-        title={t(`photos.removeTitles.${names[removal.side]}`)}
+        title={removalTitle}
         description={t("photos.removeBody")}
         confirmLabel={t("photos.remove")}
         cancelLabel={t("photos.cancel")}
         destructive
         onConfirm={async () => {
           try {
-            await removePhoto({ itemId: item._id, side: removal.side });
+            await removePhoto({ itemId: item._id, photo: removal.target });
           } catch {
             toast.error(t("photos.errors.removeFailed"));
           }
@@ -173,22 +248,28 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
 }
 
 /**
- * One side: the photo (click to view, menu to replace or remove), or a tile
- * to add one. A file can also be dropped on the tile. `url` is undefined
- * while loading.
+ * One photo slot: the photo (click to view, menu to replace or remove), or a
+ * tile to add one. A file can also be dropped on the tile. `url` is undefined
+ * while loading. Without `onFile` the photo can only be viewed or removed.
+ * `small` tiles (the more photos) show the add tile without its hint, and
+ * `labelId` names an element that already labels them.
  */
 function PhotoSlot({
   label,
+  labelId,
   url,
   busy,
+  small = false,
   onFile,
   onView,
   onRemove,
 }: {
   label: string;
+  labelId?: string;
   url: string | null | undefined;
   busy: boolean;
-  onFile: (file: File) => void;
+  small?: boolean;
+  onFile?: (file: File) => void;
   onView: () => void;
   onRemove: () => void;
 }) {
@@ -197,10 +278,11 @@ function PhotoSlot({
   const input = useRef<HTMLInputElement>(null);
   const [dropping, setDropping] = useState(false);
   const pick = () => input.current?.click();
+  const labelledBy = labelId ?? `${id}-label`;
   const tileFocus =
     "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
   const onDragOver = (event: React.DragEvent) => {
-    if (busy || !event.dataTransfer.types.includes("Files")) return;
+    if (!onFile || busy || !event.dataTransfer.types.includes("Files")) return;
     event.preventDefault();
     setDropping(true);
   };
@@ -208,7 +290,7 @@ function PhotoSlot({
     event.preventDefault();
     setDropping(false);
     const file = event.dataTransfer.files[0];
-    if (file && !busy) onFile(file);
+    if (file && onFile && !busy) onFile(file);
   };
 
   return (
@@ -229,7 +311,7 @@ function PhotoSlot({
           <button
             type="button"
             onClick={onView}
-            aria-labelledby={`${id}-label ${id}-view`}
+            aria-labelledby={`${labelledBy} ${id}-view`}
             className={cn("size-full", tileFocus)}
           >
             <img src={url} alt="" className="size-full object-contain" />
@@ -238,12 +320,13 @@ function PhotoSlot({
             </span>
           </button>
         ) : (
-          url === null && (
+          url === null &&
+          onFile && (
             <button
               type="button"
               onClick={pick}
               disabled={busy}
-              aria-labelledby={`${id}-label ${id}-add`}
+              aria-labelledby={`${labelledBy} ${id}-add`}
               className={cn(
                 "flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-muted-foreground transition-colors duration-100 hover:bg-muted/60 hover:text-foreground",
                 tileFocus,
@@ -254,10 +337,13 @@ function PhotoSlot({
                 strokeWidth={1.75}
                 aria-hidden="true"
               />
-              <span id={`${id}-add`} className="text-[13px] font-medium">
+              <span
+                id={`${id}-add`}
+                className={cn("text-[13px] font-medium", small && "sr-only")}
+              >
                 {t("photos.add")}
               </span>
-              <span className="text-xs">{t("photos.formats")}</span>
+              {!small && <span className="text-xs">{t("photos.formats")}</span>}
             </button>
           )
         )}
@@ -272,61 +358,67 @@ function PhotoSlot({
           </div>
         )}
       </div>
-      <div className="flex h-7 items-center justify-between gap-2">
-        <span
-          id={`${id}-label`}
-          className="truncate text-xs text-muted-foreground"
-        >
-          {label}
-        </span>
-        {url && (
-          // Not modal, so the confirmation it opens gets focus cleanly.
-          <DropdownMenu modal={false}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    disabled={busy}
-                    aria-labelledby={`${id}-label ${id}-actions`}
-                  >
-                    <MoreHorizontal strokeWidth={1.75} aria-hidden="true" />
-                    <span id={`${id}-actions`} className="sr-only">
-                      {t("photos.actions")}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent>{t("photos.actions")}</TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={pick}>
-                <ImageUp strokeWidth={1.75} aria-hidden="true" />
-                {t("photos.replace")}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={onRemove}
-                className="text-destructive focus:text-destructive [&_svg]:text-destructive"
-              >
-                <Trash2 strokeWidth={1.75} aria-hidden="true" />
-                {t("photos.remove")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-      <input
-        ref={input}
-        type="file"
-        accept={accept}
-        hidden
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          event.target.value = "";
-          if (file) onFile(file);
-        }}
-      />
+      {!(small && url === null) && (
+        <div className="flex h-7 items-center justify-between gap-2">
+          <span
+            id={`${id}-label`}
+            className="truncate text-xs text-muted-foreground"
+          >
+            {label}
+          </span>
+          {url && (
+            // Not modal, so the confirmation it opens gets focus cleanly.
+            <DropdownMenu modal={false}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      disabled={busy}
+                      aria-labelledby={`${labelledBy} ${id}-actions`}
+                    >
+                      <MoreHorizontal strokeWidth={1.75} aria-hidden="true" />
+                      <span id={`${id}-actions`} className="sr-only">
+                        {t("photos.actions")}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{t("photos.actions")}</TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end">
+                {onFile && (
+                  <DropdownMenuItem onSelect={pick}>
+                    <ImageUp strokeWidth={1.75} aria-hidden="true" />
+                    {t("photos.replace")}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onSelect={onRemove}
+                  className="text-destructive focus:text-destructive [&_svg]:text-destructive"
+                >
+                  <Trash2 strokeWidth={1.75} aria-hidden="true" />
+                  {t("photos.remove")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      )}
+      {onFile && (
+        <input
+          ref={input}
+          type="file"
+          accept={accept}
+          hidden
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) onFile(file);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ export const uploadLifetime = 60 * 60 * 1000;
 /** What an upload is for: an Item's photo, or a Catalog entry's image file. */
 export type UploadPurpose = "photo" | "catalogImage";
 
-/** Whether a stored file is an Item's photo or a Catalog entry's image. */
+/** Whether a stored file is an Item's photo (a side or one more) or a Catalog entry's image. */
 export async function fileInUse(ctx: QueryCtx, storageId: Id<"_storage">) {
   const user =
     (await ctx.db
@@ -17,6 +17,10 @@ export async function fileInUse(ctx: QueryCtx, storageId: Id<"_storage">) {
     (await ctx.db
       .query("items")
       .withIndex("by_backPhoto", (q) => q.eq("backPhoto", storageId))
+      .first()) ??
+    (await ctx.db
+      .query("itemPhotos")
+      .withIndex("by_storageId", (q) => q.eq("storageId", storageId))
       .first()) ??
     (await ctx.db
       .query("catalogNodes")

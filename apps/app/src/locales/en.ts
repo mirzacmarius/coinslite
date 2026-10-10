@@ -414,6 +414,13 @@ export default {
       back: "Back",
       obverse: "Obverse",
       reverse: "Reverse",
+      stamp: "Stamp",
+    },
+    more: {
+      title: "More photos",
+      hint: "Up to {limit} more: details, the edge, a certificate or packaging.",
+      label: "Photo {n}",
+      removeTitle: "Remove this photo?",
     },
     add: "Add photo",
     formats: "JPEG, PNG, WebP or GIF, up to 10 MB",
@@ -427,6 +434,7 @@ export default {
       back: "Remove the back photo?",
       obverse: "Remove the obverse photo?",
       reverse: "Remove the reverse photo?",
+      stamp: "Remove the stamp photo?",
     },
     removeBody:
       "The photo is deleted for good. You can add a new one any time.",
@@ -438,6 +446,8 @@ export default {
       tooLarge: "That file is larger than 10 MB. Pick a smaller photo.",
       notAnImage: "That file isn't a JPEG, PNG, WebP or GIF image.",
       tooMany: "Too many uploads in a short time. Try again in a few minutes.",
+      tooManyPhotos:
+        "This Item already has {limit} more photos. Remove one to add another.",
       failed: "The photo couldn't be saved. Try again.",
       removeFailed: "The photo couldn't be removed. Try again.",
     },
@@ -446,10 +456,12 @@ export default {
     delete: "Delete",
     title: "Delete “{title}”?",
     body: "The Item is deleted for good. This can't be undone.",
-    bodyOnePhoto:
+    "bodyPhotos#one":
       "The Item and its photo are deleted for good. This can't be undone.",
-    bodyTwoPhotos:
-      "The Item and its 2 photos are deleted for good. This can't be undone.",
+    "bodyPhotos#few":
+      "The Item and its {count} photos are deleted for good. This can't be undone.",
+    "bodyPhotos#other":
+      "The Item and its {count} photos are deleted for good. This can't be undone.",
     confirm: "Delete Item",
     cancel: "Cancel",
     deleted: "Item deleted",

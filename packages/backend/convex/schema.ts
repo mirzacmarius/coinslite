@@ -159,8 +159,9 @@ export default defineSchema({
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
 
-    // Photos, one file per side, private to the owner (photos.ts). The
-    // indexes keep each stored file on at most one Item side.
+    // Photos, one file per side, private to the owner (photos.ts); more
+    // photos are in itemPhotos. The indexes keep each stored file on at most
+    // one Item side.
     frontPhoto: v.optional(v.id("_storage")),
     backPhoto: v.optional(v.id("_storage")),
 
@@ -181,6 +182,20 @@ export default defineSchema({
     // editor: a new Item type reaches them, and deleting the entry leaves them
     // its facts (catalog/linkedItems.ts).
     .index("by_catalogEntryId", ["catalogEntryId"]),
+
+  /**
+   * An Item's photos besides its two sides, at most `photoLimits.more` per
+   * Item, shown in the order they were added (photos.ts). Private to the
+   * owner like the sides; each stored file is on at most one document.
+   */
+  itemPhotos: defineTable({
+    itemId: v.id("items"),
+    ownerId: v.id("users"),
+    storageId: v.id("_storage"),
+  })
+    .index("by_itemId", ["itemId"])
+    .index("by_ownerId", ["ownerId"])
+    .index("by_storageId", ["storageId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` is kept by every
