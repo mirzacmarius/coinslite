@@ -28,9 +28,9 @@ import type { DataModel } from "./dataModel.js";
  * `convex.config.ts`.
  */
 type Env = {
-  readonly ANTHROPIC_API_KEY: string | undefined;
   readonly CONVEX_CLOUD_URL: string;
   readonly CONVEX_SITE_URL: string;
+  readonly ANTHROPIC_API_KEY: string | undefined;
   readonly EMAIL_DELIVERY: "outbox" | undefined;
   readonly FEEDBACK_EMAIL: string | undefined;
   readonly METALPRICE_API_KEY: string | undefined;

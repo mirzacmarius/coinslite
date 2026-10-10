@@ -439,7 +439,7 @@ export default {
     },
     more: {
       title: "Weitere Fotos",
-      hint: "Bis zu {limit} weitere: Details, der Rand, ein Zertifikat oder die Verpackung.",
+      hint: "Bis zu {limit} weitere: Nahaufnahmen, der Rand, ein Zertifikat oder die Verpackung.",
       label: "Foto {n}",
       removeTitle: "Dieses Foto entfernen?",
     },
