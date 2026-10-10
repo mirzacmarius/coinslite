@@ -36,6 +36,9 @@ async function person(t: Test, email: string, extra: { admin?: boolean } = {}) {
 
 const firstPage = { numItems: 100, cursor: null };
 
+/** The bundled datasets take seconds to load on a slow CI runner. */
+const slowRunner = 30_000;
+
 test("only admins can preview, import or export the Catalog", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
@@ -873,194 +876,210 @@ test("each translation is credited in full, can't come from Numista, and isn't i
   ]);
 });
 
-test("the bundled US Morgan and Peace dollars load once, with their sources, and loading again changes nothing", async () => {
-  const t = newTest();
-  const admin = await person(t, "admin@example.com", { admin: true });
+test(
+  "the bundled US Morgan and Peace dollars load once, with their sources, and loading again changes nothing",
+  async () => {
+    const t = newTest();
+    const admin = await person(t, "admin@example.com", { admin: true });
 
-  // 1 country, 2 series, 96 Morgan and 24 Peace dollar dates and mints.
-  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
-    dataset: "usSilverDollars",
-    inserts: 123,
-    updates: 0,
-    unchanged: 0,
-  });
-  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
-    dataset: "usSilverDollars",
-    inserts: 0,
-    updates: 0,
-    unchanged: 123,
-  });
-
-  const nodes = records(await exportAll(admin.as));
-  const entries = nodes.filter(
-    (node) => node.is_addable === "true" && node.country === "US",
-  );
-  expect(entries).toHaveLength(120);
-  expect(
-    nodes.find((node) => node.id === "us-morgan-dollar-1893-cc"),
-  ).toMatchObject({
-    parent_id: "us-morgan-dollar",
-    item_type: "coin",
-    title: "Morgan dollar 1893-CC",
-    country: "US",
-    denomination: "1 dollar",
-    series: "Morgan dollar",
-    material: "silver",
-    strike: "circulation",
-    metal: "silver",
-    weight_g: "26.73",
-    fineness: "0.9",
-    diameter_mm: "38.1",
-    year_from: "1893",
-    year_to: "1893",
-    facts_source: "United States Mint",
-  });
-  expect(
-    nodes.find((node) => node.id === "us-morgan-dollar-1895"),
-  ).toMatchObject({
-    strike: "proof",
-  });
-  expect(
-    nodes
-      .filter((node) => node.parent_id === "us-peace-dollar")
-      .map((node) => node.title),
-  ).toContain("Peace dollar 1934-D");
-  for (const node of entries) {
-    expect(node.facts_source).toBe("United States Mint");
-    expect(node.image_url).toBe("");
-  }
-});
-
-test("the US silver dollars' technical facts are structured, and their notes come translated by CoinsLite", async () => {
-  const t = newTest();
-  const admin = await person(t, "admin@example.com", { admin: true });
-  await t.action(internal.catalog.seed.load, {});
-  const nodes = records(await exportAll(admin.as));
-  const node = (id: string) => nodes.find((each) => each.id === id);
-
-  const coinFacts = {
-    composition: "silver 90%; copper 10%",
-    edge: "reeded",
-    designers: "George T. Morgan",
-  };
-  expect(node("us-morgan-dollar-1893-cc")).toMatchObject({
-    ...coinFacts,
-    mint: "Carson City",
-    mint_mark: "CC",
-    technical_details: "",
-  });
-  expect(node("us-morgan-dollar-1893")).toMatchObject({
-    mint: "Philadelphia",
-    mint_mark: "none",
-  });
-  expect(node("us-peace-dollar-1934-d")).toMatchObject({
-    designers: "Anthony de Francisci",
-    mint: "Denver",
-    mint_mark: "D",
-  });
-  // Only what isn't a fact stays as words, in English and in every other language.
-  for (const id of ["us-morgan-dollar-1895", "us-peace-dollar-1921"]) {
-    const entry = node(id) ?? {};
-    expect(entry.technical_details).not.toBe("");
-    for (const language of ["nb", "de", "fr", "ro"]) {
-      expect(entry[`technical_details_${language}`]).not.toBe("");
-      expect(entry[`notes_source_${language}`]).toBe(
-        "CoinsLite editorial translation",
-      );
-      expect(entry[`notes_author_${language}`]).toBe("CoinsLite");
-    }
-  }
-  for (const id of ["us-morgan-dollar", "us-peace-dollar"]) {
-    const series = node(id) ?? {};
-    expect(series.technical_details).toBe("");
-    for (const language of ["nb", "de", "fr", "ro"])
-      expect(series[`historical_notes_${language}`]).not.toBe("");
-  }
-  expect(node("us-peace-dollar-1921")?.technical_details_de).toBe(
-    "In Hochrelief geprägt, ab 1922 flacher.",
-  );
-});
-
-test("loading the bundled datasets again brings Catalog data stored in the earlier shape to the current one", async () => {
-  const t = newTest();
-  await t.action(internal.catalog.seed.load, {});
-  // As production stored it before facts had fields of their own.
-  await t.run(async (ctx) => {
-    const node = await ctx.db
-      .query("catalogNodes")
-      .withIndex("by_key", (q) => q.eq("key", "us-morgan-dollar-1893-cc"))
-      .unique();
-    if (!node) throw new Error("No Morgan dollar 1893-CC");
-    const {
-      _id,
-      _creationTime,
-      mint,
-      mintMark,
-      composition,
-      edge,
-      designers,
-      ...earlier
-    } = node;
-    await ctx.db.replace("catalogNodes", _id, {
-      ...earlier,
-      technicalDetails: "Mint: Carson City.",
+    // 1 country, 2 series, 96 Morgan and 24 Peace dollar dates and mints.
+    expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
+      dataset: "usSilverDollars",
+      inserts: 123,
+      updates: 0,
+      unchanged: 0,
     });
-  });
+    expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
+      dataset: "usSilverDollars",
+      inserts: 0,
+      updates: 0,
+      unchanged: 123,
+    });
 
-  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
-    dataset: "usSilverDollars",
-    inserts: 0,
-    updates: 1,
-    unchanged: 122,
-  });
-  const node = await t.run((ctx) =>
-    ctx.db
-      .query("catalogNodes")
-      .withIndex("by_key", (q) => q.eq("key", "us-morgan-dollar-1893-cc"))
-      .unique(),
-  );
-  expect(node).toMatchObject({ mint: "Carson City", mintMark: "CC" });
-  expect(node?.technicalDetails).toBeUndefined();
-});
-
-test("every preview build loads the bundled Catalog through the function it names, bringing search words up to date", async () => {
-  // The build runs `convex run <function>` on the branch's preview deployment:
-  // by name, with no args.
-  const seedCommand = vercelBuildScript
-    .replace(/\\\n\s*/g, " ")
-    .split("\n")
-    .find((line) => /^\s*npx convex run\b/.test(line));
-  expect(seedCommand).toContain('--preview-name "$VERCEL_GIT_COMMIT_REF"');
-  const functionName = seedCommand?.trim().split(/\s+/).pop();
-  expect(functionName).toBe("catalog/seed:load");
-
-  const t = newTest();
-  const seed = makeFunctionReference<"action">(functionName ?? "");
-  expect(await t.action(seed, {})).toEqual([
-    { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
-    { dataset: "euroCommemoratives", inserts: 609, updates: 0, unchanged: 0 },
-    { dataset: "norway", inserts: 246, updates: 0, unchanged: 0 },
-  ]);
-
-  // A preview seeded before its search words changed finds nothing by them...
-  await t.run(async (ctx) => {
-    for (const node of await ctx.db.query("catalogNodes").take(200)) {
-      await ctx.db.patch(node._id, { searchText: "stale" });
+    const nodes = records(await exportAll(admin.as));
+    const entries = nodes.filter(
+      (node) => node.is_addable === "true" && node.country === "US",
+    );
+    expect(entries).toHaveLength(120);
+    expect(
+      nodes.find((node) => node.id === "us-morgan-dollar-1893-cc"),
+    ).toMatchObject({
+      parent_id: "us-morgan-dollar",
+      item_type: "coin",
+      title: "Morgan dollar 1893-CC",
+      country: "US",
+      denomination: "1 dollar",
+      series: "Morgan dollar",
+      material: "silver",
+      strike: "circulation",
+      metal: "silver",
+      weight_g: "26.73",
+      fineness: "0.9",
+      diameter_mm: "38.1",
+      year_from: "1893",
+      year_to: "1893",
+      facts_source: "United States Mint",
+    });
+    expect(
+      nodes.find((node) => node.id === "us-morgan-dollar-1895"),
+    ).toMatchObject({
+      strike: "proof",
+    });
+    expect(
+      nodes
+        .filter((node) => node.parent_id === "us-peace-dollar")
+        .map((node) => node.title),
+    ).toContain("Peace dollar 1934-D");
+    for (const node of entries) {
+      expect(node.facts_source).toBe("United States Mint");
+      expect(node.image_url).toBe("");
     }
-  });
-  const ada = await person(t, "ada@example.com");
-  const search = () =>
-    ada.as.query(api.catalog.search.find, { text: "Vereinigte Staaten" });
-  expect((await search()).groups).toEqual([]);
+  },
+  slowRunner,
+);
 
-  // ...until its next build loads the Catalog again.
-  expect(await t.action(seed, {})).toEqual([
-    { dataset: "usSilverDollars", inserts: 0, updates: 0, unchanged: 123 },
-    { dataset: "euroCommemoratives", inserts: 0, updates: 0, unchanged: 609 },
-    { dataset: "norway", inserts: 0, updates: 0, unchanged: 246 },
-  ]);
-  expect((await search()).groups).not.toEqual([]);
-});
+test(
+  "the US silver dollars' technical facts are structured, and their notes come translated by CoinsLite",
+  async () => {
+    const t = newTest();
+    const admin = await person(t, "admin@example.com", { admin: true });
+    await t.action(internal.catalog.seed.load, {});
+    const nodes = records(await exportAll(admin.as));
+    const node = (id: string) => nodes.find((each) => each.id === id);
+
+    const coinFacts = {
+      composition: "silver 90%; copper 10%",
+      edge: "reeded",
+      designers: "George T. Morgan",
+    };
+    expect(node("us-morgan-dollar-1893-cc")).toMatchObject({
+      ...coinFacts,
+      mint: "Carson City",
+      mint_mark: "CC",
+      technical_details: "",
+    });
+    expect(node("us-morgan-dollar-1893")).toMatchObject({
+      mint: "Philadelphia",
+      mint_mark: "none",
+    });
+    expect(node("us-peace-dollar-1934-d")).toMatchObject({
+      designers: "Anthony de Francisci",
+      mint: "Denver",
+      mint_mark: "D",
+    });
+    // Only what isn't a fact stays as words, in English and in every other language.
+    for (const id of ["us-morgan-dollar-1895", "us-peace-dollar-1921"]) {
+      const entry = node(id) ?? {};
+      expect(entry.technical_details).not.toBe("");
+      for (const language of ["nb", "de", "fr", "ro"]) {
+        expect(entry[`technical_details_${language}`]).not.toBe("");
+        expect(entry[`notes_source_${language}`]).toBe(
+          "CoinsLite editorial translation",
+        );
+        expect(entry[`notes_author_${language}`]).toBe("CoinsLite");
+      }
+    }
+    for (const id of ["us-morgan-dollar", "us-peace-dollar"]) {
+      const series = node(id) ?? {};
+      expect(series.technical_details).toBe("");
+      for (const language of ["nb", "de", "fr", "ro"])
+        expect(series[`historical_notes_${language}`]).not.toBe("");
+    }
+    expect(node("us-peace-dollar-1921")?.technical_details_de).toBe(
+      "In Hochrelief geprägt, ab 1922 flacher.",
+    );
+  },
+  slowRunner,
+);
+
+test(
+  "loading the bundled datasets again brings Catalog data stored in the earlier shape to the current one",
+  async () => {
+    const t = newTest();
+    await t.action(internal.catalog.seed.load, {});
+    // As production stored it before facts had fields of their own.
+    await t.run(async (ctx) => {
+      const node = await ctx.db
+        .query("catalogNodes")
+        .withIndex("by_key", (q) => q.eq("key", "us-morgan-dollar-1893-cc"))
+        .unique();
+      if (!node) throw new Error("No Morgan dollar 1893-CC");
+      const {
+        _id,
+        _creationTime,
+        mint,
+        mintMark,
+        composition,
+        edge,
+        designers,
+        ...earlier
+      } = node;
+      await ctx.db.replace("catalogNodes", _id, {
+        ...earlier,
+        technicalDetails: "Mint: Carson City.",
+      });
+    });
+
+    expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
+      dataset: "usSilverDollars",
+      inserts: 0,
+      updates: 1,
+      unchanged: 122,
+    });
+    const node = await t.run((ctx) =>
+      ctx.db
+        .query("catalogNodes")
+        .withIndex("by_key", (q) => q.eq("key", "us-morgan-dollar-1893-cc"))
+        .unique(),
+    );
+    expect(node).toMatchObject({ mint: "Carson City", mintMark: "CC" });
+    expect(node?.technicalDetails).toBeUndefined();
+  },
+  slowRunner,
+);
+
+test(
+  "every preview build loads the bundled Catalog through the function it names, bringing search words up to date",
+  async () => {
+    // The build runs `convex run <function>` on the branch's preview deployment:
+    // by name, with no args.
+    const seedCommand = vercelBuildScript
+      .replace(/\\\n\s*/g, " ")
+      .split("\n")
+      .find((line) => /^\s*npx convex run\b/.test(line));
+    expect(seedCommand).toContain('--preview-name "$VERCEL_GIT_COMMIT_REF"');
+    const functionName = seedCommand?.trim().split(/\s+/).pop();
+    expect(functionName).toBe("catalog/seed:load");
+
+    const t = newTest();
+    const seed = makeFunctionReference<"action">(functionName ?? "");
+    expect(await t.action(seed, {})).toEqual([
+      { dataset: "usSilverDollars", inserts: 123, updates: 0, unchanged: 0 },
+      { dataset: "euroCommemoratives", inserts: 609, updates: 0, unchanged: 0 },
+      { dataset: "norway", inserts: 246, updates: 0, unchanged: 0 },
+    ]);
+
+    // A preview seeded before its search words changed finds nothing by them...
+    await t.run(async (ctx) => {
+      for (const node of await ctx.db.query("catalogNodes").take(200)) {
+        await ctx.db.patch(node._id, { searchText: "stale" });
+      }
+    });
+    const ada = await person(t, "ada@example.com");
+    const search = () =>
+      ada.as.query(api.catalog.search.find, { text: "Vereinigte Staaten" });
+    expect((await search()).groups).toEqual([]);
+
+    // ...until its next build loads the Catalog again.
+    expect(await t.action(seed, {})).toEqual([
+      { dataset: "usSilverDollars", inserts: 0, updates: 0, unchanged: 123 },
+      { dataset: "euroCommemoratives", inserts: 0, updates: 0, unchanged: 609 },
+      { dataset: "norway", inserts: 0, updates: 0, unchanged: 246 },
+    ]);
+    expect((await search()).groups).not.toEqual([]);
+  },
+  slowRunner,
+);
 
 test("moving a grouping with more nodes below it than one import may move is refused", async () => {
   const t = newTest();
