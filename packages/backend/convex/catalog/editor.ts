@@ -1,3 +1,4 @@
+import { locales } from "@coinslite/i18n";
 import {
   paginationOptsValidator,
   paginationResultValidator,
@@ -9,6 +10,7 @@ import { requireAdmin } from "../utils/auth";
 import {
   catalogItemType,
   catalogKind,
+  coinEdge,
   material,
   preciousMetal,
   provenance,
@@ -19,10 +21,12 @@ import {
   type CatalogError,
   type EditorValues,
   type FileRow,
+  type TranslationValueKey,
   catalogErrors,
   editorValueKeys,
   readCatalogKey,
   readEditorValues,
+  translationValuesOf,
   valuesFromFields,
 } from "./fields";
 import { applyPlan, deleteSubtree, planDeletion, planRows } from "./tree";
@@ -54,6 +58,19 @@ const editorValues = v.object({
   diameter: optionalNumber,
   yearFrom: optionalNumber,
   yearTo: optionalNumber,
+  mint: optionalText,
+  mintMark: optionalText,
+  composition: optionalText,
+  edge: v.optional(coinEdge),
+  edgeLettering: optionalText,
+  thickness: optionalNumber,
+  width: optionalNumber,
+  height: optionalNumber,
+  designers: optionalText,
+  mintage: optionalNumber,
+  issueDate: optionalText,
+  withdrawalDate: optionalText,
+  notesLanguage: optionalText,
   technicalDetails: optionalText,
   historicalNotes: optionalText,
   numistaId: optionalNumber,
@@ -65,6 +82,9 @@ const editorValues = v.object({
   notesAuthor: optionalText,
   notesLicence: optionalText,
   notesLink: optionalText,
+  ...(Object.fromEntries(
+    translationValuesOf(locales).map((key) => [key, optionalText]),
+  ) as Record<TranslationValueKey, typeof optionalText>),
 });
 
 /** A saved node stands in a plan as the only row of a file. */

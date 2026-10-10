@@ -16,12 +16,30 @@ export type EuroCommemorativeCoin = {
   language: string;
   /** The ECB's description of the design, in English. */
   description: string;
-  /** Issuing volume, as the ECB gives it. */
+  /** Issuing volume, as the ECB gives it in English. */
   volume: string;
-  /** Issuing date, as the ECB gives it. */
+  /** Issuing date, as the ECB gives it in English. */
   issued: string;
   /** Where the title comes from when the ECB's list gives none. */
   titleFrom?: { notice: string; link: string };
+};
+
+/** A coin's description, issuing volume and date on the ECB's page in another language. */
+export type EuroCommemorativeTranslation = {
+  description: string;
+  volume?: string;
+  issued?: string;
+};
+
+/** The ECB's opening words on the commemoratives, in English and the app's languages it publishes. */
+export const euroCommemorativesIntro: Record<
+  "en" | "de" | "fr" | "ro",
+  string
+> = {
+  en: "Each country that uses the euro as its official currency may issue two commemorative coins per year. These coins have the same features, properties and common side as normal €2 coins. What makes them different is the commemorative design on their national side. Only the €2 denomination can be used for commemorative coins. €2 commemorative coins are legal tender throughout the euro area. That means they can be used – and must be accepted – just like any other euro coins.",
+  de: "Jedes Land, das den Euro als offizielle Währung verwendet, kann pro Jahr zwei Gedenkmünzen ausgeben. Dabei handelt es sich stets um 2-€-Münzen. Sie haben dieselben Merkmale und Eigenschaften wie normale 2-€-Münzen und auch dieselbe gemeinsame Seite. Der Unterschied besteht in der besonderen Gestaltung der nationalen Seite. 2-€-Gedenkmünzen sind überall im Euroraum gesetzliches Zahlungsmittel. Das bedeutet, dass sie so verwendet werden können wie alle anderen Euro-Münzen, und sie müssen auch genauso akzeptiert werden.",
+  fr: "Chaque pays dont l’euro est la monnaie officielle peut émettre deux pièces commémoratives par an. Celles-ci possèdent les mêmes caractéristiques, propriétés et faces communes que les pièces de 2 euros courantes. La seule différence est le dessin commémoratif illustrant leur face nationale. Seule la pièce de 2 euros peut faire l’objet d’une émission commémorative. Les pièces commémoratives de 2 euros ont cours légal dans l’ensemble de la zone euro. Cela signifie qu’elles peuvent être utilisées – et doivent être acceptées – comme n’importe quelle autre pièce en euros.",
+  ro: "Fiecare țară care utilizează euro ca monedă oficială poate emite două monede comemorative pe an. Aceste monede au aceleași caracteristici, proprietăți și fețe comune ca și monedele obișnuite de 2 EUR. Deosebirea constă în elementele grafice comemorative de pe fața lor națională. Numai monedele de 2 EUR pot face obiectul unei emisiuni comemorative. Monedele comemorative de 2 EUR reprezintă mijloace legale de plată în întreaga zonă euro, ceea ce înseamnă că pot fi folosite – și trebuie acceptate – la fel ca orice alte monede euro.",
 };
 
 /** Every coin from 2004 to 2025: by year, then in the order they were issued. */

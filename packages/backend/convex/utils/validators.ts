@@ -3,8 +3,10 @@ import { v } from "convex/values";
 import { planFilters, sortOrders, userSorts } from "../admin/userList";
 import { albumColours } from "../albums/rules";
 import {
+  alloyMetals,
   catalogItemTypes,
   catalogKinds,
+  coinEdges,
   preciousMetals,
 } from "../catalog/fields";
 import { scannerAvailabilities } from "../featureFlags/rules";
@@ -49,12 +51,35 @@ export const catalogKind = literalUnion(catalogKinds);
 export const catalogItemType = literalUnion(catalogItemTypes);
 /** A metal with a Spot price, for Metal value. */
 export const preciousMetal = literalUnion(preciousMetals);
+/** A metal in a Catalog entry's alloy. */
+export const alloyMetal = literalUnion(alloyMetals);
+/** How a coin's edge is finished. */
+export const coinEdge = literalUnion(coinEdges);
+/** What a Catalog entry's alloy is made of, in percent of its weight. */
+export const composition = v.array(
+  v.object({ metal: alloyMetal, percent: v.number() }),
+);
 /** Where a group of Catalog facts, its notes or its image come from. */
 export const provenance = v.object({
   source: v.string(),
   author: v.optional(v.string()),
   licence: v.optional(v.string()),
   link: v.optional(v.string()),
+});
+
+/** A Catalog node's notes in another of the app's languages, with their own credit. */
+export const notesTranslation = v.object({
+  technicalDetails: v.optional(v.string()),
+  historicalNotes: v.optional(v.string()),
+  provenance,
+});
+/** A node's translated notes by language; another language of the app adds a field. */
+export const notesTranslations = v.object({
+  en: v.optional(notesTranslation),
+  nb: v.optional(notesTranslation),
+  de: v.optional(notesTranslation),
+  fr: v.optional(notesTranslation),
+  ro: v.optional(notesTranslation),
 });
 
 /** One of the Album colours in albums/rules.ts. */
