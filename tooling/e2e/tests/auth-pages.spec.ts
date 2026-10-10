@@ -52,8 +52,8 @@ test("the privacy policy and terms are linked from sign-up", async ({
   await page.goto(`${appUrl}/signup`);
   await expect(
     page.getByRole("link", { name: "privacy policy" }),
-  ).toHaveAttribute("href", /\/privacy$/);
+  ).toHaveAttribute("href", /\/en\/privacy$/);
   await expect(
     page.getByRole("link", { name: "terms of use" }),
-  ).toHaveAttribute("href", /\/terms$/);
+  ).toHaveAttribute("href", /\/en\/terms$/);
 });

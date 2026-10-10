@@ -1,7 +1,7 @@
 "use client";
 
-import { Logo } from "@/components/logo";
 import { useI18n } from "@/locales/client";
+import { Logo } from "@coinslite/ui/logo";
 import { SearchX } from "lucide-react";
 import Link from "next/link";
 

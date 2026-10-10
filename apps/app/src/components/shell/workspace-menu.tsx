@@ -1,6 +1,5 @@
 "use client";
 
-import { Logo } from "@/components/logo";
 import {
   AppearanceRadioItems,
   LanguageRadioItems,
@@ -22,6 +21,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
+import { Logo } from "@coinslite/ui/logo";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
 import {

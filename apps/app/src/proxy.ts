@@ -6,6 +6,7 @@ import {
 import { createI18nMiddleware } from "next-international/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 import { LANGUAGE_COOKIE, ONE_YEAR_IN_SECONDS } from "./lib/language-cookie";
+import { languageFromLink } from "./lib/language-link";
 import { safeNextPath } from "./lib/next-path";
 /**
  * next-international's own cookie also stores languages it merely detected, and
@@ -116,8 +117,30 @@ function route(request: NextRequest, isAuthenticated: boolean) {
   return withLanguage(request);
 }
 
+/**
+ * A link from the marketing site names the language its visitor was reading
+ * (/signup?lang=de). Opening it is choosing that language, so it's stored as
+ * the language menu would, and the page opens in it without the parameter.
+ */
+function withLanguageFromLink(request: NextRequest) {
+  const fromLink = languageFromLink(request.nextUrl);
+  if (!fromLink) return null;
+  const response = redirect(request, fromLink.path);
+  if (fromLink.locale) {
+    response.cookies.set(LANGUAGE_COOKIE, fromLink.locale, {
+      path: "/",
+      sameSite: "lax",
+      maxAge: ONE_YEAR_IN_SECONDS,
+      secure: request.nextUrl.protocol === "https:",
+    });
+  }
+  return response;
+}
+
 export const proxy = convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
+    const linked = withLanguageFromLink(request);
+    if (linked) return linked;
     if (isVersionCheck(request)) {
       return NextResponse.next();
     }

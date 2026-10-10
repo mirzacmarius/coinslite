@@ -65,7 +65,7 @@ export function useAcceptTermsRule() {
   );
 }
 
-/** "I accept the privacy policy and the terms of use", linking both on the marketing site. */
+/** "I accept the privacy policy and the terms of use", linking both on the marketing site, in the same language. */
 export function AcceptTermsField({
   field,
   showErrors,
@@ -74,6 +74,7 @@ export function AcceptTermsField({
   showErrors: boolean;
 }) {
   const t = useI18n();
+  const locale = useCurrentLocale();
   const id = useId();
   return (
     <CheckboxField
@@ -88,7 +89,7 @@ export function AcceptTermsField({
       label={t("auth.signUp.acceptTerms", {
         privacy: (
           <a
-            href={`${env.NEXT_PUBLIC_WEB_URL}/privacy`}
+            href={`${env.NEXT_PUBLIC_WEB_URL}/${locale}/privacy`}
             target="_blank"
             rel="noreferrer"
             className={authLink}
@@ -98,7 +99,7 @@ export function AcceptTermsField({
         ),
         terms: (
           <a
-            href={`${env.NEXT_PUBLIC_WEB_URL}/terms`}
+            href={`${env.NEXT_PUBLIC_WEB_URL}/${locale}/terms`}
             target="_blank"
             rel="noreferrer"
             className={authLink}

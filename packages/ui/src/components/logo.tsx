@@ -1,4 +1,4 @@
-import { cn } from "@coinslite/ui/utils";
+import { cn } from "../utils";
 
 /** The CoinsLite wordmark: a teal coin ring and the product name. */
 export function Logo({ className }: { className?: string }) {
