@@ -1,10 +1,5 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
-import {
-  newEmail,
-  runInBackend,
-  signUpAndVerify,
-  visiblePage,
-} from "../support/accounts";
+import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
 import { catalogPicker } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
@@ -35,7 +30,6 @@ async function expectAction(button: Locator, opens: Locator) {
 test("on a phone, the Item, Album and Catalog entry titles stay readable", async ({
   page,
 }) => {
-  runInBackend("catalog/seed:load", {});
   await signUpAndVerify(page, newEmail());
 
   // An Album holding an Item picked from the Catalog.

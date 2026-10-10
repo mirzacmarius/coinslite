@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  newEmail,
-  runInBackend,
-  signUpAndVerify,
-  visiblePage,
-} from "../support/accounts";
+import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
 import { catalogPicker, waitForAddedToasts } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
@@ -17,8 +12,6 @@ test.use({ locale: "en-US" });
 test("add an Item from the Catalog, then more of it from the entry's page", async ({
   page,
 }) => {
-  // The bundled Catalog: United States silver dollars. Loading it again changes nothing.
-  runInBackend("catalog/seed:load", {});
   await signUpAndVerify(page, newEmail());
   await page.goto(`${appUrl}/collection`);
   const main = visiblePage(page);
@@ -94,7 +87,6 @@ test("add an Item from the Catalog, then more of it from the entry's page", asyn
 test("an Item picked from the Catalog saves after More details is opened", async ({
   page,
 }) => {
-  runInBackend("catalog/seed:load", {});
   await signUpAndVerify(page, newEmail());
   await page.goto(`${appUrl}/collection`);
   const main = visiblePage(page);
