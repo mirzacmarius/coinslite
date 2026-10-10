@@ -141,6 +141,19 @@ test("the language preference is stored on the account", async () => {
   expect((await as.query(api.account.get, {}))?.language).toBe("ro");
 });
 
+test("each language change is stamped, so a device can tell it from an older one", async () => {
+  const t = newTest();
+  const { as } = await ada(t);
+
+  const first = await as.mutation(api.account.setLanguage, { language: "nb" });
+  const second = await as.mutation(api.account.setLanguage, { language: "en" });
+
+  expect(second).toBeGreaterThanOrEqual(first);
+  const user = await as.query(api.users.getUser, {});
+  expect(user?.language).toBe("en");
+  expect(user?.languageChangedAt).toBe(second);
+});
+
 test("changing email: a link goes to the new address, and nothing changes until it's opened", async () => {
   const t = newTest();
   const { as, signIn } = await ada(t);

@@ -47,6 +47,8 @@ export default defineSchema({
     // Profile, set at sign-up
     displayName: v.optional(v.string()),
     language: v.optional(language),
+    /** When `language` last changed, so a device can tell a newer choice from an old one. */
+    languageChangedAt: v.optional(v.number()),
     homeCurrency: v.optional(homeCurrency),
     termsAcceptedAt: v.optional(v.number()),
 
