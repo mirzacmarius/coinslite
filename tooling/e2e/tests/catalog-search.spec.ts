@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  newEmail,
-  runInBackend,
-  signUpAndVerify,
-  visiblePage,
-} from "../support/accounts";
+import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
 import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
@@ -14,8 +9,6 @@ test.skip(
 test.use({ locale: "en-US" });
 
 test("search the Catalog with a few words, in any order", async ({ page }) => {
-  // The bundled Catalog: United States silver dollars. Loading it again changes nothing.
-  runInBackend("catalog/seed:load", {});
   await signUpAndVerify(page, newEmail());
   await page.goto(`${appUrl}/catalog`);
   const main = visiblePage(page);

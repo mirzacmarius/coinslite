@@ -95,11 +95,13 @@ export const updateContact = mutation({
 /** Remembers the language someone picked, so every device they sign in on uses it. */
 export const setLanguage = mutation({
   args: { language },
-  returns: v.null(),
+  /** When the change was made, for the device that made it to remember. */
+  returns: v.number(),
   handler: async (ctx, { language }) => {
     const userId = await requireUserId(ctx);
-    await ctx.db.patch(userId, { language });
-    return null;
+    const languageChangedAt = Date.now();
+    await ctx.db.patch(userId, { language, languageChangedAt });
+    return languageChangedAt;
   },
 });
 

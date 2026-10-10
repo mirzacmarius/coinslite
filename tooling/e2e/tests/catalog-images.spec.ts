@@ -52,7 +52,6 @@ function png(width: number, height: number) {
 test("an admin adds a credited image to a Catalog entry, then removes it", async ({
   page,
 }) => {
-  runInBackend("catalog/seed:load", {});
   const email = newEmail();
   await signUpAndVerify(page, email);
   runInBackend("admin/roles:grant", { email });
