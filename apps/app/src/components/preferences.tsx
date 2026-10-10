@@ -1,6 +1,10 @@
 "use client";
 
-import { rememberLanguage } from "@/lib/language-cookie";
+import {
+  noteLanguageChange,
+  noteSavingLanguage,
+  rememberLanguage,
+} from "@/lib/language-cookie";
 import { useChangeLocale, useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { type Locale, isLocale, localeNames, locales } from "@coinslite/i18n";
@@ -31,10 +35,13 @@ export function useChooseLanguage() {
     async (locale: Locale) => {
       rememberLanguage(locale);
       if (isAuthenticated) {
+        noteSavingLanguage();
         // This browser switches anyway; other devices keep the old language.
-        await setLanguage({ language: locale }).catch(() =>
-          toast.error(t("account.preferences.languageNotSaved")),
-        );
+        const changedAt = await setLanguage({ language: locale }).catch(() => {
+          toast.error(t("account.preferences.languageNotSaved"));
+          return undefined;
+        });
+        noteLanguageChange(changedAt);
       }
       changeLocale(locale);
     },
