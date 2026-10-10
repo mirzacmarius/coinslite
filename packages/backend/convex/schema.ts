@@ -6,6 +6,8 @@ import {
   albumColour,
   catalogItemType,
   catalogKind,
+  coinEdge,
+  composition,
   featureFlag,
   gradingScale,
   homeCurrency,
@@ -13,6 +15,7 @@ import {
   language,
   material,
   metal,
+  notesTranslations,
   perDollar,
   preciousMetal,
   provenance,
@@ -227,12 +230,35 @@ export default defineSchema({
     diameter: v.optional(v.number()),
     yearFrom: v.optional(v.number()),
     yearTo: v.optional(v.number()),
+    /** Where it was struck: "Carson City". */
+    mint: v.optional(v.string()),
+    /** "CC", or "none" for a coin with no mint mark. */
+    mintMark: v.optional(v.string()),
+    composition: v.optional(composition),
+    edge: v.optional(coinEdge),
+    /** The words on a lettered edge, as struck. */
+    edgeLettering: v.optional(v.string()),
+    /** Millimetres: a coin's thickness, a banknote's width and height. */
+    thickness: v.optional(v.number()),
+    width: v.optional(v.number()),
+    height: v.optional(v.number()),
+    designers: v.optional(v.array(v.string())),
+    /** How many were struck or printed. */
+    mintage: v.optional(v.number()),
+    /** YYYY-MM-DD, YYYY-MM or YYYY, as precisely as the source says. */
+    issueDate: v.optional(v.string()),
+    /** When it stopped being legal tender, as precisely as the source says. */
+    withdrawalDate: v.optional(v.string()),
     factsProvenance: v.optional(provenance),
 
-    // Notes, from the source in notesProvenance
+    // Notes, from the source in notesProvenance, in notesLanguage
     technicalDetails: v.optional(v.string()),
     historicalNotes: v.optional(v.string()),
     notesProvenance: v.optional(provenance),
+    /** A language code; English when absent, as every note stored before it was. */
+    notesLanguage: v.optional(v.string()),
+    /** The notes in the app's other languages, each translation credited. */
+    notesTranslations: v.optional(notesTranslations),
 
     // The image: one an admin uploaded (catalog/images.ts), else one linked
     // from a Catalog CSV file, credited in imageProvenance.

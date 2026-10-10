@@ -1,10 +1,14 @@
 "use client";
 
 import { useGradeLabels } from "@/components/items/grade-labels";
-import { useI18n } from "@/locales/client";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import type { api } from "@coinslite/backend/convex/_generated/api";
-import type { Provenance } from "@coinslite/backend/convex/catalog/fields";
+import {
+  type AlloyMetal,
+  type Provenance,
+  noMintMark,
+} from "@coinslite/backend/convex/catalog/fields";
 import type { FunctionReturnType } from "convex/server";
 import { useMemo } from "react";
 
@@ -16,6 +20,7 @@ export type CatalogEntryRow = FunctionReturnType<
 /** How Catalog facts read, in the current language. */
 export function useCatalogFormat() {
   const t = useI18n();
+  const locale = useCurrentLocale();
   const format = useFormatters();
   const labels = useGradeLabels();
   return useMemo(() => {
@@ -107,8 +112,49 @@ export function useCatalogFormat() {
       ]
         .filter(Boolean)
         .join(" · ");
+    /** A date as precise as the Catalog has it: "1964", "May 1964" or "8 May 2008". */
+    const partialDate = (value: string) => {
+      const [year, month, day] = value.split("-");
+      if (day) return format.date(value);
+      if (!month) return year ?? value;
+      return new Intl.DateTimeFormat(locale, {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(Date.UTC(Number(year), Number(month) - 1, 1)));
+    };
+    /** "Silver 90 %, Copper 10 %", the metals in the reader's language. */
+    const composition = (
+      parts: ReadonlyArray<{ metal: AlloyMetal; percent: number }>,
+    ) =>
+      parts
+        .map(
+          ({ metal, percent }) =>
+            `${t(`items.materials.${metal}`)} ${format.number(percent / 100, {
+              style: "percent",
+              maximumFractionDigits: 1,
+            })}`,
+        )
+        .join(", ");
+    /** Names joined as the reader's language joins a list. */
+    const names = (list: readonly string[]) =>
+      new Intl.ListFormat(locale, { type: "conjunction" }).format(list);
+    const mintMark = (mark: string) =>
+      mark === noMintMark ? t("catalogFacts.noMintMark") : mark;
+    /** A banknote's width and height. */
+    const size = (width: number, height: number) =>
+      `${format.number(width)} × ${format.number(height)} ${t("items.millimetres")}`;
+    /** A language's name in the reader's language: "English", "Englisch". */
+    const languageName = (code: string) =>
+      new Intl.DisplayNames([locale], { type: "language" }).of(code) ?? code;
     return {
       nodeTitle,
+      partialDate,
+      composition,
+      names,
+      mintMark,
+      size,
+      languageName,
       years,
       weight,
       fineness,
@@ -118,5 +164,5 @@ export function useCatalogFormat() {
       strikeSuffix,
       credit,
     };
-  }, [t, format, labels]);
+  }, [t, locale, format, labels]);
 }

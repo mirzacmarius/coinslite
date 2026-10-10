@@ -1,3 +1,4 @@
+import { type Locale, defaultLocale } from "@coinslite/i18n";
 import {
   type PaginationResult,
   paginationOptsValidator,
@@ -11,11 +12,15 @@ import { compareDenominations } from "../items/denominations";
 import { requireSetUpUser } from "../utils/auth";
 import {
   catalogItemType,
+  coinEdge,
+  composition,
+  language,
   material,
   preciousMetal,
   provenance,
   strike,
 } from "../utils/validators";
+import { defaultNotesLanguage } from "./fields";
 import { creditRequired } from "./imageRules";
 
 /**
@@ -198,13 +203,32 @@ const entryFields = {
   heldMore: v.boolean(),
 };
 
+/** A note as the reader gets it: in their language, or else its source's, which `language` names. */
+const note = v.object({
+  text: v.string(),
+  language: v.string(),
+  provenance: v.optional(provenance),
+});
+
 const entryDetail = v.object({
   ...entryFields,
   kind: v.literal("entry"),
-  technicalDetails: v.optional(v.string()),
-  historicalNotes: v.optional(v.string()),
+  mint: v.optional(v.string()),
+  mintMark: v.optional(v.string()),
+  composition: v.optional(composition),
+  edge: v.optional(coinEdge),
+  edgeLettering: v.optional(v.string()),
+  thickness: v.optional(v.number()),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
+  designers: v.optional(v.array(v.string())),
+  mintage: v.optional(v.number()),
+  issueDate: v.optional(v.string()),
+  withdrawalDate: v.optional(v.string()),
+  notes: v.optional(
+    v.object({ technical: v.optional(note), historical: v.optional(note) }),
+  ),
   factsProvenance: v.optional(provenance),
-  notesProvenance: v.optional(provenance),
   imageProvenance: v.optional(provenance),
   numistaId: v.optional(v.number()),
   ancestors: v.array(ancestor),
@@ -235,10 +259,19 @@ const rowFieldNames = [
 
 /** What only an entry's detail view shows. */
 const detailFieldNames = [
-  "technicalDetails",
-  "historicalNotes",
+  "mint",
+  "mintMark",
+  "composition",
+  "edge",
+  "edgeLettering",
+  "thickness",
+  "width",
+  "height",
+  "designers",
+  "mintage",
+  "issueDate",
+  "withdrawalDate",
   "factsProvenance",
-  "notesProvenance",
   "imageProvenance",
   "numistaId",
 ] as const;
@@ -254,6 +287,41 @@ function pick<T extends object, K extends keyof T>(
   }
   return picked;
 }
+
+/**
+ * An entry's technical details and historical notes for a reader: each in
+ * the reader's language where it is translated, otherwise as its source
+ * wrote it, in the language that names. Undefined when it has neither.
+ */
+export function notesFor(node: Doc<"catalogNodes">, reader: Locale) {
+  const translation = node.notesTranslations?.[reader];
+  const pickNote = (field: "technicalDetails" | "historicalNotes") => {
+    const translated = translation?.[field];
+    if (translated !== undefined)
+      return {
+        text: translated,
+        language: reader,
+        provenance: translation?.provenance,
+      };
+    const text = node[field];
+    if (text === undefined) return undefined;
+    return {
+      text,
+      language: node.notesLanguage ?? defaultNotesLanguage,
+      ...(node.notesProvenance && { provenance: node.notesProvenance }),
+    };
+  };
+  const technical = pickNote("technicalDetails");
+  const historical = pickNote("historicalNotes");
+  if (!technical && !historical) return undefined;
+  return {
+    ...(technical && { technical }),
+    ...(historical && { historical }),
+  };
+}
+
+const withNotes = (notes: ReturnType<typeof notesFor>) =>
+  notes ? { notes } : {};
 
 /** Links to an entry's image at both sizes, if it has one. */
 async function imageOf(ctx: QueryCtx, node: Doc<"catalogNodes">) {
@@ -289,9 +357,13 @@ const entryRowOf = async (
  * groupings right below it. Null when no node has the key.
  */
 export const node = query({
-  args: { key: v.string() },
+  args: {
+    key: v.string(),
+    /** The reader's language, for the notes; their stored one when left out. */
+    language: v.optional(language),
+  },
   returns: v.union(v.null(), entryDetail, groupDetail),
-  handler: async (ctx, { key }) => {
+  handler: async (ctx, { key, language: reader }) => {
     const user = await browsingUser(ctx);
     if (!user) return null;
     const node = await nodeByKey(ctx, key);
@@ -307,6 +379,7 @@ export const node = query({
         )),
         kind: "entry" as const,
         ...pick(node, detailFieldNames),
+        ...withNotes(notesFor(node, reader ?? user.language ?? defaultLocale)),
         ancestors,
       };
     }

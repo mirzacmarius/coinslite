@@ -1,6 +1,6 @@
 "use client";
 
-import { useI18n } from "@/locales/client";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { catalogPageSize } from "@coinslite/backend/convex/catalog/fields";
 import { isSet } from "@coinslite/backend/convex/catalog/setRules";
@@ -55,7 +55,9 @@ export function CatalogNodePage({ actions }: { actions?: React.ReactNode }) {
   const t = useI18n();
   const { nodeTitle } = useCatalogFormat();
   const { key } = useParams<{ key: string }>();
-  const node = useQuery(api.catalog.browse.node, { key });
+  const locale = useCurrentLocale();
+  // Notes come in the reader's language where they're translated.
+  const node = useQuery(api.catalog.browse.node, { key, language: locale });
 
   if (node === undefined) {
     return (

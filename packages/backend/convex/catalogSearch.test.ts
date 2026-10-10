@@ -417,7 +417,7 @@ test("a search shows at most 50 results and says when there are more", async () 
 
 test("the bundled Catalog: a broad search is capped, a narrow one is not", async () => {
   const t = newTest();
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
   const ada = await person(t, "ada@example.com");
 
   const morgan = await ada.as.query(api.catalog.search.find, {

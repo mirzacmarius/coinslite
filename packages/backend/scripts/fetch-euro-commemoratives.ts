@@ -1,7 +1,9 @@
 // Rebuilds convex/catalog/datasets/euroCommemorativeCoins.ts from the European
 // Central Bank's list of 2-euro commemorative coins: one page per year, read in
-// English and in each issuing country's language. Nothing here runs on a
-// deployment; run it by hand when the ECB adds coins, then review the diff.
+// English, in each issuing country's language, and in the app's languages the
+// ECB publishes (German, French, Romanian; Norwegian isn't one of them).
+// Nothing here runs on a deployment; run it by hand when the ECB adds coins,
+// then review the diff.
 // Usage: bun scripts/fetch-euro-commemoratives.ts [cache-dir]
 // With a cache directory, pages already saved there are read instead of fetched.
 import { execFileSync } from "node:child_process";
@@ -98,6 +100,32 @@ const localCountryNames: Record<string, Record<string, string>> = {
   sl: { Slovenija: "SI" },
 };
 
+/** The app's languages besides English that the ECB publishes its pages in. */
+const translations = ["de", "fr", "ro"] as const;
+type Translation = (typeof translations)[number];
+
+/** The labels each of those languages gives a coin's description, issuing volume and date. */
+const factLabels: Record<
+  Translation,
+  Record<"description" | "volume" | "issued", string[]>
+> = {
+  de: {
+    description: ["Beschreibung"],
+    volume: ["Ausgabevolumen", "Auflage", "Prägeauflage"],
+    issued: ["Ausgabedatum", "Ausgabetag"],
+  },
+  fr: {
+    description: ["Description"],
+    volume: ["Volume d’émission", "Volume d'émission"],
+    issued: ["Date d’émission", "Date d'émission"],
+  },
+  ro: {
+    description: ["Descriere"],
+    volume: ["Tirajul emisiunii", "Volumul emisiunii"],
+    issued: ["Data emiterii", "Data emisiunii"],
+  },
+};
+
 /** The label each language gives a coin's feature, the first thing a box says. */
 const featureLabels: Record<string, string[]> = {
   en: ["Feature"],
@@ -136,26 +164,69 @@ const keepEnglish = new Set([
   "2021 VA The 700th anniversary of the death of Dante Alighieri",
 ]);
 
-/** Short subject names where the ECB feature is an explanatory sentence. */
+/**
+ * Short subject names where the ECB feature is an explanatory sentence, by
+ * Catalog id: a country may issue several coins in a year.
+ */
 const conciseTitles: Record<string, { title: string; language: string }> = {
-  "2005 LU": { title: "Grand Dukes Henri and Adolphe", language: "en" },
-  "2011 NL": { title: "Erasmus and In Praise of Folly", language: "en" },
-  "2013 FR": { title: "Pierre de Coubertin", language: "fr" },
-  "2013 BE": { title: "Royal Meteorological Institute", language: "en" },
-  "2015 PT": { title: "Portugal and Timor-Leste", language: "pt" },
-  "2018 EE": { title: "Balti riigid", language: "et" },
-  "2018 LV": { title: "Baltijas valstis", language: "lv" },
-  "2018 LT": { title: "Baltijos valstybės", language: "lt" },
-  "2019 PT": {
+  "eur2-lu-2005-50th-birthday-of-grand-duke-henri-5th-anniversary": {
+    title: "Grand Dukes Henri and Adolphe",
+    language: "en",
+  },
+  "eur2-nl-2011-500th-anniversary-of-the-publication-of-the-world": {
+    title: "Desiderius Erasmus en Lof der Zotheid",
+    language: "nl",
+  },
+  "eur2-pt-2015-500-years-of-the-first-contacts-with-timor-nowadays": {
+    title: "Portugal e Timor-Leste",
+    language: "pt",
+  },
+  "eur2-fr-2013-150th-anniversary-of-the-birth-of-pierre-de": {
+    title: "Pierre de Coubertin",
+    language: "fr",
+  },
+  "eur2-be-2013-100th-anniversary-of-the-creation-of-the-royal": {
+    title: "Royal Meteorological Institute",
+    language: "en",
+  },
+  "eur2-ee-2018-estonia-latvia-and-lithuania-jointly-issued-a": {
+    title: "Balti riigid",
+    language: "et",
+  },
+  "eur2-lv-2018-estonia-latvia-and-lithuania-jointly-issued-a": {
+    title: "Baltijas valstis",
+    language: "lv",
+  },
+  "eur2-lt-2018-estonia-latvia-and-lithuania-jointly-issued-a": {
+    title: "Baltijos valstybės",
+    language: "lt",
+  },
+  "eur2-pt-2019-500-years-of-the-first-circumnavigation-organised": {
     title: "Primeira circum-navegação de Fernão de Magalhães",
     language: "pt",
   },
-  "2019 LT": { title: "Sutartinės", language: "lt" },
-  "2021 BE": { title: "Charles V's second coinage period", language: "en" },
-  "2024 LU": { title: "Feierstéppler", language: "de" },
-  "2024 DE": { title: "Frankfurter Verfassung", language: "de" },
-  "2024 ES": { title: "Sevilla y el Patrimonio Mundial", language: "es" },
-  "2024 LT": {
+  "eur2-lt-2019-sutartines-lithuanian-multipart-songs-inscribed-on": {
+    title: "Sutartinės",
+    language: "lt",
+  },
+  "eur2-be-2021-500th-anniversary-of-the-appearance-of-the": {
+    title: "Charles V's second coinage period",
+    language: "en",
+  },
+  "eur2-lu-2024-100th-anniversary-of-the-signature-by-the-grand": {
+    // Luxembourgish, which isn't one of the ECB's languages.
+    title: "Feierstéppler",
+    language: "en",
+  },
+  "eur2-de-2024-175th-anniversary-of-the-frankfurt-constitution": {
+    title: "Frankfurter Verfassung",
+    language: "de",
+  },
+  "eur2-es-2024-recognition-of-seville-archivo-de-indias-real": {
+    title: "Sevilla y el Patrimonio Mundial",
+    language: "es",
+  },
+  "eur2-lt-2024-lithuanian-tradition-of-straw-gardens-inscribed-on": {
     title: "Lietuvos šiaudinių sodų rišimo tradicija",
     language: "lt",
   },
@@ -322,7 +393,45 @@ const capitalised = (text: string, language: string) =>
 const greekLetters = (text: string, language: string) =>
   language === "el" ? text.replace(/\u00b5/g, "\u03bc") : text;
 
+/** A coin's description, issuing volume and date on a page in another language. */
+function translatedFacts(box: Box, language: Translation) {
+  const labels = factLabels[language];
+  const field = (names: string[]) =>
+    box.fields.find(([label]) => names.includes(label))?.[1];
+  // Some pages leave the description, the second thing a box says, unlabelled.
+  const unlabelled = box.fields[1]?.[0] === "" ? box.fields[1][1] : undefined;
+  const description = [field(labels.description) ?? unlabelled, ...box.extra]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+  const volume = field(labels.volume);
+  const issued = field(labels.issued);
+  for (const [label] of box.fields.slice(1)) {
+    if (label && !Object.values(labels).some((names) => names.includes(label)))
+      report.push(`${language}: unknown label ${label}`);
+  }
+  if (!description) return undefined;
+  return {
+    description: capitalised(description, language),
+    ...(volume && { volume }),
+    ...(issued && { issued }),
+  };
+}
+
+/** The ECB's opening paragraphs on the commemoratives: who may issue them, and that they are legal tender. */
+function introOf(html: string) {
+  const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+  const paragraphs = [...main.matchAll(/<p>(.*?)<\/p>/gs)].map(([, text]) =>
+    clean(text ?? ""),
+  );
+  return paragraphs.slice(1, 3).join(" ");
+}
+
 const index = await page("index.en.html");
+const intro: Record<string, string> = { en: introOf(index) };
+for (const language of translations) {
+  intro[language] = introOf(await page(`index.${language}.html`));
+}
 const years = [
   ...new Set(
     [...index.matchAll(/comm_(\d{4})\.en\.html/g)].map((match) =>
@@ -341,6 +450,12 @@ type Coin = {
   volume: string;
   issued: string;
   titleFrom?: { notice: string; link: string };
+  translations?: Partial<
+    Record<
+      Translation,
+      { description: string; volume?: string; issued?: string }
+    >
+  >;
 };
 const coins: Coin[] = [];
 const report: string[] = [];
@@ -358,6 +473,7 @@ for (const year of years) {
       if (language) needed.add(language);
     }
   }
+  for (const language of translations) needed.add(language);
   const local = new Map<string, Box[]>();
   for (const language of needed) {
     local.set(language, boxes(await page(`comm_${year}.${language}.html`)));
@@ -402,6 +518,33 @@ for (const year of years) {
       : undefined;
   };
 
+  /**
+   * The same coin's box on the page in one of the app's languages: a joint
+   * issue by the country's picture, other coins by their picture, or else by
+   * their place when both pages show the same pictures there.
+   */
+  const translatedBox = (
+    box: Box,
+    position: number,
+    language: Translation,
+    image: string | undefined,
+  ) => {
+    const page = local.get(language) ?? [];
+    if (box.images.length > 1)
+      return page.find(
+        (other) =>
+          other.images.length > 1 && image && other.images.includes(image),
+      );
+    const sameImage = page.filter(
+      (other) => other.images.length === 1 && other.images[0] === box.images[0],
+    );
+    if (sameImage.length === 1) return sameImage[0];
+    const there = page[position];
+    return there && there.images.join() === box.images.join()
+      ? there
+      : undefined;
+  };
+
   /** This year's coins, each with its place on the page. */
   const yearCoins: Array<Coin & { position: number }> = [];
   english.forEach((box, position) => {
@@ -435,11 +578,7 @@ for (const year of years) {
           report.push(`${year} ${country}: no ${national} title, kept English`);
         }
       }
-      const concise = conciseTitles[`${year} ${country}`];
-      if (concise) {
-        title = concise.title;
-        language = concise.language;
-      }
+
       const description = facts.get("Description");
       const volume = facts.get("Issuing volume");
       const issued = facts.get("Issuing date");
@@ -447,9 +586,25 @@ for (const year of years) {
         throw new Error(
           `${year} ${country}: incomplete entry ${JSON.stringify([...facts])}`,
         );
+      const translated: Coin["translations"] = {};
+      for (const language of translations) {
+        const other = translatedBox(box, position, language, image);
+        const facts = other && translatedFacts(other, language);
+        if (facts) translated[language] = facts;
+        else
+          report.push(
+            `${year} ${country}: no ${language} description, kept English`,
+          );
+      }
       const prefix = `eur2-${country.toLowerCase()}-${year}-`;
+      const key = prefix + slug(keyTitle || title, 64 - prefix.length);
+      const concise = conciseTitles[key];
+      if (concise) {
+        title = concise.title;
+        language = concise.language;
+      }
       yearCoins.push({
-        key: prefix + slug(keyTitle || title, 64 - prefix.length),
+        key,
         country,
         year,
         title,
@@ -461,6 +616,7 @@ for (const year of years) {
           fromJournal && {
             titleFrom: { notice: fromJournal.notice, link: fromJournal.link },
           }),
+        ...(Object.keys(translated).length > 0 && { translations: translated }),
         position,
       });
     }
@@ -484,13 +640,16 @@ const literal = (coin: Coin) =>
     .map(([name, value]) => `    ${name}: ${JSON.stringify(value)},`)
     .join("\n")}\n  },`;
 
-writeFileSync(
-  target,
+const header = (page: string) =>
   `// Generated by packages/backend/scripts/fetch-euro-commemoratives.ts from the
 // European Central Bank's list of 2-euro commemorative coins:
-// ${ecb}/index.en.html
+// ${ecb}/${page}
 // Run the script again rather than editing by hand.
+`;
 
+writeFileSync(
+  target,
+  `${header("index.en.html")}
 /** One 2-euro commemorative coin, as the ECB lists it. */
 export type EuroCommemorativeCoin = {
   /** The Catalog id: country, year and the ECB's English feature. */
@@ -504,21 +663,57 @@ export type EuroCommemorativeCoin = {
   language: string;
   /** The ECB's description of the design, in English. */
   description: string;
-  /** Issuing volume, as the ECB gives it. */
+  /** Issuing volume, as the ECB gives it in English. */
   volume: string;
-  /** Issuing date, as the ECB gives it. */
+  /** Issuing date, as the ECB gives it in English. */
   issued: string;
   /** Where the title comes from when the ECB's list gives none. */
   titleFrom?: { notice: string; link: string };
 };
 
+/** A coin's description, issuing volume and date on the ECB's page in another language. */
+export type EuroCommemorativeTranslation = {
+  description: string;
+  volume?: string;
+  issued?: string;
+};
+
+/** The ECB's opening words on the commemoratives, in English and the app's languages it publishes. */
+export const euroCommemorativesIntro: Record<"en" | "de" | "fr" | "ro", string> = ${JSON.stringify(intro, null, 2)};
+
 /** Every coin from ${years[0]} to ${years.at(-1)}: by year, then in the order they were issued. */
 export const euroCommemorativeCoins: EuroCommemorativeCoin[] = [
-${coins.map(literal).join("\n")}
+${coins.map(({ translations: _, ...coin }) => literal(coin)).join("\n")}
 ];
 `,
 );
-execFileSync("bunx", ["biome", "format", "--write", target], {
+const written = [target];
+/** Each language in a file of its own, as one file would be too large to format. */
+for (const language of translations) {
+  const file = target.replace(
+    /\.ts$/,
+    `${language.charAt(0).toUpperCase()}${language.slice(1)}.ts`,
+  );
+  const entries = coins.flatMap((coin) => {
+    const translation = coin.translations?.[language];
+    return translation
+      ? [`  ${JSON.stringify(coin.key)}: ${JSON.stringify(translation)},`]
+      : [];
+  });
+  writeFileSync(
+    file,
+    `${header(`index.${language}.html`)}
+import type { EuroCommemorativeTranslation } from "./euroCommemorativeCoins";
+
+/** The coins' descriptions, issuing volumes and dates on the ECB's pages in this language, by Catalog id. */
+export const ${language}: Record<string, EuroCommemorativeTranslation> = {
+${entries.join("\n")}
+};
+`,
+  );
+  written.push(file);
+}
+execFileSync("bunx", ["biome", "format", "--write", ...written], {
   stdio: "inherit",
 });
 

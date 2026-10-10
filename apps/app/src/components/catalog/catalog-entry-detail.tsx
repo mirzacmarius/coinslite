@@ -1,7 +1,7 @@
 "use client";
 
 import { useGradeLabels } from "@/components/items/grade-labels";
-import { useI18n } from "@/locales/client";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import type { api } from "@coinslite/backend/convex/_generated/api";
 import type { Provenance } from "@coinslite/backend/convex/catalog/fields";
@@ -29,10 +29,13 @@ type CatalogEntry = Extract<
 const numistaHref = (id: number) =>
   `https://en.numista.com/catalogue/pieces${id}.html`;
 
+type Note = NonNullable<NonNullable<CatalogEntry["notes"]>["technical"]>;
+
 /**
  * A Catalog entry: its picture and descriptive facts beside, and in the
  * properties panel how many the person holds, its metal and sizes, and where
- * its facts and notes come from.
+ * its facts and notes come from. Notes read in the reader's language where
+ * they're translated, otherwise in their source's language, marked as such.
  */
 export function CatalogEntryDetail({
   entry,
@@ -44,9 +47,11 @@ export function CatalogEntryDetail({
   actions?: React.ReactNode;
 }) {
   const t = useI18n();
+  const locale = useCurrentLocale();
   const format = useFormatters();
   const labels = useGradeLabels();
   const catalogFormat = useCatalogFormat();
+  const banknote = entry.itemType === "banknote";
 
   const filled = (rows: Array<[string, React.ReactNode]>) =>
     rows.filter(([, value]) => value !== undefined && value !== false);
@@ -59,6 +64,31 @@ export function CatalogEntryDetail({
     [
       t("items.material"),
       entry.material && t(`items.materials.${entry.material}`),
+    ],
+    [
+      t(
+        entry.designers && entry.designers.length > 1
+          ? "catalogFacts.designers"
+          : "catalogFacts.designer",
+      ),
+      entry.designers && catalogFormat.names(entry.designers),
+    ],
+    [t("catalogFacts.mint"), entry.mint],
+    [
+      t("catalogFacts.mintMark"),
+      entry.mintMark && catalogFormat.mintMark(entry.mintMark),
+    ],
+    [
+      t("catalogFacts.issued"),
+      entry.issueDate && catalogFormat.partialDate(entry.issueDate),
+    ],
+    [
+      t("catalogFacts.withdrawn"),
+      entry.withdrawalDate && catalogFormat.partialDate(entry.withdrawalDate),
+    ],
+    [
+      t(banknote ? "catalogFacts.numberIssued" : "catalogFacts.mintage"),
+      entry.mintage !== undefined && format.number(entry.mintage),
     ],
   ]);
   const physical = filled([
@@ -78,14 +108,49 @@ export function CatalogEntryDetail({
       t("items.diameter"),
       entry.diameter !== undefined && catalogFormat.millimetres(entry.diameter),
     ],
+    [
+      t("catalogFacts.thickness"),
+      entry.thickness !== undefined &&
+        catalogFormat.millimetres(entry.thickness),
+    ],
+    [
+      t("catalogFacts.size"),
+      entry.width !== undefined &&
+        entry.height !== undefined &&
+        catalogFormat.size(entry.width, entry.height),
+    ],
+    [
+      t("catalogFacts.composition"),
+      entry.composition && catalogFormat.composition(entry.composition),
+    ],
+    [
+      t("catalogFacts.edge"),
+      entry.edge && t(`catalogFacts.edges.${entry.edge}`),
+    ],
+    [t("catalogFacts.edgeLettering"), entry.edgeLettering],
   ]);
-  const notes = filled([
-    [t("catalog.historicalNotes"), entry.historicalNotes],
-    [t("catalog.technicalDetails"), entry.technicalDetails],
-  ]);
+  const notes = (
+    [
+      [t("catalog.historicalNotes"), entry.notes?.historical],
+      [t("catalog.technicalDetails"), entry.notes?.technical],
+    ] as Array<[string, Note | undefined]>
+  ).filter((pair): pair is [string, Note] => pair[1] !== undefined);
+  // One credit for notes that share their source, one each when they don't.
+  const sharedCredit =
+    notes.length > 0 &&
+    notes.every(
+      ([, note]) =>
+        JSON.stringify(note.provenance) ===
+        JSON.stringify(notes[0]?.[1].provenance),
+    );
+  const notesCredits = (
+    sharedCredit
+      ? [[t("catalog.notes"), notes[0]?.[1].provenance]]
+      : notes.map(([title, note]) => [title, note.provenance])
+  ).filter((pair): pair is [string, Provenance] => pair[1] !== undefined);
   const hasSources =
     entry.factsProvenance !== undefined ||
-    entry.notesProvenance !== undefined ||
+    notesCredits.length > 0 ||
     entry.numistaId !== undefined;
 
   return (
@@ -118,14 +183,30 @@ export function CatalogEntryDetail({
               ))}
             </dl>
           )}
-          {notes.map(([title, text]) => (
-            <section key={title} className="flex max-w-xl flex-col gap-1">
-              <h3 className="text-xs font-medium text-muted-foreground">
-                {title}
-              </h3>
-              <p className="whitespace-pre-line text-sm">{text}</p>
-            </section>
-          ))}
+          {notes.map(([title, note]) => {
+            const elsewhere = note.language !== locale;
+            return (
+              <section key={title} className="flex max-w-xl flex-col gap-1">
+                <h3 className="text-xs font-medium text-muted-foreground">
+                  {title}
+                  {elsewhere && (
+                    <span className="font-normal">
+                      {" · "}
+                      {t("catalogFacts.inLanguage", {
+                        language: catalogFormat.languageName(note.language),
+                      })}
+                    </span>
+                  )}
+                </h3>
+                <p
+                  lang={elsewhere ? note.language : undefined}
+                  className="whitespace-pre-line text-sm"
+                >
+                  {note.text}
+                </p>
+              </section>
+            );
+          })}
         </div>
         <PropertyPanel>
           <PanelSection title={t("catalog.yourCollection")}>
@@ -150,11 +231,11 @@ export function CatalogEntryDetail({
                   <Credit provenance={entry.factsProvenance} />
                 </PropertyRow>
               )}
-              {entry.notesProvenance && (
-                <PropertyRow label={t("catalog.notes")} wrap>
-                  <Credit provenance={entry.notesProvenance} />
+              {notesCredits.map(([label, provenance]) => (
+                <PropertyRow key={label} label={label} wrap>
+                  <Credit provenance={provenance} />
                 </PropertyRow>
-              )}
+              ))}
               {entry.numistaId !== undefined && (
                 <PropertyRow label={t("catalog.numista")}>
                   <a

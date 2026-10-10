@@ -1,4 +1,9 @@
-import { formatCountry, isCountryCode, locales } from "@coinslite/i18n";
+import {
+  type Locale,
+  formatCountry,
+  isCountryCode,
+  locales,
+} from "@coinslite/i18n";
 import { type Strike, strikes } from "../items/grades";
 import { type Material, materials } from "../items/rules";
 import { formatCsvRecord, parseCsv } from "./csvText";
@@ -27,6 +32,33 @@ export const preciousMetals = [
 ] as const;
 export type PreciousMetal = (typeof preciousMetals)[number];
 
+/** The metals a coin's alloy is made of, in its composition; each is also a material. */
+export const alloyMetals = [
+  "aluminium",
+  "copper",
+  "gold",
+  "iron",
+  "nickel",
+  "palladium",
+  "platinum",
+  "silver",
+  "tin",
+  "zinc",
+] as const;
+export type AlloyMetal = (typeof alloyMetals)[number];
+
+/** How a coin's edge is finished. */
+export const coinEdges = [
+  "plain",
+  "reeded",
+  "interruptedReeding",
+  "lettered",
+] as const;
+export type CoinEdge = (typeof coinEdges)[number];
+
+/** A mint mark that says the coin has none, as Philadelphia's dollars did. */
+export const noMintMark = "none";
+
 export const catalogErrors = {
   // The file
   emptyFile: "EMPTY_FILE",
@@ -45,12 +77,18 @@ export const catalogErrors = {
   invalidCountry: "INVALID_COUNTRY",
   invalidNumber: "INVALID_NUMBER",
   invalidYear: "INVALID_YEAR",
+  /** Dates are YYYY-MM-DD, YYYY-MM or YYYY. */
+  invalidDate: "INVALID_DATE",
   invalidUrl: "INVALID_URL",
   numistaData: "NUMISTA_DATA",
   // The node
   itemTypeRequired: "ITEM_TYPE_REQUIRED",
   notForType: "FIELD_NOT_FOR_TYPE",
   yearsReversed: "YEARS_REVERSED",
+  /** A translation of the notes in the language they're written in. */
+  sameLanguage: "SAME_LANGUAGE",
+  /** It stopped being legal tender before it was issued. */
+  datesReversed: "DATES_REVERSED",
   sourceRequired: "SOURCE_REQUIRED",
   /** Facts, notes and images each need their source, author, licence and link. */
   creditRequired: "CREDIT_REQUIRED",
@@ -81,13 +119,20 @@ export const catalogLimits = {
   title: 200,
   denomination: 100,
   series: 100,
+  mint: 100,
+  mintMark: 20,
+  edgeLettering: 200,
+  /** Each designer's name. */
+  designer: 100,
+  designers: 10,
   notes: 5000,
   provenance: 200,
   url: 2000,
   /** Grams. */
   weight: 100_000,
-  /** Millimetres. */
+  /** Millimetres: a coin's diameter and thickness, a banknote's width and height. */
   diameter: 500,
+  mintage: 1e12,
   sortOrder: 1_000_000_000,
   /** Items one save or delete updates: those linked to the entries it changes. */
   linkedItems: 1000,
@@ -119,23 +164,80 @@ export type NodeValues = {
   diameter?: number;
   yearFrom?: number;
   yearTo?: number;
+  mint?: string;
+  /** "none" when the coin has no mint mark. */
+  mintMark?: string;
+  /** "silver 90%; copper 10%", in `alloyMetals`. */
+  composition?: string;
+  edge?: CoinEdge;
+  edgeLettering?: string;
+  thickness?: number;
+  width?: number;
+  height?: number;
+  /** Names separated by "; ". */
+  designers?: string;
+  /** How many were struck or printed. */
+  mintage?: number;
+  /** YYYY-MM-DD, YYYY-MM or YYYY. */
+  issueDate?: string;
+  /** When it stopped being legal tender: YYYY-MM-DD, YYYY-MM or YYYY. */
+  withdrawalDate?: string;
+  /** The language the notes are written in, as their source wrote them; English when unset. */
+  notesLanguage?: string;
   technicalDetails?: string;
   historicalNotes?: string;
   imageUrl?: string;
   numistaId?: number;
-} & Partial<Record<ProvenanceKey, string>>;
+} & Partial<Record<ProvenanceKey | TranslationKey, string>>;
 
-const provenanceGroups = ["facts", "notes", "image"] as const;
+/** The language notes are in when nothing says otherwise. */
+export const defaultNotesLanguage = "en";
+
+const capitalised = <T extends string>(text: T) =>
+  `${text.charAt(0).toUpperCase()}${text.slice(1)}` as Capitalize<T>;
+
+/** The notes in one of the app's languages, credited on their own: "notesDe". */
+type TranslationGroup = `notes${Capitalize<Locale>}`;
+const translationGroupOf = (locale: Locale) =>
+  `notes${capitalised(locale)}` as TranslationGroup;
+/** A translated note: "historicalNotesDe". */
+type TranslationKey =
+  `${"technicalDetails" | "historicalNotes"}${Capitalize<Locale>}`;
+export const translationKeysOf = (locale: Locale) => ({
+  technicalDetails: `technicalDetails${capitalised(locale)}` as TranslationKey,
+  historicalNotes: `historicalNotes${capitalised(locale)}` as TranslationKey,
+});
+
+/** Groups of values stored with their provenance on the node. */
+const storedGroups = ["facts", "notes", "image"] as const;
+const provenanceGroups = [
+  ...storedGroups,
+  ...locales.map(translationGroupOf),
+] as const;
 const provenanceParts = ["source", "author", "licence", "link"] as const;
-type ProvenanceGroup = (typeof provenanceGroups)[number];
+type ProvenanceGroup = (typeof storedGroups)[number] | TranslationGroup;
 type ProvenancePart = (typeof provenanceParts)[number];
 type ProvenanceKey = `${ProvenanceGroup}${Capitalize<ProvenancePart>}`;
 type ValueKey = keyof NodeValues;
 
-/** "facts" and "source" make factsSource. */
-function provenanceKey(group: ProvenanceGroup, part: ProvenancePart) {
-  return `${group}${part.charAt(0).toUpperCase()}${part.slice(1)}` as ProvenanceKey;
+/** "facts" and "source" make factsSource; "notesDe" and "source" make notesDeSource. */
+export function provenanceKey(group: ProvenanceGroup, part: ProvenancePart) {
+  return `${group}${capitalised(part)}` as ProvenanceKey;
 }
+
+/** The locale a translation group holds, if it is one. */
+const localeOfGroup = (group: ProvenanceGroup) =>
+  locales.find((locale) => translationGroupOf(locale) === group);
+
+/** facts_source, or for a translation notes_source_de. */
+const provenanceColumn = (group: ProvenanceGroup, part: ProvenancePart) => {
+  const locale = localeOfGroup(group);
+  return locale ? `notes_${part}_${locale}` : `${group}_${part}`;
+};
+
+const translationValueKeys = new Set<string>(
+  locales.flatMap((locale) => Object.values(translationKeysOf(locale))),
+);
 const provenanceKeys = new Set<string>(
   provenanceGroups.flatMap((group) =>
     provenanceParts.map((part) => provenanceKey(group, part)),
@@ -155,18 +257,42 @@ const groupValues: Record<ProvenanceGroup, ValueKey[]> = {
     "diameter",
     "yearFrom",
     "yearTo",
+    "mint",
+    "mintMark",
+    "composition",
+    "edge",
+    "edgeLettering",
+    "thickness",
+    "width",
+    "height",
+    "designers",
+    "mintage",
+    "issueDate",
+    "withdrawalDate",
   ],
   notes: ["technicalDetails", "historicalNotes"],
   image: ["imageUrl"],
+  ...(Object.fromEntries(
+    locales.map((locale) => [
+      translationGroupOf(locale),
+      Object.values(translationKeysOf(locale)),
+    ]),
+  ) as Record<TranslationGroup, ValueKey[]>),
 };
 
-/** Coins only: a banknote has no metal or size. */
+/** Coins only: a banknote has no metal, coin size, edge or mint. */
 export const coinOnlyValues = [
   "material",
   "metal",
   "weight",
   "fineness",
   "diameter",
+  "thickness",
+  "composition",
+  "edge",
+  "edgeLettering",
+  "mint",
+  "mintMark",
 ] as const satisfies readonly ValueKey[];
 
 class CellError {
@@ -220,6 +346,98 @@ const year: Read = (cell) => {
   )
     fail(catalogErrors.invalidYear);
   return number;
+};
+
+/** A whole number from zero up to `max`. */
+const count =
+  (max: number): Read =>
+  (cell) => {
+    const value = cell.trim();
+    if (!value) return undefined;
+    const number = Number(value);
+    if (!/^\d+$/.test(value) || number > max) fail(catalogErrors.invalidNumber);
+    return number;
+  };
+
+/** YYYY-MM-DD, YYYY-MM or YYYY, a day that exists. */
+const date: Read = (cell) => {
+  const value = cell.trim();
+  if (!value) return undefined;
+  const match = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(value);
+  if (!match) return fail(catalogErrors.invalidDate);
+  const [, year, month = "01", day = "01"] = match;
+  const parsed = new Date(`${year}-${month}-${day}T00:00:00Z`);
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getUTCMonth() + 1 !== Number(month) ||
+    parsed.getUTCDate() !== Number(day)
+  )
+    fail(catalogErrors.invalidDate);
+  return value;
+};
+
+/** "Silver 90 %; copper 10" reads as "silver 90%; copper 10%": known metals, each once, 100% at most. */
+const composition: Read = (cell) => {
+  const value = cell.trim();
+  if (!value) return undefined;
+  const parts = value.split(";").map((part) => {
+    const match = /^([a-z]+)\s+(\d+(?:\.\d+)?)\s*%?$/i.exec(part.trim());
+    const metal = alloyMetals.find(
+      (known) => known === match?.[1]?.toLowerCase(),
+    );
+    const percent = Number(match?.[2]);
+    if (!match || !metal || !(percent > 0)) fail(catalogErrors.invalidValue);
+    return { metal: metal as AlloyMetal, percent };
+  });
+  const total = parts.reduce((sum, { percent }) => sum + percent, 0);
+  if (
+    total > 100.001 ||
+    new Set(parts.map(({ metal }) => metal)).size !== parts.length
+  )
+    fail(catalogErrors.invalidValue);
+  return formatComposition(parts);
+};
+
+/** A composition as stored, in the words CSV files use. */
+export const formatComposition = (
+  parts: ReadonlyArray<{ metal: AlloyMetal; percent: number }>,
+) => parts.map(({ metal, percent }) => `${metal} ${percent}%`).join("; ");
+
+/** A composition's parts, from the words CSV files use. */
+export const parseComposition = (text: string) =>
+  text.split("; ").map((part) => {
+    const [metal, percent] = part.split(" ");
+    return {
+      metal: metal as AlloyMetal,
+      percent: Number.parseFloat(percent as string),
+    };
+  });
+
+/** Names separated by semicolons, each within the limit. */
+const designers: Read = (cell) => {
+  const value = cell.trim();
+  if (!value) return undefined;
+  const names = value.split(";").map((name) => name.trim());
+  if (names.some((name) => !name) || names.length > catalogLimits.designers)
+    fail(catalogErrors.invalidValue);
+  if (names.some((name) => name.length > catalogLimits.designer))
+    fail(catalogErrors.tooLong);
+  return names.join("; ");
+};
+
+/** A language code such as "en" or "nb", lowercased. */
+const language: Read = (cell) => {
+  const value = cell.trim().toLowerCase();
+  if (!value) return undefined;
+  return /^[a-z]{2,3}$/.test(value) ? value : fail(catalogErrors.invalidValue);
+};
+
+/** Any mark, or "none" in any case for a coin with none. */
+const mintMark: Read = (cell) => {
+  const value = text(catalogLimits.mintMark)(cell);
+  return typeof value === "string" && value.toLowerCase() === noMintMark
+    ? noMintMark
+    : value;
 };
 
 const country: Read = (cell) => {
@@ -279,7 +497,7 @@ const provenanceText = notFromNumista(text(catalogLimits.provenance));
 const provenanceColumns = Object.fromEntries(
   provenanceGroups.flatMap((group) =>
     provenanceParts.map((part) => [
-      `${group}_${part}`,
+      provenanceColumn(group, part),
       {
         value: provenanceKey(group, part),
         read: part === "link" ? url : provenanceText,
@@ -306,6 +524,37 @@ const valueColumns: Record<string, { value: ValueKey; read: Read }> = {
   diameter_mm: { value: "diameter", read: measure(catalogLimits.diameter) },
   year_from: { value: "yearFrom", read: year },
   year_to: { value: "yearTo", read: year },
+  mint: { value: "mint", read: notFromNumista(text(catalogLimits.mint)) },
+  mint_mark: { value: "mintMark", read: mintMark },
+  composition: { value: "composition", read: composition },
+  edge: { value: "edge", read: oneOf(coinEdges) },
+  edge_lettering: {
+    value: "edgeLettering",
+    read: text(catalogLimits.edgeLettering),
+  },
+  thickness_mm: { value: "thickness", read: measure(catalogLimits.diameter) },
+  width_mm: { value: "width", read: measure(catalogLimits.diameter) },
+  height_mm: { value: "height", read: measure(catalogLimits.diameter) },
+  designers: { value: "designers", read: notFromNumista(designers) },
+  mintage: { value: "mintage", read: count(catalogLimits.mintage) },
+  issue_date: { value: "issueDate", read: date },
+  withdrawal_date: { value: "withdrawalDate", read: date },
+  notes_language: { value: "notesLanguage", read: language },
+  ...Object.fromEntries(
+    locales.flatMap((locale) => {
+      const keys = translationKeysOf(locale);
+      return [
+        [
+          `technical_details_${locale}`,
+          { value: keys.technicalDetails, read: text(catalogLimits.notes) },
+        ],
+        [
+          `historical_notes_${locale}`,
+          { value: keys.historicalNotes, read: text(catalogLimits.notes) },
+        ],
+      ];
+    }),
+  ),
   technical_details: {
     value: "technicalDetails",
     read: text(catalogLimits.notes),
@@ -323,7 +572,9 @@ const valueColumns: Record<string, { value: ValueKey; read: Read }> = {
 /**
  * Every Catalog CSV column, in the order exports write them: the spec's
  * columns first, then the Numista cross-reference and the provenance of each
- * group of facts.
+ * group of facts, then the technical facts added since, the notes' language
+ * and the notes in each of the app's languages with their credit. A file may
+ * leave out any column but id and title.
  */
 export const catalogCsvColumns = [
   "id",
@@ -359,7 +610,27 @@ export const catalogCsvColumns = [
   "notes_author",
   "notes_licence",
   "notes_link",
-] as const;
+  "mint",
+  "mint_mark",
+  "composition",
+  "edge",
+  "edge_lettering",
+  "thickness_mm",
+  "width_mm",
+  "height_mm",
+  "designers",
+  "mintage",
+  "issue_date",
+  "withdrawal_date",
+  "notes_language",
+  ...locales.flatMap((locale) => [
+    `technical_details_${locale}`,
+    `historical_notes_${locale}`,
+    ...provenanceParts.map((part) =>
+      provenanceColumn(translationGroupOf(locale), part),
+    ),
+  ]),
+];
 
 const columnOf = Object.fromEntries(
   Object.entries(valueColumns).map(([column, { value }]) => [value, column]),
@@ -538,6 +809,15 @@ export function checkNode(
     values.yearTo < values.yearFrom
   )
     problems.push({ column: "year_to", code: catalogErrors.yearsReversed });
+  if (
+    values.issueDate !== undefined &&
+    values.withdrawalDate !== undefined &&
+    datesReversed(values.issueDate, values.withdrawalDate)
+  )
+    problems.push({
+      column: "withdrawal_date",
+      code: catalogErrors.datesReversed,
+    });
   // Catalog data of unknown origin is never stored (ADR 0003), and each
   // group of facts, notes and images is credited in full: source, author,
   // licence and link.
@@ -551,7 +831,7 @@ export function checkNode(
     if (!hasData && !credited) continue;
     if (values[provenanceKey(group, "source")] === undefined)
       problems.push({
-        column: `${group}_source`,
+        column: provenanceColumn(group, "source"),
         code: catalogErrors.sourceRequired,
       });
     // Credit for data that isn't there yet needs only its source.
@@ -559,12 +839,36 @@ export function checkNode(
     for (const part of ["author", "licence", "link"] as const) {
       if (values[provenanceKey(group, part)] === undefined)
         problems.push({
-          column: `${group}_${part}`,
+          column: provenanceColumn(group, part),
           code: catalogErrors.creditRequired,
         });
     }
   }
+  // The notes themselves are in their own language; a translation adds another.
+  const own = locales.find(
+    (locale) => locale === (values.notesLanguage ?? defaultNotesLanguage),
+  );
+  if (own) {
+    const keys = translationKeysOf(own);
+    const translated = (["technicalDetails", "historicalNotes"] as const).find(
+      (note) => values[keys[note]] !== undefined,
+    );
+    if (translated)
+      problems.push({
+        column: columnOf[keys[translated]],
+        code: catalogErrors.sameLanguage,
+      });
+  }
   return problems;
+}
+
+/**
+ * Whether a date comes before another, as far as both say: 1903-12-31 comes
+ * before 1904, but 1904-03 doesn't come before 1904.
+ */
+function datesReversed(from: string, to: string) {
+  const length = Math.min(from.length, to.length);
+  return to.slice(0, length) < from.slice(0, length);
 }
 
 /** Where a group of facts comes from, as stored on a node. */
@@ -575,29 +879,68 @@ export type Provenance = {
   link?: string;
 };
 
+/** The notes in another of the app's languages, with their own credit. */
+export type NotesTranslation = {
+  technicalDetails?: string;
+  historicalNotes?: string;
+  provenance: Provenance;
+};
+
 /** The stored form of a node's values. */
-export type NodeFields = Omit<NodeValues, ProvenanceKey> & {
+export type NodeFields = Omit<
+  NodeValues,
+  ProvenanceKey | TranslationKey | "composition" | "designers"
+> & {
+  composition?: Array<{ metal: AlloyMetal; percent: number }>;
+  designers?: string[];
   factsProvenance?: Provenance;
   notesProvenance?: Provenance;
   imageProvenance?: Provenance;
+  notesTranslations?: Partial<Record<Locale, NotesTranslation>>;
 };
+
+/** A provenance record from its flattened values, if it has a source. */
+function provenanceOf(values: NodeValues, group: ProvenanceGroup) {
+  const source = values[provenanceKey(group, "source")];
+  if (source === undefined) return undefined;
+  const record: Provenance = { source };
+  for (const part of ["author", "licence", "link"] as const) {
+    const value = values[provenanceKey(group, part)];
+    if (value !== undefined) record[part] = value;
+  }
+  return record;
+}
 
 /** Stored fields from values, dropping the ones that are unset. */
 export function fieldsFromValues(values: NodeValues): NodeFields {
   const fields: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(values)) {
-    if (value !== undefined && !isProvenanceKey(key)) fields[key] = value;
+    if (value !== undefined && !isProvenanceKey(key) && !isTranslationKey(key))
+      fields[key] = value;
   }
-  for (const group of provenanceGroups) {
-    const source = values[provenanceKey(group, "source")];
-    if (source === undefined) continue;
-    const record: Record<string, string> = { source };
-    for (const part of ["author", "licence", "link"] as const) {
-      const value = values[provenanceKey(group, part)];
-      if (value !== undefined) record[part] = value;
-    }
-    fields[`${group}Provenance`] = record;
+  if (values.composition !== undefined)
+    fields.composition = parseComposition(values.composition);
+  if (values.designers !== undefined)
+    fields.designers = values.designers.split("; ");
+  for (const group of storedGroups) {
+    const record = provenanceOf(values, group);
+    if (record) fields[`${group}Provenance`] = record;
   }
+  const translations: Partial<Record<Locale, NotesTranslation>> = {};
+  for (const locale of locales) {
+    const provenance = provenanceOf(values, translationGroupOf(locale));
+    if (!provenance) continue;
+    const keys = translationKeysOf(locale);
+    const technicalDetails = values[keys.technicalDetails];
+    const historicalNotes = values[keys.historicalNotes];
+    translations[locale] = {
+      ...(technicalDetails !== undefined && { technicalDetails }),
+      ...(historicalNotes !== undefined && { historicalNotes }),
+      provenance,
+    };
+  }
+  if (Object.keys(translations).length > 0)
+    fields.notesTranslations = translations;
   return fields as NodeFields;
 }
 
@@ -606,21 +949,55 @@ export function valuesFromFields(fields: NodeFields): NodeValues {
   const values: Record<string, unknown> = {};
   for (const key of Object.keys(columnOf)) {
     const value = (fields as Record<string, unknown>)[key];
-    if (value !== undefined && !isProvenanceKey(key)) values[key] = value;
+    if (value !== undefined && !isProvenanceKey(key) && !isTranslationKey(key))
+      values[key] = value;
   }
-  for (const group of provenanceGroups) {
-    const record = fields[`${group}Provenance`];
-    if (!record) continue;
+  if (fields.composition !== undefined)
+    values.composition = formatComposition(fields.composition);
+  if (fields.designers !== undefined)
+    values.designers = fields.designers.join("; ");
+  const setProvenance = (group: ProvenanceGroup, record?: Provenance) => {
+    if (!record) return;
     for (const part of provenanceParts) {
       if (record[part] !== undefined)
         values[provenanceKey(group, part)] = record[part];
     }
+  };
+  for (const group of storedGroups) {
+    setProvenance(group, fields[`${group}Provenance`]);
+  }
+  for (const locale of locales) {
+    const translation = fields.notesTranslations?.[locale];
+    if (!translation) continue;
+    const keys = translationKeysOf(locale);
+    if (translation.technicalDetails !== undefined)
+      values[keys.technicalDetails] = translation.technicalDetails;
+    if (translation.historicalNotes !== undefined)
+      values[keys.historicalNotes] = translation.historicalNotes;
+    setProvenance(translationGroupOf(locale), translation.provenance);
   }
   return values as NodeValues;
 }
 
 const isProvenanceKey = (key: string): key is ProvenanceKey =>
   provenanceKeys.has(key);
+const isTranslationKey = (key: string): key is TranslationKey =>
+  translationValueKeys.has(key);
+
+/** A translation's values: its notes and its credit, "historicalNotesDe" and "notesDeSource". */
+export type TranslationValueKey =
+  | TranslationKey
+  | `${TranslationGroup}${Capitalize<ProvenancePart>}`;
+
+/** The values of the translations into `languages`. */
+export function translationValuesOf(languages: readonly Locale[]) {
+  return languages.flatMap((locale) => [
+    ...Object.values(translationKeysOf(locale)),
+    ...provenanceParts.map((part) =>
+      provenanceKey(translationGroupOf(locale), part),
+    ),
+  ]) as TranslationValueKey[];
+}
 
 /**
  * The values the Catalog editor sets on a node: all of them but the image
@@ -641,6 +1018,19 @@ export const editorValueKeys = [
   "diameter",
   "yearFrom",
   "yearTo",
+  "mint",
+  "mintMark",
+  "composition",
+  "edge",
+  "edgeLettering",
+  "thickness",
+  "width",
+  "height",
+  "designers",
+  "mintage",
+  "issueDate",
+  "withdrawalDate",
+  "notesLanguage",
   "technicalDetails",
   "historicalNotes",
   "numistaId",
@@ -652,6 +1042,7 @@ export const editorValueKeys = [
   "notesAuthor",
   "notesLicence",
   "notesLink",
+  ...translationValuesOf(locales),
 ] as const satisfies readonly ValueKey[];
 export type EditorValueKey = (typeof editorValueKeys)[number];
 

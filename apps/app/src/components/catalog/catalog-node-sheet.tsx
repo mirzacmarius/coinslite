@@ -6,13 +6,22 @@ import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import {
   type CatalogItemType,
+  type CoinEdge,
+  alloyMetals,
   catalogItemTypes,
   catalogLimits,
+  coinEdges,
   preciousMetals,
+  translationValuesOf,
 } from "@coinslite/backend/convex/catalog/fields";
 import { commonLicences } from "@coinslite/backend/convex/catalog/imageRules";
 import { materials } from "@coinslite/backend/convex/items/rules";
-import { countryCodes, formatCountry } from "@coinslite/i18n";
+import {
+  type Locale,
+  countryCodes,
+  formatCountry,
+  locales,
+} from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   Dialog,
@@ -37,10 +46,12 @@ import { ConvexError } from "convex/values";
 import {
   BookOpen,
   ChevronRight,
+  CircleDashed,
   Coins,
   Gem,
   Globe,
   Hammer,
+  Languages,
   Loader2,
   type LucideIcon,
   X,
@@ -59,8 +70,10 @@ import {
   hasCoinFacts,
   problemsOf,
   suggestedKey,
+  translationFields,
   valuesFromNode,
 } from "./catalog-node-form";
+import { useCatalogFormat } from "./use-catalog-format";
 
 /** What the sheet opens on: a new node below a parent (none for a root), or an existing one. */
 export type NodeSheetTarget =
@@ -84,6 +97,9 @@ const knownProblemCodes = [
   "ITEM_TYPE_REQUIRED",
   "FIELD_NOT_FOR_TYPE",
   "YEARS_REVERSED",
+  "INVALID_DATE",
+  "DATES_REVERSED",
+  "SAME_LANGUAGE",
   "SOURCE_REQUIRED",
   "CREDIT_REQUIRED",
   "ROOT_NOT_ADDABLE",
@@ -236,8 +252,21 @@ const fieldOrder: NodeFormField[] = [
   "material",
   "metal",
   "weight",
+  "designers",
+  "issueDate",
+  "withdrawalDate",
+  "mintage",
   "fineness",
   "diameter",
+  "thickness",
+  "width",
+  "height",
+  "composition",
+  "edge",
+  "edgeLettering",
+  "mint",
+  "mintMark",
+  "notesLanguage",
   "historicalNotes",
   "technicalDetails",
   "factsSource",
@@ -248,12 +277,27 @@ const fieldOrder: NodeFormField[] = [
   "notesAuthor",
   "notesLicence",
   "notesLink",
+  ...translationFields,
   "numistaId",
 ];
 
+/** The language each translation field belongs to. */
+const languageOfField = new Map<string, Locale>(
+  locales.flatMap((locale) =>
+    translationValuesOf([locale]).map((key) => [key, locale] as const),
+  ),
+);
+
 type TextField = Exclude<
   NodeFormField,
-  "kind" | "itemType" | "country" | "material" | "strike" | "metal"
+  | "kind"
+  | "itemType"
+  | "country"
+  | "material"
+  | "strike"
+  | "metal"
+  | "edge"
+  | "notesLanguage"
 >;
 
 function NodeForm({
@@ -272,6 +316,7 @@ function NodeForm({
   const mod = useModifierKey();
   const baseId = useId();
   const labels = useGradeLabels();
+  const { languageName } = useCatalogFormat();
   const createNode = useMutation(api.catalog.editor.create);
   const updateNode = useMutation(api.catalog.editor.update);
   const creating = node === undefined;
@@ -285,6 +330,8 @@ function NodeForm({
   const [keyTyped, setKeyTyped] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [failed, setFailed] = useState<string>();
+  /** The language whose translation the sheet shows. */
+  const [translationLanguage, setTranslationLanguage] = useState<Locale>();
 
   const problemText = (code: string) =>
     knownProblems.has(code)
@@ -335,6 +382,15 @@ function NodeForm({
     setSubmitted(true);
     const first = fieldOrder.find((field) => problems[field]);
     if (first) {
+      const language = languageOfField.get(first);
+      if (language) {
+        // Show that translation first, then focus its field.
+        setTranslationLanguage(language);
+        requestAnimationFrame(() =>
+          document.getElementById(`${baseId}-${first}`)?.focus(),
+        );
+        return;
+      }
       document.getElementById(`${baseId}-${first}`)?.focus();
       return;
     }
@@ -374,6 +430,26 @@ function NodeForm({
     value: metal,
     label: t(`items.materials.${metal}`),
   }));
+  const edgeOptions = coinEdges.map((edge) => ({
+    value: edge,
+    label: t(`catalogFacts.edges.${edge}`),
+  }));
+  const languageOptions = [
+    ...locales,
+    ...(locales.includes(values.notesLanguage as Locale)
+      ? []
+      : [values.notesLanguage]),
+  ].map((language) => ({ value: language, label: languageName(language) }));
+  /** Each language but the notes' own, and any that still holds a translation. */
+  const hasTranslation = (language: Locale) =>
+    translationValuesOf([language]).some((key) => values[key].trim() !== "");
+  const translationLanguages = locales.filter(
+    (language) => language !== values.notesLanguage || hasTranslation(language),
+  );
+  const shownTranslation =
+    translationLanguage && translationLanguages.includes(translationLanguage)
+      ? translationLanguage
+      : translationLanguages[0];
   const kindOptions = isRoot
     ? (["country", "theme"] as const)
     : (["grouping", "entry"] as const);
@@ -425,8 +501,12 @@ function NodeForm({
     </form.Field>
   );
   const notesField = (
-    name: "historicalNotes" | "technicalDetails",
+    name: Extract<
+      TextField,
+      `${"historicalNotes" | "technicalDetails"}${string}`
+    >,
     label: string,
+    language: string,
   ) => (
     <form.Field name={name}>
       {(field) => (
@@ -439,6 +519,7 @@ function NodeForm({
           {(control) => (
             <textarea
               {...control}
+              lang={language}
               rows={3}
               className={textareaClass}
               maxLength={catalogLimits.notes}
@@ -451,7 +532,9 @@ function NodeForm({
       )}
     </form.Field>
   );
-  const sourceFields = (group: "facts" | "notes") => (
+  const sourceFields = (
+    group: "facts" | "notes" | `notes${Capitalize<Locale>}`,
+  ) => (
     <>
       {textField(`${group}Source`, t("catalogImages.source"), {
         placeholder: t("catalogImages.sourcePlaceholder"),
@@ -474,12 +557,20 @@ function NodeForm({
     </>
   );
   const picker = <T extends string>(
-    name: "itemType" | "country" | "material" | "strike" | "metal",
+    name:
+      | "itemType"
+      | "country"
+      | "material"
+      | "strike"
+      | "metal"
+      | "edge"
+      | "notesLanguage",
     props: {
       label: string;
       icon: LucideIcon;
       placeholder: string;
-      clearLabel: string;
+      /** Without one, the value can be changed but not cleared. */
+      clearLabel?: string;
       options: Array<{ value: T; label: string }>;
       onChange?: (value: T | undefined) => void;
     },
@@ -503,10 +594,14 @@ function NodeForm({
                 field.handleChange(value as never);
                 props.onChange?.(value);
               }}
-              onClear={() => {
-                field.handleChange(undefined as never);
-                props.onChange?.(undefined);
-              }}
+              onClear={
+                props.clearLabel
+                  ? () => {
+                      field.handleChange(undefined as never);
+                      props.onChange?.(undefined);
+                    }
+                  : undefined
+              }
               clearLabel={props.clearLabel}
               noResults={t("items.noMatches")}
             />
@@ -657,7 +752,47 @@ function NodeForm({
             clearLabel: t("items.noStrike"),
             options: labels.strikeOptions(),
           })}
+          {textField(
+            "designers",
+            t(
+              values.designers.includes(";")
+                ? "catalogFacts.designers"
+                : "catalogFacts.designer",
+            ),
+            {
+              hint: t("catalogFacts.editor.designersHint"),
+              maxLength: (catalogLimits.designer + 2) * catalogLimits.designers,
+              wide: true,
+            },
+          )}
+          {textField("issueDate", t("catalogFacts.issued"), {
+            hint: t("catalogFacts.editor.dateHint"),
+          })}
+          {textField("withdrawalDate", t("catalogFacts.withdrawn"), {
+            hint: t("catalogFacts.editor.dateHint"),
+          })}
+          {textField(
+            "mintage",
+            t(coin ? "catalogFacts.mintage" : "catalogFacts.numberIssued"),
+            {
+              hint: t("catalogFacts.editor.mintageHint"),
+              inputMode: "numeric",
+            },
+          )}
         </FormSection>
+
+        {!coin && (
+          <FormSection title={t("items.physical")}>
+            {textField("width", t("catalogFacts.editor.width"), {
+              hint: t("items.millimetres"),
+              inputMode: "decimal",
+            })}
+            {textField("height", t("catalogFacts.editor.height"), {
+              hint: t("items.millimetres"),
+              inputMode: "decimal",
+            })}
+          </FormSection>
+        )}
 
         {coin && (
           <FormSection title={t("items.physical")}>
@@ -687,12 +822,56 @@ function NodeForm({
               hint: t("items.millimetres"),
               inputMode: "decimal",
             })}
+            {textField("thickness", t("catalogFacts.thickness"), {
+              hint: t("items.millimetres"),
+              inputMode: "decimal",
+            })}
+            {textField("composition", t("catalogFacts.composition"), {
+              hint: t("catalogFacts.editor.compositionHint", {
+                metals: alloyMetals.join(", "),
+              }),
+              wide: true,
+            })}
+            {picker<CoinEdge>("edge", {
+              label: t("catalogFacts.edge"),
+              icon: CircleDashed,
+              placeholder: t("catalogFacts.editor.setEdge"),
+              clearLabel: t("catalogFacts.editor.noEdge"),
+              options: edgeOptions,
+            })}
+            {textField("edgeLettering", t("catalogFacts.edgeLettering"), {
+              maxLength: catalogLimits.edgeLettering,
+            })}
+            {textField("mint", t("catalogFacts.mint"), {
+              maxLength: catalogLimits.mint,
+            })}
+            {textField("mintMark", t("catalogFacts.mintMark"), {
+              hint: t("catalogFacts.editor.mintMarkHint"),
+              maxLength: catalogLimits.mintMark,
+            })}
           </FormSection>
         )}
 
         <FormSection title={t("catalog.notes")}>
-          {notesField("historicalNotes", t("catalog.historicalNotes"))}
-          {notesField("technicalDetails", t("catalog.technicalDetails"))}
+          {picker("notesLanguage", {
+            label: t("catalogFacts.editor.notesLanguage"),
+            icon: Languages,
+            placeholder: t("catalogFacts.editor.setNotesLanguage"),
+            options: languageOptions,
+          })}
+          <p className="self-end text-xs text-muted-foreground">
+            {t("catalogFacts.editor.notesLanguageHint")}
+          </p>
+          {notesField(
+            "historicalNotes",
+            t("catalog.historicalNotes"),
+            values.notesLanguage,
+          )}
+          {notesField(
+            "technicalDetails",
+            t("catalog.technicalDetails"),
+            values.notesLanguage,
+          )}
         </FormSection>
 
         <FormSection
@@ -704,6 +883,31 @@ function NodeForm({
         <FormSection title={t("catalogEditor.notesSources")}>
           {sourceFields("notes")}
         </FormSection>
+
+        {shownTranslation && (
+          <FormSection
+            title={t("catalogFacts.editor.translations")}
+            hint={t("catalogFacts.editor.translationsHint")}
+          >
+            <div className="sm:col-span-2">
+              <SegmentedControl<Locale>
+                label={t("catalogFacts.editor.translationLanguage")}
+                options={translationLanguages.map((language) => ({
+                  value: language,
+                  label: languageName(language),
+                }))}
+                value={shownTranslation}
+                onChange={setTranslationLanguage}
+              />
+            </div>
+            <TranslationFields
+              key={shownTranslation}
+              language={shownTranslation}
+              notesField={notesField}
+              sourceFields={sourceFields}
+            />
+          </FormSection>
+        )}
         <datalist id={`${baseId}-licences`}>
           {commonLicences.map((licence) => (
             <option key={licence} value={licence} />
@@ -799,6 +1003,43 @@ function NodeForm({
         </div>
       </DialogFooter>
     </form>
+  );
+}
+
+/** One language's translated notes and where the translation comes from. */
+function TranslationFields({
+  language,
+  notesField,
+  sourceFields,
+}: {
+  language: Locale;
+  notesField: (
+    name: `${"historicalNotes" | "technicalDetails"}${Capitalize<Locale>}`,
+    label: string,
+    language: string,
+  ) => React.ReactNode;
+  sourceFields: (group: `notes${Capitalize<Locale>}`) => React.ReactNode;
+}) {
+  const t = useI18n();
+  const suffix =
+    `${language.charAt(0).toUpperCase()}${language.slice(1)}` as Capitalize<Locale>;
+  return (
+    <>
+      {notesField(
+        `historicalNotes${suffix}`,
+        t("catalog.historicalNotes"),
+        language,
+      )}
+      {notesField(
+        `technicalDetails${suffix}`,
+        t("catalog.technicalDetails"),
+        language,
+      )}
+      <h4 className="text-xs font-medium text-muted-foreground sm:col-span-2">
+        {t("catalogFacts.editor.translationSources")}
+      </h4>
+      {sourceFields(`notes${suffix}`)}
+    </>
   );
 }
 

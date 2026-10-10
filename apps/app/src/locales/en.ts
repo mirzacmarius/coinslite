@@ -658,7 +658,11 @@ export default {
         "No Numista data may be stored. Keep only the Numista number, in numista_id.",
       ITEM_TYPE_REQUIRED:
         "A Catalog entry needs an Item type: coin or banknote.",
-      FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
+      FIELD_NOT_FOR_TYPE: "Banknotes have no metal, coin size, edge or mint.",
+      INVALID_DATE: "Enter a date as YYYY-MM-DD, YYYY-MM or YYYY.",
+      DATES_REVERSED: "withdrawal_date comes before issue_date.",
+      SAME_LANGUAGE:
+        "The notes are already in this language. Use technical_details and historical_notes, or change notes_language.",
       YEARS_REVERSED: "The last year comes before the first.",
       SOURCE_REQUIRED: "Name the source of these facts, notes or image.",
       CREDIT_REQUIRED:
@@ -1299,7 +1303,10 @@ export default {
       NUMISTA_DATA:
         "No Numista data may be stored. Keep only the Numista number.",
       ITEM_TYPE_REQUIRED: "A Catalog entry needs an Item type.",
-      FIELD_NOT_FOR_TYPE: "Banknotes have no metal or size.",
+      FIELD_NOT_FOR_TYPE: "Banknotes have no metal, coin size, edge or mint.",
+      INVALID_DATE: "Enter a date such as 1999-03-15, 1999-03 or 1999.",
+      DATES_REVERSED: "It stops being legal tender before it's issued.",
+      SAME_LANGUAGE: "The notes are already in this language.",
       YEARS_REVERSED: "The last year comes before the first.",
       SOURCE_REQUIRED: "Name the source of these facts or notes.",
       CREDIT_REQUIRED:
@@ -1440,5 +1447,48 @@ export default {
     photosHint: "These photos are added to the Item.",
     photosFailed:
       "The Item was added, but its photos couldn't be saved. Add them on the Item's page.",
+  },
+  catalogFacts: {
+    designer: "Designer",
+    designers: "Designers",
+    mint: "Mint",
+    mintMark: "Mint mark",
+    noMintMark: "None",
+    issued: "Issued",
+    withdrawn: "No longer legal tender from",
+    mintage: "Mintage",
+    numberIssued: "Number issued",
+    composition: "Composition",
+    edge: "Edge",
+    edges: {
+      plain: "Plain",
+      reeded: "Reeded",
+      interruptedReeding: "Interrupted reeding",
+      lettered: "Lettered",
+    },
+    edgeLettering: "Edge lettering",
+    thickness: "Thickness",
+    size: "Size",
+    inLanguage: "In {language}",
+    editor: {
+      mintMarkHint: "Type “none” for a coin struck without a mint mark.",
+      compositionHint:
+        "Each metal and its share, such as “copper 75%; nickel 25%”, with these names: {metals}.",
+      designersHint: "Separate names with semicolons.",
+      dateHint: "Such as 1999-03-15, 1999-03 or 1999.",
+      mintageHint: "A whole number.",
+      width: "Width",
+      height: "Height",
+      setEdge: "Set edge",
+      noEdge: "Clear edge",
+      notesLanguage: "Language of the notes",
+      notesLanguageHint: "The language the notes above are written in.",
+      setNotesLanguage: "Set language",
+      translations: "Translations",
+      translationsHint:
+        "Readers see the notes in their own language where there's a translation, otherwise in the language of the notes.",
+      translationLanguage: "Translation language",
+      translationSources: "Where the translation comes from",
+    },
   },
 } as const;

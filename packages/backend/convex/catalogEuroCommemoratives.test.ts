@@ -58,7 +58,7 @@ async function exported(as: Awaited<ReturnType<typeof admin>>) {
 async function seeded() {
   const t = newTest();
   const as = await admin(t);
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
   const nodes = (await exported(as)).filter((node) =>
     node.id?.startsWith("eur2-"),
   );
@@ -92,13 +92,13 @@ test("the 2-euro commemoratives go through the Catalog CSV import with no reject
 test("loading the bundled Catalog adds the 2-euro commemoratives once; loading again changes nothing", async () => {
   const t = newTest();
 
-  expect(await t.mutation(internal.catalog.seed.load, {})).toContainEqual({
+  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
     dataset: "euroCommemoratives",
     inserts: nodeCount,
     updates: 0,
     unchanged: 0,
   });
-  expect(await t.mutation(internal.catalog.seed.load, {})).toContainEqual({
+  expect(await t.action(internal.catalog.seed.load, {})).toContainEqual({
     dataset: "euroCommemoratives",
     inserts: 0,
     updates: 0,
@@ -200,8 +200,9 @@ test("a Theme root holds the issuing countries by ISO code, each with one entry 
     diameter_mm: "25.75",
     year_from: "2006",
     year_to: "2006",
-    technical_details:
-      "Issuing volume: 30 million coins. Issuing date: February 2006.",
+    mintage: "30000000",
+    issue_date: "2006-02",
+    technical_details: "",
   });
   expect(entry("eur2-de-2006-schleswig-holstein")?.historical_notes).toMatch(
     /^The Holstentor, the gate symbolising of the town of Lübeck/,
@@ -299,7 +300,7 @@ test("no entry shows an image: the national sides' designs aren't clearly free t
 test("collectors browse the Theme to its countries and each country's coins by year, and find a coin by its title", async () => {
   const t = newTest();
   const as = await admin(t);
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
 
   expect(await as.query(api.catalog.browse.roots, {})).toContainEqual({
     key: "eur2-commemoratives",
@@ -352,4 +353,77 @@ test("collectors browse the Theme to its countries and each country's coins by y
   expect(
     found.groups.flatMap((group) => group.nodes.map((node) => node.key)),
   ).toEqual(["eur2-de-2006-schleswig-holstein"]);
+});
+
+test("the ECB's descriptions come in English, German, French and Romanian, each credited to the ECB's page in that language", async () => {
+  const { nodes, entries, entry } = await seeded();
+  const page = (year: string, language: string) =>
+    `https://www.ecb.europa.eu/euro/coins/comm/html/comm_${year}.${language}.html`;
+
+  const athens = entry("eur2-gr-2004-olympic-games-in-athens-2004") ?? {};
+  expect(athens.historical_notes).toMatch(/^The twelve stars/);
+  expect(athens.historical_notes_de).toMatch(/^Die Gedenkmünze zeigt/);
+  expect(athens.historical_notes_fr).not.toBe("");
+  expect(athens.historical_notes_ro).not.toBe("");
+  // The ECB doesn't publish in Norwegian: Norwegian readers get the English.
+  expect(athens.historical_notes_nb).toBe("");
+  expect(athens.notes_source_nb).toBe("");
+
+  let translated = 0;
+  for (const node of entries) {
+    for (const language of ["de", "fr", "ro"]) {
+      if (!node[`historical_notes_${language}`]) continue;
+      translated += 1;
+      expect(node).toMatchObject({
+        [`notes_source_${language}`]: "European Central Bank",
+        [`notes_author_${language}`]: "European Central Bank",
+        [`notes_licence_${language}`]:
+          expect.stringContaining("citing the ECB"),
+        [`notes_link_${language}`]: page(node.year_from ?? "", language),
+      });
+    }
+  }
+  // Three coins of 2025 aren't on the ECB's other pages yet.
+  expect(translated).toBe(581 * 3);
+
+  const theme = nodes.find((node) => node.id === "eur2-commemoratives") ?? {};
+  expect(theme.historical_notes).toMatch(/^Each country that uses the euro/);
+  expect(theme.historical_notes_de).toMatch(/^Jedes Land/);
+  expect(theme.notes_link_fr).toBe(
+    "https://www.ecb.europa.eu/euro/coins/comm/html/index.fr.html",
+  );
+});
+
+test("issuing volumes and dates that are plain figures are facts; the rest stays in the ECB's words, in each language", async () => {
+  const { entries, entry } = await seeded();
+
+  expect(entry("eur2-gr-2004-olympic-games-in-athens-2004")).toMatchObject({
+    mintage: "50000000",
+    issue_date: "2004-03",
+    technical_details: "",
+    technical_details_de: "",
+  });
+  expect(
+    entry("eur2-lu-2004-effigy-and-monogram-of-grand-duke-henri"),
+  ).toMatchObject({ mintage: "2490000", issue_date: "2004-06" });
+
+  const joint = entries.filter((node) =>
+    node.id?.startsWith("eur2-de-2022-35"),
+  )[0];
+  expect(joint).toMatchObject({
+    mintage: "",
+    technical_details: "Issuing volume: varies from country to country.",
+    technical_details_de: expect.stringMatching(/^Ausgabevolumen: /),
+    technical_details_ro: expect.stringMatching(/^Tirajul emisiunii: /),
+  });
+
+  const plain = entries.filter((node) => node.mintage !== "");
+  expect(plain.length).toBeGreaterThan(450);
+  for (const node of entries) {
+    // A coin the Official Journal credits keeps the ECB's figures as the ECB's words.
+    if (node.facts_source !== "European Central Bank") continue;
+    expect(node.technical_details).not.toMatch(
+      /Issuing volume: [\d., ]+ coins\./,
+    );
+  }
 });

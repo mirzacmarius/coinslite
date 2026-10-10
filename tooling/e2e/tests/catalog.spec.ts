@@ -35,7 +35,9 @@ test("browse the Catalog down to an entry, by grouping and by denomination", asy
     (url) => url.pathname === "/catalog/us-morgan-dollar-1881-cc",
   );
   await expect(heading("Morgan dollar 1881-CC")).toBeVisible();
-  await expect(main.getByText("Mint: Carson City.")).toBeVisible();
+  // Mint and mint mark are facts with labels of their own.
+  await expect(main.getByText("Carson City", { exact: true })).toBeVisible();
+  await expect(main.getByText("CC", { exact: true })).toBeVisible();
   await expect(main.getByRole("img", { name: "No image yet" })).toBeVisible();
 
   // Back up the breadcrumb, then by denomination and series.

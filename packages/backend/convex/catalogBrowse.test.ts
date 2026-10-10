@@ -312,6 +312,13 @@ test("a key that isn't in the Catalog reads as not found", async () => {
   ).toBeNull();
 });
 
+const notesCredit = {
+  source: "CoinsLite editorial",
+  author: "CoinsLite",
+  licence: "CoinsLite",
+  link: "https://www.usmint.gov/",
+};
+
 test("an entry's detail shows its facts, notes, image and Numista number with their sources, and how many the person holds", async () => {
   const t = newTest();
   const admin = await person(t, "admin@example.com", { admin: true });
@@ -337,7 +344,14 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
       facts_author: "United States Mint",
       facts_licence: "Public domain",
       facts_link: "https://www.usmint.gov/",
-      technical_details: "Mint: San Francisco.",
+      mint: "San Francisco",
+      mint_mark: "S",
+      composition: "silver 90%; copper 10%",
+      edge: "reeded",
+      designers: "George T. Morgan",
+      mintage: "12760000",
+      issue_date: "1881",
+      technical_details: "Struck from dies shipped from Philadelphia.",
       historical_notes: "Struck under the Bland-Allison Act.",
       notes_source: "CoinsLite editorial",
       notes_author: "CoinsLite",
@@ -379,18 +393,32 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
     diameter: 38.1,
     yearFrom: 1881,
     yearTo: 1881,
-    technicalDetails: "Mint: San Francisco.",
-    historicalNotes: "Struck under the Bland-Allison Act.",
+    mint: "San Francisco",
+    mintMark: "S",
+    composition: [
+      { metal: "silver", percent: 90 },
+      { metal: "copper", percent: 10 },
+    ],
+    edge: "reeded",
+    designers: ["George T. Morgan"],
+    mintage: 12760000,
+    issueDate: "1881",
+    notes: {
+      technical: {
+        text: "Struck from dies shipped from Philadelphia.",
+        language: "en",
+        provenance: notesCredit,
+      },
+      historical: {
+        text: "Struck under the Bland-Allison Act.",
+        language: "en",
+        provenance: notesCredit,
+      },
+    },
     factsProvenance: {
       source: "United States Mint",
       author: "United States Mint",
       licence: "Public domain",
-      link: "https://www.usmint.gov/",
-    },
-    notesProvenance: {
-      source: "CoinsLite editorial",
-      author: "CoinsLite",
-      licence: "CoinsLite",
       link: "https://www.usmint.gov/",
     },
     imageUrl: "https://images.example.com/morgan-1881-s.jpg",
@@ -413,6 +441,114 @@ test("an entry's detail shows its facts, notes, image and Numista number with th
   expect(
     await grace.as.query(api.catalog.browse.node, { key: "us-morgan-1881-s" }),
   ).toMatchObject({ held: 5 });
+});
+
+test("an entry's notes read in the reader's language where translated, else in their source's language, marked as such", async () => {
+  const t = newTest();
+  const admin = await person(t, "admin@example.com", { admin: true });
+  const ada = await person(t, "ada@example.com");
+  const translation = (language: string, source: string) => ({
+    [`notes_source_${language}`]: source,
+    [`notes_author_${language}`]: "CoinsLite",
+    [`notes_licence_${language}`]: "CoinsLite",
+    [`notes_link_${language}`]: "https://example.org/notes",
+  });
+  await importRows(admin.as, [
+    country("us", "United States", "US"),
+    entry("us-peace-1921", "us", {
+      technical_details: "Struck in high relief.",
+      historical_notes: "Marks the peace after the First World War.",
+      notes_source: "CoinsLite editorial",
+      notes_author: "CoinsLite",
+      notes_licence: "CoinsLite",
+      notes_link: "https://www.usmint.gov/",
+      technical_details_de: "In Hochrelief geprägt.",
+      historical_notes_de: "Erinnert an den Frieden nach dem Ersten Weltkrieg.",
+      ...translation("de", "CoinsLite editorial translation"),
+      // Only the history is translated into French.
+      historical_notes_fr: "Célèbre la paix après la Première Guerre mondiale.",
+      ...translation("fr", "CoinsLite editorial translation"),
+    }),
+    entry("no-krone", "us", {
+      notes_language: "nb",
+      historical_notes: "Kronen kom i 1875.",
+      notes_source: "Norges Bank",
+      notes_author: "Norges Bank",
+      notes_licence: "Kilde: Norges Bank",
+      notes_link: "https://www.norges-bank.no/",
+      historical_notes_en: "The krone came in 1875.",
+      ...translation("en", "CoinsLite editorial translation"),
+    }),
+  ]);
+  const notesIn = async (key: string, language?: string) => {
+    const node = await ada.as.query(api.catalog.browse.node, {
+      key,
+      ...(language && { language: language as "en" }),
+    });
+    return node?.kind === "entry" ? node.notes : undefined;
+  };
+  const english = {
+    source: "CoinsLite editorial",
+    author: "CoinsLite",
+    licence: "CoinsLite",
+    link: "https://www.usmint.gov/",
+  };
+  const translated = {
+    source: "CoinsLite editorial translation",
+    author: "CoinsLite",
+    licence: "CoinsLite",
+    link: "https://example.org/notes",
+  };
+
+  expect(await notesIn("us-peace-1921", "de")).toEqual({
+    technical: {
+      text: "In Hochrelief geprägt.",
+      language: "de",
+      provenance: translated,
+    },
+    historical: {
+      text: "Erinnert an den Frieden nach dem Ersten Weltkrieg.",
+      language: "de",
+      provenance: translated,
+    },
+  });
+  expect(await notesIn("us-peace-1921", "fr")).toEqual({
+    technical: {
+      text: "Struck in high relief.",
+      language: "en",
+      provenance: english,
+    },
+    historical: {
+      text: "Célèbre la paix après la Première Guerre mondiale.",
+      language: "fr",
+      provenance: translated,
+    },
+  });
+  expect(await notesIn("us-peace-1921", "nb")).toEqual({
+    technical: {
+      text: "Struck in high relief.",
+      language: "en",
+      provenance: english,
+    },
+    historical: {
+      text: "Marks the peace after the First World War.",
+      language: "en",
+      provenance: english,
+    },
+  });
+  expect(await notesIn("no-krone", "ro")).toMatchObject({
+    historical: { text: "Kronen kom i 1875.", language: "nb" },
+  });
+  expect(await notesIn("no-krone", "en")).toMatchObject({
+    historical: { text: "The krone came in 1875.", language: "en" },
+  });
+  // Without a language, the person's own.
+  await t.run(async (ctx) => {
+    await ctx.db.patch(ada.userId, { language: "de" });
+  });
+  expect(await notesIn("us-peace-1921")).toMatchObject({
+    technical: { language: "de" },
+  });
 });
 
 test("walking a grouping lists its entries by year, then sort order, in pages of 50, with how many the person holds", async () => {
@@ -694,7 +830,7 @@ test("browsing needs a signed-in person who has finished signing up", async () =
 test("the bundled US silver dollars browse by series grouping and by denomination", async () => {
   const t = newTest();
   const ada = await person(t, "ada@example.com");
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
 
   expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 120 }),
@@ -726,7 +862,7 @@ test("loading the bundled datasets fills in browsing for Catalog data stored bef
   vi.useFakeTimers();
   const t = newTest();
   const ada = await person(t, "ada@example.com");
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
   // As stored before browsing: no entry counts, no countries to browse by.
   await t.run(async (ctx) => {
     for await (const node of ctx.db.query("catalogNodes")) {
@@ -740,7 +876,7 @@ test("loading the bundled datasets fills in browsing for Catalog data stored bef
     expect.objectContaining({ key: "us", entryCount: 0 }),
   );
 
-  await t.mutation(internal.catalog.seed.load, {});
+  await t.action(internal.catalog.seed.load, {});
   await t.finishAllScheduledFunctions(vi.runAllTimers);
   expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
     expect.objectContaining({ key: "us", entryCount: 120 }),

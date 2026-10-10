@@ -684,7 +684,12 @@ export default {
         "Aucune donnée de Numista ne peut être stockée. Gardez seulement le numéro Numista, dans numista_id.",
       ITEM_TYPE_REQUIRED:
         "Une entrée du catalogue doit avoir un type d’objet\u00a0: pièce ou billet.",
-      FIELD_NOT_FOR_TYPE: "Les billets n’ont ni métal ni dimensions.",
+      FIELD_NOT_FOR_TYPE:
+        "Les billets n’ont ni métal, ni dimensions de pièce, ni tranche, ni atelier.",
+      INVALID_DATE: "Saisissez une date au format AAAA-MM-JJ, AAAA-MM ou AAAA.",
+      DATES_REVERSED: "withdrawal_date précède issue_date.",
+      SAME_LANGUAGE:
+        "Les notes sont déjà dans cette langue. Utilisez technical_details et historical_notes, ou modifiez notes_language.",
       YEARS_REVERSED: "La dernière année précède la première.",
       SOURCE_REQUIRED:
         "Indiquez la source de ces faits, de ces notes ou de cette image.",
@@ -1353,7 +1358,11 @@ export default {
       NUMISTA_DATA:
         "Aucune donnée de Numista ne peut être enregistrée. Gardez seulement le numéro Numista.",
       ITEM_TYPE_REQUIRED: "Une entrée du catalogue a besoin d’un type d’objet.",
-      FIELD_NOT_FOR_TYPE: "Les billets n’ont ni métal ni dimensions.",
+      FIELD_NOT_FOR_TYPE:
+        "Les billets n’ont ni métal, ni dimensions de pièce, ni tranche, ni atelier.",
+      INVALID_DATE: "Saisissez une date comme 1999-03-15, 1999-03 ou 1999.",
+      DATES_REVERSED: "La démonétisation précède l’émission.",
+      SAME_LANGUAGE: "Les notes sont déjà dans cette langue.",
       YEARS_REVERSED: "La dernière année précède la première.",
       SOURCE_REQUIRED: "Indiquez la source de ces données ou de ces notes.",
       CREDIT_REQUIRED:
@@ -1500,5 +1509,50 @@ export default {
     photosHint: "Ces photos sont ajoutées à l’objet.",
     photosFailed:
       "L’objet a été ajouté, mais ses photos n’ont pas pu être enregistrées. Ajoutez-les sur la page de l’objet.",
+  },
+  catalogFacts: {
+    designer: "Créateur",
+    designers: "Créateurs",
+    mint: "Atelier",
+    mintMark: "Marque d’atelier",
+    noMintMark: "Aucune",
+    issued: "Émission",
+    withdrawn: "Démonétisation",
+    mintage: "Tirage",
+    numberIssued: "Nombre émis",
+    composition: "Composition",
+    edge: "Tranche",
+    edges: {
+      plain: "Lisse",
+      reeded: "Cannelée",
+      interruptedReeding: "Cannelures interrompues",
+      lettered: "Inscrite",
+    },
+    edgeLettering: "Inscription sur la tranche",
+    thickness: "Épaisseur",
+    size: "Format",
+    inLanguage: "En {language}",
+    editor: {
+      mintMarkHint:
+        "Saisissez « none » pour une pièce frappée sans marque d’atelier.",
+      compositionHint:
+        "Chaque métal et sa part, par exemple « copper 75%; nickel 25% », avec ces noms : {metals}.",
+      designersHint: "Séparez les noms par des points-virgules.",
+      dateHint: "Par exemple 1999-03-15, 1999-03 ou 1999.",
+      mintageHint: "Un nombre entier.",
+      width: "Largeur",
+      height: "Hauteur",
+      setEdge: "Choisir la tranche",
+      noEdge: "Retirer la tranche",
+      notesLanguage: "Langue des notes",
+      notesLanguageHint:
+        "La langue dans laquelle les notes ci-dessus sont écrites.",
+      setNotesLanguage: "Choisir la langue",
+      translations: "Traductions",
+      translationsHint:
+        "Les lecteurs voient les notes dans leur langue lorsqu’une traduction existe, sinon dans la langue des notes.",
+      translationLanguage: "Langue de la traduction",
+      translationSources: "D’où vient la traduction",
+    },
   },
 } as const satisfies Dictionary;
