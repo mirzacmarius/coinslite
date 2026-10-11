@@ -950,6 +950,11 @@ export default {
   },
   collectionTotals: {
     title: "Totalurile colecției",
+    section: "Totaluri",
+    "summaryItems#one": "1 obiect",
+    "summaryItems#few": "{count} obiecte",
+    "summaryItems#other": "{count} de obiecte",
+    summaryMarketValue: "Valoare de piață",
     items: "Obiecte",
     itemsHint: "Fiecare obiect se numără o dată, oricare i-ar fi cantitatea",
     pieces: "Bucăți",

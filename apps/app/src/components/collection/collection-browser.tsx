@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  CollectionTotalsSection,
+  CollectionTotalsSkeleton,
+} from "@/components/collection-totals/collection-totals";
 import { isTyping, useAddItem } from "@/components/items/add-item";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
@@ -13,6 +17,7 @@ import { useQuery } from "convex/react";
 import { Coins, ListChecks } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { narrowsView } from "./collection-display";
 import {
   CollectionResults,
   Pagination,
@@ -38,7 +43,24 @@ function useLatest(result: BrowseResult | undefined) {
   return { shown: result ?? latest, loading: result === undefined };
 }
 
-/** The toolbar, the filters that are on, and one page of Items. */
+/** The toolbar's place while the Collection loads. */
+const toolbarSkeleton = <div className="h-10 border-b" aria-hidden="true" />;
+
+/** CollectionBrowser before the page knows its URL. */
+export function BrowserSkeleton() {
+  return (
+    <>
+      {toolbarSkeleton}
+      <CollectionTotalsSkeleton />
+      <ResultsSkeleton />
+    </>
+  );
+}
+
+/**
+ * The toolbar and the filters that are on, at the top where they're always
+ * in reach, then the totals, then one page of Items.
+ */
 export function CollectionBrowser() {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -126,11 +148,16 @@ export function CollectionBrowser() {
 
   const narrowed =
     view.search !== undefined || filters.some((filter) => filter.active);
+  // Keyed, so it stays mounted (and open or collapsed) as the rest changes.
+  const totals = (
+    <CollectionTotalsSection key="totals" narrowed={narrowsView(view)} />
+  );
 
   if (result === undefined) {
     return (
       <>
-        <div className="h-10 border-b" aria-hidden="true" />
+        {toolbarSkeleton}
+        {totals}
         <ResultsSkeleton />
       </>
     );
@@ -139,22 +166,25 @@ export function CollectionBrowser() {
   // A Collection with nothing in it yet: no toolbar, just the way to start.
   if (result.collectionSize === 0 && !narrowed) {
     return (
-      <div className="p-4">
-        <EmptyState
-          icon={
-            <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
-          }
-          title={t("items.emptyTitle")}
-          description={t("items.emptyDescription")}
-          action={<Button onClick={() => addItem()}>{t("items.add")}</Button>}
-        />
-      </div>
+      <>
+        {totals}
+        <div className="p-4">
+          <EmptyState
+            icon={
+              <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
+            }
+            title={t("items.emptyTitle")}
+            description={t("items.emptyDescription")}
+            action={<Button onClick={() => addItem()}>{t("items.add")}</Button>}
+          />
+        </div>
+      </>
     );
   }
 
   return (
     <>
-      <div className="flex h-10 items-center justify-between gap-2 border-b px-4">
+      <div className="sticky top-10 z-20 flex h-10 items-center justify-between gap-2 border-b bg-background px-4">
         <div className="flex min-w-0 flex-1 items-center gap-1">
           <FilterButton
             filters={filters}
@@ -200,6 +230,7 @@ export function CollectionBrowser() {
         </div>
       </div>
       <FilterChips filters={filters} onChange={update} onClearAll={clearAll} />
+      {totals}
       {!result.complete && (
         <p className="border-b px-4 py-2 text-xs text-muted-foreground">
           {t("collection.incomplete", {

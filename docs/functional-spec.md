@@ -206,6 +206,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
 - **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, denomination, Grade.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device.
+- **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts collapsed on a phone and open on wider screens, and is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.
 - **Export (Premium), covering the current filtered view:**
   - **PDF, A4 landscape:**
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.

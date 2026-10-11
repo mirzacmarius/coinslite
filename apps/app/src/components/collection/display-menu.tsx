@@ -23,7 +23,7 @@ import {
   type CollectionDisplay,
   type CollectionLayout,
   collectionLayouts,
-} from "./use-collection-display";
+} from "./collection-display";
 
 /**
  * Display options: list or grid and Items per page, kept on this device, and

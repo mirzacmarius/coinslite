@@ -64,8 +64,11 @@ test("after adding an Item, the Overview shows it among the latest and in the to
 
 /** Every row of the totals card reaches the card's right edge: no empty cell ends a row. */
 async function expectTotalsRowsFull(page: Page) {
+  // The Collection page's totals are a direct child of the page, which
+  // visiblePage's descendants leave out; a hidden earlier page has no role.
   const figures = page
-    .locator('section:has(h2:text-is("Collection totals")) dl:visible')
+    .getByRole("region", { name: /^(Collection totals|Totals)$/ })
+    .locator("dl")
     .first();
   const rows = await figures.evaluate((list) => {
     const right = list.getBoundingClientRect().right;
@@ -108,6 +111,14 @@ test("the totals card has no empty cell, and a stamp's Grade note hint suits sta
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/", "/collection"]) {
       await page.goto(`${appUrl}${path}`);
+      // The Collection page's totals start collapsed on a phone.
+      if (path === "/collection" && width === 375) {
+        const totals = visiblePage(page).getByRole("button", {
+          name: /^Totals/,
+        });
+        await expect(totals).toHaveAttribute("aria-expanded", "false");
+        await totals.click();
+      }
       await expectTotalsRowsFull(page);
     }
   }

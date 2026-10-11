@@ -942,6 +942,11 @@ export default {
   },
   collectionTotals: {
     title: "Totaler for samlingen",
+    section: "Totaler",
+    "summaryItems#one": "1 objekt",
+    "summaryItems#few": "{count} objekter",
+    "summaryItems#other": "{count} objekter",
+    summaryMarketValue: "Markedsverdi",
     items: "Objekter",
     itemsHint: "Hvert objekt telles én gang, uansett antall",
     pieces: "Stykker",
