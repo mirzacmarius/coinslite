@@ -1513,9 +1513,8 @@ export default {
     "wantedMany#one": "1 Katalogeintrag auf die Wunschliste gesetzt",
     "wantedMany#few": "{count} Katalogeinträge auf die Wunschliste gesetzt",
     "wantedMany#other": "{count} Katalogeinträge auf die Wunschliste gesetzt",
-    wantedFirst:
-      "Die ersten {limit} fehlenden Einträge stehen jetzt auf der Wunschliste. Für den Rest noch einmal „Alle fehlenden wünschen“.",
-    noneToWant: "Alle fehlenden Einträge stehen schon auf deiner Wunschliste.",
+    wantedMore:
+      "Höchstens {limit} auf einmal: Für den Rest noch einmal „Alle fehlenden wünschen“.",
     emptyTitle: "Deine Wunschliste ist leer",
     emptyDescription:
       "Markiere die Katalogeinträge, die du suchst, auf der Seite eines Eintrags oder in einem Set.",

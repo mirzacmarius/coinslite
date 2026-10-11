@@ -16,6 +16,7 @@ import {
 } from "./catalog/browse";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { bySeries } from "./catalog/sets";
+import { compareDenominations } from "./items/denominations";
 import { wantErrors, wantLimits } from "./wants/rules";
 
 /**
@@ -75,7 +76,6 @@ async function wantingUser(ctx: MutationCtx) {
 /**
  * Removes a person's want of a Catalog entry, if they have one; every way of
  * adding an Item linked to an entry calls this in the same transaction.
- * Whether there was a want to remove.
  */
 export async function clearWant(
   ctx: MutationCtx,
@@ -84,7 +84,6 @@ export async function clearWant(
 ) {
   const want = await wantOf(ctx, ownerId, entryId);
   if (want) await ctx.db.delete(want._id);
-  return want !== null;
 }
 
 /** Removes everyone's wants of a Catalog entry, as it leaves the Catalog (catalog/tree.ts). */
@@ -111,12 +110,11 @@ export const setWanted = mutation({
     const user = await wantingUser(ctx);
     const entry = await nodeByKey(ctx, key);
     if (entry?.kind !== "entry") throw new ConvexError(catalogEntryNotFound);
-    const want = await wantOf(ctx, user._id, entry._id);
     if (!wanted) {
-      if (want) await ctx.db.delete(want._id);
+      await clearWant(ctx, user._id, entry._id);
       return null;
     }
-    if (want) return null;
+    if (await wantOf(ctx, user._id, entry._id)) return null;
     if ((await wantCount(ctx, user._id)) >= wantLimits.wants)
       throw new ConvexError(wantErrors.tooManyWants);
     await ctx.db.insert("wants", {
@@ -185,20 +183,58 @@ const wantlistGroup = v.object({
   title: v.string(),
   /** A country's code, which the app names in the reader's language. */
   country: v.optional(v.string()),
-  /** Its series as browsing lists them, null for the entries without one. */
+  /** The Theme a country belongs to (2-euro commemoratives › Germany), if any. */
+  theme: v.optional(v.string()),
+  /**
+   * Its entries by denomination (by face value) and then series, as browsing
+   * the country lists them; null for the entries without one.
+   */
   series: v.array(
     v.object({
+      denomination: v.union(v.string(), v.null()),
       series: v.union(v.string(), v.null()),
       entries: v.array(entryRow),
     }),
   ),
 });
 
+/** Most entries first, then by title, as the Catalog lists its roots and a Theme its countries. */
+const byEntryCount = (
+  a: Doc<"catalogNodes"> | null,
+  b: Doc<"catalogNodes"> | null,
+) =>
+  (b?.entryCount ?? 0) - (a?.entryCount ?? 0) ||
+  (a?.title ?? "").localeCompare(b?.title ?? "");
+
 /**
- * The Wantlist: the entries the person wants, grouped by country (most
- * entries first, as the Catalog lists them) and then by series (as browsing
- * a denomination lists them), each entry with how many the person holds.
- * Empty while the Catalog is hidden from them.
+ * Entries by denomination (face value, smallest first) and then series, each
+ * series by year then sort order, as browsing a country lists them.
+ */
+function byDenominationAndSeries(entries: Doc<"catalogNodes">[]) {
+  const byYear = [...entries].sort(
+    (a, b) =>
+      (a.yearFrom ?? Number.NEGATIVE_INFINITY) -
+        (b.yearFrom ?? Number.NEGATIVE_INFINITY) || a.sortOrder - b.sortOrder,
+  );
+  const denominations = [
+    ...new Set(byYear.map((entry) => entry.denomination)),
+  ].sort(compareDenominations);
+  return denominations.flatMap((denomination) =>
+    bySeries(byYear.filter((entry) => entry.denomination === denomination)).map(
+      (group) => ({
+        denomination: denomination ?? null,
+        series: group.titles[0] ?? null,
+        entries: group.entries,
+      }),
+    ),
+  );
+}
+
+/**
+ * The Wantlist: the entries the person wants in the Catalog's order: by
+ * country (the roots most entries first, a Theme's countries likewise within
+ * it), then denomination and series, each entry with how many the person
+ * holds. Empty while the Catalog is hidden from them.
  */
 export const list = query({
   args: {},
@@ -214,41 +250,43 @@ export const list = query({
     const groups = await Promise.all(
       [...byCountry].map(async ([key, entries]) => {
         const node = await nodeByKey(ctx, key);
-        // By year, then sort order, as a grouping's entries are listed.
-        entries.sort(
-          (a, b) =>
-            (a.yearFrom ?? Number.NEGATIVE_INFINITY) -
-              (b.yearFrom ?? Number.NEGATIVE_INFINITY) ||
-            a.sortOrder - b.sortOrder,
-        );
+        const rootKey = node?.path.split("/")[0];
+        const root =
+          rootKey && rootKey !== key ? await nodeByKey(ctx, rootKey) : node;
         return {
-          key,
-          title: node?.title ?? key,
-          ...(node &&
-            isCountryNode(node) &&
-            node.country !== undefined && { country: node.country }),
-          entryCount: node?.entryCount ?? 0,
-          series: await Promise.all(
-            bySeries(entries).map(async (group) => ({
-              series: group.titles[0] ?? null,
-              entries: await Promise.all(
-                group.entries.map(async (entry) =>
-                  creditedEntryRow(
-                    ctx,
-                    entry,
-                    await heldCount(ctx, user._id, entry._id),
+          root,
+          node,
+          group: {
+            key,
+            title: node?.title ?? key,
+            ...(node &&
+              isCountryNode(node) &&
+              node.country !== undefined && { country: node.country }),
+            ...(root && root !== node && { theme: root.title }),
+            series: await Promise.all(
+              byDenominationAndSeries(entries).map(
+                async ({ entries, ...group }) => ({
+                  ...group,
+                  entries: await Promise.all(
+                    entries.map(async (entry) =>
+                      creditedEntryRow(
+                        ctx,
+                        entry,
+                        await heldCount(ctx, user._id, entry._id),
+                      ),
+                    ),
                   ),
-                ),
+                }),
               ),
-            })),
-          ),
+            ),
+          },
         };
       }),
     );
     return groups
       .sort(
-        (a, b) => b.entryCount - a.entryCount || a.title.localeCompare(b.title),
+        (a, b) => byEntryCount(a.root, b.root) || byEntryCount(a.node, b.node),
       )
-      .map(({ entryCount, ...group }) => group);
+      .map(({ group }) => group);
   },
 });

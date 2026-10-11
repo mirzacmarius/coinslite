@@ -1455,9 +1455,8 @@ export default {
     "wantedMany#one": "1 katalogoppføring lagt på ønskelisten",
     "wantedMany#few": "{count} katalogoppføringer lagt på ønskelisten",
     "wantedMany#other": "{count} katalogoppføringer lagt på ønskelisten",
-    wantedFirst:
-      "La de første {limit} som mangler, på ønskelisten. Ønsk deg alle som mangler igjen for resten.",
-    noneToWant: "Alle som mangler, står allerede på ønskelisten.",
+    wantedMore:
+      "Høyst {limit} om gangen: ønsk deg alle som mangler igjen for resten.",
     emptyTitle: "Ønskelisten er tom",
     emptyDescription:
       "Merk katalogoppføringene du leter etter, på oppføringens side eller i et sett.",

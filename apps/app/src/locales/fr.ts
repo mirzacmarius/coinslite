@@ -1496,10 +1496,8 @@ export default {
       "{count} entrées du catalogue ajoutées à votre liste de souhaits",
     "wantedMany#other":
       "{count} entrées du catalogue ajoutées à votre liste de souhaits",
-    wantedFirst:
-      "Les {limit} premières entrées manquantes sont dans votre liste de souhaits. Recommencez pour les suivantes.",
-    noneToWant:
-      "Toutes les entrées manquantes sont déjà dans votre liste de souhaits.",
+    wantedMore:
+      "Au plus {limit} à la fois : souhaitez à nouveau les manquantes pour les suivantes.",
     emptyTitle: "Votre liste de souhaits est vide",
     emptyDescription:
       "Marquez les entrées du catalogue que vous cherchez, sur la page d’une entrée ou dans un ensemble.",

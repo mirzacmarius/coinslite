@@ -222,7 +222,7 @@ function SetView({
       .filter((entry) => !wanted?.has(entry.key))
       .map((entry) => entry.key);
     if (toWant.length === 0) {
-      toast(t("wantlist.noneToWant"));
+      toast(t("wantlist.wantedMany", { count: 0 }));
       return;
     }
     setWanting(true);
@@ -230,11 +230,12 @@ function SetView({
       const count = await wantMany({
         keys: toWant.slice(0, setLimits.bulkAdd),
       });
-      toast.success(
-        toWant.length > setLimits.bulkAdd
-          ? t("wantlist.wantedFirst", { limit: setLimits.bulkAdd })
-          : t("wantlist.wantedMany", { count }),
-      );
+      toast.success(t("wantlist.wantedMany", { count }), {
+        description:
+          toWant.length > setLimits.bulkAdd
+            ? t("wantlist.wantedMore", { limit: setLimits.bulkAdd })
+            : undefined,
+      });
     } catch (failure) {
       toast.error(wantError(failure));
     } finally {

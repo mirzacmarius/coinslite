@@ -1435,9 +1435,8 @@ export default {
     "wantedMany#one": "1 Catalog entry added to your Wantlist",
     "wantedMany#few": "{count} Catalog entries added to your Wantlist",
     "wantedMany#other": "{count} Catalog entries added to your Wantlist",
-    wantedFirst:
-      "Added the first {limit} missing entries to your Wantlist. Want all missing again for the rest.",
-    noneToWant: "Every missing entry is already on your Wantlist.",
+    wantedMore:
+      "At most {limit} at a time: want all missing again for the rest.",
     emptyTitle: "Your Wantlist is empty",
     emptyDescription:
       "Mark the Catalog entries you're looking for as wanted, on an entry's page or in a Set.",

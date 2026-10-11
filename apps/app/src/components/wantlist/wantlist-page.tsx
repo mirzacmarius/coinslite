@@ -31,8 +31,8 @@ import { useSetWanted } from "./wantlist";
 type WantlistGroup = FunctionReturnType<typeof api.wants.list>[number];
 
 /**
- * The Wantlist: the Catalog entries the person wants, by country and then
- * series as the Catalog lists them. Each row adds an Item in one step (the
+ * The Wantlist: the Catalog entries the person wants, by country, then
+ * denomination and series, as the Catalog lists them. Each row adds an Item in one step (the
  * want clears, so the row goes) or comes off the list.
  */
 export function WantlistPage({ actions }: { actions?: React.ReactNode }) {
@@ -74,8 +74,11 @@ export function WantlistPage({ actions }: { actions?: React.ReactNode }) {
       </>
     );
   }
-  const countryLabel = (group: WantlistGroup) =>
-    group.country ? format.country(group.country) : group.title;
+  /** A country by its name in the reader's language, after its Theme if it has one. */
+  const countryLabel = (group: WantlistGroup) => {
+    const country = group.country ? format.country(group.country) : group.title;
+    return group.theme ? `${group.theme} › ${country}` : country;
+  };
   return (
     <>
       {header}
@@ -85,11 +88,14 @@ export function WantlistPage({ actions }: { actions?: React.ReactNode }) {
             <h2 className="sticky top-10 z-10 flex h-8 items-center border-b bg-background/95 px-4 text-xs font-medium text-muted-foreground backdrop-blur">
               <span className="truncate">{countryLabel(group)}</span>
             </h2>
-            {group.series.map(({ series, entries }) => (
-              <ul key={series ?? ""} className="divide-y">
-                {(series !== null || group.series.length > 1) && (
+            {group.series.map(({ denomination, series, entries }) => (
+              <ul key={`${denomination}/${series}`} className="divide-y">
+                {group.series.length > 1 && (
                   <li className="flex h-8 items-center px-4 text-xs text-muted-foreground">
-                    {series ?? t("catalog.noSeries")}
+                    {[
+                      denomination ?? t("catalog.noDenomination"),
+                      series ?? t("catalog.noSeries"),
+                    ].join(" › ")}
                   </li>
                 )}
                 {entries.map((entry) => (

@@ -1470,9 +1470,8 @@ export default {
       "{count} intrări de catalog adăugate în lista ta de dorințe",
     "wantedMany#other":
       "{count} de intrări de catalog adăugate în lista ta de dorințe",
-    wantedFirst:
-      "Primele {limit} intrări care lipsesc sunt în lista ta de dorințe. Repetă pentru restul.",
-    noneToWant: "Tot ce lipsește e deja în lista ta de dorințe.",
+    wantedMore:
+      "Cel mult {limit} odată: repetă „Îmi doresc tot ce lipsește” pentru restul.",
     emptyTitle: "Lista ta de dorințe e goală",
     emptyDescription:
       "Marchează intrările de catalog pe care le cauți, pe pagina intrării sau într-un set.",
@@ -1482,7 +1481,7 @@ export default {
     "count#other": "{count} de intrări dorite",
     errors: {
       tooMany:
-        "Lista de dorințe are cel mult {limit} intrări. Scoate câteva ca să adaugi altele.",
+        "Lista de dorințe are cel mult {limit} de intrări. Scoate câteva ca să adaugi altele.",
       failed: "Lista de dorințe nu a putut fi modificată. Încearcă din nou.",
     },
   },

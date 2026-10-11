@@ -59,10 +59,10 @@ export function useSetWanted() {
 }
 
 /** A small heart beside an entry the person wants. */
-export function WantedMark({ className }: { className?: string }) {
+export function WantedMark() {
   const t = useI18n();
   return (
-    <span className={cn("inline-flex shrink-0", className)}>
+    <span className="inline-flex shrink-0">
       <Heart
         className="size-3.5 fill-current text-link"
         strokeWidth={2}
