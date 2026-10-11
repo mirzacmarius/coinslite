@@ -88,6 +88,7 @@ export default {
     millimetres: "mm",
     description: "Beschreibung",
     physical: "Beschaffenheit",
+    fromCatalog: "Aus dem Katalog",
     edit: "Bearbeiten",
     editItem: "Objekt bearbeiten",
     save: "Speichern",

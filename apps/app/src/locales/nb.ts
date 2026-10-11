@@ -85,6 +85,7 @@ export default {
     millimetres: "mm",
     description: "Beskrivelse",
     physical: "Fysiske egenskaper",
+    fromCatalog: "Fra katalogen",
     edit: "Rediger",
     editItem: "Rediger objekt",
     save: "Lagre",

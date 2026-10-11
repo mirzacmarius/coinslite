@@ -82,6 +82,7 @@ export default {
     millimetres: "mm",
     description: "Description",
     physical: "Physical",
+    fromCatalog: "From the Catalog",
     edit: "Edit",
     editItem: "Edit Item",
     save: "Save",

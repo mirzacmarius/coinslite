@@ -19,7 +19,7 @@ import { setErrors, setLimits } from "./catalog/setRules";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
-import { overridesOnly } from "./items/catalogFacts";
+import { entryDetails, overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
 import { isGrade, scalesFor } from "./items/grades";
 import {
@@ -40,6 +40,8 @@ import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
 import {
   catalogItemType,
+  coinEdge,
+  composition,
   gradingScale,
   homeCurrency,
   itemType,
@@ -522,10 +524,27 @@ const catalogFacts = v.object({
   material: v.optional(material),
   strike: v.optional(strike),
   diameter: v.optional(v.number()),
+  thickness: v.optional(v.number()),
+  mintMark: v.optional(v.string()),
+  mintage: v.optional(v.number()),
   numistaNumber: v.optional(v.number()),
   metal: v.optional(metal),
   weight: v.optional(v.number()),
   purity: v.optional(v.number()),
+});
+
+/** A Catalog entry's facts Items have no field for (items/catalogFacts.ts entryDetails). */
+const entryDetailsValidator = v.object({
+  noMintMark: v.optional(v.literal(true)),
+  mint: v.optional(v.string()),
+  composition: v.optional(composition),
+  edge: v.optional(coinEdge),
+  edgeLettering: v.optional(v.string()),
+  designers: v.optional(v.array(v.string())),
+  issueDate: v.optional(v.string()),
+  withdrawalDate: v.optional(v.string()),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
 });
 
 const listedItem = schema
@@ -571,7 +590,12 @@ export const get = query({
       currency: homeCurrency,
       catalogEntry: v.union(
         v.null(),
-        v.object({ key: v.string(), title: v.string(), facts: catalogFacts }),
+        v.object({
+          key: v.string(),
+          title: v.string(),
+          facts: catalogFacts,
+          details: entryDetailsValidator,
+        }),
       ),
     }),
   ),
@@ -582,6 +606,8 @@ export const get = query({
     if (!item || item.ownerId !== owner._id) return null;
     const resolver = itemResolver(ctx);
     const entry = await resolver.entryOf(item);
+    // Only the Item page shows these, so only this read looks them up.
+    const node = entry && (await ctx.db.get(entry._id));
     return {
       ...(await resolver.resolve(item)),
       currency: owner.homeCurrency,
@@ -589,6 +615,7 @@ export const get = query({
         key: entry.key,
         title: entry.title,
         facts: entry.facts,
+        details: entryDetails(node ?? {}),
       },
     };
   },
