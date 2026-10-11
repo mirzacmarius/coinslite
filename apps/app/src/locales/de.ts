@@ -797,7 +797,7 @@ export default {
     select: "Auswählen",
     selectionBar: "Ausgewählte Objekte",
     selectHint:
-      "Wähle Objekte aus, um sie in ein Album zu verschieben oder zu löschen.",
+      "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten oder zu löschen.",
     selectPage: "Seite auswählen",
     "selectAll#one": "1 Objekt auswählen",
     "selectAll#few": "Alle {count} Objekte auswählen",
@@ -816,6 +816,17 @@ export default {
     "takenOut#other": "{count} Objekte aus ihren Alben genommen",
     moveFailed:
       "Die Objekte konnten nicht verschoben werden. Versuche es noch einmal.",
+    setGrade: "Erhaltung festlegen",
+    "gradeApply#one": "1 Objekt bewerten",
+    "gradeApply#few": "{count} Objekte bewerten",
+    "gradeApply#other": "{count} Objekte bewerten",
+    "graded#one": "1 Objekt bewertet",
+    "graded#few": "{count} Objekte bewertet",
+    "graded#other": "{count} Objekte bewertet",
+    gradedSkipped:
+      "{graded} bewertet, {skipped} übersprungen: Die Bewertungsskala passt nicht zu ihrer Objektart.",
+    gradeFailed:
+      "Die Erhaltung konnte nicht festgelegt werden. Versuche es noch einmal.",
     delete: "Löschen",
     "deleteTitle#one": "1 Objekt löschen?",
     "deleteTitle#few": "{count} Objekte löschen?",

@@ -16,12 +16,13 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteItemsButton } from "./delete-items-button";
 import type { BrowseResult } from "./filter-options";
+import { SetGradeButton } from "./set-grade-button";
 import type { ItemSelection } from "./use-item-selection";
 
 /**
  * Select mode's bar on the Collection page: select the page or the whole
  * view, pick an Album (or none) and move every selected Item there at once,
- * or delete them.
+ * set a Grade on them, or delete them.
  */
 export function MoveToAlbumBar({
   selection,
@@ -158,6 +159,18 @@ export function MoveToAlbumBar({
             : t("collection.takeOut")}
         </Button>
       )}
+      <SetGradeButton
+        selection={selection}
+        onGraded={({ graded, skipped }) => {
+          toast.success(
+            skipped > 0
+              ? t("collection.gradedSkipped", { graded, skipped })
+              : t("collection.graded", { count: graded }),
+          );
+          selection.stop();
+        }}
+        onFailed={setFailed}
+      />
       <DeleteItemsButton
         selection={selection}
         onDeleted={(deleted) => {
