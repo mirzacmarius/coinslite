@@ -2,7 +2,7 @@
 
 ### Issue tracker
 
-Issues are tracked in Linear (team `MUS`, project CoinsLite), using the Linear MCP tools. See `docs/agents/issue-tracker.md`.
+Issues are tracked in Linear (team `COIN`, project CoinsLite), using the Linear MCP tools. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
