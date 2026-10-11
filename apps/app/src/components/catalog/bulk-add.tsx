@@ -8,6 +8,7 @@ import {
   useItemLimitMessage,
   useItemsLeft,
 } from "@/components/plans/plan-usage";
+import { SelectionBar } from "@/components/selection-bar";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -18,14 +19,13 @@ import {
   setLimits,
 } from "@coinslite/backend/convex/catalog/setRules";
 import { Button } from "@coinslite/ui/button";
-import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Switch } from "@coinslite/ui/switch";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import { Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type * as React from "react";
 import { useId, useState } from "react";
@@ -151,31 +151,13 @@ export function BulkAddBar({
   const blocked = count === 0 || tooMany || overQuota;
 
   return (
-    <div
-      role="region"
-      aria-label={t("sets.addBar")}
-      className={cn(
-        "flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px]",
-        variant === "floating"
-          ? "sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 mx-2 mt-4 rounded-lg border bg-popover px-3 py-2 shadow-lg md:bottom-4 md:mx-auto md:w-full md:max-w-[760px]"
-          : "border-t px-3 py-2",
-      )}
+    <SelectionBar
+      label={t("sets.addBar")}
+      count={count}
+      onClear={onClear}
+      start={start}
+      variant={variant}
     >
-      {start}
-      {count > 0 && (
-        <span className="flex items-center gap-1">
-          <span className="font-medium tabular-nums">
-            {t("sets.selected", { count })}
-          </span>
-          <IconButton
-            type="button"
-            label={t("sets.clearSelection")}
-            onClick={onClear}
-          >
-            <X />
-          </IconButton>
-        </span>
-      )}
       <AlbumPicker
         value={bulk.albumId}
         onChange={bulk.setAlbumId}
@@ -218,7 +200,7 @@ export function BulkAddBar({
           {bulk.failed}
         </p>
       )}
-    </div>
+    </SelectionBar>
   );
 }
 

@@ -28,6 +28,7 @@ import {
   parseMoney,
 } from "@coinslite/i18n";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
+import type { FormApi, Validator } from "@tanstack/react-form";
 import type { FunctionArgs } from "convex/server";
 
 /** The Item form's fields as typed: numbers stay text until the form is sent. */
@@ -378,4 +379,28 @@ export function matchingPreset<P extends BullionPreset>(
       parseDecimal(values.weight) === preset.weight &&
       parseDecimal(values.purity) === preset.purity,
   );
+}
+
+/** The parts of the Item form that filling it uses. */
+type FillableForm = Pick<
+  FormApi<ItemFormValues, Validator<ItemFormValues, unknown> | undefined>,
+  "getFieldMeta" | "setFieldValue"
+>;
+
+/**
+ * Writes values the app supplies (a Catalog entry's facts, a scan's
+ * suggestion, a bullion preset) into the Item form.
+ *
+ * A field that hasn't shown yet, such as one under a closed "More details",
+ * gets only its value: TanStack would otherwise give it a partial state that
+ * makes validating the form throw once the field shows (MUS-734). A field
+ * that has shown is written as if typed, so it counts as unsaved input.
+ */
+export function fillForm(form: FillableForm, values: Partial<ItemFormValues>) {
+  for (const name of Object.keys(values) as (keyof ItemFormValues)[]) {
+    const value = values[name] as ItemFormValues[typeof name];
+    form.setFieldValue(name, value, {
+      dontUpdateMeta: form.getFieldMeta(name) === undefined,
+    });
+  }
 }

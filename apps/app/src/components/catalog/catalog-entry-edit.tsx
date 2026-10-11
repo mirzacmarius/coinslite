@@ -4,6 +4,7 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
+import { ActionLabel } from "@coinslite/ui/header-bar";
 import { useQuery } from "convex/react";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
@@ -31,7 +32,7 @@ export function CatalogEntryEdit({ entryKey }: { entryKey: string }) {
         }
       >
         <Pencil strokeWidth={1.75} aria-hidden="true" />
-        {t("catalogEditor.editEntry")}
+        <ActionLabel>{t("catalogEditor.editEntry")}</ActionLabel>
       </Button>
       <CatalogNodeSheet
         key={sheet.session}

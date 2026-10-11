@@ -3,6 +3,7 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Språk",
+    saveFailed: "Noe gikk galt, så ingenting ble lagret. Prøv igjen.",
     appDescription: "Registrer myntene, sedlene og frimerkene du eier.",
   },
   nav: {
@@ -57,6 +58,7 @@ export default {
     cancel: "Avbryt",
     close: "Lukk",
     added: "Objektet er lagt til i samlingen",
+    addedToAlbum: "Objekt lagt til i {album}",
     emptyTitle: "Samlingen er tom",
     emptyDescription:
       "Legg til din første mynt, seddel eller ditt første frimerke for å se det her.",
@@ -119,7 +121,11 @@ export default {
     noGrade: "Ingen kvalitet",
     gradingScale: "Kvalitetsskala",
     gradeNote: "Merknad om kvalitet",
-    gradeNotePlaceholder: "f.eks. lett patina, kanthakk",
+    gradeNotePlaceholder: {
+      coin: "f.eks. lett patina, kanthakk",
+      banknote: "f.eks. lett brett, nålehull",
+      stamp: "f.eks. kort tagg, tynt sted",
+    },
     strike: "Preging",
     setStrike: "Velg preging",
     noStrike: "Ingen preging",
@@ -763,6 +769,26 @@ export default {
     incomplete:
       "Samlingen er for stor til å søke i på én gang, så denne visningen gjelder de første {count} objektene du la til.",
     showInCollection: "Vis i samlingen",
+    select: "Velg",
+    selectionBar: "Valgte objekter",
+    selectHint: "Velg objekter for å flytte dem til et album.",
+    selectPage: "Velg siden",
+    "selectAll#one": "Velg 1 objekt",
+    "selectAll#few": "Velg alle {count} objektene",
+    "selectAll#other": "Velg alle {count} objektene",
+    selectedFirst:
+      "Valgte de første {limit} objektene i denne visningen. Flytt dem, og velg så resten.",
+    done: "Ferdig",
+    moveTo: "Flytt til {album}",
+    takeOut: "Ta ut av album",
+    "inOtherAlbum#one": "1 ligger i et annet album nå",
+    "inOtherAlbum#few": "{count} ligger i et annet album nå",
+    "inOtherAlbum#other": "{count} ligger i et annet album nå",
+    movedTo: "Flyttet til {album}",
+    "takenOut#one": "1 objekt tatt ut av albumet sitt",
+    "takenOut#few": "{count} objekter tatt ut av albumene sine",
+    "takenOut#other": "{count} objekter tatt ut av albumene sine",
+    moveFailed: "Objektene kunne ikke flyttes. Prøv igjen.",
   },
   billing: {
     currentPlan: "Din plan",
@@ -1120,6 +1146,7 @@ export default {
     description:
       "Legg til denne katalogoppføringen i samlingen som ett objekt.",
     added: "Objektet er lagt til i samlingen",
+    addedToAlbum: "Objekt lagt til i {album}",
     open: "Åpne",
     failed: "Objektet kunne ikke legges til. Prøv igjen.",
   },

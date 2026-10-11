@@ -7,7 +7,9 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Setup takes about 5 minutes and the 85 smoke journeys about 15; 20 was
+    # reached on passing runs.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2

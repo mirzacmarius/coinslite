@@ -15,6 +15,8 @@ const isCI = !!process.env.CI;
 // Convex function seam in the backend package.
 export default defineConfig({
   testDir: "./tests",
+  // The bundled Catalog, loaded once for every journey that needs it.
+  globalSetup: "./global-setup.ts",
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,

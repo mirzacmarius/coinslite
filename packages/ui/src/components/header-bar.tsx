@@ -5,6 +5,9 @@ import { cn } from "../utils";
 /**
  * The 40px bar at the top of every app screen: the page title (after its parent
  * page, if any) on the left, icon buttons and the primary action on the right.
+ *
+ * On phones the actions' `ActionLabel`s turn into their buttons' accessible
+ * names only, so the buttons shrink to icons and the title stays readable.
  */
 export function HeaderBar({
   title,
@@ -25,7 +28,7 @@ export function HeaderBar({
         className,
       )}
     >
-      <div className="flex min-w-0 items-center gap-1 text-[13px]">
+      <div className="flex min-w-0 flex-1 items-center gap-1 text-[13px]">
         {parent && (
           <span className="flex shrink-0 items-center gap-1 text-muted-foreground">
             {parent}
@@ -35,8 +38,18 @@ export function HeaderBar({
         <h1 className="truncate font-medium">{title}</h1>
       </div>
       {actions && (
-        <div className="flex shrink-0 items-center gap-1">{actions}</div>
+        <div className="flex shrink-0 items-center gap-1 max-md:[&_[data-action-label]]:sr-only">
+          {actions}
+        </div>
       )}
     </header>
   );
+}
+
+/**
+ * A header action's text label. The bar shows it from tablet width up; on
+ * phones it only names the button, which shows its icon alone.
+ */
+export function ActionLabel({ children }: { children: React.ReactNode }) {
+  return <span data-action-label="">{children}</span>;
 }

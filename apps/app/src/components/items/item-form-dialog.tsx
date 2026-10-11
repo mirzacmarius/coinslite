@@ -91,6 +91,7 @@ import {
   blankItem,
   detailFields,
   factValues,
+  fillForm,
   formArgs,
   hasDetails,
   matchingPreset,
@@ -334,7 +335,25 @@ export function ItemFormDialog({
         );
         return;
       }
-      toast.success(t(item ? "items.saved" : "items.added"));
+      // The only Album, filed into without being picked: say so, so the
+      // Item doesn't land there unnoticed.
+      const preselected =
+        !item &&
+        !copyOf &&
+        onlyAlbum !== undefined &&
+        value.albumId === onlyAlbum &&
+        // Submitting marks every field touched; only a pick makes it dirty.
+        !form.getFieldMeta("albumId")?.isDirty;
+      const filedInto = preselected
+        ? albums?.find(({ _id }) => _id === onlyAlbum)
+        : undefined;
+      toast.success(
+        item
+          ? t("items.saved")
+          : filedInto
+            ? t("items.addedToAlbum", { album: filedInto.name })
+            : t("items.added"),
+      );
       if (added && scanned) {
         const photos = scanned.photos;
         setScanned(undefined);
@@ -351,9 +370,11 @@ export function ItemFormDialog({
       if (createMore) {
         // "Create more" keeps the pills for the next Item, and starts it
         // on the Catalog picker like the first.
-        form.setFieldValue("type", value.type);
-        form.setFieldValue("country", value.country);
-        form.setFieldValue("albumId", value.albumId);
+        fillForm(form, { type: value.type, country: value.country });
+        // A preselected Album stays preselected for the next Item.
+        form.setFieldValue("albumId", value.albumId, {
+          dontUpdateMeta: preselected,
+        });
         if (catalogVisible && isCatalogType(value.type)) openPicker(true);
         else titleRef.current?.focus();
       } else {
@@ -418,21 +439,12 @@ export function ItemFormDialog({
     }
     const title = form.getFieldValue("title").trim();
     if (!title || title === linked?.title)
-      form.setFieldValue("title", entry.title);
+      fillForm(form, { title: entry.title });
     setLinked({ key: entry.key, title: entry.title, facts: entry.facts });
-    const facts = factValues(entry.facts, locale);
-    form.setFieldValue("type", entry.itemType);
-    form.setFieldValue("country", facts.country);
-    form.setFieldValue("year", facts.year);
-    form.setFieldValue("denomination", facts.denomination);
-    form.setFieldValue("series", facts.series);
-    form.setFieldValue("material", facts.material);
-    form.setFieldValue("strike", facts.strike);
-    form.setFieldValue("diameter", facts.diameter);
-    form.setFieldValue("numistaNumber", facts.numistaNumber);
-    form.setFieldValue("metal", facts.metal);
-    form.setFieldValue("weight", facts.weight);
-    form.setFieldValue("purity", facts.purity);
+    fillForm(form, {
+      type: entry.itemType,
+      ...factValues(entry.facts, locale),
+    });
     return true;
   };
 
@@ -441,21 +453,22 @@ export function ItemFormDialog({
     suggestion: NonNullable<ScanPreset["suggestion"]>,
   ) => {
     const { facts } = suggestion;
-    form.setFieldValue("type", "coin");
+    fillForm(form, { type: "coin" });
     const linkedToEntry =
       suggestion.entry !== undefined && (await linkEntry(suggestion.entry.key));
-    if (!linkedToEntry) form.setFieldValue("title", suggestion.title);
+    if (!linkedToEntry) fillForm(form, { title: suggestion.title });
     const values = factValues(facts, locale);
-    if (facts.year !== undefined) form.setFieldValue("year", values.year);
-    if (!linkedToEntry) {
-      form.setFieldValue("country", values.country);
-      form.setFieldValue("denomination", values.denomination);
-      form.setFieldValue("series", values.series);
-      form.setFieldValue("material", values.material);
-      form.setFieldValue("diameter", values.diameter);
-      form.setFieldValue("mintMark", facts.mintMark ?? "");
-      form.setFieldValue("ruler", facts.ruler ?? "");
-    }
+    if (facts.year !== undefined) fillForm(form, { year: values.year });
+    if (!linkedToEntry)
+      fillForm(form, {
+        country: values.country,
+        denomination: values.denomination,
+        series: values.series,
+        material: values.material,
+        diameter: values.diameter,
+        mintMark: facts.mintMark ?? "",
+        ruler: facts.ruler ?? "",
+      });
     // The suggested details are there to check.
     setDetailsOpen(true);
   };
@@ -522,13 +535,15 @@ export function ItemFormDialog({
     const chosen = bullionPresets.find((preset) => preset.id === id);
     if (!chosen) return;
     const filled = presetValues(chosen, locale);
-    form.setFieldValue("metal", filled.metal);
-    form.setFieldValue("weight", filled.weight);
-    form.setFieldValue("purity", filled.purity);
-    form.setFieldValue("country", filled.country);
-    form.setFieldValue("bullion", true);
+    fillForm(form, {
+      metal: filled.metal,
+      weight: filled.weight,
+      purity: filled.purity,
+      country: filled.country,
+      bullion: true,
+    });
     if (!form.getFieldValue("title").trim())
-      form.setFieldValue("title", t(`preciousMetal.presets.${id}`));
+      fillForm(form, { title: t(`preciousMetal.presets.${id}`) });
   };
   const errorOf = (errors: unknown[]) =>
     submitted
@@ -621,7 +636,7 @@ export function ItemFormDialog({
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
-            void submitForm(form);
+            void submitForm(form, t("common.saveFailed"));
           }
         }}
       >
@@ -630,7 +645,7 @@ export function ItemFormDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form);
+            void submitForm(form, t("common.saveFailed"));
           }}
           className="flex min-h-0 flex-col"
         >
@@ -994,8 +1009,7 @@ export function ItemFormDialog({
                               onClear={() => {
                                 // Weight and purity are the metal's.
                                 field.handleChange(undefined);
-                                form.setFieldValue("weight", "");
-                                form.setFieldValue("purity", "");
+                                fillForm(form, { weight: "", purity: "" });
                               }}
                               clearLabel={t("preciousMetal.noMetal")}
                               noResults={t("items.noMatches")}
@@ -1055,7 +1069,7 @@ export function ItemFormDialog({
                     )}
                   </form.Field>
                   {textField("gradeNote", t("items.gradeNote"), {
-                    placeholder: t("items.gradeNotePlaceholder"),
+                    placeholder: t(`items.gradeNotePlaceholder.${values.type}`),
                     maxLength: itemLimits.gradeNote,
                   })}
                 </DetailGroup>
@@ -1101,7 +1115,7 @@ export function ItemFormDialog({
               <Button
                 type="button"
                 disabled={submitting}
-                onClick={() => void submitForm(form)}
+                onClick={() => void submitForm(form, t("common.saveFailed"))}
               >
                 {submitting && (
                   <Loader2 className="animate-spin" aria-hidden="true" />

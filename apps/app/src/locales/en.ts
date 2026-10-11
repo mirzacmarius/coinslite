@@ -1,6 +1,7 @@
 export default {
   common: {
     language: "Language",
+    saveFailed: "Something went wrong, so nothing was saved. Try again.",
     appDescription: "Record the coins, banknotes and stamps you own.",
   },
   nav: {
@@ -55,6 +56,7 @@ export default {
     cancel: "Cancel",
     close: "Close",
     added: "Item added to your Collection",
+    addedToAlbum: "Item added to {album}",
     emptyTitle: "Your Collection is empty",
     emptyDescription: "Add your first coin, banknote or stamp to see it here.",
     showMore: "Show more",
@@ -115,7 +117,11 @@ export default {
     noGrade: "No grade",
     gradingScale: "Grading scale",
     gradeNote: "Grade note",
-    gradeNotePlaceholder: "e.g. light toning, rim nick",
+    gradeNotePlaceholder: {
+      coin: "e.g. light toning, rim nick",
+      banknote: "e.g. light fold, pinhole",
+      stamp: "e.g. short perforation, thin",
+    },
     strike: "Strike",
     setStrike: "Set strike",
     noStrike: "No strike",
@@ -748,6 +754,26 @@ export default {
     incomplete:
       "Your Collection is too large to search at once, so this view covers the first {count} Items you added.",
     showInCollection: "Show in Collection",
+    select: "Select",
+    selectionBar: "Selected Items",
+    selectHint: "Select Items to move them to an Album.",
+    selectPage: "Select page",
+    "selectAll#one": "Select 1 Item",
+    "selectAll#few": "Select all {count} Items",
+    "selectAll#other": "Select all {count} Items",
+    selectedFirst:
+      "Selected the first {limit} Items in this view. Move them, then select the rest.",
+    done: "Done",
+    moveTo: "Move to {album}",
+    takeOut: "Take out of Albums",
+    "inOtherAlbum#one": "1 is in another Album now",
+    "inOtherAlbum#few": "{count} are in another Album now",
+    "inOtherAlbum#other": "{count} are in another Album now",
+    movedTo: "Moved to {album}",
+    "takenOut#one": "1 Item taken out of its Album",
+    "takenOut#few": "{count} Items taken out of their Albums",
+    "takenOut#other": "{count} Items taken out of their Albums",
+    moveFailed: "The Items couldn't be moved. Try again.",
   },
   billing: {
     currentPlan: "Your plan",
@@ -1100,6 +1126,7 @@ export default {
     title: "Add to Collection",
     description: "Add this Catalog entry to your Collection as one Item.",
     added: "Item added to your Collection",
+    addedToAlbum: "Item added to {album}",
     open: "Open",
     failed: "The Item couldn't be added. Try again.",
   },

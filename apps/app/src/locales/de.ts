@@ -3,6 +3,8 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Sprache",
+    saveFailed:
+      "Etwas ist schiefgelaufen, daher wurde nichts gespeichert. Versuche es noch einmal.",
     appDescription:
       "Erfasse die Münzen, Banknoten und Briefmarken, die du besitzt.",
   },
@@ -58,6 +60,7 @@ export default {
     cancel: "Abbrechen",
     close: "Schließen",
     added: "Objekt zur Sammlung hinzugefügt",
+    addedToAlbum: "Objekt zu {album} hinzugefügt",
     emptyTitle: "Deine Sammlung ist leer",
     emptyDescription:
       "Füge deine erste Münze, Banknote oder Briefmarke hinzu, um sie hier zu sehen.",
@@ -121,7 +124,11 @@ export default {
     noGrade: "Keine Erhaltung",
     gradingScale: "Bewertungsskala",
     gradeNote: "Notiz zur Erhaltung",
-    gradeNotePlaceholder: "z. B. leichte Patina, Randfehler",
+    gradeNotePlaceholder: {
+      coin: "z. B. leichte Patina, Randfehler",
+      banknote: "z. B. leichter Knick, Nadelloch",
+      stamp: "z. B. kurzer Zahn, dünne Stelle",
+    },
     strike: "Prägung",
     setStrike: "Prägung wählen",
     noStrike: "Keine Prägung",
@@ -787,6 +794,27 @@ export default {
     incomplete:
       "Deine Sammlung ist zu groß, um sie auf einmal zu durchsuchen. Diese Ansicht umfasst die ersten {count} Objekte, die du hinzugefügt hast.",
     showInCollection: "In der Sammlung zeigen",
+    select: "Auswählen",
+    selectionBar: "Ausgewählte Objekte",
+    selectHint: "Wähle Objekte aus, um sie in ein Album zu verschieben.",
+    selectPage: "Seite auswählen",
+    "selectAll#one": "1 Objekt auswählen",
+    "selectAll#few": "Alle {count} Objekte auswählen",
+    "selectAll#other": "Alle {count} Objekte auswählen",
+    selectedFirst:
+      "Die ersten {limit} Objekte dieser Ansicht sind ausgewählt. Verschiebe sie, dann wähle den Rest aus.",
+    done: "Fertig",
+    moveTo: "Nach {album} verschieben",
+    takeOut: "Aus Alben nehmen",
+    "inOtherAlbum#one": "1 liegt gerade in einem anderen Album",
+    "inOtherAlbum#few": "{count} liegen gerade in einem anderen Album",
+    "inOtherAlbum#other": "{count} liegen gerade in einem anderen Album",
+    movedTo: "Nach {album} verschoben",
+    "takenOut#one": "1 Objekt aus seinem Album genommen",
+    "takenOut#few": "{count} Objekte aus ihren Alben genommen",
+    "takenOut#other": "{count} Objekte aus ihren Alben genommen",
+    moveFailed:
+      "Die Objekte konnten nicht verschoben werden. Versuche es noch einmal.",
   },
   billing: {
     currentPlan: "Dein Tarif",
@@ -1155,6 +1183,7 @@ export default {
     description:
       "Füge diesen Katalogeintrag deiner Sammlung als ein Objekt hinzu.",
     added: "Objekt zur Sammlung hinzugefügt",
+    addedToAlbum: "Objekt zu {album} hinzugefügt",
     open: "Öffnen",
     failed:
       "Das Objekt konnte nicht hinzugefügt werden. Versuche es noch einmal.",

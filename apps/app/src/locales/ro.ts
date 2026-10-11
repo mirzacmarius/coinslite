@@ -3,6 +3,7 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Limbă",
+    saveFailed: "Ceva nu a mers, așa că nu s-a salvat nimic. Încearcă din nou.",
     appDescription:
       "Înregistrează monedele, bancnotele și timbrele pe care le deții.",
   },
@@ -58,6 +59,7 @@ export default {
     cancel: "Anulează",
     close: "Închide",
     added: "Obiect adăugat în colecție",
+    addedToAlbum: "Obiect adăugat în {album}",
     emptyTitle: "Colecția ta e goală",
     emptyDescription:
       "Adaugă prima monedă, bancnotă sau primul timbru ca să-l vezi aici.",
@@ -120,7 +122,11 @@ export default {
     noGrade: "Fără stare",
     gradingScale: "Scară de evaluare",
     gradeNote: "Notă despre stare",
-    gradeNotePlaceholder: "ex. patină ușoară, lovitură pe margine",
+    gradeNotePlaceholder: {
+      coin: "ex. patină ușoară, lovitură pe margine",
+      banknote: "ex. îndoitură ușoară, gaură de ac",
+      stamp: "ex. dinte scurt, subțiere",
+    },
     strike: "Batere",
     setStrike: "Alege baterea",
     noStrike: "Fără batere",
@@ -768,6 +774,26 @@ export default {
     incomplete:
       "Colecția ta e prea mare pentru a fi căutată dintr-odată, așa că această vizualizare cuprinde primele {count} de obiecte pe care le-ai adăugat.",
     showInCollection: "Arată în colecție",
+    select: "Selectează",
+    selectionBar: "Obiecte selectate",
+    selectHint: "Selectează obiecte ca să le muți într-un album.",
+    selectPage: "Selectează pagina",
+    "selectAll#one": "Selectează 1 obiect",
+    "selectAll#few": "Selectează toate cele {count} obiecte",
+    "selectAll#other": "Selectează toate cele {count} de obiecte",
+    selectedFirst:
+      "Au fost selectate primele {limit} de obiecte din această vizualizare. Mută-le, apoi selectează restul.",
+    done: "Gata",
+    moveTo: "Mută în {album}",
+    takeOut: "Scoate din albume",
+    "inOtherAlbum#one": "1 este acum în alt album",
+    "inOtherAlbum#few": "{count} sunt acum în alt album",
+    "inOtherAlbum#other": "{count} sunt acum în alt album",
+    movedTo: "Mutat în {album}",
+    "takenOut#one": "1 obiect scos din album",
+    "takenOut#few": "{count} obiecte scoase din albume",
+    "takenOut#other": "{count} de obiecte scoase din albume",
+    moveFailed: "Obiectele nu au putut fi mutate. Încearcă din nou.",
   },
   billing: {
     currentPlan: "Planul tău",
@@ -1126,6 +1152,7 @@ export default {
     description:
       "Adaugă această intrare de catalog în colecție ca un singur obiect.",
     added: "Obiect adăugat în colecție",
+    addedToAlbum: "Obiect adăugat în {album}",
     open: "Deschide",
     failed: "Obiectul nu a putut fi adăugat. Încearcă din nou.",
   },

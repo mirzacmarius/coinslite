@@ -2,6 +2,7 @@
 
 import { type SubmittableForm, submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
+import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { Loader2 } from "lucide-react";
 import type * as React from "react";
@@ -21,6 +22,7 @@ export function AuthForm({
   };
   children: React.ReactNode;
 }) {
+  const t = useI18n();
   // A new deployment waits while someone is typing here.
   useUnsavedInput(form.useStore((state) => state.isDirty));
   const [interactive, setInteractive] = useState(false);
@@ -31,7 +33,7 @@ export function AuthForm({
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        void submitForm(form);
+        void submitForm(form, t("common.saveFailed"));
       }}
     >
       <fieldset disabled={!interactive} className="flex min-w-0 flex-col gap-4">

@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  newEmail,
-  runInBackend,
-  signUpAndVerify,
-  visiblePage,
-} from "../support/accounts";
+import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
 import { catalogPicker, waitForAddedToasts } from "../support/items";
 import { appUrl, hasLocalBackend } from "../urls";
 
@@ -17,8 +12,6 @@ test.use({ locale: "en-US" });
 test("add an Item from the Catalog, then more of it from the entry's page", async ({
   page,
 }) => {
-  // The bundled Catalog: United States silver dollars. Loading it again changes nothing.
-  runInBackend("catalog/seed:load", {});
   await signUpAndVerify(page, newEmail());
   await page.goto(`${appUrl}/collection`);
   const main = visiblePage(page);
@@ -89,4 +82,33 @@ test("add an Item from the Catalog, then more of it from the entry's page", asyn
   });
   await expect(rows).toHaveCount(2);
   await expect(rows.filter({ hasText: "×3" })).toHaveCount(1);
+});
+
+test("an Item picked from the Catalog saves after More details is opened", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  const picker = catalogPicker(page);
+  await picker
+    .getByPlaceholder("Search coins by title, denomination, series or country…")
+    .fill("1881 cc morgan");
+  await picker.getByRole("option", { name: /Morgan dollar 1881-CC/ }).click();
+  await expect(picker).toBeHidden();
+
+  // The entry's facts went into fields that only show now.
+  const dialog = page.getByRole("dialog", { name: "New Item" });
+  await dialog.getByRole("button", { name: "More details" }).click();
+  await expect(dialog.getByLabel("Year")).toHaveValue("1881");
+  await dialog.getByLabel("Purchase price").fill("410");
+  await dialog.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(dialog).toBeHidden();
+
+  const row = main.getByRole("link", { name: /Morgan dollar 1881-CC/ });
+  await expect(row).toContainText("1881 · 1 dollar · United States");
+  await row.click();
+  await expect(visiblePage(page).getByText("$410.00").first()).toBeVisible();
 });

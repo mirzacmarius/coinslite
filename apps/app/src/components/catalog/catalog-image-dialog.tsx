@@ -197,7 +197,7 @@ export function CatalogImageDialog({
     if (converting) return;
     if (!picked && !hasImage)
       setImageError(t("catalogImages.errors.imageRequired"));
-    void submitForm(form);
+    void submitForm(form, t("common.saveFailed"));
   };
 
   const choose = async (file: File) => {

@@ -1,6 +1,14 @@
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
+import { FieldApi, FormApi } from "@tanstack/react-form";
 import { describe, expect, test } from "vitest";
-import { factValues, formArgs, valuesFromItem } from "./item-form";
+import {
+  type ItemFormValues,
+  blankItem,
+  factValues,
+  fillForm,
+  formArgs,
+  valuesFromItem,
+} from "./item-form";
 
 /** A stored Item, as the Item page reads it. */
 const morgan: Doc<"items"> = {
@@ -92,5 +100,30 @@ describe("a duplicate (spec 5.5) sends what the original holds", () => {
     ] as const) {
       expect(args[fact]).toBeUndefined();
     }
+  });
+});
+
+describe("filling the form from a Catalog entry (MUS-734)", () => {
+  /** A form with only the always-visible fields mounted, like a closed "More details". */
+  const formWithTitleMounted = () => {
+    const form = new FormApi<ItemFormValues>({ defaultValues: blankItem() });
+    form.mount();
+    new FieldApi({ form, name: "title" }).mount();
+    return form;
+  };
+
+  test("a fact filled while its field is hidden still validates once the field shows", async () => {
+    const form = formWithTitleMounted();
+    fillForm(form, { title: "Morgan dollar 1881-S", year: "1881" });
+    // "More details" opens: the year field mounts.
+    new FieldApi({ form, name: "year" }).mount();
+    await expect(form.validateAllFields("submit")).resolves.toBeDefined();
+    expect(form.getFieldValue("year")).toBe("1881");
+  });
+
+  test("a filled visible field counts as input, so the unsaved-input guard holds", () => {
+    const form = formWithTitleMounted();
+    fillForm(form, { title: "Morgan dollar 1881-S", year: "1881" });
+    expect(form.state.isDirty).toBe(true);
   });
 });

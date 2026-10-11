@@ -1,7 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import { newEmail, signUpAndVerify, visiblePage } from "../support/accounts";
 import { addManually, catalogPicker } from "../support/items";
-import { hasLocalBackend } from "../urls";
+import { appUrl, hasLocalBackend } from "../urls";
 
 test.skip(
   !hasLocalBackend,
@@ -60,4 +60,55 @@ test("after adding an Item, the Overview shows it among the latest and in the to
       name: "100 kroner 1977",
     }),
   ).toBeVisible();
+});
+
+/** Every row of the totals card reaches the card's right edge: no empty cell ends a row. */
+async function expectTotalsRowsFull(page: Page) {
+  const figures = page
+    .locator('section:has(h2:text-is("Collection totals")) dl:visible')
+    .first();
+  const rows = await figures.evaluate((list) => {
+    const right = list.getBoundingClientRect().right;
+    const byTop = new Map<number, number>();
+    for (const cell of Array.from(list.children)) {
+      const box = cell.getBoundingClientRect();
+      const top = Math.round(box.top);
+      byTop.set(top, Math.max(byTop.get(top) ?? 0, box.right));
+    }
+    return [...byTop.values()].map((rowRight) => right - rowRight);
+  });
+  expect(rows.length).toBeGreaterThan(0);
+  for (const gap of rows) expect(gap).toBeLessThanOrEqual(2);
+}
+
+test("the totals card has no empty cell, and a stamp's Grade note hint suits stamps", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  const main = visiblePage(page);
+
+  // A stamp, typed in.
+  await page.goto(`${appUrl}/collection`);
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
+  const dialog = page.getByRole("dialog", { name: "New Item" });
+  await dialog.getByLabel("Title").fill("Posthorn 1872");
+  await dialog.getByRole("button", { name: "Item type: Coin" }).click();
+  await page.getByRole("option", { name: "Stamp" }).click();
+  await dialog.getByRole("button", { name: "More details" }).click();
+  await expect(dialog.getByLabel("Grade note")).toHaveAttribute(
+    "placeholder",
+    "e.g. short perforation, thin",
+  );
+  await dialog.getByLabel("Market value").fill("40");
+  await dialog.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(dialog).toBeHidden();
+
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ["/", "/collection"]) {
+      await page.goto(`${appUrl}${path}`);
+      await expectTotalsRowsFull(page);
+    }
+  }
 });

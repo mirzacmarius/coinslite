@@ -3,6 +3,8 @@ import type { Dictionary } from "./types";
 export default {
   common: {
     language: "Langue",
+    saveFailed:
+      "Une erreur s’est produite, rien n’a été enregistré. Réessayez.",
     appDescription:
       "Enregistrez les pièces, billets et timbres que vous possédez.",
   },
@@ -58,6 +60,7 @@ export default {
     cancel: "Annuler",
     close: "Fermer",
     added: "Objet ajouté à votre collection",
+    addedToAlbum: "Objet ajouté à {album}",
     emptyTitle: "Votre collection est vide",
     emptyDescription:
       "Ajoutez votre première pièce, votre premier billet ou timbre pour le voir ici.",
@@ -121,7 +124,11 @@ export default {
     noGrade: "Aucun état",
     gradingScale: "Échelle de notation",
     gradeNote: "Note sur l’état",
-    gradeNotePlaceholder: "p. ex. légère patine, choc sur la tranche",
+    gradeNotePlaceholder: {
+      coin: "p. ex. légère patine, choc sur la tranche",
+      banknote: "p. ex. léger pli, trou d’épingle",
+      stamp: "p. ex. dent courte, aminci",
+    },
     strike: "Frappe",
     setStrike: "Choisir la frappe",
     noStrike: "Aucune frappe",
@@ -776,6 +783,26 @@ export default {
     incomplete:
       "Votre collection est trop grande pour être parcourue en une fois\u00a0: cette vue porte sur les {count} premiers objets que vous avez ajoutés.",
     showInCollection: "Afficher dans la collection",
+    select: "Sélectionner",
+    selectionBar: "Objets sélectionnés",
+    selectHint: "Sélectionnez des objets pour les déplacer dans un album.",
+    selectPage: "Sélectionner la page",
+    "selectAll#one": "Sélectionner {count} objet",
+    "selectAll#few": "Sélectionner les {count} objets",
+    "selectAll#other": "Sélectionner les {count} objets",
+    selectedFirst:
+      "Les {limit} premiers objets de cette vue sont sélectionnés. Déplacez-les, puis sélectionnez le reste.",
+    done: "Terminé",
+    moveTo: "Déplacer vers {album}",
+    takeOut: "Retirer des albums",
+    "inOtherAlbum#one": "{count} est déjà dans un autre album",
+    "inOtherAlbum#few": "{count} sont déjà dans un autre album",
+    "inOtherAlbum#other": "{count} sont déjà dans un autre album",
+    movedTo: "Déplacé vers {album}",
+    "takenOut#one": "{count} objet retiré de son album",
+    "takenOut#few": "{count} objets retirés de leurs albums",
+    "takenOut#other": "{count} objets retirés de leurs albums",
+    moveFailed: "Les objets n’ont pas pu être déplacés. Réessayez.",
   },
   billing: {
     currentPlan: "Votre formule",
@@ -1138,6 +1165,7 @@ export default {
     description:
       "Ajoutez cette entrée du catalogue à votre collection sous la forme d’un objet.",
     added: "Objet ajouté à votre collection",
+    addedToAlbum: "Objet ajouté à {album}",
     open: "Ouvrir",
     failed: "L’objet n’a pas pu être ajouté. Réessayez.",
   },
