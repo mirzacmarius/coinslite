@@ -120,6 +120,8 @@ import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_files from "../utils/files.js";
 import type * as utils_validators from "../utils/validators.js";
+import type * as wants from "../wants.js";
+import type * as wants_rules from "../wants/rules.js";
 
 import type {
   ApiFromModules,
@@ -240,6 +242,8 @@ declare const fullApi: ApiFromModules<{
   "utils/auth": typeof utils_auth;
   "utils/files": typeof utils_files;
   "utils/validators": typeof utils_validators;
+  wants: typeof wants;
+  "wants/rules": typeof wants_rules;
 }>;
 
 /**

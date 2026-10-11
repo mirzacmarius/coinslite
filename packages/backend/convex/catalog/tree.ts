@@ -7,6 +7,7 @@ import {
   type QueryCtx,
   internalMutation,
 } from "../_generated/server";
+import { clearWantsOfEntry } from "../wants";
 import {
   type CatalogItemType,
   type CatalogKind,
@@ -621,7 +622,10 @@ export async function deleteSubtree(
 ) {
   const removed = [node, ...below];
   for (const each of removed) {
-    if (each.kind === "entry") await detachLinkedItems(ctx, each);
+    if (each.kind === "entry") {
+      await detachLinkedItems(ctx, each);
+      await clearWantsOfEntry(ctx, each._id);
+    }
     if (each.imageFiles) {
       await ctx.storage.delete(each.imageFiles.full);
       await ctx.storage.delete(each.imageFiles.thumbnail);

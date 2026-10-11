@@ -1467,6 +1467,43 @@ export default {
       failed: "Obiectele nu au putut fi adăugate. Încearcă din nou.",
     },
   },
+  wantlist: {
+    title: "Listă de dorințe",
+    open: "Deschide lista de dorințe",
+    want: "Îmi doresc",
+    wanted: "Dorită",
+    wantEntry: "Adaugă {title} în lista de dorințe",
+    unwantEntry: "Scoate {title} din lista de dorințe",
+    mark: "Dorită",
+    added: "Adăugată în lista ta de dorințe",
+    removed: "Scoasă din lista ta de dorințe",
+    removeEntry: "Scoate {title} din lista de dorințe",
+    cleared: "Scoasă din lista ta de dorințe",
+    "clearedMany#one": "1 intrare scoasă din lista ta de dorințe",
+    "clearedMany#few": "{count} intrări scoase din lista ta de dorințe",
+    "clearedMany#other": "{count} de intrări scoase din lista ta de dorințe",
+    wantAllMissing: "Îmi doresc tot ce lipsește",
+    "wantedMany#zero": "Tot ce lipsește e deja în lista ta de dorințe.",
+    "wantedMany#one": "1 intrare de catalog adăugată în lista ta de dorințe",
+    "wantedMany#few":
+      "{count} intrări de catalog adăugate în lista ta de dorințe",
+    "wantedMany#other":
+      "{count} de intrări de catalog adăugate în lista ta de dorințe",
+    wantedMore:
+      "Cel mult {limit} odată: repetă „Îmi doresc tot ce lipsește” pentru restul.",
+    emptyTitle: "Lista ta de dorințe e goală",
+    emptyDescription:
+      "Marchează intrările de catalog pe care le cauți, pe pagina intrării sau într-un set.",
+    browseCatalog: "Răsfoiește catalogul",
+    "count#one": "1 intrare dorită",
+    "count#few": "{count} intrări dorite",
+    "count#other": "{count} de intrări dorite",
+    errors: {
+      tooMany:
+        "Lista de dorințe are cel mult {limit} de intrări. Scoate câteva ca să adaugi altele.",
+      failed: "Lista de dorințe nu a putut fi modificată. Încearcă din nou.",
+    },
+  },
   catalogEditor: {
     menu: "Editor de catalog",
     title: "Editor de catalog",

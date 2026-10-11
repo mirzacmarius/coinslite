@@ -1511,6 +1511,43 @@ export default {
         "Die Objekte konnten nicht hinzugefügt werden. Versuche es noch einmal.",
     },
   },
+  wantlist: {
+    title: "Wunschliste",
+    open: "Wunschliste öffnen",
+    want: "Wünschen",
+    wanted: "Gewünscht",
+    wantEntry: "{title} auf die Wunschliste setzen",
+    unwantEntry: "{title} von der Wunschliste nehmen",
+    mark: "Gewünscht",
+    added: "Auf die Wunschliste gesetzt",
+    removed: "Von der Wunschliste genommen",
+    removeEntry: "{title} von der Wunschliste nehmen",
+    cleared: "Von der Wunschliste genommen",
+    "clearedMany#one": "1 von der Wunschliste genommen",
+    "clearedMany#few": "{count} von der Wunschliste genommen",
+    "clearedMany#other": "{count} von der Wunschliste genommen",
+    wantAllMissing: "Alle fehlenden wünschen",
+    "wantedMany#zero":
+      "Alle fehlenden Einträge stehen schon auf deiner Wunschliste.",
+    "wantedMany#one": "1 Katalogeintrag auf die Wunschliste gesetzt",
+    "wantedMany#few": "{count} Katalogeinträge auf die Wunschliste gesetzt",
+    "wantedMany#other": "{count} Katalogeinträge auf die Wunschliste gesetzt",
+    wantedMore:
+      "Höchstens {limit} auf einmal: Für den Rest noch einmal „Alle fehlenden wünschen“.",
+    emptyTitle: "Deine Wunschliste ist leer",
+    emptyDescription:
+      "Markiere die Katalogeinträge, die du suchst, auf der Seite eines Eintrags oder in einem Set.",
+    browseCatalog: "Katalog ansehen",
+    "count#one": "1 gewünschter Eintrag",
+    "count#few": "{count} gewünschte Einträge",
+    "count#other": "{count} gewünschte Einträge",
+    errors: {
+      tooMany:
+        "Die Wunschliste fasst höchstens {limit} Einträge. Nimm einige herunter, um weitere zu wünschen.",
+      failed:
+        "Die Wunschliste konnte nicht geändert werden. Versuche es noch einmal.",
+    },
+  },
   catalogEditor: {
     menu: "Katalog bearbeiten",
     title: "Katalog bearbeiten",

@@ -1,5 +1,6 @@
 "use client";
 
+import { WantedMark, useWantedKeys } from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -333,9 +334,10 @@ function GroupOption({
 }
 
 /**
- * A Catalog entry to pick: title, then years, denomination and metal. While
- * selecting several, choosing it selects it (or lets go of it); one already
- * held stays unselectable unless duplicates are allowed.
+ * A Catalog entry to pick: title, then years, denomination and metal, and
+ * whether it's wanted. While selecting several, choosing it selects it (or
+ * lets go of it); one already held stays unselectable unless duplicates are
+ * allowed.
  */
 function EntryOption({
   value,
@@ -352,6 +354,7 @@ function EntryOption({
   const t = useI18n();
   const catalogFormat = useCatalogFormat();
   const selection = useContext(SelectingContext);
+  const wanted = useWantedKeys()?.has(entry.key);
   const Icon = entry.itemType === "banknote" ? Banknote : Coins;
   const facts = [
     catalogFormat.years(entry.yearFrom, entry.yearTo),
@@ -374,6 +377,7 @@ function EntryOption({
         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
           {facts}
         </span>
+        {wanted && <WantedMark />}
         {held !== undefined && <HeldCount held={held} />}
       </CommandItem>
     );
@@ -389,6 +393,7 @@ function EntryOption({
       <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
         {facts}
       </span>
+      {wanted && <WantedMark />}
       {held !== undefined && <HeldCount held={held} />}
     </CommandItem>
   );

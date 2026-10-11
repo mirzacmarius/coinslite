@@ -33,6 +33,7 @@ import {
   stampCatalogue,
   strike,
 } from "./utils/validators";
+import { clearWant } from "./wants";
 
 /**
  * Importing Items from a CSV file laid out like the Collection export
@@ -322,6 +323,8 @@ export const addBatch = mutation({
         ...(albumId && { albumId }),
         ...(sale && defined(sale)),
       });
+      // An owned Item made from a wanted entry takes it off the Wantlist.
+      if (entry && !sale) await clearWant(ctx, owner._id, entry._id);
     }
     return rows.length;
   },

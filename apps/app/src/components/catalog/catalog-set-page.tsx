@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  WantToggle,
+  WantedMark,
+  useWantError,
+  useWantedKeys,
+} from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -14,9 +20,9 @@ import { Progress } from "@coinslite/ui/progress";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
 import { toast } from "@coinslite/ui/toaster";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
-import { ChevronRight, ListChecks, SearchX } from "lucide-react";
+import { ChevronRight, Heart, ListChecks, SearchX } from "lucide-react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import type * as React from "react";
@@ -206,6 +212,37 @@ function SetView({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selecting, add, clear]);
 
+  const wanted = useWantedKeys();
+  const wantMany = useMutation(api.wants.wantMany);
+  const wantError = useWantError();
+  const [wanting, setWanting] = useState(false);
+  /** Wants the missing entries not wanted yet, as many as one call takes. */
+  const wantAllMissing = async () => {
+    const toWant = missing
+      .filter((entry) => !wanted?.has(entry.key))
+      .map((entry) => entry.key);
+    if (toWant.length === 0) {
+      toast(t("wantlist.wantedMany", { count: 0 }));
+      return;
+    }
+    setWanting(true);
+    try {
+      const count = await wantMany({
+        keys: toWant.slice(0, setLimits.bulkAdd),
+      });
+      toast.success(t("wantlist.wantedMany", { count }), {
+        description:
+          toWant.length > setLimits.bulkAdd
+            ? t("wantlist.wantedMore", { limit: setLimits.bulkAdd })
+            : undefined,
+      });
+    } catch (failure) {
+      toast.error(wantError(failure));
+    } finally {
+      setWanting(false);
+    }
+  };
+
   const selectAllMissing = () => {
     const leftOut = selection.selectMany(missing);
     if (leftOut > 0) {
@@ -262,6 +299,15 @@ function SetView({
             <ListChecks strokeWidth={1.75} aria-hidden="true" />
             {t("sets.selectAllMissing")}
           </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            disabled={missing.length === 0 || wanted === undefined || wanting}
+            onClick={() => void wantAllMissing()}
+          >
+            <Heart strokeWidth={1.75} aria-hidden="true" />
+            {t("wantlist.wantAllMissing")}
+          </Button>
           <DuplicatesSwitch
             checked={selection.allowDuplicates}
             onCheckedChange={selection.setAllowDuplicates}
@@ -291,6 +337,7 @@ function SetView({
                     selected={selection.isSelected(entry.key)}
                     selectable={selection.canSelect(entry.held)}
                     onToggle={() => selection.toggle(entry)}
+                    wanted={wanted?.has(entry.key)}
                   />
                 ))}
               </ul>
@@ -365,18 +412,22 @@ function GroupHeading({
 /**
  * One entry of a Set: a checkbox to select it (unless it's held and
  * duplicates aren't allowed), its picture, title and facts, how many the
- * person holds, and the way to its page.
+ * person holds, the heart that wants a missing one (a held one only shows
+ * it's wanted), and the way to its page.
  */
 function SetEntryRow({
   entry,
   selected,
   selectable,
   onToggle,
+  wanted,
 }: {
   entry: CatalogEntryRow;
   selected: boolean;
   selectable: boolean;
   onToggle: () => void;
+  /** Undefined until the Wantlist is known. */
+  wanted?: boolean;
 }) {
   const t = useI18n();
   const catalogFormat = useCatalogFormat();
@@ -424,6 +475,15 @@ function SetEntryRow({
         </span>
       </label>
       <HeldCount held={entry.held} />
+      {entry.held === 0
+        ? wanted !== undefined && (
+            <WantToggle
+              entryKey={entry.key}
+              title={entry.title}
+              wanted={wanted}
+            />
+          )
+        : wanted && <WantedMark />}
       <Tooltip>
         <TooltipTrigger asChild>
           <Link

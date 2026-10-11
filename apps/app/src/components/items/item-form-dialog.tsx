@@ -14,6 +14,7 @@ import {
 } from "@/components/plans/plan-usage";
 import { ScanNotice } from "@/components/scanner/scan-notice";
 import type { ScanPreset } from "@/components/scanner/scan-preset";
+import { useWantedKeys } from "@/components/wantlist/wantlist";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
@@ -208,6 +209,7 @@ export function ItemFormDialog({
   const labels = useGradeLabels();
   // Only while open: the "New Item" dialog is mounted on every page.
   const albums = useAlbums(open);
+  const wantedKeys = useWantedKeys();
   // One object for the dialog's life: the form resets when it sees new defaults.
   const [defaults] = useState(() => {
     const from = item ?? copyOf;
@@ -348,6 +350,8 @@ export function ItemFormDialog({
       // An Album deleted since the form opened can't take the Item.
       if (albums && !albums.some((album) => album._id === args.albumId))
         args.albumId = undefined;
+      // Adding from a wanted entry clears the want (wants.ts), which the toast says.
+      const wanted = !item && link !== undefined && wantedKeys?.has(link.key);
       let added: Id<"items"> | undefined;
       try {
         if (item) await updateItem({ itemId: item._id, ...args });
@@ -382,6 +386,7 @@ export function ItemFormDialog({
           : filedInto
             ? t("items.addedToAlbum", { album: filedInto.name })
             : t("items.added"),
+        { description: wanted ? t("wantlist.cleared") : undefined },
       );
       if (added && scanned) {
         const photos = scanned.photos;
