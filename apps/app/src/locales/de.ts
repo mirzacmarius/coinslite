@@ -796,7 +796,8 @@ export default {
     showInCollection: "In der Sammlung zeigen",
     select: "Auswählen",
     selectionBar: "Ausgewählte Objekte",
-    selectHint: "Wähle Objekte aus, um sie in ein Album zu verschieben.",
+    selectHint:
+      "Wähle Objekte aus, um sie in ein Album zu verschieben oder zu löschen.",
     selectPage: "Seite auswählen",
     "selectAll#one": "1 Objekt auswählen",
     "selectAll#few": "Alle {count} Objekte auswählen",
@@ -815,6 +816,23 @@ export default {
     "takenOut#other": "{count} Objekte aus ihren Alben genommen",
     moveFailed:
       "Die Objekte konnten nicht verschoben werden. Versuche es noch einmal.",
+    delete: "Löschen",
+    "deleteTitle#one": "1 Objekt löschen?",
+    "deleteTitle#few": "{count} Objekte löschen?",
+    "deleteTitle#other": "{count} Objekte löschen?",
+    deleteBody:
+      "Die ausgewählten Objekte werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    "deletePhotos#one": "1 Foto wird mit ihnen gelöscht.",
+    "deletePhotos#few": "{count} Fotos werden mit ihnen gelöscht.",
+    "deletePhotos#other": "{count} Fotos werden mit ihnen gelöscht.",
+    "deleteConfirm#one": "1 Objekt löschen",
+    "deleteConfirm#few": "{count} Objekte löschen",
+    "deleteConfirm#other": "{count} Objekte löschen",
+    "deleted#one": "1 Objekt gelöscht",
+    "deleted#few": "{count} Objekte gelöscht",
+    "deleted#other": "{count} Objekte gelöscht",
+    deleteFailed:
+      "Die Objekte konnten nicht gelöscht werden. Versuche es noch einmal.",
   },
   billing: {
     currentPlan: "Dein Tarif",

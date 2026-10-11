@@ -208,7 +208,9 @@ for (const width of [1280, 375]) {
 
     await main.getByRole("button", { name: "Select", exact: true }).click();
     const bar = page.getByRole("region", { name: "Selected Items" });
-    await expect(bar).toContainText("Select Items to move them to an Album.");
+    await expect(bar).toContainText(
+      "Select Items to move them to an Album or delete them.",
+    );
     await main.getByRole("checkbox", { name: "Krone 1875" }).click();
     await main.getByRole("checkbox", { name: "Krone 1876" }).click();
     await expect(bar).toContainText("2 selected");
@@ -253,6 +255,42 @@ for (const width of [1280, 375]) {
     await expect(bar).toBeHidden();
   });
 }
+
+test("select two Items and delete them after a confirmation", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Krone 1876", "Coin");
+  await addItem(page, main, "Posthorn", "Stamp");
+
+  await main.getByRole("button", { name: "Select", exact: true }).click();
+  const bar = page.getByRole("region", { name: "Selected Items" });
+  await main.getByRole("checkbox", { name: "Krone 1875" }).click();
+  await main.getByRole("checkbox", { name: "Krone 1876" }).click();
+
+  // Cancelling keeps everything.
+  await bar.getByRole("button", { name: "Delete" }).click();
+  const confirm = page.getByRole("alertdialog", { name: "Delete 2 Items?" });
+  await expect(confirm).toContainText("deleted for good");
+  await confirm.getByRole("button", { name: "Cancel" }).click();
+  await expect(bar).toContainText("2 selected");
+
+  await bar.getByRole("button", { name: "Delete" }).click();
+  await confirm.getByRole("button", { name: "Delete 2 Items" }).click();
+  await expect(page.getByText("2 Items deleted")).toBeVisible();
+  await expect(bar).toBeHidden();
+  await expect(main.getByRole("link", { name: /Krone 187/ })).toHaveCount(0);
+  await expect(main.getByRole("link", { name: /Posthorn/ })).toBeVisible();
+  // The totals and the Free plan usage follow.
+  await expect(page.getByRole("navigation", { name: "Pages" })).toContainText(
+    "1–1 of 1",
+  );
+  await expect(page.getByText(/Free plan\s*1 \/ 50 Items/)).toBeVisible();
+});
 
 test("with one Album, the toast names it when a new Item goes in by default", async ({
   page,

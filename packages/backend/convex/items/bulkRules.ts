@@ -6,7 +6,8 @@
 export const bulkLimits = {
   /**
    * Items one bulk action changes, at most: the same as adding from a Set.
-   * Moving reads and writes each Item once and each Album's count once, far
+   * Moving reads and writes each Item once and each Album's count once;
+   * deleting writes each Item, its few photos and its counts. Both stay far
    * inside what one mutation may read and write.
    */
   items: 200,

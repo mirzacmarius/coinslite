@@ -14,12 +14,14 @@ import { toast } from "@coinslite/ui/toaster";
 import { useConvex, useMutation } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { DeleteItemsButton } from "./delete-items-button";
 import type { BrowseResult } from "./filter-options";
 import type { ItemSelection } from "./use-item-selection";
 
 /**
  * Select mode's bar on the Collection page: select the page or the whole
- * view, pick an Album (or none) and move every selected Item there at once.
+ * view, pick an Album (or none) and move every selected Item there at once,
+ * or delete them.
  */
 export function MoveToAlbumBar({
   selection,
@@ -156,6 +158,14 @@ export function MoveToAlbumBar({
             : t("collection.takeOut")}
         </Button>
       )}
+      <DeleteItemsButton
+        selection={selection}
+        onDeleted={(deleted) => {
+          toast.success(t("collection.deleted", { count: deleted }));
+          selection.stop();
+        }}
+        onFailed={setFailed}
+      />
       <Button type="button" variant="ghost" size="xs" onClick={selection.stop}>
         {t("collection.done")}
       </Button>

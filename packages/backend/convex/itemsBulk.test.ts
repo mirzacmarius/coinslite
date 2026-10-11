@@ -3,6 +3,7 @@ import rateLimiter from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
 import { expect, test } from "vitest";
 import { api } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { itemNotFound } from "./items";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
 import schema from "./schema";
@@ -109,7 +110,7 @@ test("someone else's Album can't be moved into", async () => {
   expect(await counts(bob.as)).toEqual({ "Bob's": 0 });
 });
 
-test(`at most ${bulkLimits.items} Items move at once`, async () => {
+test(`at most ${bulkLimits.items} Items move or go at once`, async () => {
   const t = newTest();
   const { as } = await person(t, "ada@example.com");
   const item = await as.mutation(api.items.add, coin("1 krone 1875"));
@@ -134,6 +135,86 @@ test(`at most ${bulkLimits.items} Items move at once`, async () => {
   await expect(
     as.mutation(api.items.moveToAlbum, { itemIds: many }),
   ).rejects.toThrow(bulkErrors.tooManyItems);
+  await expect(
+    as.mutation(api.items.removeMany, { itemIds: many }),
+  ).rejects.toThrow(bulkErrors.tooManyItems);
+  expect(await as.query(api.items.get, { itemId: many[0] })).not.toBeNull();
+});
+
+/** Gives an Item a front photo and `more` more photos; returns their storage ids. */
+async function addPhotos(t: Test, itemId: Id<"items">, more: number) {
+  return t.run(async (ctx) => {
+    const item = await ctx.db.get(itemId);
+    if (!item) throw new Error("no item");
+    const store = () => ctx.storage.store(new Blob(["photo"]));
+    const front = await store();
+    await ctx.db.patch(itemId, { frontPhoto: front });
+    const stored = [front];
+    for (let index = 0; index < more; index += 1) {
+      const storageId = await store();
+      await ctx.db.insert("itemPhotos", {
+        itemId,
+        ownerId: item.ownerId,
+        storageId,
+      });
+      stored.push(storageId);
+    }
+    return stored;
+  });
+}
+
+test("deleting several Items takes their photos and frees their counts", async () => {
+  const t = newTest();
+  const { as } = await person(t, "ada@example.com");
+  const silver = await as.mutation(api.albums.create, { name: "Silver" });
+  const one = await as.mutation(api.items.add, {
+    ...coin("1 krone 1875"),
+    albumId: silver,
+  });
+  const two = await as.mutation(api.items.add, coin("2 kroner 1878"));
+  const kept = await as.mutation(api.items.add, {
+    ...coin("10 øre 1920"),
+    albumId: silver,
+  });
+  const stored = [
+    ...(await addPhotos(t, one, 2)),
+    ...(await addPhotos(t, two, 0)),
+  ];
+
+  expect(await as.query(api.items.photoCount, { itemIds: [one, two] })).toBe(4);
+  expect(await as.query(api.plans.usage, {})).toMatchObject({ used: 3 });
+
+  await as.mutation(api.items.removeMany, { itemIds: [one, two] });
+
+  expect(await as.query(api.items.get, { itemId: one })).toBeNull();
+  expect(await as.query(api.items.get, { itemId: two })).toBeNull();
+  expect(await as.query(api.items.get, { itemId: kept })).not.toBeNull();
+  expect(await counts(as)).toEqual({ Silver: 1 });
+  expect(await as.query(api.plans.usage, {})).toMatchObject({ used: 1 });
+  await t.run(async (ctx) => {
+    for (const storageId of stored)
+      expect(await ctx.storage.getUrl(storageId)).toBeNull();
+    expect(await ctx.db.query("itemPhotos").collect()).toEqual([]);
+  });
+});
+
+test("one Item that isn't yours stops the whole delete", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  const mine = await ada.as.mutation(api.items.add, coin("1 krone 1875"));
+  const theirs = await bob.as.mutation(api.items.add, coin("2 kroner 1878"));
+
+  await expect(
+    ada.as.mutation(api.items.removeMany, { itemIds: [mine, theirs] }),
+  ).rejects.toThrow(itemNotFound);
+  expect(await ada.as.query(api.items.get, { itemId: mine })).not.toBeNull();
+  expect(await bob.as.query(api.items.get, { itemId: theirs })).not.toBeNull();
+  // Someone else's photos aren't counted either.
+  await addPhotos(t, theirs, 1);
+  expect(
+    await ada.as.query(api.items.photoCount, { itemIds: [mine, theirs] }),
+  ).toBe(0);
 });
 
 test("the view's Items can be selected up to the limit, with their Albums", async () => {
