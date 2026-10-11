@@ -2,7 +2,7 @@
 
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
-import { catalogNodeHref } from "@/components/catalog/catalog-levels";
+import { catalogNodeHref, setHref } from "@/components/catalog/catalog-levels";
 import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
 import { entryItemsHref } from "@/components/collection/collection-url";
 import { useI18n } from "@/locales/client";
@@ -18,7 +18,15 @@ import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
-import { Copy, HandCoins, Pencil, SearchX, Trash2, Undo2 } from "lucide-react";
+import {
+  Copy,
+  HandCoins,
+  ListChecks,
+  Pencil,
+  SearchX,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type * as React from "react";
@@ -355,6 +363,21 @@ export function ItemDetail() {
                     </Link>
                   </>
                 )}
+              </PropertyRow>
+            )}
+            {item.catalogEntry?.set && (
+              <PropertyRow label={t("sets.title")}>
+                <Link
+                  href={setHref(item.catalogEntry.set)}
+                  className="inline-flex items-center gap-1.5 hover:underline"
+                >
+                  <ListChecks
+                    className="size-3.5 text-muted-foreground"
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
+                  {t("sets.viewAsSet")}
+                </Link>
               </PropertyRow>
             )}
             <PropertyRow label={t("albums.album")}>

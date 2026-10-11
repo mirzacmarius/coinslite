@@ -17,6 +17,7 @@ import {
 } from "./albums/membership";
 import { heldItemLimit } from "./catalog/browse";
 import { setErrors, setLimits } from "./catalog/setRules";
+import { setOfEntry, setScope } from "./catalog/sets";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
@@ -610,6 +611,8 @@ export const get = query({
            * counting no further than `heldItemLimit`.
            */
           otherItems: v.number(),
+          /** The Set "View as Set" opens (catalog/sets.ts setOfEntry); null for none. */
+          set: v.union(v.null(), setScope),
         }),
       ),
     }),
@@ -632,6 +635,11 @@ export const get = query({
         facts: entry.facts,
         details: entryDetails(node ?? {}),
         otherItems: await otherItemsOf(ctx, item, entry._id),
+        // Sets are part of the Catalog, so hidden with it.
+        set:
+          node && (await catalogVisibleTo(ctx, owner))
+            ? await setOfEntry(ctx, node)
+            : null,
       },
     };
   },
