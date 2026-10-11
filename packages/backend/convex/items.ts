@@ -38,6 +38,11 @@ import {
   itemErrors,
 } from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
+import {
+  recordIfChanged,
+  recordNewItem,
+  splitHistory,
+} from "./items/valueHistory";
 import { requireRoomForItems } from "./plans";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
@@ -163,6 +168,7 @@ export async function storeNewItem(
   doc: Omit<Doc<"items">, "_id" | "_creationTime">,
 ) {
   const itemId = await ctx.db.insert("items", doc);
+  await recordNewItem(ctx, itemId, doc);
   await moveBetweenAlbums(
     ctx,
     undefined,
@@ -357,6 +363,7 @@ export const update = mutation({
       ...checked,
       albumId: album,
     });
+    await recordIfChanged(ctx, item, checked);
     await moveBetweenAlbums(
       ctx,
       item.albumId,
@@ -403,8 +410,11 @@ export const sell = mutation({
       ...fields,
       quantity: pieces,
       ...sale,
+      // Its pieces were added with the original's.
+      addedAt: item.addedAt ?? _creationTime,
     });
     await ctx.db.patch(itemId, { quantity: item.quantity - pieces });
+    await splitHistory(ctx, item, soldId, pieces);
     return soldId;
   },
 });

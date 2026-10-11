@@ -1039,6 +1039,12 @@ export default {
     view: "Afișare",
     chart: "Grafic",
     table: "Tabel",
+    valueOverTime: "Valoare în timp",
+    valueOverTimeDescription:
+      "Cât valora colecția ta la sfârșitul fiecărei luni, metalul la prețul spot al lunii",
+    valueMode: "Arată",
+    overTime: "În timp",
+    byDateAdded: "După data adăugării",
     valueByDateAdded: "Valoare după data adăugării",
     valueByDateAddedDescription:
       "Prețul de achiziție și valoarea de piață ale tuturor obiectelor adăugate până la sfârșitul fiecărei luni",

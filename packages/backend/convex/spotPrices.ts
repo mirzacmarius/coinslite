@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import {
   type QueryCtx,
   env,
@@ -31,6 +32,42 @@ async function latestSnapshot(ctx: QueryCtx) {
 export async function latestRates(ctx: QueryCtx): Promise<MarketRates | null> {
   const snapshot = await latestSnapshot(ctx);
   return snapshot && marketRates(snapshot);
+}
+
+/** Spot prices and exchange rates as kept for one day; never stale. */
+const ratesOfDay = (day: Doc<"spotPriceDays">) =>
+  marketRates({
+    quotedAt: day.quotedAt,
+    fetchedAt: day.quotedAt,
+    checkedAt: day.quotedAt,
+    perDollar: day.perDollar,
+  });
+
+/**
+ * The Spot prices of each month's end, by its last day ("YYYY-MM-DD"): the
+ * last kept day up to it, or for months before the first kept day the
+ * earliest. Before any day is kept, the latest prices; null before any.
+ */
+export async function ratesForDays(ctx: QueryCtx, lastDays: string[]) {
+  const earliest = await ctx.db
+    .query("spotPriceDays")
+    .withIndex("by_day")
+    .order("asc")
+    .first();
+  if (!earliest) {
+    const latest = await latestRates(ctx);
+    return lastDays.map(() => latest);
+  }
+  return await Promise.all(
+    lastDays.map(async (lastDay) => {
+      const day = await ctx.db
+        .query("spotPriceDays")
+        .withIndex("by_day", (q) => q.lte("day", lastDay))
+        .order("desc")
+        .first();
+      return ratesOfDay(day ?? earliest);
+    }),
+  );
 }
 
 /** A Spot price in whole minor units of the Home currency. */
@@ -145,7 +182,10 @@ export const refresh = internalAction({
   },
 });
 
-/** Replaces the stored snapshot with freshly fetched prices. */
+/**
+ * Replaces the stored snapshot with freshly fetched prices, and keeps the
+ * day's first good prices for good (spotPriceDays) for "Value over time".
+ */
 export const record = internalMutation({
   args: {
     quotedAt: v.number(),
@@ -161,6 +201,18 @@ export const record = internalMutation({
       await ctx.db.replace("spotPriceSnapshots", latest._id, snapshot);
     } else {
       await ctx.db.insert("spotPriceSnapshots", snapshot);
+    }
+    const day = new Date(now).toISOString().slice(0, 10);
+    const kept = await ctx.db
+      .query("spotPriceDays")
+      .withIndex("by_day", (q) => q.eq("day", day))
+      .first();
+    if (!kept) {
+      await ctx.db.insert("spotPriceDays", {
+        day,
+        quotedAt: quote.quotedAt,
+        perDollar: quote.perDollar,
+      });
     }
     return null;
   },

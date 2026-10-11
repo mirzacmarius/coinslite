@@ -175,6 +175,11 @@ export default defineSchema({
     frontPhoto: v.optional(v.id("_storage")),
     backPhoto: v.optional(v.id("_storage")),
 
+    // When the pieces were first added, for an Item split off by a sale
+    // (items.ts sell): the original's start, so its months before the sale
+    // still count. Absent otherwise: the Item started at `_creationTime`.
+    addedAt: v.optional(v.number()),
+
     // Album: at most one. Moving an Item in or out keeps the Album's itemCount
     // right (albums/membership.ts).
     albumId: v.optional(v.id("albums")),
@@ -362,6 +367,34 @@ export default defineSchema({
    * The latest Spot prices and exchange rates (spotPrices.ts): one document,
    * replaced by each successful refresh and kept when a refresh fails.
    */
+  /**
+   * Market value history (items/valueHistory.ts): an Item's Market value per
+   * piece and Quantity from `at` on, recorded whenever either changes, in
+   * minor units of the owner's Home currency (a change of it converts these
+   * too). "Value over time" reads each month's latest.
+   */
+  marketValueHistory: defineTable({
+    ownerId: v.id("users"),
+    itemId: v.id("items"),
+    at: v.number(),
+    marketValue: v.optional(v.number()),
+    quantity: v.number(),
+  })
+    .index("by_itemId_and_at", ["itemId", "at"])
+    .index("by_ownerId", ["ownerId"]),
+
+  /**
+   * The first good Spot prices of each day, kept for good (spotPrices.ts
+   * record), with the whole per-dollar table so any Home currency can be
+   * worked out later: "Value over time" prices metal at each month's.
+   */
+  spotPriceDays: defineTable({
+    /** "YYYY-MM-DD", UTC. */
+    day: v.string(),
+    quotedAt: v.number(),
+    perDollar,
+  }).index("by_day", ["day"]),
+
   spotPriceSnapshots: defineTable({
     /** When the provider quoted the prices. */
     quotedAt: v.number(),

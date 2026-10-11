@@ -1065,6 +1065,12 @@ export default {
     view: "Ansicht",
     chart: "Diagramm",
     table: "Tabelle",
+    valueOverTime: "Wert im Zeitverlauf",
+    valueOverTimeDescription:
+      "Was deine Sammlung am Ende jedes Monats wert war, Metall zum Spotpreis des Monats",
+    valueMode: "Anzeigen",
+    overTime: "Im Zeitverlauf",
+    byDateAdded: "Nach Hinzufügedatum",
     valueByDateAdded: "Wert nach Hinzufügedatum",
     valueByDateAddedDescription:
       "Kaufpreis und Marktwert von allem, was bis zum Ende jedes Monats hinzugefügt wurde",

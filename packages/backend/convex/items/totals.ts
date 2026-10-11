@@ -146,7 +146,7 @@ export const emptyTotals = ({
 });
 
 /** The month a moment falls in, "YYYY-MM", `utcOffsetMinutes` ahead of UTC. */
-const monthOf = (moment: number, utcOffsetMinutes: number) =>
+export const monthOf = (moment: number, utcOffsetMinutes: number) =>
   new Date(moment + utcOffsetMinutes * 60_000).toISOString().slice(0, 7);
 
 /** Totals over `items`. */
@@ -260,7 +260,7 @@ function combineMonths(a: MonthAmounts[], b: MonthAmounts[]): MonthAmounts[] {
 }
 
 /** The month after "YYYY-MM". */
-function nextMonth(month: string) {
+export function nextMonth(month: string) {
   const [year = 0, monthNumber = 0] = month.split("-").map(Number);
   return monthNumber === 12
     ? `${year + 1}-01`

@@ -6,6 +6,12 @@ import {
   TOTALS_PAGE_SIZE,
   combineTotals,
 } from "@coinslite/backend/convex/items/totals";
+import {
+  type MonthValue,
+  VALUE_OVER_TIME_PAGE_SIZE,
+  combineValueOverTime,
+  monthOf,
+} from "@coinslite/backend/convex/items/valueOverTime";
 import { usePaginatedQuery } from "convex/react";
 import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 
@@ -63,4 +69,39 @@ export function useCollectionTotals(
 
   const kept = previous.current;
   return complete ?? (kept && kept.sold === sold ? kept.totals : undefined);
+}
+
+/**
+ * "Value over time" for the signed-in person's Collection, live, or undefined
+ * while it first loads: the server works out a page of Items at a time, this
+ * reads every page and adds them up, through the viewer's current month.
+ */
+export function useValueOverTime(): MonthValue[] | undefined {
+  const utcOffsetMinutes = useUtcOffsetMinutes();
+  const throughMonth =
+    utcOffsetMinutes === null ? null : monthOf(Date.now(), utcOffsetMinutes);
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.collectionTotals.valueOverTimePage,
+    utcOffsetMinutes === null || throughMonth === null
+      ? "skip"
+      : { utcOffsetMinutes, throughMonth },
+    { initialNumItems: VALUE_OVER_TIME_PAGE_SIZE },
+  );
+
+  useEffect(() => {
+    if (status === "CanLoadMore") loadMore(VALUE_OVER_TIME_PAGE_SIZE);
+  }, [status, loadMore]);
+
+  const complete = useMemo(
+    () =>
+      status === "Exhausted"
+        ? results.reduce(combineValueOverTime, [])
+        : undefined,
+    [results, status],
+  );
+  const previous = useRef<MonthValue[]>(undefined);
+  useEffect(() => {
+    if (complete) previous.current = complete;
+  }, [complete]);
+  return complete ?? previous.current;
 }

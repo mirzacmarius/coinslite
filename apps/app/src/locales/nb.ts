@@ -1030,6 +1030,12 @@ export default {
     view: "Visning",
     chart: "Diagram",
     table: "Tabell",
+    valueOverTime: "Verdi over tid",
+    valueOverTimeDescription:
+      "Hva samlingen din var verdt ved slutten av hver måned, metall etter månedens spotpris",
+    valueMode: "Vis",
+    overTime: "Over tid",
+    byDateAdded: "Etter dato lagt til",
     valueByDateAdded: "Verdi etter dato lagt til",
     valueByDateAddedDescription:
       "Innkjøpspris og markedsverdi for alt som var lagt til ved slutten av hver måned",

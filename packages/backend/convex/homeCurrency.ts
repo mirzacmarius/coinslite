@@ -69,7 +69,7 @@ export const preview = query({
 /**
  * Changes the signed-in person's Home currency and converts every stored
  * amount into it at `rate`, the stored exchange rate the preview showed,
- * rounded to whole minor units.
+ * rounded to whole minor units: the Items' and their Market value history's.
  *
  * It all happens in this one transaction, so nobody ever sees a Collection
  * with some amounts in the old currency and some in the new: if any Item
@@ -109,6 +109,17 @@ export const change = mutation({
           converted += 1;
         }
         await ctx.db.patch("items", item._id, amounts);
+      }
+      // The Market value history is in the Home currency too.
+      const history = await ctx.db
+        .query("marketValueHistory")
+        .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
+        .collect();
+      for (const point of history) {
+        if (point.marketValue === undefined) continue;
+        await ctx.db.patch(point._id, {
+          marketValue: rates.convert(point.marketValue, from, to),
+        });
       }
     }
     await ctx.db.patch("users", owner._id, { homeCurrency: to });
