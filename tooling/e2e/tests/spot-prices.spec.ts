@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  newEmail,
-  runInBackend,
-  signUpAndVerify,
-  visiblePage,
-} from "../support/accounts";
+import { newEmail, runInBackend, signUpAndVerify } from "../support/accounts";
 import { hasLocalBackend } from "../urls";
 
 test.skip(
@@ -13,9 +8,7 @@ test.skip(
 );
 test.use({ locale: "en-US" });
 
-test("the Overview shows Spot prices in the Home currency", async ({
-  page,
-}) => {
+test("the sidebar shows Spot prices in the Home currency", async ({ page }) => {
   // Stored the way the scheduled refresh stores them; the test backend has no provider key.
   runInBackend("spotPrices:record", {
     quotedAt: Date.now(),
@@ -36,7 +29,7 @@ test("the Overview shows Spot prices in the Home currency", async ({
   // An American browser suggests US dollars as the Home currency.
   await signUpAndVerify(page, newEmail());
 
-  const prices = visiblePage(page).getByRole("region", { name: "Spot prices" });
+  const prices = page.getByRole("region", { name: "Spot prices" });
   await expect(prices.getByRole("row", { name: /Gold/ })).toContainText(
     "$2,400.00",
   );

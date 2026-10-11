@@ -106,7 +106,7 @@ export function AppShell({
   children: React.ReactNode;
   /** Above the navigation: the things people do most, such as adding an Item. */
   quickActions?: React.ReactNode;
-  /** The bottom of the sidebar: plan usage, nothing else. */
+  /** The bottom of the sidebar: Spot prices and plan usage, stacked. */
   sidebarFooter?: React.ReactNode;
 }) {
   const t = useI18n();
@@ -116,7 +116,7 @@ export function AppShell({
     <div className="min-h-dvh bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:grid md:h-dvh md:grid-cols-[232px_1fr] md:overflow-hidden md:bg-sidebar">
       <SkipLink label={t("shell.skipToContent")} />
 
-      <div className="hidden h-dvh flex-col justify-between gap-2 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
+      <div className="hidden h-dvh flex-col justify-between gap-2 overflow-y-auto p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
         <div className="flex min-h-0 flex-col gap-3">
           <WorkspaceMenu className="h-8 w-full" markUnseen />
           {quickActions && (
@@ -126,7 +126,9 @@ export function AppShell({
             <NavLinks items={items} layout="sidebar" />
           </nav>
         </div>
-        {sidebarFooter}
+        {sidebarFooter && (
+          <div className="flex flex-col gap-2">{sidebarFooter}</div>
+        )}
       </div>
 
       {/* From tablet width up, pages sit on a panel inset from the chrome
