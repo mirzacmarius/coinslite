@@ -129,16 +129,19 @@ export function SidebarSpotPrices() {
       <h2 id={titleId} className="text-xs font-medium">
         {t("spotPrices.title")}
       </h2>
-      <table aria-labelledby={titleId} className="w-full text-xs">
+      <table
+        aria-labelledby={titleId}
+        className="w-full whitespace-nowrap text-[11px] tabular-nums"
+      >
         <thead>
-          <tr className="text-[11px] text-muted-foreground">
+          <tr className="text-[10px] text-muted-foreground">
             <th scope="col" className="sr-only">
               {t("spotPrices.metal")}
             </th>
             <th scope="col" className="py-0.5 text-right font-normal">
               {t("spotPrices.perGram")}
             </th>
-            <th scope="col" className="py-0.5 pl-2 text-right font-normal">
+            <th scope="col" className="py-0.5 pl-1.5 text-right font-normal">
               {t("spotPrices.perOunce")}
             </th>
           </tr>
@@ -148,14 +151,14 @@ export function SidebarSpotPrices() {
             <tr key={metal}>
               <th
                 scope="row"
-                className="py-0.5 text-left font-normal text-muted-foreground"
+                className="py-0.5 pr-1.5 text-left font-normal text-muted-foreground"
               >
                 {t(`items.materials.${metal}`)}
               </th>
               <td className="py-0.5 text-right">
                 {format.money(prices[metal].perGram, prices.currency)}
               </td>
-              <td className="py-0.5 pl-2 text-right">
+              <td className="py-0.5 pl-1.5 text-right">
                 {format.money(prices[metal].perOunce, prices.currency)}
               </td>
             </tr>

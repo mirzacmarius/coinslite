@@ -57,6 +57,10 @@ import { useEffect, useState } from "react";
 import { type NavItem, isCurrent } from "./navigation";
 import { useSettingsLinks } from "./settings-links";
 
+// Tighter at the sides than shadcn/ui's, giving labels more room; collapsed
+// to icons, the default keeps them centred.
+const sectionPadding = "px-1 group-data-[collapsible=icon]:px-2";
+
 /**
  * The sidebar on tablets and desktops (shadcn/ui's sidebar-07): the logo and
  * the most used actions at the top, then the sections and Settings, and at
@@ -84,7 +88,7 @@ export function AppSidebar({
       // Clear of a notch or the rounded corners of a phone held sideways.
       className="pl-[max(0.5rem,env(safe-area-inset-left))] pt-[max(0.5rem,env(safe-area-inset-top))]"
     >
-      <SidebarHeader>
+      <SidebarHeader className={sectionPadding}>
         {/* Collapsed to icons, the logo keeps its ring; the name stays for screen readers. */}
         <div className="flex h-8 items-center pl-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0">
           <Link
@@ -100,7 +104,7 @@ export function AppSidebar({
         {quickActions && <SidebarMenu>{quickActions}</SidebarMenu>}
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className={sectionPadding}>
           <nav aria-label={t("shell.primaryNavigation")}>
             <SidebarMenu className="gap-0.5">
               {items.map(({ key, href, icon: Icon }) => {
@@ -128,7 +132,7 @@ export function AppSidebar({
           </nav>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className={sectionPadding}>
         {footer && (
           <div className="flex flex-col gap-2 group-data-[collapsible=icon]:hidden">
             {footer}
