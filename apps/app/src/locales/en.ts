@@ -22,6 +22,8 @@ export default {
     appearanceDark: "Dark",
     appearanceSystem: "System",
     more: "More",
+    settings: "Settings",
+    toggleSidebar: "Show or hide the sidebar",
   },
   placeholder: {
     title: "Nothing here yet",
@@ -675,7 +677,6 @@ export default {
     seeAll: "See all updates",
     gotIt: "Got it",
     close: "Close",
-    workspaceMenuUnseen: "Account and preferences, new release",
   },
   catalogAdmin: {
     menu: "Catalog import and export",

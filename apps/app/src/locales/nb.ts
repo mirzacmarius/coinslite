@@ -24,6 +24,8 @@ export default {
     appearanceDark: "Mørkt",
     appearanceSystem: "System",
     more: "Mer",
+    settings: "Innstillinger",
+    toggleSidebar: "Vis eller skjul sidepanelet",
   },
   placeholder: {
     title: "Ingenting her ennå",
@@ -684,7 +686,6 @@ export default {
     seeAll: "Se alle nyheter",
     gotIt: "Greit",
     close: "Lukk",
-    workspaceMenuUnseen: "Konto og innstillinger, ny versjon",
   },
   catalogAdmin: {
     menu: "Import og eksport av katalog",

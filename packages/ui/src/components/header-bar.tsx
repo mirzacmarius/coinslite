@@ -1,6 +1,16 @@
+"use client";
+
 import { ChevronRight } from "lucide-react";
-import type * as React from "react";
+import * as React from "react";
 import { cn } from "../utils";
+
+/**
+ * What every HeaderBar shows before its title from tablet width up, given by
+ * the frame around the pages: the app's sidebar toggle.
+ */
+const HeaderBarLeadingContext = React.createContext<React.ReactNode>(null);
+
+export const HeaderBarLeading = HeaderBarLeadingContext.Provider;
 
 /**
  * The 40px bar at the top of every app screen: the page title (after its parent
@@ -21,6 +31,7 @@ export function HeaderBar({
   actions?: React.ReactNode;
   className?: string;
 }) {
+  const leading = React.useContext(HeaderBarLeadingContext);
   return (
     <header
       className={cn(
@@ -29,6 +40,12 @@ export function HeaderBar({
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-1 text-[13px]">
+        {leading && (
+          <span className="-ml-2 mr-1 hidden shrink-0 items-center gap-2 md:flex">
+            {leading}
+            <span className="h-4 w-px bg-border" aria-hidden="true" />
+          </span>
+        )}
         {parent && (
           <span className="flex shrink-0 items-center gap-1 text-muted-foreground">
             {parent}

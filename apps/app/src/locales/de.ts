@@ -26,6 +26,8 @@ export default {
     appearanceDark: "Dunkel",
     appearanceSystem: "System",
     more: "Mehr",
+    settings: "Einstellungen",
+    toggleSidebar: "Seitenleiste ein- oder ausblenden",
   },
   placeholder: {
     title: "Noch nichts hier",
@@ -706,7 +708,6 @@ export default {
     seeAll: "Alle Neuigkeiten ansehen",
     gotIt: "Verstanden",
     close: "Schließen",
-    workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
   },
   catalogAdmin: {
     menu: "Katalog importieren und exportieren",

@@ -25,6 +25,8 @@ export default {
     appearanceDark: "Întunecat",
     appearanceSystem: "Sistem",
     more: "Mai mult",
+    settings: "Setări",
+    toggleSidebar: "Afișează sau ascunde bara laterală",
   },
   placeholder: {
     title: "Nimic aici încă",
@@ -688,7 +690,6 @@ export default {
     seeAll: "Vezi toate noutățile",
     gotIt: "Am înțeles",
     close: "Închide",
-    workspaceMenuUnseen: "Cont și preferințe, versiune nouă",
   },
   catalogAdmin: {
     menu: "Import și export catalog",

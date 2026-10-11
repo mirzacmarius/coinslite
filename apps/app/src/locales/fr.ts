@@ -26,6 +26,8 @@ export default {
     appearanceDark: "Sombre",
     appearanceSystem: "Système",
     more: "Plus",
+    settings: "Paramètres",
+    toggleSidebar: "Afficher ou masquer la barre latérale",
   },
   placeholder: {
     title: "Rien ici pour l’instant",
@@ -696,7 +698,6 @@ export default {
     seeAll: "Voir toutes les nouveautés",
     gotIt: "J’ai compris",
     close: "Fermer",
-    workspaceMenuUnseen: "Compte et préférences, nouvelle version",
   },
   catalogAdmin: {
     menu: "Import et export du catalogue",

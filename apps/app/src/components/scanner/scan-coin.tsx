@@ -25,6 +25,7 @@ import {
 } from "@coinslite/ui/dialog";
 import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
+import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { cn } from "@coinslite/ui/utils";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -95,15 +96,15 @@ export function ScanCoinQuickAction() {
   const scanCoin = useScanCoin();
   if (!scanner?.available) return null;
   return (
-    <Button
-      variant="ghost"
-      className="w-full justify-start hover:bg-sidebar-accent"
-      onClick={scanCoin}
-    >
-      <ScanLine aria-hidden="true" />
-      {t("scanner.scan")}
-      <Badge className="ml-auto">{t("scanner.beta")}</Badge>
-    </Button>
+    <SidebarMenuItem>
+      <SidebarMenuButton tooltip={t("scanner.scan")} onClick={scanCoin}>
+        <ScanLine aria-hidden="true" />
+        <span>{t("scanner.scan")}</span>
+        <Badge className="ml-auto group-data-[collapsible=icon]:hidden">
+          {t("scanner.beta")}
+        </Badge>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 

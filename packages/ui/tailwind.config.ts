@@ -44,9 +44,16 @@ const config = {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
+        // The sidebar's own names (shadcn/ui's sidebar), on the chrome's colours.
         sidebar: {
           DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--foreground))",
+          primary: "hsl(var(--primary))",
+          "primary-foreground": "hsl(var(--primary-foreground))",
           accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--foreground))",
+          border: "hsl(var(--border))",
+          ring: "hsl(var(--ring))",
         },
         link: "hsl(var(--link))",
         muted: {
