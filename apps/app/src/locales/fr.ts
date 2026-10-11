@@ -399,7 +399,8 @@ export default {
     backToAlbums: "Retour aux albums",
     noItemsTitle: "Aucun objet dans cet album",
     noItemsDescription:
-      "Choisissez cet album dans le formulaire d’un objet pour l’y ranger.",
+      "Utilisez « Ajouter des objets » pour choisir des objets de votre collection et les ranger ici.",
+    addItems: "Ajouter des objets",
     addToAlbum: "Ajouter à un album",
     noAlbum: "Sans album",
     createNamed: "Créer l’album «\u00a0{name}\u00a0»",
@@ -787,6 +788,8 @@ export default {
     selectionBar: "Objets sélectionnés",
     selectHint:
       "Sélectionnez des objets pour les déplacer dans un album, leur attribuer un état ou les supprimer.",
+    addToHint: "Sélectionnez les objets à ajouter à {album}.",
+    cancel: "Annuler",
     selectPage: "Sélectionner la page",
     "selectAll#one": "Sélectionner {count} objet",
     "selectAll#few": "Sélectionner les {count} objets",

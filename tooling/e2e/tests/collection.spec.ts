@@ -292,6 +292,51 @@ test("select two Items and delete them after a confirmation", async ({
   await expect(page.getByText(/Free plan\s*1 \/ 50 Items/)).toBeVisible();
 });
 
+test("Add Items on an Album picks Items from the Collection and moves them in", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Krone 1876", "Coin");
+  await addItem(page, main, "Posthorn", "Stamp");
+  await createAlbum(page, "Travel");
+  await main.getByRole("link", { name: /Travel/ }).click();
+  await page.waitForURL(/\/albums\/.+/);
+  const albumUrl = page.url();
+
+  // The empty Album points to Add Items; cancelling changes nothing.
+  await expect(main.getByText("Use Add Items")).toBeVisible();
+  await main.getByRole("link", { name: "Add Items" }).last().click();
+  const bar = page.getByRole("region", { name: "Selected Items" });
+  await expect(bar).toContainText("Select the Items to add to Travel.");
+  await bar.getByRole("button", { name: "Cancel" }).click();
+  await page.waitForURL(albumUrl);
+  await expect(main.getByText("No Items in this Album")).toBeVisible();
+
+  await main.getByRole("link", { name: "Add Items" }).first().click();
+  await main.getByRole("checkbox", { name: "Krone 1875" }).click();
+  await main.getByRole("checkbox", { name: "Posthorn" }).click();
+  await bar.getByRole("button", { name: "Move to Travel" }).click();
+  await page.waitForURL(albumUrl);
+  await expect(main.getByRole("link", { name: /Krone 1875/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /Posthorn/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /Krone 1876/ })).toHaveCount(0);
+
+  // Next time, only the Item outside the Album is offered; Esc goes back.
+  await main.getByRole("link", { name: "Add Items" }).first().click();
+  await expect(main.getByRole("checkbox")).toHaveCount(1);
+  await expect(
+    main.getByRole("checkbox", { name: "Krone 1876" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.waitForURL(albumUrl);
+  await page.goto(`${appUrl}/albums`);
+  await expect(main.getByRole("link", { name: /Travel/ })).toContainText("2");
+});
+
 test("with one Album, the toast names it when a new Item goes in by default", async ({
   page,
 }) => {

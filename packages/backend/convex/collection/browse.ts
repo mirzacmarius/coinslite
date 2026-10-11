@@ -33,6 +33,7 @@ export const collectionView = v.object({
   denomination: v.optional(v.string()),
   grade: v.optional(v.object({ gradingScale, grade: v.string() })),
   album: v.optional(v.string()),
+  notInAlbum: v.optional(v.string()),
   sort: v.optional(v.union(...collectionSorts.map((sort) => v.literal(sort)))),
 });
 
@@ -208,10 +209,11 @@ function filtersFor(
       grade === undefined ||
       (item.gradingScale === grade.gradingScale && item.grade === grade.grade),
     album: (item) =>
-      view.album === undefined ||
-      (view.album === withoutAlbum
-        ? item.albumId === undefined
-        : item.albumId === view.album),
+      (view.album === undefined ||
+        (view.album === withoutAlbum
+          ? item.albumId === undefined
+          : item.albumId === view.album)) &&
+      (view.notInAlbum === undefined || item.albumId !== view.notInAlbum),
   };
 }
 

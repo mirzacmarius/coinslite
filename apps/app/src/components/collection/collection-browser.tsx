@@ -4,13 +4,15 @@ import { isTyping, useAddItem } from "@/components/items/add-item";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { defaultSort } from "@coinslite/backend/convex/collection/view";
 import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
 import { Coins, ListChecks } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CollectionResults,
   Pagination,
@@ -56,8 +58,20 @@ export function CollectionBrowser() {
   const [filterOpen, setFilterOpen] = useState(false);
   const search = useRef<HTMLInputElement>(null);
   const selection = useItemSelection();
-  const { selecting, stop: stopSelecting, add: selectItems } = selection;
+  const { add: selectItems, start: startSelecting } = selection;
   const pageItems = result?.items;
+  // Picking Items to add to an Album (its "Add Items"): select mode from the
+  // start, and leaving it goes back to the Album.
+  const router = useRouter();
+  const addTo = view.notInAlbum as Id<"albums"> | undefined;
+  const selecting = selection.selecting || addTo !== undefined;
+  const stopSelecting = useCallback(
+    () => (addTo ? router.push(`/albums/${addTo}`) : selection.stop()),
+    [addTo, router, selection.stop],
+  );
+  useEffect(() => {
+    if (addTo) startSelecting();
+  }, [addTo, startSelecting]);
 
   // In select mode, Esc leaves it and Cmd/Ctrl+A selects the page.
   useEffect(() => {
@@ -232,7 +246,13 @@ export function CollectionBrowser() {
         )}
       </div>
       {selecting && (
-        <MoveToAlbumBar selection={selection} result={result} view={view} />
+        <MoveToAlbumBar
+          selection={selection}
+          result={result}
+          view={view}
+          addTo={addTo}
+          onLeave={addTo ? stopSelecting : undefined}
+        />
       )}
     </>
   );

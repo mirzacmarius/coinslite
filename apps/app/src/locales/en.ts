@@ -384,7 +384,8 @@ export default {
     backToAlbums: "Back to Albums",
     noItemsTitle: "No Items in this Album",
     noItemsDescription:
-      "Pick this Album on an Item's form to put the Item here.",
+      "Use Add Items to pick Items from your Collection and put them here.",
+    addItems: "Add Items",
     addToAlbum: "Add to Album",
     noAlbum: "No Album",
     createNamed: "Create Album “{name}”",
@@ -758,6 +759,8 @@ export default {
     selectionBar: "Selected Items",
     selectHint:
       "Select Items to move them to an Album, set a Grade or delete them.",
+    addToHint: "Select the Items to add to {album}.",
+    cancel: "Cancel",
     selectPage: "Select page",
     "selectAll#one": "Select 1 Item",
     "selectAll#few": "Select all {count} Items",

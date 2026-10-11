@@ -394,7 +394,8 @@ export default {
     backToAlbums: "Înapoi la albume",
     noItemsTitle: "Niciun obiect în acest album",
     noItemsDescription:
-      "Alege acest album în formularul unui obiect ca să-l pui aici.",
+      "Folosește „Adaugă obiecte” ca să alegi obiecte din colecția ta și să le pui aici.",
+    addItems: "Adaugă obiecte",
     addToAlbum: "Adaugă într-un album",
     noAlbum: "Fără album",
     createNamed: "Creează albumul „{name}”",
@@ -778,6 +779,8 @@ export default {
     selectionBar: "Obiecte selectate",
     selectHint:
       "Selectează obiecte ca să le muți într-un album, să le stabilești starea sau să le ștergi.",
+    addToHint: "Selectează obiectele de adăugat în {album}.",
+    cancel: "Anulează",
     selectPage: "Selectează pagina",
     "selectAll#one": "Selectează 1 obiect",
     "selectAll#few": "Selectează toate cele {count} obiecte",

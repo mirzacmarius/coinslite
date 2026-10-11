@@ -391,7 +391,8 @@ export default {
     backToAlbums: "Tilbake til album",
     noItemsTitle: "Ingen objekter i dette albumet",
     noItemsDescription:
-      "Velg dette albumet i skjemaet til et objekt for å legge objektet her.",
+      "Bruk «Legg til objekter» for å velge objekter fra samlingen din og legge dem her.",
+    addItems: "Legg til objekter",
     addToAlbum: "Legg i album",
     noAlbum: "Uten album",
     createNamed: "Opprett albumet «{name}»",
@@ -773,6 +774,8 @@ export default {
     selectionBar: "Valgte objekter",
     selectHint:
       "Velg objekter for å flytte dem til et album, sette en kvalitet eller slette dem.",
+    addToHint: "Velg objektene som skal legges i {album}.",
+    cancel: "Avbryt",
     selectPage: "Velg siden",
     "selectAll#one": "Velg 1 objekt",
     "selectAll#few": "Velg alle {count} objektene",
