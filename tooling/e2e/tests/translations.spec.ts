@@ -76,7 +76,6 @@ const screens: Array<{
       (t) => t.overview.add.stamp,
       (t) => t.overview.latestItems,
       (t) => t.overview.viewCollection,
-      (t) => t.spotPrices.title,
     ],
   },
   {
@@ -236,6 +235,12 @@ for (const { code, name, t, unitedStates, highRelief } of languages) {
       ).toBeVisible();
       await expectTranslated(page.locator("main"), t, screen.texts);
     }
+
+    // Spot prices, at the foot of the sidebar.
+    await page.goto(`${appUrl}/`);
+    await expect(
+      page.getByRole("region", { name: t.spotPrices.title }),
+    ).toBeVisible();
 
     // An address nothing answers.
     await page.goto(`${appUrl}/no-such-page`);
