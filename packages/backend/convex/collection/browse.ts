@@ -4,6 +4,11 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { compareDenominations } from "../items/denominations";
 import { type GradingScale, gradeRank, gradingScaleIds } from "../items/grades";
+import {
+  graderNames,
+  referenceName,
+  stampCatalogueNames,
+} from "../items/references";
 import { catalogEntryByKey, itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
 import { gradingScale, itemType } from "../utils/validators";
@@ -113,8 +118,10 @@ export function countryName(code: string, locale: Locale) {
 }
 
 /**
- * Whether an Item has every searched word in its title, its denomination or
- * its country's name, or a word is its country's code ("us").
+ * Whether an Item has every searched word in its title, its denomination,
+ * its country's name or what its label says (grader and certificate number,
+ * stamp catalogue and number, serial number), or a word is its country's
+ * code ("us"), so "PCGS 12345678" finds the coin as its page writes it.
  */
 function searchFor(search: string | undefined, locale: Locale) {
   const words = folded(search?.slice(0, searchLimit) ?? "")
@@ -131,7 +138,24 @@ function searchFor(search: string | undefined, locale: Locale) {
     return name;
   };
   return (item: Item) => {
-    const text = [item.title, item.denomination ?? ""].map(folded);
+    const text = [
+      item.title,
+      item.denomination,
+      item.grader &&
+        referenceName(graderNames, item.grader, item.graderName, ""),
+      item.certificateNumber,
+      item.stampCatalogue &&
+        referenceName(
+          stampCatalogueNames,
+          item.stampCatalogue,
+          item.stampCatalogueName,
+          "",
+        ),
+      item.stampCatalogueNumber,
+      item.serialNumber,
+    ]
+      .filter((field) => field !== undefined)
+      .map(folded);
     if (item.country) text.push(nameOf(item.country));
     const code = item.country?.toLowerCase();
     return words.every(

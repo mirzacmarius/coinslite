@@ -14,6 +14,10 @@ import {
   scalesFor,
 } from "@coinslite/backend/convex/items/grades";
 import type { BullionPreset } from "@coinslite/backend/convex/items/preciousMetal";
+import type {
+  Grader,
+  StampCatalogue,
+} from "@coinslite/backend/convex/items/references";
 import {
   type Material,
   fieldSuits,
@@ -60,6 +64,18 @@ export type ItemFormValues = {
   /** Grams. */
   weight: string;
   purity: string;
+  grader: Grader | undefined;
+  graderName: string;
+  certificateNumber: string;
+  stampCatalogue: StampCatalogue | undefined;
+  stampCatalogueName: string;
+  stampCatalogueNumber: string;
+  perforation: string;
+  watermark: string;
+  colour: string;
+  serialNumber: string;
+  signatures: string;
+  printer: string;
   purchasePrice: string;
   marketValue: string;
   purchaseDate: string;
@@ -95,6 +111,18 @@ export const blankItem = (): ItemFormValues => ({
   metal: undefined,
   weight: "",
   purity: "",
+  grader: undefined,
+  graderName: "",
+  certificateNumber: "",
+  stampCatalogue: undefined,
+  stampCatalogueName: "",
+  stampCatalogueNumber: "",
+  perforation: "",
+  watermark: "",
+  colour: "",
+  serialNumber: "",
+  signatures: "",
+  printer: "",
   purchasePrice: "",
   marketValue: "",
   purchaseDate: "",
@@ -122,6 +150,18 @@ export const detailFields = [
   "purity",
   "gradingScale",
   "gradeNote",
+  "grader",
+  "graderName",
+  "certificateNumber",
+  "stampCatalogue",
+  "stampCatalogueName",
+  "stampCatalogueNumber",
+  "perforation",
+  "watermark",
+  "colour",
+  "serialNumber",
+  "signatures",
+  "printer",
   "purchasePrice",
   "marketValue",
   "purchaseDate",
@@ -243,6 +283,18 @@ export function valuesFromItem(
     ruler: item.ruler ?? "",
     materialNote: item.materialNote ?? "",
     bullion: item.bullion ?? false,
+    grader: item.grader,
+    graderName: item.graderName ?? "",
+    certificateNumber: item.certificateNumber ?? "",
+    stampCatalogue: item.stampCatalogue,
+    stampCatalogueName: item.stampCatalogueName ?? "",
+    stampCatalogueNumber: item.stampCatalogueNumber ?? "",
+    perforation: item.perforation ?? "",
+    watermark: item.watermark ?? "",
+    colour: item.colour ?? "",
+    serialNumber: item.serialNumber ?? "",
+    signatures: item.signatures ?? "",
+    printer: item.printer ?? "",
     purchasePrice: money(item.purchasePrice),
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
@@ -315,6 +367,28 @@ export function argsFromValues(
     gradingScale: grade ? scale : undefined,
     gradeNote: values.gradeNote,
     strike: hasStrike(type) ? values.strike : undefined,
+    // A grader's or catalogue's name is typed only for "other".
+    grader: onlyFor("grader", values.grader),
+    graderName: onlyFor(
+      "graderName",
+      values.grader === "other" ? values.graderName : undefined,
+    ),
+    certificateNumber: onlyFor("certificateNumber", values.certificateNumber),
+    stampCatalogue: onlyFor("stampCatalogue", values.stampCatalogue),
+    stampCatalogueName: onlyFor(
+      "stampCatalogueName",
+      values.stampCatalogue === "other" ? values.stampCatalogueName : undefined,
+    ),
+    stampCatalogueNumber: onlyFor(
+      "stampCatalogueNumber",
+      values.stampCatalogueNumber,
+    ),
+    perforation: onlyFor("perforation", values.perforation),
+    watermark: onlyFor("watermark", values.watermark),
+    colour: onlyFor("colour", values.colour),
+    serialNumber: onlyFor("serialNumber", values.serialNumber),
+    signatures: onlyFor("signatures", values.signatures),
+    printer: onlyFor("printer", values.printer),
     purchasePrice: money(values.purchasePrice),
     marketValue: money(values.marketValue),
     purchaseDate: values.purchaseDate || undefined,

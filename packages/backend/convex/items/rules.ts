@@ -9,6 +9,7 @@ import {
   hasStrike,
   isGrade,
 } from "./grades";
+import type { Grader, StampCatalogue } from "./references";
 
 /**
  * What an Item may hold. Pure, so the add form checks the same limits before
@@ -56,7 +57,9 @@ export type Material = (typeof materials)[number];
 
 /**
  * Fields only some Item types have; every other field suits all three.
- * Metal and size are a coin's; banknotes share ruler, mintage and Numista.
+ * Metal and size are a coin's; banknotes share ruler, mintage, Numista and
+ * a Certification. The stamp catalogue's number and the printing facts are
+ * a stamp's or a banknote's own.
  */
 export const typeOnlyFields = {
   material: ["coin"],
@@ -71,6 +74,18 @@ export const typeOnlyFields = {
   metal: ["coin"],
   weight: ["coin"],
   purity: ["coin"],
+  grader: ["coin", "banknote"],
+  graderName: ["coin", "banknote"],
+  certificateNumber: ["coin", "banknote"],
+  stampCatalogue: ["stamp"],
+  stampCatalogueName: ["stamp"],
+  stampCatalogueNumber: ["stamp"],
+  perforation: ["stamp"],
+  watermark: ["stamp"],
+  colour: ["stamp"],
+  serialNumber: ["banknote"],
+  signatures: ["banknote"],
+  printer: ["banknote"],
 } as const satisfies Record<string, readonly ItemType[]>;
 
 export const fieldSuits = (
@@ -91,6 +106,8 @@ export const itemLimits = {
   diameter: 500,
   thickness: 100,
   gradeNote: 200,
+  /** Each text under "Catalogue and certification" (references.ts). */
+  reference: 100,
   source: 200,
   notes: 5000,
   saleNote: 500,
@@ -132,6 +149,20 @@ export type ItemInput = {
   gradingScale?: GradingScale;
   gradeNote?: string;
   strike?: Strike;
+  grader?: Grader;
+  /** The grader's name, when it's "other". */
+  graderName?: string;
+  certificateNumber?: string;
+  stampCatalogue?: StampCatalogue;
+  /** The catalogue's name, when it's "other". */
+  stampCatalogueName?: string;
+  stampCatalogueNumber?: string;
+  perforation?: string;
+  watermark?: string;
+  colour?: string;
+  serialNumber?: string;
+  signatures?: string;
+  printer?: string;
   quantity?: number;
   purchasePrice?: number;
   marketValue?: number;
@@ -234,6 +265,7 @@ export function checkItem(input: ItemInput, today: string) {
     ),
     ...checkPreciousMetal(input),
     ...checkGrade(input),
+    ...checkReferences(input),
     ...(country && { country }),
     ...(input.year !== undefined && { year: input.year }),
     ...withText(
@@ -339,6 +371,38 @@ function checkGrade({
     ...(grade !== undefined && { grade, gradingScale }),
     ...withText("gradeNote", text(gradeNote, itemLimits.gradeNote)),
     ...(strike && { strike }),
+  };
+}
+
+/**
+ * The facts under "Catalogue and certification" (references.ts), each a
+ * short text.
+ * A name typed for the grader or catalogue is kept only when it's "other".
+ */
+function checkReferences(input: ItemInput) {
+  const short = (value: string | undefined) =>
+    text(value, itemLimits.reference);
+  return {
+    ...(input.grader && { grader: input.grader }),
+    ...withText(
+      "graderName",
+      input.grader === "other" ? short(input.graderName) : undefined,
+    ),
+    ...withText("certificateNumber", short(input.certificateNumber)),
+    ...(input.stampCatalogue && { stampCatalogue: input.stampCatalogue }),
+    ...withText(
+      "stampCatalogueName",
+      input.stampCatalogue === "other"
+        ? short(input.stampCatalogueName)
+        : undefined,
+    ),
+    ...withText("stampCatalogueNumber", short(input.stampCatalogueNumber)),
+    ...withText("perforation", short(input.perforation)),
+    ...withText("watermark", short(input.watermark)),
+    ...withText("colour", short(input.colour)),
+    ...withText("serialNumber", short(input.serialNumber)),
+    ...withText("signatures", short(input.signatures)),
+    ...withText("printer", short(input.printer)),
   };
 }
 

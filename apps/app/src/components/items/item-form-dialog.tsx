@@ -28,6 +28,12 @@ import {
   bullionPresets,
 } from "@coinslite/backend/convex/items/preciousMetal";
 import {
+  graderNames,
+  graders,
+  stampCatalogueNames,
+  stampCatalogues,
+} from "@coinslite/backend/convex/items/references";
+import {
   fieldSuits,
   itemLimits,
   materials,
@@ -64,6 +70,8 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import {
   Award,
+  BadgeCheck,
+  BookMarked,
   BookOpen,
   ChevronRight,
   Gem,
@@ -124,6 +132,16 @@ type TextField =
   | "weight"
   | "purity"
   | "gradeNote"
+  | "graderName"
+  | "certificateNumber"
+  | "stampCatalogueName"
+  | "stampCatalogueNumber"
+  | "perforation"
+  | "watermark"
+  | "colour"
+  | "serialNumber"
+  | "signatures"
+  | "printer"
   | "purchaseDate"
   | "source";
 
@@ -293,6 +311,17 @@ export function ItemFormDialog({
   const materialOptions = materials.map((material) => ({
     value: material,
     label: t(`items.materials.${material}`),
+  }));
+  const graderOptions = graders.map((grader) => ({
+    value: grader,
+    label: grader === "other" ? t("items.otherReference") : graderNames[grader],
+  }));
+  const stampCatalogueOptions = stampCatalogues.map((catalogue) => ({
+    value: catalogue,
+    label:
+      catalogue === "other"
+        ? t("items.otherReference")
+        : stampCatalogueNames[catalogue],
   }));
   const metalOptions = metals.map((metal) => ({
     value: metal,
@@ -522,11 +551,15 @@ export function ItemFormDialog({
   // A new deployment waits while an Item is half entered.
   useUnsavedInput(open && isDirty);
   const values = form.useStore(
-    ({ values: { type, country, gradingScale, strike } }) => ({
+    ({
+      values: { type, country, gradingScale, strike, grader, stampCatalogue },
+    }) => ({
       type,
       country,
       gradingScale,
       strike,
+      grader,
+      stampCatalogue,
     }),
   );
   // A linked Item's cleared country or metal is its Catalog entry's.
@@ -1082,6 +1115,107 @@ export function ItemFormDialog({
                     placeholder: t(`items.gradeNotePlaceholder.${values.type}`),
                     maxLength: itemLimits.gradeNote,
                   })}
+                </DetailGroup>
+                <DetailGroup title={t("items.references")}>
+                  {fieldSuits("grader", values.type) && (
+                    <form.Field name="grader">
+                      {(field) => (
+                        <Field
+                          id={`${baseId}-grader`}
+                          label={t("items.grader")}
+                        >
+                          {(control) => (
+                            <PropertyPicker
+                              id={control.id}
+                              icon={BadgeCheck}
+                              label={t("items.grader")}
+                              placeholder={t("items.setGrader")}
+                              value={field.state.value}
+                              options={graderOptions}
+                              onChange={field.handleChange}
+                              onClear={() => field.handleChange(undefined)}
+                              clearLabel={t("items.noGrader")}
+                              noResults={t("items.noMatches")}
+                            />
+                          )}
+                        </Field>
+                      )}
+                    </form.Field>
+                  )}
+                  {fieldSuits("graderName", values.type) &&
+                    values.grader === "other" &&
+                    textField("graderName", t("items.graderName"), {
+                      maxLength: itemLimits.reference,
+                    })}
+                  {fieldSuits("certificateNumber", values.type) &&
+                    textField(
+                      "certificateNumber",
+                      t("items.certificateNumber"),
+                      { maxLength: itemLimits.reference },
+                    )}
+                  {fieldSuits("stampCatalogue", values.type) && (
+                    <form.Field name="stampCatalogue">
+                      {(field) => (
+                        <Field
+                          id={`${baseId}-stampCatalogue`}
+                          label={t("items.stampCatalogue")}
+                        >
+                          {(control) => (
+                            <PropertyPicker
+                              id={control.id}
+                              icon={BookMarked}
+                              label={t("items.stampCatalogue")}
+                              placeholder={t("items.setStampCatalogue")}
+                              value={field.state.value}
+                              options={stampCatalogueOptions}
+                              onChange={field.handleChange}
+                              onClear={() => field.handleChange(undefined)}
+                              clearLabel={t("items.noStampCatalogue")}
+                              noResults={t("items.noMatches")}
+                            />
+                          )}
+                        </Field>
+                      )}
+                    </form.Field>
+                  )}
+                  {fieldSuits("stampCatalogueName", values.type) &&
+                    values.stampCatalogue === "other" &&
+                    textField(
+                      "stampCatalogueName",
+                      t("items.stampCatalogueName"),
+                      { maxLength: itemLimits.reference },
+                    )}
+                  {fieldSuits("stampCatalogueNumber", values.type) &&
+                    textField(
+                      "stampCatalogueNumber",
+                      t("items.stampCatalogueNumber"),
+                      { maxLength: itemLimits.reference },
+                    )}
+                  {fieldSuits("perforation", values.type) &&
+                    textField("perforation", t("items.perforation"), {
+                      placeholder: t("items.perforationPlaceholder"),
+                      maxLength: itemLimits.reference,
+                    })}
+                  {fieldSuits("watermark", values.type) &&
+                    textField("watermark", t("items.watermark"), {
+                      maxLength: itemLimits.reference,
+                    })}
+                  {fieldSuits("colour", values.type) &&
+                    textField("colour", t("items.colour"), {
+                      maxLength: itemLimits.reference,
+                    })}
+                  {fieldSuits("serialNumber", values.type) &&
+                    textField("serialNumber", t("items.serialNumber"), {
+                      maxLength: itemLimits.reference,
+                    })}
+                  {fieldSuits("signatures", values.type) &&
+                    textField("signatures", t("items.signatures"), {
+                      maxLength: itemLimits.reference,
+                    })}
+                  {fieldSuits("printer", values.type) &&
+                    textField("printer", t("items.printer"), {
+                      maxLength: itemLimits.reference,
+                    })}
                 </DetailGroup>
                 <DetailGroup title={t("items.purchase")}>
                   {moneyField("purchasePrice", t("items.purchasePrice"))}
