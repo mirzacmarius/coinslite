@@ -85,7 +85,7 @@ export function AppSidebar({
       className="pl-[max(0.5rem,env(safe-area-inset-left))] pt-[max(0.5rem,env(safe-area-inset-top))]"
     >
       <SidebarHeader>
-        <div className="flex h-8 items-center gap-2 pl-2 group-data-[collapsible=icon]:pl-0">
+        <div className="flex h-8 items-center gap-2 pl-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0">
           <Link
             href="/"
             className="min-w-0 flex-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[collapsible=icon]:hidden"
@@ -251,7 +251,9 @@ function SidebarUser() {
     </Avatar>
   );
   const who = (
-    <span className="grid min-w-0 flex-1 text-left leading-tight">
+    // Collapsed to icons, only the picture shows (the name stays for screen
+    // readers); the menu, outside the sidebar, always shows name and email.
+    <span className="grid min-w-0 flex-1 text-left leading-tight group-data-[collapsible=icon]:sr-only">
       <span className="truncate text-[13px] font-medium text-foreground">
         {name}
       </span>
@@ -270,11 +272,14 @@ function SidebarUser() {
             <SidebarMenuButton
               size="lg"
               tooltip={name || undefined}
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:justify-center"
             >
               {avatar}
               {who}
-              <ChevronsUpDown className="ml-auto" aria-hidden="true" />
+              <ChevronsUpDown
+                className="ml-auto group-data-[collapsible=icon]:hidden"
+                aria-hidden="true"
+              />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
