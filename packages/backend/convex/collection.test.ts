@@ -616,6 +616,7 @@ test("every filter option comes with how many Items it would show", async () => 
       { albumId: gifts, count: 1 },
     ],
     withoutAlbum: 2,
+    statuses: { owned: 5, sold: 0 },
   });
 });
 

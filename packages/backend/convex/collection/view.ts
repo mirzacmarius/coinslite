@@ -52,5 +52,7 @@ export type CollectionView = {
    * Items to add to that Album.
    */
   notInAlbum?: string;
+  /** Only sold Items; owned ones when left out. */
+  status?: "sold";
   sort?: CollectionSort;
 };

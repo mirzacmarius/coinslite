@@ -28,7 +28,12 @@ import {
   itemResolver,
   resolveItems,
 } from "./items/resolve";
-import { type ItemInput, checkItem, itemErrors } from "./items/rules";
+import {
+  type ItemInput,
+  checkItem,
+  checkSale,
+  itemErrors,
+} from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
 import { requireRoomForItems } from "./plans";
 import schema from "./schema";
@@ -307,6 +312,49 @@ export const update = mutation({
     });
     await moveBetweenAlbums(ctx, item.albumId, album);
     await countItemRetyped(ctx, item.ownerId, item.type, checked.type);
+    return null;
+  },
+});
+
+/**
+ * Marks one of the signed-in person's Items sold, every piece of it, or
+ * changes its sale: the sold-on date, the sale price per piece and a note.
+ */
+export const sell = mutation({
+  args: {
+    itemId: v.id("items"),
+    soldOn: v.string(),
+    salePrice: v.optional(v.number()),
+    saleNote: v.optional(v.string()),
+  },
+  returns: v.null(),
+  handler: async (ctx, { itemId, ...sale }) => {
+    const item = await requireOwnItem(ctx, itemId);
+    await ctx.db.patch(
+      itemId,
+      checkSale(sale, latestPurchaseDate(), item.purchaseDate),
+    );
+    return null;
+  },
+});
+
+/**
+ * Removes the sale from one of the signed-in person's Items: it's owned
+ * again, if their plan has room for it.
+ */
+export const markOwned = mutation({
+  args: { itemId: v.id("items") },
+  returns: v.null(),
+  handler: async (ctx, { itemId }) => {
+    const item = await requireOwnItem(ctx, itemId);
+    if (item.soldOn === undefined) return null;
+    // Owned again, it counts against the Free plan's limit again.
+    await requireRoomForItems(ctx, item.ownerId);
+    await ctx.db.patch(itemId, {
+      soldOn: undefined,
+      salePrice: undefined,
+      saleNote: undefined,
+    });
     return null;
   },
 });

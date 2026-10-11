@@ -61,6 +61,7 @@ export const browse = query({
       ),
       albums: v.array(v.object({ albumId: v.id("albums"), count: v.number() })),
       withoutAlbum: v.number(),
+      statuses: v.object({ owned: v.number(), sold: v.number() }),
     }),
   }),
   handler: async (ctx, { locale, ...args }) => {

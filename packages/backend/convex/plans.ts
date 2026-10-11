@@ -32,7 +32,7 @@ export async function requirePremium(ctx: QueryCtx) {
 }
 
 /**
- * How many Items a person has, counted only as far as one past the Free plan's
+ * How many Items a person owns (sold ones don't count), counted only as far as one past the Free plan's
  * limit: enough to tell "under", "at" and "over" apart. A bounded read of their
  * own index range rather than a stored counter, so deleting Items (one, an
  * Album's, a whole account's) needs no bookkeeping, and two adds racing for the
@@ -41,7 +41,9 @@ export async function requirePremium(ctx: QueryCtx) {
 async function countItemsUpToLimit(ctx: QueryCtx, userId: Id<"users">) {
   const items = await ctx.db
     .query("items")
-    .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
+    .withIndex("by_ownerId_and_soldOn", (q) =>
+      q.eq("ownerId", userId).eq("soldOn", undefined),
+    )
     .take(freePlan.itemLimit + 1);
   return items.length;
 }

@@ -482,6 +482,43 @@ export default {
     deleted: "Objektet er slettet",
     failed: "Objektet kunne ikke slettes. Prøv igjen.",
   },
+  sale: {
+    sell: "Selg",
+    markOwned: "Merk som eid",
+    markOwnedTitle: "Merke «{title}» som eid?",
+    markOwnedBody:
+      "Salgsdatoen, salgsprisen og notatet fjernes, og objektet er tilbake i samlingen din.",
+    soldBadge: "Solgt",
+    section: "Salg",
+    edit: "Rediger",
+    soldOn: "Solgt den",
+    salePrice: "Salgspris",
+    note: "Notat",
+    notePlaceholder: "Hvor eller til hvem",
+    title: "Selg «{title}»",
+    editTitle: "Rediger salg",
+    description:
+      "Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
+    "descriptionPieces#one":
+      "Alle {count} stk. selges. Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
+    "descriptionPieces#few":
+      "Alle {count} stk. selges. Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
+    "descriptionPieces#other":
+      "Alle {count} stk. selges. Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
+    close: "Lukk",
+    cancel: "Avbryt",
+    confirm: "Merk som solgt",
+    save: "Lagre salg",
+    sold: "Objektet er merket som solgt",
+    saved: "Salget er lagret",
+    owned: "Objektet er merket som eid",
+    failed: "Salget kunne ikke lagres. Prøv igjen.",
+    ownedFailed: "Objektet kunne ikke merkes som eid. Prøv igjen.",
+    errors: {
+      date: "Skriv inn en dato som ikke er senere enn i dag.",
+      beforePurchase: "Salgsdatoen kan ikke være før innkjøpsdatoen.",
+    },
+  },
   feedback: {
     title: "Tilbakemelding",
     description:
@@ -733,11 +770,16 @@ export default {
       denomination: "Pålydende",
       grade: "Kvalitet",
       album: "Album",
+      status: "Status",
     },
     bullionCoins: "Investeringsmynter",
     origins: {
       own: "Innenlandske ({country})",
       foreign: "Utenlandske",
+    },
+    statuses: {
+      owned: "Eid",
+      sold: "Solgt",
     },
     withoutAlbum: "Uten album",
     unknownAlbum: "Ukjent album",
@@ -746,6 +788,8 @@ export default {
     clear: "Tøm",
     clearFilters: "Fjern filtrene",
     noMatchesTitle: "Ingen objekter passer til disse filtrene",
+    allSold: "Alle objektene i samlingen din er solgt.",
+    showSold: "Vis solgte objekter",
     display: "Visning",
     layout: "Vis som",
     layouts: {

@@ -474,6 +474,43 @@ export default {
     deleted: "Item deleted",
     failed: "The Item couldn't be deleted. Try again.",
   },
+  sale: {
+    sell: "Sell",
+    markOwned: "Mark as owned",
+    markOwnedTitle: "Mark “{title}” as owned?",
+    markOwnedBody:
+      "Its sale date, sale price and note are removed, and it's back in your Collection.",
+    soldBadge: "Sold",
+    section: "Sale",
+    edit: "Edit",
+    soldOn: "Sold on",
+    salePrice: "Sale price",
+    note: "Note",
+    notePlaceholder: "Where or to whom",
+    title: "Sell “{title}”",
+    editTitle: "Edit sale",
+    description:
+      "The Item moves to your sold Items and keeps its photos and history.",
+    "descriptionPieces#one":
+      "All {count} pieces are sold. The Item moves to your sold Items and keeps its photos and history.",
+    "descriptionPieces#few":
+      "All {count} pieces are sold. The Item moves to your sold Items and keeps its photos and history.",
+    "descriptionPieces#other":
+      "All {count} pieces are sold. The Item moves to your sold Items and keeps its photos and history.",
+    close: "Close",
+    cancel: "Cancel",
+    confirm: "Mark as sold",
+    save: "Save sale",
+    sold: "Item marked as sold",
+    saved: "Sale saved",
+    owned: "Item marked as owned",
+    failed: "The sale couldn't be saved. Try again.",
+    ownedFailed: "The Item couldn't be marked as owned. Try again.",
+    errors: {
+      date: "Enter a date no later than today.",
+      beforePurchase: "The sold-on date can't be before the Purchase date.",
+    },
+  },
   feedback: {
     title: "Feedback",
     description:
@@ -718,11 +755,16 @@ export default {
       denomination: "Denomination",
       grade: "Grade",
       album: "Album",
+      status: "Status",
     },
     bullionCoins: "Bullion coins",
     origins: {
       own: "Domestic ({country})",
       foreign: "Foreign",
+    },
+    statuses: {
+      owned: "Owned",
+      sold: "Sold",
     },
     withoutAlbum: "Without an Album",
     unknownAlbum: "Unknown Album",
@@ -731,6 +773,8 @@ export default {
     clear: "Clear",
     clearFilters: "Clear filters",
     noMatchesTitle: "No Items match these filters",
+    allSold: "Every Item in your Collection is sold.",
+    showSold: "Show sold Items",
     display: "Display",
     layout: "View",
     layouts: {
