@@ -29,6 +29,7 @@ import { DisplayMenu } from "./display-menu";
 import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
 import { type BrowseResult, useFilters } from "./filter-options";
+import { ImportDialog } from "./import-dialog";
 import { MoveToAlbumBar } from "./move-to-album-bar";
 import { useCollectionDisplay } from "./use-collection-display";
 import { useItemSelection } from "./use-item-selection";
@@ -78,6 +79,12 @@ export function CollectionBrowser() {
   );
   const filters = useFilters(result, view);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  // Keyed and first in every branch below, so it stays mounted (and keeps
+  // its progress) as the first imported batch fills an empty Collection.
+  const importDialog = (
+    <ImportDialog key="import" open={importing} onOpenChange={setImporting} />
+  );
   const search = useRef<HTMLInputElement>(null);
   const selection = useItemSelection();
   const { add: selectItems, start: startSelecting } = selection;
@@ -160,6 +167,7 @@ export function CollectionBrowser() {
   if (result === undefined) {
     return (
       <>
+        {importDialog}
         {toolbarSkeleton}
         {totals}
         <ResultsSkeleton />
@@ -174,6 +182,7 @@ export function CollectionBrowser() {
   if (result.collectionSize === 0 && !narrowed) {
     return (
       <>
+        {importDialog}
         {totals}
         <div className="p-4">
           <EmptyState
@@ -182,7 +191,14 @@ export function CollectionBrowser() {
             }
             title={t("items.emptyTitle")}
             description={t("items.emptyDescription")}
-            action={<Button onClick={() => addItem()}>{t("items.add")}</Button>}
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Button onClick={() => addItem()}>{t("items.add")}</Button>
+                <Button variant="ghost" onClick={() => setImporting(true)}>
+                  {t("collectionImport.emptyAction")}
+                </Button>
+              </div>
+            }
           />
         </div>
       </>
@@ -191,6 +207,7 @@ export function CollectionBrowser() {
 
   return (
     <>
+      {importDialog}
       <div className="sticky top-10 z-20 flex h-10 items-center justify-between gap-2 border-b bg-background px-4">
         <div className="flex min-w-0 flex-1 items-center gap-1">
           <FilterButton
@@ -220,6 +237,7 @@ export function CollectionBrowser() {
             onSortChange={(sort) => update({ sort })}
           />
           <ExportMenu
+            onImport={() => setImporting(true)}
             view={view}
             count={result.total}
             complete={result.complete}

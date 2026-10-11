@@ -71,6 +71,9 @@ async function seeded() {
 // countries; with the Theme root that makes 609 Catalog nodes.
 const nodeCount = 609;
 
+/** Loading the bundled datasets takes the CI runner several seconds; this Mac about one. */
+const slowRunner = 30_000;
+
 test("the 2-euro commemoratives go through the Catalog CSV import with no rejected rows", async () => {
   const t = newTest();
   const as = await admin(t);
@@ -297,63 +300,75 @@ test("no entry shows an image: the national sides' designs aren't clearly free t
   }
 });
 
-test("collectors browse the Theme to its countries and each country's coins by year, and find a coin by its title", async () => {
-  const t = newTest();
-  const as = await admin(t);
-  await t.action(internal.catalog.seed.load, {});
+test(
+  "collectors browse the Theme to its countries and each country's coins by year, and find a coin by its title",
+  async () => {
+    const t = newTest();
+    const as = await admin(t);
+    await t.action(internal.catalog.seed.load, {});
 
-  expect(await as.query(api.catalog.browse.roots, {})).toContainEqual({
-    key: "eur2-commemoratives",
-    kind: "theme",
-    title: "2-euro commemoratives",
-    countryNode: false,
-    entryCount: 584,
-  });
-  const theme = await as.query(api.catalog.browse.node, {
-    key: "eur2-commemoratives",
-  });
-  expect(theme).toMatchObject({ kind: "theme", countryNode: false });
-  const countries = theme && "groupings" in theme ? theme.groupings : [];
-  expect(countries).toHaveLength(24);
-  // Most coins first: Finland and Luxembourg have issued 39 each.
-  expect(countries.slice(0, 2)).toEqual([
-    expect.objectContaining({ key: "eur2-fi", country: "FI", entryCount: 39 }),
-    expect.objectContaining({ key: "eur2-lu", country: "LU", entryCount: 39 }),
-  ]);
-  expect(
-    await as.query(api.catalog.browse.node, { key: "eur2-de" }),
-  ).toMatchObject({ countryNode: true, entryCount: 33 });
+    expect(await as.query(api.catalog.browse.roots, {})).toContainEqual({
+      key: "eur2-commemoratives",
+      kind: "theme",
+      title: "2-euro commemoratives",
+      countryNode: false,
+      entryCount: 584,
+    });
+    const theme = await as.query(api.catalog.browse.node, {
+      key: "eur2-commemoratives",
+    });
+    expect(theme).toMatchObject({ kind: "theme", countryNode: false });
+    const countries = theme && "groupings" in theme ? theme.groupings : [];
+    expect(countries).toHaveLength(24);
+    // Most coins first: Finland and Luxembourg have issued 39 each.
+    expect(countries.slice(0, 2)).toEqual([
+      expect.objectContaining({
+        key: "eur2-fi",
+        country: "FI",
+        entryCount: 39,
+      }),
+      expect.objectContaining({
+        key: "eur2-lu",
+        country: "LU",
+        entryCount: 39,
+      }),
+    ]);
+    expect(
+      await as.query(api.catalog.browse.node, { key: "eur2-de" }),
+    ).toMatchObject({ countryNode: true, entryCount: 33 });
 
-  // Within a country: one denomination, no series, then the coins by year.
-  expect(
-    await as.query(api.catalog.browse.denominations, { key: "eur2-de" }),
-  ).toEqual([{ denomination: "2 euro", seriesCount: 1 }]);
-  expect(
-    await as.query(api.catalog.browse.series, {
+    // Within a country: one denomination, no series, then the coins by year.
+    expect(
+      await as.query(api.catalog.browse.denominations, { key: "eur2-de" }),
+    ).toEqual([{ denomination: "2 euro", seriesCount: 1 }]);
+    expect(
+      await as.query(api.catalog.browse.series, {
+        key: "eur2-de",
+        denomination: "2 euro",
+      }),
+    ).toEqual([{ series: null, firstYear: 2006, lastYear: 2025 }]);
+    const { page } = await as.query(api.catalog.browse.seriesEntries, {
       key: "eur2-de",
       denomination: "2 euro",
-    }),
-  ).toEqual([{ series: null, firstYear: 2006, lastYear: 2025 }]);
-  const { page } = await as.query(api.catalog.browse.seriesEntries, {
-    key: "eur2-de",
-    denomination: "2 euro",
-    series: null,
-    paginationOpts: { numItems: 3, cursor: null },
-  });
-  expect(page.map((row) => [row.yearFrom, row.title])).toEqual([
-    [2006, "„Bundesländerserie“ – Schleswig-Holstein"],
-    [2007, "„Bundesländerserie“ – Mecklenburg-Vorpommern"],
-    [2007, "50. Jahrestag der Unterzeichnung des Vertrags von Rom"],
-  ]);
+      series: null,
+      paginationOpts: { numItems: 3, cursor: null },
+    });
+    expect(page.map((row) => [row.yearFrom, row.title])).toEqual([
+      [2006, "„Bundesländerserie“ – Schleswig-Holstein"],
+      [2007, "„Bundesländerserie“ – Mecklenburg-Vorpommern"],
+      [2007, "50. Jahrestag der Unterzeichnung des Vertrags von Rom"],
+    ]);
 
-  const found = await as.query(api.catalog.search.find, {
-    text: "Schleswig-Holstein",
-    entriesOnly: true,
-  });
-  expect(
-    found.groups.flatMap((group) => group.nodes.map((node) => node.key)),
-  ).toEqual(["eur2-de-2006-schleswig-holstein"]);
-});
+    const found = await as.query(api.catalog.search.find, {
+      text: "Schleswig-Holstein",
+      entriesOnly: true,
+    });
+    expect(
+      found.groups.flatMap((group) => group.nodes.map((node) => node.key)),
+    ).toEqual(["eur2-de-2006-schleswig-holstein"]);
+  },
+  slowRunner,
+);
 
 test("the ECB's descriptions come in English, German, French and Romanian, each credited to the ECB's page in that language", async () => {
   const { nodes, entries, entry } = await seeded();

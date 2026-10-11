@@ -86,7 +86,7 @@ const fieldNames = Object.keys(itemFields) as Array<keyof typeof itemFields>;
 export const itemNotFound = "ITEM_NOT_FOUND";
 
 /** The latest allowed purchase date: tomorrow, so "today" anywhere on Earth is accepted. */
-const latestPurchaseDate = () =>
+export const latestPurchaseDate = () =>
   new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 /** One of the signed-in person's Items; anyone else's is reported as not found. */
@@ -133,7 +133,7 @@ async function requireCatalogEntry(
  * edit, `stored` is the Item as it was: facts the form leaves as they were
  * shown keep their stored state.
  */
-function checkFields(
+export function checkFields(
   fields: ItemInput,
   entry: CatalogEntryLink | null,
   stored?: Doc<"items">,
@@ -154,7 +154,7 @@ function checkFields(
  * Stores a new Item and keeps the counts that follow Items (its Album's, the
  * Collection's) right. Every way of creating an Item goes through here.
  */
-async function storeNewItem(
+export async function storeNewItem(
   ctx: MutationCtx,
   doc: Omit<Doc<"items">, "_id" | "_creationTime">,
 ) {
