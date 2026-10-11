@@ -17,7 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
-    "@auth/core": "0.37.0",
+    "@auth/core": "0.41.3",
     "@coinslite/i18n": "workspace:*",
     "@convex-dev/auth": "^0.0.80",
     "@convex-dev/rate-limiter": "^0.4.1",
