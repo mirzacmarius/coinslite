@@ -185,7 +185,7 @@ async function denominationEntries(
  * by first year (series without years after the rest), then the entries
  * without a series.
  */
-function bySeries(entries: Doc<"catalogNodes">[]): EntryGroup[] {
+export function bySeries(entries: Doc<"catalogNodes">[]): EntryGroup[] {
   const groups = new Map<string | undefined, Doc<"catalogNodes">[]>();
   for (const entry of entries) {
     groups.set(entry.series, [...(groups.get(entry.series) ?? []), entry]);

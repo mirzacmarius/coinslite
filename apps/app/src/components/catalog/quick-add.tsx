@@ -8,6 +8,7 @@ import {
   isItemLimitError,
   useItemLimitMessage,
 } from "@/components/plans/plan-usage";
+import { useWantedKeys } from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -109,6 +110,7 @@ function QuickAddDialog({
   const catalogFormat = useCatalogFormat();
   const quickAdd = useMutation(api.items.quickAdd);
   const albums = useAlbums(open);
+  const wantedKeys = useWantedKeys();
   const itemLimitMessage = useItemLimitMessage();
   const type = entry.itemType ?? "coin";
   const [scale, setScale] = useState<GradingScale>(() =>
@@ -141,6 +143,8 @@ function QuickAddDialog({
     if (!quantityValid || saving) return;
     setSaving(true);
     setFailed(undefined);
+    // Adding it clears the want (wants.ts), which the toast says.
+    const wanted = wantedKeys?.has(entry.key);
     try {
       const itemId = await quickAdd({
         catalogEntryKey: entry.key,
@@ -163,6 +167,7 @@ function QuickAddDialog({
           ? t("quickAdd.addedToAlbum", { album: filedInto.name })
           : t("quickAdd.added"),
         {
+          description: wanted ? t("wantlist.cleared") : undefined,
           action: {
             label: t("quickAdd.open"),
             onClick: () => router.push(`/collection/${itemId}`),

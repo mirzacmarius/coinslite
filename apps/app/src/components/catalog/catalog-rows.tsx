@@ -1,5 +1,6 @@
 "use client";
 
+import { WantedMark, useWantedKeys } from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -150,12 +151,14 @@ export function useOwnCountry() {
 
 /**
  * Catalog entries as rows: picture, title and Strike, facts, the picture's
- * credit when its licence asks for one, and how many the person holds.
+ * credit when its licence asks for one, whether the person wants it, and how
+ * many they hold.
  */
 export function EntryRows({ entries }: { entries: CatalogEntryRow[] }) {
   const t = useI18n();
   const catalogFormat = useCatalogFormat();
   const ownCountry = useOwnCountry();
+  const wanted = useWantedKeys();
   return entries.map((entry) => (
     <CatalogRow
       key={entry.key}
@@ -168,7 +171,12 @@ export function EntryRows({ entries }: { entries: CatalogEntryRow[] }) {
         entry.imageCredit &&
         `${t("catalog.imageCredit")} · ${catalogFormat.credit(entry.imageCredit)}`
       }
-      end={<HeldCount held={entry.held} more={entry.heldMore} />}
+      end={
+        <>
+          {wanted?.has(entry.key) && <WantedMark />}
+          <HeldCount held={entry.held} more={entry.heldMore} />
+        </>
+      }
     />
   ));
 }

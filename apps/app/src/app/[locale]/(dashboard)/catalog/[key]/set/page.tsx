@@ -1,6 +1,7 @@
 import { CatalogGate } from "@/components/catalog/catalog-gate";
 import { CatalogSearchButton } from "@/components/catalog/catalog-search-button";
 import { CatalogSetPage } from "@/components/catalog/catalog-set-page";
+import { WantlistLink } from "@/components/wantlist/wantlist";
 import { getI18n } from "@/locales/server";
 import { Suspense } from "react";
 
@@ -14,7 +15,14 @@ export default function Page() {
   return (
     <CatalogGate>
       <Suspense>
-        <CatalogSetPage actions={<CatalogSearchButton />} />
+        <CatalogSetPage
+          actions={
+            <>
+              <WantlistLink />
+              <CatalogSearchButton />
+            </>
+          }
+        />
       </Suspense>
     </CatalogGate>
   );

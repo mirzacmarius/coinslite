@@ -109,6 +109,20 @@ export default defineSchema({
       filterFields: ["plan"],
     }),
 
+  /**
+   * The Wantlist (wants.ts): a Catalog entry a person is looking for, wanted
+   * since `_creationTime`. One per entry per person; adding an Item linked
+   * to the entry removes it.
+   */
+  wants: defineTable({
+    ownerId: v.id("users"),
+    catalogEntryId: v.id("catalogNodes"),
+    note: v.optional(v.string()),
+  })
+    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
+    // Everyone's wants of an entry, removed as it leaves the Catalog.
+    .index("by_catalogEntryId", ["catalogEntryId"]),
+
   /** A requested email change, waiting for its link to be opened at the new address. */
   emailChanges: defineTable({
     userId: v.id("users"),

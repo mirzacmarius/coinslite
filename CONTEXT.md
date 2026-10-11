@@ -56,6 +56,10 @@ _Avoid_: Region, area, group
 All Catalog entries under one Catalog grouping, seen as something a user can complete, for example every year of a denomination within a series. A Set's completion is how many of its entries the user's Collection contains.
 _Avoid_: Checklist, run, series (for the whole group)
 
+**Wantlist**:
+The Catalog entries a user is looking for and has marked as wanted, one want per entry. Adding an Item from a wanted entry takes it off the Wantlist.
+_Avoid_: Wishlist, shopping list, missing (that's a Set's entries not held)
+
 ### Money
 
 **Home currency**:

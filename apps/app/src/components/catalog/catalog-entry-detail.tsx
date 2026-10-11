@@ -2,6 +2,7 @@
 
 import { entryItemsHref } from "@/components/collection/collection-url";
 import { useGradeLabels } from "@/components/items/grade-labels";
+import { WantButton } from "@/components/wantlist/wantlist";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import type { api } from "@coinslite/backend/convex/_generated/api";
@@ -163,6 +164,7 @@ export function CatalogEntryDetail({
         actions={
           <>
             <CatalogEntryEdit entryKey={entry.key} />
+            <WantButton entryKey={entry.key} />
             <QuickAdd entry={entry} />
             {actions}
           </>

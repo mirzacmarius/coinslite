@@ -1473,6 +1473,46 @@ export default {
       failed: "Impossible d’ajouter les objets. Réessayez.",
     },
   },
+  wantlist: {
+    title: "Liste de souhaits",
+    open: "Ouvrir la liste de souhaits",
+    want: "Souhaiter",
+    wanted: "Souhaitée",
+    wantEntry: "Ajouter {title} à la liste de souhaits",
+    unwantEntry: "Retirer {title} de la liste de souhaits",
+    mark: "Souhaitée",
+    added: "Ajoutée à votre liste de souhaits",
+    removed: "Retirée de votre liste de souhaits",
+    removeEntry: "Retirer {title} de la liste de souhaits",
+    cleared: "Retirée de votre liste de souhaits",
+    "clearedMany#one": "1 entrée retirée de votre liste de souhaits",
+    "clearedMany#few": "{count} entrées retirées de votre liste de souhaits",
+    "clearedMany#other": "{count} entrées retirées de votre liste de souhaits",
+    wantAllMissing: "Souhaiter les manquantes",
+    "wantedMany#zero":
+      "Toutes les entrées manquantes sont déjà dans votre liste de souhaits.",
+    "wantedMany#one": "1 entrée du catalogue ajoutée à votre liste de souhaits",
+    "wantedMany#few":
+      "{count} entrées du catalogue ajoutées à votre liste de souhaits",
+    "wantedMany#other":
+      "{count} entrées du catalogue ajoutées à votre liste de souhaits",
+    wantedFirst:
+      "Les {limit} premières entrées manquantes sont dans votre liste de souhaits. Recommencez pour les suivantes.",
+    noneToWant:
+      "Toutes les entrées manquantes sont déjà dans votre liste de souhaits.",
+    emptyTitle: "Votre liste de souhaits est vide",
+    emptyDescription:
+      "Marquez les entrées du catalogue que vous cherchez, sur la page d’une entrée ou dans un ensemble.",
+    browseCatalog: "Parcourir le catalogue",
+    "count#one": "1 entrée souhaitée",
+    "count#few": "{count} entrées souhaitées",
+    "count#other": "{count} entrées souhaitées",
+    errors: {
+      tooMany:
+        "Votre liste de souhaits compte au plus {limit} entrées. Retirez-en pour en souhaiter d’autres.",
+      failed: "La liste de souhaits n’a pas pu être modifiée. Réessayez.",
+    },
+  },
   catalogEditor: {
     menu: "Éditeur du catalogue",
     title: "Éditeur du catalogue",

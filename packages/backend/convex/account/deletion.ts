@@ -64,6 +64,7 @@ export const accountDataByTable = {
   authVerifiers: "deleted: Google sign-ins a session started",
   emailChanges: "deleted: email changes waiting for their link",
   albums: "deleted: the Albums",
+  wants: "deleted: the Wantlist",
   items:
     "deleted: the Items, with their stored photos and their links to Catalog entries",
   subscriptions:
@@ -242,6 +243,17 @@ const deleteEmailChanges: Step = async (ctx, { userId }, budget) =>
       .take(budget),
   );
 
+const deleteWants: Step = async (ctx, { userId }, budget) =>
+  deleteDocs(
+    ctx,
+    await ctx.db
+      .query("wants")
+      .withIndex("by_ownerId_and_catalogEntryId", (q) =>
+        q.eq("ownerId", userId),
+      )
+      .take(budget),
+  );
+
 /** Albums go before their Items, so deleting an Item has no Album count to keep. */
 const deleteAlbums: Step = async (ctx, { userId }, budget) =>
   deleteDocs(
@@ -296,6 +308,7 @@ const steps: Step[] = [
   deleteSessions,
   deleteEmailChanges,
   deleteUploads,
+  deleteWants,
   deleteAlbums,
   deleteItems,
   deleteOutbox,

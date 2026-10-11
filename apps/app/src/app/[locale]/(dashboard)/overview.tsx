@@ -8,6 +8,7 @@ import { useCollectionTotals } from "@/components/collection-totals/use-collecti
 import { useAddItem } from "@/components/items/add-item";
 import { AddShortcuts } from "@/components/overview/add-shortcuts";
 import { LatestItems } from "@/components/overview/latest-items";
+import { WantlistCard } from "@/components/overview/wantlist-card";
 import { OverviewPlanUsage } from "@/components/plans/plan-usage";
 import { SpotPrices } from "@/components/spot-prices/spot-prices";
 import { useI18n } from "@/locales/client";
@@ -21,8 +22,9 @@ import { useId } from "react";
 
 /**
  * Where the Collection stands (spec 9): shortcuts to add an Item of each type,
- * the totals, the latest Items, and on phones the Spot prices and how much of
- * the Free plan is used (wider screens have them in the sidebar).
+ * the totals, the latest Items, how many entries are on the Wantlist, and on
+ * phones the Spot prices and how much of the Free plan is used (wider screens
+ * have them in the sidebar).
  * An empty Collection shows a first-run prompt instead of totals and Items.
  * The header and shortcuts need no data, so they appear the moment a link is
  * clicked.
@@ -82,6 +84,7 @@ export function Overview() {
         ) : (
           <LatestItems items={latest} />
         )}
+        <WantlistCard />
         {/* From tablet width up, the sidebar's footer shows these. */}
         <div className="flex min-w-0 flex-col gap-4 md:hidden">
           <OverviewPlanUsage />

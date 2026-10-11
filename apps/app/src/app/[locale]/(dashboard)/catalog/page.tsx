@@ -1,6 +1,7 @@
 import { CatalogGate } from "@/components/catalog/catalog-gate";
 import { CatalogPage } from "@/components/catalog/catalog-page";
 import { CatalogSearchButton } from "@/components/catalog/catalog-search-button";
+import { WantlistLink } from "@/components/wantlist/wantlist";
 import { getI18n } from "@/locales/server";
 
 export async function generateMetadata() {
@@ -11,7 +12,14 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <CatalogGate>
-      <CatalogPage actions={<CatalogSearchButton />} />
+      <CatalogPage
+        actions={
+          <>
+            <WantlistLink />
+            <CatalogSearchButton />
+          </>
+        }
+      />
     </CatalogGate>
   );
 }

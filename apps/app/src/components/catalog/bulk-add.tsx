@@ -9,6 +9,7 @@ import {
   useItemsLeft,
 } from "@/components/plans/plan-usage";
 import { SelectionBar } from "@/components/selection-bar";
+import { useWantedKeys } from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -52,6 +53,7 @@ export function useBulkAdd({
   const router = useRouter();
   const addEntries = useMutation(api.items.addCatalogEntries);
   const albums = useAlbums();
+  const wantedKeys = useWantedKeys();
   const itemLimitMessage = useItemLimitMessage();
   const left = useItemsLeft();
   // Until the person picks, a single Album is chosen for them (spec 5.4).
@@ -85,6 +87,8 @@ export function useBulkAdd({
     if (saving || count === 0 || tooMany || overQuota) return;
     setSaving(true);
     setFailed(undefined);
+    // Adding them clears their wants (wants.ts), which the toast says.
+    const wanted = keys.filter((key) => wantedKeys?.has(key)).length;
     try {
       await addEntries({
         catalogEntryKeys: keys,
@@ -96,6 +100,8 @@ export function useBulkAdd({
             : albumId,
       });
       toast.success(t("sets.added", { count }), {
+        description:
+          wanted > 0 ? t("wantlist.clearedMany", { count: wanted }) : undefined,
         action: {
           label: t("sets.openCollection"),
           onClick: () => router.push("/collection"),

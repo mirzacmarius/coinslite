@@ -51,6 +51,7 @@ import {
   metal,
   strike,
 } from "./utils/validators";
+import { clearWant } from "./wants";
 
 /** Every field a person sets on an Item, as the Item form sends them. */
 const itemFields = {
@@ -173,7 +174,11 @@ export async function storeNewItem(
   return itemId;
 }
 
-/** Stores a new Item in its owner's Collection, and in an Album of theirs if given one. */
+/**
+ * Stores a new Item in its owner's Collection, and in an Album of theirs if
+ * given one. An Item made from a wanted Catalog entry takes it off the
+ * Wantlist.
+ */
 async function insertItem(
   ctx: MutationCtx,
   ownerId: Id<"users">,
@@ -182,12 +187,14 @@ async function insertItem(
   albumId: Id<"albums"> | undefined,
 ) {
   const album = await ownAlbumId(ctx, ownerId, albumId);
-  return await storeNewItem(ctx, {
+  const itemId = await storeNewItem(ctx, {
     ownerId,
     ...fields,
     ...(entry && { catalogEntryId: entry._id }),
     ...(album && { albumId: album }),
   });
+  if (entry) await clearWant(ctx, ownerId, entry._id);
+  return itemId;
 }
 
 /**

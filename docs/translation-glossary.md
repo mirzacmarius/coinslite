@@ -16,6 +16,7 @@ How CoinsLite's domain terms ([`CONTEXT.md`](../CONTEXT.md)) read in each launch
 | Catalog entry | katalogoppføring | Katalogeintrag | entrée du catalogue | intrare de catalog |
 | Theme | tema | Thema | thème | temă |
 | Set | sett | Set | ensemble | set |
+| Wantlist | ønskeliste | Wunschliste | liste de souhaits | listă de dorințe |
 | Home currency | hjemmevaluta | Heimatwährung | devise de référence | moneda de bază |
 | Purchase price | innkjøpspris | Kaufpreis | prix d’achat | preț de achiziție |
 | Market value | markedsverdi | Marktwert | valeur de marché | valoare de piață |
