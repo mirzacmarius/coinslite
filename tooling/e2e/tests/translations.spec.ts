@@ -86,6 +86,7 @@ const screens: Array<{
       (t) => t.collection.filter,
       (t) => t.collection.display,
       (t) => t.collectionExport.export,
+      (t) => t.collectionTotals.section,
     ],
   },
   {

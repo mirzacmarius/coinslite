@@ -976,6 +976,11 @@ export default {
   },
   collectionTotals: {
     title: "Summen der Sammlung",
+    section: "Summen",
+    "summaryItems#one": "1 Objekt",
+    "summaryItems#few": "{count} Objekte",
+    "summaryItems#other": "{count} Objekte",
+    summaryMarketValue: "Marktwert",
     items: "Objekte",
     itemsHint: "Jedes Objekt zählt einmal, egal wie hoch die Anzahl ist",
     pieces: "Stück",

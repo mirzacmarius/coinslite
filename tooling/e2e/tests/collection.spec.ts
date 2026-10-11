@@ -86,6 +86,68 @@ test("search, filter, sort and switch views, with the view kept in the URL", asy
   await expect(page.getByRole("radio", { name: "Grid" })).toBeChecked();
 });
 
+test("the Item list comes first, under the toolbar and the totals as last left", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Krone 1876", "Coin");
+
+  // On a phone the totals start collapsed to one line, so the first Item is
+  // on the first screen.
+  await page.reload();
+  const phone = visiblePage(page);
+  const totals = phone.getByRole("button", { name: /^Totals/ });
+  await expect(totals).toHaveAttribute("aria-expanded", "false");
+  await expect(totals).toContainText("2 Items");
+  const firstItem = phone.getByRole("listitem").getByRole("link").first();
+  await expect(firstItem).toBeInViewport({ ratio: 1 });
+
+  // Opened, they stay open after a reload.
+  await totals.click();
+  await expect(phone.getByText("Total Purchase price")).toBeVisible();
+  await page.reload();
+  const reloaded = visiblePage(page);
+  await expect(
+    reloaded.getByRole("button", { name: /^Totals/ }),
+  ).toHaveAttribute("aria-expanded", "true");
+  await expect(reloaded.getByText("Total Purchase price")).toBeVisible();
+
+  // "/" finds from anywhere on the page.
+  await expect(reloaded.getByRole("listitem").getByRole("link")).toHaveCount(2);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.keyboard.press("/");
+  const search = reloaded.getByLabel("Search the Collection");
+  await expect(search).toBeFocused();
+  await expect(search).toBeInViewport();
+
+  // A filtered link shows its Items first, whatever was left open.
+  await page.goto(`${appUrl}/collection?type=coin`);
+  const filtered = visiblePage(page);
+  await expect(
+    filtered.getByRole("button", { name: /^Totals/ }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    filtered.getByRole("listitem").getByRole("link").first(),
+  ).toBeInViewport({ ratio: 1 });
+
+  // On a wider screen the remembered choice holds too: collapsed stays collapsed.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`${appUrl}/collection`);
+  const wide = visiblePage(page);
+  const wideTotals = wide.getByRole("button", { name: /^Totals/ });
+  await expect(wideTotals).toHaveAttribute("aria-expanded", "true");
+  await wideTotals.click();
+  await expect(wideTotals).toHaveAttribute("aria-expanded", "false");
+  await page.reload();
+  await expect(
+    visiblePage(page).getByRole("button", { name: /^Totals/ }),
+  ).toHaveAttribute("aria-expanded", "false");
+});
+
 test("a view nothing matches says so and clears in one click", async ({
   page,
 }) => {

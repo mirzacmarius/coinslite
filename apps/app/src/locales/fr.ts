@@ -959,6 +959,11 @@ export default {
   },
   collectionTotals: {
     title: "Totaux de la collection",
+    section: "Totaux",
+    "summaryItems#one": "{count} objet",
+    "summaryItems#few": "{count} objets",
+    "summaryItems#other": "{count} objets",
+    summaryMarketValue: "Valeur de marché",
     items: "Objets",
     itemsHint: "Chaque objet compte une fois, quelle que soit sa quantité",
     pieces: "Exemplaires",
