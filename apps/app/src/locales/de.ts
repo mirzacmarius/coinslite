@@ -317,6 +317,8 @@ export default {
       title: "Einstellungen",
       language: "Sprache",
       homeCurrency: "Heimatwährung",
+      languageHint: "Gilt auf jedem Gerät, auf dem du dich anmeldest.",
+      appearanceHint: "Hell, dunkel oder wie auf deinem Gerät.",
       languageNotSaved:
         "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },

@@ -3,68 +3,75 @@
 @tailwind utilities;
 
 /*
- * CoinsLite design tokens ("Ledger"): calm slate neutrals, one teal accent,
- * tabular numbers. Every text/background pairing meets WCAG AA (4.5:1), and
- * control borders (--input) reach 3:1 against their surface.
+ * CoinsLite design tokens: quiet neutrals (blue-grey in the dark theme) and
+ * one indigo accent. The app sits on the chrome colour (--sidebar) and its
+ * pages on an inset panel (--background). Cards are a raised shade of the
+ * panel with no border; popovers step one shade further. Every
+ * text/background pairing meets WCAG AA (4.5:1), and control borders
+ * (--input) reach 3:1 against their surface.
  */
 @layer base {
   :root {
-    --background: 220 23% 97%; /* #f7f8fa */
-    --foreground: 222 47% 11%; /* #0f172a */
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --background: 240 9.1% 97.8%; /* #f9f9fa panel */
+    --foreground: 240 6.9% 11.4%; /* #1b1b1f */
+    --card: 240 8.3% 95.3%; /* #f2f2f4 raised, no border */
+    --card-foreground: 240 6.9% 11.4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 175 77% 26%; /* #0f766e teal */
+    --popover-foreground: 240 6.9% 11.4%;
+    --primary: 234 56.3% 59.6%; /* #5e6ad2 indigo */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 19% 35%; /* #475569 */
-    --accent: 167 85% 89%; /* #ccfbf1 */
-    --accent-foreground: 222 47% 11%;
+    --secondary: 240 8.1% 92.7%;
+    --secondary-foreground: 240 6.9% 11.4%;
+    --muted: 240 8.1% 92.7%; /* #ebebee hover, bands */
+    --muted-foreground: 222 4.8% 40.8%; /* #63666d */
+    --accent: 231 70% 96.1%; /* #eef0fc */
+    --accent-foreground: 240 6.9% 11.4%;
+    --link: 234 53.8% 56.7%; /* #5560cc */
     --destructive: 0 74% 42%; /* #b91c1c */
     --destructive-foreground: 0 0% 100%;
-    --success: 142 72% 29%; /* #15803d */
+    --success: 143 68% 26%; /* #157038 */
     --success-foreground: 0 0% 100%;
-    --border: 214 32% 91%; /* #e2e8f0 */
-    --input: 214 15% 55%;
-    --ring: 175 77% 26%;
-    --sidebar: 0 0% 100%;
+    --border: 240 3.6% 89%; /* #e2e2e4 */
+    --input: 240 3.8% 53.9%; /* #85858e */
+    --ring: 234 56.3% 59.6%;
+    --sidebar: 240 3.4% 94.3%; /* #f0f0f1 chrome */
+    --sidebar-accent: 240 5.7% 89.6%; /* #e3e3e6 hover and current on the chrome */
     --radius: 0.5rem;
-    --chart-1: 175 77% 26%;
+    --chart-1: 234 56.3% 59.6%;
     --chart-2: 199 89% 32%;
-    --chart-3: 262 52% 47%;
+    --chart-3: 175 77% 26%;
     --chart-4: 32 95% 40%;
     --chart-5: 142 72% 29%;
   }
 
   .dark {
-    --background: 214 33% 6%; /* #0b1016 */
-    --foreground: 210 36% 93%; /* #e6edf3 */
-    --card: 214 32% 10%; /* #111821 */
-    --card-foreground: 210 36% 93%;
-    --popover: 214 32% 10%;
-    --popover-foreground: 210 36% 93%;
-    --primary: 173 66% 50%; /* #2dd4bf */
-    --primary-foreground: 174 78% 7%;
-    --secondary: 213 30% 15%;
-    --secondary-foreground: 210 36% 93%;
-    --muted: 213 30% 15%;
-    --muted-foreground: 213 14% 66%;
-    --accent: 174 51% 14%;
-    --accent-foreground: 210 36% 93%;
+    --background: 233 15.3% 11.6%; /* #191a22 panel */
+    --foreground: 231 14.3% 90.4%; /* #e3e4ea */
+    --card: 235 14.3% 15.1%; /* #21222c raised, no border */
+    --card-foreground: 231 14.3% 90.4%;
+    --popover: 235 12.6% 17.1%; /* #262731 */
+    --popover-foreground: 231 14.3% 90.4%;
+    --primary: 234 56.3% 59.6%; /* #5e6ad2 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 235 13.3% 17.6%;
+    --secondary-foreground: 231 14.3% 90.4%;
+    --muted: 235 13.3% 17.6%; /* #272833 */
+    --muted-foreground: 231 6.2% 58.6%; /* #8f919c */
+    --accent: 237 34.3% 26.9%; /* #2d2f5c */
+    --accent-foreground: 231 14.3% 90.4%;
+    --link: 234 100% 75.5%; /* #828fff */
     --destructive: 0 91% 71%; /* #f87171 */
     --destructive-foreground: 0 62% 10%;
     --success: 142 69% 58%; /* #4ade80 */
     --success-foreground: 142 80% 8%;
-    --border: 211 27% 17%;
-    --input: 211 16% 44%;
-    --ring: 173 66% 50%;
-    --sidebar: 214 32% 8%;
-    --chart-1: 173 66% 50%;
+    --border: 235 11.5% 20.4%; /* #2e2f3a */
+    --input: 233 7% 44.7%; /* #6a6c7a */
+    --ring: 234 56.3% 59.6%;
+    --sidebar: 234 21.7% 9%; /* #12131c chrome */
+    --sidebar-accent: 235 11.1% 19.4%; /* #2c2d37 */
+    --chart-1: 234 100% 75.5%;
     --chart-2: 199 89% 60%;
-    --chart-3: 262 83% 74%;
+    --chart-3: 173 66% 50%;
     --chart-4: 38 92% 60%;
     --chart-5: 142 69% 58%;
   }
@@ -77,6 +84,7 @@
   body {
     @apply bg-background text-foreground;
     font-variant-numeric: tabular-nums;
+    font-feature-settings: "cv01", "ss03";
   }
 }
 

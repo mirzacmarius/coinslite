@@ -5,6 +5,7 @@ import {
   SubscriptionSummary,
 } from "@/components/billing/account-plan";
 import { InsuranceReportLink } from "@/components/insurance-report/insurance-report-link";
+import { AppearancePicker } from "@/components/preferences";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
@@ -19,13 +20,17 @@ import { Button } from "@coinslite/ui/button";
 import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
+import {
+  SettingsBlock,
+  SettingsGroup,
+  SettingsRow,
+} from "@coinslite/ui/settings-group";
 import { toast } from "@coinslite/ui/toaster";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Globe, Loader2 } from "lucide-react";
-import type * as React from "react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { DeleteAccountDialog } from "./delete-account-dialog";
@@ -65,44 +70,18 @@ export function AccountPage() {
         )}
         <SubscriptionSummary />
       </header>
-      <PlanLink plan={account.plan} />
-      <PhoneAccountLinks />
-      <UpdatesLink />
-      <InsuranceReportLink premium={account.plan === "premium"} />
+      <div className="flex flex-col rounded-xl bg-card p-1">
+        <PlanLink plan={account.plan} />
+        <PhoneAccountLinks />
+        <UpdatesLink />
+        <InsuranceReportLink premium={account.plan === "premium"} />
+      </div>
       <ContactSection account={account} />
       <PreferencesSection account={account} />
       <EmailSection account={account} />
       <FeedbackSection />
       <LeaveSection />
     </>
-  );
-}
-
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  const id = useId();
-  return (
-    <section
-      aria-labelledby={id}
-      className="flex flex-col gap-4 rounded-lg border bg-card p-4"
-    >
-      <div className="flex flex-col gap-0.5">
-        <h3 id={id} className="text-sm font-medium">
-          {title}
-        </h3>
-        {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
-        )}
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -191,116 +170,118 @@ function ContactSection({ account }: { account: Account }) {
   );
 
   return (
-    <Section
+    <SettingsGroup
       title={t("account.contact.title")}
       description={t("account.contact.description")}
     >
-      <form
-        method="post"
-        noValidate
-        className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submitForm(form, t("common.saveFailed"));
-        }}
-      >
-        {text("displayName", t("account.contact.displayName"), {
-          rule: z
-            .string()
-            .trim()
-            .min(1, t("account.contact.displayNameRequired")),
-          autoComplete: "nickname",
-        })}
-        {text("fullName", t("account.contact.fullName"), {
-          autoComplete: "name",
-        })}
-        {text("streetAddress", t("account.contact.streetAddress"), {
-          className: "sm:col-span-2",
-          autoComplete: "street-address",
-        })}
-        {text("postalCode", t("account.contact.postalCode"), {
-          autoComplete: "postal-code",
-        })}
-        {text("city", t("account.contact.city"), {
-          autoComplete: "address-level2",
-        })}
-        <form.Field name="country">
-          {(field) => (
-            <Field id="account-country" label={t("account.contact.country")}>
-              {(control) => (
-                <PropertyPicker
-                  id={control.id}
-                  icon={Globe}
-                  label={t("account.contact.country")}
-                  placeholder={t("account.contact.setCountry")}
-                  value={field.state.value}
-                  options={countryOptions}
-                  onChange={field.handleChange}
-                  onClear={() => field.handleChange(undefined)}
-                  clearLabel={t("account.contact.noCountry")}
-                  noResults={t("items.noMatches")}
-                />
-              )}
-            </Field>
-          )}
-        </form.Field>
-        {text("contactPhone", t("account.contact.phone"), {
-          rule: z
-            .string()
-            .refine(
-              (phone) =>
-                !phone.trim() || /^\+?[0-9][0-9 ()./-]*$/.test(phone.trim()),
-              t("account.contact.invalidPhone"),
-            ),
-          autoComplete: "tel",
-          type: "tel",
-        })}
-        <div className="flex items-center justify-between gap-3 sm:col-span-2">
-          <p role="alert" className="text-xs text-destructive">
-            {failed && t("account.contact.failed")}
-          </p>
-          <Button type="submit" disabled={submitting}>
-            {submitting && (
-              <Loader2 className="animate-spin" aria-hidden="true" />
+      <SettingsBlock>
+        <form
+          method="post"
+          noValidate
+          className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submitForm(form, t("common.saveFailed"));
+          }}
+        >
+          {text("displayName", t("account.contact.displayName"), {
+            rule: z
+              .string()
+              .trim()
+              .min(1, t("account.contact.displayNameRequired")),
+            autoComplete: "nickname",
+          })}
+          {text("fullName", t("account.contact.fullName"), {
+            autoComplete: "name",
+          })}
+          {text("streetAddress", t("account.contact.streetAddress"), {
+            className: "sm:col-span-2",
+            autoComplete: "street-address",
+          })}
+          {text("postalCode", t("account.contact.postalCode"), {
+            autoComplete: "postal-code",
+          })}
+          {text("city", t("account.contact.city"), {
+            autoComplete: "address-level2",
+          })}
+          <form.Field name="country">
+            {(field) => (
+              <Field id="account-country" label={t("account.contact.country")}>
+                {(control) => (
+                  <PropertyPicker
+                    id={control.id}
+                    icon={Globe}
+                    label={t("account.contact.country")}
+                    placeholder={t("account.contact.setCountry")}
+                    value={field.state.value}
+                    options={countryOptions}
+                    onChange={field.handleChange}
+                    onClear={() => field.handleChange(undefined)}
+                    clearLabel={t("account.contact.noCountry")}
+                    noResults={t("items.noMatches")}
+                  />
+                )}
+              </Field>
             )}
-            {t("account.contact.save")}
-          </Button>
-        </div>
-      </form>
-    </Section>
+          </form.Field>
+          {text("contactPhone", t("account.contact.phone"), {
+            rule: z
+              .string()
+              .refine(
+                (phone) =>
+                  !phone.trim() || /^\+?[0-9][0-9 ()./-]*$/.test(phone.trim()),
+                t("account.contact.invalidPhone"),
+              ),
+            autoComplete: "tel",
+            type: "tel",
+          })}
+          <div className="flex items-center justify-between gap-3 sm:col-span-2">
+            <p role="alert" className="text-xs text-destructive">
+              {failed && t("account.contact.failed")}
+            </p>
+            <Button type="submit" disabled={submitting}>
+              {submitting && (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              )}
+              {t("account.contact.save")}
+            </Button>
+          </div>
+        </form>
+      </SettingsBlock>
+    </SettingsGroup>
   );
 }
 
 function PreferencesSection({ account }: { account: Account }) {
   const t = useI18n();
   const currencyHintId = useId();
+  const appearanceHintId = useId();
   return (
-    <Section title={t("account.preferences.title")}>
-      <div className="grid grid-cols-[140px_1fr] items-center gap-x-3 gap-y-3 text-[13px]">
-        <span className="text-xs text-muted-foreground">
-          {t("account.preferences.language")}
-        </span>
-        <div>
-          <LanguagePicker />
-        </div>
-        <span className="text-xs text-muted-foreground">
-          {t("account.preferences.homeCurrency")}
-        </span>
-        <div>
-          <HomeCurrencySetting
-            current={account.homeCurrency}
-            hintId={currencyHintId}
-          />
-        </div>
-        {/* A row of its own, so the label lines up with the pill, not the hint. */}
-        <span
-          id={currencyHintId}
-          className="col-start-2 -mt-2 text-xs text-muted-foreground"
-        >
-          {t("homeCurrency.hint")}
-        </span>
-      </div>
-    </Section>
+    <SettingsGroup title={t("account.preferences.title")}>
+      <SettingsRow
+        label={t("account.preferences.language")}
+        description={t("account.preferences.languageHint")}
+      >
+        <LanguagePicker />
+      </SettingsRow>
+      <SettingsRow
+        label={t("account.preferences.homeCurrency")}
+        description={t("homeCurrency.hint")}
+        descriptionId={currencyHintId}
+      >
+        <HomeCurrencySetting
+          current={account.homeCurrency}
+          hintId={currencyHintId}
+        />
+      </SettingsRow>
+      <SettingsRow
+        label={t("shell.appearance")}
+        description={t("account.preferences.appearanceHint")}
+        descriptionId={appearanceHintId}
+      >
+        <AppearancePicker describedBy={appearanceHintId} />
+      </SettingsRow>
+    </SettingsGroup>
   );
 }
 
@@ -343,94 +324,98 @@ function EmailSection({ account }: { account: Account }) {
   const submitting = form.useStore((state) => state.isSubmitting);
 
   return (
-    <Section
+    <SettingsGroup
       title={t("account.email.title")}
       description={t("account.email.current", { email: account.email ?? "" })}
     >
-      {account.pendingEmail && (
-        <p
-          role="status"
-          className="rounded-md border bg-muted px-3 py-2 text-xs"
-        >
-          {t("account.email.sent", { email: account.pendingEmail })}
-        </p>
-      )}
-      <form
-        method="post"
-        noValidate
-        className="flex flex-col gap-3 sm:flex-row sm:items-start"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submitForm(form, t("common.saveFailed"));
-        }}
-      >
-        <form.Field
-          name="newEmail"
-          validators={{
-            onChange: z.string().trim().email(t("account.email.invalid")),
+      <SettingsBlock className="flex flex-col gap-3">
+        {account.pendingEmail && (
+          <p
+            role="status"
+            className="rounded-md border bg-muted px-3 py-2 text-xs"
+          >
+            {t("account.email.sent", { email: account.pendingEmail })}
+          </p>
+        )}
+        <form
+          method="post"
+          noValidate
+          className="flex flex-col gap-3 sm:flex-row sm:items-start"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void submitForm(form, t("common.saveFailed"));
           }}
         >
-          {(field) => (
-            <Field
-              id="account-new-email"
-              label={t("account.email.newEmail")}
-              error={
-                (submitted &&
-                  field.state.meta.errors
-                    .filter((e) => typeof e === "string")
-                    .join(" ")) ||
-                error
-              }
-              className="flex-1"
-            >
-              {(control) => (
-                <Input
-                  {...control}
-                  type="email"
-                  autoComplete="email"
-                  value={field.state.value}
-                  onChange={(event) => field.handleChange(event.target.value)}
-                  onBlur={field.handleBlur}
-                />
-              )}
-            </Field>
-          )}
-        </form.Field>
-        <Button
-          type="submit"
-          variant="outline"
-          disabled={submitting}
-          className="sm:mt-[22px]"
-        >
-          {submitting && (
-            <Loader2 className="animate-spin" aria-hidden="true" />
-          )}
-          {t("account.email.send")}
-        </Button>
-      </form>
-      {needsSignIn && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="self-start"
-          onClick={() => void signOut("/settings")}
-        >
-          {t("account.email.signInAgainAction")}
-        </Button>
-      )}
-    </Section>
+          <form.Field
+            name="newEmail"
+            validators={{
+              onChange: z.string().trim().email(t("account.email.invalid")),
+            }}
+          >
+            {(field) => (
+              <Field
+                id="account-new-email"
+                label={t("account.email.newEmail")}
+                error={
+                  (submitted &&
+                    field.state.meta.errors
+                      .filter((e) => typeof e === "string")
+                      .join(" ")) ||
+                  error
+                }
+                className="flex-1"
+              >
+                {(control) => (
+                  <Input
+                    {...control}
+                    type="email"
+                    autoComplete="email"
+                    value={field.state.value}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              </Field>
+            )}
+          </form.Field>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={submitting}
+            className="sm:mt-[22px]"
+          >
+            {submitting && (
+              <Loader2 className="animate-spin" aria-hidden="true" />
+            )}
+            {t("account.email.send")}
+          </Button>
+        </form>
+        {needsSignIn && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="self-start"
+            onClick={() => void signOut("/settings")}
+          >
+            {t("account.email.signInAgainAction")}
+          </Button>
+        )}
+      </SettingsBlock>
+    </SettingsGroup>
   );
 }
 
 function FeedbackSection() {
   const t = useI18n();
   return (
-    <Section
+    <SettingsGroup
       title={t("feedback.title")}
       description={t("feedback.description")}
     >
-      <SendFeedback />
-    </Section>
+      <SettingsBlock>
+        <SendFeedback />
+      </SettingsBlock>
+    </SettingsGroup>
   );
 }
 
@@ -439,19 +424,19 @@ function LeaveSection() {
   const signOut = useSignOut();
   const [deleting, setDeleting] = useState(false);
   return (
-    <Section
+    <SettingsGroup
       title={t("account.danger.title")}
       description={t("account.danger.deleteWarning")}
     >
-      <div className="flex flex-wrap gap-2">
+      <SettingsBlock className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => void signOut()}>
           {t("account.danger.signOut")}
         </Button>
         <Button variant="destructive" onClick={() => setDeleting(true)}>
           {t("account.danger.delete")}
         </Button>
-      </div>
+      </SettingsBlock>
       <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
-    </Section>
+    </SettingsGroup>
   );
 }

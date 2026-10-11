@@ -43,11 +43,7 @@ export function SubscriptionSummary() {
  * change or cancel their subscription; on the Free plan, Plans offers Premium.
  */
 export function PlanLink({ plan }: { plan: Plan }) {
-  return (
-    <div className="rounded-lg border bg-card p-1">
-      {plan === "premium" ? <ManageSubscription /> : <Upgrade />}
-    </div>
-  );
+  return plan === "premium" ? <ManageSubscription /> : <Upgrade />;
 }
 
 function ManageSubscription() {

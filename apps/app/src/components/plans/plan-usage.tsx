@@ -76,20 +76,20 @@ export function UpgradeLink({
   return (
     <Link
       href={upgradeHref}
-      className={cn("font-medium text-primary hover:underline", className)}
+      className={cn("font-medium text-link hover:underline", className)}
     >
       {children}
     </Link>
   );
 }
 
-/** The sidebar's footer: Items used on the Free plan, and from 40 a way up. */
+/** The sidebar's plan card: Items used on the Free plan and the way up, louder from 40. */
 export function SidebarPlanUsage() {
   const t = useI18n();
   const usage = useFreePlanUsage();
   if (!usage) return null;
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-card p-3">
+    <div className="flex flex-col gap-2 rounded-xl bg-background px-3 py-2.5">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-muted-foreground">{t("plans.freePlan")}</span>
         <span className="font-medium">
@@ -97,13 +97,17 @@ export function SidebarPlanUsage() {
         </span>
       </div>
       <UsageBar usage={usage} />
-      {usage.warning && (
+      {usage.warning ? (
         <div className="flex flex-wrap items-center justify-between gap-x-2 text-xs">
           <span className="text-foreground">
             {t(usage.canAdd ? "plans.nearLimit" : "plans.full")}
           </span>
           <UpgradeLink>{t("plans.upgrade")}</UpgradeLink>
         </div>
+      ) : (
+        <UpgradeLink className="text-xs">
+          {t("plans.upgradeToPremium")}
+        </UpgradeLink>
       )}
     </div>
   );
@@ -123,7 +127,7 @@ export function OverviewPlanUsage() {
   return (
     <section
       aria-label={t("plans.freePlan")}
-      className="flex flex-col gap-3 rounded-lg border bg-card p-4"
+      className="flex flex-col gap-3 rounded-xl bg-card p-4"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">

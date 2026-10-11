@@ -94,7 +94,7 @@ function FlagSettings({ flags }: { flags: FeatureFlags }) {
       <p className="text-xs text-muted-foreground">
         {t("featureFlags.description")}
       </p>
-      <div className="divide-y rounded-lg border bg-card">
+      <div className="divide-y rounded-xl bg-card">
         <FlagRow
           label={
             <label htmlFor={switchId} className="text-[13px] font-medium">

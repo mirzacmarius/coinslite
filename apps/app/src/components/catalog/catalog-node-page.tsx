@@ -89,7 +89,7 @@ export function CatalogNodePage({ actions }: { actions?: React.ReactNode }) {
             action={
               <Link
                 href={catalogHref}
-                className="text-[13px] font-medium text-primary hover:underline"
+                className="text-[13px] font-medium text-link hover:underline"
               >
                 {t("catalog.backToCatalog")}
               </Link>

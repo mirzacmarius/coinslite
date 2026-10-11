@@ -10,6 +10,7 @@ import {
   ScanCoinQuickAction,
 } from "@/components/scanner/scan-coin";
 import { AppShell } from "@/components/shell/app-shell";
+import { SidebarSpotPrices } from "@/components/spot-prices/spot-prices";
 import { ReleaseHighlights } from "@/components/updates/release-highlights";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
@@ -49,7 +50,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <ScanCoinQuickAction />
             </>
           }
-          sidebarFooter={<SidebarPlanUsage />}
+          sidebarFooter={
+            <>
+              <SidebarSpotPrices />
+              <SidebarPlanUsage />
+            </>
+          }
         >
           {/* Alongside the page, not before it: the shell and the page are on
             screen without waiting for the backend. */}

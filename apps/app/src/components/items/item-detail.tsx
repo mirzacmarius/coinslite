@@ -74,7 +74,7 @@ export function ItemDetail() {
             action={
               <Link
                 href="/collection"
-                className="text-[13px] font-medium text-primary hover:underline"
+                className="text-[13px] font-medium text-link hover:underline"
               >
                 {t("items.backToCollection")}
               </Link>
@@ -111,7 +111,7 @@ export function ItemDetail() {
           href={`https://en.numista.com/catalogue/pieces${item.numistaNumber}.html`}
           target="_blank"
           rel="noreferrer"
-          className="text-primary hover:underline"
+          className="text-link hover:underline"
         >
           N# {item.numistaNumber}
         </a>

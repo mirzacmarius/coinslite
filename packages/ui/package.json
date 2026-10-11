@@ -53,6 +53,7 @@
     "./scroll-area": "./src/components/scroll-area.tsx",
     "./segmented-control": "./src/components/segmented-control.tsx",
     "./select": "./src/components/select.tsx",
+    "./settings-group": "./src/components/settings-group.tsx",
     "./skip-link": "./src/components/skip-link.tsx",
     "./switch": "./src/components/switch.tsx",
     "./table": "./src/components/table.tsx",

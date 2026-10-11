@@ -4,6 +4,7 @@ import { seriesColorVariables } from "@/components/collection-totals/chart-card"
 import { TotalsFigures } from "@/components/collection-totals/collection-totals";
 import { ValueByDateAddedChart } from "@/components/collection-totals/value-by-date-added-chart";
 import { ValueDistributionChart } from "@/components/collection-totals/value-distribution-chart";
+import { AppearancePicker } from "@/components/preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useFormatters } from "@/locales/use-formatters";
@@ -49,6 +50,7 @@ import { PhotoViewer } from "@coinslite/ui/photo-viewer";
 import { Progress } from "@coinslite/ui/progress";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
+import { SettingsGroup, SettingsRow } from "@coinslite/ui/settings-group";
 import { Switch } from "@coinslite/ui/switch";
 import {
   Table,
@@ -117,11 +119,14 @@ const items = [
   },
 ] as const;
 const tokens = [
+  "sidebar",
+  "sidebar-accent",
   "background",
   "card",
   "muted",
   "accent",
   "primary",
+  "link",
   "success",
   "destructive",
   "border",
@@ -445,7 +450,7 @@ export function DesignGallery() {
   return (
     <AppShell
       sidebarFooter={
-        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3">
+        <div className="flex flex-col gap-2 rounded-xl bg-card p-3">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Free plan</span>
             <span className="font-medium">18 / 50 Items</span>
@@ -727,7 +732,7 @@ export function DesignGallery() {
           </Section>
 
           <Section title="Collection list">
-            <div className="rounded-lg border bg-card">
+            <div className="rounded-xl bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -794,6 +799,23 @@ export function DesignGallery() {
             <FiltersSample />
           </Section>
 
+          <Section title="Settings rows">
+            <SettingsGroup title="Preferences">
+              <SettingsRow
+                label="Show Market value"
+                description="Adds the column to the Collection list."
+              >
+                <Switch aria-label="Show Market value" defaultChecked />
+              </SettingsRow>
+              <SettingsRow
+                label="Appearance"
+                description="Light, dark, or the same as your device."
+              >
+                <AppearancePicker />
+              </SettingsRow>
+            </SettingsGroup>
+          </Section>
+
           <Section title="Unseen marker">
             <div className="flex w-[220px] flex-col rounded-lg border bg-popover p-1">
               <div className="flex h-7 items-center gap-2 rounded-md px-2 text-[13px]">
@@ -834,7 +856,7 @@ function FiltersSample() {
     { value: "VF", count: 7 },
   ];
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="rounded-xl bg-card">
       <div className="flex h-10 items-center justify-between gap-2 border-b px-4">
         <div className="flex min-w-0 flex-1 items-center gap-1">
           <Button variant="ghost" size="xs">
@@ -880,7 +902,7 @@ function FiltersSample() {
                   >
                     <span className="flex size-4 items-center justify-center">
                       {option.value === grade && (
-                        <Check className="text-primary" aria-hidden="true" />
+                        <Check className="text-link" aria-hidden="true" />
                       )}
                     </span>
                     {option.value}

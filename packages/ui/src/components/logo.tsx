@@ -1,6 +1,6 @@
 import { cn } from "../utils";
 
-/** The CoinsLite wordmark: a teal coin ring and the product name. */
+/** The CoinsLite wordmark: an indigo coin ring and the product name. */
 export function Logo({ className }: { className?: string }) {
   return (
     <span

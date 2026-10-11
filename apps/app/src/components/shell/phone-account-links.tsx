@@ -10,10 +10,7 @@ export function PhoneAccountLinks() {
   const albums = navItems.find(({ key }) => key === "albums");
   if (!albums) return null;
   return (
-    <nav
-      aria-label={t("shell.more")}
-      className="rounded-lg border bg-card p-1 md:hidden"
-    >
+    <nav aria-label={t("shell.more")} className="md:hidden">
       <Link
         href={albums.href}
         className="flex h-9 items-center gap-2 rounded-md px-2 text-[13px] font-medium hover:bg-muted"

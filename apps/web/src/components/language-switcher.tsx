@@ -52,7 +52,7 @@ export function LanguageSwitcher({
               {localeNames[value]}
               {value === locale && (
                 <Check
-                  className="ml-auto size-4 text-primary"
+                  className="ml-auto size-4 text-link"
                   strokeWidth={1.75}
                   aria-hidden="true"
                 />

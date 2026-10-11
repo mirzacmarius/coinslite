@@ -242,7 +242,7 @@ export function CatalogEntryDetail({
                     href={numistaHref(entry.numistaId)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-primary hover:underline"
+                    className="text-link hover:underline"
                   >
                     {t("catalog.numistaLink", { id: entry.numistaId })}
                   </a>

@@ -300,6 +300,8 @@ export default {
       title: "Preferences",
       language: "Language",
       homeCurrency: "Home currency",
+      languageHint: "Used on every device you sign in on.",
+      appearanceHint: "Light, dark, or the same as your device.",
       languageNotSaved:
         "Couldn't save the language to your account, so it changed on this device only.",
     },

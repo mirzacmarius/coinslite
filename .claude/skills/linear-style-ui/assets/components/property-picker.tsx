@@ -203,7 +203,7 @@ export function PropertyPicker<T extends string>(
                         </span>
                       )}
                       {!props.multiple && on && (
-                        <Check className="size-4 text-primary" />
+                        <Check className="size-4 text-link" />
                       )}
                     </span>
                   </CommandItem>

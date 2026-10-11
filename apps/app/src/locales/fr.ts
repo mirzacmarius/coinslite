@@ -313,6 +313,8 @@ export default {
       title: "Préférences",
       language: "Langue",
       homeCurrency: "Devise de référence",
+      languageHint: "Utilisée sur tous les appareils où vous vous connectez.",
+      appearanceHint: "Clair, sombre ou comme sur votre appareil.",
       languageNotSaved:
         "Impossible d’enregistrer la langue dans votre compte\u00a0: elle n’a changé que sur cet appareil.",
     },

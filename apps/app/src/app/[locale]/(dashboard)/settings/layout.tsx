@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           )
         }
       />
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6 md:py-10">
         {children}
       </div>
     </>

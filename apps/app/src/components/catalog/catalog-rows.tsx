@@ -105,7 +105,7 @@ export function HeldCount({
   return (
     <span className="inline-flex shrink-0 items-center gap-1 text-xs tabular-nums">
       <Check
-        className="size-3.5 text-primary"
+        className="size-3.5 text-link"
         strokeWidth={2}
         aria-hidden="true"
       />

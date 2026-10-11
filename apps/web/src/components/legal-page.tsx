@@ -79,7 +79,7 @@ export function LegalPage({
                       <Link
                         href={localePath("en", path)}
                         hrefLang="en"
-                        className="text-primary underline underline-offset-4"
+                        className="text-link underline underline-offset-4"
                       >
                         {t.englishVersion}
                       </Link>
@@ -158,7 +158,7 @@ function detailValues(
           <a
             key={detail}
             href={`mailto:${value}`}
-            className="text-primary underline underline-offset-4"
+            className="text-link underline underline-offset-4"
           >
             {value}
           </a>,

@@ -234,7 +234,7 @@ function FigureSection({
   return (
     <section
       aria-labelledby={id}
-      className="overflow-hidden rounded-lg border bg-card"
+      className="overflow-hidden rounded-xl bg-card"
     >
       <div className="flex flex-col gap-0.5 border-b px-4 py-2.5">
         <h2 id={id} className="text-[13px] font-medium">
@@ -281,10 +281,7 @@ function StatsSkeleton() {
     <div className="flex flex-col gap-4" aria-hidden="true">
       <span className="h-4 w-56 animate-pulse rounded bg-muted" />
       {skeleton.map(([section, count]) => (
-        <div
-          key={section}
-          className="overflow-hidden rounded-lg border bg-card"
-        >
+        <div key={section} className="overflow-hidden rounded-xl bg-card">
           <div className="flex flex-col gap-1.5 border-b px-4 py-3">
             <span className="h-3.5 w-24 animate-pulse rounded bg-muted" />
             <span className="h-3 w-64 max-w-full animate-pulse rounded bg-muted" />
