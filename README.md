@@ -60,7 +60,7 @@ On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'`
 
 CI (`.github/workflows/check.yml`) runs lint, format, typecheck, build and backend tests on every pull request push, about 3 minutes. The Playwright smoke tests run there only when started by hand, split across 2 machines: `gh workflow run check.yml --ref <branch>`. Docs-only changes start no run, and a newer push cancels the running one.
 
-CI shares Turbo's cache through Vercel Remote Cache (secret `TURBO_TOKEN`, variable `TURBO_TEAM=orvibo`), so a workspace whose files didn't change replays its last lint, typecheck, test and build result instead of running again. On a laptop, `bunx turbo login && bunx turbo link` (team orvibo) joins the same cache, so the laptop and CI reuse each other's results whenever a task's inputs match.
+CI shares Turbo's cache through Vercel Remote Cache. Each job trades its GitHub OIDC token for a short-lived cache token (a Turborepo CLI OIDC policy on team orvibo, variable `TURBO_TEAM=orvibo`), so a workspace whose files didn't change replays its last lint, typecheck, test and build result instead of running again. On a laptop, `bunx turbo login && bunx turbo link` (team orvibo) joins the same cache, so the laptop and CI reuse each other's results whenever a task's inputs match.
 
 ## Deployments
 
