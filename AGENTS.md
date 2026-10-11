@@ -22,8 +22,8 @@ Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/age
 
 - Match local checks to the changed area. Documentation or copy-only changes do not need the full suite.
 - For auth, permissions, billing, schema, or shared dependencies, run the relevant targeted tests and build checks.
-- Run the full manual CI workflow for a release candidate or when a risky change specifically calls for it: `gh workflow run check.yml --ref <branch>`.
-- CI no longer runs automatically on pushes or pull requests; do not wait for automatic checks.
+- CI runs the quick checks (lint, format, typecheck, build, backend tests) on every pull request push, and the browser suite, split across 2 machines, once the pull request is not a draft. Docs-only changes start no run, and a newer push cancels the running one. Keep a pull request in draft while iterating to save Actions minutes.
+- Run everything by hand when needed: `gh workflow run check.yml --ref <branch>`.
 
 <!-- convex-ai-start -->
 

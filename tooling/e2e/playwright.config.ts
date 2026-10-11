@@ -18,6 +18,9 @@ export default defineConfig({
   // The bundled Catalog, loaded once for every journey that needs it.
   globalSetup: "./global-setup.ts",
   fullyParallel: true,
+  // CI's runner has 2 CPUs; every journey signs up its own account, so two
+  // can share the local backend.
+  workers: isCI ? 2 : undefined,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? [["github"], ["list"]] : "list",
