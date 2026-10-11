@@ -484,6 +484,43 @@ export default {
     deleted: "Obiect șters",
     failed: "Obiectul nu a putut fi șters. Încearcă din nou.",
   },
+  sale: {
+    sell: "Vinde",
+    markOwned: "Marchează ca deținut",
+    markOwnedTitle: "Marchezi „{title}” ca deținut?",
+    markOwnedBody:
+      "Data vânzării, prețul de vânzare și nota se șterg, iar obiectul revine în colecția ta.",
+    soldBadge: "Vândut",
+    section: "Vânzare",
+    edit: "Editează",
+    soldOn: "Vândut pe",
+    salePrice: "Preț de vânzare",
+    note: "Notă",
+    notePlaceholder: "Unde sau cui",
+    title: "Vinde „{title}”",
+    editTitle: "Editează vânzarea",
+    description:
+      "Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
+    "descriptionPieces#one":
+      "Se vinde {count} bucată. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
+    "descriptionPieces#few":
+      "Se vând toate cele {count} bucăți. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
+    "descriptionPieces#other":
+      "Se vând toate cele {count} de bucăți. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
+    close: "Închide",
+    cancel: "Anulează",
+    confirm: "Marchează ca vândut",
+    save: "Salvează vânzarea",
+    sold: "Obiect marcat ca vândut",
+    saved: "Vânzare salvată",
+    owned: "Obiect marcat ca deținut",
+    failed: "Vânzarea nu a putut fi salvată. Încearcă din nou.",
+    ownedFailed: "Obiectul nu a putut fi marcat ca deținut. Încearcă din nou.",
+    errors: {
+      date: "Introdu o dată care nu e după ziua de azi.",
+      beforePurchase: "Data vânzării nu poate fi înainte de data achiziției.",
+    },
+  },
   feedback: {
     title: "Feedback",
     description:
@@ -738,11 +775,16 @@ export default {
       denomination: "Valoare nominală",
       grade: "Stare",
       album: "Album",
+      status: "Stare",
     },
     bullionCoins: "Monede de investiție",
     origins: {
       own: "Autohtone ({country})",
       foreign: "Străine",
+    },
+    statuses: {
+      owned: "Deținute",
+      sold: "Vândute",
     },
     withoutAlbum: "Fără album",
     unknownAlbum: "Album necunoscut",
@@ -751,6 +793,8 @@ export default {
     clear: "Șterge",
     clearFilters: "Șterge filtrele",
     noMatchesTitle: "Niciun obiect nu se potrivește acestor filtre",
+    allSold: "Toate obiectele din colecția ta sunt vândute.",
+    showSold: "Arată obiectele vândute",
     display: "Afișare",
     layout: "Vizualizare",
     layouts: {

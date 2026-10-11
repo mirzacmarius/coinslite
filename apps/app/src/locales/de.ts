@@ -499,6 +499,45 @@ export default {
     deleted: "Objekt gelöscht",
     failed: "Das Objekt konnte nicht gelöscht werden. Versuche es noch einmal.",
   },
+  sale: {
+    sell: "Verkaufen",
+    markOwned: "Als im Besitz markieren",
+    markOwnedTitle: "„{title}“ als im Besitz markieren?",
+    markOwnedBody:
+      "Verkaufsdatum, Verkaufspreis und Notiz werden entfernt, und das Objekt ist wieder in deiner Sammlung.",
+    soldBadge: "Verkauft",
+    section: "Verkauf",
+    edit: "Bearbeiten",
+    soldOn: "Verkauft am",
+    salePrice: "Verkaufspreis",
+    note: "Notiz",
+    notePlaceholder: "Wo oder an wen",
+    title: "„{title}“ verkaufen",
+    editTitle: "Verkauf bearbeiten",
+    description:
+      "Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
+    "descriptionPieces#one":
+      "Alle {count} Stück werden verkauft. Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
+    "descriptionPieces#few":
+      "Alle {count} Stück werden verkauft. Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
+    "descriptionPieces#other":
+      "Alle {count} Stück werden verkauft. Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
+    close: "Schließen",
+    cancel: "Abbrechen",
+    confirm: "Als verkauft markieren",
+    save: "Verkauf speichern",
+    sold: "Objekt als verkauft markiert",
+    saved: "Verkauf gespeichert",
+    owned: "Objekt als im Besitz markiert",
+    failed:
+      "Der Verkauf konnte nicht gespeichert werden. Versuche es noch einmal.",
+    ownedFailed:
+      "Das Objekt konnte nicht als im Besitz markiert werden. Versuche es noch einmal.",
+    errors: {
+      date: "Gib ein Datum ein, das nicht nach heute liegt.",
+      beforePurchase: "Das Verkaufsdatum kann nicht vor dem Kaufdatum liegen.",
+    },
+  },
   feedback: {
     title: "Feedback",
     description:
@@ -758,11 +797,16 @@ export default {
       denomination: "Nennwert",
       grade: "Erhaltung",
       album: "Album",
+      status: "Status",
     },
     bullionCoins: "Anlagemünzen",
     origins: {
       own: "Inländisch ({country})",
       foreign: "Ausländisch",
+    },
+    statuses: {
+      owned: "Im Besitz",
+      sold: "Verkauft",
     },
     withoutAlbum: "Ohne Album",
     unknownAlbum: "Unbekanntes Album",
@@ -771,6 +815,8 @@ export default {
     clear: "Leeren",
     clearFilters: "Filter entfernen",
     noMatchesTitle: "Keine Objekte passen zu diesen Filtern",
+    allSold: "Alle Objekte in deiner Sammlung sind verkauft.",
+    showSold: "Verkaufte Objekte zeigen",
     display: "Anzeige",
     layout: "Ansicht",
     layouts: {

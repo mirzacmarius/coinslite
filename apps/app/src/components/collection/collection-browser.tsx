@@ -163,6 +163,9 @@ export function CollectionBrowser() {
     );
   }
 
+  // Nothing narrows the default view, yet it's empty: every Item is sold.
+  const allSold = !narrowsView(view) && result.options.statuses.sold > 0;
+
   // A Collection with nothing in it yet: no toolbar, just the way to start.
   if (result.collectionSize === 0 && !narrowed) {
     return (
@@ -250,8 +253,19 @@ export function CollectionBrowser() {
             <p>
               {result.collectionSize === 0
                 ? t("items.emptyTitle")
-                : t("collection.noMatchesTitle")}
+                : allSold
+                  ? t("collection.allSold")
+                  : t("collection.noMatchesTitle")}
             </p>
+            {allSold && (
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => update({ status: "sold" })}
+              >
+                {t("collection.showSold")}
+              </Button>
+            )}
             {narrowed && (
               <Button variant="ghost" size="xs" onClick={clearAll}>
                 {t("collection.clearFilters")}

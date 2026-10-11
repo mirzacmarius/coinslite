@@ -490,6 +490,43 @@ export default {
     deleted: "Objet supprimé",
     failed: "Impossible de supprimer l’objet. Réessayez.",
   },
+  sale: {
+    sell: "Vendre",
+    markOwned: "Marquer comme possédé",
+    markOwnedTitle: "Marquer « {title} » comme possédé ?",
+    markOwnedBody:
+      "La date de vente, le prix de vente et la remarque sont supprimés, et l’objet revient dans votre collection.",
+    soldBadge: "Vendu",
+    section: "Vente",
+    edit: "Modifier",
+    soldOn: "Vendu le",
+    salePrice: "Prix de vente",
+    note: "Remarque",
+    notePlaceholder: "Où ou à qui",
+    title: "Vendre « {title} »",
+    editTitle: "Modifier la vente",
+    description:
+      "L’objet passe dans vos objets vendus et garde ses photos et son historique.",
+    "descriptionPieces#one":
+      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
+    "descriptionPieces#few":
+      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
+    "descriptionPieces#other":
+      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
+    close: "Fermer",
+    cancel: "Annuler",
+    confirm: "Marquer comme vendu",
+    save: "Enregistrer la vente",
+    sold: "Objet marqué comme vendu",
+    saved: "Vente enregistrée",
+    owned: "Objet marqué comme possédé",
+    failed: "Impossible d’enregistrer la vente. Réessayez.",
+    ownedFailed: "Impossible de marquer l’objet comme possédé. Réessayez.",
+    errors: {
+      date: "Saisissez une date qui n’est pas postérieure à aujourd’hui.",
+      beforePurchase: "La date de vente ne peut pas précéder la date d’achat.",
+    },
+  },
   feedback: {
     title: "Votre avis",
     description:
@@ -747,11 +784,16 @@ export default {
       denomination: "Valeur faciale",
       grade: "État",
       album: "Album",
+      status: "Statut",
     },
     bullionCoins: "Pièces d’investissement",
     origins: {
       own: "Nationaux ({country})",
       foreign: "Étrangers",
+    },
+    statuses: {
+      owned: "Possédés",
+      sold: "Vendus",
     },
     withoutAlbum: "Sans album",
     unknownAlbum: "Album inconnu",
@@ -760,6 +802,8 @@ export default {
     clear: "Effacer",
     clearFilters: "Effacer les filtres",
     noMatchesTitle: "Aucun objet ne correspond à ces filtres",
+    allSold: "Tous les objets de votre collection sont vendus.",
+    showSold: "Afficher les objets vendus",
     display: "Affichage",
     layout: "Vue",
     layouts: {
