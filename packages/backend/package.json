@@ -17,16 +17,16 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
-    "@auth/core": "0.37.0",
+    "@auth/core": "0.41.3",
     "@coinslite/i18n": "workspace:*",
-    "@convex-dev/auth": "^0.0.80",
+    "@convex-dev/auth": "^0.0.96",
     "@convex-dev/rate-limiter": "^0.4.1",
     "@pdf-lib/fontkit": "^1.1.1",
     "convex": "^1.46.0",
     "convex-helpers": "^0.1.63",
     "oslo": "^1.1.2",
     "pdf-lib": "^1.17.1",
-    "standardwebhooks": "^1.0.0"
+    "standardwebhooks": "^1.1.1"
   },
   "devDependencies": {
     "@edge-runtime/vm": "^5.0.0",
