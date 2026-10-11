@@ -501,17 +501,16 @@ export default {
     editTitle: "Editează vânzarea",
     description:
       "Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
-    "descriptionPieces#one":
-      "Se vinde {count} bucată. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
-    "descriptionPieces#few":
-      "Se vând toate cele {count} bucăți. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
-    "descriptionPieces#other":
-      "Se vând toate cele {count} de bucăți. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
+    descriptionSplit:
+      "Vinde câteva bucăți sau pe toate. Ce păstrezi rămâne în colecția ta.",
+    quantity: "Bucăți vândute",
+    quantityHint: "Până la {max}",
     close: "Închide",
     cancel: "Anulează",
     confirm: "Marchează ca vândut",
     save: "Salvează vânzarea",
     sold: "Obiect marcat ca vândut",
+    soldPart: "Vândut. Restul rămâne în colecția ta.",
     saved: "Vânzare salvată",
     owned: "Obiect marcat ca deținut",
     failed: "Vânzarea nu a putut fi salvată. Încearcă din nou.",
@@ -519,6 +518,7 @@ export default {
     errors: {
       date: "Introdu o dată care nu e după ziua de azi.",
       beforePurchase: "Data vânzării nu poate fi înainte de data achiziției.",
+      quantity: "Introdu un număr întreg de la 1 la {max}.",
     },
   },
   feedback: {

@@ -507,17 +507,16 @@ export default {
     editTitle: "Modifier la vente",
     description:
       "L’objet passe dans vos objets vendus et garde ses photos et son historique.",
-    "descriptionPieces#one":
-      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
-    "descriptionPieces#few":
-      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
-    "descriptionPieces#other":
-      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
+    descriptionSplit:
+      "Vendez une partie des exemplaires ou tous. Ceux que vous gardez restent dans votre collection.",
+    quantity: "Exemplaires vendus",
+    quantityHint: "Jusqu’à {max}",
     close: "Fermer",
     cancel: "Annuler",
     confirm: "Marquer comme vendu",
     save: "Enregistrer la vente",
     sold: "Objet marqué comme vendu",
+    soldPart: "Vendu. Le reste demeure dans votre collection.",
     saved: "Vente enregistrée",
     owned: "Objet marqué comme possédé",
     failed: "Impossible d’enregistrer la vente. Réessayez.",
@@ -525,6 +524,7 @@ export default {
     errors: {
       date: "Saisissez une date qui n’est pas postérieure à aujourd’hui.",
       beforePurchase: "La date de vente ne peut pas précéder la date d’achat.",
+      quantity: "Saisissez un nombre entier de 1 à {max}.",
     },
   },
   feedback: {

@@ -320,24 +320,43 @@ export const update = mutation({
 });
 
 /**
- * Marks one of the signed-in person's Items sold, every piece of it, or
- * changes its sale: the sold-on date, the sale price per piece and a note.
+ * Marks one of the signed-in person's Items sold, or changes its sale: the
+ * sold-on date, the sale price per piece and a note. Selling fewer pieces
+ * than the Item holds (`quantity`) splits them off: a new sold Item copies
+ * every field but the photos, and the original keeps the rest, still owned.
  */
 export const sell = mutation({
   args: {
     itemId: v.id("items"),
+    /** How many pieces; all of them when left out. */
+    quantity: v.optional(v.number()),
     soldOn: v.string(),
     salePrice: v.optional(v.number()),
     saleNote: v.optional(v.string()),
   },
-  returns: v.null(),
-  handler: async (ctx, { itemId, ...sale }) => {
+  returns: v.id("items"),
+  handler: async (ctx, { itemId, quantity, ...input }) => {
     const item = await requireOwnItem(ctx, itemId);
-    await ctx.db.patch(
-      itemId,
-      checkSale(sale, latestPurchaseDate(), item.purchaseDate),
-    );
-    return null;
+    const sale = checkSale(input, latestPurchaseDate(), item.purchaseDate);
+    const pieces = quantity ?? item.quantity;
+    if (!Number.isSafeInteger(pieces) || pieces < 1 || pieces > item.quantity)
+      throw new ConvexError(itemErrors.invalidQuantity);
+    if (pieces === item.quantity) {
+      await ctx.db.patch(itemId, sale);
+      return itemId;
+    }
+    if (item.soldOn !== undefined)
+      throw new ConvexError(itemErrors.invalidQuantity);
+    const { _id, _creationTime, frontPhoto, backPhoto, ...fields } = item;
+    const soldId = await ctx.db.insert("items", {
+      ...fields,
+      quantity: pieces,
+      ...sale,
+    });
+    await moveBetweenAlbums(ctx, undefined, item.albumId);
+    await countItemAdded(ctx, { ownerId: item.ownerId, type: item.type });
+    await ctx.db.patch(itemId, { quantity: item.quantity - pieces });
+    return soldId;
   },
 });
 

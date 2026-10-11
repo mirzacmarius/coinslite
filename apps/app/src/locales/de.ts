@@ -516,17 +516,16 @@ export default {
     editTitle: "Verkauf bearbeiten",
     description:
       "Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
-    "descriptionPieces#one":
-      "Alle {count} Stück werden verkauft. Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
-    "descriptionPieces#few":
-      "Alle {count} Stück werden verkauft. Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
-    "descriptionPieces#other":
-      "Alle {count} Stück werden verkauft. Das Objekt wandert zu deinen verkauften Objekten und behält seine Fotos und seinen Verlauf.",
+    descriptionSplit:
+      "Verkaufe einige Stück oder alle. Was du behältst, bleibt in deiner Sammlung.",
+    quantity: "Verkaufte Stück",
+    quantityHint: "Bis zu {max}",
     close: "Schließen",
     cancel: "Abbrechen",
     confirm: "Als verkauft markieren",
     save: "Verkauf speichern",
     sold: "Objekt als verkauft markiert",
+    soldPart: "Verkauft. Der Rest bleibt in deiner Sammlung.",
     saved: "Verkauf gespeichert",
     owned: "Objekt als im Besitz markiert",
     failed:
@@ -536,6 +535,7 @@ export default {
     errors: {
       date: "Gib ein Datum ein, das nicht nach heute liegt.",
       beforePurchase: "Das Verkaufsdatum kann nicht vor dem Kaufdatum liegen.",
+      quantity: "Gib eine ganze Zahl von 1 bis {max} ein.",
     },
   },
   feedback: {

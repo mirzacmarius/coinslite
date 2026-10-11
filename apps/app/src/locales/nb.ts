@@ -499,17 +499,16 @@ export default {
     editTitle: "Rediger salg",
     description:
       "Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
-    "descriptionPieces#one":
-      "Alle {count} stk. selges. Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
-    "descriptionPieces#few":
-      "Alle {count} stk. selges. Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
-    "descriptionPieces#other":
-      "Alle {count} stk. selges. Objektet flyttes til de solgte objektene dine og beholder bildene og historikken.",
+    descriptionSplit:
+      "Selg noen eller alle stk. Det du beholder, blir i samlingen din.",
+    quantity: "Antall solgt",
+    quantityHint: "Opptil {max}",
     close: "Lukk",
     cancel: "Avbryt",
     confirm: "Merk som solgt",
     save: "Lagre salg",
     sold: "Objektet er merket som solgt",
+    soldPart: "Solgt. Resten blir i samlingen din.",
     saved: "Salget er lagret",
     owned: "Objektet er merket som eid",
     failed: "Salget kunne ikke lagres. Prøv igjen.",
@@ -517,6 +516,7 @@ export default {
     errors: {
       date: "Skriv inn en dato som ikke er senere enn i dag.",
       beforePurchase: "Salgsdatoen kan ikke være før innkjøpsdatoen.",
+      quantity: "Skriv inn et helt tall fra 1 til {max}.",
     },
   },
   feedback: {

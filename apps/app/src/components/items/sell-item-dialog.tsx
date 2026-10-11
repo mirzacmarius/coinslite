@@ -32,11 +32,17 @@ import { useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { localToday } from "./item-fields";
 
-type SaleValues = { soldOn: string; salePrice: string; saleNote: string };
+type SaleValues = {
+  quantity: string;
+  soldOn: string;
+  salePrice: string;
+  saleNote: string;
+};
 
 /**
- * "Sell" for a whole Item, or "Edit sale" for one already sold: the sold-on
- * date, the sale price per piece in the Home currency and a note.
+ * "Sell" for an Item, or "Edit sale" for one already sold: how many pieces
+ * (all by default; fewer split off a new sold Item), the sold-on date, the
+ * sale price per piece in the Home currency and a note.
  */
 export function SellItemDialog({
   item,
@@ -53,9 +59,12 @@ export function SellItemDialog({
   const baseId = useId();
   const sell = useMutation(api.items.sell);
   const editing = item.soldOn !== undefined;
+  // Some pieces can be sold, and the rest kept, while the Item is owned.
+  const splittable = !editing && item.quantity > 1;
   const [failed, setFailed] = useState<string>();
   // One object for the dialog's life: the form resets when it sees new defaults.
   const [defaults] = useState<SaleValues>(() => ({
+    quantity: String(item.quantity),
     soldOn: item.soldOn ?? localToday(),
     salePrice:
       item.salePrice === undefined
@@ -69,6 +78,15 @@ export function SellItemDialog({
 
   const rules = useMemo(
     () => ({
+      quantity: z.string().refine(
+        (text) => {
+          const pieces = Number(text.trim());
+          return (
+            /^\d+$/.test(text.trim()) && pieces >= 1 && pieces <= item.quantity
+          );
+        },
+        t("sale.errors.quantity", { max: item.quantity }),
+      ),
       soldOn: z
         .string()
         .refine(
@@ -82,7 +100,7 @@ export function SellItemDialog({
           t("items.errors.amount"),
         ),
     }),
-    [t, locale],
+    [t, locale, item.quantity],
   );
 
   const form = useForm({
@@ -90,9 +108,11 @@ export function SellItemDialog({
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(undefined);
+      const pieces = splittable ? Number(value.quantity.trim()) : undefined;
       try {
         await sell({
           itemId: item._id,
+          quantity: pieces,
           soldOn: value.soldOn,
           salePrice: value.salePrice.trim()
             ? parseMoney(value.salePrice, locale) ?? undefined
@@ -106,11 +126,21 @@ export function SellItemDialog({
             ? t("sale.errors.date")
             : code === itemErrors.soldBeforePurchase
               ? t("sale.errors.beforePurchase")
-              : t("sale.failed"),
+              : code === itemErrors.invalidQuantity
+                ? t("sale.errors.quantity", { max: item.quantity })
+                : t("sale.failed"),
         );
         return;
       }
-      toast.success(t(editing ? "sale.saved" : "sale.sold"));
+      toast.success(
+        t(
+          editing
+            ? "sale.saved"
+            : pieces !== undefined && pieces < item.quantity
+              ? "sale.soldPart"
+              : "sale.sold",
+        ),
+      );
       form.reset();
       onOpenChange(false);
     },
@@ -165,12 +195,38 @@ export function SellItemDialog({
             </DialogClose>
           </DialogHeader>
           <DialogDescription className="px-4 text-xs text-muted-foreground">
-            {item.quantity > 1
-              ? t("sale.descriptionPieces", { count: item.quantity })
-              : t("sale.description")}
+            {splittable ? t("sale.descriptionSplit") : t("sale.description")}
           </DialogDescription>
 
           <div className="flex flex-col gap-3 overflow-y-auto px-4 pb-3 pt-3">
+            {splittable && (
+              <form.Field
+                name="quantity"
+                validators={{ onChange: rules.quantity }}
+              >
+                {(field) => (
+                  <Field
+                    id={`${baseId}-quantity`}
+                    label={t("sale.quantity")}
+                    hint={t("sale.quantityHint", { max: item.quantity })}
+                    error={errorOf(field.state.meta.errors)}
+                  >
+                    {(control) => (
+                      <Input
+                        {...control}
+                        inputMode="numeric"
+                        className="w-24"
+                        value={field.state.value}
+                        onChange={(event) =>
+                          field.handleChange(event.target.value)
+                        }
+                        onBlur={field.handleBlur}
+                      />
+                    )}
+                  </Field>
+                )}
+              </form.Field>
+            )}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <form.Field name="soldOn" validators={{ onChange: rules.soldOn }}>
                 {(field) => (

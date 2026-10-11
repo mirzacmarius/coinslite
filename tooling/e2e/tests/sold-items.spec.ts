@@ -110,3 +110,39 @@ test("a sold Item leaves the Collection totals and the Insurance report", async 
   await expect(figure("Pieces")).toHaveText("1");
   await expect(figure("Insured value")).toHaveText("$100.00");
 });
+
+test("sell part of an Item: the rest stay owned, the sold pieces show in the sold view", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
+  const add = page.getByRole("dialog", { name: "New Item" });
+  await add.getByLabel("Title").fill("1 krone 1875");
+  await add.getByLabel("Quantity").fill("3");
+  await add.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(add).toBeHidden();
+  await main.getByRole("link", { name: /1 krone 1875/ }).click();
+
+  await visiblePage(page).getByRole("button", { name: "Sell" }).click();
+  const dialog = page.getByRole("dialog", { name: "Sell “1 krone 1875”" });
+  await dialog.getByLabel("Pieces sold").fill("4");
+  await dialog.getByRole("button", { name: /^Mark as sold/ }).click();
+  await expect(
+    dialog.getByText("Enter a whole number from 1 to 3."),
+  ).toBeVisible();
+  await dialog.getByLabel("Pieces sold").fill("1");
+  await dialog.getByRole("button", { name: /^Mark as sold/ }).click();
+  await expect(dialog).toBeHidden();
+
+  await page.goto(`${appUrl}/collection`);
+  await expect(main.getByRole("link", { name: /1 krone 1875/ })).toContainText(
+    "×2",
+  );
+  await page.goto(`${appUrl}/collection?status=sold`);
+  const sold = main.getByRole("link", { name: /1 krone 1875/ });
+  await expect(sold).toHaveCount(1);
+  await expect(sold).not.toContainText("×");
+});
