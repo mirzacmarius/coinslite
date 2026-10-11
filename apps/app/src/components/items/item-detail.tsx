@@ -150,9 +150,10 @@ export function ItemDetail() {
   };
   const filled = (rows: Array<[string, React.ReactNode]>) =>
     rows.filter(([, value]) => value !== undefined && value !== false);
-  // Facts only the Catalog entry holds, read live from it (never stored).
+  // Facts only the Catalog entry holds, read live from it, or the copy kept
+  // when the entry left the Catalog.
   const details: Partial<NonNullable<typeof item.catalogEntry>["details"]> =
-    item.catalogEntry?.details ?? {};
+    item.catalogEntry?.details ?? item.catalogDetails ?? {};
   const fromCatalog: Array<[string, React.ReactNode]> = [
     [
       t("catalogFacts.mintMark"),

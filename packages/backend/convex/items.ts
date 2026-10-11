@@ -39,9 +39,8 @@ import { requireRoomForItems } from "./plans";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
 import {
+  catalogDetails,
   catalogItemType,
-  coinEdge,
-  composition,
   gradingScale,
   homeCurrency,
   itemType,
@@ -533,20 +532,6 @@ const catalogFacts = v.object({
   purity: v.optional(v.number()),
 });
 
-/** A Catalog entry's facts Items have no field for (items/catalogFacts.ts entryDetails). */
-const entryDetailsValidator = v.object({
-  noMintMark: v.optional(v.literal(true)),
-  mint: v.optional(v.string()),
-  composition: v.optional(composition),
-  edge: v.optional(coinEdge),
-  edgeLettering: v.optional(v.string()),
-  designers: v.optional(v.array(v.string())),
-  issueDate: v.optional(v.string()),
-  withdrawalDate: v.optional(v.string()),
-  width: v.optional(v.number()),
-  height: v.optional(v.number()),
-});
-
 const listedItem = schema
   .doc("items")
   .extend({ thumbnailUrl: v.union(v.string(), v.null()) });
@@ -594,7 +579,7 @@ export const get = query({
           key: v.string(),
           title: v.string(),
           facts: catalogFacts,
-          details: entryDetailsValidator,
+          details: catalogDetails,
         }),
       ),
     }),

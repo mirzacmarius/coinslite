@@ -1,7 +1,11 @@
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { countItemRetyped } from "../collectionCounts";
-import { entryFacts, withCatalogFacts } from "../items/catalogFacts";
+import {
+  entryDetails,
+  entryFacts,
+  withCatalogFacts,
+} from "../items/catalogFacts";
 import type { ItemType } from "../items/grades";
 import { fieldSuits, typeOnlyFields } from "../items/rules";
 
@@ -60,17 +64,21 @@ export async function retypeLinkedItems(
 
 /**
  * Before an entry leaves the Catalog: each Item linked to it takes the
- * entry's facts as its own, keeping those the person changed, and stops
- * linking to it. Nobody's Item loses a fact.
+ * entry's facts as its own, keeping those the person changed, keeps a copy
+ * of the facts it has no field for, and stops linking to it. Nobody's Item
+ * loses a fact.
  */
 export async function detachLinkedItems(
   ctx: MutationCtx,
   entry: Doc<"catalogNodes">,
 ) {
   const facts = entryFacts(entry);
+  const details = entryDetails(entry);
+  const catalogDetails = Object.keys(details).length > 0 ? details : undefined;
   for await (const item of linkedTo(ctx, entry._id)) {
     await ctx.db.patch("items", item._id, {
       ...withCatalogFacts(item, facts),
+      catalogDetails,
       catalogEntryId: undefined,
     });
   }
