@@ -485,7 +485,7 @@ export default {
     edit: "Edit",
     soldOn: "Sold on",
     salePrice: "Sale price",
-    note: "Note",
+    note: "Sale note",
     notePlaceholder: "Where or to whom",
     title: "Sell “{title}”",
     editTitle: "Edit sale",
@@ -974,10 +974,12 @@ export default {
   collectionTotals: {
     title: "Collection totals",
     section: "Totals",
+    soldSection: "Sold totals",
     "summaryItems#one": "1 Item",
     "summaryItems#few": "{count} Items",
     "summaryItems#other": "{count} Items",
     summaryMarketValue: "Market value",
+    summarySalePrice: "Sold for",
     items: "Items",
     itemsHint: "Each Item counts once, whatever its Quantity",
     pieces: "Pieces",
@@ -993,6 +995,12 @@ export default {
       "Items with both a Purchase price and a Market value: {count} of {total}",
     gainLossNone:
       "Shows once an Item has both a Purchase price and a Market value",
+    salePrice: "Total sale price",
+    realised: "Realised Gain/loss",
+    realisedNone:
+      "Shows once a sold Item has both a Purchase price and a sale price",
+    realisedPartial:
+      "Sold Items with both a Purchase price and a sale price: {count} of {total}",
     metalValue: {
       gold: "Gold Metal value",
       silver: "Silver Metal value",

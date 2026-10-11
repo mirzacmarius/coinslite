@@ -150,7 +150,11 @@ export function CollectionBrowser() {
     view.search !== undefined || filters.some((filter) => filter.active);
   // Keyed, so it stays mounted (and open or collapsed) as the rest changes.
   const totals = (
-    <CollectionTotalsSection key="totals" narrowed={narrowsView(view)} />
+    <CollectionTotalsSection
+      key="totals"
+      narrowed={narrowsView(view)}
+      sold={view.status === "sold"}
+    />
   );
 
   if (result === undefined) {

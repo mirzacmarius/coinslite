@@ -45,7 +45,7 @@ test("sell an Item, find it in the sold view, then mark it owned again", async (
   const dialog = page.getByRole("dialog", { name: "Sell “1 krone 1875”" });
   await dialog.getByLabel("Sold on").fill("2026-10-01");
   await dialog.getByLabel("Sale price").fill("210");
-  await dialog.getByLabel("Note").fill("Oslo coin fair");
+  await dialog.getByLabel("Sale note").fill("Oslo coin fair");
   await dialog.getByRole("button", { name: /^Mark as sold/ }).click();
   await expect(dialog).toBeHidden();
   await expect(detail.getByText("Sold", { exact: true })).toBeVisible();
@@ -145,4 +145,46 @@ test("sell part of an Item: the rest stay owned, the sold pieces show in the sol
   const sold = main.getByRole("link", { name: /1 krone 1875/ });
   await expect(sold).toHaveCount(1);
   await expect(sold).not.toContainText("×");
+});
+
+test("selling an Item with a Purchase price shows the Realised Gain/loss on the Overview", async ({
+  page,
+}) => {
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await main.getByRole("button", { name: "Add Item" }).first().click();
+  await addManually(page);
+  const add = page.getByRole("dialog", { name: "New Item" });
+  await add.getByLabel("Title").fill("1 krone 1875");
+  await add.getByRole("button", { name: "More details" }).click();
+  await add.getByLabel("Purchase price").fill("100");
+  await add.getByRole("button", { name: /^Add Item/ }).click();
+  await expect(add).toBeHidden();
+  await addItem(page, "5 kroner 1999");
+
+  await page.goto(`${appUrl}/`);
+  const totals = main.getByRole("region", { name: "Collection totals" });
+  await expect(totals).toContainText("Total Purchase price");
+  await expect(totals).not.toContainText("Realised Gain/loss");
+
+  await page.goto(`${appUrl}/collection`);
+  await main.getByRole("link", { name: /1 krone 1875/ }).click();
+  await visiblePage(page).getByRole("button", { name: "Sell" }).click();
+  const dialog = page.getByRole("dialog", { name: "Sell “1 krone 1875”" });
+  await dialog.getByLabel("Sale price").fill("150");
+  await dialog.getByRole("button", { name: /^Mark as sold/ }).click();
+  await expect(dialog).toBeHidden();
+
+  await page.goto(`${appUrl}/`);
+  await expect(totals).toContainText("Realised Gain/loss");
+  await expect(totals).toContainText("+$50.00");
+
+  // The sold view's totals, collapsed as for any narrowed view, sum up the
+  // sale instead of the Market value.
+  await page.goto(`${appUrl}/collection?status=sold`);
+  const soldTotals = page.getByRole("region", { name: "Sold totals" });
+  await expect(soldTotals).toContainText("Sold for $150.00");
+  await expect(soldTotals).toContainText("Realised Gain/loss +$50.00");
+  await expect(soldTotals).not.toContainText("Market value");
 });

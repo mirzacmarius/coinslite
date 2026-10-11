@@ -510,7 +510,7 @@ export default {
     edit: "Bearbeiten",
     soldOn: "Verkauft am",
     salePrice: "Verkaufspreis",
-    note: "Notiz",
+    note: "Verkaufsnotiz",
     notePlaceholder: "Wo oder an wen",
     title: "„{title}“ verkaufen",
     editTitle: "Verkauf bearbeiten",
@@ -1023,10 +1023,12 @@ export default {
   collectionTotals: {
     title: "Summen der Sammlung",
     section: "Summen",
+    soldSection: "Summen der Verkäufe",
     "summaryItems#one": "1 Objekt",
     "summaryItems#few": "{count} Objekte",
     "summaryItems#other": "{count} Objekte",
     summaryMarketValue: "Marktwert",
+    summarySalePrice: "Verkauft für",
     items: "Objekte",
     itemsHint: "Jedes Objekt zählt einmal, egal wie hoch die Anzahl ist",
     pieces: "Stück",
@@ -1040,6 +1042,12 @@ export default {
     gainLoss: "Gewinn/Verlust",
     gainLossPartial: "Objekte mit Kaufpreis und Marktwert: {count} von {total}",
     gainLossNone: "Erscheint, sobald ein Objekt Kaufpreis und Marktwert hat",
+    salePrice: "Verkaufspreis gesamt",
+    realised: "Realisierter Gewinn/Verlust",
+    realisedNone:
+      "Erscheint, sobald ein verkauftes Objekt Kaufpreis und Verkaufspreis hat",
+    realisedPartial:
+      "Verkaufte Objekte mit Kaufpreis und Verkaufspreis: {count} von {total}",
     metalValue: {
       gold: "Metallwert Gold",
       silver: "Metallwert Silber",

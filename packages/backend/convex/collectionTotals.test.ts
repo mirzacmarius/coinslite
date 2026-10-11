@@ -87,7 +87,11 @@ const addAt = (as: Signed, moment: string, item: Partial<ItemArgs> = {}) => {
  */
 async function totalsOf(
   as: Signed,
-  { pageSize = 100, utcOffsetMinutes = 0 } = {},
+  {
+    pageSize = 100,
+    utcOffsetMinutes = 0,
+    status,
+  }: { pageSize?: number; utcOffsetMinutes?: number; status?: "sold" } = {},
 ): Promise<CollectionTotals> {
   let cursor: string | null = null;
   let totals: CollectionTotals | undefined;
@@ -99,6 +103,7 @@ async function totalsOf(
     } = await as.query(api.collectionTotals.page, {
       paginationOpts: { numItems: pageSize, cursor },
       utcOffsetMinutes,
+      status,
     });
     for (const page of result.page) {
       totals = totals ? combineTotals(totals, page) : page;
@@ -476,4 +481,36 @@ test("sold Items leave the totals and Metal values; marking one owned brings it 
   const owned = await totalsOf(ada.as);
   expect(owned.items).toBe(2);
   expect(owned.metals.gold.value).toBe(1_000_000);
+});
+
+test("the sold Items' totals add up the sale prices and the realised Gain/loss of Items with both prices", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const sell = async (item: Partial<ItemArgs>, salePrice?: number) => {
+    const itemId = await add(ada.as, item);
+    await ada.as.mutation(api.items.sell, {
+      itemId,
+      soldOn: "2026-10-01",
+      salePrice,
+    });
+  };
+  // Gained 3 × 50.00
+  await sell({ quantity: 3, purchasePrice: 10_000 }, 15_000);
+  // Lost 2 × 30.00
+  await sell({ quantity: 2, purchasePrice: 8_000 }, 5_000);
+  // Left out of the realised figure: a gift sold, and a sale without a price
+  await sell({}, 4_000);
+  await sell({ purchasePrice: 2_000 });
+  // Still owned: in neither
+  await add(ada.as, { purchasePrice: 1_000, marketValue: 9_000 });
+
+  const sold = await totalsOf(ada.as, { status: "sold" });
+  expect(sold.items).toBe(4);
+  expect(sold.salePrice).toBe(45_000 + 10_000 + 4_000);
+  expect(sold.realised).toEqual({ amount: 15_000 - 6_000, items: 2 });
+
+  const owned = await totalsOf(ada.as);
+  expect(owned.items).toBe(1);
+  expect(owned.salePrice).toBe(0);
+  expect(owned.realised).toEqual({ amount: 0, items: 0 });
 });

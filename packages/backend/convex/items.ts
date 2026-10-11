@@ -150,6 +150,20 @@ function checkFields(
   return overridesOnly(checked, entry.facts, stored);
 }
 
+/**
+ * Stores a new Item and keeps the counts that follow Items (its Album's, the
+ * Collection's) right. Every way of creating an Item goes through here.
+ */
+async function storeNewItem(
+  ctx: MutationCtx,
+  doc: Omit<Doc<"items">, "_id" | "_creationTime">,
+) {
+  const itemId = await ctx.db.insert("items", doc);
+  await moveBetweenAlbums(ctx, undefined, doc.albumId);
+  await countItemAdded(ctx, { ownerId: doc.ownerId, type: doc.type });
+  return itemId;
+}
+
 /** Stores a new Item in its owner's Collection, and in an Album of theirs if given one. */
 async function insertItem(
   ctx: MutationCtx,
@@ -159,15 +173,12 @@ async function insertItem(
   albumId: Id<"albums"> | undefined,
 ) {
   const album = await ownAlbumId(ctx, ownerId, albumId);
-  const itemId = await ctx.db.insert("items", {
+  return await storeNewItem(ctx, {
     ownerId,
     ...fields,
     ...(entry && { catalogEntryId: entry._id }),
     ...(album && { albumId: album }),
   });
-  await moveBetweenAlbums(ctx, undefined, album);
-  await countItemAdded(ctx, { ownerId, type: fields.type });
-  return itemId;
 }
 
 /**
@@ -348,13 +359,11 @@ export const sell = mutation({
     if (item.soldOn !== undefined)
       throw new ConvexError(itemErrors.invalidQuantity);
     const { _id, _creationTime, frontPhoto, backPhoto, ...fields } = item;
-    const soldId = await ctx.db.insert("items", {
+    const soldId = await storeNewItem(ctx, {
       ...fields,
       quantity: pieces,
       ...sale,
     });
-    await moveBetweenAlbums(ctx, undefined, item.albumId);
-    await countItemAdded(ctx, { ownerId: item.ownerId, type: item.type });
     await ctx.db.patch(itemId, { quantity: item.quantity - pieces });
     return soldId;
   },

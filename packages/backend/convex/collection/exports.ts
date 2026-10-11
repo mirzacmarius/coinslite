@@ -68,6 +68,9 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
     currency,
     purchaseDate: item.purchaseDate,
     source: item.source,
+    soldOn: item.soldOn,
+    salePrice: plainAmount(item.salePrice),
+    saleNote: item.saleNote,
   };
   return csvColumns.map((column) => cells[column] ?? "");
 }

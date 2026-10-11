@@ -32,7 +32,12 @@ export function Overview() {
   const totalsId = useId();
   const latest = useQuery(api.overview.latestItems, {});
   const totals = useCollectionTotals();
-  const empty = latest?.length === 0;
+  const soldTotals = useCollectionTotals("sold");
+  // Someone who has sold everything still sees what they realised, once the
+  // sold totals are in; until then the first-run prompt stands.
+  const empty =
+    latest?.length === 0 &&
+    (soldTotals === undefined || soldTotals.items === 0);
 
   return (
     <>
@@ -47,7 +52,11 @@ export function Overview() {
             {totals === undefined ? (
               <FiguresSkeleton figures={4} />
             ) : (
-              <TotalsFigures totals={totals} variant="overview" />
+              <TotalsFigures
+                totals={totals}
+                sold={soldTotals}
+                variant="overview"
+              />
             )}
           </section>
         )}

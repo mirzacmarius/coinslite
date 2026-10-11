@@ -495,7 +495,7 @@ export default {
     edit: "Editează",
     soldOn: "Vândut pe",
     salePrice: "Preț de vânzare",
-    note: "Notă",
+    note: "Notă de vânzare",
     notePlaceholder: "Unde sau cui",
     title: "Vinde „{title}”",
     editTitle: "Editează vânzarea",
@@ -995,10 +995,12 @@ export default {
   collectionTotals: {
     title: "Totalurile colecției",
     section: "Totaluri",
+    soldSection: "Totaluri vânzări",
     "summaryItems#one": "1 obiect",
     "summaryItems#few": "{count} obiecte",
     "summaryItems#other": "{count} de obiecte",
     summaryMarketValue: "Valoare de piață",
+    summarySalePrice: "Vândut cu",
     items: "Obiecte",
     itemsHint: "Fiecare obiect se numără o dată, oricare i-ar fi cantitatea",
     pieces: "Bucăți",
@@ -1014,6 +1016,12 @@ export default {
       "Obiecte cu preț de achiziție și valoare de piață: {count} din {total}",
     gainLossNone:
       "Apare când un obiect are atât preț de achiziție, cât și valoare de piață",
+    salePrice: "Preț de vânzare total",
+    realised: "Câștig/pierdere realizată",
+    realisedNone:
+      "Apare când un obiect vândut are și preț de achiziție, și preț de vânzare",
+    realisedPartial:
+      "Obiecte vândute cu preț de achiziție și preț de vânzare: {count} din {total}",
     metalValue: {
       gold: "Valoarea metalului (aur)",
       silver: "Valoarea metalului (argint)",

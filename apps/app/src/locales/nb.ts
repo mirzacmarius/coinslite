@@ -493,7 +493,7 @@ export default {
     edit: "Rediger",
     soldOn: "Solgt den",
     salePrice: "Salgspris",
-    note: "Notat",
+    note: "Salgsnotat",
     notePlaceholder: "Hvor eller til hvem",
     title: "Selg «{title}»",
     editTitle: "Rediger salg",
@@ -987,10 +987,12 @@ export default {
   collectionTotals: {
     title: "Totaler for samlingen",
     section: "Totaler",
+    soldSection: "Totaler for solgte",
     "summaryItems#one": "1 objekt",
     "summaryItems#few": "{count} objekter",
     "summaryItems#other": "{count} objekter",
     summaryMarketValue: "Markedsverdi",
+    summarySalePrice: "Solgt for",
     items: "Objekter",
     itemsHint: "Hvert objekt telles én gang, uansett antall",
     pieces: "Stykker",
@@ -1005,6 +1007,12 @@ export default {
     gainLossPartial:
       "Objekter med både innkjøpspris og markedsverdi: {count} av {total}",
     gainLossNone: "Vises når et objekt har både innkjøpspris og markedsverdi",
+    salePrice: "Samlet salgspris",
+    realised: "Realisert gevinst/tap",
+    realisedNone:
+      "Vises når et solgt objekt har både innkjøpspris og salgspris",
+    realisedPartial:
+      "Solgte objekter med både innkjøpspris og salgspris: {count} av {total}",
     metalValue: {
       gold: "Metallverdi gull",
       silver: "Metallverdi sølv",

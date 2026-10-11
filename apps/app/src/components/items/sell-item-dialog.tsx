@@ -108,7 +108,11 @@ export function SellItemDialog({
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(undefined);
-      const pieces = splittable ? Number(value.quantity.trim()) : undefined;
+      // Left as shown, it means every piece, however many there are by now.
+      const pieces =
+        splittable && form.getFieldMeta("quantity")?.isDirty
+          ? Number(value.quantity.trim())
+          : undefined;
       try {
         await sell({
           itemId: item._id,

@@ -501,7 +501,7 @@ export default {
     edit: "Modifier",
     soldOn: "Vendu le",
     salePrice: "Prix de vente",
-    note: "Remarque",
+    note: "Note de vente",
     notePlaceholder: "Où ou à qui",
     title: "Vendre « {title} »",
     editTitle: "Modifier la vente",
@@ -1004,10 +1004,12 @@ export default {
   collectionTotals: {
     title: "Totaux de la collection",
     section: "Totaux",
+    soldSection: "Totaux des ventes",
     "summaryItems#one": "{count} objet",
     "summaryItems#few": "{count} objets",
     "summaryItems#other": "{count} objets",
     summaryMarketValue: "Valeur de marché",
+    summarySalePrice: "Vendu pour",
     items: "Objets",
     itemsHint: "Chaque objet compte une fois, quelle que soit sa quantité",
     pieces: "Exemplaires",
@@ -1023,6 +1025,12 @@ export default {
       "Objets avec un prix d’achat et une valeur de marché\u00a0: {count} sur {total}",
     gainLossNone:
       "S’affiche dès qu’un objet a un prix d’achat et une valeur de marché",
+    salePrice: "Prix de vente total",
+    realised: "Plus-value/moins-value réalisée",
+    realisedNone:
+      "S’affiche dès qu’un objet vendu a un prix d’achat et un prix de vente",
+    realisedPartial:
+      "Objets vendus avec un prix d’achat et un prix de vente : {count} sur {total}",
     metalValue: {
       gold: "Valeur du métal (or)",
       silver: "Valeur du métal (argent)",
