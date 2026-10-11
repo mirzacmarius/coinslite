@@ -53,7 +53,7 @@ export default async function Home({ params }: Props) {
       <main id="main" className="flex-1">
         <Hero t={t} />
 
-        <section className="py-24 md:py-40" aria-label={t.hero.eyebrow}>
+        <section className="py-24 md:py-40">
           <div className={cn(measure, "flex flex-col gap-12 md:gap-16")}>
             <p className="max-w-6xl text-balance text-3xl font-medium leading-[1.1] tracking-[-0.035em] sm:text-4xl md:text-5xl lg:text-[3.5rem]">
               {t.hero.lead}
@@ -145,7 +145,7 @@ function Hero({ t }: { t: ReturnType<typeof getDictionary> }) {
           {t.hero.eyebrow}
         </p>
         <h1 className="max-w-6xl text-balance text-[2.75rem] font-medium leading-[0.98] tracking-[-0.045em] sm:text-6xl md:text-7xl lg:text-8xl">
-          <span className="text-foreground/40">{t.hero.titleLead}</span>{" "}
+          <span className="text-foreground/60">{t.hero.titleLead}</span>{" "}
           <span>{t.hero.titleRest}</span>
         </h1>
       </div>
@@ -165,7 +165,9 @@ function Hero({ t }: { t: ReturnType<typeof getDictionary> }) {
 
 /** A coin seen edge on: a milled rim and an inner ring, drawn in hairlines. */
 function CoinEdge({ className }: { className?: string }) {
-  const ticks = 180;
+  // The milling: one ring of short dashes, 180 of them around the rim.
+  const millingRadius = 94;
+  const tick = (2 * Math.PI * millingRadius) / 180;
   return (
     <svg viewBox="0 0 200 200" aria-hidden="true" className={className}>
       <g fill="none" stroke="currentColor" strokeWidth="0.35">
@@ -173,20 +175,13 @@ function CoinEdge({ className }: { className?: string }) {
         <circle cx="100" cy="100" r="90" />
         <circle cx="100" cy="100" r="74" />
         <circle cx="100" cy="100" r="72.5" />
-        {Array.from({ length: ticks }, (_, tick) => {
-          const angle = (tick / ticks) * Math.PI * 2;
-          const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
-          return (
-            <line
-              // biome-ignore lint/suspicious/noArrayIndexKey: the ticks are fixed and never reorder
-              key={tick}
-              x1={100 + cos * 90}
-              y1={100 + sin * 90}
-              x2={100 + cos * 98}
-              y2={100 + sin * 98}
-            />
-          );
-        })}
+        <circle
+          cx="100"
+          cy="100"
+          r={millingRadius}
+          strokeWidth="8"
+          strokeDasharray={`0.35 ${tick - 0.35}`}
+        />
       </g>
     </svg>
   );
@@ -250,7 +245,7 @@ function Plans({ locale, t }: Section) {
         </SectionTitle>
         <div className="mt-12 grid border-t md:grid-cols-2">
           <PlanColumn
-            number="/0.1"
+            number="/01"
             name={t.plans.free.name}
             price={t.plans.free.price}
             summary={format(t.plans.free.summary, limit)}
@@ -259,7 +254,7 @@ function Plans({ locale, t }: Section) {
             href={appLink(locale, "/signup")}
           />
           <PlanColumn
-            number="/0.2"
+            number="/02"
             name={t.plans.premium.name}
             price={format(t.plans.premium.monthly, {
               price: price(premiumPrices[currency].month),

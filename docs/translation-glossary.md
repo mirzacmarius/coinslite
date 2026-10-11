@@ -40,7 +40,7 @@ Fixed values:
 
 ## Conventions
 
-- **Capitals.** English capitalises the glossary terms mid-sentence ("your Collection"). The other languages follow their own grammar: lower case in Norwegian, French and Romanian (German capitalises every noun anyway). Sentence case for labels, buttons and headings in every language.
+- **Capitals.** English capitalises the glossary terms mid-sentence ("your Collection"). The other languages follow their own grammar: lower case in Norwegian, French and Romanian (German capitalises every noun anyway). Sentence case for labels, buttons and headings in every language. The marketing site sets its buttons and small labels in capitals with CSS (`uppercase`); the strings themselves stay in sentence case.
 - **Address.** Norwegian, German and Romanian say *du* / *du* / *tu*; French says *vous*.
 - **Quotes.** Norwegian «…», German „…“, French « … » (with non-breaking spaces), Romanian „…”. Apostrophes are typographic (’) everywhere.
 - **Numbers.** Romanian puts *de* between a number of 20 or more and its noun: "50 de obiecte". Use a `#few` plural form for 2–19 and `#other` (with *de*) for the rest; a fixed limit of 20 or more always takes *de*.

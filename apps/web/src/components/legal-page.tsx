@@ -33,7 +33,7 @@ export function LegalPage({
       >
         <nav
           aria-labelledby="contents"
-          className="sticky top-24 hidden w-52 shrink-0 self-start lg:block"
+          className="sticky top-28 hidden w-52 shrink-0 self-start lg:block"
         >
           <p id="contents" className="px-2 pb-2 text-xs text-muted-foreground">
             {t.contents}
@@ -94,7 +94,7 @@ export function LegalPage({
             <section
               key={section.id}
               id={section.id}
-              className="flex scroll-mt-20 flex-col gap-3"
+              className="flex scroll-mt-28 flex-col gap-3"
             >
               <h2 className="pt-2 text-lg font-semibold tracking-tight">
                 {section.heading}

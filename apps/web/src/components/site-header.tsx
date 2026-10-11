@@ -59,7 +59,8 @@ export function SiteHeader({
             href={appLink(locale, "/signup")}
             className={cn(
               outlinedAction,
-              "h-10 whitespace-nowrap px-3 tracking-[0.08em] sm:px-6 sm:tracking-[0.16em]",
+              // The narrowest phones reach it from the page's own buttons.
+              "h-10 whitespace-nowrap px-3 tracking-[0.08em] max-[359px]:hidden sm:px-6 sm:tracking-[0.16em]",
             )}
           >
             {t.createAccount}
