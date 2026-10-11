@@ -258,6 +258,7 @@ async function albumFor(
     ownerId,
     ...fields,
     itemCount: 0,
+    soldItemCount: 0,
   });
   await countAlbumCreated(ctx, { ownerId });
   albums.byName.set(albumKey(name), albumId);

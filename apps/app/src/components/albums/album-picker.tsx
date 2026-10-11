@@ -30,7 +30,7 @@ export function AlbumPicker({
     value: album._id,
     label: album.name,
     icon: <AlbumDot colour={album.colour} />,
-    count: album.itemCount,
+    count: album.ownedItemCount,
   }));
 
   return (

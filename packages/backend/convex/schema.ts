@@ -226,8 +226,10 @@ export default defineSchema({
     .index("by_storageId", ["storageId"]),
 
   /**
-   * A named group of Items within a Collection. `itemCount` is kept by every
-   * write that moves an Item in or out, so lists never count Items one by one.
+   * A named group of Items within a Collection. `itemCount` and
+   * `soldItemCount` are kept by every write that moves an Item in or out,
+   * sells it or makes it owned again (albums/membership.ts), so lists never
+   * count Items one by one.
    */
   albums: defineTable({
     ownerId: v.id("users"),
@@ -235,6 +237,9 @@ export default defineSchema({
     description: v.optional(v.string()),
     colour: albumColour,
     itemCount: v.number(),
+    // How many of those Items are sold. Albums from before it was kept have
+    // none until a write counts them; until then reads count them.
+    soldItemCount: v.optional(v.number()),
   }).index("by_ownerId", ["ownerId"]),
 
   /**
