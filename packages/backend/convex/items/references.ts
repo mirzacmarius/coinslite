@@ -59,7 +59,9 @@ export function referenceName<K extends string>(
 
 /**
  * The grader's page that verifies a certificate, for the graders that have
- * one; NGC's and PMG's take the grade too, when it's a Sheldon number.
+ * one. NGC's lookup also takes the grade, which only a coin on the Sheldon
+ * scale has in NGC's numbers; PMG's banknotes never do, so theirs is the
+ * certificate alone.
  */
 export function certificateUrl(
   grader: Grader,

@@ -106,7 +106,7 @@ export const itemLimits = {
   diameter: 500,
   thickness: 100,
   gradeNote: 200,
-  /** Each Catalogue and certification text (references.ts). */
+  /** Each text under "Catalogue and certification" (references.ts). */
   reference: 100,
   source: 200,
   notes: 5000,
@@ -375,7 +375,8 @@ function checkGrade({
 }
 
 /**
- * The Catalogue and certification facts (references.ts), each a short text.
+ * The facts under "Catalogue and certification" (references.ts), each a
+ * short text.
  * A name typed for the grader or catalogue is kept only when it's "other".
  */
 function checkReferences(input: ItemInput) {

@@ -33,8 +33,9 @@ import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
  * keys, plus three optional columns of the import's own. Each row's cells
  * are read back the way the export writes them, in any language: Item type,
  * Grade on its scale, Strike, material and its note, country name or code,
- * plain amounts, a grader or stamp catalogue by its name. Pure; the rules every Item must meet (items/rules.ts) are
- * applied when the row is checked against the person's Collection.
+ * plain amounts, a grader or stamp catalogue by its name. Pure; the rules
+ * every Item must meet (items/rules.ts) are applied when the row is checked
+ * against the person's Collection.
  */
 
 export const importLimits = {
