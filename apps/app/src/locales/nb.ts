@@ -87,6 +87,8 @@ export default {
     physical: "Fysiske egenskaper",
     fromCatalog: "Fra katalogen",
     moreYouHold: "og {count} til du har",
+    previousItem: "Forrige objekt: {title}",
+    nextItem: "Neste objekt: {title}",
     edit: "Rediger",
     editItem: "Rediger objekt",
     save: "Lagre",

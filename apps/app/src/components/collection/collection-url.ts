@@ -64,9 +64,35 @@ export function readCollectionUrl(params: URLSearchParams) {
   return { view, page: Number.isSafeInteger(page) && page > 1 ? page : 1 };
 }
 
+/** Marks an Item's URL as opened from a Collection view, even the default one. */
+const fromView = "view";
+
+/**
+ * An Item's page, opened from a Collection view: the URL carries the view
+ * (without its page), so the Item page can move through it.
+ */
+export function itemInViewHref(itemId: string, view: CollectionView) {
+  const params = writeCollectionUrl(view, 1);
+  params.set(fromView, "1");
+  return `/collection/${itemId}?${params}`;
+}
+
+/** The Collection view an Item's URL carries; undefined when it was opened from elsewhere. */
+export function viewOfItemUrl(params: URLSearchParams) {
+  return params.get(fromView) === "1"
+    ? readCollectionUrl(params).view
+    : undefined;
+}
+
+/** The Collection showing a view, from its first page. */
+export function collectionHref(view: CollectionView) {
+  const query = writeCollectionUrl(view, 1).toString();
+  return query ? `/collection?${query}` : "/collection";
+}
+
 /** The Collection narrowed to the Items made from one Catalog entry. */
 export function entryItemsHref(entryKey: string) {
-  return `/collection?${writeCollectionUrl({ entry: entryKey }, 1)}`;
+  return collectionHref({ entry: entryKey });
 }
 
 export function writeCollectionUrl(view: CollectionView, page: number) {

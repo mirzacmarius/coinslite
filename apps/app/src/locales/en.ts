@@ -84,6 +84,8 @@ export default {
     physical: "Physical",
     fromCatalog: "From the Catalog",
     moreYouHold: "and {count} more you hold",
+    previousItem: "Previous Item: {title}",
+    nextItem: "Next Item: {title}",
     edit: "Edit",
     editItem: "Edit Item",
     save: "Save",

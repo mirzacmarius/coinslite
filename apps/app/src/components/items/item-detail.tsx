@@ -4,7 +4,11 @@ import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
 import { catalogNodeHref, setHref } from "@/components/catalog/catalog-levels";
 import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
-import { entryItemsHref } from "@/components/collection/collection-url";
+import {
+  collectionHref,
+  entryItemsHref,
+  viewOfItemUrl,
+} from "@/components/collection/collection-url";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -28,13 +32,14 @@ import {
   Undo2,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import type * as React from "react";
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { isItemLimitError, useItemLimitMessage } from "../plans/plan-usage";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
+import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
@@ -44,6 +49,12 @@ export function ItemDetail() {
   const t = useI18n();
   const { itemId } = useParams<{ itemId: string }>();
   const item = useQuery(api.items.get, { itemId });
+  // The Collection view the Item was opened from, if any.
+  const params = useSearchParams();
+  const view = useMemo(
+    () => viewOfItemUrl(new URLSearchParams(params.toString())),
+    [params],
+  );
   const format = useFormatters();
   const labels = useGradeLabels();
   const catalogFormat = useCatalogFormat();
@@ -60,7 +71,10 @@ export function ItemDetail() {
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
   const parent = (
-    <Link href="/collection" className="hover:text-foreground">
+    <Link
+      href={view ? collectionHref(view) : "/collection"}
+      className="hover:text-foreground"
+    >
       {t("nav.collection")}
     </Link>
   );
@@ -212,6 +226,7 @@ export function ItemDetail() {
         title={item.title}
         actions={
           <>
+            {view && <ItemNeighbours itemId={item._id} view={view} />}
             {sold ? (
               <Button
                 variant="ghost"

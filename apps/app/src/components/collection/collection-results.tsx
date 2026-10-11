@@ -12,6 +12,7 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
 import type { CollectionLayout } from "./collection-display";
+import { itemInViewHref, useCollectionUrl } from "./collection-url";
 import type { BrowseResult } from "./filter-options";
 import type { ItemSelection } from "./use-item-selection";
 
@@ -87,9 +88,11 @@ function ItemTarget({
   className: string;
   children: React.ReactNode;
 }) {
+  // The Item page moves through the view it was opened from.
+  const { view } = useCollectionUrl();
   if (!selection)
     return (
-      <Link href={`/collection/${item._id}`} className={className}>
+      <Link href={itemInViewHref(item._id, view)} className={className}>
         {children}
       </Link>
     );

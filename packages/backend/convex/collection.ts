@@ -109,3 +109,39 @@ export const selectable = query({
     };
   },
 });
+
+const neighbour = v.union(
+  v.null(),
+  v.object({ _id: v.id("items"), title: v.string() }),
+);
+
+/**
+ * The Items either side of one in a view, in the view's order across its
+ * pages, for moving through it from the Item page: null on either end. Null
+ * when the view doesn't show the Item.
+ */
+export const neighbours = query({
+  args: {
+    view: collectionView,
+    itemId: v.string(),
+    locale: v.optional(language),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({ previous: neighbour, next: neighbour }),
+  ),
+  handler: async (ctx, { view, itemId, locale }) => {
+    const owner = await requireSetUpUser(ctx);
+    const { items } = await findItems(
+      ctx,
+      owner,
+      view,
+      locale ?? owner.language ?? defaultLocale,
+    );
+    const at = items.findIndex((item) => item._id === itemId);
+    if (at === -1) return null;
+    const near = (item: (typeof items)[number] | undefined) =>
+      item ? { _id: item._id, title: item.title } : null;
+    return { previous: near(items[at - 1]), next: near(items[at + 1]) };
+  },
+});

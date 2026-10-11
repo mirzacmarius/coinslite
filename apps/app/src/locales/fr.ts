@@ -90,6 +90,8 @@ export default {
     physical: "Caractéristiques",
     fromCatalog: "Du catalogue",
     moreYouHold: "et {count} autres que vous possédez",
+    previousItem: "Objet précédent\u00a0: {title}",
+    nextItem: "Objet suivant\u00a0: {title}",
     edit: "Modifier",
     editItem: "Modifier l’objet",
     save: "Enregistrer",

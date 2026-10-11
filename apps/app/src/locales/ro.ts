@@ -88,6 +88,8 @@ export default {
     physical: "Caracteristici fizice",
     fromCatalog: "Din catalog",
     moreYouHold: "și încă {count} pe care le deții",
+    previousItem: "Obiectul anterior: {title}",
+    nextItem: "Obiectul următor: {title}",
     edit: "Editează",
     editItem: "Editează obiectul",
     save: "Salvează",
