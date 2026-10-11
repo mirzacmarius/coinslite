@@ -15,6 +15,14 @@ import {
   gradingScales,
   isGrade,
 } from "../items/grades";
+import {
+  type Grader,
+  type StampCatalogue,
+  graderNames,
+  graders,
+  stampCatalogueNames,
+  stampCatalogues,
+} from "../items/references";
 import { type Material, materials } from "../items/rules";
 import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
 
@@ -25,7 +33,7 @@ import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
  * keys, plus three optional columns of the import's own. Each row's cells
  * are read back the way the export writes them, in any language: Item type,
  * Grade on its scale, Strike, material and its note, country name or code,
- * plain amounts. Pure; the rules every Item must meet (items/rules.ts) are
+ * plain amounts, a grader or stamp catalogue by its name. Pure; the rules every Item must meet (items/rules.ts) are
  * applied when the row is checked against the person's Collection.
  */
 
@@ -80,6 +88,18 @@ export type ImportRow = {
   strike?: Strike;
   material?: Material;
   materialNote?: string;
+  grader?: Grader;
+  graderName?: string;
+  certificateNumber?: string;
+  stampCatalogue?: StampCatalogue;
+  stampCatalogueName?: string;
+  stampCatalogueNumber?: string;
+  perforation?: string;
+  watermark?: string;
+  colour?: string;
+  serialNumber?: string;
+  signatures?: string;
+  printer?: string;
   country?: string;
   quantity?: number;
   purchasePrice?: number;
@@ -148,6 +168,33 @@ const materialOf = lookup<Material>(
 const stampGradeOf = lookup<string>(
   (locale) => exportLabels[locale].stampGrades,
   gradingScales.stamp.grades,
+);
+
+/**
+ * A grader or stamp catalogue by its name ("PCGS", "Michel"), or "other"
+ * with the name as written; the word for "other" alone, in any language,
+ * is "other" with no name.
+ */
+function referenceOf<K extends string>(
+  names: Record<Exclude<K, "other">, string>,
+  keys: readonly K[],
+) {
+  const known = lookup<K>(
+    (locale) =>
+      ({ ...names, other: exportLabels[locale].other }) as Record<K, string>,
+    keys,
+  );
+  return (text: string | undefined) => {
+    if (text === undefined) return {};
+    const key = known(text);
+    if (key === undefined) return { key: "other" as K, name: text };
+    return { key };
+  };
+}
+const graderOf = referenceOf<Grader>(graderNames, graders);
+const stampCatalogueOf = referenceOf<StampCatalogue>(
+  stampCatalogueNames,
+  stampCatalogues,
 );
 
 let countryNames: Map<string, string> | undefined;
@@ -239,6 +286,9 @@ function readRow(row: number, cells: Map<Column, string>): ImportRow {
       : materialText;
   }
 
+  const grader = graderOf(text("grader"));
+  const stampCatalogue = stampCatalogueOf(text("stampCatalogue"));
+
   return {
     row,
     type,
@@ -250,6 +300,18 @@ function readRow(row: number, cells: Map<Column, string>): ImportRow {
     strike,
     material,
     materialNote,
+    grader: grader.key,
+    graderName: grader.name,
+    certificateNumber: text("certificateNumber"),
+    stampCatalogue: stampCatalogue.key,
+    stampCatalogueName: stampCatalogue.name,
+    stampCatalogueNumber: text("stampCatalogueNumber"),
+    perforation: text("perforation"),
+    watermark: text("watermark"),
+    colour: text("colour"),
+    serialNumber: text("serialNumber"),
+    signatures: text("signatures"),
+    printer: text("printer"),
     country,
     quantity: whole("quantity"),
     purchasePrice: amount("purchasePrice"),

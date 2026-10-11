@@ -10,6 +10,7 @@ import {
   coinEdge,
   composition,
   featureFlag,
+  grader,
   gradingScale,
   homeCurrency,
   itemType,
@@ -20,6 +21,7 @@ import {
   perDollar,
   preciousMetal,
   provenance,
+  stampCatalogue,
   strike,
 } from "./utils/validators";
 
@@ -155,6 +157,22 @@ export default defineSchema({
     gradingScale: v.optional(gradingScale),
     gradeNote: v.optional(v.string()),
     strike: v.optional(strike),
+    // Catalogue and certification (items/references.ts): a coin's or
+    // banknote's Certification, a stamp's catalogue number and printing, a
+    // banknote's serial number and printing. A typed grader or catalogue
+    // name is kept only for "other".
+    grader: v.optional(grader),
+    graderName: v.optional(v.string()),
+    certificateNumber: v.optional(v.string()),
+    stampCatalogue: v.optional(stampCatalogue),
+    stampCatalogueName: v.optional(v.string()),
+    stampCatalogueNumber: v.optional(v.string()),
+    perforation: v.optional(v.string()),
+    watermark: v.optional(v.string()),
+    colour: v.optional(v.string()),
+    serialNumber: v.optional(v.string()),
+    signatures: v.optional(v.string()),
+    printer: v.optional(v.string()),
     quantity: v.number(),
     purchasePrice: v.optional(v.number()),
     marketValue: v.optional(v.number()),

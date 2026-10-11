@@ -90,6 +90,7 @@ import type * as items_deletion from "../items/deletion.js";
 import type * as items_denominations from "../items/denominations.js";
 import type * as items_grades from "../items/grades.js";
 import type * as items_preciousMetal from "../items/preciousMetal.js";
+import type * as items_references from "../items/references.js";
 import type * as items_resolve from "../items/resolve.js";
 import type * as items_rules from "../items/rules.js";
 import type * as items_thumbnail from "../items/thumbnail.js";
@@ -209,6 +210,7 @@ declare const fullApi: ApiFromModules<{
   "items/denominations": typeof items_denominations;
   "items/grades": typeof items_grades;
   "items/preciousMetal": typeof items_preciousMetal;
+  "items/references": typeof items_references;
   "items/resolve": typeof items_resolve;
   "items/rules": typeof items_rules;
   "items/thumbnail": typeof items_thumbnail;

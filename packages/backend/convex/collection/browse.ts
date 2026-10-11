@@ -113,8 +113,9 @@ export function countryName(code: string, locale: Locale) {
 }
 
 /**
- * Whether an Item has every searched word in its title, its denomination or
- * its country's name, or a word is its country's code ("us").
+ * Whether an Item has every searched word in its title, its denomination,
+ * its country's name or a number on its label (certificate, stamp catalogue
+ * or serial number), or a word is its country's code ("us").
  */
 function searchFor(search: string | undefined, locale: Locale) {
   const words = folded(search?.slice(0, searchLimit) ?? "")
@@ -131,7 +132,15 @@ function searchFor(search: string | undefined, locale: Locale) {
     return name;
   };
   return (item: Item) => {
-    const text = [item.title, item.denomination ?? ""].map(folded);
+    const text = [
+      item.title,
+      item.denomination,
+      item.certificateNumber,
+      item.stampCatalogueNumber,
+      item.serialNumber,
+    ]
+      .filter((field) => field !== undefined)
+      .map(folded);
     if (item.country) text.push(nameOf(item.country));
     const code = item.country?.toLowerCase();
     return words.every(

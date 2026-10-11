@@ -4,6 +4,11 @@ import type { Doc } from "../_generated/dataModel";
 import { internalQuery, query } from "../_generated/server";
 import { formatCsvFile } from "../catalog/csvText";
 import { gradeCode, type gradingScales } from "../items/grades";
+import {
+  graderNames,
+  referenceName,
+  stampCatalogueNames,
+} from "../items/references";
 import { collectionTotals, itemGainLoss, totalPieces } from "../items/totals";
 import { requirePremium } from "../plans";
 import {
@@ -71,6 +76,25 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
     soldOn: item.soldOn,
     salePrice: plainAmount(item.salePrice),
     saleNote: item.saleNote,
+    grader:
+      item.grader &&
+      referenceName(graderNames, item.grader, item.graderName, labels.other),
+    certificateNumber: item.certificateNumber,
+    stampCatalogue:
+      item.stampCatalogue &&
+      referenceName(
+        stampCatalogueNames,
+        item.stampCatalogue,
+        item.stampCatalogueName,
+        labels.other,
+      ),
+    stampCatalogueNumber: item.stampCatalogueNumber,
+    perforation: item.perforation,
+    watermark: item.watermark,
+    colour: item.colour,
+    serialNumber: item.serialNumber,
+    signatures: item.signatures,
+    printer: item.printer,
   };
   return csvColumns.map((column) => cells[column] ?? "");
 }
