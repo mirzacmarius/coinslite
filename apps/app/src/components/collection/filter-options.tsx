@@ -14,6 +14,7 @@ import {
 import type { FunctionReturnType } from "convex/server";
 import {
   Award,
+  CircleCheck,
   CircleDollarSign,
   FolderOpen,
   Globe,
@@ -32,7 +33,8 @@ export type FilterDimension =
   | "country"
   | "denomination"
   | "grade"
-  | "album";
+  | "album"
+  | "status";
 
 export type FilterOption = {
   key: string;
@@ -261,7 +263,35 @@ export function useFilters(
         }),
     });
 
+    // Owned is the default, so only the sold view shows as an active filter.
+    filters.push({
+      dimension: "status",
+      label: t("collection.filters.status"),
+      icon: CircleCheck,
+      options: [
+        {
+          key: "owned",
+          label: t("collection.statuses.owned"),
+          count: options?.statuses.owned ?? 0,
+          selected: view.status === undefined,
+          change: { status: undefined },
+        },
+        {
+          key: "sold",
+          label: t("collection.statuses.sold"),
+          count: options?.statuses.sold ?? 0,
+          selected: view.status === "sold",
+          change: { status: "sold" },
+        },
+      ],
+      clear: { status: undefined },
+      ...(view.status === "sold"
+        ? { active: { label: t("collection.statuses.sold") } }
+        : { active: undefined }),
+    });
+
     return filters.map((filter) => {
+      if (filter.dimension === "status") return filter;
       if (filter.active) return filter;
       const chosen = filter.options.find((option) => option.selected);
       return chosen

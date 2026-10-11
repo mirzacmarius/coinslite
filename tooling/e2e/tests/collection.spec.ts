@@ -86,6 +86,69 @@ test("search, filter, sort and switch views, with the view kept in the URL", asy
   await expect(page.getByRole("radio", { name: "Grid" })).toBeChecked();
 });
 
+test("the Item list comes first, under the toolbar and the totals as last left", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 375, height: 812 });
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Krone 1876", "Coin");
+
+  // On a phone the totals start collapsed to one line, so the first Item is
+  // on the first screen.
+  await page.reload();
+  const phone = visiblePage(page);
+  const totals = phone.getByRole("button", { name: /^Totals/ });
+  await expect(totals).toHaveAttribute("aria-expanded", "false");
+  await expect(totals).toContainText("2 Items");
+  const firstItem = phone.getByRole("listitem").getByRole("link").first();
+  await expect(firstItem).toBeInViewport({ ratio: 1 });
+
+  // Opened, they stay open after a reload.
+  await totals.click();
+  await expect(phone.getByText("Total Purchase price")).toBeVisible();
+  await page.reload();
+  const reloaded = visiblePage(page);
+  await expect(
+    reloaded.getByRole("button", { name: /^Totals/ }),
+  ).toHaveAttribute("aria-expanded", "true");
+  await expect(reloaded.getByText("Total Purchase price")).toBeVisible();
+
+  // "/" finds from anywhere on the page.
+  await expect(reloaded.getByRole("listitem").getByRole("link")).toHaveCount(2);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.keyboard.press("/");
+  const search = reloaded.getByLabel("Search the Collection");
+  await expect(search).toBeFocused();
+  await expect(search).toBeInViewport();
+
+  // A filtered link shows its Items first, whatever was left open.
+  await page.goto(`${appUrl}/collection?type=coin`);
+  const filtered = visiblePage(page);
+  await expect(
+    filtered.getByRole("button", { name: /^Totals/ }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    filtered.getByRole("listitem").getByRole("link").first(),
+  ).toBeInViewport({ ratio: 1 });
+
+  // On a wider screen the remembered choice holds too: collapsed stays collapsed.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`${appUrl}/collection`);
+  const wide = visiblePage(page);
+  const wideTotals = wide.getByRole("button", { name: /^Totals/ });
+  await expect(wideTotals).toHaveAttribute("aria-expanded", "true");
+  await wideTotals.click();
+  await expect(wideTotals).toHaveAttribute("aria-expanded", "false");
+  await page.reload();
+  await expect(
+    visiblePage(page).getByRole("button", { name: /^Totals/ }),
+  ).toHaveAttribute("aria-expanded", "false");
+});
+
 test("a view nothing matches says so and clears in one click", async ({
   page,
 }) => {
@@ -208,7 +271,9 @@ for (const width of [1280, 375]) {
 
     await main.getByRole("button", { name: "Select", exact: true }).click();
     const bar = page.getByRole("region", { name: "Selected Items" });
-    await expect(bar).toContainText("Select Items to move them to an Album.");
+    await expect(bar).toContainText(
+      "Select Items to move them to an Album, set a Grade or delete them.",
+    );
     await main.getByRole("checkbox", { name: "Krone 1875" }).click();
     await main.getByRole("checkbox", { name: "Krone 1876" }).click();
     await expect(bar).toContainText("2 selected");
@@ -253,6 +318,87 @@ for (const width of [1280, 375]) {
     await expect(bar).toBeHidden();
   });
 }
+
+test("select two Items and delete them after a confirmation", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Krone 1876", "Coin");
+  await addItem(page, main, "Posthorn", "Stamp");
+
+  await main.getByRole("button", { name: "Select", exact: true }).click();
+  const bar = page.getByRole("region", { name: "Selected Items" });
+  await main.getByRole("checkbox", { name: "Krone 1875" }).click();
+  await main.getByRole("checkbox", { name: "Krone 1876" }).click();
+
+  // Cancelling keeps everything.
+  await bar.getByRole("button", { name: "Delete" }).click();
+  const confirm = page.getByRole("alertdialog", { name: "Delete 2 Items?" });
+  await expect(confirm).toContainText("deleted for good");
+  await confirm.getByRole("button", { name: "Cancel" }).click();
+  await expect(bar).toContainText("2 selected");
+
+  await bar.getByRole("button", { name: "Delete" }).click();
+  await confirm.getByRole("button", { name: "Delete 2 Items" }).click();
+  await expect(page.getByText("2 Items deleted")).toBeVisible();
+  await expect(bar).toBeHidden();
+  await expect(main.getByRole("link", { name: /Krone 187/ })).toHaveCount(0);
+  await expect(main.getByRole("link", { name: /Posthorn/ })).toBeVisible();
+  // The totals and the Free plan usage follow.
+  await expect(page.getByRole("navigation", { name: "Pages" })).toContainText(
+    "1–1 of 1",
+  );
+  await expect(page.getByText(/Free plan\s*1 \/ 50 Items/)).toBeVisible();
+});
+
+test("Add Items on an Album picks Items from the Collection and moves them in", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await signUpAndVerify(page, newEmail());
+  await page.goto(`${appUrl}/collection`);
+  const main = visiblePage(page);
+  await addItem(page, main, "Krone 1875", "Coin");
+  await addItem(page, main, "Krone 1876", "Coin");
+  await addItem(page, main, "Posthorn", "Stamp");
+  await createAlbum(page, "Travel");
+  await main.getByRole("link", { name: /Travel/ }).click();
+  await page.waitForURL(/\/albums\/.+/);
+  const albumUrl = page.url();
+
+  // The empty Album points to Add Items; cancelling changes nothing.
+  await expect(main.getByText("Use Add Items")).toBeVisible();
+  await main.getByRole("link", { name: "Add Items" }).last().click();
+  const bar = page.getByRole("region", { name: "Selected Items" });
+  await expect(bar).toContainText("Select the Items to add to Travel.");
+  await bar.getByRole("button", { name: "Cancel" }).click();
+  await page.waitForURL(albumUrl);
+  await expect(main.getByText("No Items in this Album")).toBeVisible();
+
+  await main.getByRole("link", { name: "Add Items" }).first().click();
+  await main.getByRole("checkbox", { name: "Krone 1875" }).click();
+  await main.getByRole("checkbox", { name: "Posthorn" }).click();
+  await bar.getByRole("button", { name: "Move to Travel" }).click();
+  await page.waitForURL(albumUrl);
+  await expect(main.getByRole("link", { name: /Krone 1875/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /Posthorn/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /Krone 1876/ })).toHaveCount(0);
+
+  // Next time, only the Item outside the Album is offered; Esc goes back.
+  await main.getByRole("link", { name: "Add Items" }).first().click();
+  await expect(main.getByRole("checkbox")).toHaveCount(1);
+  await expect(
+    main.getByRole("checkbox", { name: "Krone 1876" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.waitForURL(albumUrl);
+  await page.goto(`${appUrl}/albums`);
+  await expect(main.getByRole("link", { name: /Travel/ })).toContainText("2");
+});
 
 test("with one Album, the toast names it when a new Item goes in by default", async ({
   page,

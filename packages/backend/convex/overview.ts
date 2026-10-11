@@ -43,7 +43,7 @@ async function latestItemOf(ctx: QueryCtx, stored: Doc<"items">) {
   };
 }
 
-/** The signed-in person's most recently added Items, newest first. */
+/** The signed-in person's most recently added Items they still own, newest first. */
 export const latestItems = query({
   args: {},
   returns: v.array(latestItem),
@@ -51,7 +51,9 @@ export const latestItems = query({
     const owner = await requireSetUpUser(ctx);
     const items = await ctx.db
       .query("items")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
+      .withIndex("by_ownerId_and_soldOn", (q) =>
+        q.eq("ownerId", owner._id).eq("soldOn", undefined),
+      )
       .order("desc")
       .take(LATEST_ITEMS_SHOWN);
     return Promise.all(items.map((item) => latestItemOf(ctx, item)));

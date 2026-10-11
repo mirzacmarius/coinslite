@@ -23,8 +23,9 @@ import { completion, isSet, setErrors, setLimits } from "./setRules";
  *
  * Reads are bounded by the Set, never by the Collection: the entries come
  * from the tree's indexes, one index range per grouping, and how many of
- * each the person holds from their Items linked to that entry (the
- * `by_ownerId_and_catalogEntryId` index), one range per entry. A Set has at
+ * each the person holds from the Items linked to that entry they haven't
+ * sold (the `by_ownerId_and_catalogEntryId_and_soldOn` index), one range
+ * per entry. A Set has at
  * most `setLimits.entries` entries, so even the largest stays well inside a
  * query's limits.
  */

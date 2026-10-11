@@ -11,8 +11,8 @@ import { cn } from "@coinslite/ui/utils";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
+import type { CollectionLayout } from "./collection-display";
 import type { BrowseResult } from "./filter-options";
-import type { CollectionLayout } from "./use-collection-display";
 import type { ItemSelection } from "./use-item-selection";
 
 type Item = BrowseResult["items"][number];

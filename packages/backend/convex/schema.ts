@@ -161,6 +161,13 @@ export default defineSchema({
     source: v.optional(v.string()),
     notes: v.optional(v.string()),
 
+    // The sale (items/rules.ts checkSale): an Item with a sold-on date is
+    // sold, otherwise owned. The sale price is per piece, like the Purchase
+    // price.
+    soldOn: v.optional(v.string()),
+    salePrice: v.optional(v.number()),
+    saleNote: v.optional(v.string()),
+
     // Photos, one file per side, private to the owner (photos.ts); more
     // photos are in itemPhotos. The indexes keep each stored file on at most
     // one Item side.
@@ -176,10 +183,24 @@ export default defineSchema({
     catalogEntryId: v.optional(v.id("catalogNodes")),
   })
     .index("by_ownerId", ["ownerId"])
+    // Owned Items are those without a sold-on date, for the Free plan count.
+    .index("by_ownerId_and_soldOn", ["ownerId", "soldOn"])
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
     .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
-    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
+    // With `soldOn` undefined, what a person still owns of one Catalog entry
+    // (held counts, Set completion) or in one Album (the Insurance report's
+    // Album scopes).
+    .index("by_ownerId_and_catalogEntryId_and_soldOn", [
+      "ownerId",
+      "catalogEntryId",
+      "soldOn",
+    ])
+    .index("by_ownerId_and_albumId_and_soldOn", [
+      "ownerId",
+      "albumId",
+      "soldOn",
+    ])
     // Everyone's Items linked to one Catalog entry, for the admins' Catalog
     // editor: a new Item type reaches them, and deleting the entry leaves them
     // its facts (catalog/linkedItems.ts).

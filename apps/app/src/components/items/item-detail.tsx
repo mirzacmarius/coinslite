@@ -6,22 +6,27 @@ import { catalogNodeHref } from "@/components/catalog/catalog-levels";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
+import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
+import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
-import { useQuery } from "convex/react";
-import { Copy, Pencil, SearchX, Trash2 } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import { Copy, HandCoins, Pencil, SearchX, Trash2, Undo2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type * as React from "react";
 import { useState } from "react";
+import { isItemLimitError, useItemLimitMessage } from "../plans/plan-usage";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
+import { SellItemDialog } from "./sell-item-dialog";
 
 /** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
 export function ItemDetail() {
@@ -36,6 +41,10 @@ export function ItemDetail() {
   const [editing, setEditing] = useState({ open: false, key: 0 });
   const [duplicating, setDuplicating] = useState({ open: false, key: 0 });
   const [deleting, setDeleting] = useState(false);
+  const [selling, setSelling] = useState({ open: false, key: 0 });
+  const [takingBack, setTakingBack] = useState(false);
+  const markOwned = useMutation(api.items.markOwned);
+  const itemLimitMessage = useItemLimitMessage();
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
   const parent = (
@@ -122,6 +131,20 @@ export function ItemDetail() {
     [t("items.diameter"), millimetres(item.diameter)],
     [t("items.thickness"), millimetres(item.thickness)],
   ];
+  const sold = item.soldOn !== undefined;
+  const openSale = () =>
+    setSelling(({ key }) => ({ open: true, key: key + 1 }));
+  const takeBack = async () => {
+    try {
+      await markOwned({ itemId: item._id });
+    } catch (failure) {
+      toast.error(
+        isItemLimitError(failure) ? itemLimitMessage : t("sale.ownedFailed"),
+      );
+      return;
+    }
+    toast.success(t("sale.owned"));
+  };
   const filled = (rows: Array<[string, React.ReactNode]>) =>
     rows.filter(([, value]) => value !== undefined && value !== false);
   const shownFacts = filled(facts);
@@ -133,6 +156,21 @@ export function ItemDetail() {
         title={item.title}
         actions={
           <>
+            {sold ? (
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setTakingBack(true)}
+              >
+                <Undo2 aria-hidden="true" />
+                <ActionLabel>{t("sale.markOwned")}</ActionLabel>
+              </Button>
+            ) : (
+              <Button variant="ghost" size="xs" onClick={openSale}>
+                <HandCoins aria-hidden="true" />
+                <ActionLabel>{t("sale.sell")}</ActionLabel>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="xs"
@@ -173,6 +211,21 @@ export function ItemDetail() {
         onOpenChange={(open) => setDuplicating(({ key }) => ({ open, key }))}
         onAdded={(copyId) => router.push(`/collection/${copyId}`)}
       />
+      <SellItemDialog
+        key={`sell-${selling.key}`}
+        item={item}
+        open={selling.open}
+        onOpenChange={(open) => setSelling(({ key }) => ({ open, key }))}
+      />
+      <ConfirmDialog
+        open={takingBack}
+        onOpenChange={setTakingBack}
+        title={t("sale.markOwnedTitle", { title: item.title })}
+        description={t("sale.markOwnedBody")}
+        confirmLabel={t("sale.markOwned")}
+        cancelLabel={t("sale.cancel")}
+        onConfirm={takeBack}
+      />
       <DeleteItemDialog
         item={item}
         open={deleting}
@@ -185,6 +238,7 @@ export function ItemDetail() {
           <div className="flex items-center gap-3">
             <ItemTypeIcon type={item.type} />
             <h2 className="text-base font-medium">{item.title}</h2>
+            {sold && <Badge variant="outline">{t("sale.soldBadge")}</Badge>}
           </div>
           {shownFacts.length > 0 && (
             <dl className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3 text-sm">
@@ -206,6 +260,28 @@ export function ItemDetail() {
           )}
         </div>
         <aside className="flex w-full shrink-0 flex-col divide-y border-t bg-card lg:w-[280px] lg:border-l lg:border-t-0 xl:w-[300px]">
+          {item.soldOn !== undefined && (
+            <PanelSection
+              title={t("sale.section")}
+              action={
+                <Button variant="ghost" size="xs" onClick={openSale}>
+                  {t("sale.edit")}
+                </Button>
+              }
+            >
+              <PropertyRow label={t("sale.soldOn")}>
+                {format.date(item.soldOn)}
+              </PropertyRow>
+              <PropertyRow label={t("sale.salePrice")}>
+                {money(item.salePrice)}
+              </PropertyRow>
+              {item.saleNote && (
+                <PropertyRow label={t("sale.note")} wrap>
+                  {item.saleNote}
+                </PropertyRow>
+              )}
+            </PanelSection>
+          )}
           <PanelSection title={t("items.details")}>
             <PropertyRow label={t("items.type")}>
               {t(`items.types.${item.type}`)}
@@ -315,13 +391,21 @@ export function ItemDetail() {
 
 function PanelSection({
   title,
+  action,
   children,
-}: { title: string; children: React.ReactNode }) {
+}: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-1 p-4">
-      <h3 className="mb-1 text-xs font-medium text-muted-foreground">
-        {title}
-      </h3>
+      {action ? (
+        <div className="-my-1 mb-0 flex items-center justify-between gap-2">
+          <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>
+          {action}
+        </div>
+      ) : (
+        <h3 className="mb-1 text-xs font-medium text-muted-foreground">
+          {title}
+        </h3>
+      )}
       {children}
     </section>
   );

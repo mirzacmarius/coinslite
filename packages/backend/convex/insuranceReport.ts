@@ -31,7 +31,8 @@ import { homeCurrency, reportValues } from "./utils/validators";
 type Owner = Awaited<ReturnType<typeof requirePremium>>;
 
 /**
- * The Items a report covers, their facts resolved (items/resolve.ts), and
+ * The Items a report covers, the ones the person still owns, their facts
+ * resolved (items/resolve.ts), and
  * the chosen Albums. Albums must be the owner's; each is read once however
  * often it's chosen. More Items than a report holds turn the request away
  * rather than leaving some out.
@@ -46,11 +47,16 @@ async function itemsInScope(ctx: QueryCtx, owner: Owner, scope: ReportScope) {
       scope.kind === "collection"
         ? ctx.db
             .query("items")
-            .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
+            .withIndex("by_ownerId_and_soldOn", (q) =>
+              q.eq("ownerId", owner._id).eq("soldOn", undefined),
+            )
         : ctx.db
             .query("items")
-            .withIndex("by_ownerId_and_albumId", (q) =>
-              q.eq("ownerId", owner._id).eq("albumId", albumId),
+            .withIndex("by_ownerId_and_albumId_and_soldOn", (q) =>
+              q
+                .eq("ownerId", owner._id)
+                .eq("albumId", albumId)
+                .eq("soldOn", undefined),
             );
     items.push(...(await query.take(left + 1)));
     if (items.length > limit)

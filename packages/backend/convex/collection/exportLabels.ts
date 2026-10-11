@@ -31,6 +31,9 @@ export const csvColumns = [
   "currency",
   "purchaseDate",
   "source",
+  "soldOn",
+  "salePrice",
+  "saleNote",
 ] as const;
 export type CsvColumn = (typeof csvColumns)[number];
 
@@ -63,6 +66,9 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       currency: "Currency",
       purchaseDate: "Purchase date",
       source: "Source",
+      soldOn: "Sold on",
+      salePrice: "Sale price",
+      saleNote: "Sale note",
     },
     types: { coin: "Coin", banknote: "Banknote", stamp: "Stamp" },
     materials: {
@@ -116,6 +122,9 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       currency: "Valuta",
       purchaseDate: "Innkjøpsdato",
       source: "Kilde",
+      soldOn: "Solgt den",
+      salePrice: "Salgspris",
+      saleNote: "Salgsnotat",
     },
     types: { coin: "Mynt", banknote: "Seddel", stamp: "Frimerke" },
     materials: {
@@ -173,6 +182,9 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       currency: "Währung",
       purchaseDate: "Kaufdatum",
       source: "Bezugsquelle",
+      soldOn: "Verkauft am",
+      salePrice: "Verkaufspreis",
+      saleNote: "Verkaufsnotiz",
     },
     types: { coin: "Münze", banknote: "Banknote", stamp: "Briefmarke" },
     materials: {
@@ -230,6 +242,9 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       currency: "Devise",
       purchaseDate: "Date d’achat",
       source: "Provenance",
+      soldOn: "Vendu le",
+      salePrice: "Prix de vente",
+      saleNote: "Note de vente",
     },
     types: { coin: "Pièce", banknote: "Billet", stamp: "Timbre" },
     materials: {
@@ -287,6 +302,9 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       currency: "Monedă",
       purchaseDate: "Data achiziției",
       source: "Proveniență",
+      soldOn: "Vândut pe",
+      salePrice: "Preț de vânzare",
+      saleNote: "Notă de vânzare",
     },
     types: { coin: "Monedă", banknote: "Bancnotă", stamp: "Timbru" },
     materials: {

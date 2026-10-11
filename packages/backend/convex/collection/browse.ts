@@ -33,6 +33,8 @@ export const collectionView = v.object({
   denomination: v.optional(v.string()),
   grade: v.optional(v.object({ gradingScale, grade: v.string() })),
   album: v.optional(v.string()),
+  notInAlbum: v.optional(v.string()),
+  status: v.optional(v.literal("sold")),
   sort: v.optional(v.union(...collectionSorts.map((sort) => v.literal(sort)))),
 });
 
@@ -173,6 +175,7 @@ const dimensions = [
   "denomination",
   "grade",
   "album",
+  "status",
 ] as const;
 type Dimension = (typeof dimensions)[number];
 
@@ -208,10 +211,12 @@ function filtersFor(
       grade === undefined ||
       (item.gradingScale === grade.gradingScale && item.grade === grade.grade),
     album: (item) =>
-      view.album === undefined ||
-      (view.album === withoutAlbum
-        ? item.albumId === undefined
-        : item.albumId === view.album),
+      (view.album === undefined ||
+        (view.album === withoutAlbum
+          ? item.albumId === undefined
+          : item.albumId === view.album)) &&
+      (view.notInAlbum === undefined || item.albumId !== view.notInAlbum),
+    status: (item) => (item.soldOn !== undefined) === (view.status === "sold"),
   };
 }
 
@@ -245,6 +250,7 @@ function countOptions(
   >();
   const albums = new Map<Id<"albums">, number>();
   let withoutAlbums = 0;
+  const statuses = { owned: 0, sold: 0 };
   const add = <K>(counts: Map<K, number>, key: K) =>
     counts.set(key, (counts.get(key) ?? 0) + 1);
 
@@ -289,6 +295,8 @@ function countOptions(
       if (item.albumId === undefined) withoutAlbums += 1;
       else add(albums, item.albumId);
     }
+    if (counts("status"))
+      statuses[item.soldOn === undefined ? "owned" : "sold"] += 1;
   }
 
   const byCount = (a: { count: number }, b: { count: number }) =>
@@ -312,6 +320,7 @@ function countOptions(
       .map(([albumId, count]) => ({ albumId, count }))
       .sort(byCount),
     withoutAlbum: withoutAlbums,
+    statuses,
   };
 }
 

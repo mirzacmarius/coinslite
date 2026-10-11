@@ -40,6 +40,7 @@ bun run lint        # Biome + monorepo consistency
 bun run typecheck
 bun run test        # backend rules, through Convex functions (convex-test + Vitest)
 bun run test:e2e    # Playwright smoke tests; starts both apps if they aren't running
+bun run verify      # the check before merging; see below
 ```
 
 The pre-commit hook formats and lints the staged files with Biome and stages its fixes. The pre-push hook runs typecheck and tests.
@@ -55,11 +56,15 @@ E2E_LOCAL_BACKEND=1 bun run test:e2e                 # also starts the local bac
 
 On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment; the Insurance report journey uses it. Any deployment that sends real email refuses it.
 
-CI runs all four on every push and pull request.
+`bun run verify` is the check before merging: format, lint, typecheck, tests and the build, then every Playwright journey against the local test backend (set up as above). It takes about 1.5 minutes on a laptop. Arguments go to Playwright, for example a spec and `--repeat-each=3`.
+
+CI (`.github/workflows/check.yml`) runs lint, format, typecheck, build and backend tests on every pull request push: about 3 minutes from scratch, under a minute when little changed. The ruleset "Protect main" only lets a pull request into `main` once that `check` passed, and blocks force pushes and deleting `main`. The Playwright smoke tests run on CI only when started by hand, split across 2 machines: `gh workflow run e2e.yml --ref <branch>`. A newer push cancels the running check. Dependabot (`.github/dependabot.yml`) proposes updates once a month, grouped, and security fixes as soon as they're published.
+
+CI shares Turbo's cache through Vercel Remote Cache. Each job trades its GitHub OIDC token for a short-lived cache token (a Turborepo CLI OIDC policy on team orvibo, variable `TURBO_TEAM=orvibo`), so a workspace whose files didn't change replays its last lint, typecheck, test and build result instead of running again. On a laptop, `bunx turbo login && bunx turbo link` (team orvibo) joins the same cache, so the laptop and CI reuse each other's results whenever a task's inputs match.
 
 ## Deployments
 
-- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Every push gets a preview of the product app, and `main` deploys both to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`). The marketing site deploys only from `main` (`apps/web/vercel.json`): the team's plan allows 100 deployments a day, and a second preview per push used them up.
+- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Both deploy from `main` only, to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`); pushes to other branches get no preview (`git.deploymentEnabled` in each app's `vercel.json`). The team's plan allows 100 deployments a day, and previews used them up and held back production. A preview can still be made by hand with the Vercel CLI (`vercel deploy`).
 - **Backend:** Convex project `coinslite` (team museumlite).
   - Production deploys use the production deploy key.
   - Each preview branch gets its own preview deployment, through the preview deploy key. Both keys are stored as `CONVEX_DEPLOY_KEY` in Vercel.

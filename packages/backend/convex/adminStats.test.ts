@@ -367,3 +367,20 @@ test("a count reads everyone a batch per transaction, so it works however many p
   });
   expect(figures.activity.itemsAddedLast7Days).toBe(900);
 });
+
+test("selling Items doesn't change the Collection figures: they count every Item", async () => {
+  const t = newTest();
+  const ada = await admin(t);
+  const bob = await person(t, "bob@example.com");
+  await ada.as.mutation(api.items.add, krone);
+  const sold = await bob.as.mutation(api.items.add, note);
+  await bob.as.mutation(api.items.sell, { itemId: sold, soldOn: "2026-10-01" });
+
+  expect((await freshStats(t, ada.as)).collection).toEqual({
+    items: 2,
+    coins: 1,
+    banknotes: 1,
+    stamps: 0,
+    albums: 0,
+  });
+});

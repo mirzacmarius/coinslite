@@ -49,6 +49,23 @@ test("view a grouping as a Set, select what's missing and add it in one go", asy
   await expect(main.getByText("24 of 24 held")).toBeVisible();
   await expect(main.getByText("100%")).toBeVisible();
 
+  // Grade the 24 new Items at once from the Collection.
+  await page.goto(`${appUrl}/collection`);
+  await main.getByRole("button", { name: "Select", exact: true }).click();
+  const selectionBar = page.getByRole("region", { name: "Selected Items" });
+  await selectionBar.getByRole("button", { name: "Select page" }).click();
+  await expect(selectionBar).toContainText("24 selected");
+  await selectionBar.getByRole("button", { name: "Set Grade" }).click();
+  const grading = page.getByRole("dialog", { name: "Set Grade" });
+  await grading.getByRole("button", { name: /^Grading scale:/ }).click();
+  await page.getByRole("option", { name: /^European/ }).click();
+  await grading.getByRole("button", { name: /^Grade:/ }).click();
+  await page.getByRole("option", { name: /^VF/ }).click();
+  await grading.getByRole("button", { name: "Grade 24 Items" }).click();
+  await expect(page.getByText("24 Items graded")).toBeVisible();
+  await expect(selectionBar).toBeHidden();
+  await expect(main.getByRole("link", { name: /Grade VF$/ })).toHaveCount(24);
+
   // 96 Morgan dollars open on what's missing; all of them don't fit the Free plan.
   await page.goto(`${appUrl}/catalog/us-morgan-dollar/set`);
   await expect(heading("Set")).toBeVisible();

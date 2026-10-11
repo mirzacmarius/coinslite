@@ -21,13 +21,19 @@ import { catalogVisibleTo } from "./featureFlags";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
 import { overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
+import { isGrade, scalesFor } from "./items/grades";
 import {
   type CatalogEntryLink,
   catalogEntryByKey,
   itemResolver,
   resolveItems,
 } from "./items/resolve";
-import { type ItemInput, checkItem } from "./items/rules";
+import {
+  type ItemInput,
+  checkItem,
+  checkSale,
+  itemErrors,
+} from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
 import { requireRoomForItems } from "./plans";
 import schema from "./schema";
@@ -80,7 +86,7 @@ const fieldNames = Object.keys(itemFields) as Array<keyof typeof itemFields>;
 export const itemNotFound = "ITEM_NOT_FOUND";
 
 /** The latest allowed purchase date: tomorrow, so "today" anywhere on Earth is accepted. */
-const latestPurchaseDate = () =>
+export const latestPurchaseDate = () =>
   new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
 /** One of the signed-in person's Items; anyone else's is reported as not found. */
@@ -127,7 +133,7 @@ async function requireCatalogEntry(
  * edit, `stored` is the Item as it was: facts the form leaves as they were
  * shown keep their stored state.
  */
-function checkFields(
+export function checkFields(
   fields: ItemInput,
   entry: CatalogEntryLink | null,
   stored?: Doc<"items">,
@@ -144,6 +150,20 @@ function checkFields(
   return overridesOnly(checked, entry.facts, stored);
 }
 
+/**
+ * Stores a new Item and keeps the counts that follow Items (its Album's, the
+ * Collection's) right. Every way of creating an Item goes through here.
+ */
+export async function storeNewItem(
+  ctx: MutationCtx,
+  doc: Omit<Doc<"items">, "_id" | "_creationTime">,
+) {
+  const itemId = await ctx.db.insert("items", doc);
+  await moveBetweenAlbums(ctx, undefined, doc.albumId);
+  await countItemAdded(ctx, { ownerId: doc.ownerId, type: doc.type });
+  return itemId;
+}
+
 /** Stores a new Item in its owner's Collection, and in an Album of theirs if given one. */
 async function insertItem(
   ctx: MutationCtx,
@@ -153,15 +173,12 @@ async function insertItem(
   albumId: Id<"albums"> | undefined,
 ) {
   const album = await ownAlbumId(ctx, ownerId, albumId);
-  const itemId = await ctx.db.insert("items", {
+  return await storeNewItem(ctx, {
     ownerId,
     ...fields,
     ...(entry && { catalogEntryId: entry._id }),
     ...(album && { albumId: album }),
   });
-  await moveBetweenAlbums(ctx, undefined, album);
-  await countItemAdded(ctx, { ownerId, type: fields.type });
-  return itemId;
 }
 
 /**
@@ -268,7 +285,7 @@ export const addCatalogEntries = mutation({
   },
 });
 
-/** Whether a person has any Item made from a Catalog entry. */
+/** Whether a person still owns any Item made from a Catalog entry. */
 async function holdsAny(
   ctx: QueryCtx,
   ownerId: Id<"users">,
@@ -276,8 +293,11 @@ async function holdsAny(
 ) {
   const item = await ctx.db
     .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId", (q) =>
-      q.eq("ownerId", ownerId).eq("catalogEntryId", entryId),
+    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
+      q
+        .eq("ownerId", ownerId)
+        .eq("catalogEntryId", entryId)
+        .eq("soldOn", undefined),
     )
     .first();
   return item !== null;
@@ -311,6 +331,66 @@ export const update = mutation({
 });
 
 /**
+ * Marks one of the signed-in person's Items sold, or changes its sale: the
+ * sold-on date, the sale price per piece and a note. Selling fewer pieces
+ * than the Item holds (`quantity`) splits them off: a new sold Item copies
+ * every field but the photos, and the original keeps the rest, still owned.
+ */
+export const sell = mutation({
+  args: {
+    itemId: v.id("items"),
+    /** How many pieces; all of them when left out. */
+    quantity: v.optional(v.number()),
+    soldOn: v.string(),
+    salePrice: v.optional(v.number()),
+    saleNote: v.optional(v.string()),
+  },
+  returns: v.id("items"),
+  handler: async (ctx, { itemId, quantity, ...input }) => {
+    const item = await requireOwnItem(ctx, itemId);
+    const sale = checkSale(input, latestPurchaseDate(), item.purchaseDate);
+    const pieces = quantity ?? item.quantity;
+    if (!Number.isSafeInteger(pieces) || pieces < 1 || pieces > item.quantity)
+      throw new ConvexError(itemErrors.invalidQuantity);
+    if (pieces === item.quantity) {
+      await ctx.db.patch(itemId, sale);
+      return itemId;
+    }
+    if (item.soldOn !== undefined)
+      throw new ConvexError(itemErrors.invalidQuantity);
+    const { _id, _creationTime, frontPhoto, backPhoto, ...fields } = item;
+    const soldId = await storeNewItem(ctx, {
+      ...fields,
+      quantity: pieces,
+      ...sale,
+    });
+    await ctx.db.patch(itemId, { quantity: item.quantity - pieces });
+    return soldId;
+  },
+});
+
+/**
+ * Removes the sale from one of the signed-in person's Items: it's owned
+ * again, if their plan has room for it.
+ */
+export const markOwned = mutation({
+  args: { itemId: v.id("items") },
+  returns: v.null(),
+  handler: async (ctx, { itemId }) => {
+    const item = await requireOwnItem(ctx, itemId);
+    if (item.soldOn === undefined) return null;
+    // Owned again, it counts against the Free plan's limit again.
+    await requireRoomForItems(ctx, item.ownerId);
+    await ctx.db.patch(itemId, {
+      soldOn: undefined,
+      salePrice: undefined,
+      saleNote: undefined,
+    });
+    return null;
+  },
+});
+
+/**
  * Moves several of the signed-in person's Items into one of their Albums, or
  * out of any Album. Every Item is checked before anything is written, so the
  * move happens to all of them or to none.
@@ -322,25 +402,103 @@ export const moveToAlbum = mutation({
   },
   returns: v.null(),
   handler: async (ctx, { itemIds, albumId }) => {
-    const owner = await requireSetUpUser(ctx);
-    const ids = [...new Set(itemIds)];
-    if (ids.length > bulkLimits.items)
-      throw new ConvexError(bulkErrors.tooManyItems);
+    const { owner, items } = await requireOwnItems(ctx, itemIds);
     const album = await ownAlbumId(ctx, owner._id, albumId);
-    const items = await Promise.all(
-      ids.map(async (id) => {
-        const item = await ctx.db.get(id);
-        if (!item || item.ownerId !== owner._id)
-          throw new ConvexError(itemNotFound);
-        return item;
-      }),
-    );
     const moving = items.filter((item) => item.albumId !== album);
     for (const item of moving) await ctx.db.patch(item._id, { albumId: album });
     await moveManyBetweenAlbums(
       ctx,
       moving.map((item) => ({ from: item.albumId, to: album })),
     );
+    return null;
+  },
+});
+
+/**
+ * The signed-in person's Items for a bulk action: each distinct id once, at
+ * most `bulkLimits.items` of them, and every one theirs. Throws before the
+ * caller writes anything, so a bulk action happens to all of them or none.
+ */
+async function requireOwnItems(
+  ctx: QueryCtx | MutationCtx,
+  itemIds: readonly Id<"items">[],
+) {
+  const owner = await requireSetUpUser(ctx);
+  const ids = [...new Set(itemIds)];
+  if (ids.length > bulkLimits.items)
+    throw new ConvexError(bulkErrors.tooManyItems);
+  const items = await Promise.all(
+    ids.map(async (id) => {
+      const item = await ctx.db.get(id);
+      if (!item || item.ownerId !== owner._id)
+        throw new ConvexError(itemNotFound);
+      return item;
+    }),
+  );
+  return { owner, items };
+}
+
+/**
+ * Sets one Grade on several of the signed-in person's Items: those whose Item
+ * type the Grading scale suits; the others are skipped and counted. Grade
+ * notes stay as they are. Every Item is checked before anything is written.
+ */
+export const setGrade = mutation({
+  args: {
+    itemIds: v.array(v.id("items")),
+    gradingScale,
+    grade: v.string(),
+  },
+  returns: v.object({ graded: v.number(), skipped: v.number() }),
+  handler: async (ctx, { itemIds, gradingScale, grade }) => {
+    if (!isGrade(gradingScale, grade))
+      throw new ConvexError(itemErrors.invalidGrade);
+    const { items } = await requireOwnItems(ctx, itemIds);
+    const grading = items.filter((item) =>
+      scalesFor(item.type).includes(gradingScale),
+    );
+    for (const item of grading)
+      await ctx.db.patch(item._id, { gradingScale, grade });
+    return { graded: grading.length, skipped: items.length - grading.length };
+  },
+});
+
+/**
+ * How many photos deleting these Items takes with them (both sides and the
+ * more photos), for the confirmation. Items that are gone count nothing.
+ */
+export const photoCount = query({
+  args: { itemIds: v.array(v.id("items")) },
+  returns: v.number(),
+  handler: async (ctx, { itemIds }) => {
+    const owner = await requireSetUpUser(ctx);
+    let count = 0;
+    for (const id of new Set(itemIds.slice(0, bulkLimits.items))) {
+      const item = await ctx.db.get(id);
+      if (!item || item.ownerId !== owner._id) continue;
+      if (item.frontPhoto) count += 1;
+      if (item.backPhoto) count += 1;
+      const more = await ctx.db
+        .query("itemPhotos")
+        .withIndex("by_itemId", (q) => q.eq("itemId", id))
+        .collect();
+      count += more.length;
+    }
+    return count;
+  },
+});
+
+/**
+ * Deletes several of the signed-in person's Items, and their photos, for
+ * good, each the way one Item is deleted. Every Item is checked before
+ * anything is deleted, so all of them go or none.
+ */
+export const removeMany = mutation({
+  args: { itemIds: v.array(v.id("items")) },
+  returns: v.null(),
+  handler: async (ctx, { itemIds }) => {
+    const { items } = await requireOwnItems(ctx, itemIds);
+    for (const item of items) await deleteItem(ctx, item);
     return null;
   },
 });

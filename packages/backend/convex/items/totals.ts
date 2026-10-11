@@ -28,6 +28,8 @@ export type TotalsItem = MetalContent & {
   purchasePrice?: number;
   /** Per piece, in minor units of the Home currency. */
   marketValue?: number;
+  /** Per piece, in minor units of the Home currency; sold Items only. */
+  salePrice?: number;
 };
 
 /** Amounts in minor units of the Home currency. */
@@ -61,6 +63,10 @@ export type CollectionTotals = {
   marketValue: number;
   /** The Items' Gain/loss added up (itemGainLoss), and how many Items have one. */
   gainLoss: { amount: number; items: number };
+  /** Sale price × Quantity, added up; only sold Items have one. */
+  salePrice: number;
+  /** The realised Gain/loss added up (itemRealised), and how many Items have one. */
+  realised: { amount: number; items: number };
   /** Purchase price and Market value (× Quantity) of each Item type. */
   byType: Record<ItemType, Amounts>;
   /** Each precious metal the Items hold. */
@@ -99,6 +105,19 @@ export function itemGainLoss({
   return (marketValue - purchasePrice) * quantity;
 }
 
+/**
+ * A sold Item's realised Gain/loss: (sale price − Purchase price) × Quantity.
+ * Undefined unless it has both.
+ */
+export function itemRealised({
+  purchasePrice,
+  salePrice,
+  quantity,
+}: TotalsItem): number | undefined {
+  if (purchasePrice === undefined || salePrice === undefined) return undefined;
+  return (salePrice - purchasePrice) * quantity;
+}
+
 /** All the pieces, whatever their Item type. */
 export const totalPieces = ({ pieces }: CollectionTotals) =>
   pieces.coin + pieces.banknote + pieces.stamp;
@@ -116,6 +135,8 @@ export const emptyTotals = ({
   purchasePrice: 0,
   marketValue: 0,
   gainLoss: { amount: 0, items: 0 },
+  salePrice: 0,
+  realised: { amount: 0, items: 0 },
   byType: { coin: noAmounts(), banknote: noAmounts(), stamp: noAmounts() },
   metals: {
     gold: { fineWeight: 0, value: rates && 0 },
@@ -152,6 +173,13 @@ export function collectionTotals(
     added.purchasePrice += purchasePrice;
     added.marketValue += marketValue;
     byMonth.set(month, added);
+
+    totals.salePrice += (item.salePrice ?? 0) * quantity;
+    const realised = itemRealised(item);
+    if (realised !== undefined) {
+      totals.realised.amount += realised;
+      totals.realised.items += 1;
+    }
 
     const gainLoss = itemGainLoss(item);
     if (gainLoss !== undefined) {
@@ -190,6 +218,11 @@ export function combineTotals(
     gainLoss: {
       amount: a.gainLoss.amount + b.gainLoss.amount,
       items: a.gainLoss.items + b.gainLoss.items,
+    },
+    salePrice: a.salePrice + b.salePrice,
+    realised: {
+      amount: a.realised.amount + b.realised.amount,
+      items: a.realised.items + b.realised.items,
     },
     byType: {
       coin: addAmounts(a.byType.coin, b.byType.coin),

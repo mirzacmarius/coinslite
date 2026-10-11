@@ -1,8 +1,9 @@
 "use client";
 
-import { CollectionTotalsSection } from "@/components/collection-totals/collection-totals";
-import { CollectionBrowser } from "@/components/collection/collection-browser";
-import { ResultsSkeleton } from "@/components/collection/collection-results";
+import {
+  BrowserSkeleton,
+  CollectionBrowser,
+} from "@/components/collection/collection-browser";
 import { ScanCoinButton } from "@/components/scanner/scan-coin";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
@@ -13,8 +14,8 @@ import { useAddItem } from "./add-item";
 
 /**
  * The Collection: every Item the person owns, searched, filtered, sorted
- * and paged as the URL says. The URL is request data, so everything that
- * reads it streams in below the header (ADR 0004).
+ * and paged as the URL says, under the totals. The URL is request data, so
+ * everything that reads it streams in below the header (ADR 0004).
  */
 export function CollectionPage() {
   const t = useI18n();
@@ -33,15 +34,7 @@ export function CollectionPage() {
           </>
         }
       />
-      <CollectionTotalsSection />
-      <Suspense
-        fallback={
-          <>
-            <div className="h-10 border-b" aria-hidden="true" />
-            <ResultsSkeleton />
-          </>
-        }
-      >
+      <Suspense fallback={<BrowserSkeleton />}>
         <CollectionBrowser />
       </Suspense>
     </>

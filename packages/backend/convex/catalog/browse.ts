@@ -113,7 +113,7 @@ export const heldItemLimit = 100;
 
 /**
  * How many pieces of a Catalog entry a person holds: the Quantity of the
- * Items made from it, over at most `heldItemLimit` of them. `heldMore` says
+ * Items made from it that they haven't sold, over at most `heldItemLimit` of them. `heldMore` says
  * there are more Items than were counted, so they hold at least `held`.
  */
 export async function heldCount(
@@ -123,8 +123,11 @@ export async function heldCount(
 ) {
   const items = await ctx.db
     .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId", (q) =>
-      q.eq("ownerId", ownerId).eq("catalogEntryId", entryId),
+    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
+      q
+        .eq("ownerId", ownerId)
+        .eq("catalogEntryId", entryId)
+        .eq("soldOn", undefined),
     )
     .take(heldItemLimit + 1);
   return {
