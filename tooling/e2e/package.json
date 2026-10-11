@@ -13,6 +13,6 @@
     "@next/playwright": "16.4.0",
     "@playwright/test": "^1.64.0",
     "@types/node": "^22",
-    "typescript": "^5.5.4"
+    "typescript": "^7.0.2"
   }
 }
