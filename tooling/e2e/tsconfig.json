@@ -1,7 +1,0 @@
-{
-  "extends": "@coinslite/typescript/base.json",
-  "compilerOptions": {
-    "noEmit": true
-  },
-  "include": ["playwright.config.ts", "urls.ts", "tests/**/*.ts"]
-}

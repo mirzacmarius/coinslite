@@ -16,17 +16,12 @@ export function premiumProducts(): Record<BillingInterval, string> | null {
   return month && year ? { month, year } : null;
 }
 
-/** What test backends record for the smoke tests' Premium (testing/premium.ts). */
-export const testPremiumProduct = "test_premium_monthly";
-
 /**
  * Whether a subscription to this Polar product is Premium: only the
  * configured monthly and yearly Premium products are, whatever else the
- * organization sells. Test backends also count the smoke tests' product.
+ * organization sells.
  */
 export function isPremiumProduct(productId: string) {
-  if (env.EMAIL_DELIVERY === "outbox" && productId === testPremiumProduct)
-    return true;
   return (
     productId !== "" &&
     (productId === env.POLAR_PREMIUM_MONTHLY_PRODUCT_ID ||

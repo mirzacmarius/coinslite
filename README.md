@@ -16,7 +16,6 @@ A web app where collectors record the coins, banknotes and stamps they own, orga
 | `packages/backend` | Convex backend: schema, functions, auth, billing |
 | `packages/ui` | Shared UI components (shadcn/Tailwind) |
 | `packages/email` | Email templates (React Email), preview on port 3003 |
-| `tooling/e2e` | Playwright smoke tests |
 | `tooling/typescript` | Shared TypeScript config |
 
 ## Getting started
@@ -29,8 +28,6 @@ bun run setup   # configures a Convex deployment and points the app at it
 bun dev         # marketing site, product app, Convex and email preview
 ```
 
-`bun install` configures the repository's `.githooks` when run locally in a Git checkout. It leaves a different existing `core.hooksPath` untouched. To set up the hooks explicitly, run `bun run hooks:install`.
-
 `bun run setup` asks you to log in to Convex, or to start without an account and run Convex locally. Agents and CI can skip the prompt with `CONVEX_AGENT_MODE=anonymous bun run setup`.
 
 ## Checks
@@ -38,39 +35,14 @@ bun dev         # marketing site, product app, Convex and email preview
 ```sh
 bun run lint        # Biome + monorepo consistency
 bun run typecheck
-bun run test        # backend rules, through Convex functions (convex-test + Vitest)
-bun run test:e2e    # Playwright smoke tests; starts both apps if they aren't running
-bun run verify      # the check before merging; see below
 ```
 
-The pre-commit hook formats and lints the staged files with Biome and stages its fixes. The pre-push hook runs typecheck and tests.
-
-The first Playwright run needs a browser: `bunx playwright install chromium`.
-
-The account journeys (sign-up, verification, sign-in, password reset) need a backend whose emails can be read. They skip themselves unless `E2E_LOCAL_BACKEND=1`. To run them locally, use a separate checkout, because the setup script points that checkout at an anonymous local Convex deployment:
-
-```sh
-bash packages/backend/scripts/setup-e2e-backend.sh   # emails land in the dev outbox
-E2E_LOCAL_BACKEND=1 bun run test:e2e                 # also starts the local backend
-```
-
-On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment; the Insurance report journey uses it. Any deployment that sends real email refuses it.
-
-`bun run verify` is the check before merging: format, lint, typecheck, tests and the build, then every Playwright journey against the local test backend (set up as above). It takes about 1.5 minutes on a laptop. Arguments go to Playwright, for example a spec and `--repeat-each=3`.
-
-CI (`.github/workflows/check.yml`) runs lint, format, typecheck, build and backend tests on every pull request push: about 3 minutes from scratch, under a minute when little changed. The ruleset "Protect main" only lets a pull request into `main` once that `check` passed, and blocks force pushes and deleting `main`. The Playwright smoke tests run on CI only when started by hand, split across 2 machines: `gh workflow run e2e.yml --ref <branch>`. A newer push cancels the running check. Dependabot (`.github/dependabot.yml`) proposes updates once a month, grouped, and security fixes as soon as they're published.
-
-CI shares Turbo's cache through Vercel Remote Cache. Each job trades its GitHub OIDC token for a short-lived cache token (a Turborepo CLI OIDC policy on team orvibo, variable `TURBO_TEAM=orvibo`), so a workspace whose files didn't change replays its last lint, typecheck, test and build result instead of running again. On a laptop, `bunx turbo login && bunx turbo link` (team orvibo) joins the same cache, so the laptop and CI reuse each other's results whenever a task's inputs match.
+CI runs lint and typecheck on every push.
 
 ## Deployments
 
-- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Both deploy from `main` only, to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`); pushes to other branches get no preview (`git.deploymentEnabled` in each app's `vercel.json`). The team's plan allows 100 deployments a day, and previews used them up and held back production. A preview can still be made by hand with the Vercel CLI (`vercel deploy`).
+- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Every push gets a preview of the product app, and `main` deploys both to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`). The marketing site deploys only from `main` (`apps/web/vercel.json`): the team's plan allows 100 deployments a day, and a second preview per push used them up.
 - **Backend:** Convex project `coinslite` (team museumlite).
-  - Production deploys use the production deploy key.
-  - Each preview branch gets its own preview deployment, through the preview deploy key. Both keys are stored as `CONVEX_DEPLOY_KEY` in Vercel.
-- **Preview settings:** previews take their sign-in keys from the Convex project's default preview variables. The build sets each preview's `SITE_URL` to its branch URL (`packages/backend/scripts/vercel-build-app.sh`).
-- **Catalog data:** every preview build loads the bundled Catalog datasets into the branch's preview deployment (`convex run catalog/seed:load` in the same script). Loading again only updates what changed and rebuilds the datasets' search words. Production stays empty until someone runs `npx convex run catalog/seed:load --prod` in `packages/backend`; Catalog nodes from other CSV imports get new search words with `catalog/search:reindex`. The 2-euro commemoratives come from the ECB's yearly lists: when the ECB adds coins, run `bun scripts/fetch-euro-commemoratives.ts` in `packages/backend`, review the diff and commit it. Norway (Norges Bank's notes from 1877, coins from 1958 and commemoratives from 1906) is edited by hand in `convex/catalog/datasets/norway.ts`; `docs/research/catalog-data-sources.md` §10.1 lists its sources, their terms and what's left out.
-- **New deployment's sign-in keys:** `bun scripts/set-auth-keys.ts <app-url> [--prod]` in `packages/backend`.
 - **Links between the sites:** the app's `NEXT_PUBLIC_WEB_URL` (privacy policy, terms) and the marketing site's `NEXT_PUBLIC_APP_URL` point at each other's production URL, previews included.
 - **Signed-in visitors skip the marketing site** once both sites share a parent domain. Set `SIGNED_IN_HINT_DOMAIN` (for example `.coinslite.app`) on the app. On `*.vercel.app` the two sites can't share cookies.
 - **Google sign-in:** `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` on the Convex deployment. The OAuth client's redirect URIs cover the dev and prod `convex.site` domains only, so previews can't use Google.
@@ -79,4 +51,3 @@ CI shares Turbo's cache through Vercel Remote Cache. Each job trades its GitHub 
 - **Spot prices and exchange rates:** a cron fetches gold, silver and the Home currency rates from MetalpriceAPI every 15 minutes (`METALPRICE_API_KEY` on the Convex deployment). That's about 2,900 requests a month, more than the free tier allows. Without a key the refresh logs a warning, keeps the last stored prices, and a fresh deployment shows no Spot prices.
 - **Photo links:** Item photos are served only through signed links that work for an hour at most (`https://<deployment>.convex.site/photos?…`), never as plain storage addresses. Set `PHOTO_LINK_SECRET` on each Convex deployment to a long random value (for example `openssl rand -hex 32`); without it the deployment signs with a random secret it keeps in its database, which works for local development and tests. Changing the secret only makes the links already open stop working until the app fetches fresh ones (within half an hour).
 - **Billing:** Premium is sold through Polar, in its sandbox unless `POLAR_SERVER=production`. On the Convex deployment, set `POLAR_ORGANIZATION_TOKEN`, then run `npx convex run init` in `packages/backend` (`--prod` for production) once per Polar organization: it creates the Premium monthly and yearly products with their NOK, EUR, USD and RON prices and prints the `POLAR_PREMIUM_MONTHLY_PRODUCT_ID` and `POLAR_PREMIUM_YEARLY_PRODUCT_ID` values to set. Make EUR the organization's default currency in Polar. Point the organization's webhook (subscription events) at `https://<deployment>.convex.site/polar/events` and set its secret as `POLAR_WEBHOOK_SECRET`. Until all of this is set, the Plans page says Premium can't be bought on that deployment. Premium members change or cancel their subscription in Polar's customer portal, opened from Account: the organization token needs the `customer_sessions:write` scope (alongside checkouts, products and subscriptions), and Polar's Settings › Customer portal must allow subscription plan changes for members to switch between monthly and yearly there. The sandbox checkout smoke test runs with `E2E_POLAR_SANDBOX=1`.
-- **Smoke tests against a deployment:** set `E2E_APP_URL` and `E2E_WEB_URL`, plus `VERCEL_AUTOMATION_BYPASS_SECRET` if deployment protection is on, then run `bun run test:e2e`.

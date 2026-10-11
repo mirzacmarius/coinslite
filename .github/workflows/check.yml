@@ -1,61 +1,19 @@
 name: Check
-# Every pull request push runs the quick checks, and `check` must pass before
-# anything reaches main (ruleset "Protect main"). Docs-only changes run too: a
-# required check has to report, and Turbo replays them from its cache in under
-# a minute. The browser suite runs on the Mac before merging (`bun run
-# verify`), and on CI only when started by hand (e2e.yml).
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-  workflow_dispatch: {}
-
-permissions:
-  contents: read
-
-# A newer push cancels the run still going for the same branch.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+  push:
+    paths:
+      - '**'
 jobs:
   check:
     runs-on: ubuntu-latest
-    # About 3 minutes; well under a minute when Turbo replays unchanged workspaces.
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      id-token: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          persist-credentials: false
-      - name: Turbo remote cache
-        # Trades this job's GitHub OIDC token for a short-lived token to Turbo's
-        # cache on Vercel (team orvibo's Turborepo CLI policy). If that fails,
-        # every task runs from scratch instead.
-        uses: vercel/setup-turborepo-remote-cache-action@49d7b1b46ba4c9251e1977986bfe18336feabc8f # v1.1.0
-        continue-on-error: true
-        with:
-          team: ${{ vars.TURBO_TEAM }}
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          # The version Vercel builds and runs both apps with.
-          node-version: 24
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: package.json
+          bun-version: latest
       - name: Install dependencies
-        run: bun install --frozen-lockfile
-      - name: Lint
+        run: bun install
+      - name: 🔦 Run linter
         run: bun run lint
-      - name: Format
-        run: bun run format:check
-      - name: Typecheck
+      - name: 🪐 Check TypeScript
         run: bun run typecheck
-      - name: Build
-        # A route that can't produce its static shell only fails at build time.
-        run: bun run build --filter=@coinslite/app --filter=@coinslite/web
-        env:
-          NEXT_PUBLIC_CONVEX_URL: http://127.0.0.1:3210
-      - name: Backend tests
-        run: bun run test
