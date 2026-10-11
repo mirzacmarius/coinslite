@@ -60,6 +60,8 @@ On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'`
 
 CI (`.github/workflows/check.yml`) runs lint, format, typecheck, build and backend tests on every pull request push, about 3 minutes. The Playwright smoke tests run there only when started by hand, split across 2 machines: `gh workflow run check.yml --ref <branch>`. Docs-only changes start no run, and a newer push cancels the running one.
 
+CI shares Turbo's cache through Vercel Remote Cache (secret `TURBO_TOKEN`, variable `TURBO_TEAM=orvibo`), so a workspace whose files didn't change replays its last lint, typecheck, test and build result instead of running again. On a laptop, `bunx turbo login && bunx turbo link` (team orvibo) joins the same cache, so the laptop and CI reuse each other's results whenever a task's inputs match.
+
 ## Deployments
 
 - **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Both deploy from `main` only, to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`); pushes to other branches get no preview (`git.deploymentEnabled` in each app's `vercel.json`). The team's plan allows 100 deployments a day, and previews used them up and held back production. A preview can still be made by hand with the Vercel CLI (`vercel deploy`).

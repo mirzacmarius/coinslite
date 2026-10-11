@@ -1,7 +1,8 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
+  "$schema": "https://v2-11-7.turborepo.dev/schema.json",
   "globalDependencies": ["**/.env"],
   "ui": "stream",
+  "agentGuidance": false,
   "tasks": {
     "topo": {
       "dependsOn": ["^topo"]
@@ -16,7 +17,7 @@
       "cache": false
     },
     "test": {
-      "cache": false
+      "dependsOn": ["^topo"]
     },
     "clean": {
       "cache": false
@@ -27,11 +28,11 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": ["^topo"]
+      "dependsOn": ["^topo"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/biome.json"]
     },
     "typecheck": {
-      "dependsOn": ["^topo"],
-      "outputs": ["node_modules/.cache/tsbuildinfo.json"]
+      "dependsOn": ["^topo"]
     }
   }
 }
