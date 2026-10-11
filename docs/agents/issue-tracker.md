@@ -6,7 +6,7 @@ The workspace also holds the MuseumLite team (`MUS`), which belongs to another p
 
 CoinsLite issues were numbered `MUS-675` to `MUS-774` until 2026-10-11, when they moved to `COIN-1` to `COIN-96`. Old identifiers and links still redirect, so commits, PRs and docs that mention them stay valid.
 
-Linear is the only tracker. Issues aren't synced to GitHub Issues; the GitHub issues that exist are stale copies from before the sync was turned off. Never create GitHub issues.
+Linear syncs the COIN team's issues to this repo's GitHub Issues, so the same issue also appears on GitHub. Linear is the source of truth: create and update issues there only, and never create GitHub issues directly.
 
 ## Conventions
 
