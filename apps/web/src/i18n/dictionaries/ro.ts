@@ -18,7 +18,8 @@ export default {
   },
   hero: {
     eyebrow: "Pentru colecționarii de monede, bancnote și timbre",
-    title: "Colecția ta, înregistrată cum trebuie și evaluată în moneda ta",
+    titleLead: "Colecția ta,",
+    titleRest: "înregistrată cum trebuie și evaluată în moneda ta",
     lead: "CoinsLite ține o evidență clară a ceea ce ai: ce este fiecare obiect, starea lui, cât ai plătit și cât valorează azi. Alege obiecte din catalog cu câteva clicuri sau introdu-le singur.",
     primary: "Creează un cont gratuit",
     secondary: "Conectează-te",
@@ -121,6 +122,9 @@ export default {
     text: "Crearea unui cont durează un minut, iar primele {limit} de obiecte sunt gratuite.",
   },
   footer: {
+    product: "Produs",
+    account: "Cont",
+    legal: "Juridic",
     privacy: "Politica de confidențialitate",
     terms: "Termeni de utilizare",
   },

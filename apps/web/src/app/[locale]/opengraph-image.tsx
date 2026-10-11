@@ -72,7 +72,7 @@ export default async function Image({
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <div style={{ fontSize: 60, lineHeight: 1.1, letterSpacing: -1.5 }}>
-          {t.hero.title}
+          {`${t.hero.titleLead} ${t.hero.titleRest}`}
         </div>
         <div style={{ fontSize: 28, color: colours.muted }}>
           {t.hero.eyebrow}

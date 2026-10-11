@@ -18,7 +18,8 @@ export default {
   },
   hero: {
     eyebrow: "Für Sammler von Münzen, Banknoten und Briefmarken",
-    title: "Deine Sammlung, sauber erfasst und in deiner Währung bewertet",
+    titleLead: "Deine Sammlung,",
+    titleRest: "sauber erfasst und in deiner Währung bewertet",
     lead: "CoinsLite hält klar fest, was du besitzt: was jedes Objekt ist, seine Erhaltung, was du bezahlt hast und was es heute wert ist. Wähle Objekte mit wenigen Klicks aus dem Katalog oder trage sie selbst ein.",
     primary: "Kostenloses Konto erstellen",
     secondary: "Anmelden",
@@ -121,6 +122,9 @@ export default {
     text: "Ein Konto ist in einer Minute erstellt, und deine ersten {limit} Objekte sind gratis.",
   },
   footer: {
+    product: "Produkt",
+    account: "Konto",
+    legal: "Rechtliches",
     privacy: "Datenschutzerklärung",
     terms: "Nutzungsbedingungen",
   },
