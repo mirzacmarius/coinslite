@@ -322,25 +322,78 @@ export const moveToAlbum = mutation({
   },
   returns: v.null(),
   handler: async (ctx, { itemIds, albumId }) => {
-    const owner = await requireSetUpUser(ctx);
-    const ids = [...new Set(itemIds)];
-    if (ids.length > bulkLimits.items)
-      throw new ConvexError(bulkErrors.tooManyItems);
+    const { owner, items } = await requireOwnItems(ctx, itemIds);
     const album = await ownAlbumId(ctx, owner._id, albumId);
-    const items = await Promise.all(
-      ids.map(async (id) => {
-        const item = await ctx.db.get(id);
-        if (!item || item.ownerId !== owner._id)
-          throw new ConvexError(itemNotFound);
-        return item;
-      }),
-    );
     const moving = items.filter((item) => item.albumId !== album);
     for (const item of moving) await ctx.db.patch(item._id, { albumId: album });
     await moveManyBetweenAlbums(
       ctx,
       moving.map((item) => ({ from: item.albumId, to: album })),
     );
+    return null;
+  },
+});
+
+/**
+ * The signed-in person's Items for a bulk action: each distinct id once, at
+ * most `bulkLimits.items` of them, and every one theirs. Throws before the
+ * caller writes anything, so a bulk action happens to all of them or none.
+ */
+async function requireOwnItems(
+  ctx: QueryCtx | MutationCtx,
+  itemIds: readonly Id<"items">[],
+) {
+  const owner = await requireSetUpUser(ctx);
+  const ids = [...new Set(itemIds)];
+  if (ids.length > bulkLimits.items)
+    throw new ConvexError(bulkErrors.tooManyItems);
+  const items = await Promise.all(
+    ids.map(async (id) => {
+      const item = await ctx.db.get(id);
+      if (!item || item.ownerId !== owner._id)
+        throw new ConvexError(itemNotFound);
+      return item;
+    }),
+  );
+  return { owner, items };
+}
+
+/**
+ * How many photos deleting these Items takes with them (both sides and the
+ * more photos), for the confirmation. Items that are gone count nothing.
+ */
+export const photoCount = query({
+  args: { itemIds: v.array(v.id("items")) },
+  returns: v.number(),
+  handler: async (ctx, { itemIds }) => {
+    const owner = await requireSetUpUser(ctx);
+    let count = 0;
+    for (const id of new Set(itemIds.slice(0, bulkLimits.items))) {
+      const item = await ctx.db.get(id);
+      if (!item || item.ownerId !== owner._id) continue;
+      if (item.frontPhoto) count += 1;
+      if (item.backPhoto) count += 1;
+      const more = await ctx.db
+        .query("itemPhotos")
+        .withIndex("by_itemId", (q) => q.eq("itemId", id))
+        .collect();
+      count += more.length;
+    }
+    return count;
+  },
+});
+
+/**
+ * Deletes several of the signed-in person's Items, and their photos, for
+ * good, each the way one Item is deleted. Every Item is checked before
+ * anything is deleted, so all of them go or none.
+ */
+export const removeMany = mutation({
+  args: { itemIds: v.array(v.id("items")) },
+  returns: v.null(),
+  handler: async (ctx, { itemIds }) => {
+    const { items } = await requireOwnItems(ctx, itemIds);
+    for (const item of items) await deleteItem(ctx, item);
     return null;
   },
 });
