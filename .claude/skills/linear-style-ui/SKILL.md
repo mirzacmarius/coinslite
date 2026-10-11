@@ -2,7 +2,7 @@
 name: linear-style-ui
 description: >
   How to build CoinsLite's product UI: shadcn/ui components and blocks (Radix, Tailwind 3, the
-  "Ledger" tokens in packages/ui) arranged and styled the way the Linear app does it: dense,
+  graphite-and-indigo tokens in packages/ui) arranged and styled the way the Linear app does it: dense,
   calm, keyboard-first chrome; property pills; command-menu pickers; filter chips; compact create
   dialogs; a left navigation sidebar and a right properties panel. Use this skill whenever you
   touch anything a user will see in apps/app or packages/ui: a page or screen, layout or shell,
@@ -17,10 +17,11 @@ description: >
 # Linear-style UI on shadcn (CoinsLite)
 
 shadcn gives us accessible primitives. This skill is the layer on top: how those primitives are
-sized, arranged and wired so every CoinsLite screen reads like Linear does, while keeping the
-Ledger colour tokens (slate neutrals, one teal accent) from `packages/ui/src/globals.css`.
+sized, arranged and coloured so every CoinsLite screen reads like Linear does: the tokens in
+`packages/ui/src/globals.css` are graphite neutrals with one indigo accent (`#5e6ad2`), in a
+light and a dark theme, set in Inter.
 
-The one-line brief: **Ledger colours, Linear structure.** Dense but never cramped, borders instead
+The one-line brief: **Linear's colours and structure.** Dense but never cramped, borders instead
 of shadows, grey chrome with the accent spent only on the primary action and focus, every
 structured value shown as a small pill you can click to change, and every surface reachable
 from the keyboard.
@@ -91,13 +92,17 @@ default); use those rather than overriding heights per call site.
 
 - Separate regions with 1px `border-border`, not with shadows or background blocks. Shadows
   (`shadow-md`, `shadow-lg`) belong only to floating layers: popovers, menus, dialogs.
-- Surfaces step by lightness: `bg-background` page, `bg-card` content panels, `bg-popover`
-  floating. The sidebar uses `bg-sidebar`. Don't invent new greys; use `bg-muted` for hover and
+- Surfaces step by lightness: the shell's chrome is `bg-sidebar`, and from `md` up every page
+  sits on an inset, rounded, bordered `bg-background` panel that scrolls on its own (`#main`);
+  `bg-card` for cards on that panel, `bg-popover` floating. Hover and current rows on the chrome
+  use `bg-sidebar-accent`, not `bg-muted` (too faint on the chrome in light mode).
+- Links and checkmarks use `text-link`, not `text-primary`: the indigo fill is too dark to read as
+  text on the dark panel, so `--link` is a lighter indigo there. Don't invent new greys; use `bg-muted` for hover and
   selected rows.
 - Dialog overlay dims to `bg-black/40`, not `/80`. Heavy dimming reads as a different product.
 - Rows and pills get `hover:bg-muted`; selected or current gets `bg-muted text-foreground`
-  (neutral), not the teal accent. The accent is for the primary button, links, focus rings and
-  checkmarks. One teal thing per view is plenty.
+  (neutral), not the indigo accent. The accent is for the primary button, links, focus rings and
+  checkmarks. One indigo thing per view is plenty.
 
 ### Typography and colour of text
 

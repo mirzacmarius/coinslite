@@ -309,6 +309,8 @@ export default {
       title: "Preferințe",
       language: "Limbă",
       homeCurrency: "Moneda de bază",
+      languageHint: "Folosită pe fiecare dispozitiv pe care te conectezi.",
+      appearanceHint: "Luminos, întunecat sau la fel ca dispozitivul tău.",
       languageNotSaved:
         "Limba nu a putut fi salvată în cont, așa că s-a schimbat doar pe acest dispozitiv.",
     },

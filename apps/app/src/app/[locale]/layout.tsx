@@ -11,10 +11,17 @@ import { TooltipProvider } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
+import { Inter } from "next/font/google";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { ConvexClientProvider } from "../convex-client-provider";
+
+// Latin Extended covers Norwegian, German, French and Romanian.
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 /** Every language is prerendered, so each page has a static shell to serve. */
 export function generateStaticParams() {
@@ -62,7 +69,7 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <body
         className={cn(
-          `${GeistSans.variable} ${GeistMono.variable}`,
+          `${inter.variable} ${GeistMono.variable}`,
           "font-sans antialiased",
         )}
       >

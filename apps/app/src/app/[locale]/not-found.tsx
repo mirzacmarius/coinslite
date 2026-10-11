@@ -29,7 +29,7 @@ export default function NotFound() {
           </div>
           <Link
             href="/"
-            className="text-[13px] font-medium text-primary hover:underline"
+            className="text-[13px] font-medium text-link hover:underline"
           >
             {t("notFound.home")}
           </Link>

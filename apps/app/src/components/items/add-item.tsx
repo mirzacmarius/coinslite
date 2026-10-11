@@ -84,8 +84,8 @@ export function AddItemQuickAction() {
   const addItem = useAddItem();
   return (
     <Button
-      variant="subtle"
-      className="w-full justify-start"
+      variant="ghost"
+      className="w-full justify-start border bg-card text-foreground hover:bg-card hover:text-foreground hover:shadow-sm"
       onClick={() => addItem()}
     >
       <Plus aria-hidden="true" />

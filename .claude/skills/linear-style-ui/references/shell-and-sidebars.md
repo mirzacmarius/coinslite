@@ -10,13 +10,16 @@ view, or anything described as "sidebar", "panel", "split view" or "layout".
 │ sidebar     │ header bar (h-10, border-b)          │ right panel  │
 │ 232px       ├──────────────────────────────────────┤ 280px        │
 │ bg-sidebar  │ toolbar: Filter … Display (h-10)     │ border-l     │
-│ border-r    ├──────────────────────────────────────┤ bg-card      │
+│ (chrome)    ├──────────────────────────────────────┤ bg-card      │
 │             │ content (scrolls on its own)         │ (optional)   │
 └─────────────┴──────────────────────────────────────┴──────────────┘
 ```
 
-- The sidebar and right panel are `sticky top-0 h-dvh` columns; only the content column
-  scrolls. This keeps the toolbar and properties in view while a long list scrolls.
+- From `md` up the shell is one `h-dvh` frame on `bg-sidebar`: the sidebar sits on the chrome
+  with no border, and the content column is an inset panel (`rounded-lg border bg-background`,
+  8px from the top, right and bottom edges) that is the scroll container (`main#main`). Sticky
+  headers stick to the panel, and code that resets scroll must scroll `#main` as well as the
+  window (phones still scroll the window). Only the content column scrolls. This keeps the toolbar and properties in view while a long list scrolls.
 - Content column: `flex min-w-0 flex-1 flex-col`. Lists go edge to edge inside it (rows carry
   their own `px-4`), not inside a centred `max-w` box. Reading pages (Account, Plans) may use
   `max-w-2xl`.
@@ -64,6 +67,16 @@ export function SidebarSection({ title, action, defaultOpen = true, children }: 
 
 Collapsing the whole sidebar (`[` shortcut, 56px icon rail) is optional; only add it when a
 ticket asks. Don't add resizing.
+
+## Settings pages
+
+Account and other settings use `SettingsGroup`, `SettingsRow` and `SettingsBlock` from
+`@coinslite/ui/settings-group`: a 15px group heading (and optional description) above a
+`rounded-lg border bg-card` card whose rows are split by hairlines. A row has the setting's
+name (`text-[13px] font-medium`) and a one-line description (`text-xs text-muted-foreground`)
+on the left and its control on the right (a pill, a switch, or an outline menu button such as
+the appearance picker with its "Aa" samples). Forms that need the card's width go in a
+`SettingsBlock`. Links to sub-pages share one card of `h-9` rows with a chevron.
 
 ## Page header bar
 

@@ -35,7 +35,8 @@ unsure which class to reach for. Tailwind 3.4, `new-york` style, Radix primitive
 |---|---|
 | Page | `bg-background text-foreground` |
 | Content panel, card, phone header | `bg-card` |
-| Sidebar | `bg-sidebar` |
+| Shell chrome (sidebar, around the panel) | `bg-sidebar`; hover/current rows `bg-sidebar-accent` |
+| Link text, checkmarks | `text-link` |
 | Floating layer | `bg-popover text-popover-foreground border shadow-md` |
 | Hover row/pill, selected row, current nav | `hover:bg-muted`, `bg-muted` |
 | Focus | `focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1` |
@@ -85,7 +86,7 @@ const buttonVariants = cva(
         subtle: "bg-muted text-foreground hover:bg-muted/70",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-link underline-offset-4 hover:underline",
       },
       size: {
         xs: "h-7 px-2 text-[13px]",

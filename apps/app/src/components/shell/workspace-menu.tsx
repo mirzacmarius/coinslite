@@ -65,7 +65,10 @@ export function WorkspaceMenu({
               ? t("updates.workspaceMenuUnseen")
               : t("shell.workspaceMenu")
           }
-          className={cn("justify-start gap-2 px-2 text-foreground", className)}
+          className={cn(
+            "justify-start gap-2 px-2 text-foreground hover:bg-sidebar-accent",
+            className,
+          )}
         >
           <Logo className="text-[13px] font-medium" />
           <ChevronDown

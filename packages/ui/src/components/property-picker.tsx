@@ -134,10 +134,7 @@ export function PropertyPicker<T extends string>({
                     {clearLabel}
                   </span>
                   {value === undefined && (
-                    <Check
-                      className="ml-auto text-primary"
-                      aria-hidden="true"
-                    />
+                    <Check className="ml-auto text-link" aria-hidden="true" />
                   )}
                 </CommandItem>
               )}
@@ -164,7 +161,7 @@ export function PropertyPicker<T extends string>({
                       </span>
                     )}
                     {option.value === value && (
-                      <Check className="text-primary" aria-hidden="true" />
+                      <Check className="text-link" aria-hidden="true" />
                     )}
                   </span>
                 </CommandItem>

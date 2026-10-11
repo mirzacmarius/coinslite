@@ -19,12 +19,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: [
-          "var(--font-geist-sans)",
-          "ui-sans-serif",
-          "system-ui",
-          "sans-serif",
-        ],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
       colors: {
@@ -49,7 +44,11 @@ const config = {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
         },
-        sidebar: "hsl(var(--sidebar))",
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          accent: "hsl(var(--sidebar-accent))",
+        },
+        link: "hsl(var(--link))",
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",

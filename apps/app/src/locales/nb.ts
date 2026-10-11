@@ -306,6 +306,8 @@ export default {
       title: "Innstillinger",
       language: "Språk",
       homeCurrency: "Hjemmevaluta",
+      languageHint: "Brukes på alle enheter du logger inn på.",
+      appearanceHint: "Lyst, mørkt eller det samme som enheten din.",
       languageNotSaved:
         "Kunne ikke lagre språket på kontoen din, så det er bare endret på denne enheten.",
     },

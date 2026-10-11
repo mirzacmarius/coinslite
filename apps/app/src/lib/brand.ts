@@ -1,7 +1,7 @@
 /** Fixed brand colours for places CSS variables can't reach (manifest, icons, browser chrome). */
 export const brand = {
-  teal: "#0f766e",
-  mint: "#ccfbf1",
-  lightBackground: "#f7f8fa",
-  darkBackground: "#0b1016",
+  accent: "#5e6ad2",
+  ring: "#ffffff",
+  lightBackground: "#fcfcfc",
+  darkBackground: "#151517",
 } as const;

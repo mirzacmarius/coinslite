@@ -3,8 +3,15 @@ import { SiteFooter } from "@/components/site-footer";
 import { isLocale, locales } from "@coinslite/i18n";
 import { cn } from "@coinslite/ui/utils";
 import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
+import { Inter } from "next/font/google";
 import { notFound } from "next/navigation";
+
+// Latin Extended covers Norwegian, German, French and Romanian.
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -24,7 +31,7 @@ export default async function RootLayout({
     <html lang={locale}>
       <body
         className={cn(
-          `${GeistSans.variable} ${GeistMono.variable}`,
+          `${inter.variable} ${GeistMono.variable}`,
           "flex min-h-dvh flex-col font-sans antialiased",
         )}
       >

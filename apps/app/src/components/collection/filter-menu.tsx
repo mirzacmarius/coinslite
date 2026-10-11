@@ -165,9 +165,7 @@ function OptionItem({
       onSelect={onSelect}
     >
       <span className="flex size-4 shrink-0 items-center justify-center">
-        {option.selected && (
-          <Check className="text-primary" aria-hidden="true" />
-        )}
+        {option.selected && <Check className="text-link" aria-hidden="true" />}
       </span>
       {option.icon}
       <span className="truncate">

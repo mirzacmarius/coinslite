@@ -225,7 +225,9 @@ export function CollectionBrowser() {
               pageSize={display.pageSize}
               onPageChange={(next) => {
                 goToPage(next);
+                // Phones scroll the window; wider screens the shell's panel.
                 window.scrollTo({ top: 0 });
+                document.getElementById("main")?.scrollTo({ top: 0 });
               }}
             />
           </>

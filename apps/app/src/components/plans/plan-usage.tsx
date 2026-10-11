@@ -76,7 +76,7 @@ export function UpgradeLink({
   return (
     <Link
       href={upgradeHref}
-      className={cn("font-medium text-primary hover:underline", className)}
+      className={cn("font-medium text-link hover:underline", className)}
     >
       {children}
     </Link>
@@ -89,7 +89,7 @@ export function SidebarPlanUsage() {
   const usage = useFreePlanUsage();
   if (!usage) return null;
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-card p-3">
+    <div className="flex flex-col gap-2 rounded-lg border bg-background p-3">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-muted-foreground">{t("plans.freePlan")}</span>
         <span className="font-medium">

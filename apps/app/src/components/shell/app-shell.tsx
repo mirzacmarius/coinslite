@@ -51,8 +51,8 @@ function NavLinks({
               className={
                 layout === "sidebar"
                   ? cn(
-                      "flex h-7 items-center gap-2 rounded-md px-2 text-[13px] font-medium text-muted-foreground transition-colors duration-100 hover:bg-muted hover:text-foreground",
-                      current && "bg-muted text-foreground",
+                      "flex h-7 items-center gap-2 rounded-md px-2 text-[13px] font-medium text-muted-foreground transition-colors duration-100 hover:bg-sidebar-accent hover:text-foreground",
+                      current && "bg-sidebar-accent text-foreground",
                     )
                   : cn(
                       // The current tab gets a bar and bold text, not just a colour.
@@ -113,11 +113,11 @@ export function AppShell({
   const items = useNavItems();
 
   return (
-    <div className="min-h-dvh bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:grid md:grid-cols-[232px_1fr]">
+    <div className="min-h-dvh bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:grid md:h-dvh md:grid-cols-[232px_1fr] md:overflow-hidden md:bg-sidebar">
       <SkipLink label={t("shell.skipToContent")} />
 
-      <div className="sticky top-0 hidden h-dvh flex-col justify-between gap-2 border-r bg-sidebar p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
-        <div className="flex flex-col gap-3">
+      <div className="hidden h-dvh flex-col justify-between gap-2 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:flex">
+        <div className="flex min-h-0 flex-col gap-3">
           <WorkspaceMenu className="h-8 w-full" markUnseen />
           {quickActions && (
             <div className="flex flex-col gap-1">{quickActions}</div>
@@ -129,14 +129,16 @@ export function AppShell({
         {sidebarFooter}
       </div>
 
-      <div className="flex min-h-dvh min-w-0 flex-col">
+      {/* From tablet width up, pages sit on a panel inset from the chrome
+        and scroll inside it, so the sidebar and panel edges stay put. */}
+      <div className="flex min-h-dvh min-w-0 flex-col md:min-h-0 md:py-2 md:pr-2">
         <div className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
           <WorkspaceMenu className="h-8" />
         </div>
         <main
           id="main"
           tabIndex={-1}
-          className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:pb-0"
+          className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:overflow-y-auto md:rounded-lg md:border md:bg-background md:pb-0"
         >
           {children}
         </main>

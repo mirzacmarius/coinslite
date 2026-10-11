@@ -298,7 +298,7 @@ function PlanCard({
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-2">
             <Check
-              className="mt-0.5 size-4 shrink-0 text-primary"
+              className="mt-0.5 size-4 shrink-0 text-link"
               strokeWidth={1.75}
               aria-hidden="true"
             />

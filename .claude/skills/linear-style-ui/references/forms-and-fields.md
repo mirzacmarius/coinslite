@@ -78,7 +78,7 @@ export function PropertyPicker<T extends string>({
                   {o.hint && <span className="text-xs text-muted-foreground">{o.hint}</span>}
                   <span className="ml-auto flex items-center gap-2">
                     {o.count !== undefined && <span className="text-xs text-muted-foreground">{o.count}</span>}
-                    {o.value === value && <Check className="size-4 text-primary" />}
+                    {o.value === value && <Check className="size-4 text-link" />}
                   </span>
                 </CommandItem>
               ))}
