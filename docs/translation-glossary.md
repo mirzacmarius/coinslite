@@ -14,6 +14,8 @@ How CoinsLite's domain terms ([`CONTEXT.md`](../CONTEXT.md)) read in each launch
 | Strike | preging | Prägung | frappe | batere |
 | Catalog | katalog | Katalog | catalogue | catalog |
 | Catalog entry | katalogoppføring | Katalogeintrag | entrée du catalogue | intrare de catalog |
+| Certification | sertifisering | Zertifizierung | certification | certificare |
+| Stamp catalogue | frimerkekatalog | Briefmarkenkatalog | catalogue de timbres | catalog de timbre |
 | Theme | tema | Thema | thème | temă |
 | Set | sett | Set | ensemble | set |
 | Home currency | hjemmevaluta | Heimatwährung | devise de référence | moneda de bază |

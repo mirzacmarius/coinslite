@@ -13,6 +13,12 @@ import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { noMintMark } from "@coinslite/backend/convex/catalog/fields";
+import {
+  certificateUrl,
+  graderNames,
+  referenceName,
+  stampCatalogueNames,
+} from "@coinslite/backend/convex/items/references";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
@@ -157,6 +163,63 @@ export function ItemDetail() {
     [t("items.diameter"), millimetres(item.diameter)],
     [t("items.thickness"), millimetres(item.thickness)],
   ];
+  // The Certification, as its label reads ("PCGS 12345678"), linked to the
+  // grader's verification page where there is one.
+  const otherReference = t("items.otherReference");
+  const grader =
+    item.grader &&
+    referenceName(graderNames, item.grader, item.graderName, otherReference);
+  const verifyHref =
+    item.grader &&
+    item.certificateNumber &&
+    certificateUrl(
+      item.grader,
+      item.certificateNumber,
+      item.grade && item.gradingScale
+        ? { scale: item.gradingScale, grade: item.grade }
+        : undefined,
+    );
+  const verifyLink = (text: string) =>
+    verifyHref ? (
+      <a
+        href={verifyHref}
+        target="_blank"
+        rel="noreferrer"
+        className="text-link hover:underline"
+      >
+        {text}
+      </a>
+    ) : (
+      text
+    );
+  const certificate =
+    item.certificateNumber &&
+    verifyLink([grader, item.certificateNumber].filter(Boolean).join(" "));
+  const graded = item.grade && item.gradingScale;
+  const references: Array<[string, React.ReactNode]> = [
+    [t("items.grader"), grader],
+    [
+      t("items.certificateNumber"),
+      item.certificateNumber && verifyLink(item.certificateNumber),
+    ],
+    [
+      t("items.stampCatalogue"),
+      item.stampCatalogue &&
+        referenceName(
+          stampCatalogueNames,
+          item.stampCatalogue,
+          item.stampCatalogueName,
+          otherReference,
+        ),
+    ],
+    [t("items.stampCatalogueNumber"), item.stampCatalogueNumber],
+    [t("items.perforation"), item.perforation],
+    [t("items.watermark"), item.watermark],
+    [t("items.colour"), item.colour],
+    [t("items.serialNumber"), item.serialNumber],
+    [t("items.signatures"), item.signatures],
+    [t("items.printer"), item.printer],
+  ];
   const sold = item.soldOn !== undefined;
   const openSale = () =>
     setSelling(({ key }) => ({ open: true, key: key + 1 }));
@@ -219,6 +282,7 @@ export function ItemDetail() {
   const shownFacts = filled(facts);
   const shownPhysical = filled(physical);
   const shownFromCatalog = filled(fromCatalog);
+  const shownReferences = filled(references);
   return (
     <>
       <HeaderBar
@@ -406,16 +470,23 @@ export function ItemDetail() {
                 </Link>
               )}
             </PropertyRow>
-            <PropertyRow label={t("items.grade")}>
+            <PropertyRow label={t("items.grade")} wrap={Boolean(certificate)}>
               {item.grade && item.gradingScale && (
                 <>
                   {labels.grade(item.gradingScale, item.grade, item.strike)}
-                  {labels.meaning(item.gradingScale, item.grade) && (
-                    <span className="text-muted-foreground">
-                      {" · "}
-                      {labels.meaning(item.gradingScale, item.grade)}
-                    </span>
-                  )}
+                  {!certificate &&
+                    labels.meaning(item.gradingScale, item.grade) && (
+                      <span className="text-muted-foreground">
+                        {" · "}
+                        {labels.meaning(item.gradingScale, item.grade)}
+                      </span>
+                    )}
+                </>
+              )}
+              {certificate && (
+                <>
+                  {graded && " · "}
+                  {certificate}
                 </>
               )}
             </PropertyRow>
@@ -441,6 +512,15 @@ export function ItemDetail() {
           {shownPhysical.length > 0 && (
             <PanelSection title={t("items.physical")}>
               {shownPhysical.map(([label, value]) => (
+                <PropertyRow key={label} label={label}>
+                  {value}
+                </PropertyRow>
+              ))}
+            </PanelSection>
+          )}
+          {shownReferences.length > 0 && (
+            <PanelSection title={t("items.references")}>
+              {shownReferences.map(([label, value]) => (
                 <PropertyRow key={label} label={label}>
                   {value}
                 </PropertyRow>

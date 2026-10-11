@@ -34,6 +34,16 @@ export const csvColumns = [
   "soldOn",
   "salePrice",
   "saleNote",
+  "grader",
+  "certificateNumber",
+  "stampCatalogue",
+  "stampCatalogueNumber",
+  "perforation",
+  "watermark",
+  "colour",
+  "serialNumber",
+  "signatures",
+  "printer",
 ] as const;
 export type CsvColumn = (typeof csvColumns)[number];
 
@@ -46,6 +56,8 @@ export type ExportLabels = {
   scales: Record<GradingScale, string>;
   strikes: Record<Strike, string>;
   stampGrades: Record<StampGrade, string>;
+  /** A grader or stamp catalogue chosen as "other", with no name typed. */
+  other: string;
 };
 
 export const exportLabels: Record<Locale, ExportLabels> = {
@@ -69,6 +81,16 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       soldOn: "Sold on",
       salePrice: "Sale price",
       saleNote: "Sale note",
+      grader: "Grader",
+      certificateNumber: "Certificate number",
+      stampCatalogue: "Stamp catalogue",
+      stampCatalogueNumber: "Catalogue number",
+      perforation: "Perforation",
+      watermark: "Watermark",
+      colour: "Colour",
+      serialNumber: "Serial number",
+      signatures: "Signatures",
+      printer: "Printer",
     },
     types: { coin: "Coin", banknote: "Banknote", stamp: "Stamp" },
     materials: {
@@ -104,6 +126,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       proof: "Proof",
     },
     stampGrades: { mnh: "Mint never hinged", mh: "Mint hinged", used: "Used" },
+    other: "Other",
   },
   nb: {
     columns: {
@@ -125,6 +148,16 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       soldOn: "Solgt den",
       salePrice: "Salgspris",
       saleNote: "Salgsnotat",
+      grader: "Graderingsselskap",
+      certificateNumber: "Sertifikatnummer",
+      stampCatalogue: "Frimerkekatalog",
+      stampCatalogueNumber: "Katalognummer",
+      perforation: "Takking",
+      watermark: "Vannmerke",
+      colour: "Farge",
+      serialNumber: "Serienummer",
+      signatures: "Signaturer",
+      printer: "Trykkeri",
     },
     types: { coin: "Mynt", banknote: "Seddel", stamp: "Frimerke" },
     materials: {
@@ -164,6 +197,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       mh: "Ubrukt med hengsel",
       used: "Stemplet",
     },
+    other: "Annet",
   },
   de: {
     columns: {
@@ -185,6 +219,16 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       soldOn: "Verkauft am",
       salePrice: "Verkaufspreis",
       saleNote: "Verkaufsnotiz",
+      grader: "Grading-Dienst",
+      certificateNumber: "Zertifikatsnummer",
+      stampCatalogue: "Briefmarkenkatalog",
+      stampCatalogueNumber: "Katalognummer",
+      perforation: "Zähnung",
+      watermark: "Wasserzeichen",
+      colour: "Farbe",
+      serialNumber: "Seriennummer",
+      signatures: "Unterschriften",
+      printer: "Druckerei",
     },
     types: { coin: "Münze", banknote: "Banknote", stamp: "Briefmarke" },
     materials: {
@@ -224,6 +268,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       mh: "Ungebraucht mit Falz",
       used: "Gestempelt",
     },
+    other: "Andere",
   },
   fr: {
     columns: {
@@ -245,6 +290,16 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       soldOn: "Vendu le",
       salePrice: "Prix de vente",
       saleNote: "Note de vente",
+      grader: "Société de gradation",
+      certificateNumber: "Numéro de certificat",
+      stampCatalogue: "Catalogue de timbres",
+      stampCatalogueNumber: "Numéro de catalogue",
+      perforation: "Dentelure",
+      watermark: "Filigrane",
+      colour: "Couleur",
+      serialNumber: "Numéro de série",
+      signatures: "Signatures",
+      printer: "Imprimeur",
     },
     types: { coin: "Pièce", banknote: "Billet", stamp: "Timbre" },
     materials: {
@@ -284,6 +339,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       mh: "Neuf avec charnière",
       used: "Oblitéré",
     },
+    other: "Autre",
   },
   ro: {
     columns: {
@@ -305,6 +361,16 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       soldOn: "Vândut pe",
       salePrice: "Preț de vânzare",
       saleNote: "Notă de vânzare",
+      grader: "Firmă de gradare",
+      certificateNumber: "Număr de certificat",
+      stampCatalogue: "Catalog de timbre",
+      stampCatalogueNumber: "Număr de catalog",
+      perforation: "Dantelură",
+      watermark: "Filigran",
+      colour: "Culoare",
+      serialNumber: "Număr de serie",
+      signatures: "Semnături",
+      printer: "Tipografie",
     },
     types: { coin: "Monedă", banknote: "Bancnotă", stamp: "Timbru" },
     materials: {
@@ -344,5 +410,6 @@ export const exportLabels: Record<Locale, ExportLabels> = {
       mh: "Neștampilat, cu șarnieră",
       used: "Ștampilat",
     },
+    other: "Altul",
   },
 };

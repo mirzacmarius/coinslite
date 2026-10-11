@@ -93,6 +93,7 @@ const ownWords: Record<Exclude<Locale, "en">, string[]> = {
     "Photo {n}",
     "Photos",
     "Scanner",
+    "Signatures",
     "Source",
     "Sources",
     "Total",

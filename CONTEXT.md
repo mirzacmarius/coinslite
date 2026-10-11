@@ -38,6 +38,14 @@ _Avoid_: Grading system, rating
 How a coin was manufactured: circulation, brilliant uncirculated (BU) or proof. It is independent of Grade: a proof coin still has a Grade.
 _Avoid_: Finish, quality, using "Proof" or "BU" as a Grade
 
+**Certification**:
+A grading service's record that backs a coin's or banknote's Grade: the grader (PCGS, NGC, PMG…) and the certificate number on its slab, written "PCGS 12345678". Stamps have none.
+_Avoid_: Slab, cert, Grade (for the certificate itself)
+
+**Stamp catalogue**:
+A published numbering of stamps, such as Michel, Scott or Norgeskatalogen, that identifies a stamp by its number there. It is not the Catalog: CoinsLite holds no stamp entries.
+_Avoid_: Catalog, Catalog entry (for a stamp's number)
+
 ### Catalog
 
 **Catalog**:

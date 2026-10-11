@@ -12,6 +12,7 @@ import {
 import { scannerAvailabilities } from "../featureFlags/rules";
 import { reportColumns } from "../insuranceReport/rules";
 import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
+import { graders, stampCatalogues } from "../items/references";
 import { materials } from "../items/rules";
 import { photoSides } from "../photos/rules";
 import { metals } from "../spotPrices/rates";
@@ -44,6 +45,10 @@ export const gradingScale = literalUnion(
 export const strike = literalUnion(strikes);
 /** One of the coin materials in items/rules.ts. */
 export const material = literalUnion(materials);
+/** A coin's or banknote's grading service (items/references.ts). */
+export const grader = literalUnion(graders);
+/** The stamp catalogue a stamp's number is from (items/references.ts). */
+export const stampCatalogue = literalUnion(stampCatalogues);
 
 /** A Catalog node: a country or Theme root, a grouping, or a Catalog entry. */
 export const catalogKind = literalUnion(catalogKinds);

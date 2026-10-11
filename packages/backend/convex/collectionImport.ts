@@ -25,7 +25,14 @@ import { type CatalogEntryLink, catalogEntryByKey } from "./items/resolve";
 import { checkSale } from "./items/rules";
 import { itemsLeftToAdd, requireRoomForItems } from "./plans";
 import { requireSetUpUser } from "./utils/auth";
-import { gradingScale, itemType, material, strike } from "./utils/validators";
+import {
+  grader,
+  gradingScale,
+  itemType,
+  material,
+  stampCatalogue,
+  strike,
+} from "./utils/validators";
 
 /**
  * Importing Items from a CSV file laid out like the Collection export
@@ -46,6 +53,18 @@ const importRow = v.object({
   strike: v.optional(strike),
   material: v.optional(material),
   materialNote: v.optional(v.string()),
+  grader: v.optional(grader),
+  graderName: v.optional(v.string()),
+  certificateNumber: v.optional(v.string()),
+  stampCatalogue: v.optional(stampCatalogue),
+  stampCatalogueName: v.optional(v.string()),
+  stampCatalogueNumber: v.optional(v.string()),
+  perforation: v.optional(v.string()),
+  watermark: v.optional(v.string()),
+  colour: v.optional(v.string()),
+  serialNumber: v.optional(v.string()),
+  signatures: v.optional(v.string()),
+  printer: v.optional(v.string()),
   country: v.optional(v.string()),
   quantity: v.optional(v.number()),
   purchasePrice: v.optional(v.number()),
