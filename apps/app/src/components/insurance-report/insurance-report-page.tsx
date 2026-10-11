@@ -293,7 +293,7 @@ function ReportBuilder({ account }: { account: Account }) {
                   aside={
                     <span className="text-xs text-muted-foreground">
                       <span className="sr-only">{t("albums.itemCount")} </span>
-                      {format.number(album.itemCount)}
+                      {format.number(album.ownedItemCount)}
                     </span>
                   }
                 >

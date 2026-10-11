@@ -14,6 +14,7 @@ import {
   moveBetweenAlbums,
   moveManyBetweenAlbums,
   ownAlbumId,
+  saleChangedInAlbum,
 } from "./albums/membership";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
@@ -160,7 +161,12 @@ export async function storeNewItem(
   doc: Omit<Doc<"items">, "_id" | "_creationTime">,
 ) {
   const itemId = await ctx.db.insert("items", doc);
-  await moveBetweenAlbums(ctx, undefined, doc.albumId);
+  await moveBetweenAlbums(
+    ctx,
+    undefined,
+    doc.albumId,
+    doc.soldOn !== undefined,
+  );
   await countItemAdded(ctx, { ownerId: doc.ownerId, type: doc.type });
   return itemId;
 }
@@ -325,7 +331,12 @@ export const update = mutation({
       ...checked,
       albumId: album,
     });
-    await moveBetweenAlbums(ctx, item.albumId, album);
+    await moveBetweenAlbums(
+      ctx,
+      item.albumId,
+      album,
+      item.soldOn !== undefined,
+    );
     await countItemRetyped(ctx, item.ownerId, item.type, checked.type);
     return null;
   },
@@ -355,6 +366,8 @@ export const sell = mutation({
       throw new ConvexError(itemErrors.invalidQuantity);
     if (pieces === item.quantity) {
       await ctx.db.patch(itemId, sale);
+      if (item.soldOn === undefined)
+        await saleChangedInAlbum(ctx, item.albumId, true);
       return itemId;
     }
     if (item.soldOn !== undefined)
@@ -387,6 +400,7 @@ export const markOwned = mutation({
       salePrice: undefined,
       saleNote: undefined,
     });
+    await saleChangedInAlbum(ctx, item.albumId, false);
     return null;
   },
 });
@@ -409,7 +423,11 @@ export const moveToAlbum = mutation({
     for (const item of moving) await ctx.db.patch(item._id, { albumId: album });
     await moveManyBetweenAlbums(
       ctx,
-      moving.map((item) => ({ from: item.albumId, to: album })),
+      moving.map((item) => ({
+        from: item.albumId,
+        to: album,
+        sold: item.soldOn !== undefined,
+      })),
     );
     return null;
   },

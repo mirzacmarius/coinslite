@@ -27,8 +27,13 @@ export async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
     await ctx.storage.delete(photo.storageId);
     await ctx.db.delete(photo._id);
   }
-  await moveBetweenAlbums(ctx, item.albumId, undefined);
   await ctx.db.delete(item._id);
+  await moveBetweenAlbums(
+    ctx,
+    item.albumId,
+    undefined,
+    item.soldOn !== undefined,
+  );
   await countItemRemoved(ctx, item);
   return more.length;
 }

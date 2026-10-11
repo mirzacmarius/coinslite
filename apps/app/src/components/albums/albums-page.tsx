@@ -78,7 +78,7 @@ export function AlbumsPage() {
                 </span>
                 <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                   <span className="sr-only">{t("albums.itemCount")} </span>
-                  {format.number(album.itemCount)}
+                  {format.number(album.ownedItemCount)}
                 </span>
               </Link>
             </li>

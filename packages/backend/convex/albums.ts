@@ -8,6 +8,7 @@ import {
   mutation,
   query,
 } from "./_generated/server";
+import { ownedItemCount } from "./albums/membership";
 import {
   albumErrors,
   albumLimits,
@@ -62,22 +63,32 @@ export const create = mutation({
       ownerId: owner._id,
       ...album,
       itemCount: 0,
+      soldItemCount: 0,
     });
     await countAlbumCreated(ctx, { ownerId: owner._id });
     return albumId;
   },
 });
 
-/** The signed-in person's Albums, each with how many Items it holds, oldest first. */
+/**
+ * The signed-in person's Albums, oldest first, each with how many Items it
+ * holds and how many of those they still own.
+ */
 export const list = query({
   args: {},
-  returns: v.array(schema.doc("albums")),
+  returns: v.array(schema.doc("albums").extend({ ownedItemCount: v.number() })),
   handler: async (ctx) => {
     const owner = await requireSetUpUser(ctx);
-    return await ctx.db
+    const albums = await ctx.db
       .query("albums")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
       .take(albumLimits.count);
+    return await Promise.all(
+      albums.map(async (album) => ({
+        ...album,
+        ownedItemCount: await ownedItemCount(ctx, album),
+      })),
+    );
   },
 });
 
