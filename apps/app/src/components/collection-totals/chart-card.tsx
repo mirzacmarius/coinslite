@@ -60,11 +60,14 @@ export function Legend({
 export function ChartCard({
   title,
   description,
+  controls,
   chart,
   table,
 }: {
   title: string;
   description: string;
+  /** More choices before the chart/table switch, e.g. what the chart shows. */
+  controls?: ReactNode;
   chart: ReactNode;
   table: (titleId: string) => ReactNode;
 }) {
@@ -83,6 +86,7 @@ export function ChartCard({
           </h3>
           <p className="text-xs text-muted-foreground">{description}</p>
         </div>
+        {controls}
         <SegmentedControl
           label={t("collectionTotals.view")}
           options={[

@@ -1038,6 +1038,12 @@ export default {
     view: "View",
     chart: "Chart",
     table: "Table",
+    valueOverTime: "Value over time",
+    valueOverTimeDescription:
+      "What your Collection was worth at the end of each month, metal at that month’s Spot prices",
+    valueMode: "Show",
+    overTime: "Over time",
+    byDateAdded: "By date added",
     valueByDateAdded: "Value by date added",
     valueByDateAddedDescription:
       "Purchase price and Market value of everything added by the end of each month",

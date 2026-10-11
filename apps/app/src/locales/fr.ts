@@ -1068,6 +1068,12 @@ export default {
     view: "Affichage",
     chart: "Graphique",
     table: "Tableau",
+    valueOverTime: "Valeur dans le temps",
+    valueOverTimeDescription:
+      "Ce que valait votre collection à la fin de chaque mois, le métal au cours spot du mois",
+    valueMode: "Afficher",
+    overTime: "Dans le temps",
+    byDateAdded: "Par date d’ajout",
     valueByDateAdded: "Valeur par date d’ajout",
     valueByDateAddedDescription:
       "Prix d’achat et valeur de marché de tout ce qui a été ajouté à la fin de chaque mois",

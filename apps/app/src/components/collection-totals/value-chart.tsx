@@ -4,9 +4,10 @@ import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import {
   type CollectionTotals,
-  type MonthAmounts,
   valueByDateAdded,
 } from "@coinslite/backend/convex/items/totals";
+import type { MonthValue } from "@coinslite/backend/convex/items/valueOverTime";
+import { SegmentedControl } from "@coinslite/ui/segmented-control";
 import {
   Table,
   TableBody,
@@ -25,12 +26,14 @@ import {
 import {
   ChartCard,
   Legend,
+  type Series,
   seriesColors,
   useElementWidth,
   useMonthFormat,
 } from "./chart-card";
 
-const lines = ["purchasePrice", "marketValue"] as const;
+/** A month's amounts, one per series drawn. */
+type Point = { month: string } & Partial<Record<Series, number>>;
 
 /** Plot height and the room around it, in pixels. */
 const PLOT_HEIGHT = 160;
@@ -66,53 +69,102 @@ function axisTicks(max: number) {
   return ticks;
 }
 
+type Mode = "overTime" | "byDateAdded";
+
 /**
- * Value by date added (spec 7): the cumulative Purchase price and Market value
- * of the Collection by the month Items were added. Hover, or focus and use the
- * arrow keys, to read a month.
+ * The Collection's value by month (spec 7), two ways: "over time", what it
+ * was worth at the end of each month (Purchase price, the latest Market value
+ * and, with gold or silver, the Metal value at that month's Spot price); or
+ * "by date added", the cumulative Purchase price and Market value by the
+ * month Items were added. Hover, or focus and use the arrow keys, to read a
+ * month. `overTime` is undefined while it loads.
  */
-export function ValueByDateAddedChart({
+export function ValueChart({
   totals,
+  overTime,
 }: {
   totals: CollectionTotals;
+  overTime: MonthValue[] | undefined;
 }) {
   const t = useI18n();
   const format = useFormatters();
   const monthLabel = useMonthFormat();
-  const series = useMemo(() => valueByDateAdded(totals), [totals]);
-  const names = {
+  const [mode, setMode] = useState<Mode>("overTime");
+  const series: Point[] | undefined = useMemo(() => {
+    if (mode === "byDateAdded") return valueByDateAdded(totals);
+    return overTime?.map(({ metalValue, ...point }) =>
+      metalValue === null ? point : { ...point, metalValue },
+    );
+  }, [mode, totals, overTime]);
+  // Metal value is drawn only for a Collection that has some.
+  const lines: Series[] = series?.some((point) => (point.metalValue ?? 0) > 0)
+    ? ["purchasePrice", "marketValue", "metalValue"]
+    : ["purchasePrice", "marketValue"];
+  const names: Record<Series, string> = {
     purchasePrice: t("items.purchasePrice"),
     marketValue: t("items.marketValue"),
+    metalValue: t("preciousMetal.metalValue"),
   };
   const money = (amount: number) => format.money(amount, totals.currency);
-  const last = series.at(-1);
+  const last = series?.at(-1);
+  const title = t(
+    mode === "overTime"
+      ? "collectionTotals.valueOverTime"
+      : "collectionTotals.valueByDateAdded",
+  );
 
   return (
     <ChartCard
-      title={t("collectionTotals.valueByDateAdded")}
-      description={t("collectionTotals.valueByDateAddedDescription")}
+      title={title}
+      description={t(
+        mode === "overTime"
+          ? "collectionTotals.valueOverTimeDescription"
+          : "collectionTotals.valueByDateAddedDescription",
+      )}
+      controls={
+        <SegmentedControl
+          label={t("collectionTotals.valueMode")}
+          options={[
+            { value: "overTime", label: t("collectionTotals.overTime") },
+            { value: "byDateAdded", label: t("collectionTotals.byDateAdded") },
+          ]}
+          value={mode}
+          onChange={setMode}
+          className="shrink-0"
+        />
+      }
       chart={
-        <>
-          <Legend
-            shape="line"
-            entries={lines.map((line) => ({
-              series: line,
-              label: names[line],
-              value: last && money(last[line]),
-            }))}
+        series === undefined ? (
+          <div
+            className="animate-pulse rounded-md bg-muted"
+            style={{ height: HEIGHT + 20 }}
+            aria-hidden="true"
           />
-          <LineChart
-            series={series}
-            names={names}
-            money={money}
-            compactMoney={(amount) =>
-              format.money(Math.round(amount), totals.currency, {
-                compact: true,
-              })
-            }
-            monthLabel={monthLabel}
-          />
-        </>
+        ) : (
+          <>
+            <Legend
+              shape="line"
+              entries={lines.map((line) => ({
+                series: line,
+                label: names[line],
+                value: last && money(last[line] ?? 0),
+              }))}
+            />
+            <LineChart
+              label={title}
+              series={series}
+              lines={lines}
+              names={names}
+              money={money}
+              compactMoney={(amount) =>
+                format.money(Math.round(amount), totals.currency, {
+                  compact: true,
+                })
+              }
+              monthLabel={monthLabel}
+            />
+          </>
+        )
       }
       table={(titleId) => (
         <Table aria-labelledby={titleId}>
@@ -129,14 +181,14 @@ export function ValueByDateAddedChart({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {series.map((point) => (
+            {series?.map((point) => (
               <TableRow key={point.month}>
                 <TableCell className="pl-4">
                   {monthLabel(point.month)}
                 </TableCell>
                 {lines.map((line) => (
                   <TableCell key={line} className="text-right last:pr-4">
-                    {money(point[line])}
+                    {money(point[line] ?? 0)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -149,14 +201,18 @@ export function ValueByDateAddedChart({
 }
 
 function LineChart({
+  label,
   series,
+  lines,
   names,
   money,
   compactMoney,
   monthLabel,
 }: {
-  series: MonthAmounts[];
-  names: Record<(typeof lines)[number], string>;
+  label: string;
+  series: Point[];
+  lines: Series[];
+  names: Record<Series, string>;
   money: (amount: number) => string;
   compactMoney: (amount: number) => string;
   monthLabel: (month: string) => string;
@@ -168,7 +224,10 @@ function LineChart({
   const labelWidth = useLabelWidth();
 
   const ticks = axisTicks(
-    Math.max(0, ...series.flatMap((point) => lines.map((line) => point[line]))),
+    Math.max(
+      0,
+      ...series.flatMap((point) => lines.map((line) => point[line] ?? 0)),
+    ),
   );
   const tickLabels = ticks.map(compactMoney);
   const top = ticks.at(-1) ?? 1;
@@ -181,10 +240,11 @@ function LineChart({
     SIDE +
     (lastIndex === 0 ? plotWidth / 2 : (index * plotWidth) / lastIndex);
   const y = (amount: number) => TOP + PLOT_HEIGHT * (1 - amount / top);
-  const pathOf = (line: (typeof lines)[number]) =>
+  const pathOf = (line: Series) =>
     series
       .map(
-        (point, index) => `${index ? "L" : "M"}${x(index)},${y(point[line])}`,
+        (point, index) =>
+          `${index ? "L" : "M"}${x(index)},${y(point[line] ?? 0)}`,
       )
       .join("");
 
@@ -219,7 +279,7 @@ function LineChart({
     return at
       ? [
           monthLabel(at.month),
-          ...lines.map((line) => `${names[line]} ${money(at[line])}`),
+          ...lines.map((line) => `${names[line]} ${money(at[line] ?? 0)}`),
         ].join(", ")
       : "";
   };
@@ -231,7 +291,7 @@ function LineChart({
       ref={ref}
       tabIndex={0}
       role="slider"
-      aria-label={t("collectionTotals.valueByDateAdded")}
+      aria-label={label}
       aria-describedby={hintId}
       aria-valuemin={0}
       aria-valuemax={Math.max(0, lastIndex)}
@@ -328,7 +388,7 @@ function LineChart({
                 <circle
                   key={line}
                   cx={x(shown)}
-                  cy={y(at[line])}
+                  cy={y(at[line] ?? 0)}
                   r={4}
                   fill={seriesColors[line]}
                   stroke="hsl(var(--card))"
@@ -358,7 +418,7 @@ function LineChart({
                 className="h-0.5 w-3 shrink-0 rounded-full"
                 style={{ background: seriesColors[line] }}
               />
-              <span className="font-medium">{money(point[line])}</span>
+              <span className="font-medium">{money(point[line] ?? 0)}</span>
               <span className="text-muted-foreground">{names[line]}</span>
             </span>
           ))}

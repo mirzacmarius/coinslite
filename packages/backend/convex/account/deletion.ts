@@ -70,6 +70,9 @@ export const accountDataByTable = {
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   pendingCheckouts: "deleted at once: the checkout left open, if any",
+  marketValueHistory:
+    "deleted: each Item's Market value history, as the Item goes",
+  spotPriceDays: "kept: the daily Spot prices everyone shares",
   itemPhotos:
     "deleted: the Items' more photos, with their stored files, as each Item goes",
   uploads: "deleted: files they uploaded but never made a photo or an image",

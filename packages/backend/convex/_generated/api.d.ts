@@ -95,6 +95,8 @@ import type * as items_resolve from "../items/resolve.js";
 import type * as items_rules from "../items/rules.js";
 import type * as items_thumbnail from "../items/thumbnail.js";
 import type * as items_totals from "../items/totals.js";
+import type * as items_valueHistory from "../items/valueHistory.js";
+import type * as items_valueOverTime from "../items/valueOverTime.js";
 import type * as metalValues from "../metalValues.js";
 import type * as overview from "../overview.js";
 import type * as pdf_dates from "../pdf/dates.js";
@@ -217,6 +219,8 @@ declare const fullApi: ApiFromModules<{
   "items/rules": typeof items_rules;
   "items/thumbnail": typeof items_thumbnail;
   "items/totals": typeof items_totals;
+  "items/valueHistory": typeof items_valueHistory;
+  "items/valueOverTime": typeof items_valueOverTime;
   metalValues: typeof metalValues;
   overview: typeof overview;
   "pdf/dates": typeof pdf_dates;

@@ -25,8 +25,8 @@ import { cn } from "@coinslite/ui/utils";
 import { ChevronRight } from "lucide-react";
 import { type ReactNode, useId, useState } from "react";
 import { seriesColorVariables } from "./chart-card";
-import { useCollectionTotals } from "./use-collection-totals";
-import { ValueByDateAddedChart } from "./value-by-date-added-chart";
+import { useCollectionTotals, useValueOverTime } from "./use-collection-totals";
+import { ValueChart } from "./value-chart";
 import { ValueDistributionChart } from "./value-distribution-chart";
 
 const itemTypes = ["coin", "banknote", "stamp"] as const;
@@ -221,14 +221,20 @@ function TotalsDetails({
       {sold ? null : totals === undefined ? (
         <ChartsSkeleton />
       ) : (
-        !empty && (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <ValueByDateAddedChart totals={totals} />
-            <ValueDistributionChart totals={totals} />
-          </div>
-        )
+        !empty && <Charts totals={totals} />
       )}
     </>
+  );
+}
+
+/** The value chart and the value distribution of what's owned. */
+function Charts({ totals }: { totals: CollectionTotals }) {
+  const overTime = useValueOverTime();
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <ValueChart totals={totals} overTime={overTime} />
+      <ValueDistributionChart totals={totals} />
+    </div>
   );
 }
 

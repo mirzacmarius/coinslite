@@ -2,13 +2,17 @@
 
 import { seriesColorVariables } from "@/components/collection-totals/chart-card";
 import { TotalsFigures } from "@/components/collection-totals/collection-totals";
-import { ValueByDateAddedChart } from "@/components/collection-totals/value-by-date-added-chart";
+import { ValueChart } from "@/components/collection-totals/value-chart";
 import { ValueDistributionChart } from "@/components/collection-totals/value-distribution-chart";
 import { AppearancePicker } from "@/components/preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useFormatters } from "@/locales/use-formatters";
-import { collectionTotals } from "@coinslite/backend/convex/items/totals";
+import {
+  collectionTotals,
+  valueByDateAdded,
+} from "@coinslite/backend/convex/items/totals";
+import type { MonthValue } from "@coinslite/backend/convex/items/valueOverTime";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { Card } from "@coinslite/ui/card";
@@ -164,6 +168,18 @@ const currencyOptions = [
   { value: "EUR", label: "EUR", hint: "Euro" },
   { value: "RON", label: "RON", hint: "Romanian leu" },
 ];
+
+/**
+ * A sample "Value over time": the sample Collection's purchases by month, its
+ * Market value drifting up a little each month, and some gold.
+ */
+const sampleOverTime = (): MonthValue[] =>
+  valueByDateAdded(sampleTotals).map((point, index) => ({
+    month: point.month,
+    purchasePrice: point.purchasePrice,
+    marketValue: Math.round(point.marketValue * (1 + index * 0.01)),
+    metalValue: Math.round(point.purchasePrice * 0.4 * (1 + index * 0.02)),
+  }));
 
 /** A sample Collection for the charts: Items added over a year and a half. */
 const sampleTotals = {
@@ -836,7 +852,7 @@ export function DesignGallery() {
             <div
               className={cn("grid gap-4 lg:grid-cols-2", seriesColorVariables)}
             >
-              <ValueByDateAddedChart totals={sampleTotals} />
+              <ValueChart totals={sampleTotals} overTime={sampleOverTime()} />
               <ValueDistributionChart totals={sampleTotals} />
             </div>
           </Section>
