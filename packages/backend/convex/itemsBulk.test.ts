@@ -311,6 +311,12 @@ test("the view's Items can be selected up to the limit, with their Albums", asyn
   const coins = await as.query(api.collection.selectable, {
     view: { type: "coin" },
   });
+  // Adding to an Album offers only the Items outside it.
+  const outside = await as.query(api.collection.selectable, {
+    view: { notInAlbum: album },
+  });
+  expect(outside.total).toBe(2);
+  expect(outside.items.map(({ _id }) => _id)).not.toContain(inAlbum);
   expect(coins.total).toBe(2);
   expect(coins.items).toEqual(
     expect.arrayContaining([

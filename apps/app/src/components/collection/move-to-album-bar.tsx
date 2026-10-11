@@ -22,16 +22,21 @@ import type { ItemSelection } from "./use-item-selection";
 /**
  * Select mode's bar on the Collection page: select the page or the whole
  * view, pick an Album (or none) and move every selected Item there at once,
- * set a Grade on them, or delete them.
+ * set a Grade on them, or delete them. With `addTo`, the Album is set and
+ * moving into it is the only action; `onLeave` ends picking either way.
  */
 export function MoveToAlbumBar({
   selection,
   result,
   view,
+  addTo,
+  onLeave,
 }: {
   selection: ItemSelection;
   result: BrowseResult;
   view: CollectionView;
+  addTo?: Id<"albums">;
+  onLeave?: () => void;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -40,7 +45,8 @@ export function MoveToAlbumBar({
   const albums = useAlbums();
   const moveToAlbum = useMutation(api.items.moveToAlbum);
   // The Album picked to move into; `albumId` undefined means out of any Album.
-  const [target, setTarget] = useState<{ albumId?: Id<"albums"> }>();
+  const [picked, setTarget] = useState<{ albumId?: Id<"albums"> }>();
+  const target = addTo ? { albumId: addTo } : picked;
   const [capped, setCapped] = useState(false);
   const [saving, setSaving] = useState(false);
   const [failed, setFailed] = useState<string>();
@@ -88,6 +94,7 @@ export function MoveToAlbumBar({
           : t("collection.takenOut", { count }),
       );
       selection.stop();
+      onLeave?.();
     } catch {
       setFailed(t("collection.moveFailed"));
     } finally {
@@ -106,7 +113,9 @@ export function MoveToAlbumBar({
       start={
         count === 0 && (
           <span className="text-xs text-muted-foreground">
-            {t("collection.selectHint")}
+            {addTo
+              ? t("collection.addToHint", { album: album?.name ?? "" })
+              : t("collection.selectHint")}
           </span>
         )
       }
@@ -130,11 +139,13 @@ export function MoveToAlbumBar({
           {t("collection.selectAll", { count: result.total })}
         </Button>
       )}
-      <AlbumPicker
-        value={target?.albumId}
-        onChange={(albumId) => setTarget({ albumId })}
-        onCreateFailed={setFailed}
-      />
+      {!addTo && (
+        <AlbumPicker
+          value={target?.albumId}
+          onChange={(albumId) => setTarget({ albumId })}
+          onCreateFailed={setFailed}
+        />
+      )}
       <span aria-live="polite" className="min-w-0 flex-1 text-xs">
         {capped ? (
           t("collection.selectedFirst", {
@@ -159,28 +170,37 @@ export function MoveToAlbumBar({
             : t("collection.takeOut")}
         </Button>
       )}
-      <SetGradeButton
-        selection={selection}
-        onGraded={({ graded, skipped }) => {
-          toast.success(
-            skipped > 0
-              ? t("collection.gradedSkipped", { graded, skipped })
-              : t("collection.graded", { count: graded }),
-          );
-          selection.stop();
-        }}
-        onFailed={setFailed}
-      />
-      <DeleteItemsButton
-        selection={selection}
-        onDeleted={(deleted) => {
-          toast.success(t("collection.deleted", { count: deleted }));
-          selection.stop();
-        }}
-        onFailed={setFailed}
-      />
-      <Button type="button" variant="ghost" size="xs" onClick={selection.stop}>
-        {t("collection.done")}
+      {!addTo && (
+        <>
+          <SetGradeButton
+            selection={selection}
+            onGraded={({ graded, skipped }) => {
+              toast.success(
+                skipped > 0
+                  ? t("collection.gradedSkipped", { graded, skipped })
+                  : t("collection.graded", { count: graded }),
+              );
+              selection.stop();
+            }}
+            onFailed={setFailed}
+          />
+          <DeleteItemsButton
+            selection={selection}
+            onDeleted={(deleted) => {
+              toast.success(t("collection.deleted", { count: deleted }));
+              selection.stop();
+            }}
+            onFailed={setFailed}
+          />
+        </>
+      )}
+      <Button
+        type="button"
+        variant="ghost"
+        size="xs"
+        onClick={onLeave ?? selection.stop}
+      >
+        {addTo ? t("collection.cancel") : t("collection.done")}
       </Button>
       {failed && (
         <p role="alert" className="w-full text-xs text-destructive">

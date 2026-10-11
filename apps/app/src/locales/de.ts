@@ -403,7 +403,8 @@ export default {
     backToAlbums: "Zurück zu den Alben",
     noItemsTitle: "Keine Objekte in diesem Album",
     noItemsDescription:
-      "Wähle dieses Album im Formular eines Objekts, um das Objekt hier abzulegen.",
+      "Wähle mit „Objekte hinzufügen“ Objekte aus deiner Sammlung aus und lege sie hier ab.",
+    addItems: "Objekte hinzufügen",
     addToAlbum: "Zu Album hinzufügen",
     noAlbum: "Kein Album",
     createNamed: "Album „{name}“ erstellen",
@@ -798,6 +799,8 @@ export default {
     selectionBar: "Ausgewählte Objekte",
     selectHint:
       "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten oder zu löschen.",
+    addToHint: "Wähle die Objekte aus, die in {album} sollen.",
+    cancel: "Abbrechen",
     selectPage: "Seite auswählen",
     "selectAll#one": "1 Objekt auswählen",
     "selectAll#few": "Alle {count} Objekte auswählen",

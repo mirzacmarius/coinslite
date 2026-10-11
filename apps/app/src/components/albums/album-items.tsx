@@ -49,6 +49,13 @@ export function AlbumItems({ albumId }: { albumId: Id<"albums"> }) {
           }
           title={t("albums.noItemsTitle")}
           description={t("albums.noItemsDescription")}
+          action={
+            <Button size="sm" asChild>
+              <Link href={`/collection?addTo=${albumId}`}>
+                {t("albums.addItems")}
+              </Link>
+            </Button>
+          }
         />
       </div>
     );
