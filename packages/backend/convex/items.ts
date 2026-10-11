@@ -21,13 +21,14 @@ import { catalogVisibleTo } from "./featureFlags";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
 import { overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
+import { isGrade, scalesFor } from "./items/grades";
 import {
   type CatalogEntryLink,
   catalogEntryByKey,
   itemResolver,
   resolveItems,
 } from "./items/resolve";
-import { type ItemInput, checkItem } from "./items/rules";
+import { type ItemInput, checkItem, itemErrors } from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
 import { requireRoomForItems } from "./plans";
 import schema from "./schema";
@@ -357,6 +358,31 @@ async function requireOwnItems(
   );
   return { owner, items };
 }
+
+/**
+ * Sets one Grade on several of the signed-in person's Items: those whose Item
+ * type the Grading scale suits; the others are skipped and counted. Grade
+ * notes stay as they are. Every Item is checked before anything is written.
+ */
+export const setGrade = mutation({
+  args: {
+    itemIds: v.array(v.id("items")),
+    gradingScale,
+    grade: v.string(),
+  },
+  returns: v.object({ graded: v.number(), skipped: v.number() }),
+  handler: async (ctx, { itemIds, gradingScale, grade }) => {
+    if (!isGrade(gradingScale, grade))
+      throw new ConvexError(itemErrors.invalidGrade);
+    const { items } = await requireOwnItems(ctx, itemIds);
+    const grading = items.filter((item) =>
+      scalesFor(item.type).includes(gradingScale),
+    );
+    for (const item of grading)
+      await ctx.db.patch(item._id, { gradingScale, grade });
+    return { graded: grading.length, skipped: items.length - grading.length };
+  },
+});
 
 /**
  * How many photos deleting these Items takes with them (both sides and the

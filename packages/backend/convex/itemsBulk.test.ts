@@ -6,6 +6,7 @@ import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { itemNotFound } from "./items";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
+import { itemErrors } from "./items/rules";
 import schema from "./schema";
 
 const modules = import.meta.glob("./**/*.*s");
@@ -110,7 +111,7 @@ test("someone else's Album can't be moved into", async () => {
   expect(await counts(bob.as)).toEqual({ "Bob's": 0 });
 });
 
-test(`at most ${bulkLimits.items} Items move or go at once`, async () => {
+test(`at most ${bulkLimits.items} Items move, get a Grade or go at once`, async () => {
   const t = newTest();
   const { as } = await person(t, "ada@example.com");
   const item = await as.mutation(api.items.add, coin("1 krone 1875"));
@@ -137,6 +138,13 @@ test(`at most ${bulkLimits.items} Items move or go at once`, async () => {
   ).rejects.toThrow(bulkErrors.tooManyItems);
   await expect(
     as.mutation(api.items.removeMany, { itemIds: many }),
+  ).rejects.toThrow(bulkErrors.tooManyItems);
+  await expect(
+    as.mutation(api.items.setGrade, {
+      itemIds: many,
+      gradingScale: "european",
+      grade: "VF",
+    }),
   ).rejects.toThrow(bulkErrors.tooManyItems);
   expect(await as.query(api.items.get, { itemId: many[0] })).not.toBeNull();
 });
@@ -215,6 +223,75 @@ test("one Item that isn't yours stops the whole delete", async () => {
   expect(
     await ada.as.query(api.items.photoCount, { itemIds: [mine, theirs] }),
   ).toBe(0);
+});
+
+test("a Grade goes on the Items its scale suits, and the rest are counted as skipped", async () => {
+  const t = newTest();
+  const { as } = await person(t, "ada@example.com");
+  const krone = await as.mutation(api.items.add, {
+    ...coin("1 krone 1875"),
+    gradeNote: "Rim nick",
+  });
+  const note = await as.mutation(api.items.add, {
+    type: "banknote",
+    title: "5 kroner 1901",
+  });
+  const stamp = await as.mutation(api.items.add, {
+    type: "stamp",
+    title: "Posthorn 1872",
+    gradingScale: "stamp",
+    grade: "used",
+  });
+
+  expect(
+    await as.mutation(api.items.setGrade, {
+      itemIds: [krone, note, stamp],
+      gradingScale: "norwegian",
+      grade: "1+",
+    }),
+  ).toEqual({ graded: 2, skipped: 1 });
+  const graded = await as.query(api.items.get, { itemId: krone });
+  expect(graded).toMatchObject({
+    gradingScale: "norwegian",
+    grade: "1+",
+    gradeNote: "Rim nick",
+  });
+  expect(await as.query(api.items.get, { itemId: note })).toMatchObject({
+    gradingScale: "norwegian",
+    grade: "1+",
+  });
+  expect(await as.query(api.items.get, { itemId: stamp })).toMatchObject({
+    gradingScale: "stamp",
+    grade: "used",
+  });
+
+  // A Grade that isn't on the scale is refused.
+  await expect(
+    as.mutation(api.items.setGrade, {
+      itemIds: [krone],
+      gradingScale: "sheldon",
+      grade: "1+",
+    }),
+  ).rejects.toThrow(itemErrors.invalidGrade);
+});
+
+test("one Item that isn't yours stops the whole Grade change", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const bob = await person(t, "bob@example.com");
+  const mine = await ada.as.mutation(api.items.add, coin("1 krone 1875"));
+  const theirs = await bob.as.mutation(api.items.add, coin("2 kroner 1878"));
+
+  await expect(
+    ada.as.mutation(api.items.setGrade, {
+      itemIds: [mine, theirs],
+      gradingScale: "european",
+      grade: "VF",
+    }),
+  ).rejects.toThrow(itemNotFound);
+  expect(
+    (await ada.as.query(api.items.get, { itemId: mine }))?.grade,
+  ).toBeUndefined();
 });
 
 test("the view's Items can be selected up to the limit, with their Albums", async () => {

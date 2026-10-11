@@ -209,7 +209,7 @@ for (const width of [1280, 375]) {
     await main.getByRole("button", { name: "Select", exact: true }).click();
     const bar = page.getByRole("region", { name: "Selected Items" });
     await expect(bar).toContainText(
-      "Select Items to move them to an Album or delete them.",
+      "Select Items to move them to an Album, set a Grade or delete them.",
     );
     await main.getByRole("checkbox", { name: "Krone 1875" }).click();
     await main.getByRole("checkbox", { name: "Krone 1876" }).click();
