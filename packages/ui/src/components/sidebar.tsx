@@ -354,6 +354,9 @@ const SidebarRail = React.forwardRef<
         "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar",
         "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
         "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
+        // Inset, the page's card starts at the sidebar's edge: the line runs
+        // down the middle of the gap between them, as tall as the card.
+        "[[data-side=left][data-variant=inset]_&]:-right-3 [[data-variant=inset]_&]:after:inset-y-2",
         className,
       )}
       {...props}

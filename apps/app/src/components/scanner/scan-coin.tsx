@@ -99,8 +99,9 @@ export function ScanCoinQuickAction() {
     <SidebarMenuItem>
       <SidebarMenuButton tooltip={t("scanner.scan")} onClick={scanCoin}>
         <ScanLine aria-hidden="true" />
-        <span>{t("scanner.scan")}</span>
-        <Badge className="ml-auto group-data-[collapsible=icon]:hidden">
+        {/* The badge comes last, so the button's own truncation misses it. */}
+        <span className="truncate">{t("scanner.scan")}</span>
+        <Badge className="ml-auto shrink-0 group-data-[collapsible=icon]:hidden">
           {t("scanner.beta")}
         </Badge>
       </SidebarMenuButton>
