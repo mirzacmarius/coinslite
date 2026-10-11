@@ -312,3 +312,90 @@ test("an Item can't be sold before the day it was bought", async () => {
   ).rejects.toThrow("SOLD_BEFORE_PURCHASE");
   await ada.as.mutation(api.items.sell, { itemId, soldOn: "2026-09-01" });
 });
+
+test("selling two of five pieces splits off a sold Item with the same facts, and keeps three owned", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const travel = await ada.as.mutation(api.albums.create, { name: "Travel" });
+  const itemId = await ada.as.mutation(api.items.add, {
+    type: "coin",
+    title: "1 krone 1875",
+    country: "NO",
+    year: 1875,
+    quantity: 5,
+    purchasePrice: 15000,
+    marketValue: 20000,
+    gradingScale: "european",
+    grade: "XF",
+    albumId: travel,
+  });
+  await t.run(async (ctx) =>
+    ctx.db.patch(itemId, {
+      frontPhoto: await ctx.storage.store(new Blob(["x"])),
+    }),
+  );
+
+  await ada.as.mutation(api.items.sell, {
+    itemId,
+    quantity: 2,
+    soldOn: "2026-10-01",
+    salePrice: 21000,
+    saleNote: "Oslo coin fair",
+  });
+
+  const kept = await ada.as.query(api.items.get, { itemId });
+  expect(kept).toMatchObject({ quantity: 3, frontPhoto: expect.any(String) });
+  expect(kept?.soldOn).toBeUndefined();
+  const [soldRow] = (
+    await ada.as.query(api.collection.browse, {
+      view: { status: "sold" },
+      page: 1,
+      pageSize: 25,
+    })
+  ).items;
+  const split = await ada.as.query(api.items.get, { itemId: soldRow!._id });
+  expect(split?._id).not.toBe(itemId);
+  expect(split).toMatchObject({
+    title: "1 krone 1875",
+    country: "NO",
+    year: 1875,
+    quantity: 2,
+    purchasePrice: 15000,
+    marketValue: 20000,
+    gradingScale: "european",
+    grade: "XF",
+    albumId: travel,
+    soldOn: "2026-10-01",
+    salePrice: 21000,
+    saleNote: "Oslo coin fair",
+  });
+  expect(split?.frontPhoto).toBeUndefined();
+  // The Album holds both now; the Free plan counts only the owned one.
+  expect(await ada.as.query(api.albums.get, { albumId: travel })).toMatchObject(
+    { itemCount: 2 },
+  );
+  expect(
+    ((await ada.as.query(api.plans.usage, {})) as { used: number }).used,
+  ).toBe(1);
+});
+
+test("selling every piece marks the Item itself sold, and a Quantity of none or too many is refused", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const itemId = await addKrone(ada);
+  const sell = (quantity: number) =>
+    ada.as.mutation(api.items.sell, { itemId, quantity, soldOn: "2026-10-01" });
+
+  await expect(sell(0)).rejects.toThrow("INVALID_QUANTITY");
+  await expect(sell(3)).rejects.toThrow("INVALID_QUANTITY");
+  await expect(sell(1.5)).rejects.toThrow("INVALID_QUANTITY");
+  await sell(2);
+
+  expect(await browse(ada, { status: "sold" })).toMatchObject({
+    titles: ["1 krone 1875"],
+    collectionSize: 1,
+  });
+  expect((await ada.as.query(api.items.get, { itemId }))?.soldOn).toBe(
+    "2026-10-01",
+  );
+});

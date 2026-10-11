@@ -12,6 +12,8 @@ import { homeCurrency } from "./utils/validators";
 
 /**
  * Totals over the whole Collection (spec 7), read a page of Items at a time.
+ * They describe what the person owns, so sold Items are left out unless
+ * asked for: the sold view sums those instead, for its sale figures.
  *
  * Why pages: a Premium Collection can hold many thousands of Items, more than
  * one query may read. A stored running total would need every way of adding,
@@ -44,6 +46,8 @@ const totals = v.object({
   purchasePrice: v.number(),
   marketValue: v.number(),
   gainLoss: v.object({ amount: v.number(), items: v.number() }),
+  salePrice: v.number(),
+  realised: v.object({ amount: v.number(), items: v.number() }),
   byType: v.object({ coin: amounts, banknote: amounts, stamp: amounts }),
   metals: v.object({ gold: metalTotal, silver: metalTotal }),
   addedByMonth: v.array(
@@ -64,16 +68,18 @@ const MAX_UTC_OFFSET_MINUTES = 14 * 60;
 
 /**
  * The totals of one page of the signed-in person's Items, as the only entry
- * in `page`. `utcOffsetMinutes` is how far ahead of UTC the person's clock is,
- * for the months of Value by date added.
+ * in `page`: the ones they own, or with `status` "sold" the ones they sold.
+ * `utcOffsetMinutes` is how far ahead of UTC the person's clock is, for the
+ * months of Value by date added.
  */
 export const page = query({
   args: {
     paginationOpts: paginationOptsValidator,
     utcOffsetMinutes: v.number(),
+    status: v.optional(v.literal("sold")),
   },
   returns: paginationResultValidator(totals),
-  handler: async (ctx, { paginationOpts, utcOffsetMinutes }) => {
+  handler: async (ctx, { paginationOpts, utcOffsetMinutes, status }) => {
     const owner = await requireSetUpUser(ctx);
     if (
       !Number.isInteger(utcOffsetMinutes) ||
@@ -84,7 +90,14 @@ export const page = query({
     const rates = await latestRates(ctx);
     const items = await ctx.db
       .query("items")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
+      .withIndex("by_ownerId_and_soldOn", (q) =>
+        status === "sold"
+          ? // Every sold-on date is a non-empty "YYYY-MM-DD".
+            q
+              .eq("ownerId", owner._id)
+              .gt("soldOn", "")
+          : q.eq("ownerId", owner._id).eq("soldOn", undefined),
+      )
       .paginate(paginationOpts);
     // Linked Items' metal facts come from their Catalog entries.
     const pageTotals = collectionTotals(await resolveItems(ctx, items.page), {

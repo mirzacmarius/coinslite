@@ -39,10 +39,17 @@ const itemTypes = ["coin", "banknote", "stamp"] as const;
  * the rest of the visit and is remembered on the device. An empty Collection
  * shows only the Spot prices.
  */
-export function CollectionTotalsSection({ narrowed }: { narrowed: boolean }) {
+export function CollectionTotalsSection({
+  narrowed,
+  sold,
+}: {
+  narrowed: boolean;
+  /** The sold view's: the sold Items' sale figures instead. */
+  sold?: boolean;
+}) {
   const t = useI18n();
   const titleId = useId();
-  const totals = useCollectionTotals();
+  const totals = useCollectionTotals(sold ? "sold" : undefined);
   const [display, changeDisplay] = useCollectionDisplay();
   const phone = usePhoneWidth();
   const [chosen, setChosen] = useState<boolean>();
@@ -74,10 +81,15 @@ export function CollectionTotalsSection({ narrowed }: { narrowed: boolean }) {
               aria-hidden="true"
             />
             <span id={titleId} className="shrink-0 font-medium">
-              {t("collectionTotals.section")}
+              {t(
+                sold
+                  ? "collectionTotals.soldSection"
+                  : "collectionTotals.section",
+              )}
             </span>
             <TotalsSummary
               totals={totals}
+              sold={sold}
               className={cn(
                 open === true && "hidden",
                 open === undefined && "sm:hidden",
@@ -90,7 +102,7 @@ export function CollectionTotalsSection({ narrowed }: { narrowed: boolean }) {
           className={cn(open === undefined && "max-sm:hidden")}
         >
           <div className="flex flex-col gap-4 px-4 pb-4">
-            <TotalsDetails totals={totals} />
+            <TotalsDetails totals={totals} sold={sold} />
           </div>
         </CollapsibleContent>
       </section>
@@ -105,9 +117,11 @@ export function CollectionTotalsSection({ narrowed }: { narrowed: boolean }) {
  */
 function TotalsSummary({
   totals,
+  sold,
   className,
 }: {
   totals: CollectionTotals | undefined;
+  sold?: boolean;
   className?: string;
 }) {
   const t = useI18n();
@@ -122,34 +136,35 @@ function TotalsSummary({
   if (totals.items === 0) return null;
 
   const money = (amount: number) => format.money(amount, totals.currency);
-  const { gainLoss } = totals;
+  const gainLoss = sold ? totals.realised : totals.gainLoss;
   const figures: { key: string; label?: string; value: ReactNode }[] = [
     {
       key: "items",
       value: t("collectionTotals.summaryItems", { count: totals.items }),
     },
-    {
-      key: "marketValue",
-      label: t("collectionTotals.summaryMarketValue"),
-      value: money(totals.marketValue),
-    },
+    sold
+      ? {
+          key: "salePrice",
+          label: t("collectionTotals.summarySalePrice"),
+          value: money(totals.salePrice),
+        }
+      : {
+          key: "marketValue",
+          label: t("collectionTotals.summaryMarketValue"),
+          value: money(totals.marketValue),
+        },
   ];
   if (gainLoss.items > 0)
     figures.push({
       key: "gainLoss",
-      label: t("collectionTotals.gainLoss"),
+      label: t(
+        sold ? "collectionTotals.realised" : "collectionTotals.gainLoss",
+      ),
       value: (
-        <span
-          className={cn(
-            gainLoss.amount > 0 && "text-success",
-            gainLoss.amount < 0 && "text-destructive",
-          )}
-        >
-          {format.money(gainLoss.amount, totals.currency, { signed: true })}
-        </span>
+        <SignedMoney amount={gainLoss.amount} currency={totals.currency} />
       ),
     });
-  for (const metal of metals) {
+  for (const metal of sold ? [] : metals) {
     const { value } = totals.metals[metal];
     if (value)
       figures.push({
@@ -176,8 +191,17 @@ function TotalsSummary({
   );
 }
 
-/** The totals, Spot prices and charts, with placeholders while they load. */
-function TotalsDetails({ totals }: { totals: CollectionTotals | undefined }) {
+/**
+ * The totals, Spot prices and charts, with placeholders while they load. The
+ * sold view's are its sale figures, with no charts: those show what's owned.
+ */
+function TotalsDetails({
+  totals,
+  sold,
+}: {
+  totals: CollectionTotals | undefined;
+  sold?: boolean;
+}) {
   const empty = totals?.items === 0;
   return (
     <>
@@ -185,11 +209,16 @@ function TotalsDetails({ totals }: { totals: CollectionTotals | undefined }) {
         {totals === undefined ? (
           <FiguresSkeleton />
         ) : (
-          !empty && <TotalsFigures totals={totals} />
+          !empty && (
+            <TotalsFigures
+              totals={totals}
+              variant={sold ? "sold" : "collection"}
+            />
+          )
         )}
         <SpotPrices className={cn(empty && "max-w-xl xl:col-span-2")} />
       </div>
-      {totals === undefined ? (
+      {sold ? null : totals === undefined ? (
         <ChartsSkeleton />
       ) : (
         !empty && (
@@ -230,26 +259,82 @@ export function CollectionTotalsSkeleton() {
   );
 }
 
+/** An amount with its sign, green for a gain and red for a loss. */
+function SignedMoney({
+  amount,
+  currency,
+}: {
+  amount: number;
+  currency: CollectionTotals["currency"];
+}) {
+  const format = useFormatters();
+  return (
+    <span
+      className={cn(
+        amount > 0 && "text-success",
+        amount < 0 && "text-destructive",
+      )}
+    >
+      {format.money(amount, currency, { signed: true })}
+    </span>
+  );
+}
+
 /**
  * The totals as figures in one card: counts, money, then each metal held. The
- * Overview's keep to pieces and money (spec 9).
+ * Overview's keep to pieces and money (spec 9), plus the Realised Gain/loss
+ * once something is sold (`sold`, the sold Items' totals). The sold view's
+ * show the sale total and the Realised Gain/loss instead of Market value.
  */
 export function TotalsFigures({
   totals,
   variant = "collection",
+  sold,
 }: {
   totals: CollectionTotals;
-  variant?: "collection" | "overview";
+  variant?: "collection" | "overview" | "sold";
+  sold?: CollectionTotals;
 }) {
   const t = useI18n();
   const format = useFormatters();
   const money = (amount: number) => format.money(amount, totals.currency);
-  const { gainLoss } = totals;
+  /**
+   * Gain/loss over what's owned, or realised over what's sold, with a dash
+   * and a hint until an Item has both of the prices it needs.
+   */
+  const gainLossFigure = (
+    kind: "gainLoss" | "realised",
+    of: CollectionTotals,
+  ) => {
+    const figure = of[kind];
+    return (
+      <Figure
+        label={t(`collectionTotals.${kind}`)}
+        value={
+          figure.items === 0 ? (
+            <span className="text-muted-foreground">–</span>
+          ) : (
+            <SignedMoney amount={figure.amount} currency={of.currency} />
+          )
+        }
+        hint={
+          figure.items === 0
+            ? t(`collectionTotals.${kind}None`)
+            : figure.items < of.items
+              ? t(`collectionTotals.${kind}Partial`, {
+                  count: format.number(figure.items),
+                  total: format.number(of.items),
+                })
+              : undefined
+        }
+      />
+    );
+  };
 
   return (
     <div className="overflow-hidden rounded-lg border bg-card">
       <dl className={figuresLayout}>
-        {variant === "collection" && (
+        {variant !== "overview" && (
           <Figure
             label={t("collectionTotals.items")}
             value={format.number(totals.items)}
@@ -271,39 +356,27 @@ export function TotalsFigures({
           label={t("collectionTotals.purchasePrice")}
           value={money(totals.purchasePrice)}
         />
-        <Figure
-          label={t("collectionTotals.marketValue")}
-          value={money(totals.marketValue)}
-        />
-        <Figure
-          label={t("collectionTotals.gainLoss")}
-          value={
-            gainLoss.items === 0 ? (
-              <span className="text-muted-foreground">–</span>
-            ) : (
-              <span
-                className={cn(
-                  gainLoss.amount > 0 && "text-success",
-                  gainLoss.amount < 0 && "text-destructive",
-                )}
-              >
-                {format.money(gainLoss.amount, totals.currency, {
-                  signed: true,
-                })}
-              </span>
-            )
-          }
-          hint={
-            gainLoss.items === 0
-              ? t("collectionTotals.gainLossNone")
-              : gainLoss.items < totals.items
-                ? t("collectionTotals.gainLossPartial", {
-                    count: format.number(gainLoss.items),
-                    total: format.number(totals.items),
-                  })
-                : undefined
-          }
-        />
+        {variant === "sold" ? (
+          <>
+            <Figure
+              label={t("collectionTotals.salePrice")}
+              value={money(totals.salePrice)}
+            />
+            {gainLossFigure("realised", totals)}
+          </>
+        ) : (
+          <>
+            <Figure
+              label={t("collectionTotals.marketValue")}
+              value={money(totals.marketValue)}
+            />
+            {gainLossFigure("gainLoss", totals)}
+          </>
+        )}
+        {variant === "overview" &&
+          sold &&
+          sold.items > 0 &&
+          gainLossFigure("realised", sold)}
         {metals
           .filter(
             (metal) =>

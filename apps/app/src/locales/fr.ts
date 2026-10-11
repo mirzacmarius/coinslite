@@ -501,23 +501,22 @@ export default {
     edit: "Modifier",
     soldOn: "Vendu le",
     salePrice: "Prix de vente",
-    note: "Remarque",
+    note: "Note de vente",
     notePlaceholder: "Où ou à qui",
     title: "Vendre « {title} »",
     editTitle: "Modifier la vente",
     description:
       "L’objet passe dans vos objets vendus et garde ses photos et son historique.",
-    "descriptionPieces#one":
-      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
-    "descriptionPieces#few":
-      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
-    "descriptionPieces#other":
-      "Les {count} exemplaires sont vendus. L’objet passe dans vos objets vendus et garde ses photos et son historique.",
+    descriptionSplit:
+      "Vendez une partie des exemplaires ou tous. Ceux que vous gardez restent dans votre collection.",
+    quantity: "Exemplaires vendus",
+    quantityHint: "Jusqu’à {max}",
     close: "Fermer",
     cancel: "Annuler",
     confirm: "Marquer comme vendu",
     save: "Enregistrer la vente",
     sold: "Objet marqué comme vendu",
+    soldPart: "Vendu. Le reste demeure dans votre collection.",
     saved: "Vente enregistrée",
     owned: "Objet marqué comme possédé",
     failed: "Impossible d’enregistrer la vente. Réessayez.",
@@ -525,6 +524,7 @@ export default {
     errors: {
       date: "Saisissez une date qui n’est pas postérieure à aujourd’hui.",
       beforePurchase: "La date de vente ne peut pas précéder la date d’achat.",
+      quantity: "Saisissez un nombre entier de 1 à {max}.",
     },
   },
   feedback: {
@@ -1004,10 +1004,12 @@ export default {
   collectionTotals: {
     title: "Totaux de la collection",
     section: "Totaux",
+    soldSection: "Totaux des ventes",
     "summaryItems#one": "{count} objet",
     "summaryItems#few": "{count} objets",
     "summaryItems#other": "{count} objets",
     summaryMarketValue: "Valeur de marché",
+    summarySalePrice: "Vendu pour",
     items: "Objets",
     itemsHint: "Chaque objet compte une fois, quelle que soit sa quantité",
     pieces: "Exemplaires",
@@ -1023,6 +1025,12 @@ export default {
       "Objets avec un prix d’achat et une valeur de marché\u00a0: {count} sur {total}",
     gainLossNone:
       "S’affiche dès qu’un objet a un prix d’achat et une valeur de marché",
+    salePrice: "Prix de vente total",
+    realised: "Plus-value/moins-value réalisée",
+    realisedNone:
+      "S’affiche dès qu’un objet vendu a un prix d’achat et un prix de vente",
+    realisedPartial:
+      "Objets vendus avec un prix d’achat et un prix de vente : {count} sur {total}",
     metalValue: {
       gold: "Valeur du métal (or)",
       silver: "Valeur du métal (argent)",

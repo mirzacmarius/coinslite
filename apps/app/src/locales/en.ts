@@ -485,23 +485,22 @@ export default {
     edit: "Edit",
     soldOn: "Sold on",
     salePrice: "Sale price",
-    note: "Note",
+    note: "Sale note",
     notePlaceholder: "Where or to whom",
     title: "Sell “{title}”",
     editTitle: "Edit sale",
     description:
       "The Item moves to your sold Items and keeps its photos and history.",
-    "descriptionPieces#one":
-      "All {count} pieces are sold. The Item moves to your sold Items and keeps its photos and history.",
-    "descriptionPieces#few":
-      "All {count} pieces are sold. The Item moves to your sold Items and keeps its photos and history.",
-    "descriptionPieces#other":
-      "All {count} pieces are sold. The Item moves to your sold Items and keeps its photos and history.",
+    descriptionSplit:
+      "Sell some pieces or all of them. Pieces you keep stay in your Collection.",
+    quantity: "Pieces sold",
+    quantityHint: "Up to {max}",
     close: "Close",
     cancel: "Cancel",
     confirm: "Mark as sold",
     save: "Save sale",
     sold: "Item marked as sold",
+    soldPart: "Pieces sold. The rest stay in your Collection.",
     saved: "Sale saved",
     owned: "Item marked as owned",
     failed: "The sale couldn't be saved. Try again.",
@@ -509,6 +508,7 @@ export default {
     errors: {
       date: "Enter a date no later than today.",
       beforePurchase: "The sold-on date can't be before the Purchase date.",
+      quantity: "Enter a whole number from 1 to {max}.",
     },
   },
   feedback: {
@@ -974,10 +974,12 @@ export default {
   collectionTotals: {
     title: "Collection totals",
     section: "Totals",
+    soldSection: "Sold totals",
     "summaryItems#one": "1 Item",
     "summaryItems#few": "{count} Items",
     "summaryItems#other": "{count} Items",
     summaryMarketValue: "Market value",
+    summarySalePrice: "Sold for",
     items: "Items",
     itemsHint: "Each Item counts once, whatever its Quantity",
     pieces: "Pieces",
@@ -993,6 +995,12 @@ export default {
       "Items with both a Purchase price and a Market value: {count} of {total}",
     gainLossNone:
       "Shows once an Item has both a Purchase price and a Market value",
+    salePrice: "Total sale price",
+    realised: "Realised Gain/loss",
+    realisedNone:
+      "Shows once a sold Item has both a Purchase price and a sale price",
+    realisedPartial:
+      "Sold Items with both a Purchase price and a sale price: {count} of {total}",
     metalValue: {
       gold: "Gold Metal value",
       silver: "Silver Metal value",

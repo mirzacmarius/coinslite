@@ -24,17 +24,21 @@ function useUtcOffsetMinutes() {
 }
 
 /**
- * Totals over the signed-in person's whole Collection, live, or undefined
- * while they first load. The server sums a page of Items at a time; this
+ * Totals over the Items the signed-in person owns, or with `status` "sold"
+ * over the ones they sold, live, or undefined while they first load. The server sums a page of Items at a time; this
  * reads every page and adds them up (collectionTotals.ts explains why). When
  * the Collection grows past a page, the previous totals stay on screen until
  * the next page is in.
  */
-export function useCollectionTotals(): CollectionTotals | undefined {
+export function useCollectionTotals(
+  sold?: "sold",
+): CollectionTotals | undefined {
   const utcOffsetMinutes = useUtcOffsetMinutes();
   const { results, status, loadMore } = usePaginatedQuery(
     api.collectionTotals.page,
-    utcOffsetMinutes === null ? "skip" : { utcOffsetMinutes },
+    utcOffsetMinutes === null
+      ? "skip"
+      : { utcOffsetMinutes, ...(sold && { status: sold }) },
     { initialNumItems: TOTALS_PAGE_SIZE },
   );
 
@@ -49,10 +53,14 @@ export function useCollectionTotals(): CollectionTotals | undefined {
         : undefined,
     [results, status],
   );
-  const previous = useRef<CollectionTotals>(undefined);
+  // Kept per status: owned totals never stand in for sold ones.
+  const previous = useRef<{ sold?: "sold"; totals: CollectionTotals }>(
+    undefined,
+  );
   useEffect(() => {
-    if (complete) previous.current = complete;
-  }, [complete]);
+    if (complete) previous.current = { sold, totals: complete };
+  }, [complete, sold]);
 
-  return complete ?? previous.current;
+  const kept = previous.current;
+  return complete ?? (kept && kept.sold === sold ? kept.totals : undefined);
 }

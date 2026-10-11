@@ -495,23 +495,22 @@ export default {
     edit: "Editează",
     soldOn: "Vândut pe",
     salePrice: "Preț de vânzare",
-    note: "Notă",
+    note: "Notă de vânzare",
     notePlaceholder: "Unde sau cui",
     title: "Vinde „{title}”",
     editTitle: "Editează vânzarea",
     description:
       "Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
-    "descriptionPieces#one":
-      "Se vinde {count} bucată. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
-    "descriptionPieces#few":
-      "Se vând toate cele {count} bucăți. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
-    "descriptionPieces#other":
-      "Se vând toate cele {count} de bucăți. Obiectul trece la obiectele tale vândute și își păstrează fotografiile și istoricul.",
+    descriptionSplit:
+      "Vinde câteva bucăți sau pe toate. Ce păstrezi rămâne în colecția ta.",
+    quantity: "Bucăți vândute",
+    quantityHint: "Până la {max}",
     close: "Închide",
     cancel: "Anulează",
     confirm: "Marchează ca vândut",
     save: "Salvează vânzarea",
     sold: "Obiect marcat ca vândut",
+    soldPart: "Vândut. Restul rămâne în colecția ta.",
     saved: "Vânzare salvată",
     owned: "Obiect marcat ca deținut",
     failed: "Vânzarea nu a putut fi salvată. Încearcă din nou.",
@@ -519,6 +518,7 @@ export default {
     errors: {
       date: "Introdu o dată care nu e după ziua de azi.",
       beforePurchase: "Data vânzării nu poate fi înainte de data achiziției.",
+      quantity: "Introdu un număr întreg de la 1 la {max}.",
     },
   },
   feedback: {
@@ -995,10 +995,12 @@ export default {
   collectionTotals: {
     title: "Totalurile colecției",
     section: "Totaluri",
+    soldSection: "Totaluri vânzări",
     "summaryItems#one": "1 obiect",
     "summaryItems#few": "{count} obiecte",
     "summaryItems#other": "{count} de obiecte",
     summaryMarketValue: "Valoare de piață",
+    summarySalePrice: "Vândut cu",
     items: "Obiecte",
     itemsHint: "Fiecare obiect se numără o dată, oricare i-ar fi cantitatea",
     pieces: "Bucăți",
@@ -1014,6 +1016,12 @@ export default {
       "Obiecte cu preț de achiziție și valoare de piață: {count} din {total}",
     gainLossNone:
       "Apare când un obiect are atât preț de achiziție, cât și valoare de piață",
+    salePrice: "Preț de vânzare total",
+    realised: "Câștig/pierdere realizată",
+    realisedNone:
+      "Apare când un obiect vândut are și preț de achiziție, și preț de vânzare",
+    realisedPartial:
+      "Obiecte vândute cu preț de achiziție și preț de vânzare: {count} din {total}",
     metalValue: {
       gold: "Valoarea metalului (aur)",
       silver: "Valoarea metalului (argint)",

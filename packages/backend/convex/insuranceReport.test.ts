@@ -594,3 +594,36 @@ test("the PDF is made for Premium members only, on the server", async () => {
     }),
   ).rejects.toThrow("PREMIUM_REQUIRED");
 });
+
+test("sold Items are left out of every scope: the whole Collection, an Album and Items without one", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  const travel = await ada.as.mutation(api.albums.create, { name: "Travel" });
+  await add(ada, { ...kroner, quantity: 1, albumId: travel });
+  const soldInAlbum = await add(ada, {
+    ...kroner,
+    quantity: 2,
+    albumId: travel,
+  });
+  await add(ada, { ...stamp, quantity: 4 });
+  const soldLoose = await add(ada, { ...stamp, quantity: 8 });
+  for (const itemId of [soldInAlbum, soldLoose])
+    await ada.as.mutation(api.items.sell, { itemId, soldOn: "2026-10-01" });
+  const piecesIn = async (scope: Scope) => {
+    const { items, pieces } = ready(
+      await ada.as.query(api.insuranceReport.preview, {
+        scope,
+        columns: ["marketValue"],
+      }),
+    );
+    return [items, pieces];
+  };
+
+  expect(await piecesIn(collection)).toEqual([2, 5]);
+  expect(
+    await piecesIn({ kind: "albums", albumIds: [travel], withoutAlbum: false }),
+  ).toEqual([1, 1]);
+  expect(
+    await piecesIn({ kind: "albums", albumIds: [], withoutAlbum: true }),
+  ).toEqual([1, 4]);
+});

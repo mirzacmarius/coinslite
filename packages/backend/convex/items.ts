@@ -150,6 +150,20 @@ function checkFields(
   return overridesOnly(checked, entry.facts, stored);
 }
 
+/**
+ * Stores a new Item and keeps the counts that follow Items (its Album's, the
+ * Collection's) right. Every way of creating an Item goes through here.
+ */
+async function storeNewItem(
+  ctx: MutationCtx,
+  doc: Omit<Doc<"items">, "_id" | "_creationTime">,
+) {
+  const itemId = await ctx.db.insert("items", doc);
+  await moveBetweenAlbums(ctx, undefined, doc.albumId);
+  await countItemAdded(ctx, { ownerId: doc.ownerId, type: doc.type });
+  return itemId;
+}
+
 /** Stores a new Item in its owner's Collection, and in an Album of theirs if given one. */
 async function insertItem(
   ctx: MutationCtx,
@@ -159,15 +173,12 @@ async function insertItem(
   albumId: Id<"albums"> | undefined,
 ) {
   const album = await ownAlbumId(ctx, ownerId, albumId);
-  const itemId = await ctx.db.insert("items", {
+  return await storeNewItem(ctx, {
     ownerId,
     ...fields,
     ...(entry && { catalogEntryId: entry._id }),
     ...(album && { albumId: album }),
   });
-  await moveBetweenAlbums(ctx, undefined, album);
-  await countItemAdded(ctx, { ownerId, type: fields.type });
-  return itemId;
 }
 
 /**
@@ -274,7 +285,7 @@ export const addCatalogEntries = mutation({
   },
 });
 
-/** Whether a person has any Item made from a Catalog entry. */
+/** Whether a person still owns any Item made from a Catalog entry. */
 async function holdsAny(
   ctx: QueryCtx,
   ownerId: Id<"users">,
@@ -282,8 +293,11 @@ async function holdsAny(
 ) {
   const item = await ctx.db
     .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId", (q) =>
-      q.eq("ownerId", ownerId).eq("catalogEntryId", entryId),
+    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
+      q
+        .eq("ownerId", ownerId)
+        .eq("catalogEntryId", entryId)
+        .eq("soldOn", undefined),
     )
     .first();
   return item !== null;
@@ -317,24 +331,41 @@ export const update = mutation({
 });
 
 /**
- * Marks one of the signed-in person's Items sold, every piece of it, or
- * changes its sale: the sold-on date, the sale price per piece and a note.
+ * Marks one of the signed-in person's Items sold, or changes its sale: the
+ * sold-on date, the sale price per piece and a note. Selling fewer pieces
+ * than the Item holds (`quantity`) splits them off: a new sold Item copies
+ * every field but the photos, and the original keeps the rest, still owned.
  */
 export const sell = mutation({
   args: {
     itemId: v.id("items"),
+    /** How many pieces; all of them when left out. */
+    quantity: v.optional(v.number()),
     soldOn: v.string(),
     salePrice: v.optional(v.number()),
     saleNote: v.optional(v.string()),
   },
-  returns: v.null(),
-  handler: async (ctx, { itemId, ...sale }) => {
+  returns: v.id("items"),
+  handler: async (ctx, { itemId, quantity, ...input }) => {
     const item = await requireOwnItem(ctx, itemId);
-    await ctx.db.patch(
-      itemId,
-      checkSale(sale, latestPurchaseDate(), item.purchaseDate),
-    );
-    return null;
+    const sale = checkSale(input, latestPurchaseDate(), item.purchaseDate);
+    const pieces = quantity ?? item.quantity;
+    if (!Number.isSafeInteger(pieces) || pieces < 1 || pieces > item.quantity)
+      throw new ConvexError(itemErrors.invalidQuantity);
+    if (pieces === item.quantity) {
+      await ctx.db.patch(itemId, sale);
+      return itemId;
+    }
+    if (item.soldOn !== undefined)
+      throw new ConvexError(itemErrors.invalidQuantity);
+    const { _id, _creationTime, frontPhoto, backPhoto, ...fields } = item;
+    const soldId = await storeNewItem(ctx, {
+      ...fields,
+      quantity: pieces,
+      ...sale,
+    });
+    await ctx.db.patch(itemId, { quantity: item.quantity - pieces });
+    return soldId;
   },
 });
 
