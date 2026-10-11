@@ -35,11 +35,7 @@ bun dev         # marketing site, product app, Convex and email preview
 ```sh
 bun run lint        # Biome + monorepo consistency
 bun run typecheck
-bun run test        # backend rules, through Convex functions (convex-test + Vitest)
-bun run verify      # format, lint, typecheck, tests and build, as before a merge
 ```
-
-On a test backend (`bash packages/backend/scripts/setup-e2e-backend.sh`), `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment. Any deployment that sends real email refuses it.
 
 CI runs lint and typecheck on every push.
 

@@ -24,5 +24,13 @@
   },
   "formatter": {
     "indentStyle": "space"
+  },
+  "files": {
+    "ignore": ["**/_generated/**", "**/.convex/**", "**/.next/**"]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   }
 }

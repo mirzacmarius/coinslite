@@ -9,12 +9,10 @@
   },
   "scripts": {
     "lint": "biome lint",
-    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@coinslite/typescript": "workspace:*",
-    "typescript": "^5.5.4",
-    "vitest": "^3.2.4"
+    "typescript": "^5.5.4"
   }
 }

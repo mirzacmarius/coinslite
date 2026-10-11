@@ -7,8 +7,6 @@
     "setup": "convex dev --once && bun scripts/link-app-env.ts",
     "seed": "convex dev --once && convex run init",
     "seed:catalog": "convex run catalog/seed:load",
-    "test": "vitest run",
-    "test:watch": "vitest",
     "typecheck": "tsc --noEmit -p convex",
     "lint": "biome lint"
   },
@@ -29,11 +27,7 @@
     "standardwebhooks": "^1.0.0"
   },
   "devDependencies": {
-    "@edge-runtime/vm": "^5.0.0",
-    "convex-test": "^0.0.60",
     "jose": "^5.10.0",
-    "typescript": "^5.5.4",
-    "unpdf": "^1.8.1",
-    "vitest": "^3.2.4"
+    "typescript": "^5.5.4"
   }
 }
