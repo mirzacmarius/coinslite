@@ -1,5 +1,6 @@
 "use client";
 
+import { entryItemsHref } from "@/components/collection/collection-url";
 import { useGradeLabels } from "@/components/items/grade-labels";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
@@ -13,6 +14,7 @@ import {
 } from "@coinslite/ui/property-panel";
 import type { FunctionReturnType } from "convex/server";
 import { Banknote, Coins } from "lucide-react";
+import Link from "next/link";
 import type * as React from "react";
 import { CatalogEntryEdit } from "./catalog-entry-edit";
 import { CatalogHeader, type Crumb } from "./catalog-header";
@@ -211,8 +213,18 @@ export function CatalogEntryDetail({
         <PropertyPanel>
           <PanelSection title={t("catalog.yourCollection")}>
             <PropertyRow label={t("catalog.held")}>
-              {format.number(entry.held)}
-              {entry.heldMore && "+"}
+              {/* A count of zero has nothing to open. */}
+              {entry.held > 0 ? (
+                <Link
+                  href={entryItemsHref(entry.key)}
+                  className="text-link hover:underline"
+                >
+                  {format.number(entry.held)}
+                  {entry.heldMore && "+"}
+                </Link>
+              ) : (
+                format.number(entry.held)
+              )}
             </PropertyRow>
           </PanelSection>
           {physical.length > 0 && (

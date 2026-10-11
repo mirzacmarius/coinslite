@@ -4,7 +4,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { compareDenominations } from "../items/denominations";
 import { type GradingScale, gradeRank, gradingScaleIds } from "../items/grades";
-import { itemResolver } from "../items/resolve";
+import { catalogEntryByKey, itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
 import { gradingScale, itemType } from "../utils/validators";
 import {
@@ -34,6 +34,7 @@ export const collectionView = v.object({
   grade: v.optional(v.object({ gradingScale, grade: v.string() })),
   album: v.optional(v.string()),
   notInAlbum: v.optional(v.string()),
+  entry: v.optional(v.string()),
   status: v.optional(v.literal("sold")),
   sort: v.optional(v.union(...collectionSorts.map((sort) => v.literal(sort)))),
 });
@@ -175,6 +176,7 @@ const dimensions = [
   "denomination",
   "grade",
   "album",
+  "entry",
   "status",
 ] as const;
 type Dimension = (typeof dimensions)[number];
@@ -183,6 +185,7 @@ type Dimension = (typeof dimensions)[number];
 function filtersFor(
   view: CollectionView,
   ownCountry: string | null,
+  entryId: Id<"catalogNodes"> | null,
 ): Record<Dimension, Matcher> {
   const all = () => true;
   const country = view.country?.toUpperCase();
@@ -216,6 +219,10 @@ function filtersFor(
           ? item.albumId === undefined
           : item.albumId === view.album)) &&
       (view.notInAlbum === undefined || item.albumId !== view.notInAlbum),
+    // A key that names no Catalog entry matches nothing.
+    entry: (item) =>
+      view.entry === undefined ||
+      (entryId !== null && item.catalogEntryId === entryId),
     status: (item) => (item.soldOn !== undefined) === (view.status === "sold"),
   };
 }
@@ -236,6 +243,7 @@ function countOptions(
   searched: Matcher,
   filters: Record<Dimension, Matcher>,
   ownCountry: string | null,
+  entryId: Id<"catalogNodes"> | null,
 ) {
   const types = { coin: 0, banknote: 0, stamp: 0, bullion: 0 };
   const origins = { own: 0, foreign: 0 };
@@ -250,6 +258,7 @@ function countOptions(
   >();
   const albums = new Map<Id<"albums">, number>();
   let withoutAlbums = 0;
+  let ofEntry = 0;
   const statuses = { owned: 0, sold: 0 };
   const add = <K>(counts: Map<K, number>, key: K) =>
     counts.set(key, (counts.get(key) ?? 0) + 1);
@@ -295,6 +304,8 @@ function countOptions(
       if (item.albumId === undefined) withoutAlbums += 1;
       else add(albums, item.albumId);
     }
+    if (counts("entry") && entryId !== null && item.catalogEntryId === entryId)
+      ofEntry += 1;
     if (counts("status"))
       statuses[item.soldOn === undefined ? "owned" : "sold"] += 1;
   }
@@ -320,6 +331,8 @@ function countOptions(
       .map(([albumId, count]) => ({ albumId, count }))
       .sort(byCount),
     withoutAlbum: withoutAlbums,
+    /** Items made from the view's Catalog entry, when it has one. */
+    entry: ofEntry,
     statuses,
   };
 }
@@ -381,9 +394,13 @@ export async function findItems(
   const { items, complete } = await readCollection(ctx, owner._id);
   const searched = searchFor(view.search, locale);
   const ownCountry = ownCountryOf(owner);
-  const filters = filtersFor(view, ownCountry);
+  const entry =
+    view.entry === undefined ? null : await catalogEntryByKey(ctx, view.entry);
+  const entryId = entry?._id ?? null;
+  const filters = filtersFor(view, ownCountry, entryId);
   return {
     ownCountry,
+    entry: entry && { key: entry.key, title: entry.title },
     collectionSize: items.length,
     complete,
     items: items
@@ -393,7 +410,7 @@ export async function findItems(
           dimensions.every((dimension) => filters[dimension](item)),
       )
       .sort(orderFor(view.sort ?? defaultSort, locale)),
-    options: countOptions(items, searched, filters, ownCountry),
+    options: countOptions(items, searched, filters, ownCountry, entryId),
   };
 }
 

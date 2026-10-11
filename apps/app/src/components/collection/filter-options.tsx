@@ -14,6 +14,7 @@ import {
 import type { FunctionReturnType } from "convex/server";
 import {
   Award,
+  BookOpen,
   CircleCheck,
   CircleDollarSign,
   FolderOpen,
@@ -34,6 +35,7 @@ export type FilterDimension =
   | "denomination"
   | "grade"
   | "album"
+  | "entry"
   | "status";
 
 export type FilterOption = {
@@ -57,6 +59,8 @@ export type Filter = {
   clear: Partial<CollectionView>;
   /** The chosen option, when the filter is on. */
   active?: { label: string; icon?: React.ReactNode };
+  /** False for a filter only links turn on: it shows as a chip, not in the menu. */
+  inMenu?: false;
 };
 
 const optionIcon = (Icon: LucideIcon) => (
@@ -262,6 +266,31 @@ export function useFilters(
           active: { label: t("collection.unknownAlbum") },
         }),
     });
+
+    // Too many entries to list: links narrow to one ("You hold" on an entry).
+    if (view.entry) {
+      // Named once the result says which entry the key is.
+      const label = result
+        ? result.entry?.title ?? t("collection.unknownEntry")
+        : "…";
+      filters.push({
+        dimension: "entry",
+        label: t("collection.filters.entry"),
+        icon: BookOpen,
+        options: [
+          {
+            key: view.entry,
+            label,
+            count: options?.entry ?? 0,
+            selected: true,
+            change: { entry: view.entry },
+          },
+        ],
+        clear: { entry: undefined },
+        inMenu: false,
+        active: { label },
+      });
+    }
 
     // Owned is the default, so only the sold view shows as an active filter.
     filters.push({

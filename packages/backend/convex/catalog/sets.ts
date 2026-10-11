@@ -320,3 +320,38 @@ export const heldCounts = query({
     return counts.flat();
   },
 });
+
+/** Which Set "View as Set" opens: see `setOfEntry`. */
+export const setScope = v.object({
+  key: v.string(),
+  denomination: v.optional(nullable),
+  series: v.optional(nullable),
+});
+
+/**
+ * The Set an Item made from `entry` belongs to, for "View as Set": the
+ * grouping right above the entry, or for an entry right below a country,
+ * its denomination and series on the country's denomination path. Null
+ * when that is too small or too large to be a Set (setRules.ts isSet).
+ */
+export async function setOfEntry(
+  ctx: QueryCtx,
+  entry: Doc<"catalogNodes">,
+): Promise<typeof setScope.type | null> {
+  const parentKey = entry.path.split("/").at(-2);
+  const parent = parentKey && (await nodeByKey(ctx, parentKey));
+  if (!parent) return null;
+  if (!isCountryNode(parent))
+    return isSet(parent.entryCount ?? 0) ? { key: parent.key } : null;
+  const denomination = entry.denomination ?? null;
+  const series = entry.series ?? null;
+  const entries = await denominationEntries(
+    ctx,
+    parent.key,
+    denomination,
+    series,
+  );
+  return isSet(entries.length)
+    ? { key: parent.key, denomination, series }
+    : null;
+}

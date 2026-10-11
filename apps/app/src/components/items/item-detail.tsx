@@ -2,8 +2,13 @@
 
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
-import { catalogNodeHref } from "@/components/catalog/catalog-levels";
+import { catalogNodeHref, setHref } from "@/components/catalog/catalog-levels";
 import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
+import {
+  collectionHref,
+  entryItemsHref,
+  viewOfItemUrl,
+} from "@/components/collection/collection-url";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -17,15 +22,24 @@ import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
-import { Copy, HandCoins, Pencil, SearchX, Trash2, Undo2 } from "lucide-react";
+import {
+  Copy,
+  HandCoins,
+  ListChecks,
+  Pencil,
+  SearchX,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import type * as React from "react";
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { isItemLimitError, useItemLimitMessage } from "../plans/plan-usage";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
+import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
@@ -35,6 +49,12 @@ export function ItemDetail() {
   const t = useI18n();
   const { itemId } = useParams<{ itemId: string }>();
   const item = useQuery(api.items.get, { itemId });
+  // The Collection view the Item was opened from, if any.
+  const params = useSearchParams();
+  const view = useMemo(
+    () => viewOfItemUrl(new URLSearchParams(params.toString())),
+    [params],
+  );
   const format = useFormatters();
   const labels = useGradeLabels();
   const catalogFormat = useCatalogFormat();
@@ -51,7 +71,10 @@ export function ItemDetail() {
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
   const parent = (
-    <Link href="/collection" className="hover:text-foreground">
+    <Link
+      href={view ? collectionHref(view) : "/collection"}
+      className="hover:text-foreground"
+    >
       {t("nav.collection")}
     </Link>
   );
@@ -203,6 +226,7 @@ export function ItemDetail() {
         title={item.title}
         actions={
           <>
+            {view && <ItemNeighbours itemId={item._id} view={view} />}
             {sold ? (
               <Button
                 variant="ghost"
@@ -334,12 +358,40 @@ export function ItemDetail() {
               {t(`items.types.${item.type}`)}
             </PropertyRow>
             {item.catalogEntry && (
-              <PropertyRow label={t("catalogPicker.entry")}>
+              <PropertyRow label={t("catalogPicker.entry")} wrap>
                 <Link
                   href={catalogNodeHref(item.catalogEntry.key)}
                   className="hover:underline"
                 >
                   {item.catalogEntry.title}
+                </Link>
+                {item.catalogEntry.otherItems > 0 && (
+                  <>
+                    {" "}
+                    <Link
+                      href={entryItemsHref(item.catalogEntry.key)}
+                      className="text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      {t("items.moreYouHold", {
+                        count: format.number(item.catalogEntry.otherItems),
+                      })}
+                    </Link>
+                  </>
+                )}
+              </PropertyRow>
+            )}
+            {item.catalogEntry?.set && (
+              <PropertyRow label={t("sets.title")}>
+                <Link
+                  href={setHref(item.catalogEntry.set)}
+                  className="inline-flex items-center gap-1.5 hover:underline"
+                >
+                  <ListChecks
+                    className="size-3.5 text-muted-foreground"
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
+                  {t("sets.viewAsSet")}
                 </Link>
               </PropertyRow>
             )}

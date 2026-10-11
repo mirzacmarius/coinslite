@@ -24,7 +24,8 @@ import { itemTypes } from "../items/item-fields";
  * shared: ?q=krone&type=coin&bullion=1&origin=own&country=NO
  * &denomination=1%20krone&grade=european:XF&album=…&status=sold&sort=price&page=2.
  * ?addTo=<Album> picks Items to add to that Album: the view leaves out the
- * Items already in it.
+ * Items already in it. ?entry=<key> shows the Items made from one Catalog
+ * entry.
  * Defaults are left out. Anything that doesn't parse is ignored.
  */
 
@@ -54,11 +55,44 @@ export function readCollectionUrl(params: URLSearchParams) {
   if (album) view.album = album;
   const addTo = params.get("addTo");
   if (addTo) view.notInAlbum = addTo;
+  const entry = params.get("entry")?.trim();
+  if (entry) view.entry = entry.slice(0, searchLimit);
   if (params.get("status") === "sold") view.status = "sold";
   const sort = oneOf<CollectionSort>(collectionSorts, params.get("sort"));
   if (sort && sort !== defaultSort) view.sort = sort;
   const page = Number(params.get("page"));
   return { view, page: Number.isSafeInteger(page) && page > 1 ? page : 1 };
+}
+
+/** Marks an Item's URL as opened from a Collection view, even the default one. */
+const fromView = "view";
+
+/**
+ * An Item's page, opened from a Collection view: the URL carries the view
+ * (without its page), so the Item page can move through it.
+ */
+export function itemInViewHref(itemId: string, view: CollectionView) {
+  const params = writeCollectionUrl(view, 1);
+  params.set(fromView, "1");
+  return `/collection/${itemId}?${params}`;
+}
+
+/** The Collection view an Item's URL carries; undefined when it was opened from elsewhere. */
+export function viewOfItemUrl(params: URLSearchParams) {
+  return params.get(fromView) === "1"
+    ? readCollectionUrl(params).view
+    : undefined;
+}
+
+/** The Collection showing a view, from its first page. */
+export function collectionHref(view: CollectionView) {
+  const query = writeCollectionUrl(view, 1).toString();
+  return query ? `/collection?${query}` : "/collection";
+}
+
+/** The Collection narrowed to the Items made from one Catalog entry. */
+export function entryItemsHref(entryKey: string) {
+  return collectionHref({ entry: entryKey });
 }
 
 export function writeCollectionUrl(view: CollectionView, page: number) {
@@ -73,6 +107,7 @@ export function writeCollectionUrl(view: CollectionView, page: number) {
     params.set("grade", `${view.grade.gradingScale}:${view.grade.grade}`);
   if (view.album) params.set("album", view.album);
   if (view.notInAlbum) params.set("addTo", view.notInAlbum);
+  if (view.entry) params.set("entry", view.entry);
   if (view.status) params.set("status", view.status);
   if (view.sort && view.sort !== defaultSort) params.set("sort", view.sort);
   if (page > 1) params.set("page", String(page));

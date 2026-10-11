@@ -52,6 +52,8 @@ export type CollectionView = {
    * Items to add to that Album.
    */
   notInAlbum?: string;
+  /** A Catalog entry's key: only the Items made from it. */
+  entry?: string;
   /** Only sold Items; owned ones when left out. */
   status?: "sold";
   sort?: CollectionSort;

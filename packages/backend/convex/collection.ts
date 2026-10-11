@@ -41,6 +41,8 @@ export const browse = query({
     complete: v.boolean(),
     /** The currency Purchase prices and Market values are in. */
     currency: homeCurrency,
+    /** The view's Catalog entry, to name its filter; null without one or for a key that names none. */
+    entry: v.union(v.null(), v.object({ key: v.string(), title: v.string() })),
     /** The country origin compares against; null when the person has none. */
     ownCountry: v.union(v.string(), v.null()),
     /** How many Items each filter option would show. */
@@ -61,6 +63,7 @@ export const browse = query({
       ),
       albums: v.array(v.object({ albumId: v.id("albums"), count: v.number() })),
       withoutAlbum: v.number(),
+      entry: v.number(),
       statuses: v.object({ owned: v.number(), sold: v.number() }),
     }),
   }),
@@ -104,5 +107,41 @@ export const selectable = query({
         .map((item) => ({ _id: item._id, albumId: item.albumId ?? null })),
       total: items.length,
     };
+  },
+});
+
+const neighbour = v.union(
+  v.null(),
+  v.object({ _id: v.id("items"), title: v.string() }),
+);
+
+/**
+ * The Items either side of one in a view, in the view's order across its
+ * pages, for moving through it from the Item page: null on either end. Null
+ * when the view doesn't show the Item.
+ */
+export const neighbours = query({
+  args: {
+    view: collectionView,
+    itemId: v.string(),
+    locale: v.optional(language),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({ previous: neighbour, next: neighbour }),
+  ),
+  handler: async (ctx, { view, itemId, locale }) => {
+    const owner = await requireSetUpUser(ctx);
+    const { items } = await findItems(
+      ctx,
+      owner,
+      view,
+      locale ?? owner.language ?? defaultLocale,
+    );
+    const at = items.findIndex((item) => item._id === itemId);
+    if (at === -1) return null;
+    const near = (item: (typeof items)[number] | undefined) =>
+      item ? { _id: item._id, title: item.title } : null;
+    return { previous: near(items[at - 1]), next: near(items[at + 1]) };
   },
 });
