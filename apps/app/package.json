@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@auth/core": "0.37.0",
+    "@auth/core": "0.41.3",
     "@coinslite/backend": "workspace:*",
     "@coinslite/i18n": "workspace:*",
     "@coinslite/ui": "workspace:*",
