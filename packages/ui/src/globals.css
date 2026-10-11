@@ -3,25 +3,26 @@
 @tailwind utilities;
 
 /*
- * CoinsLite design tokens: quiet graphite neutrals and one indigo accent.
- * The app sits on the chrome colour (--sidebar) and its pages on an inset
- * panel (--background); cards and popovers step one shade lighter. Every
+ * CoinsLite design tokens: quiet neutrals (blue-grey in the dark theme) and
+ * one indigo accent. The app sits on the chrome colour (--sidebar) and its
+ * pages on an inset panel (--background). Cards are a raised shade of the
+ * panel with no border; popovers step one shade further. Every
  * text/background pairing meets WCAG AA (4.5:1), and control borders
  * (--input) reach 3:1 against their surface.
  */
 @layer base {
   :root {
-    --background: 0 0% 98.8%; /* #fcfcfc panel */
+    --background: 240 9.1% 97.8%; /* #f9f9fa panel */
     --foreground: 240 6.9% 11.4%; /* #1b1b1f */
-    --card: 0 0% 100%;
+    --card: 240 8.3% 95.3%; /* #f2f2f4 raised, no border */
     --card-foreground: 240 6.9% 11.4%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 6.9% 11.4%;
     --primary: 234 56.3% 59.6%; /* #5e6ad2 indigo */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 7.1% 94.5%;
+    --secondary: 240 8.1% 92.7%;
     --secondary-foreground: 240 6.9% 11.4%;
-    --muted: 240 7.1% 94.5%; /* #f0f0f2 hover and selected */
+    --muted: 240 8.1% 92.7%; /* #ebebee hover, bands */
     --muted-foreground: 222 4.8% 40.8%; /* #63666d */
     --accent: 231 70% 96.1%; /* #eef0fc */
     --accent-foreground: 240 6.9% 11.4%;
@@ -30,11 +31,11 @@
     --destructive-foreground: 0 0% 100%;
     --success: 142 72% 29%; /* #15803d */
     --success-foreground: 0 0% 100%;
-    --border: 240 4.2% 90.6%; /* #e6e6e8 */
-    --input: 240 4.1% 56.7%; /* #8c8c95 */
+    --border: 240 3.6% 89%; /* #e2e2e4 */
+    --input: 240 3.8% 53.9%; /* #85858e */
     --ring: 234 56.3% 59.6%;
-    --sidebar: 240 5.3% 96.3%; /* #f5f5f6 chrome */
-    --sidebar-accent: 240 8.1% 92.7%; /* #ebebee hover and current on the chrome */
+    --sidebar: 240 3.4% 94.3%; /* #f0f0f1 chrome */
+    --sidebar-accent: 240 5.7% 89.6%; /* #e3e3e6 hover and current on the chrome */
     --radius: 0.5rem;
     --chart-1: 234 56.3% 59.6%;
     --chart-2: 199 89% 32%;
@@ -44,30 +45,30 @@
   }
 
   .dark {
-    --background: 240 4.5% 8.6%; /* #151517 panel */
-    --foreground: 240 5.9% 90%; /* #e4e4e7 */
-    --card: 240 5.5% 10.8%; /* #1a1a1d */
-    --card-foreground: 240 5.9% 90%;
-    --popover: 240 5.1% 11.6%; /* #1c1c1f */
-    --popover-foreground: 240 5.9% 90%;
+    --background: 233 15.3% 11.6%; /* #191a22 panel */
+    --foreground: 231 14.3% 90.4%; /* #e3e4ea */
+    --card: 235 14.3% 15.1%; /* #21222c raised, no border */
+    --card-foreground: 231 14.3% 90.4%;
+    --popover: 235 12.6% 17.1%; /* #262731 */
+    --popover-foreground: 231 14.3% 90.4%;
     --primary: 234 56.3% 59.6%; /* #5e6ad2 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5.4% 14.5%;
-    --secondary-foreground: 240 5.9% 90%;
-    --muted: 240 5.4% 14.5%; /* #232327 */
-    --muted-foreground: 219 6.4% 56.9%; /* #8a8f98 */
-    --accent: 237 34.5% 21.6%; /* #24264a */
-    --accent-foreground: 240 5.9% 90%;
+    --secondary: 235 13.3% 17.6%;
+    --secondary-foreground: 231 14.3% 90.4%;
+    --muted: 235 13.3% 17.6%; /* #272833 */
+    --muted-foreground: 231 6.2% 58.6%; /* #8f919c */
+    --accent: 237 34.3% 26.9%; /* #2d2f5c */
+    --accent-foreground: 231 14.3% 90.4%;
     --link: 234 100% 75.5%; /* #828fff */
     --destructive: 0 91% 71%; /* #f87171 */
     --destructive-foreground: 0 62% 10%;
     --success: 142 69% 58%; /* #4ade80 */
     --success-foreground: 142 80% 8%;
-    --border: 240 5% 15.7%; /* #26262a */
-    --input: 233 4.3% 40.6%; /* #63646c */
+    --border: 235 11.5% 20.4%; /* #2e2f3a */
+    --input: 233 7% 44.7%; /* #6a6c7a */
     --ring: 234 56.3% 59.6%;
-    --sidebar: 240 6.3% 6.3%; /* #0f0f11 chrome */
-    --sidebar-accent: 240 5.4% 14.5%; /* #232327 */
+    --sidebar: 234 21.7% 9%; /* #12131c chrome */
+    --sidebar-accent: 235 11.1% 19.4%; /* #2c2d37 */
     --chart-1: 234 100% 75.5%;
     --chart-2: 199 89% 60%;
     --chart-3: 173 66% 50%;

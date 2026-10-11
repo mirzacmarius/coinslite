@@ -450,7 +450,7 @@ export function DesignGallery() {
   return (
     <AppShell
       sidebarFooter={
-        <div className="flex flex-col gap-2 rounded-lg border bg-card p-3">
+        <div className="flex flex-col gap-2 rounded-xl bg-card p-3">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Free plan</span>
             <span className="font-medium">18 / 50 Items</span>
@@ -732,7 +732,7 @@ export function DesignGallery() {
           </Section>
 
           <Section title="Collection list">
-            <div className="rounded-lg border bg-card">
+            <div className="rounded-xl bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -856,7 +856,7 @@ function FiltersSample() {
     { value: "VF", count: 7 },
   ];
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="rounded-xl bg-card">
       <div className="flex h-10 items-center justify-between gap-2 border-b px-4">
         <div className="flex min-w-0 flex-1 items-center gap-1">
           <Button variant="ghost" size="xs">

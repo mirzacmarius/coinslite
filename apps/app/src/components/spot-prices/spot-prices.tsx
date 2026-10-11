@@ -32,7 +32,7 @@ export function SpotPrices({ className }: { className?: string }) {
     <section
       aria-labelledby={titleId}
       aria-busy={prices === undefined}
-      className={cn("rounded-lg border bg-card", className)}
+      className={cn("rounded-xl bg-card", className)}
     >
       <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 border-b px-4 py-2">
         <h2 id={titleId} className="text-[13px] font-medium">
@@ -124,7 +124,7 @@ export function SidebarSpotPrices() {
   return (
     <section
       aria-labelledby={titleId}
-      className="flex flex-col gap-1 rounded-lg border bg-background px-3 py-2.5"
+      className="flex flex-col gap-1 rounded-xl bg-background px-3 py-2.5"
     >
       <h2 id={titleId} className="text-xs font-medium">
         {t("spotPrices.title")}

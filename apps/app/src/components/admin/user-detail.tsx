@@ -141,7 +141,7 @@ function Section({
   return (
     <section
       aria-labelledby={id}
-      className="overflow-hidden rounded-lg border bg-card"
+      className="overflow-hidden rounded-xl bg-card"
     >
       <h3 id={id} className="border-b px-4 py-2.5 text-[13px] font-medium">
         {title}
@@ -329,10 +329,7 @@ function DetailSkeleton() {
     >
       <span className="h-5 w-48 animate-pulse rounded bg-muted" />
       {skeleton.map(([section, rows]) => (
-        <div
-          key={section}
-          className="overflow-hidden rounded-lg border bg-card"
-        >
+        <div key={section} className="overflow-hidden rounded-xl bg-card">
           <div className="border-b px-4 py-3">
             <span className="block h-3.5 w-24 animate-pulse rounded bg-muted" />
           </div>

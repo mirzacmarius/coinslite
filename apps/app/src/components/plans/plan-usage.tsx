@@ -89,7 +89,7 @@ export function SidebarPlanUsage() {
   const usage = useFreePlanUsage();
   if (!usage) return null;
   return (
-    <div className="flex flex-col gap-2 rounded-lg border bg-background px-3 py-2.5">
+    <div className="flex flex-col gap-2 rounded-xl bg-background px-3 py-2.5">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-muted-foreground">{t("plans.freePlan")}</span>
         <span className="font-medium">
@@ -127,7 +127,7 @@ export function OverviewPlanUsage() {
   return (
     <section
       aria-label={t("plans.freePlan")}
-      className="flex flex-col gap-3 rounded-lg border bg-card p-4"
+      className="flex flex-col gap-3 rounded-xl bg-card p-4"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">

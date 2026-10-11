@@ -18,7 +18,7 @@ export default function NotFound() {
         className="flex flex-1 justify-center px-4 pb-16 pt-[10dvh]"
       >
         <div className="flex max-w-sm flex-col items-center gap-3 text-center">
-          <div className="flex size-9 items-center justify-center rounded-lg border bg-card text-muted-foreground">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
             <SearchX className="size-4" strokeWidth={1.75} aria-hidden="true" />
           </div>
           <div className="flex flex-col gap-1">

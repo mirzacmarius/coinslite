@@ -29,7 +29,7 @@ export function SettingsGroup({
       </div>
       <div
         className={cn(
-          "flex flex-col divide-y rounded-lg border bg-card px-4",
+          "flex flex-col divide-y rounded-xl bg-card px-4",
           className,
         )}
       >

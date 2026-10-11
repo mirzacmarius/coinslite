@@ -140,7 +140,7 @@ export function AppShell({
         <main
           id="main"
           tabIndex={-1}
-          className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:overflow-y-auto md:rounded-lg md:border md:bg-background md:pb-0"
+          className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:overflow-y-auto md:rounded-xl md:border md:bg-background md:pb-0"
         >
           {children}
         </main>

@@ -16,7 +16,7 @@ view, or anything described as "sidebar", "panel", "split view" or "layout".
 ```
 
 - From `md` up the shell is one `h-dvh` frame on `bg-sidebar`: the sidebar sits on the chrome
-  with no border, and the content column is an inset panel (`rounded-lg border bg-background`,
+  with no border, and the content column is an inset panel (`rounded-xl border bg-background`,
   8px from the top, right and bottom edges) that is the scroll container (`main#main`). Sticky
   headers stick to the panel, and code that resets scroll must scroll `#main` as well as the
   window (phones still scroll the window). Only the content column scrolls. This keeps the toolbar and properties in view while a long list scrolls.
@@ -72,7 +72,7 @@ ticket asks. Don't add resizing.
 
 Account and other settings use `SettingsGroup`, `SettingsRow` and `SettingsBlock` from
 `@coinslite/ui/settings-group`: a 15px group heading (and optional description) above a
-`rounded-lg border bg-card` card whose rows are split by hairlines. A row has the setting's
+borderless `rounded-xl bg-card` card whose rows are split by hairlines. A row has the setting's
 name (`text-[13px] font-medium`) and a one-line description (`text-xs text-muted-foreground`)
 on the left and its control on the right (a pill, a switch, or an outline menu button such as
 the appearance picker with its "Aa" samples). Forms that need the card's width go in a

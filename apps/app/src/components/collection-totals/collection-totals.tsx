@@ -50,8 +50,8 @@ export function CollectionTotalsSection() {
       </div>
       {totals === undefined ? (
         <div className="grid gap-4 lg:grid-cols-2" aria-hidden="true">
-          <div className="h-72 animate-pulse rounded-lg border bg-card" />
-          <div className="h-72 animate-pulse rounded-lg border bg-card" />
+          <div className="h-72 animate-pulse rounded-xl bg-card" />
+          <div className="h-72 animate-pulse rounded-xl bg-card" />
         </div>
       ) : (
         !empty && (
@@ -82,7 +82,7 @@ export function TotalsFigures({
   const { gainLoss } = totals;
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-card">
+    <div className="overflow-hidden rounded-xl bg-card">
       <dl className={figuresLayout}>
         {variant === "collection" && (
           <Figure
@@ -213,10 +213,7 @@ function Figure({
 /** TotalsFigures while the totals load: up to five grey placeholders. */
 export function FiguresSkeleton({ figures = 5 }: { figures?: number }) {
   return (
-    <div
-      className="overflow-hidden rounded-lg border bg-card"
-      aria-hidden="true"
-    >
+    <div className="overflow-hidden rounded-xl bg-card" aria-hidden="true">
       <div className={figuresLayout}>
         {[0, 1, 2, 3, 4].slice(0, figures).map((figure) => (
           <div

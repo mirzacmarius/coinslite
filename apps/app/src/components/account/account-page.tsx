@@ -70,7 +70,7 @@ export function AccountPage() {
         )}
         <SubscriptionSummary />
       </header>
-      <div className="flex flex-col rounded-lg border bg-card p-1">
+      <div className="flex flex-col rounded-xl bg-card p-1">
         <PlanLink plan={account.plan} />
         <PhoneAccountLinks />
         <UpdatesLink />

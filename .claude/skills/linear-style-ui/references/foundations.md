@@ -21,7 +21,8 @@ unsure which class to reach for. Tailwind 3.4, `new-york` style, Radix primitive
 | `p-4` | 16px | Dialog body, panel sections, cards |
 | `px-4 py-3` | | Dialog header and footer |
 | `rounded-md` | 6px | Controls, pills, rows, menu items |
-| `rounded-lg` | 8px | Dialogs, popovers, cards, sheets |
+| `rounded-lg` | 8px | Dialogs, popovers, sheets |
+| `rounded-xl` | 12px | The page panel and content cards (`rounded-xl bg-card`, no border) |
 | `rounded-full` | | Avatars, colour dots only (not badges) |
 | `w-[232px]` | | Left sidebar |
 | `w-[280px]` | | Right properties panel (`lg:w-[300px]` on wide screens) |

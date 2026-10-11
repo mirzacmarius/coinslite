@@ -18,8 +18,8 @@ description: >
 
 shadcn gives us accessible primitives. This skill is the layer on top: how those primitives are
 sized, arranged and coloured so every CoinsLite screen reads like Linear does: the tokens in
-`packages/ui/src/globals.css` are graphite neutrals with one indigo accent (`#5e6ad2`), in a
-light and a dark theme, set in Inter.
+`packages/ui/src/globals.css` are quiet neutrals (blue-grey in the dark theme) with one indigo
+accent (`#5e6ad2`), in a light and a dark theme, set in Inter.
 
 The one-line brief: **Linear's colours and structure.** Dense but never cramped, borders instead
 of shadows, grey chrome with the accent spent only on the primary action and focus, every
@@ -90,7 +90,10 @@ default); use those rather than overriding heights per call site.
 
 ### Surfaces, borders and shadows
 
-- Separate regions with 1px `border-border`, not with shadows or background blocks. Shadows
+- Content cards on the page panel are `rounded-xl bg-card` with **no border**: the raised
+  shade does the separating. Rows inside a card are split with `divide-y`. Borders stay on
+  inputs, outline buttons, the page panel's edge and floating layers.
+- Separate other regions with 1px `border-border`, not with shadows. Shadows
   (`shadow-md`, `shadow-lg`) belong only to floating layers: popovers, menus, dialogs.
 - Surfaces step by lightness: the shell's chrome is `bg-sidebar`, and from `md` up every page
   sits on an inset, rounded, bordered `bg-background` panel that scrolls on its own (`#main`);
