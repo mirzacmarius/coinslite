@@ -18,7 +18,8 @@ export default {
   },
   hero: {
     eyebrow: "Pour les collectionneurs de pièces, billets et timbres",
-    title: "Votre collection, bien répertoriée et estimée dans votre devise",
+    titleLead: "Votre collection,",
+    titleRest: "bien répertoriée et estimée dans votre devise",
     lead: "CoinsLite tient un inventaire clair de ce que vous possédez : ce qu’est chaque objet, son état, ce que vous l’avez payé et ce qu’il vaut aujourd’hui. Choisissez vos objets dans le catalogue en quelques clics, ou saisissez-les vous-même.",
     primary: "Créer un compte gratuit",
     secondary: "Se connecter",
@@ -121,6 +122,9 @@ export default {
     text: "Créer un compte prend une minute, et vos {limit} premiers objets sont gratuits.",
   },
   footer: {
+    product: "Produit",
+    account: "Compte",
+    legal: "Mentions légales",
     privacy: "Politique de confidentialité",
     terms: "Conditions d’utilisation",
   },

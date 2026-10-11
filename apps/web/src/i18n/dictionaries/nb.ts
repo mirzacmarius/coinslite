@@ -17,7 +17,8 @@ export default {
   },
   hero: {
     eyebrow: "For samlere av mynter, sedler og frimerker",
-    title: "Samlingen din, ordentlig registrert og verdsatt i din valuta",
+    titleLead: "Samlingen din,",
+    titleRest: "ordentlig registrert og verdsatt i din valuta",
     lead: "CoinsLite gir deg full oversikt over det du eier: hva hvert objekt er, kvaliteten, hva du betalte og hva det er verdt i dag. Velg objekter fra katalogen med noen få klikk, eller legg dem inn selv.",
     primary: "Opprett en gratis konto",
     secondary: "Logg inn",
@@ -120,6 +121,9 @@ export default {
     text: "Det tar et minutt å opprette en konto, og de første {limit} objektene er gratis.",
   },
   footer: {
+    product: "Produkt",
+    account: "Konto",
+    legal: "Juridisk",
     privacy: "Personvernerklæring",
     terms: "Vilkår for bruk",
   },

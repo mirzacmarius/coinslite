@@ -15,7 +15,9 @@ export default {
   },
   hero: {
     eyebrow: "For collectors of coins, banknotes and stamps",
-    title: "Your Collection, recorded properly and valued in your currency",
+    /** The headline's opening words, set muted, then the rest. */
+    titleLead: "Your Collection,",
+    titleRest: "recorded properly and valued in your currency",
     lead: "CoinsLite keeps a clear record of what you own: what each Item is, its Grade, what you paid and what it’s worth today. Pick Items from the Catalog in a few clicks, or enter them yourself.",
     primary: "Create a free account",
     secondary: "Sign in",
@@ -118,6 +120,9 @@ export default {
     text: "It takes a minute to create an account, and your first {limit} Items are free.",
   },
   footer: {
+    product: "Product",
+    account: "Account",
+    legal: "Legal",
     privacy: "Privacy policy",
     terms: "Terms of use",
   },
