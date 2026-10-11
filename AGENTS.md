@@ -21,7 +21,7 @@ Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/age
 ## Prelaunch verification policy
 
 - Before a pull request with code changes merges, run `bun run verify`: the quick checks, the build and every browser journey on the local test backend, about 1.5 minutes. Put what it reported in the pull request (for example "verify: 89 passed, 1 skipped"). New or changed journeys also get `bun run verify <spec> --repeat-each=3`. Documentation or copy-only changes don't need it.
-- CI runs the quick checks (lint, format, typecheck, build, backend tests) on every pull request push. The browser suite runs on CI only when started by hand, for example before a release: `gh workflow run check.yml --ref <branch>`. Docs-only changes start no run, and a newer push cancels the running one.
+- CI runs the quick checks (lint, format, typecheck, build, backend tests) on every pull request push, and `main` only accepts a pull request whose `check` passed. Merge with `gh pr merge <n> --merge --auto`: it lands once `check` passes, and the head branch is deleted. The browser suite runs on CI only when started by hand, for example before a release: `gh workflow run e2e.yml --ref <branch>`. A newer push cancels the running check.
 - Vercel deploys the product app from `main` only; pull requests get no preview. Check UI changes locally (screenshots at phone and desktop width, light and dark). After a merge, confirm the production deployment succeeded before saying a change is live.
 
 <!-- convex-ai-start -->
