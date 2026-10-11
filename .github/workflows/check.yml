@@ -1,7 +1,8 @@
 name: Check
-# Pull requests get the quick checks on every push; the browser suite runs once
-# a pull request is ready for review (not a draft) and the quick checks pass.
-# Docs-only changes start nothing. A manual run checks everything.
+# Pull requests get the quick checks on every push. The browser suite runs on
+# the Mac before merging (`bun run verify`); here it runs only when started by
+# hand (`gh workflow run check.yml --ref <branch>`), for example before a
+# release. Docs-only changes start nothing.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -43,7 +44,7 @@ jobs:
 
   smoke:
     needs: check
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     # Each shard: about 4 minutes of setup and 8 of journeys, one at a time.
     timeout-minutes: 25
