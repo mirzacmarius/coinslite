@@ -95,7 +95,11 @@ export function ScanCoinQuickAction() {
   const scanCoin = useScanCoin();
   if (!scanner?.available) return null;
   return (
-    <Button variant="ghost" className="w-full justify-start" onClick={scanCoin}>
+    <Button
+      variant="ghost"
+      className="w-full justify-start hover:bg-sidebar-accent"
+      onClick={scanCoin}
+    >
       <ScanLine aria-hidden="true" />
       {t("scanner.scan")}
       <Badge className="ml-auto">{t("scanner.beta")}</Badge>

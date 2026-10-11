@@ -98,7 +98,7 @@ export function CatalogSetPage({ actions }: { actions?: React.ReactNode }) {
             action={
               <Link
                 href={set ? catalogNodeHref(set.key) : catalogHref}
-                className="text-[13px] font-medium text-primary hover:underline"
+                className="text-[13px] font-medium text-link hover:underline"
               >
                 {set
                   ? t("sets.browse", { title: nodeTitle(set) })

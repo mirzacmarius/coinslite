@@ -18,7 +18,7 @@ export function LatestItems({ items }: { items: LatestItem[] | undefined }) {
     <section
       aria-labelledby={titleId}
       aria-busy={items === undefined}
-      className="overflow-hidden rounded-lg border bg-card"
+      className="overflow-hidden rounded-xl bg-card"
     >
       <div className="flex h-10 items-center justify-between gap-3 border-b pl-4 pr-2">
         <h2 id={titleId} className="text-[13px] font-medium">

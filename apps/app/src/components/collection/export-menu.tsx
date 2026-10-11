@@ -19,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
 import { toast } from "@coinslite/ui/toaster";
@@ -28,6 +29,7 @@ import {
   Download,
   FileSpreadsheet,
   FileText,
+  FileUp,
   Loader2,
   Sparkles,
 } from "lucide-react";
@@ -36,17 +38,21 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 /**
- * The Collection toolbar's Export menu. On Premium it downloads the view on
- * screen (its search, filters and sort) as a file the server makes; on the
- * Free plan it shows the way to Premium instead. One entry per file format:
- * CSV for spreadsheets, PDF for printing. A Collection too large to read
- * whole isn't exported at all, rather than with Items missing.
+ * The Collection toolbar's Export and import menu. On Premium it downloads
+ * the view on screen (its search, filters and sort) as a file the server
+ * makes; on the Free plan it shows the way to Premium instead. One entry per
+ * file format: CSV for spreadsheets, PDF for printing. A Collection too
+ * large to read whole isn't exported at all, rather than with Items missing.
+ * Importing from a CSV file is on both plans.
  */
 export function ExportMenu({
   view,
   count,
   complete,
+  onImport,
 }: {
+  /** Opens the Import dialog. */
+  onImport: () => void;
   view: CollectionView;
   /** How many Items the view shows. */
   count: number;
@@ -127,11 +133,9 @@ export function ExportMenu({
           ) : (
             <Download strokeWidth={1.75} aria-hidden="true" />
           )}
-          <span className="hidden sm:inline">
-            {t("collectionExport.export")}
-          </span>
+          <span className="hidden sm:inline">{t("collectionExport.menu")}</span>
           <span className="sr-only sm:hidden">
-            {t("collectionExport.export")}
+            {t("collectionExport.menu")}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -182,6 +186,11 @@ export function ExportMenu({
             )}
           </>
         )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={onImport}>
+          <FileUp strokeWidth={1.75} />
+          {t("collectionImport.menuItem")}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -50,7 +50,7 @@ function ReleaseNotes({
   return (
     <article
       aria-labelledby={id}
-      className="flex flex-col gap-4 rounded-lg border bg-card p-4"
+      className="flex flex-col gap-4 rounded-xl bg-card p-4"
     >
       <header className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">

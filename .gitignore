@@ -57,3 +57,6 @@ tailwind.css
 # playwright
 test-results/
 playwright-report/
+
+# local Convex backend state (convex dev --local)
+.convex

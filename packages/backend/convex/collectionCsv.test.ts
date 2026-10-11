@@ -112,6 +112,9 @@ const englishHeader = [
   "Currency",
   "Purchase date",
   "Source",
+  "Sold on",
+  "Sale price",
+  "Sale note",
 ];
 
 test("a Premium member's export has a header row and one row per Item, every column filled from the Item", async () => {
@@ -154,6 +157,9 @@ test("a Premium member's export has a header row and one row per Item, every col
       "NOK",
       "2024-03-05",
       "Auction",
+      "",
+      "",
+      "",
     ],
   ]);
 });
@@ -194,7 +200,7 @@ test("text holding commas, quotes or line breaks is quoted as RFC 4180 has it, a
   const lines = csv.slice(1).split("\r\n");
   expect(lines[2]).toBe("");
   expect(lines[1]).toBe(
-    'Banknote,"The ""Viking"" note, 1st issue",,100 kroner,,,,,,1,,,NOK,,"Grandad\'s drawer\nOslo, 1990"',
+    'Banknote,"The ""Viking"" note, 1st issue",,100 kroner,,,,,,1,,,NOK,,"Grandad\'s drawer\nOslo, 1990",,,',
   );
   expect((await exported(ada))[1]).toEqual([
     "Banknote",
@@ -212,6 +218,9 @@ test("text holding commas, quotes or line breaks is quoted as RFC 4180 has it, a
     "NOK",
     "",
     "Grandad's drawer\nOslo, 1990",
+    "",
+    "",
+    "",
   ]);
 });
 
@@ -327,6 +336,9 @@ test("headings and names are in the person's language, or the one asked for; num
       "Valuta",
       "Innkjøpsdato",
       "Kilde",
+      "Solgt den",
+      "Salgspris",
+      "Salgsnotat",
     ],
     [
       "Mynt",
@@ -344,6 +356,9 @@ test("headings and names are in the person's language, or the one asked for; num
       "NOK",
       "2023-11-30",
       "",
+      "",
+      "",
+      "",
     ],
     [
       "Frimerke",
@@ -359,6 +374,9 @@ test("headings and names are in the person's language, or the one asked for; num
       "",
       "",
       "NOK",
+      "",
+      "",
+      "",
       "",
       "",
     ],
@@ -413,4 +431,28 @@ test("a Collection too large to read whole isn't exported, rather than exported 
   await expect(
     ada.as.query(api.collection.exports.csv, { view: {} }),
   ).rejects.toThrow("COLLECTION_TOO_LARGE_TO_EXPORT");
+});
+
+test("the sold view's export fills the sold-on date, sale price and sale note; owned Items leave them empty", async () => {
+  const t = newTest();
+  const ada = await premiumMember(t, "ada@example.com");
+  const [kept, sold] = await addAll(ada, [
+    { type: "coin", title: "Kept krone" },
+    { type: "coin", title: "Sold krone", purchasePrice: 10000 },
+  ]);
+  await ada.as.mutation(api.items.sell, {
+    itemId: sold!,
+    soldOn: "2026-10-01",
+    salePrice: 125050,
+    saleNote: "Oslo coin fair",
+  });
+
+  const [header, row] = await exported(ada, { status: "sold" });
+  expect(header?.slice(-3)).toEqual(["Sold on", "Sale price", "Sale note"]);
+  expect(row?.[1]).toBe("Sold krone");
+  expect(row?.slice(-3)).toEqual(["2026-10-01", "1250.50", "Oslo coin fair"]);
+  const [, owned] = await exported(ada);
+  expect(owned?.[1]).toBe("Kept krone");
+  expect(owned?.slice(-3)).toEqual(["", "", ""]);
+  expect(kept).toBeDefined();
 });

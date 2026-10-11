@@ -22,7 +22,9 @@ import { itemTypes } from "../items/item-fields";
 /**
  * The Collection view lives in the URL, so any view can be bookmarked or
  * shared: ?q=krone&type=coin&bullion=1&origin=own&country=NO
- * &denomination=1%20krone&grade=european:XF&album=…&sort=price&page=2.
+ * &denomination=1%20krone&grade=european:XF&album=…&status=sold&sort=price&page=2.
+ * ?addTo=<Album> picks Items to add to that Album: the view leaves out the
+ * Items already in it.
  * Defaults are left out. Anything that doesn't parse is ignored.
  */
 
@@ -50,6 +52,9 @@ export function readCollectionUrl(params: URLSearchParams) {
     view.grade = { gradingScale, grade };
   const album = params.get("album");
   if (album) view.album = album;
+  const addTo = params.get("addTo");
+  if (addTo) view.notInAlbum = addTo;
+  if (params.get("status") === "sold") view.status = "sold";
   const sort = oneOf<CollectionSort>(collectionSorts, params.get("sort"));
   if (sort && sort !== defaultSort) view.sort = sort;
   const page = Number(params.get("page"));
@@ -67,6 +72,8 @@ export function writeCollectionUrl(view: CollectionView, page: number) {
   if (view.grade)
     params.set("grade", `${view.grade.gradingScale}:${view.grade.grade}`);
   if (view.album) params.set("album", view.album);
+  if (view.notInAlbum) params.set("addTo", view.notInAlbum);
+  if (view.status) params.set("status", view.status);
   if (view.sort && view.sort !== defaultSort) params.set("sort", view.sort);
   if (page > 1) params.set("page", String(page));
   return params;
@@ -108,10 +115,10 @@ export function useCollectionUrl() {
       (nextPage: number) => go(view, nextPage, "push"),
       [go, view],
     ),
-    /** Clears the search and every filter, keeping the sort. */
+    /** Clears the search and every filter, keeping the sort and the Album being added to. */
     clearAll: useCallback(
-      () => go({ sort: view.sort }, 1, "push"),
-      [go, view.sort],
+      () => go({ sort: view.sort, notInAlbum: view.notInAlbum }, 1, "push"),
+      [go, view.sort, view.notInAlbum],
     ),
   };
 }

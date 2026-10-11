@@ -111,6 +111,9 @@ const entry = (id: string, parent: string, extra: Row = {}): Row => ({
   ...extra,
 });
 
+/** Loading the bundled datasets takes the CI runner several seconds; this Mac about one. */
+const slowRunner = 30_000;
+
 test("roots are countries and Themes with their entry counts, most entries first", async () => {
   const t = newTest();
   const admin = await person(t, "admin@example.com", { admin: true });
@@ -858,41 +861,45 @@ test("the bundled US silver dollars browse by series grouping and by denominatio
   ]);
 });
 
-test("loading the bundled datasets fills in browsing for Catalog data stored before it existed, a batch at a time", async () => {
-  vi.useFakeTimers();
-  const t = newTest();
-  const ada = await person(t, "ada@example.com");
-  await t.action(internal.catalog.seed.load, {});
-  // As stored before browsing: no entry counts, no countries to browse by.
-  await t.run(async (ctx) => {
-    for await (const node of ctx.db.query("catalogNodes")) {
-      await ctx.db.patch(node._id, {
-        entryCount: undefined,
-        countryNodeKey: undefined,
-      });
-    }
-  });
-  expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
-    expect.objectContaining({ key: "us", entryCount: 0 }),
-  );
+test(
+  "loading the bundled datasets fills in browsing for Catalog data stored before it existed, a batch at a time",
+  async () => {
+    vi.useFakeTimers();
+    const t = newTest();
+    const ada = await person(t, "ada@example.com");
+    await t.action(internal.catalog.seed.load, {});
+    // As stored before browsing: no entry counts, no countries to browse by.
+    await t.run(async (ctx) => {
+      for await (const node of ctx.db.query("catalogNodes")) {
+        await ctx.db.patch(node._id, {
+          entryCount: undefined,
+          countryNodeKey: undefined,
+        });
+      }
+    });
+    expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
+      expect.objectContaining({ key: "us", entryCount: 0 }),
+    );
 
-  await t.action(internal.catalog.seed.load, {});
-  await t.finishAllScheduledFunctions(vi.runAllTimers);
-  expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
-    expect.objectContaining({ key: "us", entryCount: 120 }),
-  );
-  expect(
-    await ada.as.query(api.catalog.browse.denominations, { key: "us" }),
-  ).toEqual([{ denomination: "1 dollar", seriesCount: 2 }]);
-  // Over 700 nodes: more than one transaction refreshes.
-  const refreshes = await t.run(async (ctx) =>
-    (await ctx.db.system.query("_scheduled_functions").collect()).filter(
-      (job) => job.name.includes("refreshBrowseFields"),
-    ),
-  );
-  expect(refreshes.length).toBeGreaterThan(1);
-  vi.useRealTimers();
-});
+    await t.action(internal.catalog.seed.load, {});
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+    expect(await ada.as.query(api.catalog.browse.roots, {})).toContainEqual(
+      expect.objectContaining({ key: "us", entryCount: 120 }),
+    );
+    expect(
+      await ada.as.query(api.catalog.browse.denominations, { key: "us" }),
+    ).toEqual([{ denomination: "1 dollar", seriesCount: 2 }]);
+    // Over 700 nodes: more than one transaction refreshes.
+    const refreshes = await t.run(async (ctx) =>
+      (await ctx.db.system.query("_scheduled_functions").collect()).filter(
+        (job) => job.name.includes("refreshBrowseFields"),
+      ),
+    );
+    expect(refreshes.length).toBeGreaterThan(1);
+    vi.useRealTimers();
+  },
+  slowRunner,
+);
 
 test("a root that becomes a country once it gets a country code is browsed by denomination from then on", async () => {
   const t = newTest();

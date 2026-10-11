@@ -47,5 +47,12 @@ export type CollectionView = {
   grade?: { gradingScale: GradingScale; grade: string };
   /** An Album's id, or `withoutAlbum`. */
   album?: string;
+  /**
+   * An Album's id: leaves out the Items already in it, as when picking
+   * Items to add to that Album.
+   */
+  notInAlbum?: string;
+  /** Only sold Items; owned ones when left out. */
+  status?: "sold";
   sort?: CollectionSort;
 };

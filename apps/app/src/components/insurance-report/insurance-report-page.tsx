@@ -65,7 +65,7 @@ function Section({
   return (
     <section
       aria-labelledby={id}
-      className="flex flex-col gap-4 rounded-lg border bg-card p-4"
+      className="flex flex-col gap-4 rounded-xl bg-card p-4"
     >
       <div className="flex flex-col gap-0.5">
         <h2 id={id} className="text-sm font-medium">
@@ -83,7 +83,7 @@ function Section({
 function LockedReport() {
   const t = useI18n();
   return (
-    <section className="flex flex-col items-start gap-3 rounded-lg border bg-card p-4">
+    <section className="flex flex-col items-start gap-3 rounded-xl bg-card p-4">
       <ShieldCheck
         className="size-4 text-muted-foreground"
         strokeWidth={1.75}

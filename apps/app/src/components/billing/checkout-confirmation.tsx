@@ -30,9 +30,9 @@ export function CheckoutConfirmation() {
   return (
     <section
       aria-live="polite"
-      className="flex flex-col items-center gap-3 rounded-lg border bg-card px-6 py-12 text-center"
+      className="flex flex-col items-center gap-3 rounded-xl bg-card px-6 py-12 text-center"
     >
-      <div className="flex size-9 items-center justify-center rounded-lg border bg-card text-muted-foreground">
+      <div className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
         {premium ? (
           <Check className="size-4 text-success" strokeWidth={1.75} />
         ) : (

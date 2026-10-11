@@ -62,7 +62,7 @@ function Section({
   return (
     <section
       aria-labelledby={id}
-      className="flex flex-col gap-4 rounded-lg border bg-card p-4"
+      className="flex flex-col gap-4 rounded-xl bg-card p-4"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">

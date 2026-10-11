@@ -36,6 +36,9 @@ describe.each(locales)("%s", async (locale: Locale) => {
       marketValue: t.items.marketValue,
       purchaseDate: t.items.purchaseDate,
       source: t.items.source,
+      soldOn: t.sale.soldOn,
+      salePrice: t.sale.salePrice,
+      saleNote: t.sale.note,
     });
   });
 

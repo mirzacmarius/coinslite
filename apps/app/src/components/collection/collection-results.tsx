@@ -11,8 +11,8 @@ import { cn } from "@coinslite/ui/utils";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
+import type { CollectionLayout } from "./collection-display";
 import type { BrowseResult } from "./filter-options";
-import type { CollectionLayout } from "./use-collection-display";
 import type { ItemSelection } from "./use-item-selection";
 
 type Item = BrowseResult["items"][number];
@@ -246,7 +246,7 @@ function ItemGrid({
               item={item}
               items={result.items}
               selection={selection}
-              className="relative flex h-full flex-col overflow-hidden rounded-lg border bg-card outline-none transition-colors duration-100 hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
+              className="relative flex h-full flex-col overflow-hidden rounded-xl bg-card outline-none transition-colors duration-100 hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
             >
               {selection && (
                 <span className="absolute left-2 top-2">

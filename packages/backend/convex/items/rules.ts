@@ -23,6 +23,7 @@ export const itemErrors = {
   invalidCountry: "INVALID_COUNTRY",
   invalidAmount: "INVALID_AMOUNT",
   invalidDate: "INVALID_DATE",
+  soldBeforePurchase: "SOLD_BEFORE_PURCHASE",
   invalidGrade: "INVALID_GRADE",
   invalidStrike: "INVALID_STRIKE",
   invalidNumber: "INVALID_NUMBER",
@@ -92,6 +93,7 @@ export const itemLimits = {
   gradeNote: 200,
   source: 200,
   notes: 5000,
+  saleNote: 500,
   quantity: 1_000_000,
   /** Ancient coins are welcome; years are whole numbers, BC as negatives. */
   earliestYear: -3000,
@@ -246,6 +248,34 @@ export function checkItem(input: ItemInput, today: string) {
   };
 }
 
+/** A sale as the Sell dialog sends it; the price is per piece. */
+export type SaleInput = {
+  soldOn: string;
+  salePrice?: number;
+  saleNote?: string;
+};
+
+/**
+ * Checks and tidies a sale. The sold-on date is required and, like a
+ * purchase date, may be at most `today`; nor can it come before the Item's
+ * `purchaseDate`.
+ */
+export function checkSale(
+  input: SaleInput,
+  today: string,
+  purchaseDate?: string,
+) {
+  const soldOn = input.soldOn.trim();
+  if (!isPastOrToday(soldOn, today)) fail(itemErrors.invalidDate);
+  if (purchaseDate !== undefined && soldOn < purchaseDate)
+    fail(itemErrors.soldBeforePurchase);
+  return {
+    soldOn,
+    salePrice: amount(input.salePrice),
+    saleNote: text(input.saleNote, itemLimits.saleNote),
+  };
+}
+
 /** A count or catalogue number: a whole number from 1 to `max`. */
 function wholeNumber(value: number | undefined, max: number) {
   if (value === undefined) return undefined;
@@ -325,5 +355,6 @@ const withNumber = <K extends string>(key: K, value: number | undefined) =>
 export const itemMoneyFields = [
   "purchasePrice",
   "marketValue",
-] as const satisfies ReadonlyArray<keyof ItemInput>;
+  "salePrice",
+] as const satisfies ReadonlyArray<keyof ItemInput | keyof SaleInput>;
 export type ItemMoneyField = (typeof itemMoneyFields)[number];

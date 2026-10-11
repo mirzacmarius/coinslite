@@ -32,7 +32,7 @@ export function SpotPrices({ className }: { className?: string }) {
     <section
       aria-labelledby={titleId}
       aria-busy={prices === undefined}
-      className={cn("rounded-lg border bg-card", className)}
+      className={cn("rounded-xl bg-card", className)}
     >
       <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 border-b px-4 py-2">
         <h2 id={titleId} className="text-[13px] font-medium">
@@ -105,6 +105,72 @@ export function SpotPrices({ className }: { className?: string }) {
             </p>
           )}
         </>
+      )}
+    </section>
+  );
+}
+
+/**
+ * The sidebar's Spot prices: each metal per gram and per troy ounce, in a
+ * card narrow enough for the sidebar. Nothing shows until prices exist.
+ */
+export function SidebarSpotPrices() {
+  const t = useI18n();
+  const format = useFormatters();
+  const titleId = useId();
+  const prices = useQuery(api.spotPrices.current, {});
+  if (!prices) return null;
+
+  return (
+    <section
+      aria-labelledby={titleId}
+      className="flex flex-col gap-1 rounded-xl bg-background px-3 py-2.5"
+    >
+      <h2 id={titleId} className="text-xs font-medium">
+        {t("spotPrices.title")}
+      </h2>
+      <table aria-labelledby={titleId} className="w-full text-xs">
+        <thead>
+          <tr className="text-[11px] text-muted-foreground">
+            <th scope="col" className="sr-only">
+              {t("spotPrices.metal")}
+            </th>
+            <th scope="col" className="py-0.5 text-right font-normal">
+              {t("spotPrices.perGram")}
+            </th>
+            <th scope="col" className="py-0.5 pl-2 text-right font-normal">
+              {t("spotPrices.perOunce")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {metals.map((metal) => (
+            <tr key={metal}>
+              <th
+                scope="row"
+                className="py-0.5 text-left font-normal text-muted-foreground"
+              >
+                {t(`items.materials.${metal}`)}
+              </th>
+              <td className="py-0.5 text-right">
+                {format.money(prices[metal].perGram, prices.currency)}
+              </td>
+              <td className="py-0.5 pl-2 text-right">
+                {format.money(prices[metal].perOunce, prices.currency)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {prices.stale && (
+        <p className="flex items-start gap-1.5 text-[11px] leading-4 text-muted-foreground">
+          <Clock
+            className="mt-px size-3 shrink-0"
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+          {t("spotPrices.stale")}
+        </p>
       )}
     </section>
   );

@@ -665,3 +665,46 @@ test("how many of chosen entries a person holds, for marking search results whil
     t.query(api.catalog.sets.heldCounts, { keys: [] }),
   ).rejects.toThrow("NOT_SIGNED_IN");
 });
+
+test("selling the held Item drops the Set's completion and the entry's held count", async () => {
+  const t = newTest();
+  const { ada } = await withCatalog(t);
+  await holdItem(t, ada.userId, "no-krone-1974", 2);
+  await holdItem(t, ada.userId, "no-krone-1975");
+  const itemOf = (title: string) =>
+    t.run(async (ctx) =>
+      (
+        await ctx.db
+          .query("items")
+          .withIndex("by_ownerId", (q) => q.eq("ownerId", ada.userId))
+          .collect()
+      ).find((item) => item.title === title),
+    );
+  const sold = await itemOf("no-krone-1975");
+  if (!sold) throw new Error("No 1975 krone");
+  const krone = { key: "no-krone" };
+  expect(await ada.as.query(api.catalog.sets.get, krone)).toMatchObject({
+    held: 2,
+  });
+
+  await ada.as.mutation(api.items.sell, {
+    itemId: sold._id,
+    soldOn: "2026-10-01",
+  });
+
+  expect(await ada.as.query(api.catalog.sets.get, krone)).toMatchObject({
+    held: 1,
+  });
+  expect(
+    await ada.as.query(api.catalog.sets.heldCounts, {
+      keys: ["no-krone-1974", "no-krone-1975"],
+    }),
+  ).toEqual([
+    { key: "no-krone-1974", held: 2 },
+    { key: "no-krone-1975", held: 0 },
+  ]);
+  // No longer held, it can be added again without allowing a duplicate.
+  await ada.as.mutation(api.items.addCatalogEntries, {
+    catalogEntryKeys: ["no-krone-1975"],
+  });
+});

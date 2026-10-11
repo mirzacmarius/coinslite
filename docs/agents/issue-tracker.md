@@ -1,32 +1,34 @@
 # Issue tracker: Linear
 
-Issues and specs for CoinsLite live in Linear: workspace **MuseumLite**, team **MuseumLite** (key `MUS`), project **CoinsLite** (`P-MUS-4`). Use the Linear MCP tools (`mcp__claude_ai_Linear__*`) for all operations.
+Issues and specs for CoinsLite live in Linear: workspace **MuseumLite**, team **CoinsLite** (key `COIN`), project **CoinsLite**. Use the Linear MCP tools (`mcp__claude_ai_Linear__*`) for all operations.
 
-The team is shared with other products, so **every CoinsLite issue belongs to the CoinsLite project**, and every query filters by `project: "CoinsLite"`. Never apply the `module/*` or `phase/*` labels; they belong to other products.
+The workspace also holds the MuseumLite team (`MUS`), which belongs to another product. Create and query CoinsLite issues in team `COIN` only, and never apply the `module/*` or `phase/*` labels; they belong to MuseumLite.
 
-Linear syncs CoinsLite issues to this repo's GitHub Issues automatically, so the same issue also appears on GitHub. Linear is the source of truth: create and update issues there only, and never create GitHub issues directly.
+CoinsLite issues were numbered `MUS-675` to `MUS-774` until 2026-10-11, when they moved to `COIN-1` to `COIN-96`. Old identifiers and links still redirect, so commits, PRs and docs that mention them stay valid.
+
+Linear syncs the COIN team's issues to this repo's GitHub Issues, so the same issue also appears on GitHub. Linear is the source of truth: create and update issues there only, and never create GitHub issues directly.
 
 ## Conventions
 
-- **Create an issue**: `save_issue` with `team: "MUS"`, `project: "CoinsLite"`, `title`, and a Markdown `description`. New issues start in `Backlog`. Add a type label (`Feature`, `Bug`, `Improvement`, `Task`, `Chore`, `Docs`) and, when known, a `milestone`.
-- **Read an issue**: `get_issue` with the identifier (e.g. `MUS-123`; add `includeRelations: true` for blockers), plus `list_comments` for the discussion.
-- **List issues**: `list_issues` with `project: "CoinsLite"` and filters such as `label`, `state`, `assignee`, `parentId` or `milestone`.
+- **Create an issue**: `save_issue` with `team: "COIN"`, `project: "CoinsLite"`, `title`, and a Markdown `description`. New issues start in `Backlog`. Add a type label (`Feature`, `Bug`, `Improvement`, `Task`, `Chore`, `Docs`) and, when known, a `milestone`.
+- **Read an issue**: `get_issue` with the identifier (e.g. `COIN-12`; add `includeRelations: true` for blockers), plus `list_comments` for the discussion.
+- **List issues**: `list_issues` with `team: "COIN"` and filters such as `label`, `state`, `assignee`, `parentId` or `milestone`.
 - **Comment on an issue**: `save_comment` with `issueId` and `body`.
 - **Apply / remove labels**: `save_issue` with `id` and `addLabels` / `removeLabels`. Avoid `labels`, which replaces the whole set.
 - **Change status**: `save_issue` with `id` and `state` (`Todo`, `In Progress`, `In Review`, `Done`, `Canceled`, `Duplicate`).
 - **Close**: comment with the reason first, then set `state: "Done"`, or `"Canceled"` for won't-do.
 - **Milestones**: the CoinsLite project's milestones group the build phases. List them with `list_milestones`, and create them with `save_milestone` if they're missing.
-- **Code links**: name branches with the issue's `gitBranchName`, and put the identifier (`MUS-123`) in commit and PR titles.
+- **Code links**: name branches with the issue's `gitBranchName`, and put the identifier (`COIN-12`) in commit and PR titles.
 
 Issue content describes CoinsLite's own requirements, using the vocabulary in `CONTEXT.md`.
 
 ## When a skill says "publish to the issue tracker"
 
-Create a Linear issue in team `MUS`, project `CoinsLite`.
+Create a Linear issue in team `COIN`, project `CoinsLite`.
 
 ## When a skill says "fetch the relevant ticket"
 
-Run `get_issue` with the identifier (e.g. `MUS-123`), then `list_comments` for the issue.
+Run `get_issue` with the identifier (e.g. `COIN-12`), then `list_comments` for the issue.
 
 ## Wayfinding operations
 

@@ -25,7 +25,7 @@ export function NotFoundPage({ locale }: { locale: Locale }) {
           </div>
           <Link
             href={localePath(locale)}
-            className="rounded-md text-[13px] font-medium text-primary hover:underline"
+            className="rounded-md text-[13px] font-medium text-link hover:underline"
           >
             {t.home}
           </Link>

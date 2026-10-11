@@ -6,11 +6,11 @@ const size = { width: 1200, height: 630 };
 
 /** Fixed brand colours: CSS variables don't reach the image renderer. */
 const colours = {
-  teal: "#0f766e",
-  mint: "#ccfbf1",
-  background: "#f7f8fa",
-  text: "#0f172a",
-  muted: "#475569",
+  accent: "#5e6ad2",
+  ring: "#ffffff",
+  background: "#fcfcfc",
+  text: "#1b1b1f",
+  muted: "#63666d",
 };
 
 const dictionaryFor = async (params: Promise<{ locale: string }>) => {
@@ -53,7 +53,7 @@ export default async function Image({
             width: 56,
             height: 56,
             borderRadius: 28,
-            background: colours.teal,
+            background: colours.accent,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -64,7 +64,7 @@ export default async function Image({
               width: 34,
               height: 34,
               borderRadius: 17,
-              border: `4px solid ${colours.mint}`,
+              border: `4px solid ${colours.ring}`,
             }}
           />
         </div>

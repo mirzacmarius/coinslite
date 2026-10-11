@@ -1,0 +1,31 @@
+# Keeps dependencies current with few pull requests. Once a month: one pull
+# request for every GitHub Action, one for every minor and patch package
+# update, and one per major upgrade. Security fixes come when an advisory is
+# published, together in one pull request. A release must be a week old
+# before it's proposed, so a compromised version is usually caught first.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: [minor, patch]
+      security:
+        applies-to: security-updates
+        patterns: ["*"]

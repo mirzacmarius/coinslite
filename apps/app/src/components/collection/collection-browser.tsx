@@ -1,16 +1,23 @@
 "use client";
 
+import {
+  CollectionTotalsSection,
+  CollectionTotalsSkeleton,
+} from "@/components/collection-totals/collection-totals";
 import { isTyping, useAddItem } from "@/components/items/add-item";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { defaultSort } from "@coinslite/backend/convex/collection/view";
 import { Button } from "@coinslite/ui/button";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
 import { Coins, ListChecks } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { narrowsView } from "./collection-display";
 import {
   CollectionResults,
   Pagination,
@@ -22,6 +29,7 @@ import { DisplayMenu } from "./display-menu";
 import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
 import { type BrowseResult, useFilters } from "./filter-options";
+import { ImportDialog } from "./import-dialog";
 import { MoveToAlbumBar } from "./move-to-album-bar";
 import { useCollectionDisplay } from "./use-collection-display";
 import { useItemSelection } from "./use-item-selection";
@@ -36,7 +44,24 @@ function useLatest(result: BrowseResult | undefined) {
   return { shown: result ?? latest, loading: result === undefined };
 }
 
-/** The toolbar, the filters that are on, and one page of Items. */
+/** The toolbar's place while the Collection loads. */
+const toolbarSkeleton = <div className="h-10 border-b" aria-hidden="true" />;
+
+/** CollectionBrowser before the page knows its URL. */
+export function BrowserSkeleton() {
+  return (
+    <>
+      {toolbarSkeleton}
+      <CollectionTotalsSkeleton />
+      <ResultsSkeleton />
+    </>
+  );
+}
+
+/**
+ * The toolbar and the filters that are on, at the top where they're always
+ * in reach, then the totals, then one page of Items.
+ */
 export function CollectionBrowser() {
   const t = useI18n();
   const locale = useCurrentLocale();
@@ -54,10 +79,28 @@ export function CollectionBrowser() {
   );
   const filters = useFilters(result, view);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  // Keyed and first in every branch below, so it stays mounted (and keeps
+  // its progress) as the first imported batch fills an empty Collection.
+  const importDialog = (
+    <ImportDialog key="import" open={importing} onOpenChange={setImporting} />
+  );
   const search = useRef<HTMLInputElement>(null);
   const selection = useItemSelection();
-  const { selecting, stop: stopSelecting, add: selectItems } = selection;
+  const { add: selectItems, start: startSelecting } = selection;
   const pageItems = result?.items;
+  // Picking Items to add to an Album (its "Add Items"): select mode from the
+  // start, and leaving it goes back to the Album.
+  const router = useRouter();
+  const addTo = view.notInAlbum as Id<"albums"> | undefined;
+  const selecting = selection.selecting || addTo !== undefined;
+  const stopSelecting = useCallback(
+    () => (addTo ? router.push(`/albums/${addTo}`) : selection.stop()),
+    [addTo, router, selection.stop],
+  );
+  useEffect(() => {
+    if (addTo) startSelecting();
+  }, [addTo, startSelecting]);
 
   // In select mode, Esc leaves it and Cmd/Ctrl+A selects the page.
   useEffect(() => {
@@ -112,35 +155,60 @@ export function CollectionBrowser() {
 
   const narrowed =
     view.search !== undefined || filters.some((filter) => filter.active);
+  // Keyed, so it stays mounted (and open or collapsed) as the rest changes.
+  const totals = (
+    <CollectionTotalsSection
+      key="totals"
+      narrowed={narrowsView(view)}
+      sold={view.status === "sold"}
+    />
+  );
 
   if (result === undefined) {
     return (
       <>
-        <div className="h-10 border-b" aria-hidden="true" />
+        {importDialog}
+        {toolbarSkeleton}
+        {totals}
         <ResultsSkeleton />
       </>
     );
   }
 
+  // Nothing narrows the default view, yet it's empty: every Item is sold.
+  const allSold = !narrowsView(view) && result.options.statuses.sold > 0;
+
   // A Collection with nothing in it yet: no toolbar, just the way to start.
   if (result.collectionSize === 0 && !narrowed) {
     return (
-      <div className="p-4">
-        <EmptyState
-          icon={
-            <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
-          }
-          title={t("items.emptyTitle")}
-          description={t("items.emptyDescription")}
-          action={<Button onClick={() => addItem()}>{t("items.add")}</Button>}
-        />
-      </div>
+      <>
+        {importDialog}
+        {totals}
+        <div className="p-4">
+          <EmptyState
+            icon={
+              <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
+            }
+            title={t("items.emptyTitle")}
+            description={t("items.emptyDescription")}
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Button onClick={() => addItem()}>{t("items.add")}</Button>
+                <Button variant="ghost" onClick={() => setImporting(true)}>
+                  {t("collectionImport.emptyAction")}
+                </Button>
+              </div>
+            }
+          />
+        </div>
+      </>
     );
   }
 
   return (
     <>
-      <div className="flex h-10 items-center justify-between gap-2 border-b px-4">
+      {importDialog}
+      <div className="sticky top-10 z-20 flex h-10 items-center justify-between gap-2 border-b bg-background px-4">
         <div className="flex min-w-0 flex-1 items-center gap-1">
           <FilterButton
             filters={filters}
@@ -169,6 +237,7 @@ export function CollectionBrowser() {
             onSortChange={(sort) => update({ sort })}
           />
           <ExportMenu
+            onImport={() => setImporting(true)}
             view={view}
             count={result.total}
             complete={result.complete}
@@ -186,6 +255,7 @@ export function CollectionBrowser() {
         </div>
       </div>
       <FilterChips filters={filters} onChange={update} onClearAll={clearAll} />
+      {totals}
       {!result.complete && (
         <p className="border-b px-4 py-2 text-xs text-muted-foreground">
           {t("collection.incomplete", {
@@ -205,8 +275,19 @@ export function CollectionBrowser() {
             <p>
               {result.collectionSize === 0
                 ? t("items.emptyTitle")
-                : t("collection.noMatchesTitle")}
+                : allSold
+                  ? t("collection.allSold")
+                  : t("collection.noMatchesTitle")}
             </p>
+            {allSold && (
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => update({ status: "sold" })}
+              >
+                {t("collection.showSold")}
+              </Button>
+            )}
             {narrowed && (
               <Button variant="ghost" size="xs" onClick={clearAll}>
                 {t("collection.clearFilters")}
@@ -225,14 +306,22 @@ export function CollectionBrowser() {
               pageSize={display.pageSize}
               onPageChange={(next) => {
                 goToPage(next);
+                // Phones scroll the window; wider screens the shell's panel.
                 window.scrollTo({ top: 0 });
+                document.getElementById("main")?.scrollTo({ top: 0 });
               }}
             />
           </>
         )}
       </div>
       {selecting && (
-        <MoveToAlbumBar selection={selection} result={result} view={view} />
+        <MoveToAlbumBar
+          selection={selection}
+          result={result}
+          view={view}
+          addTo={addTo}
+          onLeave={addTo ? stopSelecting : undefined}
+        />
       )}
     </>
   );
