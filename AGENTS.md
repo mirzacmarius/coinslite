@@ -15,15 +15,14 @@ Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/age
 ## Working here
 
 - Work in your own git worktree: another agent session may be using this checkout.
-- Run end-to-end tests locally with `bun run test:e2e:local <spec>` (once per machine: `packages/backend/scripts/setup-e2e-backend.sh`).
+- Run end-to-end tests locally with `bun run test:e2e:local <spec>` while working (once per machine: `packages/backend/scripts/setup-e2e-backend.sh`). In a new worktree, before the first run, copy both `.env.local` files from a worktree that already uses the local test backend (`anonymous:anonymous-agent`, never the cloud deployment) and link its `packages/backend/.convex`.
 - When a page behaves differently locally than in CI, reinstall with `rm -rf node_modules && bun install`: bun keeps stale nested packages after lockfile changes.
 
 ## Prelaunch verification policy
 
-- Match local checks to the changed area. Documentation or copy-only changes do not need the full suite.
-- For auth, permissions, billing, schema, or shared dependencies, run the relevant targeted tests and build checks.
-- CI runs the quick checks (lint, format, typecheck, build, backend tests) on every pull request push, and the browser suite, split across 2 machines, once the pull request is not a draft. Docs-only changes start no run, and a newer push cancels the running one. Keep a pull request in draft while iterating to save Actions minutes.
-- Run everything by hand when needed: `gh workflow run check.yml --ref <branch>`.
+- Before a pull request with code changes merges, run `bun run verify`: the quick checks, the build and every browser journey on the local test backend, about 1.5 minutes. Put what it reported in the pull request (for example "verify: 89 passed, 1 skipped"). New or changed journeys also get `bun run verify <spec> --repeat-each=3`. Documentation or copy-only changes don't need it.
+- CI runs the quick checks (lint, format, typecheck, build, backend tests) on every pull request push. The browser suite runs on CI only when started by hand, for example before a release: `gh workflow run check.yml --ref <branch>`. Docs-only changes start no run, and a newer push cancels the running one.
+- Vercel deploys the product app from `main` only; pull requests get no preview. Check UI changes locally (screenshots at phone and desktop width, light and dark). After a merge, confirm the production deployment succeeded before saying a change is live.
 
 <!-- convex-ai-start -->
 

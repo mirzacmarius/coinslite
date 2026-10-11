@@ -21,6 +21,7 @@
     "setup": "bun --filter @coinslite/backend setup",
     "test:e2e": "playwright test -c tooling/e2e/playwright.config.ts",
     "test:e2e:local": "E2E_LOCAL_BACKEND=1 E2E_APP_PORT=3300 E2E_WEB_PORT=3301 playwright test -c tooling/e2e/playwright.config.ts",
+    "verify": "bash scripts/verify.sh",
     "format:check": "biome format .",
     "hooks:install": "bash scripts/install-hooks.sh",
     "prepare": "bun run hooks:install"
