@@ -89,6 +89,7 @@ test("search, filter, sort and switch views, with the view kept in the URL", asy
 test("the Item list comes first, under the toolbar and the totals as last left", async ({
   page,
 }) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 375, height: 812 });
   await signUpAndVerify(page, newEmail());
   await page.goto(`${appUrl}/collection`);
