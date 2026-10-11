@@ -22,6 +22,8 @@ export default {
     appearanceDark: "Dark",
     appearanceSystem: "System",
     more: "More",
+    settings: "Settings",
+    toggleSidebar: "Show or hide the sidebar",
   },
   placeholder: {
     title: "Nothing here yet",

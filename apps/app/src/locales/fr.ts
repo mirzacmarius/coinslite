@@ -26,6 +26,8 @@ export default {
     appearanceDark: "Sombre",
     appearanceSystem: "Système",
     more: "Plus",
+    settings: "Paramètres",
+    toggleSidebar: "Afficher ou masquer la barre latérale",
   },
   placeholder: {
     title: "Rien ici pour l’instant",

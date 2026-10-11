@@ -26,6 +26,8 @@ export default {
     appearanceDark: "Dunkel",
     appearanceSystem: "System",
     more: "Mehr",
+    settings: "Einstellungen",
+    toggleSidebar: "Seitenleiste ein- oder ausblenden",
   },
   placeholder: {
     title: "Noch nichts hier",

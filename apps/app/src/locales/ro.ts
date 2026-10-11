@@ -25,6 +25,8 @@ export default {
     appearanceDark: "Întunecat",
     appearanceSystem: "Sistem",
     more: "Mai mult",
+    settings: "Setări",
+    toggleSidebar: "Afișează sau ascunde bara laterală",
   },
   placeholder: {
     title: "Nimic aici încă",

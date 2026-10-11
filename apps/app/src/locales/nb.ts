@@ -24,6 +24,8 @@ export default {
     appearanceDark: "Mørkt",
     appearanceSystem: "System",
     more: "Mer",
+    settings: "Innstillinger",
+    toggleSidebar: "Vis eller skjul sidepanelet",
   },
   placeholder: {
     title: "Ingenting her ennå",

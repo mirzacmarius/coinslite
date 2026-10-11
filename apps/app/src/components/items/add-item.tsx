@@ -5,6 +5,7 @@ import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd } from "@coinslite/ui/kbd";
+import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { Plus } from "lucide-react";
 import {
   createContext,
@@ -83,14 +84,16 @@ export function AddItemQuickAction() {
   const t = useI18n();
   const addItem = useAddItem();
   return (
-    <Button
-      variant="ghost"
-      className="w-full justify-start border bg-card text-foreground hover:bg-card hover:text-foreground hover:shadow-sm"
-      onClick={() => addItem()}
-    >
-      <Plus aria-hidden="true" />
-      {t("items.add")}
-      <Kbd className="ml-auto">C</Kbd>
-    </Button>
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        tooltip={t("items.add")}
+        className="border bg-card text-foreground hover:bg-card hover:text-foreground hover:shadow-sm group-data-[collapsible=icon]:border-0"
+        onClick={() => addItem()}
+      >
+        <Plus aria-hidden="true" />
+        <span>{t("items.add")}</span>
+        <Kbd className="ml-auto group-data-[collapsible=icon]:hidden">C</Kbd>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }

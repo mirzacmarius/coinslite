@@ -6,10 +6,8 @@ import {
 } from "@/components/preferences";
 import { useSignOut } from "@/components/sign-out";
 import { UnseenMarker } from "@/components/updates/unseen-marker";
-import { updatesHref } from "@/components/updates/updates-href";
 import { useUpdatesStatus } from "@/components/updates/use-updates-status";
 import { useI18n } from "@/locales/client";
-import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import {
   DropdownMenu,
@@ -23,36 +21,22 @@ import {
 } from "@coinslite/ui/dropdown-menu";
 import { Logo } from "@coinslite/ui/logo";
 import { cn } from "@coinslite/ui/utils";
-import { useQuery } from "convex/react";
-import {
-  ChartColumn,
-  ChevronDown,
-  CreditCard,
-  FileSpreadsheet,
-  Languages,
-  ListTree,
-  LogOut,
-  Sparkles,
-  SunMoon,
-  ToggleRight,
-  UserRound,
-  UsersRound,
-} from "lucide-react";
+import { ChevronDown, Languages, LogOut, SunMoon } from "lucide-react";
 import Link from "next/link";
+import { useSettingsLinks } from "./settings-links";
 
-/** The row at the top of the sidebar (and phone top bar) holding account and preferences. */
+/** The phone top bar's menu: Settings' links, language and appearance, and signing out. */
 export function WorkspaceMenu({
   className,
   markUnseen = false,
 }: {
   className?: string;
-  /** Put the unseen-release marker on the button itself: in the sidebar (phones have it on the Account tab). */
+  /** Put the unseen-release marker on the button itself (phones have it on the Account tab). */
   markUnseen?: boolean;
 }) {
   const t = useI18n();
   const signOut = useSignOut();
-  // Admin areas stay out of sight for everyone else.
-  const isAdmin = useQuery(api.admin.roles.isAdmin);
+  const links = useSettingsLinks();
   const unseen = useUpdatesStatus()?.unseen === true;
 
   return (
@@ -79,70 +63,20 @@ export function WorkspaceMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[220px]">
-        <DropdownMenuItem asChild>
-          <Link href="/settings">
-            <UserRound strokeWidth={1.75} />
-            {t("nav.account")}
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/settings/billing">
-            <CreditCard strokeWidth={1.75} />
-            {t("shell.plans")}
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href={updatesHref}>
-            <Sparkles strokeWidth={1.75} />
-            {t("updates.title")}
-            {unseen && (
-              <>
-                <UnseenMarker className="ml-auto" />
-                <span className="sr-only">{t("updates.unseen")}</span>
-              </>
-            )}
-          </Link>
-        </DropdownMenuItem>
-        {isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin/catalog/editor">
-              <ListTree strokeWidth={1.75} />
-              {t("catalogEditor.menu")}
+        {links.map(({ href, label, icon: Icon, unseen: linkUnseen }) => (
+          <DropdownMenuItem key={href} asChild>
+            <Link href={href}>
+              <Icon strokeWidth={1.75} />
+              {label}
+              {linkUnseen && (
+                <>
+                  <UnseenMarker className="ml-auto" />
+                  <span className="sr-only">{t("updates.unseen")}</span>
+                </>
+              )}
             </Link>
           </DropdownMenuItem>
-        )}
-        {isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin/catalog">
-              <FileSpreadsheet strokeWidth={1.75} />
-              {t("catalogAdmin.menu")}
-            </Link>
-          </DropdownMenuItem>
-        )}
-        {isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin/stats">
-              <ChartColumn strokeWidth={1.75} />
-              {t("adminStats.menu")}
-            </Link>
-          </DropdownMenuItem>
-        )}
-        {isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin/flags">
-              <ToggleRight strokeWidth={1.75} />
-              {t("featureFlags.menu")}
-            </Link>
-          </DropdownMenuItem>
-        )}
-        {isAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin/users">
-              <UsersRound strokeWidth={1.75} />
-              {t("adminUsers.menu")}
-            </Link>
-          </DropdownMenuItem>
-        )}
+        ))}
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
