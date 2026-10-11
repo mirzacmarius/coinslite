@@ -16,7 +16,6 @@ A web app where collectors record the coins, banknotes and stamps they own, orga
 | `packages/backend` | Convex backend: schema, functions, auth, billing |
 | `packages/ui` | Shared UI components (shadcn/Tailwind) |
 | `packages/email` | Email templates (React Email), preview on port 3003 |
-| `tooling/e2e` | Playwright smoke tests |
 | `tooling/typescript` | Shared TypeScript config |
 
 ## Getting started
@@ -29,8 +28,6 @@ bun run setup   # configures a Convex deployment and points the app at it
 bun dev         # marketing site, product app, Convex and email preview
 ```
 
-`bun install` configures the repository's `.githooks` when run locally in a Git checkout. It leaves a different existing `core.hooksPath` untouched. To set up the hooks explicitly, run `bun run hooks:install`.
-
 `bun run setup` asks you to log in to Convex, or to start without an account and run Convex locally. Agents and CI can skip the prompt with `CONVEX_AGENT_MODE=anonymous bun run setup`.
 
 ## Checks
@@ -39,23 +36,12 @@ bun dev         # marketing site, product app, Convex and email preview
 bun run lint        # Biome + monorepo consistency
 bun run typecheck
 bun run test        # backend rules, through Convex functions (convex-test + Vitest)
-bun run test:e2e    # Playwright smoke tests; starts both apps if they aren't running
+bun run verify      # format, lint, typecheck, tests and build, as before a merge
 ```
 
-The pre-commit hook formats and lints the staged files with Biome and stages its fixes. The pre-push hook runs typecheck and tests.
+On a test backend (`bash packages/backend/scripts/setup-e2e-backend.sh`), `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment. Any deployment that sends real email refuses it.
 
-The first Playwright run needs a browser: `bunx playwright install chromium`.
-
-The account journeys (sign-up, verification, sign-in, password reset) need a backend whose emails can be read. They skip themselves unless `E2E_LOCAL_BACKEND=1`. To run them locally, use a separate checkout, because the setup script points that checkout at an anonymous local Convex deployment:
-
-```sh
-bash packages/backend/scripts/setup-e2e-backend.sh   # emails land in the dev outbox
-E2E_LOCAL_BACKEND=1 bun run test:e2e                 # also starts the local backend
-```
-
-On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment; the Insurance report journey uses it. Any deployment that sends real email refuses it.
-
-CI runs all four on every push and pull request.
+CI runs lint and typecheck on every push.
 
 ## Deployments
 

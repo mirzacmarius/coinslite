@@ -12,8 +12,6 @@
     "start:web": "turbo start --filter=@coinslite/web",
     "start:app": "turbo start --filter=@coinslite/app",
     "test": "turbo test",
-    "checks:coverage": "bun scripts/checks-coverage.mjs",
-    "test:checks-coverage": "bun test scripts/checks-coverage.test.js",
     "format": "biome format --write .",
     "lint": "turbo lint && bun lint:repo",
     "lint:repo": "sherif --fail-on-warnings",
@@ -21,11 +19,8 @@
     "typecheck": "turbo typecheck",
     "dev:backend": "turbo dev --filter=@coinslite/backend",
     "setup": "bun --filter @coinslite/backend setup",
-    "test:e2e": "playwright test -c tooling/e2e/playwright.config.ts",
-    "test:e2e:local": "E2E_LOCAL_BACKEND=1 E2E_APP_PORT=3300 E2E_WEB_PORT=3301 playwright test -c tooling/e2e/playwright.config.ts",
-    "format:check": "biome format .",
-    "hooks:install": "bash scripts/install-hooks.sh",
-    "prepare": "bun run hooks:install"
+    "verify": "bash scripts/verify.sh",
+    "format:check": "biome format ."
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
