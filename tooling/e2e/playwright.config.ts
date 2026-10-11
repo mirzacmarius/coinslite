@@ -18,9 +18,11 @@ export default defineConfig({
   // The bundled Catalog, loaded once for every journey that needs it.
   globalSetup: "./global-setup.ts",
   fullyParallel: true,
-  // CI's runner has 2 CPUs; every journey signs up its own account, so two
-  // can share the local backend.
-  workers: isCI ? 2 : undefined,
+  // One journey at a time on CI. The runner has 2 CPUs, which `next dev`,
+  // the local backend and the browser already keep busy; with two journeys
+  // at once, the longer ones ran past the 30 s each gets. The shards in
+  // check.yml run the suite in parallel instead.
+  workers: isCI ? 1 : undefined,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? [["github"], ["list"]] : "list",
