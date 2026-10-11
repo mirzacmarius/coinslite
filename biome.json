@@ -4,7 +4,7 @@
     "enabled": true
   },
   "linter": {
-    "ignore": ["node_modules", ".next"],
+    "ignore": ["node_modules", ".next", "packages/tsconfig"],
     "enabled": true,
     "rules": {
       "recommended": true,
@@ -24,18 +24,5 @@
   },
   "formatter": {
     "indentStyle": "space"
-  },
-  "files": {
-    "ignore": [
-      "**/_generated/**",
-      "**/.convex/**",
-      "**/.next/**",
-      "**/test-results/**"
-    ]
-  },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
   }
 }
