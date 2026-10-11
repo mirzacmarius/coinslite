@@ -19,8 +19,13 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    # About 3 minutes.
+    # About 3 minutes; a minute or so when Turbo replays unchanged workspaces.
     timeout-minutes: 15
+    # Turbo's cache on Vercel, shared by every run. Without the token, every
+    # task runs from scratch.
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
