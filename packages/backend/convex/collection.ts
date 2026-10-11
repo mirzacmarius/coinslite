@@ -41,6 +41,8 @@ export const browse = query({
     complete: v.boolean(),
     /** The currency Purchase prices and Market values are in. */
     currency: homeCurrency,
+    /** The view's Catalog entry, to name its filter; null without one or for a key that names none. */
+    entry: v.union(v.null(), v.object({ key: v.string(), title: v.string() })),
     /** The country origin compares against; null when the person has none. */
     ownCountry: v.union(v.string(), v.null()),
     /** How many Items each filter option would show. */
@@ -61,6 +63,7 @@ export const browse = query({
       ),
       albums: v.array(v.object({ albumId: v.id("albums"), count: v.number() })),
       withoutAlbum: v.number(),
+      entry: v.number(),
       statuses: v.object({ owned: v.number(), sold: v.number() }),
     }),
   }),

@@ -198,6 +198,7 @@ export function FilterButton({
 }) {
   const t = useI18n();
   const active = filters.filter((filter) => filter.active).length;
+  const offered = filters.filter((filter) => filter.inMenu !== false);
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <Tooltip>
@@ -228,7 +229,7 @@ export function FilterButton({
         {/* Each opening starts at the list of filters. */}
         {open && (
           <FilterCommand
-            filters={filters}
+            filters={offered}
             onChange={(change) => {
               onChange(change);
               onOpenChange(false);

@@ -15,6 +15,7 @@ import {
   moveManyBetweenAlbums,
   ownAlbumId,
 } from "./albums/membership";
+import { heldItemLimit } from "./catalog/browse";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
@@ -305,6 +306,30 @@ async function holdsAny(
 }
 
 /**
+ * How many Items made from a Catalog entry a person still owns besides
+ * `item`, counting no further than `heldItemLimit`.
+ */
+async function otherItemsOf(
+  ctx: QueryCtx,
+  item: Doc<"items">,
+  entryId: Id<"catalogNodes">,
+) {
+  const owned = await ctx.db
+    .query("items")
+    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
+      q
+        .eq("ownerId", item.ownerId)
+        .eq("catalogEntryId", entryId)
+        .eq("soldOn", undefined),
+    )
+    .take(heldItemLimit + 1);
+  return Math.min(
+    heldItemLimit,
+    owned.filter((other) => other._id !== item._id).length,
+  );
+}
+
+/**
  * Saves the whole Item form: a field left empty is cleared. On an Item
  * linked to a Catalog entry, a fact left empty or set to the entry's follows
  * the entry again; only the facts that differ are kept as the person's.
@@ -580,6 +605,11 @@ export const get = query({
           title: v.string(),
           facts: catalogFacts,
           details: catalogDetails,
+          /**
+           * How many other Items made from the entry the person still owns,
+           * counting no further than `heldItemLimit`.
+           */
+          otherItems: v.number(),
         }),
       ),
     }),
@@ -601,6 +631,7 @@ export const get = query({
         title: entry.title,
         facts: entry.facts,
         details: entryDetails(node ?? {}),
+        otherItems: await otherItemsOf(ctx, item, entry._id),
       },
     };
   },

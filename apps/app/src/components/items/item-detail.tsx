@@ -4,6 +4,7 @@ import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
 import { catalogNodeHref } from "@/components/catalog/catalog-levels";
 import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
+import { entryItemsHref } from "@/components/collection/collection-url";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -334,13 +335,26 @@ export function ItemDetail() {
               {t(`items.types.${item.type}`)}
             </PropertyRow>
             {item.catalogEntry && (
-              <PropertyRow label={t("catalogPicker.entry")}>
+              <PropertyRow label={t("catalogPicker.entry")} wrap>
                 <Link
                   href={catalogNodeHref(item.catalogEntry.key)}
                   className="hover:underline"
                 >
                   {item.catalogEntry.title}
                 </Link>
+                {item.catalogEntry.otherItems > 0 && (
+                  <>
+                    {" "}
+                    <Link
+                      href={entryItemsHref(item.catalogEntry.key)}
+                      className="text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      {t("items.moreYouHold", {
+                        count: format.number(item.catalogEntry.otherItems),
+                      })}
+                    </Link>
+                  </>
+                )}
               </PropertyRow>
             )}
             <PropertyRow label={t("albums.album")}>
