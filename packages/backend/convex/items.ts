@@ -274,7 +274,7 @@ export const addCatalogEntries = mutation({
   },
 });
 
-/** Whether a person has any Item made from a Catalog entry. */
+/** Whether a person still owns any Item made from a Catalog entry. */
 async function holdsAny(
   ctx: QueryCtx,
   ownerId: Id<"users">,
@@ -282,8 +282,11 @@ async function holdsAny(
 ) {
   const item = await ctx.db
     .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId", (q) =>
-      q.eq("ownerId", ownerId).eq("catalogEntryId", entryId),
+    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
+      q
+        .eq("ownerId", ownerId)
+        .eq("catalogEntryId", entryId)
+        .eq("soldOn", undefined),
     )
     .first();
   return item !== null;

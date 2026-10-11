@@ -144,3 +144,22 @@ test("the latest Items need a signed-in person who has finished signing up", asy
     "NOT_SET_UP",
   );
 });
+
+test("a sold Item leaves the latest, and the one before it takes its place", async () => {
+  const t = newTest();
+  const ada = await person(t, "ada@example.com");
+  for (const title of ["First", "Second", "Third"])
+    await add(ada.as, { title });
+  const fourth = await add(ada.as, { title: "Fourth" });
+
+  await ada.as.mutation(api.items.sell, {
+    itemId: fourth,
+    soldOn: "2026-10-01",
+  });
+
+  expect(
+    (await ada.as.query(api.overview.latestItems, {})).map(
+      (item) => item.title,
+    ),
+  ).toEqual(["Third", "Second", "First"]);
+});

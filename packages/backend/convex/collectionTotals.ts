@@ -12,6 +12,7 @@ import { homeCurrency } from "./utils/validators";
 
 /**
  * Totals over the whole Collection (spec 7), read a page of Items at a time.
+ * They describe what the person owns, so sold Items are left out.
  *
  * Why pages: a Premium Collection can hold many thousands of Items, more than
  * one query may read. A stored running total would need every way of adding,
@@ -84,7 +85,9 @@ export const page = query({
     const rates = await latestRates(ctx);
     const items = await ctx.db
       .query("items")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
+      .withIndex("by_ownerId_and_soldOn", (q) =>
+        q.eq("ownerId", owner._id).eq("soldOn", undefined),
+      )
       .paginate(paginationOpts);
     // Linked Items' metal facts come from their Catalog entries.
     const pageTotals = collectionTotals(await resolveItems(ctx, items.page), {

@@ -445,3 +445,35 @@ test("turns away a time zone that doesn't exist", async () => {
     ).rejects.toThrow("INVALID_UTC_OFFSET");
   }
 });
+
+test("sold Items leave the totals and Metal values; marking one owned brings it back", async () => {
+  const t = newTest();
+  await storeSpotPrices(t);
+  const ada = await person(t, "ada@example.com");
+  await add(ada.as, {
+    title: "Kept",
+    purchasePrice: 2_000,
+    marketValue: 3_000,
+  });
+  // 10 g of pure gold: 10,000.00 kroner of Metal value
+  const gold = await add(ada.as, {
+    title: "Gold",
+    metal: "gold",
+    weight: 10,
+    purity: 1,
+    purchasePrice: 900_000,
+    marketValue: 1_100_000,
+  });
+
+  await ada.as.mutation(api.items.sell, { itemId: gold, soldOn: "2026-10-01" });
+  const sold = await totalsOf(ada.as);
+  expect(sold.items).toBe(1);
+  expect(sold.purchasePrice).toBe(2_000);
+  expect(sold.marketValue).toBe(3_000);
+  expect(sold.metals.gold).toEqual({ fineWeight: 0, value: 0 });
+
+  await ada.as.mutation(api.items.markOwned, { itemId: gold });
+  const owned = await totalsOf(ada.as);
+  expect(owned.items).toBe(2);
+  expect(owned.metals.gold.value).toBe(1_000_000);
+});

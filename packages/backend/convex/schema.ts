@@ -188,7 +188,19 @@ export default defineSchema({
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
     .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
-    .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
+    // With `soldOn` undefined, what a person still owns of one Catalog entry
+    // (held counts, Set completion) or in one Album (the Insurance report's
+    // Album scopes).
+    .index("by_ownerId_and_catalogEntryId_and_soldOn", [
+      "ownerId",
+      "catalogEntryId",
+      "soldOn",
+    ])
+    .index("by_ownerId_and_albumId_and_soldOn", [
+      "ownerId",
+      "albumId",
+      "soldOn",
+    ])
     // Everyone's Items linked to one Catalog entry, for the admins' Catalog
     // editor: a new Item type reaches them, and deleting the entry leaves them
     // its facts (catalog/linkedItems.ts).
