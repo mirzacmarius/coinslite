@@ -21,7 +21,7 @@ export default defineConfig({
   // One journey at a time on CI. The runner has 2 CPUs, which `next dev`,
   // the local backend and the browser already keep busy; with two journeys
   // at once, the longer ones ran past the 30 s each gets. The shards in
-  // check.yml run the suite in parallel instead.
+  // e2e.yml run the suite in parallel instead.
   workers: isCI ? 1 : undefined,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
