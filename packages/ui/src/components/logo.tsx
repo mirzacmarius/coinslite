@@ -1,7 +1,13 @@
 import { cn } from "../utils";
 
-/** The CoinsLite wordmark: an indigo coin ring and the product name. */
-export function Logo({ className }: { className?: string }) {
+/**
+ * The CoinsLite wordmark: an indigo coin ring and the product name.
+ * `nameClassName` styles the name alone, e.g. to keep only the ring.
+ */
+export function Logo({
+  className,
+  nameClassName,
+}: { className?: string; nameClassName?: string }) {
   return (
     <span
       className={cn(
@@ -24,7 +30,7 @@ export function Logo({ className }: { className?: string }) {
           strokeWidth="1.6"
         />
       </svg>
-      CoinsLite
+      <span className={nameClassName}>CoinsLite</span>
     </span>
   );
 }

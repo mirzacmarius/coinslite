@@ -39,7 +39,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-  SidebarTrigger,
   useSidebar,
 } from "@coinslite/ui/sidebar";
 import { useQuery } from "convex/react";
@@ -63,7 +62,8 @@ import { useSettingsLinks } from "./settings-links";
  * the most used actions at the top, then the sections and Settings, and at
  * the bottom Spot prices, plan usage and the person, whose menu holds the
  * language, appearance and signing out. It collapses to icons (Cmd/Ctrl+B,
- * the button beside the logo, or the rail along its edge).
+ * the toggle at the start of every page's header bar, or the rail along its
+ * edge), keeping the logo's ring.
  */
 export function AppSidebar({
   items,
@@ -85,17 +85,17 @@ export function AppSidebar({
       className="pl-[max(0.5rem,env(safe-area-inset-left))] pt-[max(0.5rem,env(safe-area-inset-top))]"
     >
       <SidebarHeader>
-        <div className="flex h-8 items-center gap-2 pl-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0">
+        {/* Collapsed to icons, the logo keeps its ring; the name stays for screen readers. */}
+        <div className="flex h-8 items-center pl-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0">
           <Link
             href="/"
-            className="min-w-0 flex-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[collapsible=icon]:hidden"
+            className="flex min-w-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
           >
-            <Logo className="text-[13px] font-medium" />
+            <Logo
+              className="text-[13px] font-medium"
+              nameClassName="group-data-[collapsible=icon]:sr-only"
+            />
           </Link>
-          <SidebarTrigger
-            label={t("shell.toggleSidebar")}
-            className="text-muted-foreground hover:bg-sidebar-accent"
-          />
         </div>
         {quickActions && <SidebarMenu>{quickActions}</SidebarMenu>}
       </SidebarHeader>

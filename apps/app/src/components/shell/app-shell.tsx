@@ -4,7 +4,12 @@ import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useUpdatesStatus } from "@/components/updates/use-updates-status";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
-import { SidebarInset, SidebarProvider } from "@coinslite/ui/sidebar";
+import { HeaderBarLeading } from "@coinslite/ui/header-bar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@coinslite/ui/sidebar";
 import { SkipLink } from "@coinslite/ui/skip-link";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
@@ -132,18 +137,28 @@ export function AppShell({
 
       {/* From tablet width up, pages sit on a panel inset from the chrome
         and scroll inside it, so the sidebar and panel edges stay put. */}
-      <SidebarInset className="min-w-0 md:overflow-hidden">
-        <div className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
-          <WorkspaceMenu className="h-8" />
-        </div>
-        <main
-          id="main"
-          tabIndex={-1}
-          className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:overflow-y-auto md:pb-0"
-        >
-          {children}
-        </main>
-      </SidebarInset>
+      {/* Every page's header bar starts with the sidebar's toggle (tablets and up). */}
+      <HeaderBarLeading
+        value={
+          <SidebarTrigger
+            label={t("shell.toggleSidebar")}
+            className="text-muted-foreground"
+          />
+        }
+      >
+        <SidebarInset className="min-w-0 md:overflow-hidden">
+          <div className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
+            <WorkspaceMenu className="h-8" />
+          </div>
+          <main
+            id="main"
+            tabIndex={-1}
+            className="flex min-w-0 flex-1 flex-col pb-28 outline-none md:overflow-y-auto md:pb-0"
+          >
+            {children}
+          </main>
+        </SidebarInset>
+      </HeaderBarLeading>
 
       <nav
         aria-label={t("shell.primaryNavigation")}
