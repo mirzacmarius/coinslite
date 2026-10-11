@@ -6,15 +6,16 @@ import { deleteHistory } from "./valueHistory";
 
 /**
  * Deletes an Item for good, together with its stored photos (sides and more)
- * and its Market value history, and takes it
- * out of its Album's Item count and its owner's Collection counts. The one
+ * and its Market value history, and takes it out of its Album's Item count
+ * and its owner's Collection counts. The one
  * way to delete Items: deleting one Item, an Album with chosen Items, or a
  * whole account all go through here so no photo is left behind and nothing
  * miscounts.
  *
  * It checks nothing: the caller has already made sure the Item is the
  * signed-in person's (or that the whole account is going). Returns how many
- * more photos went with the Item, for callers that budget their writes.
+ * more documents (photos and history points) went with the Item, for
+ * callers that budget their writes.
  */
 export async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
   for (const photo of [item.frontPhoto, item.backPhoto]) {
@@ -29,7 +30,7 @@ export async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
     await ctx.storage.delete(photo.storageId);
     await ctx.db.delete(photo._id);
   }
-  await deleteHistory(ctx, item._id);
+  const points = await deleteHistory(ctx, item._id);
   await ctx.db.delete(item._id);
   await moveBetweenAlbums(
     ctx,
@@ -38,5 +39,5 @@ export async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
     item.soldOn !== undefined,
   );
   await countItemRemoved(ctx, item);
-  return more.length;
+  return more.length + points;
 }

@@ -13,9 +13,9 @@ export { monthOf } from "./totals";
 
 /**
  * How many Items "Value over time" reads per page: each brings its history,
- * so fewer than the totals' pages.
+ * up to a point a month, so far fewer than the totals' pages.
  */
-export const VALUE_OVER_TIME_PAGE_SIZE = 200;
+export const VALUE_OVER_TIME_PAGE_SIZE = 100;
 
 /** An Item's Market value from a moment on (marketValueHistory in schema.ts). */
 export type ValuePoint = {

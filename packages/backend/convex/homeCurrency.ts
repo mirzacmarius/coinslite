@@ -12,15 +12,28 @@ import { requireSetUpUser } from "./utils/auth";
 import { homeCurrency } from "./utils/validators";
 
 /**
- * The person's Items, as far as one past the most a change converts: enough
- * to tell whether the whole Collection fits in one change.
+ * The person's Items and the Market value history with an amount, each as far
+ * as one past the most a change converts: enough to tell whether the whole
+ * Collection fits in one change.
  */
 async function collectionOf(ctx: QueryCtx, ownerId: Id<"users">) {
   const items = await ctx.db
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
     .take(homeCurrencyLimits.items + 1);
-  return { items, tooLarge: items.length > homeCurrencyLimits.items };
+  const history = (
+    await ctx.db
+      .query("marketValueHistory")
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
+      .take(homeCurrencyLimits.historyPoints + 1)
+  ).filter((point) => point.marketValue !== undefined);
+  return {
+    items,
+    history,
+    tooLarge:
+      items.length > homeCurrencyLimits.items ||
+      history.length > homeCurrencyLimits.historyPoints,
+  };
 }
 
 /** The money fields an Item has a value in. */
@@ -87,11 +100,11 @@ export const change = mutation({
     const owner = await requireSetUpUser(ctx);
     const from = owner.homeCurrency;
     if (to === from) throw new ConvexError(homeCurrencyErrors.sameCurrency);
-    const { items, tooLarge } = await collectionOf(ctx, owner._id);
+    const { items, history, tooLarge } = await collectionOf(ctx, owner._id);
     if (tooLarge) throw new ConvexError(homeCurrencyErrors.collectionTooLarge);
     const withAmounts = items.filter((item) => amountsOn(item).length > 0);
     let converted = 0;
-    if (withAmounts.length > 0) {
+    if (withAmounts.length > 0 || history.length > 0) {
       const rates = await latestRates(ctx);
       if (!rates) throw new ConvexError(homeCurrencyErrors.rateUnavailable);
       // Amounts are only ever converted at the rate the person saw and confirmed.
@@ -111,15 +124,12 @@ export const change = mutation({
         await ctx.db.patch("items", item._id, amounts);
       }
       // The Market value history is in the Home currency too.
-      const history = await ctx.db
-        .query("marketValueHistory")
-        .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
-        .collect();
       for (const point of history) {
-        if (point.marketValue === undefined) continue;
-        await ctx.db.patch(point._id, {
-          marketValue: rates.convert(point.marketValue, from, to),
-        });
+        const marketValue = rates.convert(point.marketValue ?? 0, from, to);
+        if (marketValue > itemLimits.amount) {
+          throw new ConvexError(homeCurrencyErrors.amountTooLarge);
+        }
+        await ctx.db.patch(point._id, { marketValue });
       }
     }
     await ctx.db.patch("users", owner._id, { homeCurrency: to });

@@ -21,4 +21,6 @@ export const homeCurrencyLimits = {
    * read and write limits.
    */
   items: 5000,
+  /** The most Market value history points one change converts, likewise. */
+  historyPoints: 5000,
 } as const;

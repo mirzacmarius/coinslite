@@ -364,10 +364,6 @@ export default defineSchema({
     }),
 
   /**
-   * The latest Spot prices and exchange rates (spotPrices.ts): one document,
-   * replaced by each successful refresh and kept when a refresh fails.
-   */
-  /**
    * Market value history (items/valueHistory.ts): an Item's Market value per
    * piece and Quantity from `at` on, recorded whenever either changes, in
    * minor units of the owner's Home currency (a change of it converts these
@@ -395,6 +391,10 @@ export default defineSchema({
     perDollar,
   }).index("by_day", ["day"]),
 
+  /**
+   * The latest Spot prices and exchange rates (spotPrices.ts): one document,
+   * replaced by each successful refresh and kept when a refresh fails.
+   */
   spotPriceSnapshots: defineTable({
     /** When the provider quoted the prices. */
     quotedAt: v.number(),

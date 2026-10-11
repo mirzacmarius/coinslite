@@ -22,7 +22,15 @@ export async function historyOf(ctx: QueryCtx, itemId: Id<"items">) {
     .collect();
 }
 
-/** Notes an Item's Market value and Quantity as they are from now on. */
+/** The UTC month of a moment, "YYYY-MM". */
+const utcMonth = (moment: number) => new Date(moment).toISOString().slice(0, 7);
+
+/**
+ * Notes an Item's Market value and Quantity as they are from now on. A
+ * change in the same (UTC) month as the last point replaces it: only each
+ * month's last state counts, and the history stays at most one point per
+ * Item per month, so the series' pages stay inside the read limits.
+ */
 export async function recordValue(
   ctx: MutationCtx,
   itemId: Id<"items">,
@@ -32,12 +40,41 @@ export async function recordValue(
     quantity,
   }: Pick<Doc<"items">, "ownerId" | "marketValue" | "quantity">,
 ) {
-  await ctx.db.insert("marketValueHistory", {
-    ownerId,
-    itemId,
-    at: Date.now(),
+  const now = Date.now();
+  const point = {
+    at: now,
     ...(marketValue !== undefined && { marketValue }),
     quantity,
+  };
+  const last = await ctx.db
+    .query("marketValueHistory")
+    .withIndex("by_itemId_and_at", (q) => q.eq("itemId", itemId))
+    .order("desc")
+    .first();
+  if (last && utcMonth(last.at) === utcMonth(now)) {
+    await ctx.db.replace(last._id, { ownerId, itemId, ...point });
+    return;
+  }
+  await ctx.db.insert("marketValueHistory", { ownerId, itemId, ...point });
+}
+
+/**
+ * An Item from before history was kept gets its first point before it
+ * changes: its values as they were, dated when its pieces were added, so the
+ * months before the change keep them.
+ */
+async function ensureStart(ctx: MutationCtx, item: Doc<"items">) {
+  const kept = await ctx.db
+    .query("marketValueHistory")
+    .withIndex("by_itemId_and_at", (q) => q.eq("itemId", item._id))
+    .first();
+  if (kept) return;
+  await ctx.db.insert("marketValueHistory", {
+    ownerId: item.ownerId,
+    itemId: item._id,
+    at: item.addedAt ?? item._creationTime,
+    ...(item.marketValue !== undefined && { marketValue: item.marketValue }),
+    quantity: item.quantity,
   });
 }
 
@@ -61,15 +98,14 @@ export async function recordIfChanged(
     before.quantity === after.quantity
   )
     return;
+  await ensureStart(ctx, before);
   await recordValue(ctx, before._id, { ownerId: before.ownerId, ...after });
 }
 
 /**
  * Selling some of an Item's pieces splits them off into `soldId`: the sold
  * copy takes `pieces` of every past point and the original keeps the rest,
- * so the months before the sale still add up to every piece. An original
- * without history (from before it was kept) gets its first points now,
- * dated when its pieces were added.
+ * so the months before the sale still add up to every piece.
  */
 export async function splitHistory(
   ctx: MutationCtx,
@@ -77,28 +113,14 @@ export async function splitHistory(
   soldId: Id<"items">,
   pieces: number,
 ) {
-  const history = await historyOf(ctx, original._id);
-  if (history.length === 0) {
-    if (original.marketValue === undefined) return;
-    const at = original.addedAt ?? original._creationTime;
-    const point = {
-      ownerId: original.ownerId,
-      at,
-      marketValue: original.marketValue,
-    };
-    await ctx.db.insert("marketValueHistory", {
-      ...point,
-      itemId: original._id,
-      quantity: original.quantity - pieces,
-    });
-    await ctx.db.insert("marketValueHistory", {
-      ...point,
-      itemId: soldId,
-      quantity: pieces,
-    });
-    return;
-  }
-  for (const { _id, _creationTime, itemId, quantity, ...point } of history) {
+  await ensureStart(ctx, original);
+  for (const {
+    _id,
+    _creationTime,
+    itemId,
+    quantity,
+    ...point
+  } of await historyOf(ctx, original._id)) {
     const split = Math.min(pieces, quantity);
     await ctx.db.insert("marketValueHistory", {
       ...point,
@@ -109,10 +131,11 @@ export async function splitHistory(
   }
 }
 
-/** Deletes an Item's history with it (items/deletion.ts). */
+/** Deletes an Item's history with it (items/deletion.ts); how many points went. */
 export async function deleteHistory(ctx: MutationCtx, itemId: Id<"items">) {
-  for (const point of await historyOf(ctx, itemId))
-    await ctx.db.delete(point._id);
+  const history = await historyOf(ctx, itemId);
+  for (const point of history) await ctx.db.delete(point._id);
+  return history.length;
 }
 
 /** Items one backfill batch reads. */
