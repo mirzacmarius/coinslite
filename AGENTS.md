@@ -15,8 +15,15 @@ Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/age
 ## Working here
 
 - Work in your own git worktree: another agent session may be using this checkout.
-- Run end-to-end tests locally with `bun run test:e2e:local <spec>` (once per machine: `packages/backend/scripts/setup-e2e-backend.sh`). CI runs the whole suite.
+- Run end-to-end tests locally with `bun run test:e2e:local <spec>` (once per machine: `packages/backend/scripts/setup-e2e-backend.sh`).
 - When a page behaves differently locally than in CI, reinstall with `rm -rf node_modules && bun install`: bun keeps stale nested packages after lockfile changes.
+
+## Prelaunch verification policy
+
+- Match local checks to the changed area. Documentation or copy-only changes do not need the full suite.
+- For auth, permissions, billing, schema, or shared dependencies, run the relevant targeted tests and build checks.
+- Run the full manual CI workflow for a release candidate or when a risky change specifically calls for it: `gh workflow run check.yml --ref <branch>`.
+- CI no longer runs automatically on pushes or pull requests; do not wait for automatic checks.
 
 <!-- convex-ai-start -->
 

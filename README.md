@@ -55,7 +55,7 @@ E2E_LOCAL_BACKEND=1 bun run test:e2e                 # also starts the local bac
 
 On such a test backend, `npx convex run testing/premium:grant '{"email":"…"}'` (in `packages/backend`) makes an account Premium without a payment; the Insurance report journey uses it. Any deployment that sends real email refuses it.
 
-CI runs all four on every push and pull request.
+The full CI suite is manual and includes lint, format, typecheck, build, backend tests, and Playwright smoke tests. Run it for a release candidate or when a risky change calls for full verification: `gh workflow run check.yml --ref <branch>`. CI no longer runs automatically on pushes or pull requests; no GitHub required check should reference this manual workflow.
 
 ## Deployments
 
