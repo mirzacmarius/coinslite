@@ -14,6 +14,8 @@ Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/age
 
 ## Working here
 
+When auditing which check scripts run in workspaces, read `docs/agents/checks.md` and use `bun run checks:coverage`.
+
 - Work in your own git worktree: another agent session may be using this checkout.
 - Run end-to-end tests locally with `bun run test:e2e:local <spec>` (once per machine: `packages/backend/scripts/setup-e2e-backend.sh`). CI runs the whole suite.
 - When a page behaves differently locally than in CI, reinstall with `rm -rf node_modules && bun install`: bun keeps stale nested packages after lockfile changes.

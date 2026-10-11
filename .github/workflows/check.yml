@@ -19,6 +19,10 @@ jobs:
         run: bun run lint
       - name: Format
         run: bun run format:check
+      - name: Check coverage CLI tests
+        run: bun run test:checks-coverage
+      - name: Lint coverage CLI
+        run: bunx biome check scripts/checks-coverage.mjs scripts/checks-coverage.test.js
       - name: Typecheck
         run: bun run typecheck
       - name: Build

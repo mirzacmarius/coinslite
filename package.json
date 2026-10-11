@@ -12,6 +12,8 @@
     "start:web": "turbo start --filter=@coinslite/web",
     "start:app": "turbo start --filter=@coinslite/app",
     "test": "turbo test",
+    "checks:coverage": "bun scripts/checks-coverage.mjs",
+    "test:checks-coverage": "bun test scripts/checks-coverage.test.js",
     "format": "biome format --write .",
     "lint": "turbo lint && bun lint:repo",
     "lint:repo": "sherif --fail-on-warnings",
