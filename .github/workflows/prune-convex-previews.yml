@@ -1,0 +1,35 @@
+name: Prune Convex previews
+# Each Vercel preview build creates a Convex preview deployment for its branch.
+# Once the pull request is merged or closed, that deployment only takes up the
+# team's shared deployment quota, so delete it. The daily run catches any a
+# closed event missed.
+on:
+  pull_request:
+    types: [closed]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: prune-convex-previews
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Delete previews without an open pull request
+        run: |
+          if [ -z "$CONVEX_TEAM_TOKEN" ]; then
+            echo "::warning::Add a Convex team access token as the CONVEX_TEAM_TOKEN secret to prune previews."
+            exit 0
+          fi
+          bash scripts/prune-convex-previews.sh
+        env:
+          CONVEX_TEAM_TOKEN: ${{ secrets.CONVEX_TEAM_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
