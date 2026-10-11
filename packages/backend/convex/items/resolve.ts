@@ -12,7 +12,8 @@ import {
  * the facts the person changed; the rest are its entry's, looked up as the
  * Item is read (catalogFacts.ts). So EVERY reader of an Item's descriptive
  * facts (country, year, denomination, series, material, Strike, diameter,
- * Numista number, metal, weight, purity) goes through `resolveItems`, or
+ * thickness, mint mark, mintage, Numista number, metal, weight, purity) goes
+ * through `resolveItems`, or
  * `itemResolver` when reading Items one by one: the Item page, the
  * Collection and its exports, Album lists, totals, Metal values, reports.
  * Reading `ctx.db` Items directly shows a linked Item without its facts.

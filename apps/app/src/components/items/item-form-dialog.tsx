@@ -441,10 +441,15 @@ export function ItemFormDialog({
     if (!title || title === linked?.title)
       fillForm(form, { title: entry.title });
     setLinked({ key: entry.key, title: entry.title, facts: entry.facts });
-    fillForm(form, {
-      type: entry.itemType,
-      ...factValues(entry.facts, locale),
-    });
+    const values: Partial<ReturnType<typeof factValues>> = factValues(
+      entry.facts,
+      locale,
+    );
+    // Facts few entries hold: what the person already typed stays, as their
+    // own, when the entry has nothing to put there.
+    for (const name of ["mintMark", "mintage", "thickness"] as const)
+      if (entry.facts[name] === undefined) delete values[name];
+    fillForm(form, { type: entry.itemType, ...values });
     return true;
   };
 

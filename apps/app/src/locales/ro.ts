@@ -86,6 +86,7 @@ export default {
     millimetres: "mm",
     description: "Descriere",
     physical: "Caracteristici fizice",
+    fromCatalog: "Din catalog",
     edit: "Editează",
     editItem: "Editează obiectul",
     save: "Salvează",

@@ -197,7 +197,7 @@ type FactValues = Pick<ItemFormValues, CatalogFactName>;
  * changed.
  */
 export function factValues(facts: CatalogFacts, locale: Locale): FactValues {
-  const { decimal } = numberText(locale);
+  const { whole, decimal } = numberText(locale);
   return {
     country:
       facts.country && isCountryCode(facts.country) ? facts.country : undefined,
@@ -207,6 +207,9 @@ export function factValues(facts: CatalogFacts, locale: Locale): FactValues {
     material: facts.material,
     strike: facts.strike,
     diameter: decimal(facts.diameter),
+    thickness: decimal(facts.thickness),
+    mintMark: facts.mintMark ?? "",
+    mintage: whole(facts.mintage),
     numistaNumber:
       facts.numistaNumber === undefined ? "" : String(facts.numistaNumber),
     metal: facts.metal,
@@ -220,7 +223,6 @@ export function valuesFromItem(
   item: Doc<"items">,
   locale: Locale,
 ): ItemFormValues {
-  const { whole, decimal } = numberText(locale);
   const money = (minor?: number) =>
     minor === undefined
       ? ""
@@ -239,10 +241,7 @@ export function valuesFromItem(
     quantity: String(item.quantity),
     category: item.category ?? "",
     ruler: item.ruler ?? "",
-    mintMark: item.mintMark ?? "",
-    mintage: whole(item.mintage),
     materialNote: item.materialNote ?? "",
-    thickness: decimal(item.thickness),
     bullion: item.bullion ?? false,
     purchasePrice: money(item.purchasePrice),
     marketValue: money(item.marketValue),

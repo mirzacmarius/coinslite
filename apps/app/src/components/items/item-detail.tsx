@@ -3,9 +3,11 @@
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
 import { catalogNodeHref } from "@/components/catalog/catalog-levels";
+import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import { noMintMark } from "@coinslite/backend/convex/catalog/fields";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
@@ -19,7 +21,7 @@ import { Copy, HandCoins, Pencil, SearchX, Trash2, Undo2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import type * as React from "react";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { isItemLimitError, useItemLimitMessage } from "../plans/plan-usage";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
@@ -35,6 +37,7 @@ export function ItemDetail() {
   const item = useQuery(api.items.get, { itemId });
   const format = useFormatters();
   const labels = useGradeLabels();
+  const catalogFormat = useCatalogFormat();
   const albums = useAlbums();
   const router = useRouter();
   // Each opening starts the form afresh from the Item as it is now.
@@ -147,8 +150,52 @@ export function ItemDetail() {
   };
   const filled = (rows: Array<[string, React.ReactNode]>) =>
     rows.filter(([, value]) => value !== undefined && value !== false);
+  // Facts only the Catalog entry holds, read live from it, or the copy kept
+  // when the entry left the Catalog.
+  const details: Partial<NonNullable<typeof item.catalogEntry>["details"]> =
+    item.catalogEntry?.details ?? item.catalogDetails ?? {};
+  const fromCatalog: Array<[string, React.ReactNode]> = [
+    [
+      t("catalogFacts.mintMark"),
+      details.noMintMark && catalogFormat.mintMark(noMintMark),
+    ],
+    [t("catalogFacts.mint"), details.mint],
+    [
+      t(
+        details.designers && details.designers.length > 1
+          ? "catalogFacts.designers"
+          : "catalogFacts.designer",
+      ),
+      details.designers && catalogFormat.names(details.designers),
+    ],
+    [
+      t("catalogFacts.issued"),
+      details.issueDate && catalogFormat.partialDate(details.issueDate),
+    ],
+    [
+      t("catalogFacts.withdrawn"),
+      details.withdrawalDate &&
+        catalogFormat.partialDate(details.withdrawalDate),
+    ],
+    [
+      t("catalogFacts.composition"),
+      details.composition && catalogFormat.composition(details.composition),
+    ],
+    [
+      t("catalogFacts.edge"),
+      details.edge && t(`catalogFacts.edges.${details.edge}`),
+    ],
+    [t("catalogFacts.edgeLettering"), details.edgeLettering],
+    [
+      t("catalogFacts.size"),
+      details.width !== undefined &&
+        details.height !== undefined &&
+        catalogFormat.size(details.width, details.height),
+    ],
+  ];
   const shownFacts = filled(facts);
   const shownPhysical = filled(physical);
+  const shownFromCatalog = filled(fromCatalog);
   return (
     <>
       <HeaderBar
@@ -348,6 +395,15 @@ export function ItemDetail() {
               ))}
             </PanelSection>
           )}
+          {shownFromCatalog.length > 0 && (
+            <PanelSection title={t("items.fromCatalog")}>
+              {shownFromCatalog.map(([label, value]) => (
+                <PropertyRow key={label} label={label} wrap>
+                  {value}
+                </PropertyRow>
+              ))}
+            </PanelSection>
+          )}
           {item.type === "coin" && (item.metal || item.bullion) && (
             <PanelSection title={t("preciousMetal.title")}>
               <PropertyRow label={t("preciousMetal.metal")}>
@@ -394,15 +450,24 @@ function PanelSection({
   action,
   children,
 }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  const titleId = useId();
   return (
-    <section className="flex flex-col gap-1 p-4">
+    <section aria-labelledby={titleId} className="flex flex-col gap-1 p-4">
       {action ? (
         <div className="-my-1 mb-0 flex items-center justify-between gap-2">
-          <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>
+          <h3
+            id={titleId}
+            className="text-xs font-medium text-muted-foreground"
+          >
+            {title}
+          </h3>
           {action}
         </div>
       ) : (
-        <h3 className="mb-1 text-xs font-medium text-muted-foreground">
+        <h3
+          id={titleId}
+          className="mb-1 text-xs font-medium text-muted-foreground"
+        >
           {title}
         </h3>
       )}

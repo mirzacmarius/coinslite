@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { statsFigures, statsTable } from "./admin/statsFigures";
 import {
   albumColour,
+  catalogDetails,
   catalogItemType,
   catalogKind,
   coinEdge,
@@ -181,6 +182,10 @@ export default defineSchema({
     // The Catalog entry the Item was created from (ADR 0001), if any. The
     // Catalog shows how many of each entry a person holds from this link.
     catalogEntryId: v.optional(v.id("catalogNodes")),
+    // The entry's facts Items have no field for, frozen when the entry left
+    // the Catalog (catalog/linkedItems.ts), so the Item page still shows
+    // them. A linked Item reads them live from its entry instead.
+    catalogDetails: v.optional(catalogDetails),
   })
     .index("by_ownerId", ["ownerId"])
     // Owned Items are those without a sold-on date, for the Free plan count.

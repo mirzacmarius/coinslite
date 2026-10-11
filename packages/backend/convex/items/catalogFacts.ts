@@ -1,7 +1,13 @@
-import type { CatalogItemType, PreciousMetal } from "../catalog/fields";
+import {
+  type AlloyMetal,
+  type CatalogItemType,
+  type CoinEdge,
+  type PreciousMetal,
+  noMintMark,
+} from "../catalog/fields";
 import { type Metal, metals } from "../spotPrices/rates";
 import type { Strike } from "./grades";
-import { type ItemInput, type Material, fieldSuits } from "./rules";
+import { type ItemInput, type Material, fieldSuits, itemLimits } from "./rules";
 
 /**
  * The descriptive facts an Item takes from its Catalog entry (ADR 0001).
@@ -23,6 +29,9 @@ export const catalogFactNames = [
   "material",
   "strike",
   "diameter",
+  "thickness",
+  "mintMark",
+  "mintage",
   "numistaNumber",
   "metal",
   "weight",
@@ -45,6 +54,10 @@ export type CatalogEntryFacts = {
   weight?: number;
   fineness?: number;
   diameter?: number;
+  thickness?: number;
+  /** A mint mark, or "none" (catalog/fields.ts noMintMark) for a coin without one. */
+  mintMark?: string;
+  mintage?: number;
   yearFrom?: number;
   yearTo?: number;
   numistaId?: number;
@@ -75,6 +88,26 @@ export function entryFacts(entry: CatalogEntryFacts): CatalogFacts {
     material: coin("material") ? entry.material : undefined,
     strike: entry.strike,
     diameter: coin("diameter") ? entry.diameter : undefined,
+    // Only values an Item may hold: a thickness to hundredths, within its
+    // limit, and a mintage of at least one.
+    thickness:
+      coin("thickness") &&
+      entry.thickness !== undefined &&
+      entry.thickness <= itemLimits.thickness
+        ? Math.round(entry.thickness * 100) / 100 || undefined
+        : undefined,
+    // "none" says the coin has no mint mark: the Item shows none either.
+    mintMark:
+      coin("mintMark") && entry.mintMark !== noMintMark
+        ? entry.mintMark
+        : undefined,
+    mintage:
+      coin("mintage") &&
+      entry.mintage !== undefined &&
+      entry.mintage >= 1 &&
+      entry.mintage <= itemLimits.mintage
+        ? entry.mintage
+        : undefined,
     numistaNumber: coin("numistaNumber") ? entry.numistaId : undefined,
     metal: metal ?? undefined,
     weight: metal ? entry.weight : undefined,
@@ -136,3 +169,37 @@ function definedOnly<T extends object>(value: T): T {
     Object.entries(value).filter(([, field]) => field !== undefined),
   ) as T;
 }
+
+/**
+ * The facts a Catalog entry holds that Items have no field for: where it was
+ * struck, what it's made of, its edge, designers, dates and a banknote's
+ * size. An Item page shows them read live from the entry; nothing of them is
+ * stored on the Item, and only the ones the entry has are present.
+ */
+export function entryDetails(entry: {
+  mintMark?: string;
+  mint?: string;
+  composition?: Array<{ metal: AlloyMetal; percent: number }>;
+  edge?: CoinEdge;
+  edgeLettering?: string;
+  designers?: string[];
+  issueDate?: string;
+  withdrawalDate?: string;
+  width?: number;
+  height?: number;
+}) {
+  return definedOnly({
+    // Not a fact an Item holds, so said here: the coin has no mint mark.
+    noMintMark: entry.mintMark === noMintMark ? (true as const) : undefined,
+    mint: entry.mint,
+    composition: entry.composition,
+    edge: entry.edge,
+    edgeLettering: entry.edgeLettering,
+    designers: entry.designers?.length ? entry.designers : undefined,
+    issueDate: entry.issueDate,
+    withdrawalDate: entry.withdrawalDate,
+    width: entry.width,
+    height: entry.height,
+  });
+}
+export type EntryDetails = ReturnType<typeof entryDetails>;

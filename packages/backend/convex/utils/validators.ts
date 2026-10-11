@@ -59,6 +59,23 @@ export const coinEdge = literalUnion(coinEdges);
 export const composition = v.array(
   v.object({ metal: alloyMetal, percent: v.number() }),
 );
+/**
+ * A Catalog entry's facts Items have no field for (items/catalogFacts.ts
+ * entryDetails): read live from a linked entry, or frozen on an Item whose
+ * entry left the Catalog.
+ */
+export const catalogDetails = v.object({
+  noMintMark: v.optional(v.literal(true)),
+  mint: v.optional(v.string()),
+  composition: v.optional(composition),
+  edge: v.optional(coinEdge),
+  edgeLettering: v.optional(v.string()),
+  designers: v.optional(v.array(v.string())),
+  issueDate: v.optional(v.string()),
+  withdrawalDate: v.optional(v.string()),
+  width: v.optional(v.number()),
+  height: v.optional(v.number()),
+});
 /** Where a group of Catalog facts, its notes or its image come from. */
 export const provenance = v.object({
   source: v.string(),
