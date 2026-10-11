@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { AdminOnly } from "./admin-only";
 import { DesignGallery } from "./gallery";
 
 export const metadata = {
@@ -6,8 +6,14 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-/** A living reference for the design system. Never served in production. */
+/**
+ * A living reference for the design system: every component on one page.
+ * Signed-in admins only, in every environment; to anyone else it's not found.
+ */
 export default function Page() {
-  if (process.env.VERCEL_ENV === "production") notFound();
-  return <DesignGallery />;
+  return (
+    <AdminOnly>
+      <DesignGallery />
+    </AdminOnly>
+  );
 }

@@ -46,10 +46,6 @@ const inEveryLanguage = (paths: string[]) =>
 // Open tabs ask which deployment is live; signed in or not, in any language.
 const isVersionCheck = createRouteMatcher(["/api/version"]);
 
-// The /design gallery shows the design system; it's public everywhere except production.
-const isDesignGallery = createRouteMatcher(inEveryLanguage(["/design"]));
-const designGalleryIsPublic = process.env.VERCEL_ENV !== "production";
-
 // Signing in, signing up and the emailed links; signed-in visitors are sent on.
 const isSignInPage = createRouteMatcher(
   inEveryLanguage(["/login", "/signup", "/verify", "/link"]),
@@ -143,9 +139,6 @@ export const proxy = convexAuthNextjsMiddleware(
     if (linked) return linked;
     if (isVersionCheck(request)) {
       return NextResponse.next();
-    }
-    if (designGalleryIsPublic && isDesignGallery(request)) {
-      return withLanguage(request);
     }
     const isAuthenticated = await convexAuth.isAuthenticated();
     return withSignedInHint(
