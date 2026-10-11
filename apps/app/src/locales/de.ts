@@ -689,7 +689,6 @@ export default {
     seeAll: "Alle Neuigkeiten ansehen",
     gotIt: "Verstanden",
     close: "Schließen",
-    workspaceMenuUnseen: "Konto und Einstellungen, neue Version",
   },
   catalogAdmin: {
     menu: "Katalog importieren und exportieren",

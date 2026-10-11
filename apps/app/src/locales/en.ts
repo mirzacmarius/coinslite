@@ -658,7 +658,6 @@ export default {
     seeAll: "See all updates",
     gotIt: "Got it",
     close: "Close",
-    workspaceMenuUnseen: "Account and preferences, new release",
   },
   catalogAdmin: {
     menu: "Catalog import and export",

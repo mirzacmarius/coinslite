@@ -54,7 +54,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type NavItem, isCurrent } from "./navigation";
 import { useSettingsLinks } from "./settings-links";
 
@@ -81,6 +81,8 @@ export function AppSidebar({
       collapsible="icon"
       variant="inset"
       label={t("shell.primaryNavigation")}
+      // Clear of a notch or the rounded corners of a phone held sideways.
+      className="pl-[max(0.5rem,env(safe-area-inset-left))] pt-[max(0.5rem,env(safe-area-inset-top))]"
     >
       <SidebarHeader>
         <div className="flex h-8 items-center gap-2 pl-2 group-data-[collapsible=icon]:pl-0">
@@ -101,25 +103,26 @@ export function AppSidebar({
         <SidebarGroup>
           <nav aria-label={t("shell.primaryNavigation")}>
             <SidebarMenu className="gap-0.5">
-              {items.map(({ key, href, icon: Icon }) => (
-                <SidebarMenuItem key={key}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isCurrent(pathname, href)}
-                    tooltip={t(`nav.${key}`)}
-                  >
-                    <Link
-                      href={href}
-                      aria-current={
-                        isCurrent(pathname, href) ? "page" : undefined
-                      }
+              {items.map(({ key, href, icon: Icon }) => {
+                const current = isCurrent(pathname, href);
+                return (
+                  <SidebarMenuItem key={key}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={current}
+                      tooltip={t(`nav.${key}`)}
                     >
-                      <Icon strokeWidth={1.75} aria-hidden="true" />
-                      <span>{t(`nav.${key}`)}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                      <Link
+                        href={href}
+                        aria-current={current ? "page" : undefined}
+                      >
+                        <Icon strokeWidth={1.75} aria-hidden="true" />
+                        <span>{t(`nav.${key}`)}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
               <SettingsItem />
             </SidebarMenu>
           </nav>
@@ -140,8 +143,9 @@ export function AppSidebar({
 
 /**
  * Settings, opening onto the account, plans, updates and the admin areas.
- * Open while one of them is the page; collapsed to an icon, it opens the
- * sidebar to show them.
+ * It opens on arriving at one of them, and shows as current while closed
+ * over the current one; collapsed to an icon, it opens the sidebar to show
+ * them.
  */
 function SettingsItem() {
   const t = useI18n();
@@ -154,7 +158,14 @@ function SettingsItem() {
     .filter(({ href }) => isCurrent(pathname, href))
     .sort((a, b) => b.href.length - a.href.length)[0];
   const [open, setOpen] = useState(current !== undefined);
-  const unseen = links.some((link) => link.unseen);
+  // The shell stays mounted between pages, so arriving at one opens it.
+  const currentHref = current?.href;
+  useEffect(() => {
+    if (currentHref) setOpen(true);
+  }, [currentHref]);
+  // The marker shows on Settings whenever its links are out of sight.
+  const unseen =
+    links.some((link) => link.unseen) && (!open || state === "collapsed");
   return (
     <Collapsible
       asChild
@@ -166,7 +177,7 @@ function SettingsItem() {
         <CollapsibleTrigger asChild>
           <SidebarMenuButton
             tooltip={t("shell.settings")}
-            isActive={current !== undefined && state === "collapsed"}
+            isActive={current !== undefined && (!open || state === "collapsed")}
             onClick={(event) => {
               if (state !== "collapsed") return;
               event.preventDefault();
@@ -176,7 +187,7 @@ function SettingsItem() {
           >
             <Settings strokeWidth={1.75} aria-hidden="true" />
             <span>{t("shell.settings")}</span>
-            {unseen && !open && (
+            {unseen && (
               <>
                 <UnseenMarker className="ml-auto group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:right-1 group-data-[collapsible=icon]:top-1 group-data-[collapsible=icon]:size-1.5" />
                 <span className="sr-only">{t("updates.unseen")}</span>
@@ -230,7 +241,7 @@ function SidebarUser() {
   const signOut = useSignOut();
   const { isMobile } = useSidebar();
   const user = useQuery(api.users.getUser);
-  const name = user?.name ?? user?.email ?? "";
+  const name = user?.name || user?.email || "";
   const avatar = (
     <Avatar className="size-7 rounded-md">
       {user?.image && <AvatarImage src={user.image} alt="" />}
@@ -258,7 +269,7 @@ function SidebarUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              aria-label={t("shell.workspaceMenu")}
+              tooltip={name || undefined}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               {avatar}

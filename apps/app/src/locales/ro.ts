@@ -671,7 +671,6 @@ export default {
     seeAll: "Vezi toate noutățile",
     gotIt: "Am înțeles",
     close: "Închide",
-    workspaceMenuUnseen: "Cont și preferințe, versiune nouă",
   },
   catalogAdmin: {
     menu: "Import și export catalog",

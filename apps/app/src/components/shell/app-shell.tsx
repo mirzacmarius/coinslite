@@ -79,8 +79,10 @@ function useNavItems() {
 const sidebarCookie = "sidebar_state";
 
 /**
- * Whether the sidebar is open: open at first, as every page is prerendered,
- * then as the person last left it, read from its cookie in the browser.
+ * Whether the sidebar is open: open at first, as every page is prerendered
+ * (ADR 0004: no cookies read for the shell), then as the person last left
+ * it, read from its cookie in the browser. A full page load of someone who
+ * keeps it collapsed therefore closes it just after the first paint.
  */
 function useSidebarOpen() {
   const [open, setOpen] = useState(true);
@@ -117,7 +119,7 @@ export function AppShell({
     <SidebarProvider
       open={open}
       onOpenChange={setOpen}
-      className="bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:h-dvh md:overflow-hidden"
+      className="bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:h-svh md:overflow-hidden"
     >
       <SkipLink label={t("shell.skipToContent")} />
 
