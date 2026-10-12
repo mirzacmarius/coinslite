@@ -30,12 +30,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HeldCount } from "./catalog-rows";
 import { useCatalogFormat } from "./use-catalog-format";
 import type { SelectableEntry } from "./use-entry-selection";
 
 export type { CatalogSearchHit };
+
+/** How long typing pauses before the search runs, as in the Collection's search. */
+const pause = 250;
 
 /**
  * Selecting several Catalog entries instead of picking one (the Catalog
@@ -83,26 +86,30 @@ export function CatalogSearch({
 }: CatalogSearchProps) {
   const t = useI18n();
   const [text, setText] = useState("");
+  // What's searched for: the text, once typing pauses.
+  const [query, setQuery] = useState("");
+  useEffect(() => {
+    if (text === query) return;
+    const timer = setTimeout(() => setQuery(text), pause);
+    return () => clearTimeout(timer);
+  }, [text, query]);
   const searching = searchQueryWords(text).length > 0;
+  // While selecting, each entry found comes with how many the person holds.
   const latest = useQuery(
     api.catalog.search.find,
-    searching ? { text, itemType, entriesOnly } : "skip",
+    searching && searchQueryWords(query).length > 0
+      ? {
+          text: query,
+          itemType,
+          entriesOnly,
+          withHeld: selection ? true : undefined,
+        }
+      : "skip",
   );
-  // While the next keystroke's results load, keep showing the last ones.
+  // While the next search's results load, keep showing the last ones.
   const previous = useRef(latest);
   if (latest !== undefined) previous.current = latest;
   const results = searching ? latest ?? previous.current : undefined;
-  // While selecting, how many of each entry found the person holds.
-  const entryKeys = selection
-    ? (results?.groups ?? []).flatMap((group) =>
-        group.nodes.flatMap((hit) => (hit.kind === "entry" ? [hit.key] : [])),
-      )
-    : [];
-  const heldRows = useQuery(
-    api.catalog.sets.heldCounts,
-    entryKeys.length > 0 ? { keys: entryKeys } : "skip",
-  );
-  const held = new Map(heldRows?.map((row) => [row.key, row.held]));
 
   return (
     <Command shouldFilter={false} loop label={placeholder}>
@@ -126,7 +133,6 @@ export function CatalogSearch({
               group={group}
               onPick={onPick}
               selection={selection}
-              held={held}
             />
           ))
         )}
@@ -182,12 +188,10 @@ function ResultGroup({
   group,
   onPick,
   selection,
-  held,
 }: {
   group: Group;
   onPick: (hit: CatalogSearchHit) => void;
   selection?: HitSelection;
-  held: ReadonlyMap<string, number>;
 }) {
   const t = useI18n();
   const { country } = useFormatters();
@@ -203,7 +207,7 @@ function ResultGroup({
             key={hit._id}
             hit={hit}
             selection={selection}
-            held={held.get(hit.key)}
+            held={hit.held}
           />
         ) : (
           <ResultRow key={hit._id} hit={hit} onPick={onPick} />
