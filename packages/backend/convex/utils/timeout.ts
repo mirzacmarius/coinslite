@@ -13,8 +13,10 @@ export async function withTimeout<T>(
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timedOut = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
-      controller.abort();
+      // Rejected first, so the race ends with `message` rather than with
+      // whatever `work` fails with once it's aborted.
       reject(new Error(message));
+      controller.abort();
     }, ms);
   });
   try {

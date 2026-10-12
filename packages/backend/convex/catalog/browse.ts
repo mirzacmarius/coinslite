@@ -72,13 +72,13 @@ const groupRowOf = (node: GroupNode) => ({
   entryCount: node.entryCount ?? 0,
 });
 
-type Counted = { entryCount?: number; title: string } | null;
+type CountedNode = { entryCount?: number; title: string } | null;
 
 /**
  * Most entries first, equal counts by title, as the Catalog lists its roots
  * and a Theme its countries. A missing node or count sorts as no entries.
  */
-export const byEntryCount = (a: Counted, b: Counted) =>
+export const byEntryCount = (a: CountedNode, b: CountedNode) =>
   (b?.entryCount ?? 0) - (a?.entryCount ?? 0) ||
   (a?.title ?? "").localeCompare(b?.title ?? "");
 

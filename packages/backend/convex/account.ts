@@ -20,7 +20,7 @@ import { planOf } from "./plans";
 import schema from "./schema";
 import { requireSetUpUser, requireUserId } from "./utils/auth";
 import { hex } from "./utils/hex";
-import { homeCurrency, language } from "./utils/validators";
+import { homeCurrency, language, plan } from "./utils/validators";
 
 export const emailChangeErrors = {
   sameEmail: "SAME_EMAIL",
@@ -60,7 +60,7 @@ export const get = query({
       )
       .extend({
         homeCurrency,
-        plan: v.union(v.literal("free"), v.literal("premium")),
+        plan,
         /** The address an email change waits to be confirmed at, if one is pending. */
         pendingEmail: v.optional(v.string()),
       }),
