@@ -11,7 +11,6 @@
         "RESEND_API_KEY",
         "LOOPS_ENDPOINT",
         "LOOPS_API_KEY",
-        "OPENPANEL_SECRET_KEY",
         "SENTRY_AUTH_TOKEN",
         "SENTRY_ORG",
         "SENTRY_PROJECT"

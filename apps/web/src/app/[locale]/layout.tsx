@@ -1,4 +1,5 @@
 import "@coinslite/ui/globals.css";
+import { Analytics } from "@/components/analytics";
 import { SiteFooter } from "@/components/site-footer";
 import { isLocale, locales } from "@coinslite/i18n";
 import { cn } from "@coinslite/ui/utils";
@@ -37,6 +38,7 @@ export default async function RootLayout({
       >
         {children}
         <SiteFooter locale={locale} />
+        <Analytics />
       </body>
     </html>
   );

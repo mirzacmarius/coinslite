@@ -77,7 +77,7 @@ export default {
     },
     noAds: {
       title: "Ingen reklame",
-      text: "Ingen reklame i noe abonnement, og ingen analyse- eller sporingsskript.",
+      text: "Ingen reklame i noe abonnement, og ingen informasjonskapsler for sporing: sidevisninger telles uten at vi vet hvem du er.",
     },
   },
   plans: {

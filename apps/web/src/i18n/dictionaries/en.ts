@@ -76,7 +76,7 @@ export default {
     },
     noAds: {
       title: "No ads",
-      text: "No ads on any plan, and no analytics or tracking scripts.",
+      text: "No ads on any plan, and no tracking cookies: page views are counted without us knowing who you are.",
     },
   },
   plans: {
