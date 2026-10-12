@@ -21,6 +21,8 @@ const datasets = [
   internal.catalog.seeds.euroCirculationCoins.load,
   internal.catalog.seeds.romania.load,
   internal.catalog.seeds.euroBanknotes.load,
+  // Below the Finland root the euro circulation coins add.
+  internal.catalog.seeds.finland.load,
 ];
 
 const loadReport = v.object({
