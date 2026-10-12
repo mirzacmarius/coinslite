@@ -1,8 +1,11 @@
+import { ConvexError } from "convex/values";
 import { type GradingScale, type ItemType, suitsGrade } from "./grades";
+import { type PurchaseInput, checkPurchase } from "./rules";
 
 /**
- * Acting on several Items at once (spec 5.x, MUS-739), and undoing a move or
- * a grading (COIN-120). Pure, so the app shares the limit with the backend.
+ * Acting on several Items at once (spec 5.x, MUS-739), setting a bought
+ * lot's purchase on them (COIN-119), and undoing a move, a grading or a
+ * purchase (COIN-120). Pure, so the app shares the limit with the backend.
  */
 
 export const bulkLimits = {
@@ -18,6 +21,8 @@ export const bulkLimits = {
 export const bulkErrors = {
   /** More Items than one bulk action takes. */
   tooManyItems: "TOO_MANY_ITEMS",
+  /** A Set purchase with none of its fields filled in: nothing to set. */
+  emptyPurchase: "EMPTY_PURCHASE",
 } as const;
 
 /**
@@ -106,6 +111,60 @@ export function planGradeUndo<ItemId>({
       grade,
     }));
   return { restore, skipped: regraded.length - restore.length };
+}
+
+/**
+ * What Set purchase writes on each selected Item (COIN-119): the Purchase
+ * price per piece, purchase date and source filled in, checked as the Item
+ * form checks them (items/rules.ts). A field left empty isn't in it, so each
+ * Item keeps its own; with every field empty there's nothing to set.
+ */
+export function purchasePatch(input: PurchaseInput, today: string) {
+  const patch = checkPurchase(input, today);
+  if (Object.keys(patch).length === 0)
+    throw new ConvexError(bulkErrors.emptyPurchase);
+  return patch;
+}
+
+/** An Item's purchase: what Set purchase writes, and undoing it restores. */
+type Purchase = PurchaseInput;
+
+const purchaseFields = ["purchasePrice", "purchaseDate", "source"] as const;
+
+/**
+ * Plans undoing a Set purchase: each Item it was set on (`before`, with the
+ * purchase it had) gets back its own value, or none, for each field the
+ * purchase set (`after`); the fields it left alone aren't touched. One that
+ * already had those values wasn't changed by it and is left out. One deleted
+ * (missing from `now`) or no longer holding the values set has changed since:
+ * it's skipped and counted.
+ */
+export function planPurchaseUndo<ItemId>({
+  before,
+  after,
+  now,
+}: {
+  before: ReadonlyArray<{ itemId: ItemId } & Purchase>;
+  after: Purchase;
+  now: ReadonlyMap<ItemId, Purchase>;
+}) {
+  const fields = purchaseFields.filter((field) => after[field] !== undefined);
+  const holdsSet = (item: Purchase) =>
+    fields.every((field) => item[field] === after[field]);
+  const changed = firstOfEach(before).filter((item) => !holdsSet(item));
+  const restore = changed
+    .filter(({ itemId }) => {
+      const item = now.get(itemId);
+      return item !== undefined && holdsSet(item);
+    })
+    .map((was) => ({
+      itemId: was.itemId,
+      // Each field set, even one the Item had no value for: that clears it.
+      ...(Object.fromEntries(
+        fields.map((field) => [field, was[field]]),
+      ) as Purchase),
+    }));
+  return { restore, skipped: changed.length - restore.length };
 }
 
 /** Each Item once, as first listed, so none is restored twice. */

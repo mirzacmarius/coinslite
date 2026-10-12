@@ -26,6 +26,8 @@ import {
   bulkLimits,
   planGradeUndo,
   planMoveUndo,
+  planPurchaseUndo,
+  purchasePatch,
 } from "./items/bulkRules";
 import { entryDetails, overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
@@ -673,6 +675,66 @@ export const undoGrade = mutation({
     });
     for (const { itemId, gradingScale, grade } of restore)
       await ctx.db.patch("items", itemId, { gradingScale, grade });
+    return { restored: restore.length, skipped };
+  },
+});
+
+/** An Item's purchase as Set purchase takes it: Purchase price per piece, purchase date and source. */
+const purchase = {
+  purchasePrice: v.optional(v.number()),
+  purchaseDate: v.optional(v.string()),
+  source: v.optional(v.string()),
+};
+
+/** An Item Set purchase was set on, with the purchase it had before: what undoing it needs. */
+const purchasedItem = v.object({ itemId: v.id("items"), ...purchase });
+
+/**
+ * Sets a bought lot's purchase on several of the signed-in person's Items:
+ * the Purchase price per piece, purchase date and source filled in, checked
+ * as the Item form checks them, while a field left empty keeps each Item's
+ * own (items/bulkRules.ts). Market value and Quantity stay as they are, so
+ * there's no Market value history to record. Every Item is checked before
+ * anything is written. Returns the purchase as set and the purchase each
+ * Item had, for `undoPurchase`.
+ */
+export const setPurchase = mutation({
+  args: { itemIds: v.array(v.id("items")), ...purchase },
+  returns: v.object({
+    set: v.object(purchase),
+    before: v.array(purchasedItem),
+  }),
+  handler: async (ctx, { itemIds, ...input }) => {
+    const set = purchasePatch(input, latestPurchaseDate());
+    const { items } = await requireOwnItems(ctx, itemIds);
+    for (const item of items) await ctx.db.patch("items", item._id, set);
+    return {
+      set,
+      before: items.map((item) => ({
+        itemId: item._id,
+        purchasePrice: item.purchasePrice,
+        purchaseDate: item.purchaseDate,
+        source: item.source,
+      })),
+    };
+  },
+});
+
+/**
+ * Undoes `setPurchase`: gives each Item it was set on (`before`) its own
+ * value back, or none, for each field the purchase set (`set`), if the Item
+ * still holds the values set (items/bulkRules.ts). The others are skipped
+ * and counted.
+ */
+export const undoPurchase = mutation({
+  args: { before: v.array(purchasedItem), set: v.object(purchase) },
+  returns: undone,
+  handler: async (ctx, { before, set }) => {
+    const owner = await requireSetUpUser(ctx);
+    const now = await ownItemsNow(ctx, owner._id, before);
+    const { restore, skipped } = planPurchaseUndo({ before, after: set, now });
+    for (const { itemId, ...was } of restore)
+      await ctx.db.patch("items", itemId, was);
     return { restored: restore.length, skipped };
   },
 });

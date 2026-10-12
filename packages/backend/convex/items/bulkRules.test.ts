@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { planGradeUndo, planMoveUndo } from "./bulkRules";
+import {
+  planGradeUndo,
+  planMoveUndo,
+  planPurchaseUndo,
+  purchasePatch,
+} from "./bulkRules";
 
 describe("planMoveUndo", () => {
   test("Items still in the Album they were moved to go back to their own Albums, or to none", () => {
@@ -258,6 +263,162 @@ describe("planGradeUndo", () => {
       }),
     ).toEqual({
       restore: [{ itemId: "krone", gradingScale: undefined, grade: undefined }],
+      skipped: 0,
+    });
+  });
+});
+
+describe("purchasePatch", () => {
+  const today = "2026-10-12";
+
+  test("writes only the fields filled in; empty ones leave each Item's own alone", () => {
+    expect(
+      purchasePatch(
+        { purchasePrice: 12500, purchaseDate: "2026-09-30", source: "" },
+        today,
+      ),
+    ).toStrictEqual({ purchasePrice: 12500, purchaseDate: "2026-09-30" });
+  });
+
+  test("keeps the source trimmed, and a Purchase price of 0 as a price", () => {
+    expect(
+      purchasePatch({ purchasePrice: 0, source: "  Oslo Myntgalleri " }, today),
+    ).toStrictEqual({ purchasePrice: 0, source: "Oslo Myntgalleri" });
+  });
+
+  test("refuses a Purchase price the Item form refuses", () => {
+    expect(() => purchasePatch({ purchasePrice: -100 }, today)).toThrow(
+      "INVALID_AMOUNT",
+    );
+    expect(() => purchasePatch({ purchasePrice: 12.5 }, today)).toThrow(
+      "INVALID_AMOUNT",
+    );
+    expect(() =>
+      purchasePatch({ purchasePrice: 10_000_000_000_001 }, today),
+    ).toThrow("INVALID_AMOUNT");
+  });
+
+  test("refuses a purchase date after today or that doesn't exist", () => {
+    expect(() => purchasePatch({ purchaseDate: "2026-10-13" }, today)).toThrow(
+      "INVALID_DATE",
+    );
+    expect(() => purchasePatch({ purchaseDate: "2026-02-30" }, today)).toThrow(
+      "INVALID_DATE",
+    );
+    expect(() => purchasePatch({ purchaseDate: "12.10.2026" }, today)).toThrow(
+      "INVALID_DATE",
+    );
+  });
+
+  test("refuses a source longer than the Item form allows", () => {
+    expect(() => purchasePatch({ source: "x".repeat(201) }, today)).toThrow(
+      "TOO_LONG",
+    );
+  });
+
+  test("with nothing filled in, or only blanks, is refused", () => {
+    expect(() => purchasePatch({}, today)).toThrow("EMPTY_PURCHASE");
+    expect(() =>
+      purchasePatch({ purchaseDate: " ", source: "   " }, today),
+    ).toThrow("EMPTY_PURCHASE");
+  });
+});
+
+describe("planPurchaseUndo", () => {
+  test("Items still with the purchase set get back their own values for the fields set, or none", () => {
+    expect(
+      planPurchaseUndo({
+        before: [
+          {
+            itemId: "krone",
+            purchasePrice: 9900,
+            purchaseDate: "2024-05-01",
+            source: "Auction",
+          },
+          { itemId: "ore", source: "Flea market" },
+        ],
+        after: { purchasePrice: 12500, purchaseDate: "2026-09-30" },
+        now: new Map([
+          [
+            "krone",
+            {
+              purchasePrice: 12500,
+              purchaseDate: "2026-09-30",
+              source: "Auction",
+            },
+          ],
+          [
+            "ore",
+            {
+              purchasePrice: 12500,
+              purchaseDate: "2026-09-30",
+              source: "Flea market",
+            },
+          ],
+        ]),
+      }),
+    ).toStrictEqual({
+      restore: [
+        { itemId: "krone", purchasePrice: 9900, purchaseDate: "2024-05-01" },
+        { itemId: "ore", purchasePrice: undefined, purchaseDate: undefined },
+      ],
+      skipped: 0,
+    });
+  });
+
+  test("Items whose purchase changed since, or deleted since, are skipped and counted", () => {
+    expect(
+      planPurchaseUndo({
+        before: [
+          { itemId: "krone", purchasePrice: 9900 },
+          { itemId: "ore", purchasePrice: 500 },
+          { itemId: "dollar", purchasePrice: 2000 },
+        ],
+        after: { purchasePrice: 12500, source: "Oslo Myntgalleri" },
+        now: new Map([
+          ["krone", { purchasePrice: 12500, source: "Oslo Myntgalleri" }],
+          ["ore", { purchasePrice: 11000, source: "Oslo Myntgalleri" }],
+        ]),
+      }),
+    ).toStrictEqual({
+      restore: [{ itemId: "krone", purchasePrice: 9900, source: undefined }],
+      skipped: 2,
+    });
+  });
+
+  test("Items that already had the purchase set are neither restored nor skipped", () => {
+    expect(
+      planPurchaseUndo({
+        before: [
+          { itemId: "krone", purchaseDate: "2024-05-01", source: "Auction" },
+          { itemId: "ore", purchaseDate: "2026-09-30", source: "Auction" },
+          { itemId: "dime", purchaseDate: "2026-09-30" },
+        ],
+        after: { purchaseDate: "2026-09-30" },
+        now: new Map([
+          ["krone", { purchaseDate: "2026-09-30", source: "Auction" }],
+          ["ore", { purchaseDate: "2026-09-30", source: "Auction" }],
+          ["dime", { purchaseDate: "2025-01-01" }],
+        ]),
+      }),
+    ).toStrictEqual({
+      restore: [{ itemId: "krone", purchaseDate: "2024-05-01" }],
+      skipped: 0,
+    });
+  });
+
+  test("An Item listed twice gets the purchase first given back, once", () => {
+    expect(
+      planPurchaseUndo({
+        before: [
+          { itemId: "krone", source: "Auction" },
+          { itemId: "krone", source: "Flea market" },
+        ],
+        after: { source: "Oslo Myntgalleri" },
+        now: new Map([["krone", { source: "Oslo Myntgalleri" }]]),
+      }),
+    ).toStrictEqual({
+      restore: [{ itemId: "krone", source: "Auction" }],
       skipped: 0,
     });
   });
