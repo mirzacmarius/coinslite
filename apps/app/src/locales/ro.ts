@@ -863,7 +863,7 @@ export default {
     select: "Selectează",
     selectionBar: "Obiecte selectate",
     selectHint:
-      "Selectează obiecte ca să le muți într-un album, să le stabilești starea sau să le ștergi.",
+      "Selectează obiecte ca să le muți într-un album, să le stabilești starea sau achiziția ori să le ștergi.",
     addToHint: "Selectează obiectele de adăugat în {album}.",
     cancel: "Anulează",
     selectPage: "Selectează pagina",
@@ -898,6 +898,20 @@ export default {
     gradeFailed: "Starea nu a putut fi stabilită. Încearcă din nou.",
     gradeUndone: "Stabilirea stării a fost anulată",
     gradeUndoneSkipped:
+      "Restabilite {restored}, sărite {skipped}: s-au schimbat între timp.",
+    setPurchase: "Stabilește achiziția",
+    purchaseHint:
+      "Câmpurile pe care le lași goale păstrează valoarea fiecărui obiect.",
+    "purchaseApply#one": "Aplică la 1 obiect",
+    "purchaseApply#few": "Aplică la {count} obiecte",
+    "purchaseApply#other": "Aplică la {count} de obiecte",
+    "purchaseSet#one": "Achiziție stabilită pentru 1 obiect",
+    "purchaseSet#few": "Achiziție stabilită pentru {count} obiecte",
+    "purchaseSet#other": "Achiziție stabilită pentru {count} de obiecte",
+    purchaseEmpty: "Completează cel puțin un câmp.",
+    purchaseFailed: "Achiziția nu a putut fi stabilită. Încearcă din nou.",
+    purchaseUndone: "Stabilirea achiziției a fost anulată",
+    purchaseUndoneSkipped:
       "Restabilite {restored}, sărite {skipped}: s-au schimbat între timp.",
     undo: "Anulează",
     undoFailed: "Modificarea nu a putut fi anulată. Încearcă din nou.",

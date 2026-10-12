@@ -872,7 +872,7 @@ export default {
     select: "Sélectionner",
     selectionBar: "Objets sélectionnés",
     selectHint:
-      "Sélectionnez des objets pour les déplacer dans un album, leur attribuer un état ou les supprimer.",
+      "Sélectionnez des objets pour les déplacer dans un album, leur attribuer un état, définir leur achat ou les supprimer.",
     addToHint: "Sélectionnez les objets à ajouter à {album}.",
     cancel: "Annuler",
     selectPage: "Sélectionner la page",
@@ -907,6 +907,20 @@ export default {
     gradeFailed: "Impossible d’attribuer l’état. Réessayez.",
     gradeUndone: "Attribution de l’état annulée",
     gradeUndoneSkipped:
+      "{restored} rétablis, {skipped} ignorés : ils ont changé depuis.",
+    setPurchase: "Définir l’achat",
+    purchaseHint:
+      "Les champs laissés vides gardent la valeur propre à chaque objet.",
+    "purchaseApply#one": "Appliquer à {count} objet",
+    "purchaseApply#few": "Appliquer à {count} objets",
+    "purchaseApply#other": "Appliquer à {count} objets",
+    "purchaseSet#one": "Achat défini pour {count} objet",
+    "purchaseSet#few": "Achat défini pour {count} objets",
+    "purchaseSet#other": "Achat défini pour {count} objets",
+    purchaseEmpty: "Remplissez au moins un champ.",
+    purchaseFailed: "Impossible de définir l’achat. Réessayez.",
+    purchaseUndone: "Définition de l’achat annulée",
+    purchaseUndoneSkipped:
       "{restored} rétablis, {skipped} ignorés : ils ont changé depuis.",
     undo: "Annuler",
     undoFailed: "Impossible d’annuler la modification. Réessayez.",
