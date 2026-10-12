@@ -10,12 +10,14 @@ import {
 } from "./_generated/server";
 import {
   browsingUser,
+  byEntryCount,
   creditedEntryRow,
   entryRow,
-  heldCount,
   isCountryNode,
   nodeByKey,
 } from "./catalog/browse";
+import { catalogEntryNotFound } from "./catalog/fields";
+import { heldCount } from "./catalog/held";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { bySeries } from "./catalog/sets";
 import { compareDenominations } from "./items/denominations";
@@ -28,9 +30,6 @@ import { wantErrors, wantLimits } from "./wants/rules";
  * Like the rest of the Catalog, wants are neither read nor written while
  * the Catalog is hidden from the person.
  */
-
-/** The Catalog key the backend reports for an entry that's gone or hidden (items.ts). */
-const catalogEntryNotFound = "CATALOG_ENTRY_NOT_FOUND";
 
 const wantsOf = (ctx: QueryCtx, ownerId: Id<"users">) =>
   ctx.db
@@ -263,14 +262,6 @@ const wantlistGroup = v.object({
     }),
   ),
 });
-
-/** Most entries first, then by title, as the Catalog lists its roots and a Theme its countries. */
-const byEntryCount = (
-  a: Doc<"catalogNodes"> | null,
-  b: Doc<"catalogNodes"> | null,
-) =>
-  (b?.entryCount ?? 0) - (a?.entryCount ?? 0) ||
-  (a?.title ?? "").localeCompare(b?.title ?? "");
 
 /**
  * Entries by denomination (face value, smallest first) and then series, each

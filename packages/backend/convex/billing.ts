@@ -30,6 +30,7 @@ import {
   premiumUntil,
 } from "./billing/rules";
 import { requireSetUpUser } from "./utils/auth";
+import { plan } from "./utils/validators";
 
 /**
  * Premium billing through Polar: checkout, the subscription state Polar's
@@ -75,7 +76,7 @@ export const status = query({
   returns: v.union(
     v.null(),
     v.object({
-      plan: v.union(v.literal("free"), v.literal("premium")),
+      plan,
       prices: v.object({
         currency: premiumCurrency,
         month: v.number(),

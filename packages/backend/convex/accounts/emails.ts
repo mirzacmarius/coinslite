@@ -9,10 +9,12 @@ import {
   internalQuery,
 } from "../_generated/server";
 import { sendEmail } from "../email";
+import { language } from "../utils/validators";
 
 /** The language to write a user's emails in, by their email address. */
 export const languageFor = internalQuery({
   args: { email: v.string() },
+  returns: v.union(language, v.null()),
   handler: async (ctx, { email }) => {
     const user = await ctx.db
       .query("users")
@@ -30,6 +32,7 @@ export const recordInOutbox = internalMutation({
     text: v.string(),
     code: v.optional(v.string()),
   },
+  returns: v.null(),
   handler: async (ctx, email) => {
     await ctx.db.insert("devOutbox", email);
     return null;

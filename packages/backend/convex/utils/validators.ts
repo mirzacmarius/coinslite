@@ -15,6 +15,7 @@ import { type GradingScale, gradingScaleIds, strikes } from "../items/grades";
 import { graders, stampCatalogues } from "../items/references";
 import { materials } from "../items/rules";
 import { photoSides } from "../photos/rules";
+import { plans } from "../plans/rules";
 import { metals } from "../spotPrices/rates";
 
 /** A validator accepting exactly the given strings, e.g. the supported locales. */
@@ -29,6 +30,8 @@ function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
 
 export const language = literalUnion(locales);
 export const homeCurrency = literalUnion(homeCurrencies);
+/** Free or Premium (plans/rules.ts). */
+export const plan = literalUnion(plans);
 
 /** A Catalog change running in the background (catalog/changes.ts): a deletion, or linked Items taking an entry's new Item type. */
 export const catalogChangeKind = v.union(

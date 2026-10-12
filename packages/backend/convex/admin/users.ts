@@ -17,6 +17,7 @@ import { requireAdmin } from "../utils/auth";
 import {
   homeCurrency,
   language,
+  plan,
   planFilter,
   sortOrder,
   userSort,
@@ -44,7 +45,7 @@ const listedUser = v.object({
   admin: v.boolean(),
   /** Whether they've finished signing up (terms accepted, Home currency chosen). */
   signedUp: v.boolean(),
-  plan: v.union(v.literal("premium"), v.literal("free")),
+  plan,
   planEnd: v.union(v.number(), v.null()),
   items: v.number(),
   albums: v.number(),
@@ -446,7 +447,7 @@ export const get = query({
         lastSignInAt: nullable(v.number()),
       }),
       admin: v.boolean(),
-      plan: v.union(v.literal("premium"), v.literal("free")),
+      plan,
       subscription: nullable(subscriptionDetail),
       collection: v.object({
         items: v.number(),

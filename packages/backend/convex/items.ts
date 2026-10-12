@@ -1,7 +1,3 @@
-import {
-  paginationOptsValidator,
-  paginationResultValidator,
-} from "convex/server";
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
@@ -16,7 +12,8 @@ import {
   ownAlbumId,
   saleChangedInAlbum,
 } from "./albums/membership";
-import { heldItemLimit } from "./catalog/browse";
+import { catalogEntryNotFound } from "./catalog/fields";
+import { holdsAny, otherItemsOf } from "./catalog/held";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { setOfEntry, setScope } from "./catalog/sets";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
@@ -43,7 +40,6 @@ import {
   type CatalogEntryLink,
   catalogEntryByKey,
   itemResolver,
-  resolveItems,
 } from "./items/resolve";
 import {
   type ItemInput,
@@ -51,7 +47,6 @@ import {
   checkSale,
   itemErrors,
 } from "./items/rules";
-import { withThumbnail } from "./items/thumbnail";
 import {
   historyOf,
   recordIfChanged,
@@ -61,7 +56,6 @@ import {
 import { requireRoomForItems } from "./plans";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
-import { capped } from "./utils/pagination";
 import {
   catalogDetails,
   catalogItemType,
@@ -146,9 +140,6 @@ export async function requireOwnItem(
   if (!item || item.ownerId !== owner._id) throw new ConvexError(itemNotFound);
   return item;
 }
-
-/** A Catalog key that isn't a Catalog entry's: nothing to add an Item from. */
-export const catalogEntryNotFound = "CATALOG_ENTRY_NOT_FOUND";
 
 /**
  * The Catalog entry with this key, if the person may see the Catalog: while
@@ -345,48 +336,6 @@ export const addCatalogEntries = mutation({
     return itemIds;
   },
 });
-
-/** Whether a person still owns any Item made from a Catalog entry. */
-async function holdsAny(
-  ctx: QueryCtx,
-  ownerId: Id<"users">,
-  entryId: Id<"catalogNodes">,
-) {
-  const item = await ctx.db
-    .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
-      q
-        .eq("ownerId", ownerId)
-        .eq("catalogEntryId", entryId)
-        .eq("soldOn", undefined),
-    )
-    .first();
-  return item !== null;
-}
-
-/**
- * How many Items made from a Catalog entry a person still owns besides
- * `item`, counting no further than `heldItemLimit`.
- */
-async function otherItemsOf(
-  ctx: QueryCtx,
-  item: Doc<"items">,
-  entryId: Id<"catalogNodes">,
-) {
-  const owned = await ctx.db
-    .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
-      q
-        .eq("ownerId", item.ownerId)
-        .eq("catalogEntryId", entryId)
-        .eq("soldOn", undefined),
-    )
-    .take(heldItemLimit + 1);
-  return Math.min(
-    heldItemLimit,
-    owned.filter((other) => other._id !== item._id).length,
-  );
-}
 
 /**
  * Saves the whole Item form: a field left empty is cleared. On an Item
@@ -850,43 +799,6 @@ const catalogFacts = v.object({
   metal: v.optional(metal),
   weight: v.optional(v.number()),
   purity: v.optional(v.number()),
-});
-
-const listedItem = schema
-  .doc("items")
-  .extend({ thumbnailUrl: v.union(v.string(), v.null()) });
-
-/**
- * The most Items one page of an Item list (`list`, albums.items) holds,
- * however many the app asks for; it asks for 25 or 50.
- */
-export const ITEM_LIST_PAGE_SIZE = 100;
-
-/**
- * The signed-in person's Items, newest first, a page at a time (up to
- * ITEM_LIST_PAGE_SIZE), their facts resolved. Each comes with its thumbnail (items/thumbnail.ts): the small
- * copy of the front photo, else of the back photo, else of the first more
- * photo, else null.
- */
-export const list = query({
-  args: { paginationOpts: paginationOptsValidator },
-  returns: paginationResultValidator(listedItem),
-  handler: async (ctx, { paginationOpts }) => {
-    const owner = await requireSetUpUser(ctx);
-    const items = await ctx.db
-      .query("items")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
-      .order("desc")
-      .paginate(capped(paginationOpts, { numItems: ITEM_LIST_PAGE_SIZE }));
-    return {
-      ...items,
-      page: await Promise.all(
-        (await resolveItems(ctx, items.page)).map((item) =>
-          withThumbnail(ctx, item),
-        ),
-      ),
-    };
-  },
 });
 
 /**

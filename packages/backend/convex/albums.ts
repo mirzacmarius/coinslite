@@ -1,4 +1,7 @@
-import { paginationOptsValidator } from "convex/server";
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
@@ -16,10 +19,10 @@ import {
   nextColour,
 } from "./albums/rules";
 import { countAlbumCreated, countAlbumDeleted } from "./collectionCounts";
-import { ITEM_LIST_PAGE_SIZE, itemNotFound } from "./items";
+import { itemNotFound } from "./items";
 import { deleteItem } from "./items/deletion";
 import { resolveItems } from "./items/resolve";
-import { withThumbnail } from "./items/thumbnail";
+import { itemWithThumbnail, withThumbnail } from "./items/thumbnail";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
 import { capped } from "./utils/pagination";
@@ -119,13 +122,17 @@ export const get = query({
   },
 });
 
+/** The most Items one page of an Album holds, however many the app asks for. */
+const ALBUM_PAGE_SIZE = 100;
+
 /**
  * The Items in one of the signed-in person's Albums, newest first, a page at
- * a time (up to ITEM_LIST_PAGE_SIZE), their facts resolved and each with its list thumbnail as in the
- * Collection.
+ * a time (up to ALBUM_PAGE_SIZE), their facts resolved and each with its list
+ * thumbnail as in the Collection.
  */
 export const items = query({
   args: { albumId: v.id("albums"), paginationOpts: paginationOptsValidator },
+  returns: paginationResultValidator(itemWithThumbnail),
   handler: async (ctx, { albumId, paginationOpts }) => {
     const owner = await requireSetUpUser(ctx);
     const items = await ctx.db
@@ -134,7 +141,7 @@ export const items = query({
         q.eq("ownerId", owner._id).eq("albumId", albumId),
       )
       .order("desc")
-      .paginate(capped(paginationOpts, { numItems: ITEM_LIST_PAGE_SIZE }));
+      .paginate(capped(paginationOpts, { numItems: ALBUM_PAGE_SIZE }));
     return {
       ...items,
       page: await Promise.all(

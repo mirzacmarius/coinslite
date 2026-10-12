@@ -1,4 +1,4 @@
-import { catalogErrors, catalogLimits } from "./fields";
+import { catalogEntryNotFound, catalogErrors, catalogLimits } from "./fields";
 
 /**
  * Catalog entry image rules, shared by the backend and the app (no Convex
@@ -23,7 +23,7 @@ export const catalogImageLimits = {
 /** Error codes the image functions throw (ConvexError data). */
 export const catalogImageErrors = {
   /** The key names no Catalog entry. */
-  entryNotFound: "CATALOG_ENTRY_NOT_FOUND",
+  entryNotFound: catalogEntryNotFound,
   /** The upload is gone, too old, or already in use. */
   notFound: "IMAGE_NOT_FOUND",
   notWebp: "IMAGE_NOT_WEBP",

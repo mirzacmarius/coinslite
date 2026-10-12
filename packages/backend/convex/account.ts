@@ -17,8 +17,10 @@ import { requireNormalizedEmail } from "./accounts/credentials";
 import { deleteUserAndSignInMethods } from "./accounts/linking";
 import { nameKey } from "./admin/userList";
 import { planOf } from "./plans";
+import schema from "./schema";
 import { requireSetUpUser, requireUserId } from "./utils/auth";
-import { language } from "./utils/validators";
+import { hex } from "./utils/hex";
+import { homeCurrency, language, plan } from "./utils/validators";
 
 export const emailChangeErrors = {
   sameEmail: "SAME_EMAIL",
@@ -41,6 +43,28 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
 /** The Account screen: who the person is, how to reach them, their preferences and plan. */
 export const get = query({
   args: {},
+  returns: v.union(
+    v.null(),
+    schema
+      .doc("users")
+      .pick(
+        "email",
+        "displayName",
+        "fullName",
+        "streetAddress",
+        "postalCode",
+        "city",
+        "country",
+        "contactPhone",
+        "language",
+      )
+      .extend({
+        homeCurrency,
+        plan,
+        /** The address an email change waits to be confirmed at, if one is pending. */
+        pendingEmail: v.optional(v.string()),
+      }),
+  ),
   handler: async (ctx) => {
     // Someone who hasn't finished signing up has no Account screen yet (they're sent to /welcome).
     const userId = await requireUserId(ctx);
@@ -289,6 +313,3 @@ async function sha256(text: string) {
     ),
   );
 }
-
-const hex = (bytes: Uint8Array) =>
-  Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");

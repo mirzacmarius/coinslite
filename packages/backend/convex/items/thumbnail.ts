@@ -1,7 +1,14 @@
+import { v } from "convex/values";
 import type { Doc } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { photoLink } from "../photos/links";
 import { listImageFile } from "../photos/rules";
+import schema from "../schema";
+
+/** An Item as `withThumbnail` returns it, for return validators. */
+export const itemWithThumbnail = schema
+  .doc("items")
+  .extend({ thumbnailUrl: v.union(v.string(), v.null()) });
 
 /**
  * An Item with its list thumbnail: a link to the small copy of its front

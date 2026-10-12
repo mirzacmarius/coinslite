@@ -8,6 +8,7 @@ import {
   internalMutation,
 } from "../_generated/server";
 import { unkeyWantsOfEntry } from "../wants";
+import { nodeByKey } from "./browse";
 import {
   blockedByChanges,
   changeLimits,
@@ -188,13 +189,6 @@ async function entriesBelow(ctx: QueryCtx, path: string) {
     count++;
   }
   return count;
-}
-
-async function nodeByKey(ctx: QueryCtx, key: string) {
-  return await ctx.db
-    .query("catalogNodes")
-    .withIndex("by_key", (q) => q.eq("key", key))
-    .unique();
 }
 
 /**

@@ -9,6 +9,7 @@ import {
   internalMutation,
   internalQuery,
 } from "../_generated/server";
+import { hex } from "../utils/hex";
 import { photoSignatureLength, photoType } from "./rules";
 
 /**
@@ -165,9 +166,6 @@ async function sign(
   );
   return hex(new Uint8Array(mac));
 }
-
-const hex = (bytes: Uint8Array) =>
-  Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 
 /** Compares two strings in time that doesn't depend on where they differ. */
 function sameText(a: string, b: string) {

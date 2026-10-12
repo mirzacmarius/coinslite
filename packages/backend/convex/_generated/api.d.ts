@@ -55,6 +55,7 @@ import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSi
 import type * as catalog_denominationCounts from "../catalog/denominationCounts.js";
 import type * as catalog_editor from "../catalog/editor.js";
 import type * as catalog_fields from "../catalog/fields.js";
+import type * as catalog_held from "../catalog/held.js";
 import type * as catalog_imageRules from "../catalog/imageRules.js";
 import type * as catalog_images from "../catalog/images.js";
 import type * as catalog_linkedItems from "../catalog/linkedItems.js";
@@ -144,7 +145,9 @@ import type * as uploads from "../uploads.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_files from "../utils/files.js";
+import type * as utils_hex from "../utils/hex.js";
 import type * as utils_pagination from "../utils/pagination.js";
+import type * as utils_timeout from "../utils/timeout.js";
 import type * as utils_validators from "../utils/validators.js";
 import type * as wants from "../wants.js";
 import type * as wants_rules from "../wants/rules.js";
@@ -203,6 +206,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/denominationCounts": typeof catalog_denominationCounts;
   "catalog/editor": typeof catalog_editor;
   "catalog/fields": typeof catalog_fields;
+  "catalog/held": typeof catalog_held;
   "catalog/imageRules": typeof catalog_imageRules;
   "catalog/images": typeof catalog_images;
   "catalog/linkedItems": typeof catalog_linkedItems;
@@ -292,7 +296,9 @@ declare const fullApi: ApiFromModules<{
   users: typeof users;
   "utils/auth": typeof utils_auth;
   "utils/files": typeof utils_files;
+  "utils/hex": typeof utils_hex;
   "utils/pagination": typeof utils_pagination;
+  "utils/timeout": typeof utils_timeout;
   "utils/validators": typeof utils_validators;
   wants: typeof wants;
   "wants/rules": typeof wants_rules;
