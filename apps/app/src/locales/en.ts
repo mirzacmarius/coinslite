@@ -96,6 +96,7 @@ export default {
     description: "Description",
     physical: "Physical",
     fromCatalog: "From the Catalog",
+    factsSource: "Facts source",
     references: "Catalogue and certification",
     grader: "Grader",
     setGrader: "Set grader",

@@ -3,6 +3,7 @@ import {
   type CatalogFacts,
   detachedFields,
   entryFacts,
+  factsCreditFor,
   overridesOnLink,
   slimEntryOf,
 } from "./catalogFacts";
@@ -234,5 +235,90 @@ describe("the facts an Item keeps when it's linked to a Catalog entry", () => {
       year: 1882,
       weight: 26.7,
     });
+  });
+});
+
+describe("the facts credit an Item page shows", () => {
+  const bnr = {
+    source: "Banca Națională a României",
+    author: "Banca Națională a României",
+    licence:
+      "Redistribuit cu indicarea sursei; informațiile sunt disponibile gratuit pe www.bnr.ro. Modificări CoinsLite: aranjate în câmpurile Catalogului.",
+    link: "https://www.bnr.ro/2267-monede-in-circulatie",
+  };
+  /** "50 bani 2005": its facts in Item terms. */
+  const fiftyBani = {
+    facts: {
+      country: "RO",
+      year: 2005,
+      denomination: "50 bani",
+      series: "Leu 2005",
+      diameter: 23.75,
+    } satisfies CatalogFacts,
+    details: {},
+    credit: bnr,
+  };
+
+  test("an Item showing its entry's facts credits the entry's source", () => {
+    expect(factsCreditFor({}, fiftyBani)).toEqual({
+      source: "Banca Națională a României",
+      author: "Banca Națională a României",
+      licence:
+        "Redistribuit cu indicarea sursei; informațiile sunt disponibile gratuit pe www.bnr.ro. Modificări CoinsLite: aranjate în câmpurile Catalogului.",
+      link: "https://www.bnr.ro/2267-monede-in-circulatie",
+    });
+  });
+
+  test("an Item without a Catalog entry shows no credit", () => {
+    expect(factsCreditFor({ country: "RO", year: 2005 }, null)).toBeNull();
+  });
+
+  test("an Item whose own facts override every fact its entry gives shows no credit", () => {
+    expect(
+      factsCreditFor(
+        {
+          country: "RO",
+          year: 2006,
+          denomination: "50 bani",
+          series: "Leu 2005",
+          diameter: 23.7,
+        },
+        fiftyBani,
+      ),
+    ).toBeNull();
+  });
+
+  test("one fact still from the entry is enough for its credit", () => {
+    expect(
+      factsCreditFor(
+        {
+          country: "RO",
+          year: 2006,
+          denomination: "50 bani",
+          series: "Leu 2005",
+        },
+        fiftyBani,
+      )?.source,
+    ).toBe("Banca Națională a României");
+  });
+
+  test("facts the Item has no field for, shown from the entry, keep its credit", () => {
+    const overridden = {
+      country: "RO",
+      year: 2006,
+      denomination: "50 bani",
+      series: "Leu 2005",
+      diameter: 23.7,
+    };
+    expect(
+      factsCreditFor(overridden, {
+        ...fiftyBani,
+        details: { edge: "reeded", issueDate: "2005-07-01" },
+      })?.source,
+    ).toBe("Banca Națională a României");
+  });
+
+  test("an entry without a facts credit gives none", () => {
+    expect(factsCreditFor({}, { ...fiftyBani, credit: undefined })).toBeNull();
   });
 });

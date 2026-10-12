@@ -99,6 +99,7 @@ export default {
     description: "Beskrivelse",
     physical: "Fysiske egenskaper",
     fromCatalog: "Fra katalogen",
+    factsSource: "Kilde for fakta",
     references: "Katalog og sertifisering",
     grader: "Graderingsselskap",
     setGrader: "Velg graderingsselskap",

@@ -18,6 +18,7 @@ import type { FunctionReturnType } from "convex/server";
 import { Banknote, Coins } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
+import { CatalogCredit } from "./catalog-credit";
 import { CatalogEntryEdit } from "./catalog-entry-edit";
 import { CatalogHeader, type Crumb } from "./catalog-header";
 import { CatalogImageAdmin } from "./catalog-image-admin";
@@ -244,12 +245,12 @@ export function CatalogEntryDetail({
             <PanelSection title={t("catalog.sources")}>
               {entry.factsProvenance && (
                 <PropertyRow label={t("catalog.facts")} wrap>
-                  <Credit provenance={entry.factsProvenance} />
+                  <CatalogCredit provenance={entry.factsProvenance} />
                 </PropertyRow>
               )}
               {notesCredits.map(([label, provenance]) => (
                 <PropertyRow key={label} label={label} wrap>
-                  <Credit provenance={provenance} />
+                  <CatalogCredit provenance={provenance} />
                 </PropertyRow>
               ))}
               {entry.numistaId !== undefined && (
@@ -269,23 +270,6 @@ export function CatalogEntryDetail({
         </PropertyPanel>
       </div>
     </>
-  );
-}
-
-/** Who to credit for some facts, notes or an image, linked to the source when it has a link. */
-function Credit({ provenance }: { provenance: Provenance }) {
-  const catalogFormat = useCatalogFormat();
-  const text = catalogFormat.credit(provenance);
-  if (!provenance.link) return <>{text}</>;
-  return (
-    <a
-      href={provenance.link}
-      target="_blank"
-      rel="noreferrer"
-      className="underline-offset-2 hover:underline"
-    >
-      {text}
-    </a>
   );
 }
 
@@ -330,7 +314,7 @@ function EntryPicture({ entry }: { entry: CatalogEntry }) {
         <figcaption className="text-xs text-muted-foreground">
           {t("catalog.imageCredit")}
           {" · "}
-          <Credit provenance={entry.imageProvenance} />
+          <CatalogCredit provenance={entry.imageProvenance} />
         </figcaption>
       )}
     </figure>

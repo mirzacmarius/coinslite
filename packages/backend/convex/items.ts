@@ -33,7 +33,11 @@ import {
   planPurchaseUndo,
   purchasePatch,
 } from "./items/bulkRules";
-import { entryDetails, overridesOnly } from "./items/catalogFacts";
+import {
+  entryDetails,
+  factsCreditFor,
+  overridesOnly,
+} from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
 import { isGrade, scalesFor } from "./items/grades";
 import {
@@ -65,6 +69,7 @@ import {
   itemType,
   material,
   metal,
+  provenance,
   stampCatalogue,
   strike,
 } from "./utils/validators";
@@ -820,6 +825,11 @@ export const get = query({
           facts: catalogFacts,
           details: catalogDetails,
           /**
+           * Who to credit for the facts the Item shows from the entry; null
+           * when it shows none of them (items/catalogFacts.ts factsCreditFor).
+           */
+          factsCredit: v.union(v.null(), provenance),
+          /**
            * How many other Items made from the entry the person still owns,
            * counting no further than `heldItemLimit`.
            */
@@ -839,6 +849,7 @@ export const get = query({
     const entry = await resolver.entryOf(item);
     // Only the Item page shows these, so only this read looks them up.
     const node = entry && (await ctx.db.get(entry._id));
+    const details = entryDetails(node ?? {});
     return {
       ...(await resolver.resolve(item)),
       currency: owner.homeCurrency,
@@ -846,7 +857,13 @@ export const get = query({
         key: entry.key,
         title: entry.title,
         facts: entry.facts,
-        details: entryDetails(node ?? {}),
+        details,
+        // Judged on the Item as stored, so its overrides count as its own.
+        factsCredit: factsCreditFor(item, {
+          facts: entry.facts,
+          details,
+          credit: node?.factsProvenance,
+        }),
         otherItems: await otherItemsOf(ctx, item, entry._id),
         // Sets are part of the Catalog, so hidden with it.
         set:

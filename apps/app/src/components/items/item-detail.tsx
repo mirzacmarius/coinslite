@@ -3,6 +3,7 @@
 import { useMoney } from "@/components/account/home-currency-change";
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
+import { CatalogCredit } from "@/components/catalog/catalog-credit";
 import { catalogNodeHref, setHref } from "@/components/catalog/catalog-levels";
 import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
 import {
@@ -297,6 +298,8 @@ export function ItemDetail() {
   const shownPhysical = filled(physical);
   const shownFromCatalog = filled(fromCatalog);
   const shownReferences = filled(references);
+  // Whose facts the Item shows from its entry, credited as the entry page does.
+  const factsCredit = item.catalogEntry?.factsCredit;
   return (
     <>
       <HeaderBar
@@ -549,13 +552,18 @@ export function ItemDetail() {
               ))}
             </PanelSection>
           )}
-          {shownFromCatalog.length > 0 && (
+          {(shownFromCatalog.length > 0 || factsCredit) && (
             <PanelSection title={t("items.fromCatalog")}>
               {shownFromCatalog.map(([label, value]) => (
                 <PropertyRow key={label} label={label} wrap>
                   {value}
                 </PropertyRow>
               ))}
+              {factsCredit && (
+                <PropertyRow label={t("items.factsSource")} wrap>
+                  <CatalogCredit provenance={factsCredit} />
+                </PropertyRow>
+              )}
             </PanelSection>
           )}
           {item.type === "coin" && (item.metal || item.bullion) && (
