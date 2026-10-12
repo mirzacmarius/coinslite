@@ -18,6 +18,10 @@ _Avoid_: Category, kind
 How many identical pieces an Item stands for.
 _Avoid_: Count, amount
 
+**Date acquired**:
+When an Item became the user's: its purchase date, or when it was recorded in CoinsLite if that is earlier or it has no purchase date.
+_Avoid_: Date added (that is when it was recorded), acquisition date
+
 **Collection**:
 Everything a single user owns: the sum of all their Items.
 _Avoid_: Portfolio, inventory, "my collection" for a named subset
