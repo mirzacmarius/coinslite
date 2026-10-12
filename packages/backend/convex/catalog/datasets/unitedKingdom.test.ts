@@ -74,7 +74,10 @@ describe("the United Kingdom circulating coins dataset", () => {
         strike: "circulation",
       });
       expect(entry.values.mintage).toBeUndefined();
-      expect(entry.values.yearFrom).toBeGreaterThanOrEqual(1998);
+      // Every metal the proclamations name has its Catalog material.
+      expect(entry.values.material).toBeDefined();
+      // The first notice published as data, in 1998, came into force in December 1997.
+      expect(entry.values.yearFrom).toBeGreaterThanOrEqual(1997);
       expect(entry.values.issueDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(entry.values.technicalDetails).toContain("Reverse: ");
       expect(entry.values.factsLink).toMatch(

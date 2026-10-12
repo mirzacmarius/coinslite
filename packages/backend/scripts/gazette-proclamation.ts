@@ -153,7 +153,7 @@ const tens: Record<string, number> = {
 };
 
 /** "seventy-five" is 75, "five and one half" 5.5, "9" 9; undefined for anything else. */
-export function numberIn(words: string): number | undefined {
+function numberIn(words: string): number | undefined {
   const text = words.trim().toLowerCase();
   if (/^\d+(\.\d+)?$/.test(text)) return Number(text);
   const half = /^(.+?) and (?:one|a) half$/.exec(text);
@@ -273,7 +273,7 @@ function dateAfter(text: string, lead: string) {
 }
 
 /** "fifty pence" reads "50 pence", "one pound" "1 pound", "two-pounds" "2 pounds". */
-export function denominationIn(words: string) {
+function denominationIn(words: string) {
   const match = /^(.+?)[\s-](penny|pence|pounds?)$/i.exec(words.trim());
   if (!match) return undefined;
   const amount = numberIn(match[1] as string);

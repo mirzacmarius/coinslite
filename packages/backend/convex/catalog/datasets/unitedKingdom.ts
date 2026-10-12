@@ -21,9 +21,11 @@ import {
  * nor how many it struck. Gold, silver and platinum coins and the five-pound
  * crowns and up are left out.
  *
- * An entry's year is the one its design puts on the coin where it fixes
- * one, else the year its proclamation came into force; its issue date is the
- * day the proclamation was given.
+ * An entry's year is the year its proclamation came into force, which can
+ * be a year before the date on the coin (a proclamation of late 2017 for
+ * coins dated 2018); the obverse in its details gives the date where the
+ * proclamation fixes it. Its issue date is the day the proclamation was
+ * given.
  *
  * Not yet: coins proclaimed before 1998, when The Gazette began publishing
  * notices as data; their proclamations are only scanned pages.
@@ -45,15 +47,17 @@ const gazette = (link: string) => ({
   link,
 });
 type Provenance = ReturnType<typeof gazette>;
-const credit = (from: Provenance) =>
-  Object.fromEntries(
-    (["facts", "notes"] as const).flatMap((group) => [
-      [`${group}_source`, from.source],
-      [`${group}_author`, from.author],
-      [`${group}_licence`, from.licence],
-      [`${group}_link`, from.link],
-    ]),
-  );
+const credit = (group: "facts" | "notes", from: Provenance) => ({
+  [`${group}_source`]: from.source,
+  [`${group}_author`]: from.author,
+  [`${group}_licence`]: from.licence,
+  [`${group}_link`]: from.link,
+});
+/** Facts and notes alike come from the proclamation. */
+const proclaimedIn = (link: string) => ({
+  ...credit("facts", gazette(link)),
+  ...credit("notes", gazette(link)),
+});
 
 type Row = Record<string, string>;
 
@@ -82,8 +86,8 @@ const materials: Record<string, string> = {
 /** Metals the Catalog's compositions know; a plated steel coin's composition goes in its details instead. */
 const alloyMetals = new Set(["copper", "nickel", "zinc", "tin", "aluminium"]);
 
-const partsText = (parts: ProclaimedPart[]) =>
-  parts.map(({ metal, percent }) => `${metal} ${percent}%`).join(", ");
+const partsText = (parts: ProclaimedPart[], separator = ", ") =>
+  parts.map(({ metal, percent }) => `${metal} ${percent}%`).join(separator);
 
 function metalOf(design: UkCoinDesign) {
   if (design.sections)
@@ -97,7 +101,7 @@ function metalOf(design: UkCoinDesign) {
 function compositionOf(design: UkCoinDesign) {
   const parts = design.composition;
   if (!parts?.every(({ metal }) => alloyMetals.has(metal))) return undefined;
-  return parts.map(({ metal, percent }) => `${metal} ${percent}%`).join("; ");
+  return partsText(parts, "; ");
 }
 
 const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
@@ -273,7 +277,7 @@ function entries(
       ...(design.purpose && {
         historical_notes: `Made ${sentence(design.purpose)}`,
       }),
-      ...credit(gazette(design.link)),
+      ...proclaimedIn(design.link),
     };
   });
 }
@@ -313,7 +317,7 @@ function denominationRows(
       is_addable: "false",
       ...shared(denomination),
       year_from: String(Math.min(...years)),
-      ...credit(gazette(designs[0]?.link ?? proclamations)),
+      ...proclaimedIn(designs[0]?.link ?? proclamations),
     },
     ...ordered.flatMap(([id, group], index) => {
       keys.add(id);
@@ -329,7 +333,7 @@ function denominationRows(
           year_from: String(
             Math.min(...group.designs.map((design) => design.year)),
           ),
-          ...credit(gazette(group.designs[0]?.link ?? proclamations)),
+          ...proclaimedIn(group.designs[0]?.link ?? proclamations),
         },
         ...entries(group.designs, id, group.title),
       ];
@@ -342,9 +346,9 @@ const rows: Row[] = [
     id: root,
     title: "United Kingdom",
     country: "GB",
-    // After the United States, the euro and Norway.
-    sort_order: "3",
-    ...credit(gazette(proclamations)),
+    // After the United States, the euro, Norway and Romania.
+    sort_order: "4",
+    ...proclaimedIn(proclamations),
   },
   ...denominations.flatMap((denomination, index) =>
     denominationRows(denomination, index + 1),

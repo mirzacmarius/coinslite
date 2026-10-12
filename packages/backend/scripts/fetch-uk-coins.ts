@@ -134,35 +134,24 @@ type Design = {
  */
 function seriesOf(
   proclamation: Proclamation,
-  base: ProclaimedCoin[],
+  baseMetal: ProclaimedCoin[],
 ): Design["series"] {
-  const denominationsMade = new Set(base.map((coin) => coin.denomination));
+  const denominationsMade = new Set(baseMetal.map((coin) => coin.denomination));
   if (denominationsMade.size >= 3) return "definitive";
   if (proclamation.commemorative) return "commemorative";
   if (denominationsMade.has("50 pence") || denominationsMade.has("2 pounds"))
     return "commemorative";
-  const several = base.some(
+  const several = baseMetal.some(
     (coin) =>
       coin.denomination !== "1 pound" &&
-      (proclamation.designs[coin.design ?? -1]?.reverses.length ?? 0) > 1,
+      (designOf(proclamation, coin)?.reverses.length ?? 0) > 1,
   );
   return several ? "commemorative" : "definitive";
 }
 
-/**
- * The year on the coin where the design fixes it (a date in its obverse or
- * reverse in the year the proclamation came into force or the next, as the
- * 2018 coins proclaimed late in 2017); otherwise the year it came into force.
- */
-function yearOf(inForce: string, obverse: string, reverse: string) {
-  const from = Number(inForce.slice(0, 4));
-  const candidates = [
-    ...`${obverse} ${reverse}`.matchAll(/(?<![\d.-])((?:19|20)\d\d)(?![\d-])/g),
-  ]
-    .map((match) => Number(match[1]))
-    .filter((year) => year === from || year === from + 1);
-  return candidates.length > 0 ? Math.max(...candidates) : from;
-}
+/** The design a proclamation gives a coin. */
+const designOf = (proclamation: Proclamation, coin: ProclaimedCoin) =>
+  coin.design === undefined ? undefined : proclamation.designs[coin.design];
 
 const designs: Design[] = [];
 const used: string[] = [];
@@ -174,7 +163,7 @@ const problems: string[] = [];
 const seen = new Set<string>();
 
 /** A Markdown list item: "- 2017-02-16 [2712446](…/notice/2712446) DETERMINING …". */
-const describe = (proclamation: Proclamation) => {
+const listItem = (proclamation: Proclamation) => {
   const title =
     proclamation.title.length > 110
       ? `${proclamation.title.slice(0, 110).replace(/\s\S*$/, "")}…`
@@ -187,45 +176,38 @@ for (const id of await noticeIds()) {
     fetched(`${gazette}/notice/${id}/data.xml`),
   );
   for (const proclamation of parseNotice(xml)) {
-    const base = proclamation.coins.filter(
+    const baseMetal = proclamation.coins.filter(
       (coin) =>
         isDenomination(coin.denomination) && !preciousMetal.test(coin.metal),
     );
-    if (base.length === 0) {
+    if (baseMetal.length === 0) {
       (/^ALTERING\b/i.test(proclamation.title) ? alterations : leftOut).push(
-        describe(proclamation),
+        listItem(proclamation),
       );
       continue;
     }
     if (!proclamation.inForce) {
-      problems.push(`${describe(proclamation)}: no date it came into force`);
+      problems.push(`${listItem(proclamation)}: no date it came into force`);
       continue;
     }
-    used.push(describe(proclamation));
-    const series = seriesOf(proclamation, base);
-    for (const coin of base) {
-      const design =
-        coin.design === undefined
-          ? undefined
-          : proclamation.designs[coin.design];
+    used.push(listItem(proclamation));
+    const series = seriesOf(proclamation, baseMetal);
+    for (const coin of baseMetal) {
+      const design = designOf(proclamation, coin);
       if (!design || design.reverses.length === 0) {
         problems.push(
-          `${describe(proclamation)}: no design for ${coin.denomination}`,
+          `${listItem(proclamation)}: no design for ${coin.denomination}`,
         );
         continue;
       }
       for (const reverse of design.reverses) {
         if (reverse.onlyFor && !reverse.onlyFor.includes(coin.metal)) {
           reversesLeftOut.push(
-            `${describe(proclamation)}: “${reverse.description}”, only for ${reverse.onlyFor}`,
+            `${listItem(proclamation)}: “${reverse.description}”, only for ${reverse.onlyFor}`,
           );
           continue;
         }
-        const year = yearOf(
-          proclamation.inForce,
-          design.obverse ?? "",
-          reverse.description,
-        );
+        const year = Number(proclamation.inForce.slice(0, 4));
         // A reverse proclaimed again for the same year, alone or with another obverse, is the same design.
         const same = [
           coin.denomination,
@@ -308,7 +290,7 @@ export type UkCoinDesign = {
     | "50 pence"
     | "1 pound"
     | "2 pounds";
-  /** The year on the coin where the proclamation fixes it, else the year it came into force. */
+  /** The year the proclamation came into force. */
   year: number;
   /** The coin's metal, in the proclamation's words: "cupro-nickel". */
   metal: string;
