@@ -34,10 +34,25 @@ export function metalValue(
 ): number | undefined {
   if (metal === undefined || weight === undefined || purity === undefined)
     return undefined;
-  return Math.round(
-    weight * purity * rates.spotPricePerGram(metal, currency) * quantity,
+  return roundedMetalValue(
+    weight * purity,
+    rates.spotPricePerGram(metal, currency),
+    quantity,
   );
 }
+
+/**
+ * The Metal value of `quantity` pieces each holding `finePerPiece` grams of
+ * the pure metal (weight × purity) at `spotPricePerGram`, in whole minor
+ * units, rounded as the Item shows it. Totals that only know how much metal
+ * each Item holds (items/totals.ts) work out each Item's with this. Worked
+ * left to right like `metalValue`, so the two agree to the minor unit.
+ */
+export const roundedMetalValue = (
+  finePerPiece: number,
+  spotPricePerGram: number,
+  quantity: number,
+) => Math.round(finePerPiece * spotPricePerGram * quantity);
 
 export type BullionPreset = {
   /** Also the preset's name in the app's language files. */

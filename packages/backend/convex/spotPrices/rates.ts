@@ -26,6 +26,32 @@ export type RateCode = (typeof rateCodes)[number];
  */
 export type PerDollar = Record<RateCode, number>;
 
+/**
+ * The Spot price of one gram of `metal`, in minor units of `currency`. Not
+ * rounded, so a Metal value can multiply it and round once at the end.
+ */
+const perGram = (perDollar: PerDollar, metal: Metal, currency: HomeCurrency) =>
+  ((perDollar[currency] / perDollar[metalCodes[metal]]) * 100) /
+  TROY_OUNCE_GRAMS;
+
+/**
+ * Gold's and silver's Spot price: a gram of each in minor units of one Home
+ * currency, not rounded, so Metal values can multiply them and round once.
+ */
+export type SpotPrices = Record<Metal, number>;
+
+/**
+ * The Spot prices in `currency` from a stored table: the same as
+ * MarketRates.spotPricePerGram gives.
+ */
+export const spotPricesPerGram = (
+  perDollar: PerDollar,
+  currency: HomeCurrency,
+): SpotPrices => ({
+  gold: perGram(perDollar, "gold", currency),
+  silver: perGram(perDollar, "silver", currency),
+});
+
 /** Prices this much older than the latest refresh attempt are shown as out of date. */
 export const STALE_AFTER_MS = 60 * 60 * 1000;
 
@@ -63,7 +89,7 @@ export function marketRates(snapshot: Snapshot) {
      * rounded, so a Metal value can multiply it and round once at the end.
      */
     spotPricePerGram: (metal: Metal, currency: HomeCurrency) =>
-      (rate(metalCodes[metal], currency) * 100) / TROY_OUNCE_GRAMS,
+      perGram(perDollar, metal, currency),
   };
 }
 

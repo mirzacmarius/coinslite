@@ -199,7 +199,7 @@ export const pdf = internalQuery({
     if (items.length > collectionPdfLimits.items)
       throw new ConvexError(collectionExportErrors.tooManyItems);
     const currency = owner.homeCurrency;
-    const totals = collectionTotals(items, { currency, rates: null });
+    const totals = collectionTotals(items, { currency, spotPrices: null });
     const albumId =
       view.album === undefined || view.album === withoutAlbum
         ? null

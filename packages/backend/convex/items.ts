@@ -51,6 +51,7 @@ import {
 import { requireRoomForItems } from "./plans";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
+import { capped } from "./utils/pagination";
 import {
   catalogDetails,
   catalogItemType,
@@ -750,8 +751,14 @@ const listedItem = schema
   .extend({ thumbnailUrl: v.union(v.string(), v.null()) });
 
 /**
- * The signed-in person's Items, newest first, a page at a time, their facts
- * resolved. Each comes with its thumbnail (items/thumbnail.ts): the small
+ * The most Items one page of an Item list (`list`, albums.items) holds,
+ * however many the app asks for; it asks for 25 or 50.
+ */
+export const ITEM_LIST_PAGE_SIZE = 100;
+
+/**
+ * The signed-in person's Items, newest first, a page at a time (up to
+ * ITEM_LIST_PAGE_SIZE), their facts resolved. Each comes with its thumbnail (items/thumbnail.ts): the small
  * copy of the front photo, else of the back photo, else of the first more
  * photo, else null.
  */
@@ -764,7 +771,7 @@ export const list = query({
       .query("items")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
       .order("desc")
-      .paginate(paginationOpts);
+      .paginate(capped(paginationOpts, { numItems: ITEM_LIST_PAGE_SIZE }));
     return {
       ...items,
       page: await Promise.all(

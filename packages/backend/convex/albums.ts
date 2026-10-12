@@ -16,12 +16,13 @@ import {
   nextColour,
 } from "./albums/rules";
 import { countAlbumCreated, countAlbumDeleted } from "./collectionCounts";
-import { itemNotFound } from "./items";
+import { ITEM_LIST_PAGE_SIZE, itemNotFound } from "./items";
 import { deleteItem } from "./items/deletion";
 import { resolveItems } from "./items/resolve";
 import { withThumbnail } from "./items/thumbnail";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
+import { capped } from "./utils/pagination";
 import { albumColour } from "./utils/validators";
 
 /** Every field a person sets on an Album, as the Album form sends them. */
@@ -120,7 +121,7 @@ export const get = query({
 
 /**
  * The Items in one of the signed-in person's Albums, newest first, a page at
- * a time, their facts resolved and each with its list thumbnail as in the
+ * a time (up to ITEM_LIST_PAGE_SIZE), their facts resolved and each with its list thumbnail as in the
  * Collection.
  */
 export const items = query({
@@ -133,7 +134,7 @@ export const items = query({
         q.eq("ownerId", owner._id).eq("albumId", albumId),
       )
       .order("desc")
-      .paginate(paginationOpts);
+      .paginate(capped(paginationOpts, { numItems: ITEM_LIST_PAGE_SIZE }));
     return {
       ...items,
       page: await Promise.all(

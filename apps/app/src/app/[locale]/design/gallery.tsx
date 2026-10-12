@@ -198,7 +198,7 @@ const sampleTotals = {
       purchasePrice: Number(purchasePrice),
       marketValue: Number(marketValue),
     })),
-    { currency: "NOK", rates: null },
+    { currency: "NOK", spotPrices: null },
   ),
   metals: {
     gold: { fineWeight: 62.2, value: 512_000 },

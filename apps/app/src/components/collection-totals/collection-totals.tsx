@@ -25,7 +25,11 @@ import { cn } from "@coinslite/ui/utils";
 import { ChevronRight } from "lucide-react";
 import { type ReactNode, useId, useState } from "react";
 import { seriesColorVariables } from "./chart-card";
-import { useCollectionTotals, useValueOverTime } from "./use-collection-totals";
+import {
+  type ShownTotals,
+  useCollectionTotals,
+  useValueOverTime,
+} from "./use-collection-totals";
 import { ValueChart } from "./value-chart";
 import { ValueDistributionChart } from "./value-distribution-chart";
 
@@ -80,7 +84,7 @@ export function CollectionTotalsSection({
     >
       <section
         aria-labelledby={titleId}
-        aria-busy={totals === undefined}
+        aria-busy={totals === undefined || totals.counting}
         className={cn("border-b", seriesColorVariables)}
       >
         <h2 className="flex h-10 items-center px-2">
@@ -126,14 +130,15 @@ export function CollectionTotalsSection({
 /**
  * The collapsed totals in one line: Items, total Market value, Gain/loss and
  * any Metal value. The line holds as many whole figures as fit, in that
- * order; the rest wrap out of sight rather than being cut.
+ * order; the rest wrap out of sight rather than being cut. It pulses while
+ * the totals are still counting.
  */
 function TotalsSummary({
   totals,
   sold,
   className,
 }: {
-  totals: CollectionTotals | undefined;
+  totals: ShownTotals | undefined;
   sold?: boolean;
   className?: string;
 }) {
@@ -191,6 +196,7 @@ function TotalsSummary({
     <span
       className={cn(
         "flex h-5 min-w-0 flex-1 flex-wrap gap-x-3 overflow-hidden text-muted-foreground",
+        totals.counting && "animate-pulse",
         className,
       )}
     >
@@ -212,7 +218,7 @@ function TotalsDetails({
   totals,
   sold,
 }: {
-  totals: CollectionTotals | undefined;
+  totals: ShownTotals | undefined;
   sold?: boolean;
 }) {
   const empty = totals?.items === 0;
@@ -226,6 +232,7 @@ function TotalsDetails({
             <TotalsFigures
               totals={totals}
               variant={sold ? "sold" : "collection"}
+              counting={totals.counting}
             />
           )
         )}
@@ -240,12 +247,20 @@ function TotalsDetails({
   );
 }
 
-/** The value chart and the value distribution of what's owned. */
-function Charts({ totals }: { totals: CollectionTotals }) {
+/**
+ * The value chart and the value distribution of what's owned, pulsing while
+ * the totals or "Value over time" are still counting.
+ */
+function Charts({ totals }: { totals: ShownTotals }) {
   const overTime = useValueOverTime();
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <ValueChart totals={totals} overTime={overTime} />
+    <div
+      className={cn(
+        "grid gap-4 lg:grid-cols-2",
+        (totals.counting || overTime?.counting) && "animate-pulse",
+      )}
+    >
+      <ValueChart totals={totals} overTime={overTime?.sum} />
       <ValueDistributionChart totals={totals} />
     </div>
   );
@@ -303,15 +318,18 @@ function SignedMoney({
  * Overview's keep to pieces and money (spec 9), plus the Realised Gain/loss
  * once something is sold (`sold`, the sold Items' totals). The sold view's
  * show the sale total and the Realised Gain/loss instead of Market value.
+ * The card pulses while the totals are still `counting`.
  */
 export function TotalsFigures({
   totals,
   variant = "collection",
   sold,
+  counting,
 }: {
   totals: CollectionTotals;
   variant?: "collection" | "overview" | "sold";
   sold?: CollectionTotals;
+  counting?: boolean;
 }) {
   const t = useI18n();
   const format = useFormatters();
@@ -350,7 +368,12 @@ export function TotalsFigures({
   };
 
   return (
-    <div className="overflow-hidden rounded-xl bg-card">
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl bg-card",
+        counting && "animate-pulse",
+      )}
+    >
       <dl className={figuresLayout}>
         {variant !== "overview" && (
           <Figure

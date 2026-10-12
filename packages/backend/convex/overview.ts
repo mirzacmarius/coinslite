@@ -7,8 +7,8 @@ import { requireSetUpUser } from "./utils/auth";
 import { itemType } from "./utils/validators";
 
 /**
- * The Overview (spec 9). Its totals come from `collectionTotals.page` and its
- * plan usage from `plans.usage`; this module adds what only the Overview shows.
+ * The Overview (spec 9). Its totals come from collectionTotals.ts and its plan
+ * usage from `plans.usage`; this module adds what only the Overview shows.
  */
 
 /** How many of the most recently added Items the Overview shows. */

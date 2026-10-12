@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { marketRates } from "../spotPrices/rates";
+import { spotPricesPerGram } from "../spotPrices/rates";
 import {
   type CollectionTotals,
   type TotalsItem,
@@ -8,6 +8,8 @@ import {
   combineTotals,
   itemFigures,
   monthOf,
+  pageTotals,
+  withMetalValues,
 } from "./totals";
 
 /** Oslo in winter: an hour ahead of UTC. */
@@ -65,11 +67,8 @@ describe("the month an Item was acquired", () => {
 
 // Gold at $2,000 and silver at $25 a troy ounce (31.1034768 g), 10 NOK to
 // the dollar: a troy ounce of gold is 20,000 kr and one of silver 250 kr.
-const rates = marketRates({
-  quotedAt: 0,
-  fetchedAt: 0,
-  checkedAt: 0,
-  perDollar: {
+const spotPrices = spotPricesPerGram(
+  {
     USD: 1,
     NOK: 10,
     SEK: 10.5,
@@ -81,7 +80,8 @@ const rates = marketRates({
     XAU: 1 / 2000,
     XAG: 1 / 25,
   },
-});
+  "NOK",
+);
 
 // Amounts in øre.
 const krugerrand: TotalsItem = {
@@ -119,7 +119,11 @@ const soldStamps: TotalsItem = {
   salePrice: 20_00,
 };
 
-const context = { currency: "NOK", rates, utcOffsetMinutes: OSLO } as const;
+const context = {
+  currency: "NOK",
+  spotPrices,
+  utcOffsetMinutes: OSLO,
+} as const;
 
 const expectedTotals: CollectionTotals = {
   currency: "NOK",
@@ -156,36 +160,64 @@ describe("Collection totals", () => {
     ).toEqual(expectedTotals);
   });
 
-  test("combining the totals of separate pages gives the same as one pass", () => {
-    const firstPage = collectionTotals(
-      [krugerrand, inheritedBanknote],
-      context,
-    );
-    const secondPage = collectionTotals([silverCoins, soldStamps], context);
+  test("combining any split of the same Items into pages gives the same totals as one page", () => {
+    const splits: TotalsItem[][][] = [
+      [
+        [krugerrand, inheritedBanknote],
+        [silverCoins, soldStamps],
+      ],
+      [[krugerrand], [silverCoins, inheritedBanknote, soldStamps]],
+      [[soldStamps], [inheritedBanknote], [silverCoins], [krugerrand]],
+      [[], [krugerrand, silverCoins, inheritedBanknote, soldStamps], []],
+    ];
+    for (const pages of splits) {
+      const combined = pages
+        .map((page) => pageTotals(page, context))
+        .reduce(combineTotals);
+      expect(withMetalValues(combined, spotPrices)).toEqual(expectedTotals);
+    }
+  });
 
-    expect(combineTotals(firstPage, secondPage)).toEqual(expectedTotals);
+  test("work out each Item's Metal value at the Spot prices and add them up as each Item shows it", () => {
+    // Silver at 1.003 kr (100.3 øre) a gram. Two Items of three 1 g pieces,
+    // half silver, are worth 150.45 øre each, shown as 150; a 2 g piece of
+    // pure silver is worth 200.6 øre, shown as 201. Together 501 øre, not the
+    // 502 that the 5 g of fine silver would round to as one amount.
+    const halfSilver: TotalsItem = {
+      _creationTime: Date.UTC(2026, 0, 15, 12),
+      type: "coin",
+      quantity: 3,
+      metal: "silver",
+      weight: 1,
+      purity: 0.5,
+    };
+    const pureSilver: TotalsItem = {
+      ...halfSilver,
+      quantity: 1,
+      weight: 2,
+      purity: 1,
+    };
+    const totals = withMetalValues(
+      combineTotals(
+        pageTotals([halfSilver], context),
+        pageTotals([pureSilver, halfSilver], context),
+      ),
+      { gold: 60_000, silver: 100.3 },
+    );
+
+    expect(totals.metals).toEqual({
+      gold: { fineWeight: 0, value: 0 },
+      silver: { fineWeight: 5, value: 501 },
+    });
   });
 
   test("the Metal value is null without Spot prices, while fine weight still counts", () => {
-    const totals = collectionTotals([krugerrand, silverCoins], {
-      ...context,
-      rates: null,
-    });
+    const totals = withMetalValues(
+      pageTotals([krugerrand, silverCoins], context),
+      null,
+    );
 
     expect(totals.metals).toEqual({
-      gold: { fineWeight: 31.1034768, value: null },
-      silver: { fineWeight: 31.1034768, value: null },
-    });
-  });
-
-  test("a page without Spot prices makes the combined Metal value null", () => {
-    const withPrices = collectionTotals([krugerrand], context);
-    const withoutPrices = collectionTotals([silverCoins], {
-      ...context,
-      rates: null,
-    });
-
-    expect(combineTotals(withPrices, withoutPrices).metals).toEqual({
       gold: { fineWeight: 31.1034768, value: null },
       silver: { fineWeight: 31.1034768, value: null },
     });

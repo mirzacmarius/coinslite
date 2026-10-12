@@ -468,11 +468,23 @@ export default defineSchema({
     quotedAt: v.number(),
     /** When CoinsLite stored them. */
     fetchedAt: v.number(),
-    /** The latest refresh attempt, whether or not it succeeded. */
-    checkedAt: v.number(),
+    /**
+     * Where the latest refresh attempt was kept before spotPriceChecks; read
+     * only until that table has its document. A successful refresh drops it.
+     */
+    checkedAt: v.optional(v.number()),
     perDollar,
     /** The provider plan's monthly request quota, when it states one; refreshes are spaced to fit it. */
     requestsPerMonth: v.optional(v.number()),
+  }),
+
+  /**
+   * When Spot prices were last asked for, whether or not the refresh
+   * succeeded (spotPrices.ts): one document, apart from the prices, so a
+   * failed refresh changes nothing that only reads the prices.
+   */
+  spotPriceChecks: defineTable({
+    checkedAt: v.number(),
   }),
 
   /**

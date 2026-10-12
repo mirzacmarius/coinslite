@@ -121,6 +121,71 @@ describe("pages of a Collection combined", () => {
   });
 });
 
+describe("pages of a Collection, however split", () => {
+  test("combine to the same series as one page", () => {
+    // All recorded in October 2026: a coin bought on 20 August for 50.00 kr,
+    // valued at 70.00 kr; one without a purchase date at 20.00 kr, valued at
+    // 30.00 kr; and 10 g of gold at 0.9 fine bought on 5 September for
+    // 4,000.00 kr, valued at 6,000.00 kr. Gold at 600.00 kr a gram makes it
+    // 5,400.00 kr of metal.
+    const bought = coin({
+      purchaseDate: "2026-08-20",
+      purchasePrice: 5_000,
+      marketValue: 7_000,
+      history: [{ at: RECORDED, marketValue: 7_000, quantity: 1 }],
+    });
+    const recorded = coin({
+      purchasePrice: 2_000,
+      marketValue: 3_000,
+      history: [{ at: RECORDED, marketValue: 3_000, quantity: 1 }],
+    });
+    const gold = coin({
+      metal: "gold",
+      weight: 10,
+      purity: 0.9,
+      purchaseDate: "2026-09-05",
+      purchasePrice: 400_000,
+      marketValue: 600_000,
+      history: [{ at: RECORDED, marketValue: 600_000, quantity: 1 }],
+    });
+    const pageOf = (items: SeriesItem[]) =>
+      valueOverTime(items, {
+        months: seriesMonths(items, "2026-10", OSLO),
+        currency: "NOK",
+        utcOffsetMinutes: OSLO,
+        ratesFor: () => goldAt(60_000),
+      });
+    const splits: SeriesItem[][][] = [
+      [[bought, recorded, gold]],
+      [[bought], [recorded, gold]],
+      [[gold, recorded], [bought]],
+      [[recorded], [], [gold], [bought]],
+    ];
+    for (const pages of splits) {
+      expect(pages.map(pageOf).reduce(combineValueOverTime, [])).toEqual([
+        {
+          month: "2026-08",
+          purchasePrice: 5_000,
+          marketValue: 5_000,
+          metalValue: 0,
+        },
+        {
+          month: "2026-09",
+          purchasePrice: 405_000,
+          marketValue: 405_000,
+          metalValue: 540_000,
+        },
+        {
+          month: "2026-10",
+          purchasePrice: 407_000,
+          marketValue: 610_000,
+          metalValue: 540_000,
+        },
+      ]);
+    }
+  });
+});
+
 describe("the series for an Item bought before it was recorded", () => {
   test("counts it at its Purchase price until its first recorded Market value", () => {
     // Two pieces at 100.00 kr, bought in March 2024, recorded in October 2026
