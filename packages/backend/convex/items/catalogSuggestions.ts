@@ -21,10 +21,13 @@ export const suggestionLimits = {
   dismissed: 20,
   /** Distinct denominations read for one country and Item type. */
   denominations: 200,
-  /** Entries of one denomination read for one year, the latest started first. */
-  entriesPerDenomination: 50,
+  /**
+   * Entries of one denomination first issued by an Item's year read from
+   * each end: the earliest started (general issues) and the latest.
+   */
+  entriesPerEnd: 50,
   /** Items one look-up after an import takes. */
-  items: 50,
+  items: 25,
 } as const;
 
 /** What the matcher reads of an Item. */
@@ -52,20 +55,35 @@ const coversYear = (entry: CandidateEntry, year: number) =>
   entry.yearFrom <= year &&
   (entry.yearTo === undefined || year <= entry.yearTo);
 
+/** An Item the Catalog could have: a coin or banknote with a country, year and denomination. */
+export type SuggestableItem = SuggestedItem & {
+  type: CatalogItemType;
+  country: string;
+  denomination: string;
+  year: number;
+};
+
+/** Whether an Item can get suggestions at all; only then is anything read. */
+export const suggestable = (item: SuggestedItem): item is SuggestableItem =>
+  item.type !== "stamp" &&
+  Boolean(item.country) &&
+  Boolean(item.denomination) &&
+  item.year !== undefined;
+
 /**
  * The entries that could be the Item, best first, at most `limit`: those
  * whose denomination is written as the Item's come before those that only
- * share its face value, then those with a last year before those still
- * issued, then the fewest years, the latest started and by title.
+ * share its face value, then those covering the most years up to the
+ * Item's (a general issue is likelier than a one-year special issue, such as
+ * a commemorative), then the latest started, then by title.
  */
 export function catalogCandidates<T extends CandidateEntry>(
   item: SuggestedItem,
   entries: readonly T[],
   limit: number = suggestionLimits.candidates,
 ): T[] {
+  if (!suggestable(item)) return [];
   const { type, country, denomination, year } = item;
-  if (type === "stamp" || !country || !denomination || year === undefined)
-    return [];
   const written = denominationText(denomination);
   const ranked = entries
     .filter(
@@ -80,8 +98,7 @@ export function catalogCandidates<T extends CandidateEntry>(
       entry,
       rank: [
         denominationText(entry.denomination ?? "") === written ? 0 : 1,
-        entry.yearTo === undefined ? 1 : 0,
-        (entry.yearTo ?? year) - (entry.yearFrom ?? year),
+        -((entry.yearTo ?? year) - (entry.yearFrom ?? year)),
         -(entry.yearFrom ?? 0),
       ],
     }));

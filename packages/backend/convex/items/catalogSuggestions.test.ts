@@ -161,7 +161,7 @@ describe("Catalog entries suggested for an Item", () => {
     ).toEqual([]);
   });
 
-  test("best first: the denomination as written, then the narrowest years, at most three", () => {
+  test("best first: the denomination as written, then the most years up to the Item's, at most three", () => {
     const coin = {
       type: "coin" as const,
       country: "NO",
@@ -207,16 +207,44 @@ describe("Catalog entries suggested for an Item", () => {
       }),
     ];
     expect(keys(catalogCandidates(coin, candidates))).toEqual([
-      "single-1960-a",
-      "single-1960-b",
-      "wide-1940-1980",
-    ]);
-    expect(keys(catalogCandidates(coin, candidates, 10))).toEqual([
-      "single-1960-a",
-      "single-1960-b",
       "wide-1940-1980",
       "open-1950",
+      "single-1960-a",
+    ]);
+    expect(keys(catalogCandidates(coin, candidates, 10))).toEqual([
+      "wide-1940-1980",
+      "open-1950",
+      "single-1960-a",
+      "single-1960-b",
       "half-krone-1960",
+    ]);
+  });
+
+  test("a general issue still struck comes before a commemorative of the Item's year", () => {
+    const coin = {
+      type: "coin" as const,
+      country: "DE",
+      denomination: "2 euro",
+      year: 2024,
+    };
+    const candidates = [
+      entry("de-2-euro-2024-mecklenburg", {
+        itemType: "coin",
+        country: "DE",
+        denomination: "2 euro",
+        yearFrom: 2024,
+        yearTo: 2024,
+      }),
+      entry("de-eur-2-euro", {
+        itemType: "coin",
+        country: "DE",
+        denomination: "2 euro",
+        yearFrom: 2007,
+      }),
+    ];
+    expect(keys(catalogCandidates(coin, candidates))).toEqual([
+      "de-eur-2-euro",
+      "de-2-euro-2024-mecklenburg",
     ]);
   });
 });

@@ -81,6 +81,15 @@ test("two denominations are the same when they read alike or count the same face
   expect(sameDenomination("–", "—")).toBe(false);
 });
 
+test("the same face value in another unit is another denomination", () => {
+  expect(sameDenomination("1 shilling", "1 pound")).toBe(false);
+  expect(sameDenomination("1 krona", "1 dollar")).toBe(false);
+  expect(sameDenomination("1 kr", "1 krone")).toBe(true);
+  expect(sameDenomination("1 krona", "1 krone")).toBe(true);
+  expect(sameDenomination("2 Mark", "2 Reichsmark")).toBe(true);
+  expect(sameDenomination("2 euro", "2")).toBe(true);
+});
+
 test("reading alike ignores capitals, accents and spacing", () => {
   expect(denominationText(" 50  Øre ")).toBe("50 øre");
   expect(denominationText("5 Céntimos")).toBe("5 centimos");

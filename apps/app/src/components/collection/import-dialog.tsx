@@ -117,10 +117,13 @@ export function ImportDialog({
   const convex = useConvex();
   const fileInput = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<Stage>({ stage: "pick" });
+  // Counts closings, so a look-up still running when the dialog is closed
+  // doesn't reopen it on a stale state.
+  const closings = useRef(0);
+  // Looking for Catalog entries can be left: the Items are in.
   const busy =
     state.stage === "reading" ||
     state.stage === "importing" ||
-    state.stage === "finding" ||
     (state.stage === "linking" && state.busy);
 
   const reason = (code: string) =>
@@ -211,7 +214,9 @@ export function ImportDialog({
     }
     toast.success(t("collectionImport.imported", { count: done }));
     setState({ stage: "finding", added: done });
+    const opened = closings.current;
     const suggested = await suggestionsFor(itemIds);
+    if (closings.current !== opened) return;
     if (suggested.length === 0) {
       setState({ stage: "pick" });
       onOpenChange(false);
@@ -264,7 +269,10 @@ export function ImportDialog({
 
   const close = (next: boolean) => {
     if (busy) return;
-    if (!next) setState({ stage: "pick" });
+    if (!next) {
+      closings.current += 1;
+      setState({ stage: "pick" });
+    }
     onOpenChange(next);
   };
 
@@ -442,7 +450,9 @@ export function ImportDialog({
             ) : (
               <DialogClose asChild>
                 <Button type="button" variant="ghost" disabled={busy}>
-                  {t("collectionImport.cancel")}
+                  {state.stage === "finding"
+                    ? t("catalogSuggestion.afterImport.done")
+                    : t("collectionImport.cancel")}
                 </Button>
               </DialogClose>
             )}

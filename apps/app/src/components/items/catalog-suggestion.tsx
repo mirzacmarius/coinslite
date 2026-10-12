@@ -26,7 +26,8 @@ export function CatalogSuggestion({ itemId }: { itemId: Id<"items"> }) {
   const best = suggestions?.[0];
   if (!best) return null;
 
-  const act = async (action: "link" | "dismiss") => {
+  /** Link the suggested entry, or turn it down ("Not this"). */
+  const answer = async (action: "link" | "dismiss") => {
     setBusy(true);
     try {
       const args = { itemId, catalogEntryKey: best.key };
@@ -71,7 +72,7 @@ export function CatalogSuggestion({ itemId }: { itemId: Id<"items"> }) {
           variant="outline"
           size="xs"
           disabled={busy}
-          onClick={() => void act("link")}
+          onClick={() => void answer("link")}
         >
           {t("catalogSuggestion.link")}
         </Button>
@@ -80,7 +81,7 @@ export function CatalogSuggestion({ itemId }: { itemId: Id<"items"> }) {
           variant="ghost"
           size="xs"
           disabled={busy}
-          onClick={() => void act("dismiss")}
+          onClick={() => void answer("dismiss")}
         >
           {t("catalogSuggestion.notThis")}
         </Button>

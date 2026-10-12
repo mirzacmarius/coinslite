@@ -8,16 +8,12 @@ import {
 } from "./_generated/server";
 import type { CatalogItemType } from "./catalog/fields";
 import { catalogVisibleTo } from "./featureFlags";
-import {
-  catalogEntryNotFound,
-  itemNotFound,
-  requireCatalogEntry,
-  requireOwnItem,
-} from "./items";
+import { itemNotFound, requireCatalogEntry, requireOwnItem } from "./items";
 import { bulkErrors, bulkLimits } from "./items/bulkRules";
 import { catalogFactNames, overridesOnLink } from "./items/catalogFacts";
 import {
   catalogCandidates,
+  suggestable,
   suggestionLimits,
 } from "./items/catalogSuggestions";
 import { sameDenomination } from "./items/denominations";
@@ -44,7 +40,7 @@ export const suggestionErrors = {
   /** The entry is of another Item type than the Item. */
   otherType: "CATALOG_ENTRY_OTHER_TYPE",
   /** More Items than one look-up takes. */
-  tooManyItems: "TOO_MANY_ITEMS",
+  tooManyItems: "TOO_MANY_ITEMS_FOR_SUGGESTIONS",
 } as const;
 
 const bySuggestion = "by_country_and_itemType_and_denomination_and_yearFrom";
@@ -62,8 +58,8 @@ function candidateFinder(ctx: QueryCtx) {
     country: string,
     itemType: CatalogItemType | undefined,
   ) => {
-    const id = JSON.stringify([country, itemType ?? null]);
-    let found = denominations.get(id);
+    const cacheKey = JSON.stringify([country, itemType ?? null]);
+    let found = denominations.get(cacheKey);
     if (!found) {
       found = (async () => {
         const distinct: string[] = [];
@@ -84,56 +80,63 @@ function candidateFinder(ctx: QueryCtx) {
         }
         return distinct;
       })();
-      denominations.set(id, found);
+      denominations.set(cacheKey, found);
     }
     return found;
   };
 
-  /** A denomination's entries first issued by `year`, the latest started first. */
+  /**
+   * A denomination's entries first issued by `year`: the earliest started,
+   * where general issues are, and the latest, where that year's are.
+   */
   const entriesOf = (
     country: string,
     itemType: CatalogItemType | undefined,
     denomination: string,
     year: number,
   ) => {
-    const id = JSON.stringify([country, itemType ?? null, denomination, year]);
-    let found = entries.get(id);
+    const cacheKey = JSON.stringify([
+      country,
+      itemType ?? null,
+      denomination,
+      year,
+    ]);
+    let found = entries.get(cacheKey);
     if (!found) {
-      found = ctx.db
-        .query("catalogSlimEntries")
-        .withIndex(bySuggestion, (q) =>
-          q
-            .eq("country", country)
-            .eq("itemType", itemType)
-            .eq("denomination", denomination)
-            .gt("yearFrom", undefined)
-            .lte("yearFrom", year),
-        )
-        .order("desc")
-        .take(suggestionLimits.entriesPerDenomination);
-      entries.set(id, found);
+      const issuedBy = () =>
+        ctx.db
+          .query("catalogSlimEntries")
+          .withIndex(bySuggestion, (q) =>
+            q
+              .eq("country", country)
+              .eq("itemType", itemType)
+              .eq("denomination", denomination)
+              .gt("yearFrom", undefined)
+              .lte("yearFrom", year),
+          );
+      found = Promise.all([
+        issuedBy().take(suggestionLimits.entriesPerEnd),
+        issuedBy().order("desc").take(suggestionLimits.entriesPerEnd),
+      ]).then(([earliest, latest]) => {
+        const read = new Set(earliest.map(({ _id }) => _id));
+        return [...earliest, ...latest.filter(({ _id }) => !read.has(_id))];
+      });
+      entries.set(cacheKey, found);
     }
     return found;
   };
 
   /** An Item's candidates, best first, leaving out those it turned down. */
   return async (item: Doc<"items">) => {
+    if (item.catalogEntryId !== undefined || !suggestable(item)) return [];
     const { type, country, denomination, year } = item;
-    if (
-      item.catalogEntryId !== undefined ||
-      type === "stamp" ||
-      !country ||
-      !denomination ||
-      year === undefined
-    )
-      return [];
     // An entry stored without an Item type is a coin's.
     const itemTypes = type === "coin" ? (["coin", undefined] as const) : [type];
     const found: Doc<"catalogSlimEntries">[] = [];
     for (const itemType of itemTypes) {
-      for (const written of await denominationsOf(country, itemType)) {
-        if (sameDenomination(written, denomination))
-          found.push(...(await entriesOf(country, itemType, written, year)));
+      for (const stored of await denominationsOf(country, itemType)) {
+        if (sameDenomination(stored, denomination))
+          found.push(...(await entriesOf(country, itemType, stored, year)));
       }
     }
     const dismissed = new Set(item.dismissedCatalogEntryIds ?? []);
@@ -198,22 +201,31 @@ export const forItems = query({
   },
 });
 
+/** An Item and the Catalog entry it's to be linked to. */
+type Link = { item: Doc<"items">; entry: CatalogEntryLink };
+
 /**
- * Links an Item added without a Catalog entry to one (ADR 0001): the facts
- * it holds that the entry says the same of follow the entry from then on,
- * the rest stay its own (items/catalogFacts.ts overridesOnLink). An owned
- * Item takes the entry off the Wantlist, as adding one from it does.
+ * Whether an Item is to be linked to an entry: not when it already is.
+ * Throws when it can't be: it's linked to another entry, or the entry is of
+ * another Item type.
  */
-async function linkItem(
-  ctx: MutationCtx,
-  item: Doc<"items">,
-  entry: CatalogEntryLink,
-) {
+function needsLink({ item, entry }: Link) {
   if (item.catalogEntryId === entry._id) return false;
   if (item.catalogEntryId !== undefined)
     throw new ConvexError(suggestionErrors.alreadyLinked);
   if (entry.itemType !== item.type)
     throw new ConvexError(suggestionErrors.otherType);
+  return true;
+}
+
+/**
+ * Links an Item added without a Catalog entry to one (ADR 0001), once
+ * `needsLink` says it may: the facts it holds that the entry says the same
+ * of follow the entry from then on, the rest stay its own
+ * (items/catalogFacts.ts overridesOnLink). An owned Item takes the entry off
+ * the Wantlist, as adding one from it does.
+ */
+async function linkItem(ctx: MutationCtx, { item, entry }: Link) {
   const kept = overridesOnLink(item, entry.facts);
   const facts = Object.fromEntries(
     catalogFactNames.map((name) => [name, kept[name]]),
@@ -225,7 +237,17 @@ async function linkItem(
     catalogDetails: undefined,
   });
   if (item.soldOn === undefined) await clearWant(ctx, item.ownerId, entry._id);
-  return true;
+}
+
+/** One of the signed-in person's Items; anyone else's, or one that's gone, is not found. */
+async function ownItem(
+  ctx: QueryCtx,
+  owner: Doc<"users">,
+  itemId: Id<"items">,
+) {
+  const item = await ctx.db.get("items", itemId);
+  if (!item || item.ownerId !== owner._id) throw new ConvexError(itemNotFound);
+  return item;
 }
 
 /** Links one of the signed-in person's Items to a suggested Catalog entry ("Link"). */
@@ -233,10 +255,12 @@ export const link = mutation({
   args: { itemId: v.id("items"), catalogEntryKey: v.string() },
   returns: v.null(),
   handler: async (ctx, { itemId, catalogEntryKey }) => {
-    const item = await requireOwnItem(ctx, itemId);
     const owner = await requireSetUpUser(ctx);
-    const entry = await requireCatalogEntry(ctx, owner, catalogEntryKey);
-    await linkItem(ctx, item, entry);
+    const planned = {
+      item: await ownItem(ctx, owner, itemId),
+      entry: await requireCatalogEntry(ctx, owner, catalogEntryKey),
+    };
+    if (needsLink(planned)) await linkItem(ctx, planned);
     return null;
   },
 });
@@ -258,37 +282,22 @@ export const linkMany = mutation({
     const owner = await requireSetUpUser(ctx);
     if (links.length > bulkLimits.items)
       throw new ConvexError(bulkErrors.tooManyItems);
-    if (links.length > 0 && !(await catalogVisibleTo(ctx, owner)))
-      throw new ConvexError(catalogEntryNotFound);
     const entries = new Map<string, CatalogEntryLink>();
-    const items = new Map<Id<"items">, Doc<"items">>();
-    const planned: Array<{ item: Doc<"items">; entry: CatalogEntryLink }> = [];
+    const seen = new Set<Id<"items">>();
+    const planned: Link[] = [];
     for (const { itemId, catalogEntryKey } of links) {
-      if (items.has(itemId)) continue;
-      const item = await ctx.db.get("items", itemId);
-      if (!item || item.ownerId !== owner._id)
-        throw new ConvexError(itemNotFound);
-      items.set(itemId, item);
+      if (seen.has(itemId)) continue;
+      seen.add(itemId);
+      const item = await ownItem(ctx, owner, itemId);
       let entry = entries.get(catalogEntryKey);
       if (!entry) {
-        const found = await catalogEntryByKey(ctx, catalogEntryKey);
-        if (!found) throw new ConvexError(catalogEntryNotFound);
-        entry = found;
+        entry = await requireCatalogEntry(ctx, owner, catalogEntryKey);
         entries.set(catalogEntryKey, entry);
       }
-      if (
-        item.catalogEntryId !== undefined &&
-        item.catalogEntryId !== entry._id
-      )
-        throw new ConvexError(suggestionErrors.alreadyLinked);
-      if (entry.itemType !== item.type)
-        throw new ConvexError(suggestionErrors.otherType);
-      planned.push({ item, entry });
+      if (needsLink({ item, entry })) planned.push({ item, entry });
     }
-    let linked = 0;
-    for (const { item, entry } of planned)
-      if (await linkItem(ctx, item, entry)) linked += 1;
-    return linked;
+    for (const link of planned) await linkItem(ctx, link);
+    return planned.length;
   },
 });
 

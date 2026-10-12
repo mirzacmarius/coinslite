@@ -163,6 +163,7 @@ async function visibleCatalogEntry(
   return await catalogEntryByKey(ctx, key);
 }
 
+/** The Catalog entry with this key, if the person may see the Catalog; otherwise not found. */
 export async function requireCatalogEntry(
   ctx: QueryCtx,
   user: Doc<"users">,
