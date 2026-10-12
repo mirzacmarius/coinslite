@@ -2,6 +2,7 @@ import type { Doc } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { moveBetweenAlbums } from "../albums/membership";
 import { countItemRemoved } from "../collectionCounts";
+import { deleteFiles } from "../utils/files";
 import { deleteHistory } from "./valueHistory";
 
 /**
@@ -19,17 +20,19 @@ import { deleteHistory } from "./valueHistory";
  */
 export async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
   const { frontPhoto, frontThumbnail, backPhoto, backThumbnail } = item;
-  for (const file of [frontPhoto, frontThumbnail, backPhoto, backThumbnail]) {
-    if (file) await ctx.storage.delete(file);
-  }
+  await deleteFiles(ctx, [
+    frontPhoto,
+    frontThumbnail,
+    backPhoto,
+    backThumbnail,
+  ]);
   // Bounded by the per-Item limit, so all of them, whatever the limit was.
   const more = await ctx.db
     .query("itemPhotos")
     .withIndex("by_itemId", (q) => q.eq("itemId", item._id))
     .collect();
   for (const photo of more) {
-    await ctx.storage.delete(photo.storageId);
-    if (photo.thumbnailId) await ctx.storage.delete(photo.thumbnailId);
+    await deleteFiles(ctx, [photo.storageId, photo.thumbnailId]);
     await ctx.db.delete(photo._id);
   }
   const points = await deleteHistory(ctx, item._id);

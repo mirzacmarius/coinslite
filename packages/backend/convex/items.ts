@@ -623,7 +623,8 @@ const listedItem = schema
 /**
  * The signed-in person's Items, newest first, a page at a time, their facts
  * resolved. Each comes with its thumbnail (items/thumbnail.ts): the small
- * copy of the front photo, else of the back photo, else null.
+ * copy of the front photo, else of the back photo, else of the first more
+ * photo, else null.
  */
 export const list = query({
   args: { paginationOpts: paginationOptsValidator },

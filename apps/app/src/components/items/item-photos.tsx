@@ -1,6 +1,7 @@
 "use client";
 
-import { ShrinkError, photoThumbnail, shrinkImage } from "@/lib/shrink-image";
+import { useStorePhotoFile } from "@/components/items/use-store-photo-file";
+import { photoThumbnail, shrinkImage } from "@/lib/shrink-image";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -65,37 +66,35 @@ async function checkFile(file: File) {
 }
 
 /**
- * Uploads a photo file to storage, along with the thumbnail the browser makes
- * of it for lists, then has the server check both and put them on the Item:
- * on `side`, or as one more photo when no side is given. The photo itself
- * uploads as it is.
+ * The thumbnail lists show of a photo, or undefined when this browser can't
+ * make one (of a picture too large for it to read, say): the photo then
+ * lists as itself, like photos from before thumbnails.
  */
-function usePhotoUpload(itemId: Id<"items">) {
-  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
-  const register = useMutation(api.photos.register);
-  const attach = useAction(api.photos.attach);
-  const store = async (body: Blob, type: string) => {
-    const response = await fetch(await generateUploadUrl(), {
-      method: "POST",
-      headers: { "Content-Type": type },
-      body,
-    });
-    if (!response.ok) throw new Error(`Upload failed (${response.status})`);
-    const { storageId } = (await response.json()) as {
-      storageId: Id<"_storage">;
-    };
-    // At once, so the upload is ours before anything else can use it.
-    await register({ storageId });
-    return storageId;
-  };
-  return async (side: PhotoSide | undefined, file: File) => {
-    const type = await checkFile(file);
-    const { thumbnail } = await shrinkImage(file, {
+async function thumbnailOf(photo: File) {
+  try {
+    const { thumbnail } = await shrinkImage(photo, {
       thumbnail: photoThumbnail,
     });
+    return thumbnail.blob;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Uploads a photo file to storage as it is, along with the thumbnail the
+ * browser makes of it for lists, then has the server check both and put them
+ * on the Item: on `side`, or as one more photo when no side is given.
+ */
+function usePhotoUpload(itemId: Id<"items">) {
+  const store = useStorePhotoFile();
+  const attach = useAction(api.photos.attach);
+  return async (side: PhotoSide | undefined, file: File) => {
+    const type = await checkFile(file);
+    const thumbnail = await thumbnailOf(file);
     const [storageId, thumbnailId] = await Promise.all([
       store(file, type),
-      store(thumbnail.blob, thumbnail.blob.type),
+      thumbnail && store(thumbnail),
     ]);
     await attach({ itemId, side, storageId, thumbnailId });
   };
@@ -154,13 +153,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
     try {
       await upload(side, file);
     } catch (failure) {
-      const code =
-        failure instanceof ConvexError
-          ? String(failure.data)
-          : // The browser couldn't read the picture to make its thumbnail.
-            failure instanceof ShrinkError && failure.reason === "unreadable"
-            ? photoErrors.notAnImage
-            : "";
+      const code = failure instanceof ConvexError ? String(failure.data) : "";
       toast.error(
         code === photoErrors.tooLarge
           ? t("photos.errors.tooLarge")

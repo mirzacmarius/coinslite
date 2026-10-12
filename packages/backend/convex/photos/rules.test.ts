@@ -1,8 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type { Id } from "../_generated/dataModel";
 import { listImageFile, thumbnailProblem } from "./rules";
 
-/** The first bytes of a WebP file: "RIFF", four bytes of length, "WEBPVP8 ". */
+/** The first bytes of a WebP file: "RIFF", four bytes of length, "WEBP". */
 const webp = new Uint8Array([
   0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50,
 ]);
@@ -34,48 +33,42 @@ describe("a photo's thumbnail", () => {
   });
 });
 
-/** A stored file's id, as Convex hands them out. */
-const file = (name: string) => name as Id<"_storage">;
-
 describe("an Item's list image", () => {
   test("is its front photo's thumbnail", () => {
     const item = {
-      frontPhoto: file("front"),
-      frontThumbnail: file("front-small"),
-      backPhoto: file("back"),
-      backThumbnail: file("back-small"),
+      frontPhoto: "front",
+      frontThumbnail: "front-small",
+      backPhoto: "back",
+      backThumbnail: "back-small",
     };
-    expect(listImageFile(item)).toBe(file("front-small"));
+    expect(listImageFile(item)).toBe("front-small");
   });
 
   test("is the front photo itself when it predates thumbnails", () => {
     const item = {
-      frontPhoto: file("front"),
-      backPhoto: file("back"),
-      backThumbnail: file("back-small"),
+      frontPhoto: "front",
+      backPhoto: "back",
+      backThumbnail: "back-small",
     };
-    expect(listImageFile(item)).toBe(file("front"));
+    expect(listImageFile(item)).toBe("front");
   });
 
   test("is the back photo's thumbnail, else the back photo, without a front photo", () => {
     expect(
-      listImageFile({
-        backPhoto: file("back"),
-        backThumbnail: file("back-small"),
-      }),
-    ).toBe(file("back-small"));
-    expect(listImageFile({ backPhoto: file("back") })).toBe(file("back"));
+      listImageFile({ backPhoto: "back", backThumbnail: "back-small" }),
+    ).toBe("back-small");
+    expect(listImageFile({ backPhoto: "back" })).toBe("back");
   });
 
   test("is the first more photo's thumbnail, else that photo, without side photos", () => {
-    const more = { storageId: file("more"), thumbnailId: file("more-small") };
-    expect(listImageFile({}, more)).toBe(file("more-small"));
-    expect(listImageFile({}, { storageId: file("more") })).toBe(file("more"));
+    const more = { storageId: "more", thumbnailId: "more-small" };
+    expect(listImageFile({}, more)).toBe("more-small");
+    expect(listImageFile({}, { storageId: "more" })).toBe("more");
   });
 
   test("is a side photo before any more photo", () => {
-    const more = { storageId: file("more"), thumbnailId: file("more-small") };
-    expect(listImageFile({ backPhoto: file("back") }, more)).toBe(file("back"));
+    const more = { storageId: "more", thumbnailId: "more-small" };
+    expect(listImageFile({ backPhoto: "back" }, more)).toBe("back");
   });
 
   test("is nothing without photos", () => {

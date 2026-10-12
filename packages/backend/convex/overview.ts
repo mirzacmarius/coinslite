@@ -20,7 +20,7 @@ const latestItem = v.object({
   title: v.string(),
   year: v.optional(v.number()),
   denomination: v.optional(v.string()),
-  /** The small copy of the front photo, else of the back photo, else null (items/thumbnail.ts). */
+  /** The small copy of the front photo, else of the back photo, else of the first more photo, else null (items/thumbnail.ts). */
   thumbnailUrl: v.union(v.string(), v.null()),
 });
 

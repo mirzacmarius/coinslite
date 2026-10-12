@@ -3,7 +3,6 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import {
   type ActionCtx,
-  type MutationCtx,
   type QueryCtx,
   action,
   internalMutation,
@@ -24,6 +23,7 @@ import { limitUploads } from "./uploads";
 import { requireSetUpUser } from "./utils/auth";
 import {
   claimUpload,
+  deleteFiles,
   discardUpload,
   ownUpload,
   settleUpload,
@@ -35,14 +35,6 @@ const sideFields = {
   front: { photo: "frontPhoto", thumbnail: "frontThumbnail" },
   back: { photo: "backPhoto", thumbnail: "backThumbnail" },
 } as const;
-
-/** Deletes the stored files given, skipping the ones that aren't there. */
-async function deleteFiles(
-  ctx: MutationCtx,
-  files: (Id<"_storage"> | undefined)[],
-) {
-  for (const file of files) if (file) await ctx.storage.delete(file);
-}
 
 /** An Item's more photos, in the order they were added. */
 const morePhotosOf = (ctx: QueryCtx, itemId: Id<"items">) =>
@@ -76,13 +68,13 @@ const filesOf = ({ storageId, thumbnailId }: Upload) =>
  */
 async function checkUpload(ctx: QueryCtx, upload: Upload, now: number) {
   const item = await requireOwnItem(ctx, upload.itemId);
-  const own = (file: Id<"_storage">) =>
+  const ownPhotoUpload = (file: Id<"_storage">) =>
     ownUpload(ctx, file, item.ownerId, "photo", now);
-  const file = await own(upload.storageId);
+  const file = await ownPhotoUpload(upload.storageId);
   const thumbnail =
     upload.thumbnailId === undefined
       ? undefined
-      : await own(upload.thumbnailId);
+      : await ownPhotoUpload(upload.thumbnailId);
   if (!file || thumbnail === null || upload.thumbnailId === upload.storageId)
     throw new ConvexError(photoErrors.notFound);
   return { item, file, thumbnail };
@@ -235,13 +227,21 @@ export const claim = internalMutation({
   },
 });
 
-/** Throws away an upload of the caller's that was rejected, thumbnail and all. */
+/**
+ * Throws away an upload of the caller's that was rejected, thumbnail and
+ * all: each of its files that is still their unused upload, so one that
+ * vanished doesn't keep the other.
+ */
 export const discard = internalMutation({
   args: uploadArgs,
   returns: v.null(),
   handler: async (ctx, upload) => {
-    await checkUpload(ctx, upload, Date.now());
-    for (const file of filesOf(upload)) await discardUpload(ctx, file);
+    const item = await requireOwnItem(ctx, upload.itemId);
+    const now = Date.now();
+    for (const file of filesOf(upload)) {
+      if (await ownUpload(ctx, file, item.ownerId, "photo", now))
+        await discardUpload(ctx, file);
+    }
     return null;
   },
 });
@@ -260,7 +260,7 @@ export const save = internalMutation({
       const fields = sideFields[side];
       await deleteFiles(ctx, [item[fields.photo], item[fields.thumbnail]]);
       // A photo without a thumbnail leaves none of the one it replaces.
-      await ctx.db.patch(item._id, {
+      await ctx.db.patch("items", item._id, {
         [fields.photo]: upload.storageId,
         [fields.thumbnail]: upload.thumbnailId,
       });
@@ -298,7 +298,7 @@ export const remove = mutation({
       const files = [item[fields.photo], item[fields.thumbnail]];
       if (files.some(Boolean)) {
         await deleteFiles(ctx, files);
-        await ctx.db.patch(itemId, {
+        await ctx.db.patch("items", itemId, {
           [fields.photo]: undefined,
           [fields.thumbnail]: undefined,
         });

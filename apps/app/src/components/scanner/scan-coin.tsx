@@ -1,6 +1,7 @@
 "use client";
 
 import { useAddItem } from "@/components/items/add-item";
+import { useStorePhotoFile } from "@/components/items/use-store-photo-file";
 import {
   ShrinkError,
   type ShrinkTarget,
@@ -36,7 +37,7 @@ import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { cn } from "@coinslite/ui/utils";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
   Camera,
@@ -176,21 +177,7 @@ const codeOf = (failure: unknown) =>
  * so only they can use them.
  */
 function useScanUpload() {
-  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
-  const register = useMutation(api.photos.register);
-  const store = async (blob: Blob) => {
-    const response = await fetch(await generateUploadUrl(), {
-      method: "POST",
-      headers: { "Content-Type": blob.type },
-      body: blob,
-    });
-    if (!response.ok) throw new Error(`Upload failed (${response.status})`);
-    const { storageId } = (await response.json()) as {
-      storageId: Id<"_storage">;
-    };
-    await register({ storageId });
-    return storageId;
-  };
+  const store = useStorePhotoFile();
   return async ({ blob, thumbnail }: TakenPhoto) => {
     const [storageId, thumbnailId] = await Promise.all([
       store(blob),

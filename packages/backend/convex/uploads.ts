@@ -13,8 +13,8 @@ import { discardUpload, fileInUse, uploadLifetime } from "./utils/files";
  */
 
 /**
- * Each photo and each Catalog image is two uploads (the file and its
- * thumbnail): 30 in a row, then 60 an hour.
+ * Each photo is two uploads, the photo and its thumbnail, as each Catalog
+ * image is: so 30 photos in a row, then 60 an hour.
  */
 export const rateLimiter = new RateLimiter(components.rateLimiter, {
   upload: { kind: "token bucket", rate: 120, period: HOUR, capacity: 60 },

@@ -1,5 +1,3 @@
-import type { Id } from "../_generated/dataModel";
-
 /**
  * Item photo rules, shared by the backend and the app (no Convex imports).
  * The backend is authoritative; the app checks the same rules first so people
@@ -103,19 +101,16 @@ export function thumbnailProblem(head: Uint8Array, bytes: number) {
   return undefined;
 }
 
-/** An Item's side photos, each with its thumbnail when it has one. */
-type SidePhotos = {
-  frontPhoto?: Id<"_storage">;
-  frontThumbnail?: Id<"_storage">;
-  backPhoto?: Id<"_storage">;
-  backThumbnail?: Id<"_storage">;
+/** An Item's side photos, each with its thumbnail when it has one, by stored file id. */
+type SidePhotos<File> = {
+  frontPhoto?: File;
+  frontThumbnail?: File;
+  backPhoto?: File;
+  backThumbnail?: File;
 };
 
 /** One of an Item's more photos, with its thumbnail when it has one. */
-type MorePhoto = {
-  storageId: Id<"_storage">;
-  thumbnailId?: Id<"_storage">;
-};
+type MorePhoto<File> = { storageId: File; thumbnailId?: File };
 
 /**
  * The stored file an Item's list image is (spec §5.6): of its front photo,
@@ -124,7 +119,10 @@ type MorePhoto = {
  * without photos. `firstMore` matters only without side photos, so it can be
  * left out when the Item has one.
  */
-export function listImageFile(item: SidePhotos, firstMore?: MorePhoto) {
+export function listImageFile<File>(
+  item: SidePhotos<File>,
+  firstMore?: MorePhoto<File>,
+): File | undefined {
   if (item.frontPhoto) return item.frontThumbnail ?? item.frontPhoto;
   if (item.backPhoto) return item.backThumbnail ?? item.backPhoto;
   if (firstMore) return firstMore.thumbnailId ?? firstMore.storageId;

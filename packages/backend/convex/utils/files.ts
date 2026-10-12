@@ -123,6 +123,14 @@ export async function settleUpload(
   if (registration) await ctx.db.delete(registration._id);
 }
 
+/** Deletes the stored files given, skipping the ones left out. */
+export async function deleteFiles(
+  ctx: MutationCtx,
+  files: (Id<"_storage"> | undefined)[],
+) {
+  for (const file of files) if (file) await ctx.storage.delete(file);
+}
+
 /** Throws away an upload that won't be used: its file, unless in use, and its registration. */
 export async function discardUpload(
   ctx: MutationCtx,
