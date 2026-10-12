@@ -21,7 +21,7 @@ export function ProfileLanguage() {
   const changeLocale = useChangeLocale();
   const preferred = user?.language;
   const changedAt = user?.languageChangedAt;
-  // biome-ignore lint/correctness/useExhaustiveDependencies: follow the profile, not every switch on this device
+  // Runs when the profile changes, not on every switch on this device.
   useEffect(() => {
     // Only a change made on another device since this browser's own last
     // choice; already this browser's choice means the language menu that set
