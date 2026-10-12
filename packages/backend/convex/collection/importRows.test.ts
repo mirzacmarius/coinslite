@@ -22,6 +22,7 @@ describe("readImportFile", () => {
         "Currency",
         "Purchase date",
         "Source",
+        // One of the import's own columns, which go by their key.
         "notes",
       ],
       [

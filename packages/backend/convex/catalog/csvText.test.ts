@@ -3,7 +3,7 @@ import { formatCsvFile, formatCsvRecord, parseCsv } from "./csvText";
 
 describe("parseCsv", () => {
   test("reads one record per line, skipping a leading byte order mark", () => {
-    expect(parseCsv("﻿title,year\r\n2 øre,1918\r\n")).toEqual({
+    expect(parseCsv("\uFEFFtitle,year\r\n2 øre,1918\r\n")).toEqual({
       records: [
         ["title", "year"],
         ["2 øre", "1918"],
@@ -63,7 +63,7 @@ describe("writing CSV", () => {
         ["title", "year"],
         ["2 øre", "1918"],
       ]),
-    ).toBe("﻿title,year\r\n2 øre,1918\r\n");
+    ).toBe("\uFEFFtitle,year\r\n2 øre,1918\r\n");
   });
 
   test("what is written reads back the same", () => {

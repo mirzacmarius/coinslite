@@ -38,11 +38,11 @@ bun run typecheck
 bun test              # unit tests: *.test.ts next to the module, on bun:test
 ```
 
-CI (`.github/workflows/check.yml`) runs all four on every push, then builds both apps with `next build`, using placeholder values instead of real secrets. A route that can't produce its static shell fails there rather than in the production deploy.
+CI (`.github/workflows/check.yml`) runs all four on every push, then builds both apps with `next build` against a placeholder Convex URL, without any secrets. A route that can't produce its static shell fails there rather than in the production deploy.
 
 ## Deployments
 
-- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Both deploy from `main` only, to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`); pushes to other branches get no preview (`git.deploymentEnabled` in each app's `vercel.json`). The team's plan allows 100 deployments a day, and previews used them up.
+- **Hosting:** Vercel, team orvibo. `coinslite` builds `apps/app` and `coinslite-web` builds `apps/web`. Both deploy from `main` only, to production (`coinslite.vercel.app`, `coinslite-web.vercel.app`); pushes to other branches get no preview (`git.deploymentEnabled` in each app's `vercel.json`). The team's plan allows 100 deployments a day, and previews used them up. A preview can still be made by hand with the Vercel CLI (`vercel deploy`).
 - **Backend:** Convex project `coinslite` (team museumlite).
 - **Links between the sites:** the app's `NEXT_PUBLIC_WEB_URL` (privacy policy, terms) and the marketing site's `NEXT_PUBLIC_APP_URL` point at each other's production URL, previews included.
 - **Signed-in visitors skip the marketing site** once both sites share a parent domain. Set `SIGNED_IN_HINT_DOMAIN` (for example `.coinslite.app`) on the app. On `*.vercel.app` the two sites can't share cookies.

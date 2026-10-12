@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { TROY_OUNCE_GRAMS, marketRates } from "../spotPrices/rates";
+import { marketRates } from "../spotPrices/rates";
 import {
   type CollectionTotals,
   type TotalsItem,
@@ -62,8 +62,8 @@ describe("the month an Item was acquired", () => {
   });
 });
 
-// Gold at $2,000 and silver at $25 a troy ounce, 10 NOK to the dollar: a
-// troy ounce of gold is 20,000 kr and one of silver 250 kr.
+// Gold at $2,000 and silver at $25 a troy ounce (31.1034768 g), 10 NOK to
+// the dollar: a troy ounce of gold is 20,000 kr and one of silver 250 kr.
 const rates = marketRates({
   quotedAt: 0,
   fetchedAt: 0,
@@ -90,7 +90,7 @@ const krugerrand: TotalsItem = {
   purchasePrice: 15_000_00,
   marketValue: 21_000_00,
   metal: "gold",
-  weight: TROY_OUNCE_GRAMS,
+  weight: 31.1034768,
   purity: 1,
 };
 const silverCoins: TotalsItem = {
@@ -100,7 +100,7 @@ const silverCoins: TotalsItem = {
   quantity: 2,
   purchasePrice: 300_00,
   metal: "silver",
-  weight: TROY_OUNCE_GRAMS,
+  weight: 31.1034768,
   purity: 0.5,
 };
 const inheritedBanknote: TotalsItem = {
@@ -135,8 +135,8 @@ const expectedTotals: CollectionTotals = {
     stamp: { purchasePrice: 30_00, marketValue: 36_00 },
   },
   metals: {
-    gold: { fineWeight: TROY_OUNCE_GRAMS, value: 20_000_00 },
-    silver: { fineWeight: TROY_OUNCE_GRAMS, value: 250_00 },
+    gold: { fineWeight: 31.1034768, value: 20_000_00 },
+    silver: { fineWeight: 31.1034768, value: 250_00 },
   },
   addedByMonth: [
     { month: "2026-01", purchasePrice: 15_000_00, marketValue: 21_000_00 },
@@ -146,7 +146,7 @@ const expectedTotals: CollectionTotals = {
 };
 
 describe("Collection totals", () => {
-  test("add up every Item's amounts, pieces and Metal value in one pass", () => {
+  test("add up every Item's Purchase price, Market value, pieces and Metal value in one pass", () => {
     expect(
       collectionTotals(
         [krugerrand, silverCoins, inheritedBanknote, soldStamps],
@@ -172,8 +172,8 @@ describe("Collection totals", () => {
     });
 
     expect(totals.metals).toEqual({
-      gold: { fineWeight: TROY_OUNCE_GRAMS, value: null },
-      silver: { fineWeight: TROY_OUNCE_GRAMS, value: null },
+      gold: { fineWeight: 31.1034768, value: null },
+      silver: { fineWeight: 31.1034768, value: null },
     });
   });
 
@@ -185,8 +185,8 @@ describe("Collection totals", () => {
     });
 
     expect(combineTotals(withPrices, withoutPrices).metals).toEqual({
-      gold: { fineWeight: TROY_OUNCE_GRAMS, value: null },
-      silver: { fineWeight: TROY_OUNCE_GRAMS, value: null },
+      gold: { fineWeight: 31.1034768, value: null },
+      silver: { fineWeight: 31.1034768, value: null },
     });
   });
 });

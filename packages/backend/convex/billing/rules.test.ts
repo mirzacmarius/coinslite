@@ -115,7 +115,7 @@ describe("isPremiumAt", () => {
     expect(isPremiumAt(nov11, nov12)).toBe(false);
   });
 
-  test("not Premium is never Premium", () => {
+  test("someone who isn't Premium (null) is Premium at no time", () => {
     expect(isPremiumAt(null, nov11)).toBe(false);
   });
 });
