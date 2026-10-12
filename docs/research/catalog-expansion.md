@@ -498,7 +498,7 @@ All three bundled datasets work the same way, and new ones should too:
 - **One TypeScript module per dataset** in `packages/backend/convex/catalog/datasets/`. It builds rows as objects and writes them through `formatCsvRecord(catalogCsvColumns…)`.
 - **Credit on every row**, through a `credit("facts" | "notes", provenance)` helper, so the CSV import's `checkNode` finds source, author, licence and link for every group that holds data.
 - **A rebuild script for sources fetched in bulk**, for example `scripts/fetch-euro-commemoratives.ts`, which is run by hand and reviewed as a diff, never on a deployment.
-- **Registration in `catalog/seed.ts`**: the `datasets` map and the `loadDataset` argument union.
+- **Registration**: a module in `catalog/seeds/` that loads only that dataset, and its place in the `datasets` list in `catalog/seed.ts`.
 
 | Column | Euro coins | Euro banknotes | Romania (BNR) | US programmes | Finland (Finlex) | Denmark | UK (Gazette) | Sweden |
 |---|---|---|---|---|---|---|---|---|
