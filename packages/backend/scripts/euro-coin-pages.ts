@@ -15,18 +15,21 @@ const entities: Record<string, string> = {
 
 /** A fragment of a page as plain words: paragraphs and line breaks become spaces, other tags go. */
 export function plainText(fragment: string) {
-  return fragment
-    .replace(/<script[\s\S]*?<\/script>/g, "")
-    .replace(/<\/?(?:p|div|br|li|ul|h\d)\b[^>]*>/g, " ")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
-      String.fromCodePoint(Number.parseInt(hex, 16)),
-    )
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
-    .replace(/&([a-z]+);/gi, (match, name) => entities[name] ?? match)
-    .replace(/[ \s]+/g, " ")
-    .replace(/​/g, "")
-    .trim();
+  return (
+    fragment
+      .replace(/<script[\s\S]*?<\/script>/g, "")
+      .replace(/<\/?(?:p|div|br|li|ul|h\d)\b[^>]*>/g, " ")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
+        String.fromCodePoint(Number.parseInt(hex, 16)),
+      )
+      .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+      .replace(/&([a-z]+);/gi, (match, name) => entities[name] ?? match)
+      // Zero-width spaces go; \s covers no-break spaces.
+      .replace(/\u200b/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 const mainOf = (html: string) =>

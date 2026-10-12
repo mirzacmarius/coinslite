@@ -14,6 +14,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  type CommonSide,
   type NationalSide,
   cashYears,
   commonSides,
@@ -164,8 +165,11 @@ const seriesPlans: Record<
       "The first series, showing Pope John Paul II, was issued between 2002 and 2005",
       2005,
     ),
-    // Dated 2005 (MMV), issued until March 2006.
-    since(2005, 'the year of issue in Roman numerals, i.e. "MMV"', 2005),
+    since(
+      2005,
+      "The second series, issued between June 2005 and March 2006",
+      2006,
+    ),
     since(
       2006,
       "The third series, issued between April 2006 and December 2013",
@@ -296,15 +300,17 @@ const alloy = nordicGold(
 );
 if (!alloy) throw new Error("No Nordic gold alloy in the regulation's annex");
 
+type Fact = CommonSide["facts"][number];
+/** The figures the dataset reads from the English page, by label. */
+const measures = ["Diameter (mm)", "Thickness (mm)", "Weight (g)"];
+
 /** Each denomination's specifications, from the common sides page in each language. */
-const specifications: Record<
-  string,
-  Array<{ label: string; value: string }>
-> = {};
-const commonWords: Record<
-  Translation,
-  Record<string, Array<{ label: string; value: string }>>
-> = { de: {}, fr: {}, ro: {} };
+const specifications: Record<string, Fact[]> = {};
+const commonWords: Record<Translation, Record<string, Fact[]>> = {
+  de: {},
+  fr: {},
+  ro: {},
+};
 for (const language of ["en", ...translations] as const) {
   for (const side of commonSides(
     await page(commonPage(language), `common.${language}.html`),
@@ -317,19 +323,19 @@ for (const language of ["en", ...translations] as const) {
       throw new Error(
         `${language} ${side.picture}: ${side.facts.length} facts`,
       );
-    if (language === "en") specifications[denomination.name] = side.facts;
-    else commonWords[language][denomination.name] = side.facts;
+    if (language === "en") {
+      // Diameter, thickness and weight come first, as plain figures.
+      measures.forEach((label, index) => {
+        const fact = side.facts[index];
+        if (fact?.label !== label || !/^\d+(\.\d+)?$/.test(fact.value))
+          throw new Error(
+            `${side.picture}: no ${label} in ${JSON.stringify(side.facts)}`,
+          );
+      });
+      specifications[denomination.name] = side.facts;
+    } else commonWords[language][denomination.name] = side.facts;
   }
 }
-const number = (
-  facts: Array<{ label: string; value: string }>,
-  label: string,
-) => {
-  const value = facts.find((fact) => fact.label === label)?.value;
-  if (!value || !/^\d+(\.\d+)?$/.test(value))
-    throw new Error(`No ${label} in ${JSON.stringify(facts)}`);
-  return value;
-};
 
 type Series = {
   title: string;

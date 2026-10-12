@@ -1,6 +1,16 @@
 import { formatCsvRecord } from "../csvText";
 import { type CoinEdge, catalogCsvColumns } from "../fields";
 import {
+  type EcbTranslation,
+  colon,
+  credit,
+  ecb,
+  ecbAndRegulation,
+  ecbPages,
+  ecbTranslations,
+  translated,
+} from "./ecbCredit";
+import {
   type EuroCoinFact,
   type EuroCoinSeries,
   euroCoinIssuers,
@@ -11,7 +21,6 @@ import {
 import { de, deSpecifications } from "./euroCoinSidesDe";
 import { fr, frSpecifications } from "./euroCoinSidesFr";
 import { ro, roSpecifications } from "./euroCoinSidesRo";
-import { credit, ecb, ecbPages, translated } from "./euroCommemoratives";
 
 /**
  * The euro circulation coins, 1 cent to 2 euro, of every issuer, as a Catalog
@@ -23,18 +32,20 @@ import { credit, ecb, ecbPages, translated } from "./euroCommemoratives";
  * of each denomination, its page on the common sides (sizes, weights,
  * composition and edge) and its page on joining the euro area, rebuilt into
  * euroCoinSides.ts by scripts/fetch-euro-circulation-coins.ts, under the ECB's
- * terms (see euroCommemoratives.ts). The ECB's design text is each entry's
- * technical details, in English and in German, French and Romanian, credited
- * to the page in each language. Nordic gold's alloy comes from Council
- * Regulation (EU) No 729/2014, which recast Regulation (EC) No 975/98; the
- * 10, 20 and 50-cent entries credit it beside the ECB.
+ * terms (ecbCredit.ts). The ECB's design text is each entry's technical
+ * details, in English and in German, French and Romanian, credited to the
+ * page in each language; each denomination's shape, colour, composition and
+ * edge, in the ECB's words, are its grouping's. Nordic gold's alloy comes
+ * from Council Regulation (EU) No 729/2014, which recast Regulation (EC) No
+ * 975/98; the 10, 20 and 50-cent entries credit it beside the ECB.
  *
  * Years: a member's first series begins the year it introduced euro cash
  * (2002 for the twelve founders, though some struck coins dated 1999–2001);
- * later series begin the year the ECB gives, and a replaced series ends the
- * year before the next began. Designers and the 2-euro edge lettering are
- * taken from the ECB's text where it gives them. Nothing the ECB doesn't give
- * is filled in: no mintages, and no years for Andorra or San Marino.
+ * later series begin, and the Vatican's end, in the years the ECB gives, and
+ * otherwise a replaced series ends the year before the next began. Designers
+ * and the 2-euro edge lettering are taken from the ECB's text where it gives
+ * them. Nothing the ECB doesn't give is filled in: no mintages, and no years
+ * for Andorra or San Marino.
  *
  * No images: the national sides' designs belong to each issuing country, and
  * the ECB's terms don't cover showing them, so entries show the placeholder.
@@ -53,15 +64,6 @@ const pageName = (denomination: string) =>
     ? "1cent"
     : denomination.replace(" ", "").replace(/cent$/, "cents");
 
-/** The ECB and the regulation together, for facts that include Nordic gold's alloy. */
-const ecbAndRegulation = (link: string) => ({
-  source: "European Central Bank; Council Regulation (EU) No 729/2014",
-  author: "European Central Bank; Council of the European Union",
-  licence:
-    "ECB: its copyright terms, citing the ECB; free of charge at www.ecb.europa.eu. Regulation: © European Union (Commission Decision 2011/833/EU). Changes: arranged into Catalog fields.",
-  link,
-});
-
 /** The ECB's words for each composition and edge, as Catalog materials and edges. */
 const materialOf = (composition: string) => {
   if (composition === "Nordic gold") return "aluminiumBronze";
@@ -79,19 +81,22 @@ const edges: Record<string, CoinEdge | ""> = {
   "Shaped edge with fine scallops": "",
 };
 
-const factOf = (facts: EuroCoinFact[], index: number) => {
-  const fact = facts[index];
-  if (!fact) throw new Error(`No fact ${index} in ${JSON.stringify(facts)}`);
+/** The common side's fact with this label on the ECB's English page. */
+const factOf = (facts: EuroCoinFact[], label: string) => {
+  const fact = facts.find((one) => one.label === label);
+  if (!fact) throw new Error(`No ${label} in ${JSON.stringify(facts)}`);
   return fact.value;
 };
+/** Diameter, thickness and weight come first on the common sides page in every language; they have fields of their own. */
+const measuredFacts = 3;
 
 /** "Shape: Round. Colour: Gold. …": the common side's words that have no field, in one language. */
 const specificationWords = (facts: EuroCoinFact[], language: string) =>
   facts
-    .slice(3)
+    .slice(measuredFacts)
     .map(
       ({ label, value }) =>
-        `${label}${language === "fr" ? " : " : ": "}${value.replace(/\.$/, "")}.`,
+        `${label}${colon(language)}${value.replace(/\.$/, "")}.`,
     )
     .join(" ");
 
@@ -99,15 +104,15 @@ const specificationWords = (facts: EuroCoinFact[], language: string) =>
 function denominationFacts(denomination: string) {
   const facts = euroCoinSpecifications[denomination];
   if (!facts) throw new Error(`No specification for ${denomination}`);
-  const composition = factOf(facts, 5);
-  const edge = edges[factOf(facts, 6)];
+  const composition = factOf(facts, "Composition");
+  const edge = edges[factOf(facts, "Edge")];
   if (edge === undefined)
-    throw new Error(`Unknown euro coin edge ${factOf(facts, 6)}`);
+    throw new Error(`Unknown euro coin edge ${factOf(facts, "Edge")}`);
   return {
     material: materialOf(composition),
-    weight_g: String(Number(factOf(facts, 2))),
-    diameter_mm: String(Number(factOf(facts, 0))),
-    thickness_mm: String(Number(factOf(facts, 1))),
+    weight_g: String(Number(factOf(facts, "Weight (g)"))),
+    diameter_mm: String(Number(factOf(facts, "Diameter (mm)"))),
+    thickness_mm: String(Number(factOf(facts, "Thickness (mm)"))),
     edge,
     ...(composition === "Nordic gold" && {
       composition: Object.entries(nordicGold)
@@ -117,26 +122,58 @@ function denominationFacts(denomination: string) {
   };
 }
 
-const translations = {
+/** The ECB's pages in the app's other languages: the national sides' texts and the common sides' words. */
+const translations: Record<
+  EcbTranslation,
+  {
+    sides: Record<string, string>;
+    specifications: Record<string, EuroCoinFact[]>;
+  }
+> = {
   de: { sides: de, specifications: deSpecifications },
   fr: { sides: fr, specifications: frSpecifications },
   ro: { sides: ro, specifications: roSpecifications },
-} as const;
-const translationLanguages = Object.keys(translations) as Array<
-  keyof typeof translations
->;
+};
 
-const yearsOf = (series: EuroCoinSeries[]) => {
+/** Technical details in each language the ECB has them in, each credited to its page. */
+const translatedDetails = (
+  detailsIn: (language: EcbTranslation) => string | undefined,
+  pageIn: (language: EcbTranslation) => string,
+): Row =>
+  Object.assign(
+    {},
+    ...ecbTranslations.flatMap((language) => {
+      const details = detailsIn(language);
+      return details
+        ? [
+            translated(
+              language,
+              { technical_details: details },
+              pageIn(language),
+            ),
+          ]
+        : [];
+    }),
+  );
+
+const seriesYears = ({ yearFrom, yearTo }: EuroCoinSeries) => ({
+  year_from: yearFrom === undefined ? "" : String(yearFrom),
+  year_to: yearTo === undefined ? "" : String(yearTo),
+});
+
+/** The years a denomination's series span, open while one is still issued. */
+const spanOf = (series: EuroCoinSeries[]) => {
   const from = series.flatMap(({ yearFrom }) =>
     yearFrom === undefined ? [] : [yearFrom],
   );
   const open = series.some(({ yearTo }) => yearTo === undefined);
-  return {
-    year_from: from.length > 0 ? String(Math.min(...from)) : "",
-    year_to: open
-      ? ""
-      : String(Math.max(...series.map(({ yearTo = 0 }) => yearTo))),
-  };
+  return seriesYears({
+    title: "",
+    yearFrom: from.length > 0 ? Math.min(...from) : undefined,
+    yearTo: open
+      ? undefined
+      : Math.max(...series.map(({ yearTo = 0 }) => yearTo)),
+  });
 };
 
 /** "2 euro 2002–2007", "2 euro 2014–", or "2 euro, first series" when the ECB gives no years. */
@@ -172,7 +209,7 @@ function denominationRows(country: string, denomination: string): Row[] {
   const facts = denominationFacts(denomination);
   const specifications = euroCoinSpecifications[denomination] ?? [];
   const entryCredit = facts.composition
-    ? ecbAndRegulation(sidesPage(page, "en"))
+    ? ecbAndRegulation("(EU) No 729/2014", sidesPage(page, "en"))
     : ecb(sidesPage(page, "en"));
   return [
     {
@@ -182,32 +219,18 @@ function denominationRows(country: string, denomination: string): Row[] {
       sort_order: String(denominationOrder.indexOf(denomination) + 1),
       is_addable: "false",
       ...shared,
-      ...yearsOf(side.series),
+      ...spanOf(side.series),
       ...credit("facts", ecb(sidesPage(page, "en"))),
       technical_details: specificationWords(specifications, "en"),
       ...credit("notes", ecb(commonPage("en"))),
-      ...Object.assign(
-        {},
-        ...translationLanguages.flatMap((language) => {
-          const words = translations[language].specifications[denomination];
-          return words
-            ? [
-                translated(
-                  language,
-                  { technical_details: specificationWords(words, language) },
-                  commonPage(language),
-                ),
-              ]
-            : [];
-        }),
-      ),
+      ...translatedDetails((language) => {
+        const words = translations[language].specifications[denomination];
+        return words && specificationWords(words, language);
+      }, commonPage),
     },
     ...side.series.flatMap((series, index) => {
       const seriesKey = `${key}-series-${index + 1}`;
-      const years = {
-        year_from: series.yearFrom === undefined ? "" : String(series.yearFrom),
-        year_to: series.yearTo === undefined ? "" : String(series.yearTo),
-      };
+      const years = seriesYears(series);
       return [
         {
           id: seriesKey,
@@ -236,20 +259,9 @@ function denominationRows(country: string, denomination: string): Row[] {
           ...credit("facts", entryCredit),
           technical_details: side.text,
           ...credit("notes", ecb(sidesPage(page, "en"))),
-          ...Object.assign(
-            {},
-            ...translationLanguages.flatMap((language) => {
-              const text = translations[language].sides[side.key];
-              return text
-                ? [
-                    translated(
-                      language,
-                      { technical_details: text },
-                      sidesPage(page, language),
-                    ),
-                  ]
-                : [];
-            }),
+          ...translatedDetails(
+            (language) => translations[language].sides[side.key],
+            (language) => sidesPage(page, language),
           ),
         },
       ];

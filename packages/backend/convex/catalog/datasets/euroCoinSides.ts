@@ -674,7 +674,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -935,7 +935,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -1196,7 +1196,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -1466,7 +1466,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -1736,7 +1736,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -2006,7 +2006,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -2274,7 +2274,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
       },
       { title: "Third series", yearFrom: 2006, yearTo: 2013 },
@@ -2647,7 +2647,7 @@ export const euroNationalSides: EuroNationalSide[] = [
       {
         title: "Second series",
         yearFrom: 2005,
-        yearTo: 2005,
+        yearTo: 2006,
         designers: ["D. Longo"],
         edgeLettering:
           "2*, repeated six times, alternately upright and inverted",
