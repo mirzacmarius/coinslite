@@ -15,7 +15,6 @@ A web app where collectors record the coins, banknotes and stamps they own, orga
 | `apps/web` | Marketing site (Next.js), port 3001 |
 | `packages/backend` | Convex backend: schema, functions, auth, billing |
 | `packages/ui` | Shared UI components (shadcn/Tailwind) |
-| `packages/email` | Email templates (React Email), preview on port 3003 |
 | `tooling/typescript` | Shared TypeScript config |
 
 ## Getting started
@@ -25,7 +24,7 @@ Requires [Bun](https://bun.sh).
 ```sh
 bun install
 bun run setup   # configures a Convex deployment and points the app at it
-bun dev         # marketing site, product app, Convex and email preview
+bun dev         # marketing site, product app and Convex
 ```
 
 `bun run setup` asks you to log in to Convex, or to start without an account and run Convex locally. Agents and CI can skip the prompt with `CONVEX_AGENT_MODE=anonymous bun run setup`.
