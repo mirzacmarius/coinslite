@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs/config";
 import "./src/env.mjs";
 
 const deploymentId =
@@ -21,4 +22,13 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Uploads source maps for readable stack traces when SENTRY_AUTH_TOKEN is set
+// (Vercel Production), then deletes them so they aren't served.
+export default withSentryConfig(nextConfig, {
+  org: "museumlite",
+  project: "coinslite",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  sourcemaps: { deleteSourcemapsAfterUpload: true },
+});

@@ -54,6 +54,7 @@ export default {
           "Google: only if you choose to sign in with Google, under Google’s own privacy policy.",
           "Polar: sells Premium as merchant of record. When you upgrade, it receives your email address, your account id and your IP address (to choose the currency and tax), and it collects your payment details directly. Polar acts as an independent controller for the payment, under its own privacy policy.",
           "Anthropic: only when you use the coin scanner (a Premium beta), it receives the two photos you take and the possible Catalog entries, to suggest which coin it is. Nothing that names you is sent.",
+          "Sentry: records errors in the app, and how long a sample of pages takes to load, so we can find and fix problems. With each report it receives the page’s address (without its query string), your browser and device details and your approximate location. It doesn’t store your IP address, reports never name you, and it keeps the data in Germany.",
           "OpenPanel: counts how the app and this website are used. With each page view it receives the page’s title and address (without the ids of your Items and Albums, search terms or sign-in codes), the site that linked to it, your browser and device details and your IP address. It works out your approximate location and a visitor identifier that changes every day, then discards the IP address. It sets no cookies and keeps the data in Germany.",
           "MetalpriceAPI: supplies Spot prices and exchange rates. Our requests contain no personal data.",
         ],
