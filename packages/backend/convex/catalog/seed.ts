@@ -20,6 +20,7 @@ const datasets = [
   internal.catalog.seeds.norway.load,
   internal.catalog.seeds.euroCirculationCoins.load,
   internal.catalog.seeds.romania.load,
+  internal.catalog.seeds.euroBanknotes.load,
 ];
 
 const loadReport = v.object({

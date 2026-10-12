@@ -136,7 +136,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ### 6.1 Structure
 - The Catalog is a tree.
-  - **Roots** are countries or **Themes**: groups spanning several countries, such as 2-euro commemoratives.
+  - **Roots** are countries or **Themes**: groups spanning several countries, such as 2-euro commemoratives or euro banknotes.
+  - **A Theme's children** are its countries (2-euro commemoratives › Germany), or its series when its money has no country of its own (euro banknotes › Europa series, whose entries have no country).
   - **Grouping nodes** sit below them (category, denomination, series, and so on).
   - **Leaves** are Catalog entries, which are the only nodes an Item can be created from.
 - **A Catalog entry holds:**
@@ -154,6 +155,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - official central-bank material, plus our own editing
   - Every stored group of facts records its source. Catalog data of unknown origin is never imported.
 - **Images** are shown only where they're clearly permitted: public-domain designs, money that is excluded from copyright, designs whose copyright has expired, and Creative Commons photos of those. Every other entry shows a neutral placeholder until a licence is held.
+  - **Banknotes an issuer allows images of under its reproduction rules**, such as the ECB's specimen images of euro banknotes (Decision ECB/2013/10): an image credited as reproduced under that Decision is uploaded, never linked, and stored at no more than 72 dpi at the note's real width and height, so only for an entry that has them.
 - **Numista:** an entry may keep its Numista ID as a cross-reference, shown as an attributed link to Numista. No Numista data is stored.
 
 ### 6.2 Catalog picker (used when adding Items)
@@ -163,7 +165,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Recently picked:** up to 6 entries per Item type, remembered on the device.
 - **Browse:**
   1. Countries and Themes, each with its entry count, sorted by count.
-  2. For a Theme: its countries.
+  2. For a Theme: its countries, sorted by entry count, or its series, in order. A Theme's series lists its entries (step 4), as any grouping node does.
   3. Within a country, one of two paths:
      - Walk its grouping nodes, used when the country's entries are organised that way.
      - Or **denomination → series → entries**. Denominations sort by face value, treating minor units (øre, cent, penny…) as hundredths. Series sort by first year. Entries without a series or denomination are grouped explicitly.

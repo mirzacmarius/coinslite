@@ -522,7 +522,7 @@ function NodeLevel({
         <GroupOption
           key={grouping.key}
           value={`node:${grouping.key}`}
-          icon={node.kind === "theme" ? Flag : ListTree}
+          icon={grouping.countryNode ? Flag : ListTree}
           title={nodeTitle(grouping)}
           detail={format.number(grouping.entryCount)}
           onSelect={() =>

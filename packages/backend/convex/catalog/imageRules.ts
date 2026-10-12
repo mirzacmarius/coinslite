@@ -1,4 +1,11 @@
-import { catalogEntryNotFound, catalogErrors, catalogLimits } from "./fields";
+import {
+  catalogEntryNotFound,
+  catalogErrors,
+  catalogLimits,
+  reproducedUnderEcbRules,
+} from "./fields";
+
+export { reproducedUnderEcbRules };
 
 /**
  * Catalog entry image rules, shared by the backend and the app (no Convex
@@ -31,6 +38,13 @@ export const catalogImageErrors = {
   tooLarge: "IMAGE_TOO_LARGE",
   /** The thumbnail is over its limits, or bigger than the full-size image. */
   thumbnailTooLarge: "THUMBNAIL_TOO_LARGE",
+  /**
+   * Credited as reproduced under the ECB's rules, the image is over 72 dpi at
+   * the note's real size, or wasn't checked against it (`fullImageBounds`).
+   */
+  overReproductionLimit: "IMAGE_OVER_REPRODUCTION_LIMIT",
+  /** Credited as reproduced under the ECB's rules, the entry has no width and height. */
+  reproductionSizeRequired: "REPRODUCTION_SIZE_REQUIRED",
   /** Changing the credit of an entry that has no image. */
   noImage: "NO_IMAGE",
   /** Source, author, licence or link is missing. */
@@ -49,19 +63,81 @@ export const catalogImageErrors = {
 export type CatalogImageError =
   (typeof catalogImageErrors)[keyof typeof catalogImageErrors];
 
+/** A picture's size in pixels. */
+export type ImageSize = { width: number; height: number };
+
+/**
+ * The most pixels a picture may have on its longest and its shortest side,
+ * whichever way round it is.
+ */
+export type ImageBounds = { longest: number; shortest: number };
+
+const boundsOf = (bounds: number | ImageBounds): ImageBounds =>
+  typeof bounds === "number" ? { longest: bounds, shortest: bounds } : bounds;
+
 /**
  * The size a picture is stored at: scaled down so its longest side is at
- * most `longest`, keeping its shape. A smaller picture keeps its size; it is
- * never scaled up.
+ * most `longest` (and with bounds, its shortest side at most `shortest`),
+ * keeping its shape. A smaller picture keeps its size; it is never scaled up.
  */
-export function fitWithin(
-  size: { width: number; height: number },
-  longest: number,
-) {
-  const scale = Math.min(1, longest / Math.max(size.width, size.height));
+export function fitWithin(size: ImageSize, bounds: number | ImageBounds) {
+  const { longest, shortest } = boundsOf(bounds);
+  const scale = Math.min(
+    1,
+    longest / Math.max(size.width, size.height),
+    shortest / Math.min(size.width, size.height),
+  );
   return {
     width: Math.max(1, Math.round(size.width * scale)),
     height: Math.max(1, Math.round(size.height * scale)),
+  };
+}
+
+/** Whether neither side of a picture is over its bound. */
+export function withinBounds(size: ImageSize, bounds: ImageBounds) {
+  return (
+    Math.max(size.width, size.height) <= bounds.longest &&
+    Math.min(size.width, size.height) <= bounds.shortest
+  );
+}
+
+/**
+ * The licence the euro banknotes' specimen images are credited with. The ECB
+ * lets anyone use images of euro banknotes within its reproduction rules,
+ * Decision ECB/2013/10, Art. 2: an electronic reproduction marked
+ * "specimen" whose resolution "in its 100 % size does not exceed 72 dots per
+ * inch". The size is kept to here; the marking comes with the ECB's own
+ * specimen files, which are the only pictures credited this way. Such an
+ * image is uploaded, never linked (fields.ts checkNode).
+ */
+export const ecbSpecimenLicence =
+  "Reproduced under Decision ECB/2013/10: specimen image, 72 dpi";
+
+/** The resolution Decision ECB/2013/10 allows a banknote's image at its real size. */
+const reproductionDpi = 72;
+const millimetresPerInch = 25.4;
+
+/**
+ * The most pixels an entry's full-size image may have, given its licence:
+ * `catalogImageLimits.full` on its longest side, and for a banknote
+ * reproduced under the ECB's rules also no more than 72 dpi at its real
+ * width and height, so it is never stored above that (€500, 160 × 82 mm:
+ * 453 × 232 px). Null when such an image's entry has no width and height,
+ * as its size can't then be kept to the rules.
+ */
+export function fullImageBounds(
+  entry: { width?: number; height?: number },
+  licence: string,
+): ImageBounds | null {
+  const full = catalogImageLimits.full;
+  if (!reproducedUnderEcbRules(licence))
+    return { longest: full, shortest: full };
+  if (entry.width === undefined || entry.height === undefined) return null;
+  const pixels = (millimetres: number) =>
+    Math.floor((millimetres / millimetresPerInch) * reproductionDpi);
+  return {
+    longest: Math.min(full, pixels(Math.max(entry.width, entry.height))),
+    shortest: Math.min(full, pixels(Math.min(entry.width, entry.height))),
   };
 }
 

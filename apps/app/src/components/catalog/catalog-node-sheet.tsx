@@ -988,6 +988,8 @@ function NodeForm({
                     title: node.values.title,
                     imageUrl: node.imageUrl,
                     imageProvenance: node.imageProvenance,
+                    width: node.values.width,
+                    height: node.values.height,
                   }}
                 />
               </div>

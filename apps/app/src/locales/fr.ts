@@ -805,6 +805,8 @@ export default {
       SAME_LANGUAGE:
         "Les notes sont déjà dans cette langue. Utilisez technical_details et historical_notes, ou modifiez notes_language.",
       YEARS_REVERSED: "La dernière année précède la première.",
+      REPRODUCTION_LINKED:
+        "Une image reproduite selon la décision BCE/2013/10 est téléversée, afin que sa taille respecte les règles de la BCE. Laissez image_url vide.",
       SOURCE_REQUIRED:
         "Indiquez la source de ces faits, de ces notes ou de cette image.",
       CREDIT_REQUIRED:
@@ -1050,7 +1052,10 @@ export default {
     emptyDescription:
       "Les pays et les thèmes apparaissent ici dès que des entrées du catalogue sont ajoutées.",
     theme: "Thème",
-    themes: { euroCommemoratives: "Pièces commémoratives de 2 euros" },
+    themes: {
+      euroCommemoratives: "Pièces commémoratives de 2 euros",
+      euroBanknotes: "Billets en euros",
+    },
     groupings: {
       commemorativeCoins: "Pièces commémoratives",
       denominationCoins: "{denomination} en pièces",
@@ -1231,6 +1236,10 @@ export default {
       IMAGE_TOO_LARGE:
         "L’image convertie est trop grande. Essayez une image plus petite.",
       THUMBNAIL_TOO_LARGE: "La miniature convertie est trop grande. Réessayez.",
+      IMAGE_OVER_REPRODUCTION_LIMIT:
+        "Les règles de reproduction de la BCE limitent cette image à 72 dpi au format réel du billet. Choisissez à nouveau l’image pour l’enregistrer plus petite.",
+      REPRODUCTION_SIZE_REQUIRED:
+        "Les règles de reproduction de la BCE limitent cette image selon le format réel du billet. Saisissez d’abord la largeur et la hauteur du billet.",
       NO_IMAGE:
         "Cette entrée n’a pas d’image à créditer. Choisissez une image.",
       CREDIT_REQUIRED: "Indiquez la source, l’auteur, la licence et le lien.",

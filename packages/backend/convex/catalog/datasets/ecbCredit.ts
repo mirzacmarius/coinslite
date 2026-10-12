@@ -47,6 +47,26 @@ export const ecbAndRegulation = (
   link,
 });
 
+/**
+ * Decision ECB/2013/10 on euro banknotes, consolidated with its amendments
+ * on EUR-Lex, as the ECB's page on banknote images links it.
+ */
+export const banknoteDecision =
+  "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02013D0010-20210104";
+
+/**
+ * The ECB and its Decision ECB/2013/10 together, for what comes from both;
+ * the two licences shortened to fit one credit. The link is the Decision,
+ * or the ECB's page where that says more.
+ */
+export const ecbAndDecision = (link = banknoteDecision): Provenance => ({
+  source: "European Central Bank; Decision ECB/2013/10",
+  author: "European Central Bank",
+  licence:
+    "ECB terms, citing the ECB, free of charge at www.ecb.europa.eu. Decision: © European Union, reused with the source acknowledged (EUR-Lex). Arranged into Catalog fields.",
+  link,
+});
+
 /** Facts or notes credited: facts_source, facts_author… */
 export const credit = (group: "facts" | "notes", from: Provenance) => ({
   [`${group}_source`]: from.source,

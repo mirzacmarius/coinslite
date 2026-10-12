@@ -817,6 +817,8 @@ export default {
       SAME_LANGUAGE:
         "Die Hinweise sind bereits in dieser Sprache. Verwende technical_details und historical_notes oder ändere notes_language.",
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
+      REPRODUCTION_LINKED:
+        "Ein nach dem Beschluss EZB/2013/10 wiedergegebenes Bild wird hochgeladen, damit seine Größe den Regeln der EZB entspricht. Lass image_url leer.",
       SOURCE_REQUIRED:
         "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
       CREDIT_REQUIRED:
@@ -1070,7 +1072,10 @@ export default {
     emptyDescription:
       "Länder und Themen erscheinen hier, sobald Katalogeinträge hinzugefügt sind.",
     theme: "Thema",
-    themes: { euroCommemoratives: "2-Euro-Gedenkmünzen" },
+    themes: {
+      euroCommemoratives: "2-Euro-Gedenkmünzen",
+      euroBanknotes: "Euro-Banknoten",
+    },
     groupings: {
       commemorativeCoins: "Gedenkmünzen",
       denominationCoins: "{denomination}-Münzen",
@@ -1254,6 +1259,10 @@ export default {
         "Das umgewandelte Bild ist zu groß. Versuche es mit einem kleineren Bild.",
       THUMBNAIL_TOO_LARGE:
         "Das umgewandelte Vorschaubild ist zu groß. Versuche es noch einmal.",
+      IMAGE_OVER_REPRODUCTION_LIMIT:
+        "Nach den Reproduktionsregeln der EZB darf dieses Bild in Originalgröße der Banknote höchstens 72 dpi haben. Wähle das Bild noch einmal, um es kleiner zu speichern.",
+      REPRODUCTION_SIZE_REQUIRED:
+        "Die Reproduktionsregeln der EZB begrenzen dieses Bild nach der echten Größe der Banknote. Gib zuerst Breite und Höhe der Banknote ein.",
       NO_IMAGE:
         "Dieser Eintrag hat kein Bild, das nachgewiesen werden kann. Wähle ein Bild aus.",
       CREDIT_REQUIRED: "Gib Quelle, Urheber, Lizenz und Link an.",

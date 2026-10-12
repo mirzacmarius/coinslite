@@ -777,6 +777,8 @@ export default {
       SAME_LANGUAGE:
         "The notes are already in this language. Use technical_details and historical_notes, or change notes_language.",
       YEARS_REVERSED: "The last year comes before the first.",
+      REPRODUCTION_LINKED:
+        "An image reproduced under Decision ECB/2013/10 is uploaded, so its size keeps to the ECB's rules. Leave image_url empty.",
       SOURCE_REQUIRED: "Name the source of these facts, notes or image.",
       CREDIT_REQUIRED:
         "Facts, notes and images each need their source, author, licence and link.",
@@ -1019,7 +1021,10 @@ export default {
     emptyDescription:
       "Countries and Themes show here once Catalog entries are added.",
     theme: "Theme",
-    themes: { euroCommemoratives: "2-euro commemoratives" },
+    themes: {
+      euroCommemoratives: "2-euro commemoratives",
+      euroBanknotes: "Euro banknotes",
+    },
     groupings: {
       commemorativeCoins: "Commemorative coins",
       denominationCoins: "{denomination} coins",
@@ -1198,6 +1203,10 @@ export default {
       IMAGE_TOO_LARGE:
         "The converted image is too large. Try a smaller picture.",
       THUMBNAIL_TOO_LARGE: "The converted thumbnail is too large. Try again.",
+      IMAGE_OVER_REPRODUCTION_LIMIT:
+        "The ECB's reproduction rules allow this image at no more than 72 dpi at the note's real size. Choose the picture again to store it smaller.",
+      REPRODUCTION_SIZE_REQUIRED:
+        "The ECB's reproduction rules limit this image by the note's real size. Enter the banknote's width and height first.",
       NO_IMAGE: "This entry has no image to credit. Choose an image.",
       CREDIT_REQUIRED: "Enter the source, author, licence and link.",
       TOO_LONG: "Part of the credit is too long.",

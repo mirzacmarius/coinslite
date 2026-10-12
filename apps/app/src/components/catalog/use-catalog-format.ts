@@ -11,6 +11,11 @@ import {
 } from "@coinslite/backend/convex/catalog/fields";
 import type { FunctionReturnType } from "convex/server";
 import { useMemo } from "react";
+import {
+  type NodeWords,
+  type TitledNode,
+  catalogNodeTitle,
+} from "./catalog-node-title";
 
 /** A Catalog entry as entry lists show it. */
 export type CatalogEntryRow = FunctionReturnType<
@@ -24,41 +29,20 @@ export function useCatalogFormat() {
   const format = useFormatters();
   const labels = useGradeLabels();
   return useMemo(() => {
-    /**
-     * What a Catalog node is called: a country by its name in the reader's
-     * language, anything else by its title, which stays as the Catalog has
-     * it (titles and series are kept in the issuing country's language).
-     */
-    const nodeTitle = (node: {
-      key?: string;
-      title: string;
-      kind?: string;
-      country?: string;
-      countryNode?: boolean;
-      denomination?: string;
-      itemType?: string;
-      series?: string;
-    }) => {
-      if (node.key === "eur2-commemoratives")
-        return t("catalog.themes.euroCommemoratives");
-      if (node.country === "NO" && node.key?.endsWith("-comm"))
-        return t("catalog.groupings.commemorativeCoins");
-      if (
-        node.country === "NO" &&
-        node.kind === "grouping" &&
-        node.denomination &&
-        node.series === undefined
-      )
-        return t(
-          node.itemType === "banknote"
+    const words: NodeWords = {
+      theme: (name) => t(`catalog.themes.${name}`),
+      commemorativeCoins: () => t("catalog.groupings.commemorativeCoins"),
+      denominationGrouping: (itemType, denomination) =>
+        t(
+          itemType === "banknote"
             ? "catalog.groupings.denominationBanknotes"
             : "catalog.groupings.denominationCoins",
-          { denomination: node.denomination },
-        );
-      return node.countryNode && node.country
-        ? format.country(node.country)
-        : node.title;
+          { denomination },
+        ),
+      country: format.country,
     };
+    /** What a Catalog node is called (catalog-node-title.ts). */
+    const nodeTitle = (node: TitledNode) => catalogNodeTitle(node, words);
     /** "1881", or "1878–1904" for an issue over several years. */
     const years = (from?: number, to?: number) => {
       if (from === undefined) return to === undefined ? undefined : `–${to}`;

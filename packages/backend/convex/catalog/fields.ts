@@ -95,6 +95,8 @@ export const catalogErrors = {
   sameLanguage: "SAME_LANGUAGE",
   /** It stopped being legal tender before it was issued. */
   datesReversed: "DATES_REVERSED",
+  /** An image credited as reproduced under Decision ECB/2013/10 is uploaded, not linked. */
+  reproductionLinked: "REPRODUCTION_LINKED",
   sourceRequired: "SOURCE_REQUIRED",
   /** Facts, notes and images each need their source, author, licence and link. */
   creditRequired: "CREDIT_REQUIRED",
@@ -785,6 +787,14 @@ export function readCatalogFile(csv: string): {
 }
 
 /**
+ * Whether an image's licence is the ECB's rules on reproducing euro
+ * banknotes: it names Decision ECB/2013/10, which limits the image's size
+ * (imageRules.ts `fullImageBounds`).
+ */
+export const reproducedUnderEcbRules = (licence: string | undefined) =>
+  /\bECB\/2013\/10\b/i.test(licence ?? "");
+
+/**
  * The rules a node's values must meet once the file is merged into it.
  * `uploadedImage` says the node keeps an image an admin uploaded, which the
  * file's image credit then covers.
@@ -809,6 +819,15 @@ export function checkNode(
         });
     }
   }
+  // Its size can only be kept to the ECB's rules once uploaded (imageRules.ts).
+  if (
+    values.imageUrl !== undefined &&
+    reproducedUnderEcbRules(values.imageLicence)
+  )
+    problems.push({
+      column: "image_url",
+      code: catalogErrors.reproductionLinked,
+    });
   if (
     values.yearFrom !== undefined &&
     values.yearTo !== undefined &&

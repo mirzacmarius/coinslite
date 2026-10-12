@@ -308,7 +308,7 @@ function ShowMore({ onClick }: { onClick: () => void }) {
   );
 }
 
-/** The groupings right below a node (a Theme's countries), then its own entries. */
+/** The groupings right below a node (a Theme's countries or series), then its own entries. */
 function GroupContents({ node }: { node: GroupNode }) {
   const t = useI18n();
   const { nodeTitle } = useCatalogFormat();
@@ -333,7 +333,7 @@ function GroupContents({ node }: { node: GroupNode }) {
           <CatalogRow
             key={grouping.key}
             href={catalogNodeHref(grouping.key)}
-            tile={<IconTile icon={node.kind === "theme" ? Flag : ListTree} />}
+            tile={<IconTile icon={grouping.countryNode ? Flag : ListTree} />}
             title={nodeTitle(grouping)}
             end={
               <RowCount

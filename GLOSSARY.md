@@ -61,7 +61,7 @@ One specific issue in the Catalog that an Item can be created from, such as "2 Ã
 _Avoid_: Catalog item, listing, record
 
 **Theme**:
-A top-level Catalog grouping whose entries span several countries, such as 2-euro commemoratives.
+A top-level Catalog grouping whose entries span several countries: issued by several, such as 2-euro commemoratives, or circulating in several, such as euro banknotes. Its children are its countries, or its series when its money has no country of its own.
 _Avoid_: Region, area, group
 
 **Set**:
