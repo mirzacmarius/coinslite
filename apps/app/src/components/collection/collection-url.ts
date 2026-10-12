@@ -4,6 +4,7 @@ import {
   type CollectionSort,
   type CollectionView,
   type Origin,
+  type PageSize,
   collectionSorts,
   defaultSort,
   origins,
@@ -100,7 +101,7 @@ export function collectionHref(view: CollectionView, page = 1) {
 export function hrefAfterDeleting(
   itemParams: URLSearchParams,
   place: { position: number; total: number } | null | undefined,
-  pageSize: number,
+  pageSize: PageSize,
 ) {
   const view = viewOfItemUrl(itemParams);
   if (!view) return "/collection";

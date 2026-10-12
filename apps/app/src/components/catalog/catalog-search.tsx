@@ -106,13 +106,30 @@ export function CatalogSearch({
         }
       : "skip",
   );
-  // While the next search's results load, keep showing the last ones.
-  const previous = useRef(latest);
-  if (latest !== undefined) previous.current = latest;
-  const results = searching ? latest ?? previous.current : undefined;
+  // While the next search's results load, keep showing the last ones, with
+  // the text they were found for.
+  const last = useRef<{ text: string; results: NonNullable<typeof latest> }>(
+    undefined,
+  );
+  if (latest !== undefined) last.current = { text: query, results: latest };
+  const shown = searching ? last.current : undefined;
+  // Showing results for other text than what's typed, or none yet.
+  const behind = searching && (text !== query || latest === undefined);
 
   return (
-    <Command shouldFilter={false} loop label={placeholder}>
+    <Command
+      shouldFilter={false}
+      loop
+      label={placeholder}
+      onKeyDown={(event) => {
+        // Enter doesn't pick from results for older text: it searches at
+        // once, and picks once the results for what's typed are in.
+        if (event.key === "Enter" && behind && !event.nativeEvent.isComposing) {
+          event.preventDefault();
+          setQuery(text);
+        }
+      }}
+    >
       <CommandInput
         value={text}
         onValueChange={setText}
@@ -122,12 +139,14 @@ export function CatalogSearch({
       <CommandList className="max-h-[min(440px,60dvh)]">
         {!searching ? (
           idle ?? <Note>{t("catalogSearch.minLength")}</Note>
-        ) : results === undefined ? (
+        ) : shown === undefined ? (
           <LoadingRows />
-        ) : results.groups.length === 0 ? (
-          <Note>{t("catalogSearch.noResults", { text: text.trim() })}</Note>
+        ) : shown.results.groups.length === 0 ? (
+          <Note>
+            {t("catalogSearch.noResults", { text: shown.text.trim() })}
+          </Note>
         ) : (
-          results.groups.map((group) => (
+          shown.results.groups.map((group) => (
             <ResultGroup
               key={`${group.country ?? ""}/${group.series ?? ""}`}
               group={group}
@@ -139,8 +158,7 @@ export function CatalogSearch({
       </CommandList>
       <div className="flex min-h-8 shrink-0 items-center gap-3 border-t px-3 py-1.5 text-xs text-muted-foreground">
         <p aria-live="polite" className="min-w-0 flex-1">
-          {searching &&
-            results?.capped &&
+          {shown?.results.capped &&
             t("catalogSearch.capped", { count: catalogSearchLimits.results })}
         </p>
         <span className="hidden shrink-0 items-center gap-3 sm:flex">
