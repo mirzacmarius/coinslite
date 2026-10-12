@@ -23,6 +23,7 @@ export default {
           "Abonnementet ditt: om du har gratisplanen eller Premium, og for Premium abonnementets periode, pris, valuta og slutten av gjeldende periode, slik Polar rapporterer dem.",
           "Tilbakemeldinger: meldingene du sender oss fra kontosiden, med e-postadressen og konto-ID-en din.",
           "Tekniske data: IP-adressen din og opplysninger om nettleseren når våre driftsleverandører med hver forespørsel og kan havne i loggene deres.",
+          "Bruksstatistikk: hvilke sider i appen og på dette nettstedet som åpnes, nettstedet som lenket dit, nettleseren, operativsystemet og typen enhet du bruker, og omtrent hvor du er (land, region og by), utledet fra IP-adressen din. Den telles uten informasjonskapsler og uten kontoen din, og sideadressene utelater ID-ene til objektene og albumene dine, søkeord og innloggingskoder.",
         ],
         "Vi ber ikke om og ønsker ikke sensitive opplysninger, for eksempel om helse eller religion. Hold notatene om objektene dine til objektene.",
       ],
@@ -34,10 +35,11 @@ export default {
         [
           "For å levere CoinsLite etter avtalen med deg (oppfyllelse av en avtale): kontoen din, samlingen din og summene i den, rapportene og eksportene du ber om, e-postene som logger deg inn eller bekrefter en endring, og Premium hvis du kjøper det.",
           "For å holde CoinsLite trygt og i drift (vår berettigede interesse): begrense mislykkede innlogginger og hvor raskt opplastinger og meldinger kan sendes, finne og rette feil, og hindre misbruk.",
+          "For å se hvilke deler av CoinsLite som brukes, slik at vi kan forbedre dem (vår berettigede interesse): bruksstatistikk, talt via OpenPanel uten informasjonskapsler og uten at vi vet hvem du er. En innholdsblokkerer i nettleseren stopper den.",
           "For å svare deg (vår berettigede interesse): svar på tilbakemeldinger og henvendelser.",
           "For å oppfylle rettslige plikter (rettslig forpliktelse): for eksempel å oppbevare opplysninger vi er pålagt å oppbevare.",
         ],
-        "Vi selger ikke opplysningene dine, viser ikke reklame og bruker ikke opplysningene dine til profilering eller markedsføring. Vi bruker ingen analyse- eller sporingsverktøy.",
+        "Vi selger ikke opplysningene dine, viser ikke reklame og bruker ikke opplysningene dine til profilering eller markedsføring. Bruksstatistikken vår identifiserer deg ikke, og ingenting følger deg til andre nettsteder.",
       ],
     },
     {
@@ -52,6 +54,7 @@ export default {
           "Google: bare hvis du velger å logge inn med Google, etter Googles egen personvernerklæring.",
           "Polar: selger Premium som forhandler (merchant of record). Når du oppgraderer, mottar Polar e-postadressen din, konto-ID-en din og IP-adressen din (for å velge valuta og avgift), og samler inn betalingsopplysningene dine direkte. Polar er selvstendig behandlingsansvarlig for betalingen, etter sin egen personvernerklæring.",
           "Anthropic: bare når du bruker myntskanneren (en betaversjon i Premium), mottar Anthropic de to bildene du tar og de mulige katalogoppføringene, for å foreslå hvilken mynt det er. Ingenting som identifiserer deg, sendes.",
+          "OpenPanel: teller hvordan appen og dette nettstedet brukes. Ved hver sidevisning mottar den sideadressen (uten ID-ene til objektene og albumene dine, søkeord eller innloggingskoder), nettstedet som lenket dit, opplysninger om nettleseren og enheten og IP-adressen din. Den utleder omtrent hvor du er og en besøks-ID som endres hver dag, og forkaster deretter IP-adressen. Den setter ingen informasjonskapsler og lagrer dataene i Tyskland.",
           "MetalpriceAPI: leverer spotpriser og valutakurser. Forespørslene våre inneholder ingen personopplysninger.",
         ],
       ],
@@ -67,7 +70,7 @@ export default {
       id: "cookies",
       heading: "Informasjonskapsler og lokal lagring",
       blocks: [
-        "CoinsLite lagrer bare det den trenger for å fungere. Ingenting brukes til reklame, analyse eller sporing, så vi ber ikke om samtykke til informasjonskapsler.",
+        "CoinsLite lagrer bare det den trenger for å fungere. Ingenting brukes til reklame eller sporing, og bruksstatistikken vår setter ingen informasjonskapsler, så vi ber ikke om samtykke til informasjonskapsler.",
         [
           "Innlogging: informasjonskapslene __convexAuthJWT og __convexAuthRefreshToken holder deg innlogget, og __convexAuthOAuthVerifier finnes mens du logger inn med Google. Tilsvarende oppføringer som begynner med __convexAuth, ligger i nettleserens lokale lagring.",
           "coinslite-signed-in (informasjonskapsel, ett år): forteller dette nettstedet at du er innlogget, så det åpner appen i stedet for forsiden.",

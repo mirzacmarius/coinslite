@@ -23,6 +23,7 @@ export default {
           "Planul tău: dacă ai planul gratuit sau Premium și, pentru Premium, perioada, prețul, moneda și sfârșitul perioadei curente a abonamentului, așa cum le raportează Polar.",
           "Mesajele tale: mesajele pe care ni le trimiți din pagina contului, cu adresa ta de e-mail și ID-ul contului.",
           "Date tehnice: adresa ta IP și informații despre browser ajung la furnizorii noștri de găzduire la fiecare cerere și pot apărea în jurnalele lor.",
+          "Statistici de utilizare: ce pagini ale aplicației și ale acestui site sunt deschise, site-ul care a trimis spre ele, browserul, sistemul de operare și tipul de dispozitiv, precum și locația ta aproximativă (țară, regiune și oraș), dedusă din adresa ta IP. Sunt numărate fără cookie-uri și fără contul tău, iar adresele paginilor omit identificatorii obiectelor și albumelor tale, termenii de căutare și codurile de conectare.",
         ],
         "Nu cerem și nu dorim date sensibile, cum ar fi cele despre sănătate sau religie. Te rugăm ca notele despre obiecte să se refere doar la obiecte.",
       ],
@@ -34,10 +35,11 @@ export default {
         [
           "Pentru a-ți oferi CoinsLite conform acordului nostru (executarea unui contract): contul tău, colecția ta și totalurile ei, rapoartele și exporturile pe care le ceri, e-mailurile care te conectează sau confirmă o modificare și Premium, dacă îl cumperi.",
           "Pentru ca CoinsLite să rămână sigur și funcțional (interesul nostru legitim): limităm conectările eșuate și cât de repede pot fi trimise fișiere și mesaje, găsim și corectăm erori și prevenim abuzurile.",
+          "Pentru a afla ce părți din CoinsLite sunt folosite, ca să le putem îmbunătăți (interesul nostru legitim): statistici de utilizare, numărate prin OpenPanel fără cookie-uri și fără să știm cine ești. Un blocator de conținut din browser le oprește.",
           "Pentru a-ți răspunde (interesul nostru legitim): răspunsuri la mesaje și solicitări.",
           "Pentru a ne îndeplini obligațiile legale (obligație legală): de exemplu, păstrarea documentelor pe care suntem obligați să le păstrăm.",
         ],
-        "Nu îți vindem datele, nu afișăm reclame și nu folosim datele tale pentru profilare sau marketing. Nu folosim instrumente de analiză sau de urmărire.",
+        "Nu îți vindem datele, nu afișăm reclame și nu folosim datele tale pentru profilare sau marketing. Statisticile noastre de utilizare nu te identifică și nimic nu te urmărește pe alte site-uri.",
       ],
     },
     {
@@ -52,6 +54,7 @@ export default {
           "Google: doar dacă alegi să te conectezi cu Google, conform propriei politici de confidențialitate a Google.",
           "Polar: vinde Premium ca vânzător înregistrat (merchant of record). Când treci la Premium, Polar primește adresa ta de e-mail, ID-ul contului și adresa IP (pentru a alege moneda și taxele) și colectează direct datele tale de plată. Polar acționează ca operator independent pentru plată, conform propriei politici de confidențialitate.",
           "Anthropic: doar când folosești scanerul de monede (o versiune beta în Premium), Anthropic primește cele două fotografii pe care le faci și intrările de catalog posibile, pentru a sugera ce monedă este. Nu se trimite nimic care să te identifice.",
+          "OpenPanel: numără cum sunt folosite aplicația și acest site. La fiecare pagină vizualizată primește adresa paginii (fără identificatorii obiectelor și albumelor tale, termeni de căutare sau coduri de conectare), site-ul de proveniență, informații despre browser și dispozitiv și adresa ta IP. Deduce din ele locația ta aproximativă și un identificator de vizitator care se schimbă zilnic, apoi șterge adresa IP. Nu setează cookie-uri și păstrează datele în Germania.",
           "MetalpriceAPI: furnizează prețurile spot și cursurile de schimb. Cererile noastre nu conțin date cu caracter personal.",
         ],
       ],
@@ -67,7 +70,7 @@ export default {
       id: "cookies",
       heading: "Cookie-uri și stocare locală",
       blocks: [
-        "CoinsLite păstrează doar ce îi trebuie ca să funcționeze. Nimic nu este folosit pentru reclame, analiză sau urmărire, așa că nu cerem consimțământ pentru cookie-uri.",
+        "CoinsLite păstrează doar ce îi trebuie ca să funcționeze. Nimic nu este folosit pentru reclame sau urmărire, iar statisticile noastre de utilizare nu setează cookie-uri, așa că nu cerem consimțământ pentru cookie-uri.",
         [
           "Conectare: cookie-urile __convexAuthJWT și __convexAuthRefreshToken te mențin conectat, iar __convexAuthOAuthVerifier există cât timp te conectezi cu Google. Intrări corespunzătoare care încep cu __convexAuth sunt păstrate în stocarea locală a browserului.",
           "coinslite-signed-in (cookie, un an): îi spune acestui site că ești conectat, ca să deschidă aplicația în locul paginii principale.",

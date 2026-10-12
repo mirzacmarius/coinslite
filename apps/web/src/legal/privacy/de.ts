@@ -23,6 +23,7 @@ export default {
           "Dein Tarif: ob du den Gratis-Tarif oder Premium hast, und bei Premium Laufzeit, Preis, Währung und Ende des aktuellen Zeitraums des Abonnements, wie Polar sie meldet.",
           "Feedback: die Nachrichten, die du uns von der Kontoseite aus sendest, mit deiner E-Mail-Adresse und Konto-ID.",
           "Technische Daten: deine IP-Adresse und Angaben zu deinem Browser erreichen unsere Hosting-Anbieter mit jeder Anfrage und können in deren Protokollen erscheinen.",
+          "Nutzungsstatistik: welche Seiten der App und dieser Website aufgerufen werden, die Website, die dorthin verlinkt hat, dein Browser, Betriebssystem und Gerätetyp sowie dein ungefährer Standort (Land, Region und Stadt), ermittelt aus deiner IP-Adresse. Sie wird ohne Cookies und ohne dein Konto erfasst, und die Seitenadressen lassen die IDs deiner Objekte und Alben, Suchbegriffe und Anmeldecodes weg.",
         ],
         "Wir fragen nicht nach sensiblen Daten wie Gesundheit oder Religion und möchten sie auch nicht haben. Bitte beschränke deine Notizen zu Objekten auf die Objekte.",
       ],
@@ -34,10 +35,11 @@ export default {
         [
           "Um CoinsLite nach unserer Vereinbarung mit dir bereitzustellen (Vertragserfüllung): dein Konto, deine Sammlung und ihre Summen, die Berichte und Exporte, die du anforderst, die E-Mails, die dich anmelden oder eine Änderung bestätigen, und Premium, wenn du es kaufst.",
           "Um CoinsLite sicher und funktionsfähig zu halten (unser berechtigtes Interesse): fehlgeschlagene Anmeldungen begrenzen und wie schnell Uploads und Nachrichten gesendet werden können, Fehler finden und beheben, Missbrauch verhindern.",
+          "Um zu erfahren, welche Teile von CoinsLite genutzt werden, damit wir sie verbessern können (unser berechtigtes Interesse): Nutzungsstatistik, über OpenPanel erfasst, ohne Cookies und ohne zu wissen, wer du bist. Ein Inhaltsblocker in deinem Browser verhindert sie.",
           "Um dir zu antworten (unser berechtigtes Interesse): Antworten auf Feedback und Anfragen.",
           "Um rechtliche Pflichten zu erfüllen (rechtliche Verpflichtung): etwa Unterlagen aufzubewahren, die wir aufbewahren müssen.",
         ],
-        "Wir verkaufen deine Daten nicht, zeigen keine Werbung und nutzen deine Daten weder für Profiling noch für Marketing. Wir verwenden keine Analyse- oder Tracking-Werkzeuge.",
+        "Wir verkaufen deine Daten nicht, zeigen keine Werbung und nutzen deine Daten weder für Profiling noch für Marketing. Unsere Nutzungsstatistik identifiziert dich nicht, und nichts verfolgt dich auf andere Websites.",
       ],
     },
     {
@@ -52,6 +54,7 @@ export default {
           "Google: nur, wenn du dich mit Google anmeldest, nach Googles eigener Datenschutzerklärung.",
           "Polar: verkauft Premium als Händler (Merchant of Record). Wenn du auf Premium umsteigst, erhält Polar deine E-Mail-Adresse, deine Konto-ID und deine IP-Adresse (um Währung und Steuer zu bestimmen) und erhebt deine Zahlungsdaten direkt. Polar ist für die Zahlung selbst verantwortlich, nach seiner eigenen Datenschutzerklärung.",
           "Anthropic: nur, wenn du den Münzscanner nutzt (eine Beta in Premium), erhält Anthropic die beiden Fotos, die du aufnimmst, und die infrage kommenden Katalogeinträge, um vorzuschlagen, welche Münze es ist. Nichts, was dich identifiziert, wird übermittelt.",
+          "OpenPanel: zählt, wie die App und diese Website genutzt werden. Bei jedem Seitenaufruf erhält es die Seitenadresse (ohne die IDs deiner Objekte und Alben, Suchbegriffe oder Anmeldecodes), die verweisende Website, Angaben zu deinem Browser und Gerät sowie deine IP-Adresse. Es ermittelt daraus deinen ungefähren Standort und eine Besucherkennung, die sich täglich ändert, und verwirft dann die IP-Adresse. Es setzt keine Cookies und speichert die Daten in Deutschland.",
           "MetalpriceAPI: liefert Spotpreise und Wechselkurse. Unsere Anfragen enthalten keine personenbezogenen Daten.",
         ],
       ],
@@ -67,7 +70,7 @@ export default {
       id: "cookies",
       heading: "Cookies und lokaler Speicher",
       blocks: [
-        "CoinsLite speichert nur, was es zum Funktionieren braucht. Nichts davon dient Werbung, Analyse oder Tracking, daher fragen wir nicht nach einer Einwilligung zu Cookies.",
+        "CoinsLite speichert nur, was es zum Funktionieren braucht. Nichts davon dient Werbung oder Tracking, und unsere Nutzungsstatistik setzt keine Cookies, daher fragen wir nicht nach einer Einwilligung zu Cookies.",
         [
           "Anmeldung: Die Cookies __convexAuthJWT und __convexAuthRefreshToken halten dich angemeldet, __convexAuthOAuthVerifier besteht, während du dich mit Google anmeldest. Passende Einträge, die mit __convexAuth beginnen, liegen im lokalen Speicher deines Browsers.",
           "coinslite-signed-in (Cookie, ein Jahr): teilt dieser Website mit, dass du angemeldet bist, damit sie die App statt der Startseite öffnet.",

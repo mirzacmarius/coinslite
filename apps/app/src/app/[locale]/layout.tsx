@@ -1,4 +1,5 @@
 import "@coinslite/ui/globals.css";
+import { Analytics } from "@/components/analytics";
 import { NewDeploymentReload } from "@/components/new-deployment-reload";
 import { ThemeProvider } from "@/components/theme-provider";
 import { brand } from "@/lib/brand";
@@ -88,6 +89,7 @@ export default async function RootLayout({
           </TooltipProvider>
           <Toaster />
           <NewDeploymentReload />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

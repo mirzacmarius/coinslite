@@ -14,7 +14,7 @@ import type { LegalText } from "./types";
 export type LegalDocument = "privacy" | "terms";
 
 /** When the texts last changed; update it with every change to them. */
-export const lastUpdated = "2026-10-10";
+export const lastUpdated = "2026-10-12";
 
 /** Each text in each language. The English one governs if they differ. */
 export const legalTexts = {

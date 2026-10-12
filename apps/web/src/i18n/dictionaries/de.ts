@@ -78,7 +78,7 @@ export default {
     },
     noAds: {
       title: "Keine Werbung",
-      text: "Keine Werbung in keinem Tarif, und keine Analyse- oder Tracking-Skripte.",
+      text: "Keine Werbung in keinem Tarif, und keine Tracking-Cookies: Seitenaufrufe werden gezählt, ohne zu wissen, wer du bist.",
     },
   },
   plans: {

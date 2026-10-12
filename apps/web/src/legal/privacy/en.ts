@@ -23,6 +23,7 @@ export default {
           "Your plan: whether you are on the Free plan or Premium, and for Premium the subscription’s interval, price, currency and end of the current period, as reported by Polar.",
           "Feedback: the messages you send us from the Account screen, with your email address and account id.",
           "Technical data: your IP address and browser details reach our hosting providers with every request and may appear in their logs.",
+          "Usage statistics: which pages of the app and this website are opened, the site that linked to them, your browser, operating system and kind of device, and your approximate location (country, region and city), worked out from your IP address. They are counted without cookies and without your account, and the page addresses leave out the ids of your Items and Albums, search terms and sign-in codes.",
         ],
         "We don’t ask for and don’t want sensitive data such as health or religion. Please keep notes about your Items to the Items.",
       ],
@@ -34,10 +35,11 @@ export default {
         [
           "To provide CoinsLite under our agreement with you (performance of a contract): your account, your Collection and its totals, the reports and exports you ask for, the emails that sign you in or confirm a change, and Premium if you buy it.",
           "To keep CoinsLite safe and working (our legitimate interest): limiting failed sign-ins and how fast uploads and messages can be sent, finding and fixing errors, and preventing abuse.",
+          "To learn which parts of CoinsLite are used, so we can improve them (our legitimate interest): usage statistics, counted through OpenPanel without cookies and without knowing who you are. A content blocker in your browser stops them.",
           "To answer you (our legitimate interest): replying to feedback and requests.",
           "To meet legal duties (legal obligation): for example keeping records we are required to keep.",
         ],
-        "We don’t sell your data, don’t show ads and don’t use your data for profiling or marketing. We don’t use analytics or tracking tools.",
+        "We don’t sell your data, don’t show ads and don’t use your data for profiling or marketing. Our usage statistics don’t identify you, and nothing follows you to other websites.",
       ],
     },
     {
@@ -52,6 +54,7 @@ export default {
           "Google: only if you choose to sign in with Google, under Google’s own privacy policy.",
           "Polar: sells Premium as merchant of record. When you upgrade, it receives your email address, your account id and your IP address (to choose the currency and tax), and it collects your payment details directly. Polar acts as an independent controller for the payment, under its own privacy policy.",
           "Anthropic: only when you use the coin scanner (a Premium beta), it receives the two photos you take and the possible Catalog entries, to suggest which coin it is. Nothing that names you is sent.",
+          "OpenPanel: counts how the app and this website are used. With each page view it receives the page address (without the ids of your Items and Albums, search terms or sign-in codes), the site that linked to it, your browser and device details and your IP address. It works out your approximate location and a visitor identifier that changes every day, then discards the IP address. It sets no cookies and keeps the data in Germany.",
           "MetalpriceAPI: supplies Spot prices and exchange rates. Our requests contain no personal data.",
         ],
       ],
@@ -67,7 +70,7 @@ export default {
       id: "cookies",
       heading: "Cookies and local storage",
       blocks: [
-        "CoinsLite stores only what it needs to work. Nothing is used for ads, analytics or tracking, so we don’t ask for consent to cookies.",
+        "CoinsLite stores only what it needs to work. Nothing is used for ads or tracking, and our usage statistics set no cookies, so we don’t ask for consent to cookies.",
         [
           "Sign-in: the cookies __convexAuthJWT and __convexAuthRefreshToken keep you signed in, and __convexAuthOAuthVerifier lasts while you sign in with Google. Matching entries starting with __convexAuth are kept in your browser’s local storage.",
           "coinslite-signed-in (cookie, one year): tells this website you are signed in, so it opens the app instead of the home page.",

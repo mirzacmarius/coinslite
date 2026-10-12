@@ -23,6 +23,7 @@ export default {
           "Votre formule : formule gratuite ou Premium et, pour Premium, la périodicité, le prix, la devise et la fin de la période en cours de l’abonnement, tels que Polar les communique.",
           "Vos messages : les messages que vous nous envoyez depuis la page du compte, avec votre adresse e-mail et votre identifiant de compte.",
           "Données techniques : votre adresse IP et des informations sur votre navigateur parviennent à nos hébergeurs à chaque requête et peuvent figurer dans leurs journaux.",
+          "Statistiques d’utilisation : les pages de l’application et de ce site qui sont ouvertes, le site qui y renvoie, votre navigateur, votre système d’exploitation et votre type d’appareil, ainsi que votre localisation approximative (pays, région et ville), déduite de votre adresse IP. Elles sont comptées sans cookies et sans votre compte, et les adresses des pages omettent les identifiants de vos objets et albums, les termes de recherche et les codes de connexion.",
         ],
         "Nous ne demandons pas et ne souhaitons pas recevoir de données sensibles, comme la santé ou la religion. Merci de limiter vos notes sur les objets aux objets.",
       ],
@@ -34,10 +35,11 @@ export default {
         [
           "Pour fournir CoinsLite selon notre accord avec vous (exécution d’un contrat) : votre compte, votre collection et ses totaux, les rapports et exports que vous demandez, les e-mails qui vous connectent ou confirment un changement, et Premium si vous l’achetez.",
           "Pour que CoinsLite reste sûr et fonctionne (notre intérêt légitime) : limiter les connexions échouées et la fréquence des envois de fichiers et de messages, trouver et corriger les erreurs, prévenir les abus.",
+          "Pour savoir quelles parties de CoinsLite sont utilisées, afin de les améliorer (notre intérêt légitime) : des statistiques d’utilisation, comptées via OpenPanel sans cookies et sans savoir qui vous êtes. Un bloqueur de contenu dans votre navigateur les empêche.",
           "Pour vous répondre (notre intérêt légitime) : réponses à vos messages et demandes.",
           "Pour respecter nos obligations légales (obligation légale) : par exemple conserver les documents que nous sommes tenus de conserver.",
         ],
-        "Nous ne vendons pas vos données, n’affichons pas de publicité et n’utilisons pas vos données pour du profilage ou du marketing. Nous n’utilisons aucun outil d’analyse ni de suivi.",
+        "Nous ne vendons pas vos données, n’affichons pas de publicité et n’utilisons pas vos données pour du profilage ou du marketing. Nos statistiques d’utilisation ne vous identifient pas, et rien ne vous suit sur d’autres sites.",
       ],
     },
     {
@@ -52,6 +54,7 @@ export default {
           "Google : seulement si vous choisissez de vous connecter avec Google, selon la politique de confidentialité de Google.",
           "Polar : vend Premium en tant que revendeur officiel (merchant of record). Quand vous passez à Premium, Polar reçoit votre adresse e-mail, votre identifiant de compte et votre adresse IP (pour choisir la devise et la taxe), et collecte directement vos données de paiement. Polar agit comme responsable de traitement indépendant pour le paiement, selon sa propre politique de confidentialité.",
           "Anthropic : seulement quand vous utilisez le scanner de pièces (une bêta de Premium), Anthropic reçoit les deux photos que vous prenez et les entrées du catalogue possibles, pour suggérer de quelle pièce il s’agit. Rien qui vous identifie n’est envoyé.",
+          "OpenPanel : compte la façon dont l’application et ce site sont utilisés. À chaque page vue, il reçoit l’adresse de la page (sans les identifiants de vos objets et albums, ni termes de recherche ni codes de connexion), le site d’origine, des informations sur votre navigateur et votre appareil, et votre adresse IP. Il en déduit votre localisation approximative et un identifiant de visiteur qui change chaque jour, puis supprime l’adresse IP. Il ne dépose aucun cookie et conserve les données en Allemagne.",
           "MetalpriceAPI : fournit les cours spot et les taux de change. Nos requêtes ne contiennent aucune donnée personnelle.",
         ],
       ],
@@ -67,7 +70,7 @@ export default {
       id: "cookies",
       heading: "Cookies et stockage local",
       blocks: [
-        "CoinsLite n’enregistre que ce dont il a besoin pour fonctionner. Rien ne sert à la publicité, à l’analyse ou au suivi ; nous ne demandons donc pas de consentement aux cookies.",
+        "CoinsLite n’enregistre que ce dont il a besoin pour fonctionner. Rien ne sert à la publicité ou au suivi, et nos statistiques d’utilisation ne déposent aucun cookie ; nous ne demandons donc pas de consentement aux cookies.",
         [
           "Connexion : les cookies __convexAuthJWT et __convexAuthRefreshToken vous gardent connecté, et __convexAuthOAuthVerifier existe le temps de la connexion avec Google. Des entrées correspondantes commençant par __convexAuth sont conservées dans le stockage local de votre navigateur.",
           "coinslite-signed-in (cookie, un an) : indique à ce site que vous êtes connecté, pour qu’il ouvre l’application au lieu de la page d’accueil.",
