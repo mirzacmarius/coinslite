@@ -1,7 +1,11 @@
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { type QueryCtx, mutation, query } from "./_generated/server";
-import { homeCurrencyErrors, homeCurrencyLimits } from "./homeCurrency/rules";
+import {
+  homeCurrencyErrors,
+  homeCurrencyLimits,
+  tooLargeToConvert,
+} from "./homeCurrency/rules";
 import {
   type ItemMoneyField,
   itemLimits,
@@ -12,27 +16,23 @@ import { requireSetUpUser } from "./utils/auth";
 import { homeCurrency } from "./utils/validators";
 
 /**
- * The person's Items and the Market value history with an amount, each as far
- * as one past the most a change converts: enough to tell whether the whole
- * Collection fits in one change.
+ * The person's Items and Market value history, each read as far as one past
+ * the most a change converts: enough to tell whether the whole Collection fits
+ * in one change. Of the history, only the points with an amount are returned.
  */
 async function collectionOf(ctx: QueryCtx, ownerId: Id<"users">) {
   const items = await ctx.db
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
     .take(homeCurrencyLimits.items + 1);
-  const history = (
-    await ctx.db
-      .query("marketValueHistory")
-      .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
-      .take(homeCurrencyLimits.historyPoints + 1)
-  ).filter((point) => point.marketValue !== undefined);
+  const history = await ctx.db
+    .query("marketValueHistory")
+    .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
+    .take(homeCurrencyLimits.historyPoints + 1);
   return {
     items,
-    history,
-    tooLarge:
-      items.length > homeCurrencyLimits.items ||
-      history.length > homeCurrencyLimits.historyPoints,
+    history: history.filter((point) => point.marketValue !== undefined),
+    tooLarge: tooLargeToConvert({ items, history }),
   };
 }
 
@@ -87,7 +87,8 @@ export const preview = query({
  * It all happens in this one transaction, so nobody ever sees a Collection
  * with some amounts in the old currency and some in the new: if any Item
  * can't be converted, or the database refuses the write, nothing changes.
- * That is why one change converts at most `homeCurrencyLimits.items` Items.
+ * That is why one change converts at most `homeCurrencyLimits.items` Items
+ * and `homeCurrencyLimits.historyPoints` history points.
  */
 export const change = mutation({
   args: {

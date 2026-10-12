@@ -7,7 +7,7 @@ export const homeCurrencyErrors = {
   rateUnavailable: "RATE_UNAVAILABLE",
   /** The stored rate isn't the one the person confirmed: it was refreshed meanwhile. */
   rateChanged: "RATE_CHANGED",
-  /** More Items than one change can convert at once (`homeCurrencyLimits.items`). */
+  /** More Items or Market value history points than one change can convert at once (`homeCurrencyLimits`). */
   collectionTooLarge: "COLLECTION_TOO_LARGE",
   /** A converted amount would go past the largest amount an Item may hold. */
   amountTooLarge: "AMOUNT_TOO_LARGE",
@@ -24,3 +24,18 @@ export const homeCurrencyLimits = {
   /** The most Market value history points one change converts, likewise. */
   historyPoints: 5000,
 } as const;
+
+/**
+ * Whether a Collection is too large to convert in one change, given what was
+ * read of it: its Items and its Market value history points, each read as far
+ * as one past the most a change converts. Every point read counts, with a
+ * Market value or without: reading past the limit means some points went
+ * unread, and those may have one, so a change would convert only part of the
+ * history.
+ */
+export const tooLargeToConvert = (read: {
+  items: readonly unknown[];
+  history: readonly { marketValue?: number }[];
+}) =>
+  read.items.length > homeCurrencyLimits.items ||
+  read.history.length > homeCurrencyLimits.historyPoints;
