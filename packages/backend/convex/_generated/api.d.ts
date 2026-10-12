@@ -64,6 +64,7 @@ import type * as collection_importRows from "../collection/importRows.js";
 import type * as collection_pdf from "../collection/pdf.js";
 import type * as collection_pdfMessages from "../collection/pdfMessages.js";
 import type * as collection_view from "../collection/view.js";
+import type * as collection_viewRules from "../collection/viewRules.js";
 import type * as collectionCounts from "../collectionCounts.js";
 import type * as collectionImport from "../collectionImport.js";
 import type * as collectionPdf from "../collectionPdf.js";
@@ -190,6 +191,7 @@ declare const fullApi: ApiFromModules<{
   "collection/pdf": typeof collection_pdf;
   "collection/pdfMessages": typeof collection_pdfMessages;
   "collection/view": typeof collection_view;
+  "collection/viewRules": typeof collection_viewRules;
   collectionCounts: typeof collectionCounts;
   collectionImport: typeof collectionImport;
   collectionPdf: typeof collectionPdf;

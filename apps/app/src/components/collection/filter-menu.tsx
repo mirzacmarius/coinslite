@@ -93,7 +93,7 @@ function FilterCommand({
             ))}
             {current.options.length === 0 && (
               <p className="px-2 py-3 text-xs text-muted-foreground">
-                {t("collection.nothingToFilter")}
+                {current.counting ? "…" : t("collection.nothingToFilter")}
               </p>
             )}
           </CommandGroup>
@@ -177,9 +177,11 @@ function OptionItem({
           {option.hint}
         </span>
       )}
-      <span className="ml-auto pl-2 text-xs tabular-nums text-muted-foreground">
-        {option.count}
-      </span>
+      {option.count !== undefined && (
+        <span className="ml-auto pl-2 text-xs tabular-nums text-muted-foreground">
+          {option.count}
+        </span>
+      )}
     </CommandItem>
   );
 }
@@ -243,16 +245,21 @@ export function FilterButton({
 
 /**
  * The filters that are on, one chip each: change the value or remove the
- * filter, or clear every filter and the search at once.
+ * filter, or clear every filter and the search at once. `open` is the chip
+ * whose options are showing, if any.
  */
 export function FilterChips({
   filters,
   onChange,
   onClearAll,
+  open,
+  onOpenChange,
 }: {
   filters: Filter[];
   onChange: Change;
   onClearAll: () => void;
+  open: FilterDimension | null;
+  onOpenChange: (dimension: FilterDimension, open: boolean) => void;
 }) {
   const t = useI18n();
   const active = filters.filter((filter) => filter.active);
@@ -267,6 +274,8 @@ export function FilterChips({
           key={filter.dimension}
           filter={filter}
           onChange={onChange}
+          open={open === filter.dimension}
+          onOpenChange={(isOpen) => onOpenChange(filter.dimension, isOpen)}
         />
       ))}
       <Button variant="ghost" size="xs" onClick={onClearAll}>
@@ -279,9 +288,15 @@ export function FilterChips({
 function ActiveFilter({
   filter,
   onChange,
-}: { filter: Filter; onChange: Change }) {
+  open,
+  onOpenChange: setOpen,
+}: {
+  filter: Filter;
+  onChange: Change;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const t = useI18n();
-  const [open, setOpen] = useState(false);
   if (!filter.active) return null;
   return (
     <FilterChip
