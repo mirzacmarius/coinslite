@@ -1,5 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { acquiredAt, monthOf } from "./totals";
+import { TROY_OUNCE_GRAMS, marketRates } from "../spotPrices/rates";
+import {
+  type CollectionTotals,
+  type TotalsItem,
+  acquiredAt,
+  collectionTotals,
+  combineTotals,
+  monthOf,
+} from "./totals";
 
 /** Oslo in winter: an hour ahead of UTC. */
 const OSLO = 60;
@@ -51,5 +59,134 @@ describe("the month an Item was acquired", () => {
     expect(acquiredAt(recorded, "2026-10-01", OSLO)).toBe(
       Date.parse("2026-09-30T23:00:00Z"),
     );
+  });
+});
+
+// Gold at $2,000 and silver at $25 a troy ounce, 10 NOK to the dollar: a
+// troy ounce of gold is 20,000 kr and one of silver 250 kr.
+const rates = marketRates({
+  quotedAt: 0,
+  fetchedAt: 0,
+  checkedAt: 0,
+  perDollar: {
+    USD: 1,
+    NOK: 10,
+    SEK: 10.5,
+    DKK: 6.9,
+    EUR: 0.92,
+    RON: 4.6,
+    GBP: 0.79,
+    CHF: 0.88,
+    XAU: 1 / 2000,
+    XAG: 1 / 25,
+  },
+});
+
+// Amounts in øre.
+const krugerrand: TotalsItem = {
+  _creationTime: Date.UTC(2026, 0, 15, 12),
+  type: "coin",
+  quantity: 1,
+  purchasePrice: 15_000_00,
+  marketValue: 21_000_00,
+  metal: "gold",
+  weight: TROY_OUNCE_GRAMS,
+  purity: 1,
+};
+const silverCoins: TotalsItem = {
+  // 23:30 on 31 January in UTC is already 1 February in Oslo.
+  _creationTime: Date.UTC(2026, 0, 31, 23, 30),
+  type: "coin",
+  quantity: 2,
+  purchasePrice: 300_00,
+  metal: "silver",
+  weight: TROY_OUNCE_GRAMS,
+  purity: 0.5,
+};
+const inheritedBanknote: TotalsItem = {
+  _creationTime: Date.UTC(2026, 2, 10, 12),
+  type: "banknote",
+  quantity: 1,
+  marketValue: 500_00,
+};
+const soldStamps: TotalsItem = {
+  _creationTime: Date.UTC(2026, 2, 20, 12),
+  type: "stamp",
+  quantity: 3,
+  purchasePrice: 10_00,
+  marketValue: 12_00,
+  salePrice: 20_00,
+};
+
+const context = { currency: "NOK", rates, utcOffsetMinutes: OSLO } as const;
+
+const expectedTotals: CollectionTotals = {
+  currency: "NOK",
+  items: 4,
+  pieces: { coin: 3, banknote: 1, stamp: 3 },
+  purchasePrice: 15_630_00,
+  marketValue: 21_536_00,
+  gainLoss: { amount: 6_006_00, items: 2 },
+  salePrice: 60_00,
+  realised: { amount: 30_00, items: 1 },
+  byType: {
+    coin: { purchasePrice: 15_600_00, marketValue: 21_000_00 },
+    banknote: { purchasePrice: 0, marketValue: 500_00 },
+    stamp: { purchasePrice: 30_00, marketValue: 36_00 },
+  },
+  metals: {
+    gold: { fineWeight: TROY_OUNCE_GRAMS, value: 20_000_00 },
+    silver: { fineWeight: TROY_OUNCE_GRAMS, value: 250_00 },
+  },
+  addedByMonth: [
+    { month: "2026-01", purchasePrice: 15_000_00, marketValue: 21_000_00 },
+    { month: "2026-02", purchasePrice: 600_00, marketValue: 0 },
+    { month: "2026-03", purchasePrice: 30_00, marketValue: 536_00 },
+  ],
+};
+
+describe("Collection totals", () => {
+  test("add up every Item's amounts, pieces and Metal value in one pass", () => {
+    expect(
+      collectionTotals(
+        [krugerrand, silverCoins, inheritedBanknote, soldStamps],
+        context,
+      ),
+    ).toEqual(expectedTotals);
+  });
+
+  test("combining the totals of separate pages gives the same as one pass", () => {
+    const firstPage = collectionTotals(
+      [krugerrand, inheritedBanknote],
+      context,
+    );
+    const secondPage = collectionTotals([silverCoins, soldStamps], context);
+
+    expect(combineTotals(firstPage, secondPage)).toEqual(expectedTotals);
+  });
+
+  test("the Metal value is null without Spot prices, while fine weight still counts", () => {
+    const totals = collectionTotals([krugerrand, silverCoins], {
+      ...context,
+      rates: null,
+    });
+
+    expect(totals.metals).toEqual({
+      gold: { fineWeight: TROY_OUNCE_GRAMS, value: null },
+      silver: { fineWeight: TROY_OUNCE_GRAMS, value: null },
+    });
+  });
+
+  test("a page without Spot prices makes the combined Metal value null", () => {
+    const withPrices = collectionTotals([krugerrand], context);
+    const withoutPrices = collectionTotals([silverCoins], {
+      ...context,
+      rates: null,
+    });
+
+    expect(combineTotals(withPrices, withoutPrices).metals).toEqual({
+      gold: { fineWeight: TROY_OUNCE_GRAMS, value: null },
+      silver: { fineWeight: TROY_OUNCE_GRAMS, value: null },
+    });
   });
 });
