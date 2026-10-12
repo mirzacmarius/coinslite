@@ -231,8 +231,13 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 - **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
-- **Shortcuts:** add a coin, a banknote or a stamp, each opening the form with that type chosen.
-- **Latest Items:** the three most recently added, each with thumbnail, year and denomination. When the Collection is empty, a first-run prompt to add an Item.
+- **Shortcuts:** add a coin, a banknote or a stamp, each opening the form with that type chosen. While the Collection is empty they sit in the first-run prompt instead.
+- **Latest Items:** the three most recently added, each with thumbnail, year and denomination.
+- **First-run prompt:** while the Collection is empty, one start card takes the place of the totals and Latest Items, with three ways to start:
+  - **Add an Item:** the three shortcuts.
+  - **Add a whole Set:** opens the Catalog to pick a Set and add what the user owns from it (§6.4). Absent while the Catalog is hidden.
+  - **Import a spreadsheet:** opens the CSV import.
+  - The empty Collection page offers the same three ways.
 
 ## 10. Insurance report (Premium)
 

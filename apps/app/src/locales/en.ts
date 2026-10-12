@@ -67,7 +67,7 @@ export default {
     added: "Item added to your Collection",
     addedToAlbum: "Item added to {album}",
     emptyTitle: "Your Collection is empty",
-    emptyDescription: "Add your first coin, banknote or stamp to see it here.",
+    emptyDescription: "Choose how to begin. Your Items then show here.",
     showMore: "Show more",
     notFoundTitle: "Item not found",
     notFound: "This Item doesn't exist, or it isn't in your Collection.",
@@ -1172,7 +1172,16 @@ export default {
     viewCollection: "View Collection",
     firstRunTitle: "Start your Collection",
     firstRunDescription:
-      "Add a coin, banknote or stamp you own. Your totals and latest Items then show here.",
+      "Choose how to begin. Your totals and latest Items then show here.",
+  },
+  startCard: {
+    addItem: "Add an Item",
+    addItemDescription: "Record a coin, banknote or stamp you own.",
+    addSet: "Add a whole Set",
+    addSetDescription:
+      "Open a country or Theme in the Catalog, choose “View as Set”, then add what you own from it.",
+    import: "Import a spreadsheet",
+    importDescription: "Bring in a list you already keep, saved as a CSV file.",
   },
   adminStats: {
     menu: "Stats",
@@ -1242,7 +1251,6 @@ export default {
   },
   collectionImport: {
     menuItem: "Import from CSV…",
-    emptyAction: "Import from CSV",
     title: "Import Items",
     description:
       "Pick a CSV file laid out like the Collection export, up to {size} and {rows} rows. Nothing is added until you confirm.",
