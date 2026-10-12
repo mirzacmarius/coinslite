@@ -21,6 +21,7 @@ import {
   strike,
 } from "../utils/validators";
 import { defaultNotesLanguage } from "./fields";
+import { type Held, heldCount } from "./held";
 import { creditRequired } from "./imageRules";
 
 /**
@@ -71,11 +72,15 @@ const groupRowOf = (node: GroupNode) => ({
   entryCount: node.entryCount ?? 0,
 });
 
-/** Most entries first; equal counts by title. */
-const byEntryCount = (
-  a: { entryCount: number; title: string },
-  b: { entryCount: number; title: string },
-) => b.entryCount - a.entryCount || a.title.localeCompare(b.title);
+type Counted = { entryCount?: number; title: string } | null;
+
+/**
+ * Most entries first, equal counts by title, as the Catalog lists its roots
+ * and a Theme its countries. A missing node or count sorts as no entries.
+ */
+export const byEntryCount = (a: Counted, b: Counted) =>
+  (b?.entryCount ?? 0) - (a?.entryCount ?? 0) ||
+  (a?.title ?? "").localeCompare(b?.title ?? "");
 
 /**
  * The set-up person browsing, or null while the Catalog is hidden from them
@@ -104,41 +109,6 @@ export const roots = query({
       .sort(byEntryCount);
   },
 });
-
-/**
- * How many of a person's Items made from one Catalog entry are counted for
- * how many pieces of it they hold; past that it's "at least" (`heldMore`).
- */
-export const heldItemLimit = 100;
-
-/**
- * How many pieces of a Catalog entry a person holds: the Quantity of the
- * Items made from it that they haven't sold, over at most `heldItemLimit` of them. `heldMore` says
- * there are more Items than were counted, so they hold at least `held`.
- */
-export async function heldCount(
-  ctx: QueryCtx,
-  ownerId: Id<"users">,
-  entryId: Id<"catalogNodes">,
-) {
-  const items = await ctx.db
-    .query("items")
-    .withIndex("by_ownerId_and_catalogEntryId_and_soldOn", (q) =>
-      q
-        .eq("ownerId", ownerId)
-        .eq("catalogEntryId", entryId)
-        .eq("soldOn", undefined),
-    )
-    .take(heldItemLimit + 1);
-  return {
-    held: items
-      .slice(0, heldItemLimit)
-      .reduce((pieces, item) => pieces + item.quantity, 0),
-    heldMore: items.length > heldItemLimit,
-  };
-}
-
-export type Held = Awaited<ReturnType<typeof heldCount>>;
 
 export async function nodeByKey(ctx: QueryCtx, key: string) {
   return await ctx.db

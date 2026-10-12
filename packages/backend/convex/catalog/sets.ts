@@ -9,7 +9,6 @@ import {
   byDenomination,
   creditedEntryRow,
   entryRow,
-  heldCount,
   isCountryNode,
   nodeByKey,
   nullable,
@@ -19,6 +18,7 @@ import {
   type DenominationGroup,
   storedDenominationCount,
 } from "./denominationCounts";
+import { heldCount } from "./held";
 import {
   type FoundSet,
   type NodeName,

@@ -59,6 +59,12 @@ export type CoinEdge = (typeof coinEdges)[number];
 /** A mint mark that says the coin has none, as Philadelphia's dollars did. */
 export const noMintMark = "none";
 
+/**
+ * The error code (ConvexError data) for a Catalog key that names no entry
+ * the person can see: it's gone, or the Catalog is hidden from them.
+ */
+export const catalogEntryNotFound = "CATALOG_ENTRY_NOT_FOUND";
+
 export const catalogErrors = {
   // The file
   emptyFile: "EMPTY_FILE",

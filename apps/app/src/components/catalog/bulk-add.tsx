@@ -16,6 +16,7 @@ import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { albumErrors } from "@coinslite/backend/convex/albums/rules";
+import { catalogEntryNotFound } from "@coinslite/backend/convex/catalog/fields";
 import {
   setErrors,
   setLimits,
@@ -31,9 +32,6 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type * as React from "react";
 import { useId, useState } from "react";
-
-/** The Catalog key the backend reports for an entry that's gone or hidden. */
-const catalogEntryNotFound = "CATALOG_ENTRY_NOT_FOUND";
 
 /**
  * Adding the selected Catalog entries to the Collection, one Item each
