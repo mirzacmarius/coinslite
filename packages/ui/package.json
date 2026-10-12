@@ -16,7 +16,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4"
+    "typescript": "^5.9.3"
   },
   "exports": {
     "./avatar": "./src/components/avatar.tsx",

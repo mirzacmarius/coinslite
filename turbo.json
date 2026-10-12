@@ -1,5 +1,6 @@
 {
-  "$schema": "https://turborepo.org/schema.json",
+  "$schema": "https://v2-11-7.turborepo.dev/schema.json",
+  "agentGuidance": false,
   "globalDependencies": ["**/.env"],
   "ui": "stream",
   "tasks": {
