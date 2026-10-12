@@ -57,7 +57,7 @@ Ranked by value per effort, best first.
 
 | # | Dataset | Source | Licence verdict | Entries | Effort | Entries a day | Images in scope | Follow-up |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Euro circulation coins, every issuer's national sides | ECB national-side pages + common-side specifications | **Allowed with attribution** (ECB terms, as the 2-euro dataset) | ~295 | M (2 days) | ~150 | No (national sides need each country's consent) | COIN-135 |
+| 1 | Euro circulation coins, every issuer's national sides | ECB national-side pages + common-side specifications | **Allowed with attribution** (ECB terms, as the 2-euro dataset) | ~295 | M (2 days) | ~150 | No (national sides need each country's consent) | COIN-135: **built** (`catalog/datasets/euroCirculationCoins.ts`, 295 entries) |
 | 2 | Romania: numismatic issues 1995–2026, circulation coins and notes | BNR website | **Allowed with attribution** + "free at bnr.ro" notice for paid services | ~380 | M (2 days) | ~190 | No (needs BNR confirmation) | COIN-137 |
 | 3 | Euro banknotes, first and Europa series | ECB pages, Decision ECB/2013/10, ECB press releases | **Allowed with attribution**; images **allowed** under ECB/2013/10 | 13 | S (1 day incl. images) | 13 | **Yes**: the Catalog's first clearly free images | COIN-136 |
 | 4 | US circulating coin programmes 1999–2025 | US Mint coin pages + coin specifications | **Allowed** (public domain, 17 U.S.C. § 105) | ~400 (design × mint) | M–L (3 days) | ~130 | No (separate step; see §4) | COIN-138 |
@@ -103,6 +103,7 @@ COIN-136 specifies the shape, the code to check and the spec change, rather than
   - Several issuers have more than one series: Vatican 5, Belgium 3, Monaco 3, Spain 3 (€1/€2) or 2, France 2 (€1 to 10c), the Netherlands 2, San Marino 2.
 - **Specifications:** the [common sides page](https://www.ecb.europa.eu/euro/coins/common/html/index.en.html) gives each denomination's diameter, thickness, weight, shape, colour, composition and edge. For example, €2 is 25.75 mm, 2.20 mm and 8.50 g, with *"Outer part: copper-nickel; inner part: three layers: nickel brass, nickel, nickel brass"*.
   - The exact alloy percentages, which the `composition` column needs, are in Council Regulation (EC) No 975/98 as amended, on EUR-Lex.
+    - Regulation 975/98 was repealed and recast by Council Regulation (EU) No 729/2014 (Art. 12), whose Annex I carries the same table, with Nordic gold as Cu89Al5Zn5Sn1. The built dataset credits 729/2014.
   - **Reuse of EUR-Lex documents:** Commission Decision 2011/833/EU (read on [legislation.gov.uk's copy](https://www.legislation.gov.uk/eudn/2011/833/article/6/data.htm), because EUR-Lex blocked automated reading).
     - Art. 3(2) defines reuse as use *"for commercial or non-commercial purposes"*.
     - Art. 6(2) allows these conditions: *"the obligation for the reuser to acknowledge the source of the documents; (b) the obligation not to distort the original meaning or message of the documents"*.

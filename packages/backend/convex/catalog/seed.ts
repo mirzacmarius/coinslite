@@ -1,6 +1,7 @@
 import { ConvexError, type Infer, v } from "convex/values";
 import { internal } from "../_generated/api";
 import { internalAction, internalMutation } from "../_generated/server";
+import { euroCirculationCoins } from "./datasets/euroCirculationCoins";
 import { euroCommemoratives } from "./datasets/euroCommemoratives";
 import { norway } from "./datasets/norway";
 import { usSilverDollars } from "./datasets/usSilverDollars";
@@ -11,7 +12,12 @@ import { importCatalogFile } from "./tree";
  * order they load. Each is CoinsLite's own data from a source it may store
  * (ADR 0003); nothing is fetched while loading.
  */
-const datasets = { usSilverDollars, euroCommemoratives, norway };
+const datasets = {
+  usSilverDollars,
+  euroCommemoratives,
+  norway,
+  euroCirculationCoins,
+};
 
 const loadReport = v.object({
   dataset: v.string(),
@@ -27,6 +33,7 @@ export const loadDataset = internalMutation({
       v.literal("usSilverDollars"),
       v.literal("euroCommemoratives"),
       v.literal("norway"),
+      v.literal("euroCirculationCoins"),
     ),
   },
   returns: loadReport,

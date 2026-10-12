@@ -33,11 +33,11 @@ import { ro } from "./euroCommemorativeCoinsRo";
  * the ECB's terms don't cover showing them, so entries show the placeholder.
  */
 
-const ecbPages = "https://www.ecb.europa.eu/euro/coins";
+export const ecbPages = "https://www.ecb.europa.eu/euro/coins";
 const changes =
   "Changes by CoinsLite: arranged into Catalog fields; capitals and typography tidied.";
 
-const ecb = (link: string) => ({
+export const ecb = (link: string) => ({
   source: "European Central Bank",
   author: "European Central Bank",
   licence: `Reused under the ECB's copyright terms, citing the ECB. Available free of charge at www.ecb.europa.eu. ${changes}`,
@@ -51,7 +51,7 @@ const officialJournal = (notice: string, link: string) => ({
 });
 
 type Provenance = ReturnType<typeof ecb>;
-const credit = (group: "facts" | "notes", from: Provenance) => ({
+export const credit = (group: "facts" | "notes", from: Provenance) => ({
   [`${group}_source`]: from.source,
   [`${group}_author`]: from.author,
   [`${group}_licence`]: from.licence,
@@ -64,7 +64,7 @@ type Translation = keyof typeof translations;
 const translationLanguages = Object.keys(translations) as Translation[];
 
 /** Notes in one of those languages, credited to the ECB's page in it. */
-const translated = (
+export const translated = (
   language: Translation,
   notes: { technical_details?: string; historical_notes?: string },
   link: string,
