@@ -1,9 +1,10 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { type QueryCtx, query } from "./_generated/server";
 import { premiumSubscriptionOf } from "./billing";
 import { type Plan, freePlan, planErrors } from "./plans/rules";
-import { requireSetUpUser, setUpUserOrNull } from "./utils/auth";
+import { requireSetUpUser } from "./utils/auth";
 
 /**
  * The plan a person is on: Premium while a subscription makes them Premium
@@ -91,8 +92,9 @@ export const usage = query({
     v.object({ plan: v.literal("premium") }),
   ),
   handler: async (ctx) => {
-    const user = await setUpUserOrNull(ctx);
-    if (!user) return null;
+    const userId = await getAuthUserId(ctx);
+    const user = userId && (await ctx.db.get(userId));
+    if (!user?.termsAcceptedAt || !user.homeCurrency) return null;
     if ((await planOf(ctx, user._id)) === "premium") {
       return { plan: "premium" as const };
     }

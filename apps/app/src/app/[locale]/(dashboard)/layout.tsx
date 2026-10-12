@@ -1,5 +1,5 @@
 import { ProfileLanguage } from "@/components/account/profile-language";
-import { EndSession, UntilSessionEnds } from "@/components/end-session";
+import { EndSession } from "@/components/end-session";
 import {
   AddItemProvider,
   AddItemQuickAction,
@@ -64,7 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Suspense>
           <ProfileLanguage />
           <ReleaseHighlights />
-          <UntilSessionEnds>{children}</UntilSessionEnds>
+          {children}
         </AppShell>
       </ScanCoinProvider>
     </AddItemProvider>
