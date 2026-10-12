@@ -10,12 +10,11 @@ import {
 } from "./_generated/server";
 import {
   browsingUser,
-  byEntryCount,
   creditedEntryRow,
   entryRow,
-  isCountryNode,
   nodeByKey,
 } from "./catalog/browse";
+import { byEntryCount, isCountryNode } from "./catalog/countryNodes";
 import { catalogEntryNotFound } from "./catalog/fields";
 import { heldCount } from "./catalog/held";
 import { setErrors, setLimits } from "./catalog/setRules";
@@ -243,13 +242,19 @@ export const count = query({
 });
 
 const wantlistGroup = v.object({
-  /** The country's node key, or for entries outside any country, their root's. */
+  /**
+   * The country's node key (or a Theme's series': Euro banknotes › First
+   * series), or for entries outside any country, their root's.
+   */
   key: v.string(),
   title: v.string(),
   /** A country's code, which the app names in the reader's language. */
   country: v.optional(v.string()),
-  /** The Theme a country belongs to (2-euro commemoratives › Germany), if any. */
-  theme: v.optional(v.string()),
+  /**
+   * The Theme a country or series belongs to (2-euro commemoratives ›
+   * Germany), if any, by key and title, which the app names it by.
+   */
+  theme: v.optional(v.object({ key: v.string(), title: v.string() })),
   /**
    * Its entries by denomination (by face value) and then series, as browsing
    * the country lists them; null for the entries without one.
@@ -319,7 +324,10 @@ export const list = query({
             ...(node &&
               isCountryNode(node) &&
               node.country !== undefined && { country: node.country }),
-            ...(root && root !== node && { theme: root.title }),
+            ...(root &&
+              root !== node && {
+                theme: { key: root.key, title: root.title },
+              }),
             series: await Promise.all(
               byDenominationAndSeries(entries).map(
                 async ({ entries, ...group }) => ({

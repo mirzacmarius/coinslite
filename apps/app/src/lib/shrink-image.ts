@@ -19,6 +19,8 @@ export type ImageFormat = "image/webp" | "image/jpeg";
 export type ShrinkTarget = {
   /** Its longest side at most, in pixels. A smaller picture keeps its size: it's never scaled up. */
   longest: number;
+  /** Its shortest side at most, in pixels, when that is smaller still. */
+  shortest?: number;
   /** The formats to write it in, preferred first: the first this browser can write is used. */
   types: readonly ImageFormat[];
   /** The qualities to try, best first, until the copy fits in `maxBytes`. */
@@ -86,7 +88,10 @@ async function copyOf(
   bitmap: ImageBitmap,
   target: ShrinkTarget,
 ): Promise<ShrunkImage> {
-  const { width, height } = fitWithin(bitmap, target.longest);
+  const { width, height } = fitWithin(bitmap, {
+    longest: target.longest,
+    shortest: target.shortest ?? target.longest,
+  });
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;

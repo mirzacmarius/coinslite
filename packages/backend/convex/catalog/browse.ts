@@ -20,6 +20,7 @@ import {
   provenance,
   strike,
 } from "../utils/validators";
+import { byEntryCount, inBrowseOrder, isCountryNode } from "./countryNodes";
 import { defaultNotesLanguage } from "./fields";
 import { type Held, heldCount } from "./held";
 import { creditRequired } from "./imageRules";
@@ -47,9 +48,10 @@ const groupRow = v.object({
   title: v.string(),
   country: v.optional(v.string()),
   /**
-   * Whether it is a country (a country root, or a Theme's country): it can be
-   * browsed by denomination, and the app names it by `country`, in the
-   * reader's language, rather than by its title.
+   * Whether it is a country (a country root, or a Theme's country, not a
+   * Theme's series; countryNodes.ts): it can be browsed by denomination, and
+   * the app names it by `country`, in the reader's language, rather than by
+   * its title.
    */
   countryNode: v.boolean(),
   entryCount: v.number(),
@@ -59,10 +61,6 @@ type GroupNode = Doc<"catalogNodes"> & {
   kind: "country" | "theme" | "grouping";
 };
 
-/** Whether a node is a country: a country root, or a Theme's country. */
-export const isCountryNode = (node: Doc<"catalogNodes">) =>
-  node.countryNodeKey === node.key;
-
 const groupRowOf = (node: GroupNode) => ({
   key: node.key,
   kind: node.kind,
@@ -71,16 +69,6 @@ const groupRowOf = (node: GroupNode) => ({
   countryNode: isCountryNode(node),
   entryCount: node.entryCount ?? 0,
 });
-
-type CountedNode = { entryCount?: number; title: string } | null;
-
-/**
- * Most entries first, equal counts by title, as the Catalog lists its roots
- * and a Theme its countries. A missing node or count sorts as no entries.
- */
-export const byEntryCount = (a: CountedNode, b: CountedNode) =>
-  (b?.entryCount ?? 0) - (a?.entryCount ?? 0) ||
-  (a?.title ?? "").localeCompare(b?.title ?? "");
 
 /**
  * The set-up person browsing, or null while the Catalog is hidden from them
@@ -210,7 +198,7 @@ const entryDetail = v.object({
 const groupDetail = v.object({
   ...groupRow.fields,
   ancestors: v.array(ancestor),
-  /** The grouping nodes right below: a Theme's countries, most entries first; elsewhere in sort order. */
+  /** The grouping nodes right below: a Theme's countries, most entries first; its series, and elsewhere, in sort order. */
   groupings: v.array(groupRow),
 });
 
@@ -372,8 +360,7 @@ export const node = query({
     return {
       ...groupRowOf(node as GroupNode),
       ancestors,
-      groupings:
-        node.kind === "theme" ? groupings.sort(byEntryCount) : groupings,
+      groupings: inBrowseOrder(node.kind, groupings),
     };
   },
 });

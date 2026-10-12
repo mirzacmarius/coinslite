@@ -9,11 +9,11 @@ import {
   byDenomination,
   creditedEntryRow,
   entryRow,
-  isCountryNode,
   nodeByKey,
   nullable,
   stored,
 } from "./browse";
+import { isCountryNode } from "./countryNodes";
 import {
   type DenominationGroup,
   storedDenominationCount,

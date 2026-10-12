@@ -23,8 +23,11 @@ import {
   catalogImageErrors,
   catalogImageLimits,
   checkImageCredit,
+  fullImageBounds,
+  reproducedUnderEcbRules,
   webpHeaderLength,
   webpSize,
+  withinBounds,
 } from "./imageRules";
 
 /**
@@ -135,16 +138,28 @@ async function storedWebpSize(ctx: ActionCtx, storageId: Id<"_storage">) {
   return webpSize(new Uint8Array(head));
 }
 
+/** What `claim` finds out about the upload and the entry it is for. */
+type Claimed = {
+  bytes: { full: number; thumbnail: number };
+  /** The entry's width and height, in millimetres, if it has them. */
+  entry: { width?: number; height?: number };
+};
+
 /**
  * Why two uploaded files can't be an entry's image, or undefined when they
- * can: both must be WebP, the full size at most 800 px on its longest side,
- * the thumbnail at most 128 px and no bigger than the full size.
+ * can: both must be WebP, the full size at most 800 px on its longest side
+ * (a banknote reproduced under the ECB's rules no more than 72 dpi at its
+ * real size, imageRules.ts `fullImageBounds`), the thumbnail at most 128 px
+ * and no bigger than the full size.
  */
 async function imageProblem(
   ctx: ActionCtx,
   { full, thumbnail }: Upload,
-  bytes: { full: number; thumbnail: number },
+  { bytes, entry }: Claimed,
+  licence: string,
 ): Promise<CatalogImageError | undefined> {
+  const bounds = fullImageBounds(entry, licence);
+  if (!bounds) return catalogImageErrors.reproductionSizeRequired;
   const fullSize = await storedWebpSize(ctx, full);
   const thumbnailSize = await storedWebpSize(ctx, thumbnail);
   if (!fullSize || !thumbnailSize) return catalogImageErrors.notWebp;
@@ -155,6 +170,8 @@ async function imageProblem(
     bytes.full > catalogImageLimits.fullBytes
   )
     return catalogImageErrors.tooLarge;
+  if (!withinBounds(fullSize, bounds))
+    return catalogImageErrors.overReproductionLimit;
   if (
     longest(thumbnailSize) > catalogImageLimits.thumbnail ||
     thumbnailSize.width > fullSize.width ||
@@ -173,7 +190,7 @@ export const attach = action({
   args: { ...uploadArgs, credit },
   returns: v.null(),
   handler: async (ctx, { credit, ...upload }) => {
-    const bytes: { full: number; thumbnail: number } = await ctx.runMutation(
+    const claimed: Claimed = await ctx.runMutation(
       internal.catalog.images.claim,
       upload,
     );
@@ -181,7 +198,7 @@ export const attach = action({
     const problem =
       "problem" in checked
         ? checked.problem
-        : await imageProblem(ctx, upload, bytes);
+        : await imageProblem(ctx, upload, claimed, checked.credit.licence);
     if (problem) {
       await ctx.runMutation(internal.catalog.images.discard, upload);
       throw new ConvexError(problem);
@@ -193,11 +210,18 @@ export const attach = action({
 
 /**
  * Registers the files to the admin if nobody has yet, and returns the sizes
- * in bytes of the files they may put on the entry.
+ * in bytes of the files they may put on the entry, with the entry's width
+ * and height.
  */
 export const claim = internalMutation({
   args: uploadArgs,
-  returns: v.object({ full: v.number(), thumbnail: v.number() }),
+  returns: v.object({
+    bytes: v.object({ full: v.number(), thumbnail: v.number() }),
+    entry: v.object({
+      width: v.optional(v.number()),
+      height: v.optional(v.number()),
+    }),
+  }),
   handler: async (ctx, upload) => {
     const admin = await requireAdmin(ctx);
     const now = Date.now();
@@ -205,8 +229,18 @@ export const claim = internalMutation({
       for (const file of [upload.full, upload.thumbnail])
         await claimUpload(ctx, file, admin._id, "catalogImage", now);
     }
-    const { fullFile, thumbnailFile } = await checkUpload(ctx, upload, now);
-    return { full: fullFile.size, thumbnail: thumbnailFile.size };
+    const { entry, fullFile, thumbnailFile } = await checkUpload(
+      ctx,
+      upload,
+      now,
+    );
+    return {
+      bytes: { full: fullFile.size, thumbnail: thumbnailFile.size },
+      entry: {
+        ...(entry.width !== undefined && { width: entry.width }),
+        ...(entry.height !== undefined && { height: entry.height }),
+      },
+    };
   },
 });
 
@@ -241,7 +275,11 @@ export const save = internalMutation({
   },
 });
 
-/** Changes the credit of an entry's image, keeping the image. */
+/**
+ * Changes the credit of an entry's image, keeping the image. An image can't
+ * newly be credited as reproduced under the ECB's rules: its size wasn't
+ * checked against them, so it is chosen again instead.
+ */
 export const updateCredit = mutation({
   args: { key: v.string(), credit },
   returns: v.null(),
@@ -251,6 +289,11 @@ export const updateCredit = mutation({
     const imageProvenance = requireCredit(credit);
     if (!entry.imageFiles && !entry.imageUrl)
       throw new ConvexError(catalogImageErrors.noImage);
+    if (
+      reproducedUnderEcbRules(imageProvenance.licence) &&
+      !reproducedUnderEcbRules(entry.imageProvenance?.licence)
+    )
+      throw new ConvexError(catalogImageErrors.overReproductionLimit);
     await ctx.db.patch("catalogNodes", entry._id, { imageProvenance });
     return null;
   },

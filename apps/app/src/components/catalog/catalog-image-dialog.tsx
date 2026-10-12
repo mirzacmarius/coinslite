@@ -18,11 +18,14 @@ import { catalogLimits } from "@coinslite/backend/convex/catalog/fields";
 import type { Provenance } from "@coinslite/backend/convex/catalog/fields";
 import {
   type CatalogImageError,
+  type ImageBounds,
   type ImageCredit,
   catalogImageErrors,
   catalogImageLimits,
   commonLicences,
+  fullImageBounds,
   isWebAddress,
+  withinBounds,
 } from "@coinslite/backend/convex/catalog/imageRules";
 import { uploadErrors } from "@coinslite/backend/convex/photos/rules";
 import { Button } from "@coinslite/ui/button";
@@ -54,20 +57,18 @@ type PickedImage = { full: ShrunkImage; thumbnail: ShrunkImage };
 
 /**
  * The sizes a Catalog image is stored at, both WebP (the server accepts
- * nothing else), so the original never uploads.
+ * nothing else), so the original never uploads: the full size within the
+ * bounds its licence allows (imageRules.ts `fullImageBounds`).
  */
-const catalogImageSizes = {
-  full: {
-    longest: catalogImageLimits.full,
-    types: ["image/webp"],
-    qualities: [0.85],
-  },
-  thumbnail: {
-    longest: catalogImageLimits.thumbnail,
-    types: ["image/webp"],
-    qualities: [0.85],
-  },
-} satisfies Record<keyof PickedImage, ShrinkTarget>;
+const catalogImageSizes = (full: ImageBounds) =>
+  ({
+    full: { ...full, types: ["image/webp"], qualities: [0.85] },
+    thumbnail: {
+      longest: catalogImageLimits.thumbnail,
+      types: ["image/webp"],
+      qualities: [0.85],
+    },
+  }) satisfies Record<keyof PickedImage, ShrinkTarget>;
 
 /** The Catalog entry whose image is edited, as it is now. */
 export type CatalogImageEntry = {
@@ -75,6 +76,9 @@ export type CatalogImageEntry = {
   title: string;
   imageUrl?: string;
   imageProvenance?: Provenance;
+  /** A banknote's real size, in millimetres, which some licences limit its image by. */
+  width?: number;
+  height?: number;
 };
 
 const accept = "image/jpeg,image/png,image/webp,image/gif";
@@ -156,7 +160,12 @@ export function CatalogImageDialog({
     licence: entry.imageProvenance?.licence ?? "",
     link: entry.imageProvenance?.link ?? "",
   }));
+  /** The chosen picture as it was, to convert again if the licence allows less. */
+  const [original, setOriginal] = useState<Blob>();
   const hasImage = entry.imageUrl !== undefined;
+  /** How large the full size may be under a licence; null when the entry lacks the size it needs. */
+  const boundsFor = (licence: string) =>
+    fullImageBounds({ width: entry.width, height: entry.height }, licence);
   const failureMessage = (failure: unknown, fallback: string) => {
     const code = failureCode(failure);
     return code ? t(`catalogImages.errors.${code}`) : fallback;
@@ -201,11 +210,20 @@ export function CatalogImageDialog({
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       if (!picked && !hasImage) return;
+      const bounds = boundsFor(value.licence);
+      if (!bounds) {
+        setFailed(t("catalogImages.errors.REPRODUCTION_SIZE_REQUIRED"));
+        return;
+      }
       try {
-        if (picked) {
+        if (picked && original) {
+          // The licence may allow less than when the picture was chosen.
+          const image = withinBounds(picked.full, bounds)
+            ? picked
+            : await shrinkImage(original, catalogImageSizes(bounds));
           const [full, thumbnail] = await Promise.all([
-            storeFile(picked.full.blob),
-            storeFile(picked.thumbnail.blob),
+            storeFile(image.full.blob),
+            storeFile(image.thumbnail.blob),
           ]);
           await attach({ key: entry.key, full, thumbnail, credit: value });
         } else {
@@ -248,7 +266,13 @@ export function CatalogImageDialog({
     }
     setConverting(true);
     try {
-      setPicked(await shrinkImage(file, catalogImageSizes));
+      const full = catalogImageLimits.full;
+      const bounds = boundsFor(form.getFieldValue("licence")) ?? {
+        longest: full,
+        shortest: full,
+      };
+      setPicked(await shrinkImage(file, catalogImageSizes(bounds)));
+      setOriginal(file);
       return true;
     } catch (failure) {
       const unwritable =

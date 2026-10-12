@@ -1032,7 +1032,10 @@ export default {
     emptyDescription:
       "Land og temaer vises her når det er lagt til katalogoppføringer.",
     theme: "Tema",
-    themes: { euroCommemoratives: "2-euro-minnemynter" },
+    themes: {
+      euroCommemoratives: "2-euro-minnemynter",
+      euroBanknotes: "Eurosedler",
+    },
     groupings: {
       commemorativeCoins: "Minnemynter",
       denominationCoins: "{denomination}-mynter",
@@ -1211,6 +1214,10 @@ export default {
         "Det konverterte bildet er for stort. Prøv et mindre bilde.",
       THUMBNAIL_TOO_LARGE:
         "Det konverterte miniatyrbildet er for stort. Prøv igjen.",
+      IMAGE_OVER_REPRODUCTION_LIMIT:
+        "ESBs regler for gjengivelse tillater dette bildet med høyst 72 dpi i seddelens faktiske størrelse. Velg bildet på nytt for å lagre det mindre.",
+      REPRODUCTION_SIZE_REQUIRED:
+        "ESBs regler for gjengivelse begrenser dette bildet etter seddelens faktiske størrelse. Legg inn seddelens bredde og høyde først.",
       NO_IMAGE:
         "Denne oppføringen har ikke noe bilde å kreditere. Velg et bilde.",
       CREDIT_REQUIRED: "Oppgi kilde, opphavsperson, lisens og lenke.",

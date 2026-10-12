@@ -9,7 +9,7 @@ import {
   catalogKind,
   preciousMetal,
 } from "../utils/validators";
-import { isCountryNode } from "./browse";
+import { isCountryNode } from "./countryNodes";
 import { catalogLimits, searchTextOf, valuesFromFields } from "./fields";
 import { heldCount } from "./held";
 import {

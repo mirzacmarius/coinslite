@@ -1041,7 +1041,10 @@ export default {
     emptyDescription:
       "Țările și temele apar aici după ce se adaugă intrări de catalog.",
     theme: "Temă",
-    themes: { euroCommemoratives: "Monede comemorative de 2 euro" },
+    themes: {
+      euroCommemoratives: "Monede comemorative de 2 euro",
+      euroBanknotes: "Bancnote euro",
+    },
     groupings: {
       commemorativeCoins: "Monede comemorative",
       denominationCoins: "{denomination} monede",
@@ -1222,6 +1225,10 @@ export default {
         "Imaginea convertită este prea mare. Încearcă o imagine mai mică.",
       THUMBNAIL_TOO_LARGE:
         "Miniatura convertită este prea mare. Încearcă din nou.",
+      IMAGE_OVER_REPRODUCTION_LIMIT:
+        "Regulile BCE privind reproducerea permit această imagine la cel mult 72 dpi la dimensiunea reală a bancnotei. Alege din nou imaginea pentru a o salva mai mică.",
+      REPRODUCTION_SIZE_REQUIRED:
+        "Regulile BCE privind reproducerea limitează această imagine după dimensiunea reală a bancnotei. Introdu mai întâi lățimea și înălțimea bancnotei.",
       NO_IMAGE:
         "Această intrare nu are o imagine de creditat. Alege o imagine.",
       CREDIT_REQUIRED: "Precizează sursa, autorul, licența și linkul.",

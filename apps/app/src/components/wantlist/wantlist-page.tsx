@@ -17,7 +17,6 @@ import {
   useCatalogFormat,
 } from "@/components/catalog/use-catalog-format";
 import { useI18n } from "@/locales/client";
-import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { IconButton } from "@coinslite/ui/icon-button";
@@ -37,7 +36,7 @@ type WantlistGroup = FunctionReturnType<typeof api.wants.list>[number];
  */
 export function WantlistPage({ actions }: { actions?: React.ReactNode }) {
   const t = useI18n();
-  const format = useFormatters();
+  const { nodeTitle } = useCatalogFormat();
   const groups = useQuery(api.wants.list, {});
   const header = (
     <CatalogHeader crumbs={[]} title={t("wantlist.title")} actions={actions} />
@@ -74,10 +73,18 @@ export function WantlistPage({ actions }: { actions?: React.ReactNode }) {
       </>
     );
   }
-  /** A country by its name in the reader's language, after its Theme if it has one. */
+  /**
+   * A country by its name in the reader's language (or a Theme's series by
+   * its title), after its Theme if it has one.
+   */
   const countryLabel = (group: WantlistGroup) => {
-    const country = group.country ? format.country(group.country) : group.title;
-    return group.theme ? `${group.theme} › ${country}` : country;
+    const country = nodeTitle({
+      key: group.key,
+      title: group.title,
+      country: group.country,
+      countryNode: group.country !== undefined,
+    });
+    return group.theme ? `${nodeTitle(group.theme)} › ${country}` : country;
   };
   return (
     <>
