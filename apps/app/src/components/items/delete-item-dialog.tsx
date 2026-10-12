@@ -1,17 +1,25 @@
 "use client";
 
-import { useI18n } from "@/locales/client";
+import {
+  hrefAfterDeleting,
+  viewOfItemUrl,
+} from "@/components/collection/collection-url";
+import { useCollectionDisplay } from "@/components/collection/use-collection-display";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { toast } from "@coinslite/ui/toaster";
 import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 
 /**
- * Confirms deleting an Item and its photos, then goes back to the Collection.
- * `onLeaving(true)` fires just before the Item disappears, so the page can
- * show it's leaving rather than "not found".
+ * Confirms deleting an Item and its photos, then goes back to the Collection
+ * view the Item was opened from, at the page that showed it. Reads the URL,
+ * so it must sit inside Suspense (ADR 0004). `onLeaving(true)` fires just
+ * before the Item disappears, so the page can show it's leaving rather than
+ * "not found".
  */
 export function DeleteItemDialog({
   item,
@@ -26,7 +34,20 @@ export function DeleteItemDialog({
 }) {
   const t = useI18n();
   const router = useRouter();
+  const locale = useCurrentLocale();
   const removeItem = useMutation(api.items.remove);
+  const [display] = useCollectionDisplay();
+  const params = useSearchParams();
+  const itemParams = useMemo(
+    () => new URLSearchParams(params.toString()),
+    [params],
+  );
+  const view = useMemo(() => viewOfItemUrl(itemParams), [itemParams]);
+  // Where the Item stands in that view; the Item page's arrows already ask.
+  const place = useQuery(
+    api.collection.neighbours,
+    view ? { view, itemId: item._id, locale } : "skip",
+  );
   // The sides are on the Item; its more photos come with the photo links,
   // which the photos section already holds, so this resolves at once.
   const photos = useQuery(
@@ -49,6 +70,8 @@ export function DeleteItemDialog({
       cancelLabel={t("deleteItem.cancel")}
       destructive
       onConfirm={async () => {
+        // Decided first: once the Item is gone, the view no longer shows it.
+        const next = hrefAfterDeleting(itemParams, place, display.pageSize);
         onLeaving(true);
         try {
           await removeItem({ itemId: item._id });
@@ -58,7 +81,7 @@ export function DeleteItemDialog({
           return;
         }
         toast.success(t("deleteItem.deleted"));
-        router.replace("/collection");
+        router.replace(next);
       }}
     />
   );

@@ -84,10 +84,30 @@ export function viewOfItemUrl(params: URLSearchParams) {
     : undefined;
 }
 
-/** The Collection showing a view, from its first page. */
-export function collectionHref(view: CollectionView) {
-  const query = writeCollectionUrl(view, 1).toString();
+/** The Collection showing a view, from its first page unless told otherwise. */
+export function collectionHref(view: CollectionView, page = 1) {
+  const query = writeCollectionUrl(view, page).toString();
   return query ? `/collection?${query}` : "/collection";
+}
+
+/**
+ * Where the Item page goes once its Item is deleted: back to the Collection
+ * view its URL carries, at the page that showed the Item (`place`: where it
+ * stood in the view, from 0, and how many the view held with it), or the
+ * page before when the Item was alone on the last one. Without a known
+ * place, the view's first page; without a view, the Collection.
+ */
+export function hrefAfterDeleting(
+  itemParams: URLSearchParams,
+  place: { position: number; total: number } | null | undefined,
+  pageSize: number,
+) {
+  const view = viewOfItemUrl(itemParams);
+  if (!view) return "/collection";
+  if (!place) return collectionHref(view);
+  const pagesLeft = Math.ceil((place.total - 1) / pageSize);
+  const page = Math.min(Math.floor(place.position / pageSize) + 1, pagesLeft);
+  return collectionHref(view, page);
 }
 
 /** The Collection narrowed to the Items made from one Catalog entry. */
