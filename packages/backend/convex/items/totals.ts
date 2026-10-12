@@ -93,6 +93,12 @@ export type TotalsContext = {
   utcOffsetMinutes?: number;
 };
 
+/** What an Item's Gain/loss is worked out from. */
+type ItemPrices = Pick<
+  TotalsItem,
+  "quantity" | "purchasePrice" | "marketValue" | "salePrice"
+>;
+
 /**
  * An Item's Gain/loss: (Market value − Purchase price) × Quantity. Undefined
  * unless it has both: a missing Market value isn't a loss, nor a missing
@@ -102,7 +108,7 @@ export function itemGainLoss({
   purchasePrice,
   marketValue,
   quantity,
-}: TotalsItem): number | undefined {
+}: ItemPrices): number | undefined {
   if (purchasePrice === undefined || marketValue === undefined)
     return undefined;
   return (marketValue - purchasePrice) * quantity;
@@ -116,9 +122,48 @@ export function itemRealised({
   purchasePrice,
   salePrice,
   quantity,
-}: TotalsItem): number | undefined {
+}: ItemPrices): number | undefined {
   if (purchasePrice === undefined || salePrice === undefined) return undefined;
   return (salePrice - purchasePrice) * quantity;
+}
+
+/**
+ * The figures one Item's page leads with, read as the Collection totals of
+ * the view it shows in read it. Amounts in minor units of the Home currency.
+ */
+export type ItemFigures = {
+  /**
+   * An owned Item's Market value, or what a sold Item sold for (its sale
+   * price), per piece and × Quantity. Undefined while it has none.
+   */
+  value: {
+    kind: "marketValue" | "salePrice";
+    perPiece: number | undefined;
+    total: number | undefined;
+  };
+  /**
+   * An owned Item's Gain/loss (itemGainLoss), or a sold Item's realised
+   * Gain/loss (itemRealised). Undefined while it lacks a price it needs.
+   */
+  gainLoss: { kind: "gainLoss" | "realised"; amount: number | undefined };
+};
+
+/** An owned Item's figures, or a sold one's (it has a sold-on date): see ItemFigures. */
+export function itemFigures(
+  item: ItemPrices & { soldOn?: string },
+): ItemFigures {
+  const sold = item.soldOn !== undefined;
+  const perPiece = sold ? item.salePrice : item.marketValue;
+  return {
+    value: {
+      kind: sold ? "salePrice" : "marketValue",
+      perPiece,
+      total: perPiece === undefined ? undefined : perPiece * item.quantity,
+    },
+    gainLoss: sold
+      ? { kind: "realised", amount: itemRealised(item) }
+      : { kind: "gainLoss", amount: itemGainLoss(item) },
+  };
 }
 
 /** All the pieces, whatever their Item type. */

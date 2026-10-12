@@ -6,6 +6,7 @@ import {
   acquiredAt,
   collectionTotals,
   combineTotals,
+  itemFigures,
   monthOf,
 } from "./totals";
 
@@ -187,6 +188,57 @@ describe("Collection totals", () => {
     expect(combineTotals(withPrices, withoutPrices).metals).toEqual({
       gold: { fineWeight: 31.1034768, value: null },
       silver: { fineWeight: 31.1034768, value: null },
+    });
+  });
+});
+
+describe("One Item's figures", () => {
+  test("an owned Item shows its Market value × Quantity and its Gain/loss", () => {
+    // Three pieces bought at 150 kr, each worth 210 kr now.
+    expect(
+      itemFigures({ quantity: 3, purchasePrice: 150_00, marketValue: 210_00 }),
+    ).toEqual({
+      value: { kind: "marketValue", perPiece: 210_00, total: 630_00 },
+      gainLoss: { kind: "gainLoss", amount: 180_00 },
+    });
+  });
+
+  test("without a Market value, an owned Item has neither a value nor a Gain/loss, not a loss", () => {
+    // Two pieces bought at 40 kr, never valued.
+    expect(itemFigures({ quantity: 2, purchasePrice: 40_00 })).toEqual({
+      value: { kind: "marketValue", perPiece: undefined, total: undefined },
+      gainLoss: { kind: "gainLoss", amount: undefined },
+    });
+  });
+
+  test("a sold Item shows what it sold for × Quantity and its realised Gain/loss, whatever its Market value", () => {
+    // Two pieces bought at 100 kr and valued at 300 kr, sold at 80 kr each.
+    expect(
+      itemFigures({
+        soldOn: "2026-09-01",
+        quantity: 2,
+        purchasePrice: 100_00,
+        marketValue: 300_00,
+        salePrice: 80_00,
+      }),
+    ).toEqual({
+      value: { kind: "salePrice", perPiece: 80_00, total: 160_00 },
+      gainLoss: { kind: "realised", amount: -40_00 },
+    });
+  });
+
+  test("a sold Item without a sale price has neither, even with a Market value", () => {
+    // Given away: one piece bought at 100 kr and valued at 300 kr.
+    expect(
+      itemFigures({
+        soldOn: "2026-09-01",
+        quantity: 1,
+        purchasePrice: 100_00,
+        marketValue: 300_00,
+      }),
+    ).toEqual({
+      value: { kind: "salePrice", perPiece: undefined, total: undefined },
+      gainLoss: { kind: "realised", amount: undefined },
     });
   });
 });
