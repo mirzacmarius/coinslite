@@ -3,7 +3,6 @@
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
-import { Button } from "@coinslite/ui/button";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd } from "@coinslite/ui/kbd";
 import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";

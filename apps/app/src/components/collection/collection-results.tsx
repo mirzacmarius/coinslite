@@ -103,6 +103,7 @@ function ItemTarget({
     );
   const checked = selection.isSelected(item._id);
   return (
+    // biome-ignore lint/a11y/useSemanticElements: the whole row toggles (shift-click selects a range); an <input> can't hold the row
     <button
       type="button"
       role="checkbox"

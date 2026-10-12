@@ -11,6 +11,7 @@ export function AddShortcuts({ className }: { className?: string }) {
   const t = useI18n();
   const addItem = useAddItem();
   return (
+    // biome-ignore lint/a11y/useSemanticElements: a row of buttons; a fieldset's min-content width would keep them from wrapping
     <div
       role="group"
       aria-label={t("overview.addShortcuts")}

@@ -506,6 +506,7 @@ function ImagePicker({
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: a drop target only; the button inside is the click and keyboard control */}
       <div
         aria-busy={converting}
         onDragOver={onDragOver}

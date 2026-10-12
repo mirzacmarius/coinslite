@@ -263,6 +263,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           </div>
         </>
       ) : (
+        // biome-ignore lint/a11y/useSemanticElements: a row of buttons; a fieldset's min-content width would keep them from wrapping
         <div
           role="group"
           aria-labelledby={addId}

@@ -30,8 +30,7 @@ export function SelectionBar({
 }) {
   const t = useI18n();
   return (
-    <div
-      role="region"
+    <section
       aria-label={label}
       className={cn(
         "flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px]",
@@ -56,6 +55,6 @@ export function SelectionBar({
         </span>
       )}
       {children}
-    </div>
+    </section>
   );
 }

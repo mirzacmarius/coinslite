@@ -115,6 +115,7 @@ const SidebarProvider = React.forwardRef<
         }
 
         // Remembered across visits; the caller reads it back (app-shell.tsx).
+        // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API isn't in every browser we support
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
       },
       [setOpenProp, open],

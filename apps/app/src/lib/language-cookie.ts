@@ -10,6 +10,7 @@ export const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
  */
 export function rememberLanguage(locale: Locale) {
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API isn't in every browser we support
   document.cookie = `${LANGUAGE_COOKIE}=${locale}; Max-Age=${ONE_YEAR_IN_SECONDS}; Path=/; SameSite=Lax${secure}`;
 }
 

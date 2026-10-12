@@ -141,14 +141,13 @@ export function faceValue(denomination: string): number | undefined {
 
 /** The words naming a denomination's main unit: "krone" of "½ krone", none of "50 øre". */
 const unitWords = (text: string) =>
-  text
-    .split(/[^\p{L}]+/u)
-    .filter(
-      (word) =>
-        word.length > 1 &&
-        !minorUnits.has(word) &&
-        !Object.prototype.hasOwnProperty.call(shares, word),
-    );
+  text.split(/[^\p{L}]+/u).filter(
+    (word) =>
+      word.length > 1 &&
+      !minorUnits.has(word) &&
+      // biome-ignore lint/suspicious/noPrototypeBuiltins: Object.hasOwn needs lib ES2022; Convex's tsconfig has ES2021
+      !Object.prototype.hasOwnProperty.call(shares, word),
+  );
 
 /**
  * Whether two words could name one unit: one holds the other ("kr" and

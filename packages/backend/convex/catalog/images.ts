@@ -50,7 +50,7 @@ async function requireEntry(ctx: QueryCtx, key: string) {
     .query("catalogNodes")
     .withIndex("by_key", (q) => q.eq("key", key))
     .unique();
-  if (!node || node.kind !== "entry")
+  if (node?.kind !== "entry")
     throw new ConvexError(catalogImageErrors.entryNotFound);
   return node;
 }

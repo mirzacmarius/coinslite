@@ -237,7 +237,7 @@ export async function renderTableDocument(
       for (const [label, value] of group.rows) {
         const labelLines = wrap(regular, label, size.label, labelWidth);
         const valueLines = wrap(regular, value, size.text, valueWidth);
-        labelLines.forEach((line, n) =>
+        labelLines.forEach((line, n) => {
           text(
             line,
             x,
@@ -245,17 +245,17 @@ export async function renderTableDocument(
             regular,
             size.label,
             muted,
-          ),
-        );
-        valueLines.forEach((line, n) =>
+          );
+        });
+        valueLines.forEach((line, n) => {
           text(
             line,
             x + labelWidth + 8,
             top - n * size.text * leading,
             regular,
             size.text,
-          ),
-        );
+          );
+        });
         top -=
           Math.max(labelLines.length, valueLines.length) * size.text * leading +
           3;
