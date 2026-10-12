@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { type QueryCtx, query } from "../_generated/server";
+import { catalogItemType, catalogKind } from "../utils/validators";
 import {
   ancestor,
   ancestorsOf,
@@ -14,7 +15,17 @@ import {
   nullable,
   stored,
 } from "./browse";
-import { storedDenominationCount } from "./denominationCounts";
+import {
+  type DenominationGroup,
+  storedDenominationCount,
+} from "./denominationCounts";
+import {
+  type FoundSet,
+  type NodeName,
+  type SetProgress,
+  type SetScope,
+  setIdOf,
+} from "./setProgress";
 import { completion, isSet, setErrors, setLimits } from "./setRules";
 
 /**
@@ -342,20 +353,194 @@ export async function setOfEntry(
   ctx: QueryCtx,
   entry: Doc<"catalogNodes">,
 ): Promise<typeof setScope.type | null> {
+  const set = await entrySet(entry, {
+    node: (key) => nodeByKey(ctx, key),
+    entryCount: async (group) =>
+      (await storedDenominationCount(ctx, group)) ??
+      // Not counted yet, until catalog/denominationCounts:backfill has run.
+      (
+        await denominationEntries(
+          ctx,
+          group.countryNodeKey,
+          group.denomination ?? null,
+          group.series ?? null,
+        )
+      ).length,
+  });
+  return set?.scope ?? null;
+}
+
+/** How `entrySet` reads the tree: a node by key, and a denomination path's entry count (null when unknown). */
+type SetReads = {
+  node: (key: string) => Promise<Doc<"catalogNodes"> | null>;
+  entryCount: (group: DenominationGroup) => Promise<number | null>;
+};
+
+/**
+ * The Set an entry belongs to (see `setOfEntry`), with the grouping it is
+ * of and how many entries it has. Null when there's none, or its entry
+ * count is unknown.
+ */
+async function entrySet(
+  entry: Doc<"catalogNodes">,
+  reads: SetReads,
+): Promise<{
+  scope: SetScope;
+  node: Doc<"catalogNodes">;
+  total: number;
+} | null> {
   const parentKey = entry.path.split("/").at(-2);
-  const parent = parentKey && (await nodeByKey(ctx, parentKey));
+  const parent = parentKey ? await reads.node(parentKey) : null;
   if (!parent) return null;
-  if (!isCountryNode(parent))
-    return isSet(parent.entryCount ?? 0) ? { key: parent.key } : null;
-  const denomination = entry.denomination ?? null;
-  const series = entry.series ?? null;
-  const entryCount =
-    (await storedDenominationCount(ctx, {
-      countryNodeKey: parent.key,
-      denomination: entry.denomination,
-      series: entry.series,
-    })) ??
-    // Not counted yet, until catalog/denominationCounts:backfill has run.
-    (await denominationEntries(ctx, parent.key, denomination, series)).length;
-  return isSet(entryCount) ? { key: parent.key, denomination, series } : null;
+  if (!isCountryNode(parent)) {
+    const total = parent.entryCount ?? 0;
+    return isSet(total)
+      ? { scope: { key: parent.key }, node: parent, total }
+      : null;
+  }
+  const total = await reads.entryCount({
+    countryNodeKey: parent.key,
+    denomination: entry.denomination,
+    series: entry.series,
+  });
+  if (total === null || !isSet(total)) return null;
+  const scope = {
+    key: parent.key,
+    denomination: entry.denomination ?? null,
+    series: entry.series ?? null,
+  };
+  return { scope, node: parent, total };
+}
+
+/** A Catalog node as the app names it (setProgress.ts NodeName). */
+function nameOf(node: Doc<"catalogNodes">): NodeName {
+  return {
+    key: node.key,
+    title: node.title,
+    kind: node.kind,
+    ...(node.country !== undefined && { country: node.country }),
+    countryNode: isCountryNode(node),
+    ...(node.denomination !== undefined && {
+      denomination: node.denomination,
+    }),
+    ...(node.itemType !== undefined && { itemType: node.itemType }),
+    ...(node.series !== undefined && { series: node.series }),
+  };
+}
+
+/** A node as Set progress names it, for return values. */
+export const nodeName = v.object({
+  key: v.string(),
+  title: v.string(),
+  kind: v.optional(catalogKind),
+  country: v.optional(v.string()),
+  countryNode: v.boolean(),
+  denomination: v.optional(v.string()),
+  itemType: v.optional(catalogItemType),
+  series: v.optional(v.string()),
+});
+
+/** What `setsOfEntries` finds, for return values (setProgress.ts SetProgress). */
+export const setProgress = v.object({
+  sets: v.array(
+    v.object({
+      id: v.string(),
+      scope: setScope,
+      node: nodeName,
+      parent: v.optional(nodeName),
+      total: v.number(),
+    }),
+  ),
+  held: v.array(v.object({ id: v.string(), sets: v.array(v.string()) })),
+});
+
+/** Reads each thing once, however often it's asked for. */
+function readOnce<A, T>(
+  keyOf: (arg: A) => string,
+  read: (arg: A) => Promise<T>,
+) {
+  const reads = new Map<string, Promise<T>>();
+  return (arg: A) => {
+    const key = keyOf(arg);
+    let found = reads.get(key);
+    if (!found) {
+      found = read(arg);
+      reads.set(key, found);
+    }
+    return found;
+  };
+}
+
+/** An entry's own denomination and series in its country, as a Set; null outside any country. */
+function denominationPathOf(entry: Doc<"catalogNodes">): SetScope | null {
+  if (entry.countryNodeKey === undefined) return null;
+  return {
+    key: entry.countryNodeKey,
+    denomination: entry.denomination ?? null,
+    series: entry.series ?? null,
+  };
+}
+
+/**
+ * Set progress (setProgress.ts) for distinct Catalog entries a person
+ * holds: the Set each one opens with "View as Set", with its entry count,
+ * and every Set each entry counts toward on a Set view: each grouping above
+ * it, and its denomination and series in its country. Reads each node and
+ * count at most once, and only stored counts: a denomination path not
+ * counted yet is left out rather than counted here, so this reads at most
+ * a few documents per entry however large its Set.
+ */
+export async function setsOfEntries(
+  ctx: QueryCtx,
+  entries: Doc<"catalogNodes">[],
+): Promise<SetProgress> {
+  const node = readOnce(
+    (key: string) => key,
+    (key) => nodeByKey(ctx, key),
+  );
+  const reads: SetReads = {
+    node,
+    entryCount: readOnce(
+      (group: DenominationGroup) =>
+        setIdOf({
+          key: group.countryNodeKey,
+          denomination: group.denomination ?? null,
+          series: group.series ?? null,
+        }),
+      (group) => storedDenominationCount(ctx, group),
+    ),
+  };
+  const sets = new Map<string, FoundSet>();
+  await Promise.all(
+    entries.map(async (entry) => {
+      const set = await entrySet(entry, reads);
+      if (!set) return;
+      // A grouping Set is named with the grouping above it.
+      const aboveKey =
+        set.scope.denomination === undefined
+          ? set.node.path.split("/").at(-2)
+          : undefined;
+      const above = aboveKey ? await node(aboveKey) : null;
+      sets.set(setIdOf(set.scope), {
+        id: setIdOf(set.scope),
+        scope: set.scope,
+        node: nameOf(set.node),
+        ...(above && { parent: nameOf(above) }),
+        total: set.total,
+      });
+    }),
+  );
+  return {
+    sets: [...sets.values()],
+    held: entries.map((entry) => {
+      const path = denominationPathOf(entry);
+      return {
+        id: entry._id,
+        sets: [
+          ...entry.path.split("/").slice(0, -1),
+          ...(path ? [setIdOf(path)] : []),
+        ],
+      };
+    }),
+  };
 }
