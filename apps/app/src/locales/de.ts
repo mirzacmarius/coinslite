@@ -78,6 +78,9 @@ export default {
     notFound:
       "Dieses Objekt gibt es nicht, oder es gehört nicht zu deiner Sammlung.",
     backToCollection: "Zurück zur Sammlung",
+    loading: "Objekt wird geladen",
+    gainLossNone: "Benötigt Kaufpreis und Marktwert",
+    realisedNone: "Benötigt Kaufpreis und Verkaufspreis",
     details: "Angaben",
     purchase: "Kauf",
     noMatches: "Keine Treffer",
@@ -486,6 +489,7 @@ export default {
       removeTitle: "Dieses Foto entfernen?",
     },
     add: "Foto hinzufügen",
+    addPhotos: "Fotos hinzufügen",
     formats: "JPEG, PNG, WebP oder GIF, bis 10 MB",
     uploading: "Foto wird hochgeladen",
     view: "Im Vollbild ansehen",

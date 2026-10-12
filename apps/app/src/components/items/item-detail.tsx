@@ -19,12 +19,10 @@ import {
   referenceName,
   stampCatalogueNames,
 } from "@coinslite/backend/convex/items/references";
-import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
-import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
@@ -45,12 +43,16 @@ import { isItemLimitError, useItemLimitMessage } from "../plans/plan-usage";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
+import { ItemHeader, ItemHeaderSkeleton, type ItemMoney } from "./item-header";
 import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
 
-/** One Item, every recorded fact: descriptive facts beside, the rest in the properties panel. */
+/**
+ * One Item, every recorded fact: its title, value and Gain/loss first, then
+ * the photos and descriptive facts beside the properties panel.
+ */
 export function ItemDetail() {
   const t = useI18n();
   const { itemId } = useParams<{ itemId: string }>();
@@ -86,7 +88,7 @@ export function ItemDetail() {
   );
 
   if (item === undefined || (item === null && leaving)) {
-    return <HeaderBar parent={parent} title="" />;
+    return <ItemDetailSkeleton parent={parent} />;
   }
   if (item === null) {
     return (
@@ -118,8 +120,10 @@ export function ItemDetail() {
   }
 
   const album = albums?.find(({ _id }) => _id === item.albumId);
-  const money = (amount: number | undefined) =>
-    amount === undefined ? undefined : format.money(amount, item.currency);
+  const money: ItemMoney = (amount, options) =>
+    amount === undefined
+      ? undefined
+      : format.money(amount, item.currency, options);
   const millimetres = (value: number | undefined) =>
     value === undefined
       ? undefined
@@ -367,14 +371,10 @@ export function ItemDetail() {
         onOpenChange={setDeleting}
         onLeaving={setLeaving}
       />
+      <ItemHeader item={item} money={money} />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
           <ItemPhotos item={item} />
-          <div className="flex items-center gap-3">
-            <ItemTypeIcon type={item.type} />
-            <h2 className="text-base font-medium">{item.title}</h2>
-            {sold && <Badge variant="outline">{t("sale.soldBadge")}</Badge>}
-          </div>
           {shownFacts.length > 0 && (
             <dl className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3 text-sm">
               {shownFacts.map(([label, value]) => (
@@ -387,9 +387,9 @@ export function ItemDetail() {
           )}
           {item.notes && (
             <section className="flex max-w-xl flex-col gap-1">
-              <h3 className="text-xs font-medium text-muted-foreground">
+              <h2 className="text-xs font-medium text-muted-foreground">
                 {t("items.notes")}
-              </h3>
+              </h2>
               <p className="whitespace-pre-line text-sm">{item.notes}</p>
             </section>
           )}
@@ -577,6 +577,64 @@ export function ItemDetail() {
   );
 }
 
+/**
+ * The Item page while the Item loads (and once it's deleted, while the page
+ * goes back): its bar, header, facts and properties panel as placeholders.
+ */
+export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
+  const t = useI18n();
+  const placeholder = (size: string) => (
+    <span className={cn("animate-pulse rounded bg-muted", size)} />
+  );
+  return (
+    <>
+      <HeaderBar
+        parent={
+          parent ?? (
+            <Link href="/collection" className="hover:text-foreground">
+              {t("nav.collection")}
+            </Link>
+          )
+        }
+        title={
+          <>
+            <span className="sr-only">{t("items.loading")}</span>
+            <span
+              className="inline-block h-3.5 w-40 animate-pulse rounded bg-muted align-middle"
+              aria-hidden="true"
+            />
+          </>
+        }
+      />
+      <div aria-busy="true" className="flex flex-1 flex-col">
+        <ItemHeaderSkeleton />
+        <div className="flex flex-1 flex-col lg:flex-row" aria-hidden="true">
+          <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
+            {placeholder("h-11 w-full max-w-xl rounded-lg")}
+            <div className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3">
+              {[0, 1, 2, 3].map((fact) => (
+                <div key={fact} className="flex flex-col gap-1.5">
+                  {placeholder("h-3 w-16")}
+                  {placeholder("h-4 w-24")}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex w-full shrink-0 flex-col gap-3 border-t bg-card p-4 lg:w-[280px] lg:border-l lg:border-t-0 xl:w-[300px]">
+            {placeholder("h-3 w-20")}
+            {[0, 1, 2, 3, 4].map((row) => (
+              <div key={row} className="grid grid-cols-[112px_1fr] gap-2">
+                {placeholder("h-3 w-16")}
+                {placeholder("h-3.5 w-24")}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function PanelSection({
   title,
   action,
@@ -587,21 +645,21 @@ function PanelSection({
     <section aria-labelledby={titleId} className="flex flex-col gap-1 p-4">
       {action ? (
         <div className="-my-1 mb-0 flex items-center justify-between gap-2">
-          <h3
+          <h2
             id={titleId}
             className="text-xs font-medium text-muted-foreground"
           >
             {title}
-          </h3>
+          </h2>
           {action}
         </div>
       ) : (
-        <h3
+        <h2
           id={titleId}
           className="mb-1 text-xs font-medium text-muted-foreground"
         >
           {title}
-        </h3>
+        </h2>
       )}
       {children}
     </section>

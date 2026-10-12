@@ -78,6 +78,9 @@ export default {
     notFound:
       "Cet objet n’existe pas ou ne fait pas partie de votre collection.",
     backToCollection: "Retour à la collection",
+    loading: "Chargement de l’objet",
+    gainLossNone: "Nécessite un prix d’achat et une valeur de marché",
+    realisedNone: "Nécessite un prix d’achat et un prix de vente",
     details: "Détails",
     purchase: "Achat",
     noMatches: "Aucun résultat",
@@ -479,6 +482,7 @@ export default {
       removeTitle: "Retirer cette photo\u00a0?",
     },
     add: "Ajouter une photo",
+    addPhotos: "Ajouter des photos",
     formats: "JPEG, PNG, WebP ou GIF, jusqu’à 10 Mo",
     uploading: "Envoi de la photo",
     view: "Voir en plein écran",
@@ -1071,7 +1075,7 @@ export default {
     gainLossNone:
       "S’affiche dès qu’un objet a un prix d’achat et une valeur de marché",
     salePrice: "Prix de vente total",
-    realised: "Plus-value/moins-value réalisée",
+    realised: "Gain/perte réalisée",
     realisedNone:
       "S’affiche dès qu’un objet vendu a un prix d’achat et un prix de vente",
     realisedPartial:

@@ -278,6 +278,10 @@ export function CollectionTotalsSkeleton() {
   );
 }
 
+/** The colour of a Gain/loss wherever it shows: green for a gain, red for a loss. */
+export const gainLossColour = (amount: number) =>
+  cn(amount > 0 && "text-success", amount < 0 && "text-destructive");
+
 /** An amount with its sign, green for a gain and red for a loss. */
 function SignedMoney({
   amount,
@@ -288,12 +292,7 @@ function SignedMoney({
 }) {
   const format = useFormatters();
   return (
-    <span
-      className={cn(
-        amount > 0 && "text-success",
-        amount < 0 && "text-destructive",
-      )}
-    >
+    <span className={gainLossColour(amount)}>
       {format.money(amount, currency, { signed: true })}
     </span>
   );

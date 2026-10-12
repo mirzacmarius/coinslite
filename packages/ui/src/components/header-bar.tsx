@@ -25,7 +25,8 @@ export function HeaderBar({
   actions,
   className,
 }: {
-  title: string;
+  /** Text; a placeholder while the page loads. */
+  title: React.ReactNode;
   /** A link to the parent page, e.g. the Album an Item belongs to. */
   parent?: React.ReactNode;
   actions?: React.ReactNode;
