@@ -84,6 +84,8 @@ export const accountDataByTable = {
   devOutbox:
     "deleted: emails sent to the account's address (local and CI deployments only)",
   catalogNodes: "kept: the Catalog everyone shares",
+  catalogDenominationCounts:
+    "kept: the Catalog's entry counts, which name no one",
   photoLinkKeys:
     "kept: when photo links are issued and the deployment's own signing secret, which name no one",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",
