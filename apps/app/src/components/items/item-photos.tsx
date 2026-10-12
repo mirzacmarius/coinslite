@@ -102,7 +102,8 @@ function usePhotoUpload(itemId: Id<"items">) {
 
 /**
  * An Item's photos: its two sides, then up to `photoLimits.more` more. Each
- * can be added, replaced (sides) or removed, and viewed full screen.
+ * can be added, replaced (sides) or removed, and viewed full screen. An Item
+ * without any shows one compact row to add them instead.
  */
 export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   const t = useI18n();
@@ -110,6 +111,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   const upload = usePhotoUpload(item._id);
   const removePhoto = useMutation(api.photos.remove);
   const moreId = useId();
+  const addId = useId();
   const [busy, setBusy] = useState<Record<PhotoSide | "more", boolean>>({
     front: false,
     back: false,
@@ -122,6 +124,11 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   });
   const names = sideNames[item.type];
   const more = photos?.more ?? [];
+  // Until the photos load, the Item's sides tell whether it has any.
+  const hasPhotos =
+    photos === undefined
+      ? item.frontPhoto !== undefined || item.backPhoto !== undefined
+      : Boolean(photos?.front || photos?.back || more.length > 0);
   const urlOf = (side: PhotoSide) =>
     photos === undefined ? undefined : photos?.[side] ?? null;
   const moreLabel = (n: number) => t("photos.more.label", { n });
@@ -176,58 +183,96 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   return (
     <section
       aria-label={t("photos.title")}
-      className="flex max-w-sm flex-col gap-4"
+      className={cn("flex flex-col gap-4", hasPhotos ? "max-w-sm" : "max-w-xl")}
     >
-      <div className="grid grid-cols-2 gap-3">
-        {photoSides.map((side) => (
-          <PhotoSlot
-            key={side}
-            label={t(`photos.sides.${names[side]}`)}
-            url={urlOf(side)}
-            busy={busy[side]}
-            onFile={(file) => void add(side, file)}
-            onView={() => view(side)}
-            onRemove={() => setRemoval({ open: true, target: side })}
-          />
-        ))}
-      </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-0.5">
-          <h3 id={moreId} className="text-xs font-medium text-muted-foreground">
-            {t("photos.more.title")}
-          </h3>
-          {photos !== undefined && more.length === 0 && (
-            <p className="text-xs text-muted-foreground">
-              {t("photos.more.hint", { limit: photoLimits.more })}
-            </p>
-          )}
-        </div>
-        {photos !== undefined && (
-          <div className="grid grid-cols-3 gap-2">
-            {more.map((photo, at) => (
+      {hasPhotos ? (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            {photoSides.map((side) => (
               <PhotoSlot
-                key={photo.id}
-                small
-                label={moreLabel(at + 1)}
-                url={photo.url}
-                busy={false}
-                onView={() => view(photo.id)}
-                onRemove={() => setRemoval({ open: true, target: photo.id })}
+                key={side}
+                label={t(`photos.sides.${names[side]}`)}
+                url={urlOf(side)}
+                busy={busy[side]}
+                onFile={(file) => void add(side, file)}
+                onView={() => view(side)}
+                onRemove={() => setRemoval({ open: true, target: side })}
               />
             ))}
-            {more.length < photoLimits.more && (
-              <PhotoSlot
-                small
-                label={t("photos.more.title")}
-                labelId={moreId}
-                url={null}
-                busy={busy.more}
-                onFile={(file) => void add(undefined, file)}
-              />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-0.5">
+              <h2
+                id={moreId}
+                className="text-xs font-medium text-muted-foreground"
+              >
+                {t("photos.more.title")}
+              </h2>
+              {photos !== undefined && more.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {t("photos.more.hint", { limit: photoLimits.more })}
+                </p>
+              )}
+            </div>
+            {photos !== undefined && (
+              <div className="grid grid-cols-3 gap-2">
+                {more.map((photo, at) => (
+                  <PhotoSlot
+                    key={photo.id}
+                    small
+                    label={moreLabel(at + 1)}
+                    url={photo.url}
+                    busy={false}
+                    onView={() => view(photo.id)}
+                    onRemove={() =>
+                      setRemoval({ open: true, target: photo.id })
+                    }
+                  />
+                ))}
+                {more.length < photoLimits.more && (
+                  <PhotoSlot
+                    small
+                    label={t("photos.more.title")}
+                    labelId={moreId}
+                    url={null}
+                    busy={busy.more}
+                    onFile={(file) => void add(undefined, file)}
+                  />
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div
+          role="group"
+          aria-labelledby={addId}
+          className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2"
+        >
+          <span
+            id={addId}
+            className="mr-1 text-[13px] font-medium text-muted-foreground"
+          >
+            {t("photos.addPhotos")}
+          </span>
+          {photoSides.map((side) => (
+            <AddPhotoButton
+              key={side}
+              label={t(`photos.sides.${names[side]}`)}
+              busy={busy[side]}
+              onFile={(file) => void add(side, file)}
+            />
+          ))}
+          <AddPhotoButton
+            label={t("photos.more.title")}
+            busy={busy.more}
+            onFile={(file) => void add(undefined, file)}
+          />
+          <span className="ml-auto hidden text-xs text-muted-foreground sm:inline">
+            {t("photos.formats")}
+          </span>
+        </div>
+      )}
       <PhotoViewer
         index={viewing}
         onIndexChange={setViewing}
@@ -253,6 +298,97 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
         }}
       />
     </section>
+  );
+}
+
+/**
+ * Where a photo file comes from: the file picker `pick` opens (its hidden
+ * `input` must be rendered), or a file dropped on whatever takes `dropTarget`.
+ * Without `onFile`, or while `busy`, it takes no file.
+ */
+function usePhotoFile(
+  onFile: ((file: File) => void) | undefined,
+  busy: boolean,
+) {
+  const input = useRef<HTMLInputElement>(null);
+  const [dropping, setDropping] = useState(false);
+  const dropTarget = {
+    onDragOver: (event: React.DragEvent) => {
+      if (!onFile || busy || !event.dataTransfer.types.includes("Files"))
+        return;
+      event.preventDefault();
+      setDropping(true);
+    },
+    onDragLeave: () => setDropping(false),
+    onDrop: (event: React.DragEvent) => {
+      event.preventDefault();
+      setDropping(false);
+      const file = event.dataTransfer.files[0];
+      if (file && onFile && !busy) onFile(file);
+    },
+  };
+  const fileInput = onFile && (
+    <input
+      ref={input}
+      type="file"
+      accept={accept}
+      hidden
+      onChange={(event) => {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (file) onFile(file);
+      }}
+    />
+  );
+  return {
+    pick: () => input.current?.click(),
+    dropping,
+    dropTarget,
+    fileInput,
+  };
+}
+
+/**
+ * One button of the compact row an Item without photos shows: it adds a photo
+ * to one place (a side, or the more photos), picked or dropped on it.
+ */
+function AddPhotoButton({
+  label,
+  busy,
+  onFile,
+}: {
+  label: string;
+  busy: boolean;
+  onFile: (file: File) => void;
+}) {
+  const t = useI18n();
+  const { pick, dropping, dropTarget, fileInput } = usePhotoFile(onFile, busy);
+  return (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        size="xs"
+        onClick={pick}
+        disabled={busy}
+        aria-busy={busy}
+        className={cn(dropping && "ring-2 ring-ring")}
+        {...dropTarget}
+      >
+        {busy ? (
+          <Loader2
+            className="animate-spin"
+            strokeWidth={1.75}
+            role="img"
+            aria-label={t("photos.uploading")}
+          />
+        ) : (
+          <ImagePlus strokeWidth={1.75} aria-hidden="true" />
+        )}
+        {label}
+      </Button>
+      {fileInput}
+    </>
   );
 }
 
@@ -285,31 +421,16 @@ function PhotoSlot({
 }) {
   const t = useI18n();
   const id = useId();
-  const input = useRef<HTMLInputElement>(null);
-  const [dropping, setDropping] = useState(false);
-  const pick = () => input.current?.click();
+  const { pick, dropping, dropTarget, fileInput } = usePhotoFile(onFile, busy);
   const labelledBy = labelId ?? `${id}-label`;
   const tileFocus =
     "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
-  const onDragOver = (event: React.DragEvent) => {
-    if (!onFile || busy || !event.dataTransfer.types.includes("Files")) return;
-    event.preventDefault();
-    setDropping(true);
-  };
-  const onDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    setDropping(false);
-    const file = event.dataTransfer.files[0];
-    if (file && onFile && !busy) onFile(file);
-  };
 
   return (
     <div className="flex min-w-0 flex-col gap-1">
       <div
         aria-busy={busy}
-        onDragOver={onDragOver}
-        onDragLeave={() => setDropping(false)}
-        onDrop={onDrop}
+        {...dropTarget}
         className={cn(
           "relative aspect-square overflow-hidden rounded-lg border bg-muted",
           url === null && "border-dashed",
@@ -416,19 +537,7 @@ function PhotoSlot({
           )}
         </div>
       )}
-      {onFile && (
-        <input
-          ref={input}
-          type="file"
-          accept={accept}
-          hidden
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = "";
-            if (file) onFile(file);
-          }}
-        />
-      )}
+      {fileInput}
     </div>
   );
 }
