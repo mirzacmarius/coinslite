@@ -247,17 +247,20 @@ function TotalsDetails({
   );
 }
 
-/** The value chart and the value distribution of what's owned, pulsing while the totals are still counting. */
+/**
+ * The value chart and the value distribution of what's owned, pulsing while
+ * the totals or "Value over time" are still counting.
+ */
 function Charts({ totals }: { totals: ShownTotals }) {
   const overTime = useValueOverTime();
   return (
     <div
       className={cn(
         "grid gap-4 lg:grid-cols-2",
-        totals.counting && "animate-pulse",
+        (totals.counting || overTime?.counting) && "animate-pulse",
       )}
     >
-      <ValueChart totals={totals} overTime={overTime} />
+      <ValueChart totals={totals} overTime={overTime?.sum} />
       <ValueDistributionChart totals={totals} />
     </div>
   );
