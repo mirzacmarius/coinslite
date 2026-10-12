@@ -7,7 +7,7 @@ import {
   type QueryCtx,
   internalMutation,
 } from "../_generated/server";
-import { clearWantsOfEntry } from "../wants";
+import { clearWantsOfEntry, unkeyWantsOfEntry } from "../wants";
 import {
   type CatalogItemType,
   type CatalogKind,
@@ -508,6 +508,9 @@ export async function applyPlan(
     }
     countEntry(node.existing.path, node.existing.kind === "entry", -1);
     denominationCounts.count(node.existing, -1);
+    // No longer an entry: its wants stay, but no longer name it (wants.ts).
+    if (node.existing.kind === "entry" && node.kind !== "entry")
+      await unkeyWantsOfEntry(ctx, node.existing._id);
     if (node.existing.path !== path) refresh.push(node.existing.path);
     else if (node.parentKey === null && node.existing.kind !== node.kind)
       refresh.push(path);

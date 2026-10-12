@@ -119,6 +119,13 @@ export default defineSchema({
   wants: defineTable({
     ownerId: v.id("users"),
     catalogEntryId: v.id("catalogNodes"),
+    /**
+     * The entry's key, which never changes, so listing what a person wants
+     * reads no Catalog entries. Absent on wants from before it was stored
+     * (until `wants:backfillKeys` has run), and on wants of an entry since
+     * turned into a grouping.
+     */
+    catalogEntryKey: v.optional(v.string()),
     note: v.optional(v.string()),
   })
     .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
