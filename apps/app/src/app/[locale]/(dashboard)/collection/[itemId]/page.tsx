@@ -1,4 +1,4 @@
-import { ItemDetail } from "@/components/items/item-detail";
+import { ItemDetail, ItemDetailSkeleton } from "@/components/items/item-detail";
 import { getI18n } from "@/locales/server";
 import { Suspense } from "react";
 
@@ -10,7 +10,7 @@ export async function generateMetadata() {
 /** The Item comes from the URL, so it's read inside Suspense. */
 export default function Page() {
   return (
-    <Suspense>
+    <Suspense fallback={<ItemDetailSkeleton />}>
       <ItemDetail />
     </Suspense>
   );
