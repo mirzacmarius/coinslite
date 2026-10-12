@@ -2,6 +2,7 @@
 
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useAlbums } from "@/components/albums/use-albums";
+import { collectionHref } from "@/components/collection/collection-url";
 import {
   UpgradeLink,
   isItemLimitError,
@@ -104,7 +105,8 @@ export function useBulkAdd({
           wanted > 0 ? t("wantlist.clearedMany", { count: wanted }) : undefined,
         action: {
           label: t("sets.openCollection"),
-          onClick: () => router.push("/collection"),
+          // Newest added first: the Items just added, together at the top.
+          onClick: () => router.push(collectionHref({ sort: "newest" })),
         },
       });
       onAdded(count);

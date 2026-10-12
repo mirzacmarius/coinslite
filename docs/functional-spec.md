@@ -107,7 +107,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Free plan limit:** with 50 Items, adding or duplicating is blocked with an upgrade path. A warning appears from 40 Items. The limit is enforced on the server.
 
 ### 5.5 Editing, duplicating, deleting
-- **Edit** changes any field, photos included.
+- **Edit** changes any field, photos included. On the Item page, **E** opens it, except while typing or with a dialog open.
+- **Set purchase** records a bought lot's purchase on many Items at once, from the Collection's select mode (§7).
 - **Duplicate** opens the form prefilled from an existing Item and saves it as a new Item. Photos are not copied unless the user adds them.
 - **Delete** requires a confirmation and removes the Item **and its stored photos**.
 
@@ -165,7 +166,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Entries already in the Collection are marked with how many the user holds, and stay unselectable unless the user deliberately allows a duplicate.
   - Up to **200** entries per operation.
   - Before adding, the user chooses a target Album and sees their remaining Free plan quota. If the selection exceeds the quota, an upgrade path is offered.
-  - Each selected entry becomes **one Item**.
+  - Each selected entry becomes **one Item**. The confirmation links to the Collection sorted by newest added, so the new Items come first.
 
 ### 6.3 Catalog browsing
 - **Browse** the tree with a breadcrumb and back navigation. Every level has its own URL so it can be linked and bookmarked.
@@ -208,6 +209,12 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Album: all, one Album, or without an Album, each with counts
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
 - **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, denomination, Grade.
+- **Select mode:** select Items one by one, a page or the whole view (up to 200 at once), then act on all of them:
+  - move them to an Album, or out of any Album
+  - set a Grade, on those whose Item type the Grading scale suits
+  - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in.
+  - delete them, with a confirmation
+  - A move, a Grade or a purchase can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device.
 - **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts open only on a screen at least 1024 px wide and 1000 px tall, where the list still starts in view below it, and collapsed on anything smaller, such as a phone or a 1280 × 800 laptop; it is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.
 - **Export (Premium), covering the current filtered view:**

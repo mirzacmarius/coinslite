@@ -858,7 +858,7 @@ export default {
     select: "Velg",
     selectionBar: "Valgte objekter",
     selectHint:
-      "Velg objekter for å flytte dem til et album, sette en kvalitet eller slette dem.",
+      "Velg objekter for å flytte dem til et album, sette en kvalitet eller et innkjøp, eller slette dem.",
     addToHint: "Velg objektene som skal legges i {album}.",
     cancel: "Avbryt",
     selectPage: "Velg siden",
@@ -893,6 +893,19 @@ export default {
     gradeFailed: "Kvaliteten kunne ikke settes. Prøv igjen.",
     gradeUndone: "Kvalitetene er satt tilbake",
     gradeUndoneSkipped:
+      "Satt tilbake {restored}, hoppet over {skipped}: de er endret siden.",
+    setPurchase: "Sett innkjøp",
+    purchaseHint: "Felt du lar stå tomme, beholder hvert objekts egen verdi.",
+    "purchaseApply#one": "Sett på 1 objekt",
+    "purchaseApply#few": "Sett på {count} objekter",
+    "purchaseApply#other": "Sett på {count} objekter",
+    "purchaseSet#one": "Innkjøp satt på 1 objekt",
+    "purchaseSet#few": "Innkjøp satt på {count} objekter",
+    "purchaseSet#other": "Innkjøp satt på {count} objekter",
+    purchaseEmpty: "Fyll ut minst ett felt.",
+    purchaseFailed: "Innkjøpet kunne ikke settes. Prøv igjen.",
+    purchaseUndone: "Innkjøpet er satt tilbake",
+    purchaseUndoneSkipped:
       "Satt tilbake {restored}, hoppet over {skipped}: de er endret siden.",
     undo: "Angre",
     undoFailed: "Endringen kunne ikke angres. Prøv igjen.",

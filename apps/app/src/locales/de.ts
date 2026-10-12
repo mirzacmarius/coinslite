@@ -885,7 +885,7 @@ export default {
     select: "Auswählen",
     selectionBar: "Ausgewählte Objekte",
     selectHint:
-      "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten oder zu löschen.",
+      "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten, ihren Kauf festzulegen oder sie zu löschen.",
     addToHint: "Wähle die Objekte aus, die in {album} sollen.",
     cancel: "Abbrechen",
     selectPage: "Seite auswählen",
@@ -922,6 +922,20 @@ export default {
       "Die Erhaltung konnte nicht festgelegt werden. Versuche es noch einmal.",
     gradeUndone: "Bewertung rückgängig gemacht",
     gradeUndoneSkipped:
+      "{restored} zurückgesetzt, {skipped} übersprungen: Die Objekte wurden inzwischen geändert.",
+    setPurchase: "Kauf festlegen",
+    purchaseHint: "Leer gelassene Felder behalten bei jedem Objekt ihren Wert.",
+    "purchaseApply#one": "Für 1 Objekt festlegen",
+    "purchaseApply#few": "Für {count} Objekte festlegen",
+    "purchaseApply#other": "Für {count} Objekte festlegen",
+    "purchaseSet#one": "Kauf für 1 Objekt festgelegt",
+    "purchaseSet#few": "Kauf für {count} Objekte festgelegt",
+    "purchaseSet#other": "Kauf für {count} Objekte festgelegt",
+    purchaseEmpty: "Fülle mindestens ein Feld aus.",
+    purchaseFailed:
+      "Der Kauf konnte nicht festgelegt werden. Versuche es noch einmal.",
+    purchaseUndone: "Kauf rückgängig gemacht",
+    purchaseUndoneSkipped:
       "{restored} zurückgesetzt, {skipped} übersprungen: Die Objekte wurden inzwischen geändert.",
     undo: "Rückgängig",
     undoFailed:

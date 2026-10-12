@@ -228,9 +228,7 @@ export function checkItem(input: ItemInput, today: string) {
   ) {
     fail(itemErrors.invalidYear);
   }
-  const purchaseDate = input.purchaseDate?.trim() || undefined;
-  if (purchaseDate !== undefined && !isPastOrToday(purchaseDate, today))
-    fail(itemErrors.invalidDate);
+  const purchase = checkPurchase(input, today);
 
   for (const field of Object.keys(typeOnlyFields) as Array<
     keyof typeof typeOnlyFields
@@ -271,11 +269,35 @@ export function checkItem(input: ItemInput, today: string) {
       "denomination",
       text(input.denomination, itemLimits.denomination),
     ),
-    ...withNumber("purchasePrice", amount(input.purchasePrice)),
+    ...purchase,
     ...withNumber("marketValue", amount(input.marketValue)),
+    ...withText("notes", text(input.notes, itemLimits.notes)),
+  };
+}
+
+/** The fields of an Item's purchase: Purchase price per piece, purchase date and source. */
+export const purchaseFields = [
+  "purchasePrice",
+  "purchaseDate",
+  "source",
+] as const satisfies ReadonlyArray<keyof ItemInput>;
+
+/** An Item's purchase as typed, or as stored. */
+export type PurchaseInput = Pick<ItemInput, (typeof purchaseFields)[number]>;
+
+/**
+ * Checks and tidies an Item's purchase, as `checkItem` does: a field left
+ * empty is left out, never written as empty. `today` is the latest allowed
+ * purchase date ("YYYY-MM-DD").
+ */
+export function checkPurchase(input: PurchaseInput, today: string) {
+  const purchaseDate = input.purchaseDate?.trim() || undefined;
+  if (purchaseDate !== undefined && !isPastOrToday(purchaseDate, today))
+    fail(itemErrors.invalidDate);
+  return {
+    ...withNumber("purchasePrice", amount(input.purchasePrice)),
     ...(purchaseDate && { purchaseDate }),
     ...withText("source", text(input.source, itemLimits.source)),
-    ...withText("notes", text(input.notes, itemLimits.notes)),
   };
 }
 

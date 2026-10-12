@@ -843,7 +843,7 @@ export default {
     select: "Select",
     selectionBar: "Selected Items",
     selectHint:
-      "Select Items to move them to an Album, set a Grade or delete them.",
+      "Select Items to move them to an Album, set a Grade or a purchase, or delete them.",
     addToHint: "Select the Items to add to {album}.",
     cancel: "Cancel",
     selectPage: "Select page",
@@ -878,6 +878,19 @@ export default {
     gradeFailed: "The Grade couldn't be set. Try again.",
     gradeUndone: "Grading undone",
     gradeUndoneSkipped:
+      "Restored {restored}, skipped {skipped}: they've changed since.",
+    setPurchase: "Set purchase",
+    purchaseHint: "Fields you leave empty keep each Item's own.",
+    "purchaseApply#one": "Set on 1 Item",
+    "purchaseApply#few": "Set on {count} Items",
+    "purchaseApply#other": "Set on {count} Items",
+    "purchaseSet#one": "Purchase set on 1 Item",
+    "purchaseSet#few": "Purchase set on {count} Items",
+    "purchaseSet#other": "Purchase set on {count} Items",
+    purchaseEmpty: "Fill in at least one field.",
+    purchaseFailed: "The purchase couldn't be set. Try again.",
+    purchaseUndone: "Purchase undone",
+    purchaseUndoneSkipped:
       "Restored {restored}, skipped {skipped}: they've changed since.",
     undo: "Undo",
     undoFailed: "The change couldn't be undone. Try again.",
