@@ -146,7 +146,7 @@ function SetPurchaseDialog({
       setFailed(undefined);
       const purchase = {
         purchasePrice: value.purchasePrice.trim()
-          ? parseMoney(value.purchasePrice, locale) ?? undefined
+          ? (parseMoney(value.purchasePrice, locale) ?? undefined)
           : undefined,
         purchaseDate: value.purchaseDate || undefined,
         source: value.source.trim() || undefined,
@@ -170,7 +170,7 @@ function SetPurchaseDialog({
                 : code === homeCurrencyErrors.changing
                   ? t("homeCurrency.moneyBusy")
                   : code === homeCurrencyErrors.otherCurrency
-                    ? locked ?? t("collection.purchaseFailed")
+                    ? (locked ?? t("collection.purchaseFailed"))
                     : t("collection.purchaseFailed"),
         );
         return;

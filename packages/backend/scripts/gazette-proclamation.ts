@@ -246,8 +246,8 @@ function yearIn(words: string) {
     );
   if (!match) return undefined;
   const thousands = match[1] === "one" ? 1000 : 2000;
-  const hundreds = match[2] === undefined ? 0 : units[match[2]] ?? Number.NaN;
-  const rest = match[3] === undefined ? 0 : numberIn(match[3]) ?? Number.NaN;
+  const hundreds = match[2] === undefined ? 0 : (units[match[2]] ?? Number.NaN);
+  const rest = match[3] === undefined ? 0 : (numberIn(match[3]) ?? Number.NaN);
   const year = thousands + hundreds * 100 + rest;
   return Number.isInteger(year) ? year : undefined;
 }

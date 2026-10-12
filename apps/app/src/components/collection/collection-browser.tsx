@@ -28,11 +28,7 @@ import { useCollectionUrl } from "./collection-url";
 import { DisplayMenu } from "./display-menu";
 import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
-import {
-  type BrowseResult,
-  type FilterDimension,
-  useFilters,
-} from "./filter-options";
+import { type FilterDimension, useFilters } from "./filter-options";
 import { ImportDialog } from "./import-dialog";
 import { MoveToAlbumBar } from "./move-to-album-bar";
 import { StartCard } from "./start-card";

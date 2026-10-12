@@ -7,7 +7,10 @@ import { cn } from "../utils";
 export function Logo({
   className,
   nameClassName,
-}: { className?: string; nameClassName?: string }) {
+}: {
+  className?: string;
+  nameClassName?: string;
+}) {
   return (
     <span
       className={cn(

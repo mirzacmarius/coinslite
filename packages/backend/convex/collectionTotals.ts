@@ -143,9 +143,7 @@ const itemsPage = (
     .withIndex("by_ownerId_and_soldOn", (q) =>
       status === "sold"
         ? // Every sold-on date is a non-empty "YYYY-MM-DD".
-          q
-            .eq("ownerId", ownerId)
-            .gt("soldOn", "")
+          q.eq("ownerId", ownerId).gt("soldOn", "")
         : q.eq("ownerId", ownerId).eq("soldOn", undefined),
     )
     .paginate(

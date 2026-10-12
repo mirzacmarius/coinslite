@@ -32,7 +32,7 @@ import type { FunctionReturnType } from "convex/server";
 import { ChevronDown, ChevronUp, Loader2, ShieldOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useRef } from "react";
 import { UserSearch } from "./user-search";
 import { type UsersView, useUsersUrl } from "./users-url";
 

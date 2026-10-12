@@ -1,13 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { FieldApi, FormApi } from "@tanstack/react-form";
-import {
-  type ItemFormValues,
-  blankItem,
-  factValues,
-  fillForm,
-  valuesFromItem,
-} from "./item-form";
+import { blankItem, factValues, fillForm, valuesFromItem } from "./item-form";
 import { formArgs } from "./item-form-submit";
 
 /** A stored Item, as the Item page reads it. */

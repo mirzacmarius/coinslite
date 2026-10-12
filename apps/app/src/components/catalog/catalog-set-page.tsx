@@ -367,13 +367,7 @@ function Completion({
 }
 
 /** A sub-group's heading, sticking under the page header while its entries scroll by. */
-function GroupHeading({
-  group,
-  label,
-}: {
-  group: SetGroup;
-  label: string;
-}) {
+function GroupHeading({ group, label }: { group: SetGroup; label: string }) {
   const t = useI18n();
   const held = group.entries.filter((entry) => entry.held > 0).length;
   return (

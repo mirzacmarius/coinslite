@@ -58,8 +58,8 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
     denomination: item.denomination,
     grade:
       scale && item.grade !== undefined
-        ? gradeCode(scale, item.grade, item.strike) ??
-          labels.stampGrades[item.grade as StampGrade]
+        ? (gradeCode(scale, item.grade, item.strike) ??
+          labels.stampGrades[item.grade as StampGrade])
         : undefined,
     gradingScale: scale && labels.scales[scale],
     strike: item.strike && labels.strikes[item.strike],

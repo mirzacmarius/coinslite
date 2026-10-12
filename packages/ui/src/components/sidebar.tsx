@@ -1,7 +1,7 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
-import { type VariantProps, cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeft } from "lucide-react";
 import * as React from "react";
 
@@ -115,6 +115,7 @@ const SidebarProvider = React.forwardRef<
         }
 
         // Remembered across visits; the caller reads it back (app-shell.tsx).
+        // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API is async and needs Safari 18.4+ or Firefox 140+; this write must work everywhere
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
       },
       [setOpenProp, open],

@@ -221,7 +221,10 @@ export function MoneyField({
 export function DetailGroup({
   title,
   children,
-}: { title: string; children: React.ReactNode }) {
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="flex flex-col gap-3">
       <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>

@@ -2,7 +2,10 @@
 export function SkipLink({
   href = "#main",
   label,
-}: { href?: string; label: string }) {
+}: {
+  href?: string;
+  label: string;
+}) {
   return (
     <a
       href={href}

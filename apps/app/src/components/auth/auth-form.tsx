@@ -47,7 +47,10 @@ export function AuthForm({
 export function SubmitButton({
   submitting,
   children,
-}: { submitting: boolean; children: string }) {
+}: {
+  submitting: boolean;
+  children: string;
+}) {
   return (
     <Button type="submit" disabled={submitting} className="w-full">
       {submitting && <Loader2 className="animate-spin" aria-hidden="true" />}

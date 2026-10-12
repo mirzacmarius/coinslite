@@ -259,9 +259,7 @@ for (const { slug, html } of await detailPagesOf("2271-monede-si-medalii")) {
       details: detailsOf(
         [
           // Values the BNR's page failed to fill in are left out.
-          piece.lines
-            .filter((line) => !isBroken(line))
-            .join(" "),
+          piece.lines.filter((line) => !isBroken(line)).join(" "),
           piece.obverse,
           piece.reverse,
         ],

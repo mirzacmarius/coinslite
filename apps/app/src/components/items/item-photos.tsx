@@ -143,7 +143,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
       ?.focus();
   }, [hasPhotos]);
   const urlOf = (side: PhotoSide) =>
-    photos === undefined ? undefined : photos?.[side] ?? null;
+    photos === undefined ? undefined : (photos?.[side] ?? null);
   const moreLabel = (n: number) => t("photos.more.label", { n });
   const shown = [
     ...photoSides.flatMap((side) => {
@@ -263,10 +263,9 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           </div>
         </>
       ) : (
-        <div
-          role="group"
+        <fieldset
           aria-labelledby={addId}
-          className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2"
+          className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2"
         >
           <span
             id={addId}
@@ -290,7 +289,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           <span className="ml-auto hidden text-xs text-muted-foreground sm:inline">
             {t("photos.formats")}
           </span>
-        </div>
+        </fieldset>
       )}
       <PhotoViewer
         index={viewing}

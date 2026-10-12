@@ -4,5 +4,6 @@ import type { Locale } from "@coinslite/i18n";
 /** Stores the language picked in the switcher, as the app's language menu does. */
 export function rememberLanguage(locale: Locale) {
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API is async and needs Safari 18.4+ or Firefox 140+; this write must work everywhere
   document.cookie = `${LANGUAGE_COOKIE}=${locale}; Max-Age=${ONE_YEAR_IN_SECONDS}; Path=/; SameSite=Lax${secure}`;
 }

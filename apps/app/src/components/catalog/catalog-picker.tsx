@@ -449,7 +449,10 @@ function SelectMissingOption({
 function MoreOption({
   value,
   onSelect,
-}: { value: string; onSelect: () => void }) {
+}: {
+  value: string;
+  onSelect: () => void;
+}) {
   const t = useI18n();
   return (
     <CommandItem

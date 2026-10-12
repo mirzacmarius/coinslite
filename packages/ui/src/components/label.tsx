@@ -5,6 +5,7 @@ export const Label = React.forwardRef<
   HTMLLabelElement,
   React.LabelHTMLAttributes<HTMLLabelElement>
 >(({ className, ...props }, ref) => (
+  // biome-ignore lint/a11y/noLabelWithoutControl: a wrapper; callers pass htmlFor or the control as children
   <label
     ref={ref}
     className={cn(

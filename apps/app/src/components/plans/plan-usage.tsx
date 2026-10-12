@@ -72,7 +72,10 @@ function UsageBar({ usage }: { usage: Usage }) {
 export function UpgradeLink({
   children,
   className,
-}: { children: React.ReactNode; className?: string }) {
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <Link
       href={upgradeHref}

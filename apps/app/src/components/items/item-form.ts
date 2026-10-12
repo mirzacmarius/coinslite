@@ -1,16 +1,12 @@
-import type { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
-import {
-  type CatalogFactName,
-  type CatalogFacts,
-  catalogFactNames,
+import type {
+  CatalogFactName,
+  CatalogFacts,
 } from "@coinslite/backend/convex/items/catalogFacts";
 import {
   type GradingScale,
   type Strike,
   defaultScale,
-  hasStrike,
-  isGrade,
   scalesFor,
 } from "@coinslite/backend/convex/items/grades";
 import type { BullionPreset } from "@coinslite/backend/convex/items/preciousMetal";
@@ -18,18 +14,13 @@ import type {
   Grader,
   StampCatalogue,
 } from "@coinslite/backend/convex/items/references";
-import {
-  type Material,
-  fieldSuits,
-  type typeOnlyFields,
-} from "@coinslite/backend/convex/items/rules";
+import type { Material } from "@coinslite/backend/convex/items/rules";
 import type { Metal } from "@coinslite/backend/convex/spotPrices/rates";
 import {
   type CountryCode,
   type Locale,
   formatNumber,
   isCountryCode,
-  parseMoney,
 } from "@coinslite/i18n";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import type {
@@ -38,7 +29,6 @@ import type {
   UpdateMetaOptions,
   Updater,
 } from "@tanstack/react-form";
-import type { FunctionArgs } from "convex/server";
 
 /** The Item form's fields as typed: numbers stay text until the form is sent. */
 export type ItemFormValues = {
@@ -174,7 +164,7 @@ export const detailFields = [
 /** Whether a fact as typed says the same as the Catalog entry's. */
 export const sameFact = (typed: unknown, fromEntry: unknown) => {
   const text = (value: unknown) =>
-    typeof value === "string" ? value.trim() : value ?? "";
+    typeof value === "string" ? value.trim() : (value ?? "");
   return text(typed) === text(fromEntry);
 };
 

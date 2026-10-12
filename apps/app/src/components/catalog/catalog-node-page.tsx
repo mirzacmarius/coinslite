@@ -213,7 +213,10 @@ function CatalogGroup({
 function BrowseBy({
   nodeKey,
   level,
-}: { nodeKey: string; level: CatalogLevel }) {
+}: {
+  nodeKey: string;
+  level: CatalogLevel;
+}) {
   const t = useI18n();
   const views = [
     { view: "groups", label: t("catalog.byGroup") },

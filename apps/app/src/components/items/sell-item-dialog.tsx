@@ -130,7 +130,7 @@ export function SellItemDialog({
           quantity: pieces,
           soldOn: value.soldOn,
           salePrice: value.salePrice.trim()
-            ? parseMoney(value.salePrice, locale) ?? undefined
+            ? (parseMoney(value.salePrice, locale) ?? undefined)
             : undefined,
           saleNote: value.saleNote,
           amountsIn,

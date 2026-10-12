@@ -25,7 +25,6 @@ import { ConvexError } from "convex/values";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { isCatalogType } from "./item-fields";
 import {
-  type ItemFormValues,
   blankItem,
   factValues,
   fillForm,
