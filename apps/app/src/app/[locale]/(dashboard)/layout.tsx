@@ -10,6 +10,7 @@ import {
   ScanCoinQuickAction,
 } from "@/components/scanner/scan-coin";
 import { AppShell } from "@/components/shell/app-shell";
+import { UntilSignedOut } from "@/components/sign-out";
 import { SidebarSpotPrices } from "@/components/spot-prices/spot-prices";
 import { ReleaseHighlights } from "@/components/updates/release-highlights";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -64,7 +65,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Suspense>
           <ProfileLanguage />
           <ReleaseHighlights />
-          {children}
+          <UntilSignedOut>{children}</UntilSignedOut>
         </AppShell>
       </ScanCoinProvider>
     </AddItemProvider>
