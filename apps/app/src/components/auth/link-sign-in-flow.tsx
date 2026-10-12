@@ -4,7 +4,6 @@ import { nextQuery } from "@/lib/next-path";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import Link from "next/link";
 import { useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
@@ -37,7 +36,6 @@ export function LinkSignInFlow({ next }: { next: string }) {
 
   const form = useForm({
     defaultValues: { email: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       const email = normalizeEmail(value.email);
       if ((await send(email)) === "failed") {

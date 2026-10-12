@@ -1,9 +1,11 @@
 "use client";
 
+import { errorText } from "@/lib/form-errors";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
 import { MoneyInput } from "@coinslite/ui/money-input";
+import { useSelector } from "@tanstack/react-form";
 import type * as React from "react";
 import { createContext, useContext, useId, useMemo } from "react";
 import { type FactValues, scaleOf } from "./item-form";
@@ -48,12 +50,12 @@ export function ItemFieldsProvider({
     () => itemFormRules((key) => t(key), locale),
     [t, locale],
   );
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
+  );
   const errorOf = (errors: unknown[]) =>
-    submitted
-      ? errors.filter((error) => typeof error === "string").join(" ") ||
-        undefined
-      : undefined;
+    submitted ? errorText(errors) : undefined;
   return (
     <ItemFieldsContext.Provider
       value={{ form, baseId, fromEntry, rules, errorOf }}
@@ -70,18 +72,18 @@ export function ItemFieldsProvider({
  */
 export function useItemKind() {
   const { form, fromEntry } = useItemFields();
-  const values = form.useStore(
-    ({
-      values: { type, country, gradingScale, strike, grader, stampCatalogue },
-    }) => ({
-      type,
-      country,
-      gradingScale,
-      strike,
-      grader,
-      stampCatalogue,
-    }),
-  );
+  // One value each: only a change to one of these redraws the sections.
+  const values = {
+    type: useSelector(form.store, (state) => state.values.type),
+    country: useSelector(form.store, (state) => state.values.country),
+    gradingScale: useSelector(form.store, (state) => state.values.gradingScale),
+    strike: useSelector(form.store, (state) => state.values.strike),
+    grader: useSelector(form.store, (state) => state.values.grader),
+    stampCatalogue: useSelector(
+      form.store,
+      (state) => state.values.stampCatalogue,
+    ),
+  };
   const scale = scaleOf({
     ...values,
     country: values.country ?? fromEntry?.country,

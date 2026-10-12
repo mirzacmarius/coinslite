@@ -2,6 +2,7 @@
 
 import { FormDialog } from "@/components/form-dialog";
 import { formChanged } from "@/lib/discard-changes";
+import { errorText } from "@/lib/form-errors";
 import {
   ShrinkError,
   type ShrinkTarget,
@@ -38,8 +39,7 @@ import { Input } from "@coinslite/ui/input";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
 import { cn } from "@coinslite/ui/utils";
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { useAction, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ChevronRight, ImageIcon, ImagePlus, Loader2, X } from "lucide-react";
@@ -185,7 +185,6 @@ export function CatalogImageDialog({
 
   const form = useForm({
     defaultValues: defaults,
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       if (!picked && !hasImage) return;
@@ -209,14 +208,16 @@ export function CatalogImageDialog({
       onOpenChange(false);
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
-  const changed = form.useStore((state) => formChanged(state, defaults));
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
+  );
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
+  const changed = useSelector(form.store, (state) =>
+    formChanged(state, defaults),
+  );
   const errorOf = (errors: unknown[]) =>
-    submitted
-      ? errors.filter((error) => typeof error === "string").join(" ") ||
-        undefined
-      : undefined;
+    submitted ? errorText(errors) : undefined;
 
   const submit = (from: Element) => {
     if (converting) return;

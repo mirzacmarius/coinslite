@@ -4,6 +4,7 @@ import { useCatalogVisible } from "@/components/catalog/use-catalog-visible";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
+import { useSelector } from "@tanstack/react-form";
 import { BookOpen } from "lucide-react";
 import { isCatalogType, itemTypeIcons, itemTypes } from "./item-fields";
 import { useItemFields } from "./item-form-fields";
@@ -26,7 +27,7 @@ export function CatalogLink({
 }) {
   const t = useI18n();
   const { form } = useItemFields();
-  const type = form.useStore((state) => state.values.type);
+  const type = useSelector(form.store, (state) => state.values.type);
   const catalogVisible = useCatalogVisible();
   const typeOptions = itemTypes.map((type) => {
     const Icon = itemTypeIcons[type];

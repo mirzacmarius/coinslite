@@ -4,9 +4,11 @@ import { type SubmittableForm, submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
+import { useSelector } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import type * as React from "react";
 import { useEffect, useState } from "react";
+import type { FormStore } from "./use-auth-form";
 
 /**
  * The form around each auth step. Its fields stay disabled until the page is
@@ -17,14 +19,12 @@ export function AuthForm({
   form,
   children,
 }: {
-  form: SubmittableForm & {
-    useStore: <T>(select: (state: { isDirty: boolean }) => T) => T;
-  };
+  form: SubmittableForm & FormStore<{ isDirty: boolean }>;
   children: React.ReactNode;
 }) {
   const t = useI18n();
   // A new deployment waits while someone is typing here.
-  useUnsavedInput(form.useStore((state) => state.isDirty));
+  useUnsavedInput(useSelector(form.store, (state) => state.isDirty));
   const [interactive, setInteractive] = useState(false);
   useEffect(() => setInteractive(true), []);
   return (

@@ -4,7 +4,6 @@ import { goTo } from "@/lib/go-to";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useEffect, useRef, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, type FormMessageState } from "./auth-panel";
@@ -40,7 +39,6 @@ export function CodeStep({
 
   const form = useForm({
     defaultValues: { code: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setMessage(undefined);
       const result = await attempt({

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const env = createEnv({
   client: {
-    NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+    NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
     /** OpenPanel client for usage statistics; unset, nothing is sent. */
     NEXT_PUBLIC_OPENPANEL_CLIENT_ID: z.string().optional(),
   },

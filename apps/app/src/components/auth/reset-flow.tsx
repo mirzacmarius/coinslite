@@ -4,7 +4,6 @@ import { goTo } from "@/lib/go-to";
 import { useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
@@ -65,7 +64,6 @@ function RequestStep({
   const schemas = useAuthSchemas();
   const form = useForm({
     defaultValues: { email: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       const email = normalizeEmail(value.email);
       // Whether or not the address has an account, the next step looks the same.
@@ -119,7 +117,6 @@ function NewPasswordStep({
   );
   const form = useForm({
     defaultValues: { code, newPassword: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setMessage(undefined);
       const result = await attempt({

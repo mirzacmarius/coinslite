@@ -106,7 +106,7 @@ describe("a duplicate (spec 5.5) sends what the original holds", () => {
 describe("filling the form from a Catalog entry (MUS-734)", () => {
   /** A form with only the always-visible fields mounted, like a closed "More details". */
   const formWithTitleMounted = () => {
-    const form = new FormApi<ItemFormValues>({ defaultValues: blankItem() });
+    const form = new FormApi({ defaultValues: blankItem() });
     form.mount();
     new FieldApi({ form, name: "title" }).mount();
     return form;

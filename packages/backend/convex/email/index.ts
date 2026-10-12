@@ -14,7 +14,7 @@ const ResendErrorSchema = z.union([
     name: z.literal("UnknownError"),
     message: z.literal("Unknown Error"),
     statusCode: z.literal(500),
-    cause: z.any(),
+    cause: z.any().optional(),
   }),
 ]);
 

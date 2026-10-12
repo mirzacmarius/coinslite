@@ -6,7 +6,6 @@ import { useCurrentLocale, useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import type { HomeCurrency } from "@coinslite/i18n";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import Link from "next/link";
 import { useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
@@ -44,7 +43,6 @@ export function SignUpFlow({
       homeCurrency: suggestedCurrency,
       acceptTerms: false,
     },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(false);
       const email = normalizeEmail(value.email);

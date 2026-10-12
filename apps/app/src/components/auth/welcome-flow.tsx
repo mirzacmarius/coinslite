@@ -5,7 +5,6 @@ import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { type HomeCurrency, isHomeCurrency } from "@coinslite/i18n";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
@@ -66,7 +65,6 @@ function WelcomeForm({
 
   const form = useForm({
     defaultValues: { homeCurrency, acceptTerms: false },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(false);
       try {

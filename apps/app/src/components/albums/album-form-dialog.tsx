@@ -2,6 +2,7 @@
 
 import { FormDialog } from "@/components/form-dialog";
 import { formChanged } from "@/lib/discard-changes";
+import { errorText } from "@/lib/form-errors";
 import { submitForm } from "@/lib/submit-form";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -23,8 +24,7 @@ import {
 import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
 import { Check, ChevronRight, FolderOpen, Loader2, X } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
@@ -99,7 +99,6 @@ export function AlbumFormDialog({
 
   const form = useForm({
     defaultValues: defaults,
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       try {
@@ -125,14 +124,16 @@ export function AlbumFormDialog({
       onOpenChange(false);
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
-  const changed = form.useStore((state) => formChanged(state, defaults));
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
+  );
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
+  const changed = useSelector(form.store, (state) =>
+    formChanged(state, defaults),
+  );
   const errorOf = (errors: unknown[]) =>
-    submitted
-      ? errors.filter((error) => typeof error === "string").join(" ") ||
-        undefined
-      : undefined;
+    submitted ? errorText(errors) : undefined;
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>

@@ -19,8 +19,7 @@ import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules
 import { photoSides } from "@coinslite/backend/convex/photos/rules";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
-import { type FormApi, type ReactFormApi, useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -39,10 +38,8 @@ import { type LinkedEntry, itemSave } from "./item-form-submit";
 /** An Item as its page reads it: facts resolved, with the Catalog entry it's linked to. */
 type EditedItem = Doc<"items"> & { catalogEntry?: LinkedEntry | null };
 
-type ItemFormValidator = ReturnType<typeof zodValidator>;
 /** The Item form's TanStack form. */
-export type ItemForm = FormApi<ItemFormValues, ItemFormValidator> &
-  ReactFormApi<ItemFormValues, ItemFormValidator>;
+export type ItemForm = ReturnType<typeof useItemForm>["form"];
 
 /** What the Item form dialog is given (item-form-dialog.tsx). */
 export type ItemFormProps = {
@@ -123,7 +120,6 @@ export function useItemForm({
 
   const form = useForm({
     defaultValues: defaults,
-    validatorAdapter: zodValidator(),
     onSubmitInvalid: ({ formApi }) => {
       if (
         detailFields.some((name) => formApi.getFieldMeta(name)?.errors.length)
@@ -341,10 +337,10 @@ export function useItemForm({
       toast.error(t("scanner.photosFailed"));
     }
   };
-  const submitting = form.useStore((state) => state.isSubmitting);
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
   // A scan's photos are input too: closing the form drops them.
   const changed =
-    form.useStore((state) => formChanged(state, defaults)) ||
+    useSelector(form.store, (state) => formChanged(state, defaults)) ||
     scanned !== undefined;
 
   return {
