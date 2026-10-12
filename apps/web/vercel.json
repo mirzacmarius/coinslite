@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "npx turbo-ignore@2 @coinslite/web",
   "git": {
     "deploymentEnabled": {
       "**": false,
