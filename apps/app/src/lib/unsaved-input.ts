@@ -8,7 +8,7 @@ const listeners = new Set<() => void>();
 
 export const hasUnsavedInput = () => unsaved.size > 0;
 
-/** Calls `listener` whenever a form's input is saved or dismissed. */
+/** Calls `listener` whenever a form starts holding unsaved input, or its input is saved or dismissed. */
 export function onUnsavedInputChange(listener: () => void) {
   listeners.add(listener);
   return () => {
@@ -16,15 +16,34 @@ export function onUnsavedInputChange(listener: () => void) {
   };
 }
 
+const changed = () => {
+  for (const listener of listeners) listener();
+};
+
+/** Marks a form as holding unsaved input; returns how to release it. */
+export function registerUnsavedInput() {
+  const form = Symbol("unsaved form");
+  unsaved.add(form);
+  changed();
+  return () => {
+    unsaved.delete(form);
+    changed();
+  };
+}
+
+/**
+ * Lets go of every form's input, for leaving the page on purpose: after
+ * signing in or out, what was typed is done with, so leaving doesn't ask.
+ */
+export function releaseAllUnsavedInput() {
+  unsaved.clear();
+  changed();
+}
+
 /** Marks a form as holding unsaved input while `isDirty` is true. */
 export function useUnsavedInput(isDirty: boolean) {
   useEffect(() => {
     if (!isDirty) return;
-    const form = Symbol("unsaved form");
-    unsaved.add(form);
-    return () => {
-      unsaved.delete(form);
-      for (const listener of listeners) listener();
-    };
+    return registerUnsavedInput();
   }, [isDirty]);
 }

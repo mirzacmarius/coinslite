@@ -1,6 +1,6 @@
 "use client";
 
-import { nextQuery } from "@/lib/next-path";
+import { goTo, nextQuery } from "@/lib/next-path";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useCallback } from "react";
 
@@ -13,7 +13,7 @@ export function useSignOut() {
   return useCallback(
     async (next = "/") => {
       await signOut();
-      window.location.assign(`/login${nextQuery(next)}`);
+      goTo(`/login${nextQuery(next)}`);
     },
     [signOut],
   );

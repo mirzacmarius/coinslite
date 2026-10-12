@@ -1,6 +1,7 @@
 "use client";
 
 import { nextQuery } from "@/lib/next-path";
+import { releaseAllUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -25,9 +26,11 @@ export function OtherSignInMethods({ next }: { next: string }) {
         type="button"
         variant="outline"
         className="w-full"
-        onClick={() =>
-          void signIn("google", { redirectTo: `/welcome${nextQuery(next)}` })
-        }
+        onClick={() => {
+          // Google takes over the page: what was typed here is done with.
+          releaseAllUnsavedInput();
+          void signIn("google", { redirectTo: `/welcome${nextQuery(next)}` });
+        }}
       >
         <GoogleMark />
         {t("auth.methods.google")}
