@@ -2,6 +2,7 @@
 
 import { ItemThumbnail } from "@/components/items/item-thumbnail";
 import { useI18n } from "@/locales/client";
+import { useFormatters } from "@/locales/use-formatters";
 import type { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import type { FunctionReturnType } from "convex/server";
@@ -10,7 +11,38 @@ import { useId } from "react";
 
 type LatestItem = FunctionReturnType<typeof api.overview.latestItems>[number];
 
-/** The most recently added Items, newest first, each opening its Item detail. */
+/**
+ * A row's figures on the right, as the Collection's rows show them on a
+ * phone: the Market value of one piece, × Quantity when there's more than
+ * one. The value never truncates; the title gives way instead.
+ */
+function ItemFigures({ item }: { item: LatestItem }) {
+  const t = useI18n();
+  const format = useFormatters();
+  const { marketValue, quantity } = item;
+  if (marketValue === undefined && quantity === 1) return null;
+  return (
+    <span className="shrink-0 whitespace-nowrap text-right text-[13px] tabular-nums">
+      {marketValue !== undefined && (
+        <>
+          <span className="sr-only">{t("items.marketValue")} </span>
+          {format.money(marketValue, item.currency)}
+        </>
+      )}
+      {quantity > 1 && (
+        <span className="text-xs text-muted-foreground">
+          {marketValue !== undefined && " "}
+          <span className="sr-only">{t("items.quantity")} </span>×{quantity}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/**
+ * The most recently added Items, newest first, each with its Market value
+ * and opening its Item detail.
+ */
 export function LatestItems({ items }: { items: LatestItem[] | undefined }) {
   const t = useI18n();
   const titleId = useId();
@@ -68,6 +100,7 @@ export function LatestItems({ items }: { items: LatestItem[] | undefined }) {
                       </span>
                     )}
                   </span>
+                  <ItemFigures item={item} />
                 </Link>
               </li>
             );
