@@ -263,11 +263,9 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           </div>
         </>
       ) : (
-        // biome-ignore lint/a11y/useSemanticElements: a row of buttons; a fieldset's min-content width would keep them from wrapping
-        <div
-          role="group"
+        <fieldset
           aria-labelledby={addId}
-          className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2"
+          className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2"
         >
           <span
             id={addId}
@@ -291,7 +289,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
           <span className="ml-auto hidden text-xs text-muted-foreground sm:inline">
             {t("photos.formats")}
           </span>
-        </div>
+        </fieldset>
       )}
       <PhotoViewer
         index={viewing}

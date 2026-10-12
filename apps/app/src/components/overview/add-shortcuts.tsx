@@ -11,11 +11,9 @@ export function AddShortcuts({ className }: { className?: string }) {
   const t = useI18n();
   const addItem = useAddItem();
   return (
-    // biome-ignore lint/a11y/useSemanticElements: a row of buttons; a fieldset's min-content width would keep them from wrapping
-    <div
-      role="group"
+    <fieldset
       aria-label={t("overview.addShortcuts")}
-      className={cn("flex flex-wrap items-center gap-2", className)}
+      className={cn("flex min-w-0 flex-wrap items-center gap-2", className)}
     >
       {itemTypes.map((type) => {
         const Icon = itemTypeIcons[type];
@@ -31,6 +29,6 @@ export function AddShortcuts({ className }: { className?: string }) {
           </Button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
