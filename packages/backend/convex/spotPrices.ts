@@ -1,4 +1,3 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
@@ -17,6 +16,7 @@ import {
   marketRates,
   spotPriceOf,
 } from "./spotPrices/rates";
+import { setUpUserOrNull } from "./utils/auth";
 import { homeCurrency, perDollar } from "./utils/validators";
 
 /** The one stored snapshot, or null before the first successful refresh. */
@@ -95,9 +95,8 @@ export const current = query({
     }),
   ),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    const user = userId && (await ctx.db.get("users", userId));
-    if (!user?.termsAcceptedAt || !user.homeCurrency) return null;
+    const user = await setUpUserOrNull(ctx);
+    if (!user) return null;
     const currency = user.homeCurrency;
     const rates = await latestRates(ctx);
     if (!rates) return null;

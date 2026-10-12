@@ -1,5 +1,5 @@
 import { ProfileLanguage } from "@/components/account/profile-language";
-import { EndSession } from "@/components/end-session";
+import { EndSession, UntilSessionEnds } from "@/components/end-session";
 import {
   AddItemProvider,
   AddItemQuickAction,
@@ -10,7 +10,6 @@ import {
   ScanCoinQuickAction,
 } from "@/components/scanner/scan-coin";
 import { AppShell } from "@/components/shell/app-shell";
-import { UntilSignedOut } from "@/components/sign-out";
 import { SidebarSpotPrices } from "@/components/spot-prices/spot-prices";
 import { ReleaseHighlights } from "@/components/updates/release-highlights";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -65,7 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Suspense>
           <ProfileLanguage />
           <ReleaseHighlights />
-          <UntilSignedOut>{children}</UntilSignedOut>
+          <UntilSessionEnds>{children}</UntilSessionEnds>
         </AppShell>
       </ScanCoinProvider>
     </AddItemProvider>
