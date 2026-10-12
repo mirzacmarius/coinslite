@@ -16,7 +16,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseCoinPage } from "./usMintPage";
+import { parseCoinPage } from "./us-mint-page";
 
 const target = new URL(
   "../convex/catalog/datasets/usCoinProgrammeCoins.ts",
@@ -101,6 +101,25 @@ const designNames: Record<string, string> = {
 };
 
 /**
+ * Years of issue a page gives wrongly: the Tuskegee Airmen page says 2020,
+ * but its background ("The 2021 Tuskegee Airmen National Historic Site
+ * Quarter is the 56th coin…") and its reverse inscription say 2021.
+ */
+const yearCorrections: Record<string, number> = {
+  "tuskegee-airmen-national-historic-site": 2021,
+};
+
+/**
+ * Artists' names some pages misspell, as the name the other pages give: John
+ * Flanagan, whose portrait of Washington the quarters carry.
+ */
+const artistCorrections: Record<string, string> = {
+  "John Flannagan": "John Flanagan",
+  "John Flannigan": "John Flanagan",
+  "Jonathan Flanagan": "John Flanagan",
+};
+
+/**
  * Edge inscriptions a page lists wrongly, corrected: the Thomas Jefferson
  * page breaks "IN GOD WE TRUST" across two lines, as "E PLURIBUS UNUMIN" and
  * "GOD WE TRUST"; the other 2007 pages read as corrected here.
@@ -133,7 +152,9 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function archived(url: string) {
   for (let attempt = 1; ; attempt += 1) {
     await delay(1500);
-    const response = await fetch(url).catch(() => undefined);
+    const response = await fetch(url, {
+      headers: { "User-Agent": "CoinsLite catalog builder" },
+    }).catch(() => undefined);
     if (response?.ok) return await response.text();
     if (attempt === 6)
       throw new Error(`${url}: HTTP ${response?.status ?? "failed"}`);
@@ -216,7 +237,15 @@ for (const programme of programmes) {
       `${programme.key}--${slug}--${timestamp}.html`,
       () => archived(`https://web.archive.org/web/${timestamp}id_/${page}`),
     );
-    const parsed = parseCoinPage(html);
+    const read = parseCoinPage(html);
+    const parsed = {
+      ...read,
+      year: yearCorrections[slug] ?? read.year,
+      artists: read.artists.map(({ name, role }) => ({
+        name: artistCorrections[name] ?? name,
+        role,
+      })),
+    };
     const mints = parsed.mints.flatMap((mint) => {
       const mark = mintMarks[mint];
       // West Point struck circulating quarters only in 2019 and 2020.

@@ -1,5 +1,5 @@
 import { formatCsvRecord } from "../csvText";
-import { catalogCsvColumns } from "../fields";
+import { catalogCsvColumns, catalogLimits } from "../fields";
 import { type UsProgrammeCoin, usProgrammeCoins } from "./usCoinProgrammeCoins";
 import { usMint } from "./usSilverDollars";
 
@@ -8,8 +8,12 @@ import { usMint } from "./usSilverDollars";
  * below the United States root the silver dollars add: the 50 State Quarters,
  * DC and U.S. Territories, America the Beautiful and American Women quarters,
  * and the Presidential and Native American $1 coins. One entry per design and
- * circulation mint: Philadelphia (P) and Denver (D), and West Point (W) for
- * the quarters it struck in 2019 and 2020.
+ * circulation mint its page lists: Philadelphia (P) and Denver (D).
+ *
+ * Not yet: the West Point (W) quarters of 2019 and 2020, which no coin page
+ * lists; the 2025 American Women Quarters and Native American $1, whose pages
+ * the Wayback Machine doesn't hold; and mintages, as the Mint's production
+ * report can't be read.
  *
  * Facts and notes: each coin's page on usmint.gov (usCoinProgrammeCoins.ts,
  * rebuilt by scripts/fetch-us-coin-programmes.ts) and the Mint's coin
@@ -113,7 +117,7 @@ function entryKey(
 ) {
   const prefix = `us-${denomination}-${coin.year}-`;
   const suffix = `-${mark.toLowerCase()}`;
-  const room = 64 - prefix.length - suffix.length;
+  const room = catalogLimits.key - prefix.length - suffix.length;
   let design = "";
   for (const word of coin.slug.replace(/^\d{4}-/, "").split("-")) {
     const next = design ? `${design}-${word}` : word;

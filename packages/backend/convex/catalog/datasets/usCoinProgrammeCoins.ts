@@ -78,9 +78,9 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
       "https://web.archive.org/web/20260325074730/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/50-state-quarters/new-jersey",
     releaseDate: "1999-05-17",
     mints: ["P", "D"],
-    designers: ["John Flannigan", "William Cousins", "Alfred Maletsky"],
+    designers: ["John Flanagan", "William Cousins", "Alfred Maletsky"],
     artistCredits:
-      "John Flannigan, obverse designer; William Cousins, obverse designer; Alfred Maletsky, reverse designer and sculptor",
+      "John Flanagan, obverse designer; William Cousins, obverse designer; Alfred Maletsky, reverse designer and sculptor",
     design:
       "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. The reverse (tails) design depicts General George Washington and his troops crossing the Delaware River on December 25, 1776.",
   },
@@ -94,9 +94,9 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
       "https://web.archive.org/web/20260325074732/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/50-state-quarters/georgia",
     releaseDate: "1999-07-19",
     mints: ["P", "D"],
-    designers: ["John Flannagan", "William Cousins", "T. James Ferrell"],
+    designers: ["John Flanagan", "William Cousins", "T. James Ferrell"],
     artistCredits:
-      "John Flannagan, obverse designer; William Cousins, obverse designer; T. James Ferrell, reverse designer and sculptor",
+      "John Flanagan, obverse designer; William Cousins, obverse designer; T. James Ferrell, reverse designer and sculptor",
     design:
       'The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. The reverse (tails) design shows a peach (the state symbol), branches of a live oak tree (the state tree), and the state motto "Wisdom, Justice, Moderation" over an outline of the state.',
   },
@@ -110,9 +110,9 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
       "https://web.archive.org/web/20260325074856/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/50-state-quarters/connecticut",
     releaseDate: "1999-10-12",
     mints: ["P", "D"],
-    designers: ["John Flannagan", "William Cousins", "T. James Ferrell"],
+    designers: ["John Flanagan", "William Cousins", "T. James Ferrell"],
     artistCredits:
-      "John Flannagan, obverse designer; William Cousins, obverse sculptor; T. James Ferrell, reverse designer and sculptor",
+      "John Flanagan, obverse designer; William Cousins, obverse sculptor; T. James Ferrell, reverse designer and sculptor",
     design:
       "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. The reverse (tails) design shows the Charter Oak tree, the hiding spot of Connecticut's 1662 charter from King Charles II and later state constitution.",
   },
@@ -126,9 +126,9 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
       "https://web.archive.org/web/20260325074753/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/50-state-quarters/massachusetts",
     releaseDate: "2000-01-03",
     mints: ["P", "D"],
-    designers: ["John Flannagan", "William Cousins", "Thomas D. Rogers"],
+    designers: ["John Flanagan", "William Cousins", "Thomas D. Rogers"],
     artistCredits:
-      "John Flannagan, obverse designer; William Cousins, obverse sculptor; Thomas D. Rogers, reverse designer and sculptor",
+      "John Flanagan, obverse designer; William Cousins, obverse sculptor; Thomas D. Rogers, reverse designer and sculptor",
     design:
       "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. The reverse (tails) shows the figure of a minuteman soldier of the American Revolution against an outline of the state.",
   },
@@ -286,9 +286,9 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
       "https://web.archive.org/web/20260325074819/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/50-state-quarters/tennessee",
     releaseDate: "2002-01-02",
     mints: ["P", "D"],
-    designers: ["Jonathan Flanagan", "William Cousins", "Donna Weaver"],
+    designers: ["John Flanagan", "William Cousins", "Donna Weaver"],
     artistCredits:
-      "Jonathan Flanagan, obverse designer; William Cousins, obverse sculptor; Donna Weaver, reverse designer and sculptor",
+      "John Flanagan, obverse designer; William Cousins, obverse sculptor; Donna Weaver, reverse designer and sculptor",
     design:
       "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. The reverse (tails) design features the image of several musical instruments, the fiddle, the trumpet, and the guitar.",
   },
@@ -1770,21 +1770,6 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
   },
   {
     programme: "americaTheBeautifulQuarters",
-    slug: "tuskegee-airmen-national-historic-site",
-    year: 2020,
-    name: "Tuskegee Airmen National Historic Site",
-    page: "https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/america-the-beautiful-quarters/tuskegee-airmen-national-historic-site",
-    capture:
-      "https://web.archive.org/web/20260325090852/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/america-the-beautiful-quarters/tuskegee-airmen-national-historic-site",
-    mints: ["P", "D"],
-    designers: ["John Flanagan", "Chris Costello", "Phebe Hemphill"],
-    artistCredits:
-      "John Flanagan, obverse designer; Chris Costello, reverse designer; Phebe Hemphill, reverse sculptor",
-    design:
-      "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. It has been restored to bring out subtle details and the beauty of the original. The reverse (tails) design depicts a Tuskegee Airman pilot suiting up to join the fight during World War II with the Moton Field control tower in the background. The pilot looks upward with pride and confidence as two P-51 Mustangs pass overhead. The inscription “THEY FOUGHT TWO WARS” is arced across the top as a reference to the dual battles the Tuskegee Airmen fought–fascism abroad and racial discrimination at home.",
-  },
-  {
-    programme: "americaTheBeautifulQuarters",
     slug: "weir-farm-national-historic-site",
     year: 2020,
     name: "Weir Farm National Historic Site",
@@ -1797,6 +1782,21 @@ export const usProgrammeCoins: UsProgrammeCoin[] = [
       "John Flanagan, obverse designer; Justin Kunz, reverse designer; Phebe Hemphill, reverse sculptor",
     design:
       "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. It has been restored to bring out subtle details and the beauty of the original. This reverse (tails) design portrays an artist, wearing a painter’s smock, painting outside Julian Alden Weir’s studio at Weir Farm. It is inspired by various images of the studio and Weir’s paintings created on the property, as well as descriptions of Weir and his fellow artist’s creative inspiration from the rural environment.",
+  },
+  {
+    programme: "americaTheBeautifulQuarters",
+    slug: "tuskegee-airmen-national-historic-site",
+    year: 2021,
+    name: "Tuskegee Airmen National Historic Site",
+    page: "https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/america-the-beautiful-quarters/tuskegee-airmen-national-historic-site",
+    capture:
+      "https://web.archive.org/web/20260325090852/https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/america-the-beautiful-quarters/tuskegee-airmen-national-historic-site",
+    mints: ["P", "D"],
+    designers: ["John Flanagan", "Chris Costello", "Phebe Hemphill"],
+    artistCredits:
+      "John Flanagan, obverse designer; Chris Costello, reverse designer; Phebe Hemphill, reverse sculptor",
+    design:
+      "The obverse (heads) design features the familiar image of George Washington by John Flanagan, used on the quarter since 1932. It has been restored to bring out subtle details and the beauty of the original. The reverse (tails) design depicts a Tuskegee Airman pilot suiting up to join the fight during World War II with the Moton Field control tower in the background. The pilot looks upward with pride and confidence as two P-51 Mustangs pass overhead. The inscription “THEY FOUGHT TWO WARS” is arced across the top as a reference to the dual battles the Tuskegee Airmen fought–fascism abroad and racial discrimination at home.",
   },
   {
     programme: "americanWomenQuarters",
