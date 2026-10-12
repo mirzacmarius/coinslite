@@ -865,6 +865,9 @@ export default {
     "takenOut#few": "{count} objekter tatt ut av albumene sine",
     "takenOut#other": "{count} objekter tatt ut av albumene sine",
     moveFailed: "Objektene kunne ikke flyttes. Prøv igjen.",
+    moveUndone: "Flyttingen er angret",
+    moveUndoneSkipped:
+      "Flyttet {restored} tilbake, hoppet over {skipped}: de eller albumene deres er endret siden.",
     setGrade: "Sett kvalitet",
     "gradeApply#one": "Sett på 1 objekt",
     "gradeApply#few": "Sett på {count} objekter",
@@ -875,6 +878,11 @@ export default {
     gradedSkipped:
       "Satt på {graded}, hoppet over {skipped}: skalaen passer ikke til objekttypen deres.",
     gradeFailed: "Kvaliteten kunne ikke settes. Prøv igjen.",
+    gradeUndone: "Kvalitetene er satt tilbake",
+    gradeUndoneSkipped:
+      "Satt tilbake {restored}, hoppet over {skipped}: de er endret siden.",
+    undo: "Angre",
+    undoFailed: "Endringen kunne ikke angres. Prøv igjen.",
     delete: "Slett",
     "deleteTitle#one": "Slette 1 objekt?",
     "deleteTitle#few": "Slette {count} objekter?",

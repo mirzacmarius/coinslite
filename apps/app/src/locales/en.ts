@@ -850,6 +850,9 @@ export default {
     "takenOut#few": "{count} Items taken out of their Albums",
     "takenOut#other": "{count} Items taken out of their Albums",
     moveFailed: "The Items couldn't be moved. Try again.",
+    moveUndone: "Move undone",
+    moveUndoneSkipped:
+      "Moved {restored} back, skipped {skipped}: they or their Albums have changed since.",
     setGrade: "Set Grade",
     "gradeApply#one": "Grade 1 Item",
     "gradeApply#few": "Grade {count} Items",
@@ -860,6 +863,11 @@ export default {
     gradedSkipped:
       "Graded {graded}, skipped {skipped}: the Grading scale doesn't suit their Item type.",
     gradeFailed: "The Grade couldn't be set. Try again.",
+    gradeUndone: "Grading undone",
+    gradeUndoneSkipped:
+      "Restored {restored}, skipped {skipped}: they've changed since.",
+    undo: "Undo",
+    undoFailed: "The change couldn't be undone. Try again.",
     delete: "Delete",
     "deleteTitle#one": "Delete 1 Item?",
     "deleteTitle#few": "Delete {count} Items?",

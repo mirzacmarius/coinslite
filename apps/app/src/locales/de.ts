@@ -893,6 +893,9 @@ export default {
     "takenOut#other": "{count} Objekte aus ihren Alben genommen",
     moveFailed:
       "Die Objekte konnten nicht verschoben werden. Versuche es noch einmal.",
+    moveUndone: "Verschieben rückgängig gemacht",
+    moveUndoneSkipped:
+      "{restored} zurückverschoben, {skipped} übersprungen: Sie oder ihre Alben wurden inzwischen geändert.",
     setGrade: "Erhaltung festlegen",
     "gradeApply#one": "1 Objekt bewerten",
     "gradeApply#few": "{count} Objekte bewerten",
@@ -904,6 +907,12 @@ export default {
       "{graded} bewertet, {skipped} übersprungen: Die Bewertungsskala passt nicht zu ihrer Objektart.",
     gradeFailed:
       "Die Erhaltung konnte nicht festgelegt werden. Versuche es noch einmal.",
+    gradeUndone: "Bewertung rückgängig gemacht",
+    gradeUndoneSkipped:
+      "{restored} zurückgesetzt, {skipped} übersprungen: Sie wurden inzwischen geändert.",
+    undo: "Rückgängig",
+    undoFailed:
+      "Die Änderung konnte nicht rückgängig gemacht werden. Versuche es noch einmal.",
     delete: "Löschen",
     "deleteTitle#one": "1 Objekt löschen?",
     "deleteTitle#few": "{count} Objekte löschen?",
