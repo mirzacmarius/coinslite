@@ -1,5 +1,3 @@
-import { releaseAllUnsavedInput } from "./unsaved-input";
-
 const SAME_SITE = "https://coinslite.invalid";
 
 /**
@@ -24,12 +22,3 @@ export function safeNextPath(
 /** "?next=…" for links between the auth pages, or nothing when it's the home page. */
 export const nextQuery = (next: string) =>
   next === "/" ? "" : `?next=${encodeURIComponent(next)}`;
-
-/**
- * A full page load, so the server sees the new session before rendering.
- * What was typed is done with, so the page doesn't ask before leaving.
- */
-export function goTo(path: string) {
-  releaseAllUnsavedInput();
-  window.location.assign(path);
-}

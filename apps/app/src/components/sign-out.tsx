@@ -1,6 +1,7 @@
 "use client";
 
-import { goTo, nextQuery } from "@/lib/next-path";
+import { goTo } from "@/lib/go-to";
+import { nextQuery } from "@/lib/next-path";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useCallback } from "react";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormDialog } from "@/components/form-dialog";
+import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -126,7 +127,7 @@ export function AlbumFormDialog({
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
-  const isDirty = form.useStore((state) => state.isDirty);
+  const changed = form.useStore((state) => formChanged(state, defaults));
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -134,7 +135,7 @@ export function AlbumFormDialog({
       : undefined;
 
   return (
-    <FormDialog open={open} onOpenChange={onOpenChange} changed={isDirty}>
+    <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>
       <DialogContent
         className="sm:max-w-[560px]"
         onOpenAutoFocus={(event) => {

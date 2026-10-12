@@ -9,6 +9,7 @@ import { AppearancePicker } from "@/components/preferences";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
+import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
@@ -98,9 +99,8 @@ function ContactSection({ account }: { account: Account }) {
         .sort((a, b) => a.label.localeCompare(b.label, locale)),
     [locale],
   );
-  // The details as last saved, one object until the next save: the form
-  // resets when it sees new defaults.
-  const [saved, setSaved] = useState(() => ({
+  // The details as stored; an untouched form follows them.
+  const stored = {
     displayName: account.displayName ?? "",
     fullName: account.fullName ?? "",
     streetAddress: account.streetAddress ?? "",
@@ -108,29 +108,31 @@ function ContactSection({ account }: { account: Account }) {
     city: account.city ?? "",
     country: account.country as CountryCode | undefined,
     contactPhone: account.contactPhone ?? "",
-  }));
+  };
+  // The details last sent, as typed: the stored copy is trimmed.
+  const [sent, setSent] = useState(stored);
   const form = useForm({
-    defaultValues: saved,
+    defaultValues: stored,
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(false);
       try {
         await updateContact(value);
         toast.success(t("account.contact.saved"));
+        setSent(value);
       } catch {
         setFailed(true);
-        return;
       }
-      // What's on screen is saved: the form starts over from it, unchanged.
-      form.update({ ...form.options, defaultValues: value });
-      form.reset();
-      setSaved(value);
     },
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
-  // An update reload waits while the details are being typed.
-  useUnsavedInput(form.useStore((state) => state.isDirty));
+  // A new deployment's reload waits while the details differ from both.
+  useUnsavedInput(
+    form.useStore(
+      (state) => formChanged(state, stored) && formChanged(state, sent),
+    ),
+  );
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -303,6 +305,9 @@ const emailErrorKeys = {
   TOO_MANY_REQUESTS: "account.email.tooMany",
 } as const;
 
+/** The change-email form before anything is typed. */
+const noNewEmail = { newEmail: "" };
+
 function EmailSection({ account }: { account: Account }) {
   const t = useI18n();
   const requestEmailChange = useMutation(api.account.requestEmailChange);
@@ -310,7 +315,7 @@ function EmailSection({ account }: { account: Account }) {
   const [error, setError] = useState<string>();
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const form = useForm({
-    defaultValues: { newEmail: "" },
+    defaultValues: noNewEmail,
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setError(undefined);
@@ -333,7 +338,7 @@ function EmailSection({ account }: { account: Account }) {
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
-  useUnsavedInput(form.useStore((state) => state.isDirty));
+  useUnsavedInput(form.useStore((state) => formChanged(state, noNewEmail)));
 
   return (
     <SettingsGroup

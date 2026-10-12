@@ -1,6 +1,6 @@
 "use client";
 
-import { asksBeforeClosing } from "@/lib/discard-changes";
+import { type CloseRequest, asksBeforeClosing } from "@/lib/discard-changes";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
@@ -10,10 +10,10 @@ import { useState } from "react";
 
 /**
  * The dialog around a form. While the form has changes, closing it (Esc, the
- * backdrop, the close button or Cancel) first asks "Discard changes?", and
- * the changes hold an update reload and the leaving-page prompt. An unchanged
- * form closes straight away. Closing after a save calls `onOpenChange` itself,
- * so it doesn't ask.
+ * backdrop, the close button or Cancel) first asks "Discard changes?", a new
+ * deployment's reload waits, and leaving the page asks too. An unchanged form
+ * closes straight away. Closing after a save calls `onOpenChange` itself, so
+ * it doesn't ask.
  */
 export function FormDialog({
   open,
@@ -21,14 +21,10 @@ export function FormDialog({
   changed,
   keepsDraft,
   children,
-}: {
+}: Omit<CloseRequest, "open"> & {
   open: boolean;
   /** Leave it out to keep the dialog open, e.g. while it saves. */
   onOpenChange?: (open: boolean) => void;
-  /** Whether the form holds input that hasn't been saved. */
-  changed: boolean;
-  /** Whether closing keeps the input for next time, as the New Item dialog does. */
-  keepsDraft?: boolean;
   children: React.ReactNode;
 }) {
   const t = useI18n();

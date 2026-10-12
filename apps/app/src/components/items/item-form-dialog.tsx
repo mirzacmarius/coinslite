@@ -16,6 +16,7 @@ import {
 import { ScanNotice } from "@/components/scanner/scan-notice";
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useWantedKeys } from "@/components/wantlist/wantlist";
+import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -553,7 +554,8 @@ export function ItemFormDialog({
   const submitting = form.useStore((state) => state.isSubmitting);
   // A scan's photos are input too: closing the form drops them.
   const changed =
-    form.useStore((state) => state.isDirty) || scanned !== undefined;
+    form.useStore((state) => formChanged(state, defaults)) ||
+    scanned !== undefined;
   // A new Item's form stays as it was for next time, unless it holds a scan.
   const keepsDraft = !item && !copyOf && scanned === undefined;
   const values = form.useStore(

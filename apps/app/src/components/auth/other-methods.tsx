@@ -27,9 +27,15 @@ export function OtherSignInMethods({ next }: { next: string }) {
         variant="outline"
         className="w-full"
         onClick={() => {
-          // Google takes over the page: what was typed here is done with.
-          releaseAllUnsavedInput();
-          void signIn("google", { redirectTo: `/welcome${nextQuery(next)}` });
+          // Google takes over the page: what was typed here is done with,
+          // unless signing in fails and the page stays.
+          const stayed = releaseAllUnsavedInput();
+          void signIn("google", {
+            redirectTo: `/welcome${nextQuery(next)}`,
+          }).catch((error: unknown) => {
+            stayed();
+            throw error;
+          });
         }}
       >
         <GoogleMark />

@@ -1,6 +1,6 @@
 "use client";
 
-import { goTo } from "@/lib/next-path";
+import { goTo } from "@/lib/go-to";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { type HomeCurrency, isHomeCurrency } from "@coinslite/i18n";

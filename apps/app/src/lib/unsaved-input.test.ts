@@ -44,4 +44,21 @@ describe("unsaved input", () => {
     expect(hasUnsavedInput()).toBe(false);
     expect(heard).toEqual([false]);
   });
+
+  test("when leaving fails, the forms hold their input again", () => {
+    const release = registerUnsavedInput();
+    const stayed = releaseAllUnsavedInput();
+    stayed();
+    expect(hasUnsavedInput()).toBe(true);
+    release();
+    expect(hasUnsavedInput()).toBe(false);
+  });
+
+  test("a form that lets go while the page is leaving stays released if it stays", () => {
+    const release = registerUnsavedInput();
+    const stayed = releaseAllUnsavedInput();
+    release();
+    stayed();
+    expect(hasUnsavedInput()).toBe(false);
+  });
 });

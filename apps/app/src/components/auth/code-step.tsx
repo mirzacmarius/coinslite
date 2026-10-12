@@ -1,6 +1,6 @@
 "use client";
 
-import { goTo } from "@/lib/next-path";
+import { goTo } from "@/lib/go-to";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { useForm } from "@tanstack/react-form";

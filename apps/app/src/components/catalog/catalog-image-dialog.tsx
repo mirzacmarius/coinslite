@@ -1,6 +1,7 @@
 "use client";
 
 import { FormDialog } from "@/components/form-dialog";
+import { formChanged } from "@/lib/discard-changes";
 import {
   ShrinkError,
   type ShrinkTarget,
@@ -210,7 +211,7 @@ export function CatalogImageDialog({
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
-  const isDirty = form.useStore((state) => state.isDirty);
+  const changed = form.useStore((state) => formChanged(state, defaults));
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -257,7 +258,7 @@ export function CatalogImageDialog({
     <FormDialog
       open={open}
       onOpenChange={submitting ? undefined : onOpenChange}
-      changed={isDirty || picked !== undefined}
+      changed={changed || picked !== undefined}
     >
       <DialogContent
         className="sm:max-w-[600px]"

@@ -4,6 +4,8 @@ import { hasUnsavedInput, onUnsavedInputChange } from "@/lib/unsaved-input";
 import { useEffect } from "react";
 
 const askBeforeLeaving = (event: BeforeUnloadEvent) => {
+  // The input may have been saved since the listener went on.
+  if (!hasUnsavedInput()) return;
   event.preventDefault();
   // Older browsers only ask when this is set.
   event.returnValue = "";

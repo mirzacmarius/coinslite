@@ -2,6 +2,7 @@
 
 import { FormDialog } from "@/components/form-dialog";
 import { useGradeLabels } from "@/components/items/grade-labels";
+import { formChanged } from "@/lib/discard-changes";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import {
@@ -157,7 +158,7 @@ export function CatalogNodeSheet({
       <NodeForm
         parent={target.parent}
         titleRef={titleRef}
-        onDirtyChange={setChanged}
+        onChanged={setChanged}
         onDone={() => onOpenChange(false)}
       />
     );
@@ -184,7 +185,7 @@ export function CatalogNodeSheet({
       <NodeForm
         node={node}
         titleRef={titleRef}
-        onDirtyChange={setChanged}
+        onChanged={setChanged}
         onDone={() => onOpenChange(false)}
       />
     );
@@ -306,14 +307,14 @@ function NodeForm({
   parent = null,
   node,
   titleRef,
-  onDirtyChange,
+  onChanged,
   onDone,
 }: {
   parent?: ParentNode | null;
   node?: EditedNode;
   titleRef: React.RefObject<HTMLInputElement | null>;
-  /** Told whether the form holds unsaved input, so closing the sheet can ask first. */
-  onDirtyChange: (dirty: boolean) => void;
+  /** Told whether the form holds changes, so closing the sheet can ask first. */
+  onChanged: (changed: boolean) => void;
   onDone: () => void;
 }) {
   const t = useI18n();
@@ -371,8 +372,8 @@ function NodeForm({
   });
   const values = form.useStore((state) => state.values);
   const submitting = form.useStore((state) => state.isSubmitting);
-  const isDirty = form.useStore((state) => state.isDirty);
-  useEffect(() => onDirtyChange(isDirty), [isDirty, onDirtyChange]);
+  const changed = form.useStore((state) => formChanged(state, defaults));
+  useEffect(() => onChanged(changed), [changed, onChanged]);
   const problems = useMemo(
     () => problemsOf(values, { creating }),
     [values, creating],
