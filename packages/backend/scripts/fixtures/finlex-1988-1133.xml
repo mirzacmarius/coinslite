@@ -1,0 +1,154 @@
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:finlex="http://data.finlex.fi/schema/finlex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <act contains="originalVersion" name="main">
+        <meta>
+            <identification source="#organization_fi.finlex">
+                <FRBRWork>
+                    <FRBRthis value="/akn/fi/act/statute/1988/1133/!main"/>
+                    <FRBRuri value="/akn/fi/act/statute/1988/1133"/>
+                    <FRBRalias name="eli" value="http://data.finlex.fi/eli/sd/1988/1133/alkup"/>
+                    <FRBRdate date="1988-12-23" name="dateIssued"/>
+                    <FRBRauthor as="#role_author" href="#organization_fi.parliament"/>
+                    <FRBRcountry value="fi"/>
+                    <FRBRsubtype value="statute"/>
+                    <FRBRnumber value="1133"/>
+                    <FRBRprescriptive value="true"/>
+                    <FRBRauthoritative value="true"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/fi/act/statute/1988/1133/fin@/!main"/>
+                    <FRBRuri value="/akn/fi/act/statute/1988/1133/fin@"/>
+                    <FRBRalias name="eli" value="http://data.finlex.fi/eli/sd/1988/1133/alkup/fin"/>
+                    <FRBRdate date="1988-12-23" name="dateIssued"/>
+                    <FRBRauthor as="#role_author" href="#organization_fi.parliament"/>
+                    <FRBRlanguage language="fin"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/fi/act/statute/1988/1133/fin@/!main.xml"/>
+                    <FRBRuri value="/akn/fi/act/statute/1988/1133/fin@.akn"/>
+                    <FRBRalias name="eli" value="http://data.finlex.fi/eli/sd/1988/1133/alkup/fin/xml"/>
+                    <FRBRdate date="2025-02-23" name="dateProduced"/>
+                    <FRBRauthor as="#role_editor" href="#organization_fi.finlex"/>
+                    <FRBRformat value="xml"/>
+                </FRBRManifestation>
+            </identification>
+            <references source="#organization_fi.finlex">
+                <TLCOrganization eId="organization_fi.finlex" href="/akn/ontology/organization/fi.finlex" showAs="Finlex"/>
+                <TLCRole eId="role_author" href="/akn/ontology/role/author" showAs="Tekijä"/>
+                <TLCRole eId="role_editor" href="/akn/ontology/role/editor" showAs="Toimittaja"/>
+                <TLCConcept eId="decree" href="/akn/ontology/concept/statute/type-statute.decree" showAs="Asetus"/>
+                <TLCConcept eId="new-statute" href="/akn/ontology/concept/statute/category-statute.new-statute" showAs="Uusi säädös"/>
+            </references>
+            <proprietary source="#organization_fi.finlex">
+                <finlex:typeStatute refersTo="#decree"/>
+                <finlex:categoryStatute refersTo="#new-statute"/>
+                <finlex:documentYear>1988</finlex:documentYear>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docNumber>1133/1988</docNumber>
+                <docTitle>Asetus Lahdessa vuonna 1989 pidettävien hiihdon maailmanmestaruuskilpailujen johdosta lyötävästä juhlarahasta</docTitle>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="enactingClause">
+                <p>Valtiovarainministeriön toimialaan kuuluvia asioita käsittelemään määrätyn ministerin esittelystä säädetään 30 päivänä maaliskuuta 1962 annetun rahalain (276/62) 8§:n nojalla:</p>
+            </formula>
+        </preamble>
+        <body>
+            <hcontainer finlex:outline="Säädöksen teksti" name="statuteProvisionsWrapper">
+                <section eId="sec_1">
+                    <num>1 §</num>
+                    <subsection eId="sec_1__subsec_1">
+                        <content>
+                            <p> Lahdessa vuonna 1989 pidettävien hiihdon maailmanmestaruuskilpailujen johdosta lyödään sadan markan juhlaraha.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_2">
+                    <num>2 §</num>
+                    <subsection eId="sec_2__subsec_1">
+                        <content>
+                            <p>Juhlaraha on hopeaseosta, jonka painosta on 830 promillea hopeaa ja 170 promillea kuparia. Pitoisuudet saavat vaihdella enintään ±10 promilleyksikköä.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_3">
+                    <num>3 §</num>
+                    <subsection eId="sec_3__subsec_1">
+                        <content>
+                            <p>Juhlarahan paino on 24 grammaa ja halkaisija 35 millimetriä, josta enintään viisi prosenttia rahoista saa poiketa enemmän kuin ±0,1 millimetriä.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_4">
+                    <num>4 §</num>
+                    <subsection eId="sec_4__subsec_1">
+                        <content>
+                            <p>Juhlaraha on ympyrän muotoinen. Kuvat ja kirjoitukset laakapinnoilla on sijoitettu siten, että rahaa kirjan lehden tavoin käännettäessä kumpikin puoli on oikein päin.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_4__subsec_2">
+                        <content>
+                            <p>Rahan sileässä lieriöpinnassa on syvennyksinä teksti ''MM-KISAT LAHDESSA VM-TÄVLINGEN I LAHTIS''.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_4__subsec_3">
+                        <content>
+                            <p>Rahassa voi lisäksi olla rahan suunnitelleen taiteilijan ja rahapajan johtajan sukunimien alkukirjaimet.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_5">
+                    <num>5 §</num>
+                    <subsection eId="sec_5__subsec_1">
+                        <content>
+                            <p>Juhlarahan leimat ovat seuraavien selitelmän ja kuvien mukaiset.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_5__subsec_2">
+                        <content>
+                            <p>Rahan tunnuspuolella on naishiihtäjä ja vuosiluku ''1989'' sekä sanat ''SUOMI'' ja ''FINLAND''. Rahan arvopuolella on näkymä Lahden hiihtostadionista kolmine hyppyrimäkineen ja teksti ''100 MK''.</p>
+                            <block name="image">
+                                <img alt="" height="186" src="media/0154.gif" width="400"/>
+                            </block>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_6">
+                    <num>6 §</num>
+                    <subsection eId="sec_6__subsec_1">
+                        <content>
+                            <p>Juhlarahan leimojen tarkemmat yksityiskohdat ilmenevät Suomen rahapajan hallussa olevista perusmalleista ja -työkaluista.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_7">
+                    <num>7 §</num>
+                    <subsection eId="sec_7__subsec_1">
+                        <content>
+                            <p>Tämä asetus tulee voimaan 1 päivänä tammikuuta 1989.</p>
+                        </content>
+                    </subsection>
+                </section>
+            </hcontainer>
+            <hcontainer finlex:outline="Esityöt ja allekirjoitukset" name="conclusions">
+                <hcontainer finlex:outline="Allekirjoitukset" name="signatures">
+                    <content>
+                        <p>Helsingissä 23 päivänä joulukuuta 1988</p>
+                        <p>
+                            <signature>
+                                <role refersTo="">Tasavallan Presidentti </role>
+                                <person refersTo="">Mauno Koivisto</person>
+                            </signature>
+                            <signature>
+                                <role refersTo="">Valtiovarainministeri </role>
+                                <person refersTo="">Erkki Liikanen</person>
+                            </signature>
+                        </p>
+                    </content>
+                </hcontainer>
+            </hcontainer>
+        </body>
+    </act>
+</akomaNtoso>

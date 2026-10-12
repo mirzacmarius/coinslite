@@ -50,6 +50,8 @@ import type * as catalog_datasets_euroCommemorativeCoinsDe from "../catalog/data
 import type * as catalog_datasets_euroCommemorativeCoinsFr from "../catalog/datasets/euroCommemorativeCoinsFr.js";
 import type * as catalog_datasets_euroCommemorativeCoinsRo from "../catalog/datasets/euroCommemorativeCoinsRo.js";
 import type * as catalog_datasets_euroCommemoratives from "../catalog/datasets/euroCommemoratives.js";
+import type * as catalog_datasets_finland from "../catalog/datasets/finland.js";
+import type * as catalog_datasets_finlandCollectorCoins from "../catalog/datasets/finlandCollectorCoins.js";
 import type * as catalog_datasets_norway from "../catalog/datasets/norway.js";
 import type * as catalog_datasets_romania from "../catalog/datasets/romania.js";
 import type * as catalog_datasets_romaniaBnr from "../catalog/datasets/romaniaBnr.js";
@@ -70,6 +72,7 @@ import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_seeds_euroBanknotes from "../catalog/seeds/euroBanknotes.js";
 import type * as catalog_seeds_euroCirculationCoins from "../catalog/seeds/euroCirculationCoins.js";
 import type * as catalog_seeds_euroCommemoratives from "../catalog/seeds/euroCommemoratives.js";
+import type * as catalog_seeds_finland from "../catalog/seeds/finland.js";
 import type * as catalog_seeds_norway from "../catalog/seeds/norway.js";
 import type * as catalog_seeds_romania from "../catalog/seeds/romania.js";
 import type * as catalog_seeds_usCoinProgrammes from "../catalog/seeds/usCoinProgrammes.js";
@@ -208,6 +211,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/datasets/euroCommemorativeCoinsFr": typeof catalog_datasets_euroCommemorativeCoinsFr;
   "catalog/datasets/euroCommemorativeCoinsRo": typeof catalog_datasets_euroCommemorativeCoinsRo;
   "catalog/datasets/euroCommemoratives": typeof catalog_datasets_euroCommemoratives;
+  "catalog/datasets/finland": typeof catalog_datasets_finland;
+  "catalog/datasets/finlandCollectorCoins": typeof catalog_datasets_finlandCollectorCoins;
   "catalog/datasets/norway": typeof catalog_datasets_norway;
   "catalog/datasets/romania": typeof catalog_datasets_romania;
   "catalog/datasets/romaniaBnr": typeof catalog_datasets_romaniaBnr;
@@ -228,6 +233,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/seeds/euroBanknotes": typeof catalog_seeds_euroBanknotes;
   "catalog/seeds/euroCirculationCoins": typeof catalog_seeds_euroCirculationCoins;
   "catalog/seeds/euroCommemoratives": typeof catalog_seeds_euroCommemoratives;
+  "catalog/seeds/finland": typeof catalog_seeds_finland;
   "catalog/seeds/norway": typeof catalog_seeds_norway;
   "catalog/seeds/romania": typeof catalog_seeds_romania;
   "catalog/seeds/usCoinProgrammes": typeof catalog_seeds_usCoinProgrammes;

@@ -1,0 +1,175 @@
+<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:finlex="http://data.finlex.fi/schema/finlex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <act contains="originalVersion" name="main">
+        <meta>
+            <identification source="#organization_fi.finlex">
+                <FRBRWork>
+                    <FRBRthis value="/akn/fi/act/statute/2011/959/!main"/>
+                    <FRBRuri value="/akn/fi/act/statute/2011/959"/>
+                    <FRBRalias name="eli" value="http://data.finlex.fi/eli/sd/2011/959/alkup"/>
+                    <FRBRdate date="2011-08-08" name="dateIssued"/>
+                    <FRBRdate date="2011-08-17" name="datePublished"/>
+                    <FRBRauthor as="#role_author" href="#organization_fi.parliament"/>
+                    <FRBRcountry value="fi"/>
+                    <FRBRsubtype value="statute"/>
+                    <FRBRnumber value="959"/>
+                    <FRBRprescriptive value="true"/>
+                    <FRBRauthoritative value="true"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/fi/act/statute/2011/959/fin@/!main"/>
+                    <FRBRuri value="/akn/fi/act/statute/2011/959/fin@"/>
+                    <FRBRalias name="eli" value="http://data.finlex.fi/eli/sd/2011/959/alkup/fin"/>
+                    <FRBRdate date="2011-08-08" name="dateIssued"/>
+                    <FRBRdate date="2011-08-17" name="datePublished"/>
+                    <FRBRauthor as="#role_author" href="#organization_fi.parliament"/>
+                    <FRBRlanguage language="fin"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/fi/act/statute/2011/959/fin@/!main.xml"/>
+                    <FRBRuri value="/akn/fi/act/statute/2011/959/fin@.akn"/>
+                    <FRBRalias name="eli" value="http://data.finlex.fi/eli/sd/2011/959/alkup/fin/xml"/>
+                    <FRBRdate date="2025-02-22" name="dateProduced"/>
+                    <FRBRdate date="2011-08-17" name="datePublished"/>
+                    <FRBRauthor as="#role_editor" href="#organization_fi.finlex"/>
+                    <FRBRformat value="xml"/>
+                </FRBRManifestation>
+            </identification>
+            <references source="#organization_fi.finlex">
+                <TLCOrganization eId="organization_fi.finlex" href="/akn/ontology/organization/fi.finlex" showAs="Finlex"/>
+                <TLCRole eId="role_author" href="/akn/ontology/role/author" showAs="Tekijä"/>
+                <TLCRole eId="role_editor" href="/akn/ontology/role/editor" showAs="Toimittaja"/>
+                <TLCConcept eId="decree" href="/akn/ontology/concept/statute/type-statute.decree" showAs="Asetus"/>
+                <TLCConcept eId="new-statute" href="/akn/ontology/concept/statute/category-statute.new-statute" showAs="Uusi säädös"/>
+            </references>
+            <proprietary source="#organization_fi.finlex">
+                <finlex:typeStatute refersTo="#decree"/>
+                <finlex:categoryStatute refersTo="#new-statute"/>
+                <finlex:documentYear>2011</finlex:documentYear>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docNumber>959/2011</docNumber>
+                <docTitle>Valtiovarainministeriön asetus Juhani Aho ja suomalainen kirjallisuus -juhlarahasta</docTitle>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="enactingClause">
+                <p>Valtiovarainministeriön päätöksen mukaisesti säädetään metallirahasta 27 päivänä maaliskuuta 1998 annetun lain (216/1998) 1 §:n 2 momentin nojalla, sellaisena kuin se on laissa 378/2002:</p>
+            </formula>
+        </preamble>
+        <body>
+            <hcontainer finlex:outline="Säädöksen teksti" name="statuteProvisionsWrapper">
+                <section eId="sec_1">
+                    <num>1 §</num>
+                    <subsection eId="sec_1__subsec_1">
+                        <content>
+                            <p>Kirjailija Juhani Ahon syntymän 150-vuotisjuhlan johdosta lyödään Juhani Aho ja suomalainen kirjallisuus -aiheinen 10 euron hopeinen juhlaraha.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_2">
+                    <num>2 §</num>
+                    <subsection eId="sec_2__subsec_1">
+                        <content>
+                            <p>Osa juhlarahoista lyödään erikoislyöntinä, jolloin rahoissa on peilikiiltoinen pohja ja mattapintainen kuvio.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_3">
+                    <num>3 §</num>
+                    <subsection eId="sec_3__subsec_1">
+                        <content>
+                            <p>Juhlaraha on hopeaseosta, jonka painosta 500 promillea on hopeaa ja 500 promillea kuparia. Pitoisuudet saavat vaihdella enintään ±10 promilleyksikköä.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_3__subsec_2">
+                        <content>
+                            <p>Erikoislyöntinen juhlaraha on hopeaseosta, jonka painosta 925 promillea on hopeaa ja 75 promillea kuparia. Pitoisuudet saavat vaihdella enintään ±10 promilleyksikköä.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_4">
+                    <num>4 §</num>
+                    <subsection eId="sec_4__subsec_1">
+                        <content>
+                            <p>Juhlarahan halkaisija on 38,6 ± 0,1 millimetriä ja paino 25,5± 0,5 grammaa.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_4__subsec_2">
+                        <content>
+                            <p>Enintään 5 prosenttia rahoista saa poiketa halkaisijastaan enemmän kuin ± 0,1 millimetriä.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_5">
+                    <num>5 §</num>
+                    <subsection eId="sec_5__subsec_1">
+                        <content>
+                            <p>Juhlarahan kuvat ja kirjoitukset laakapinnoilla on sijoitettu siten, että rahoja kirjan lehden tavoin käännettäessä kumpikin puoli on oikein päin.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_5__subsec_2">
+                        <content>
+                            <p>Rahassa on sen suunnitelleen taiteilijan sukunimen alkukirjain P sekä Suomen Rahapaja Oy:n tunnus.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_6">
+                    <num>6 §</num>
+                    <subsection eId="sec_6__subsec_1">
+                        <content>
+                            <p>Juhlaraha on seuraavan selitelmän ja kuvan mukainen.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_6__subsec_2">
+                        <content>
+                            <p>Rahan tunnuspuolella on kuvattuna mustekynän kärki, jonka muoto jatkuu tyyliteltynä kirjan aukeamana, jossa on tekstiä, ja taustalla Ahon teoksiin viittaavia kuvioita. Vuosiluvut 1861 ja 1921 ovat allekkain kolikon vasemmalla puolella ja teksti JUHANI AHO on kaarevasti kolikon alareunassa.</p>
+                        </content>
+                    </subsection>
+                    <subsection eId="sec_6__subsec_3">
+                        <content>
+                            <p>Rahan arvopuolella jatkuu kirjan aukeama, jonka alareuna on muotoiltu puusta veistetyiksi lastuiksi. Kirjan aukeamassa on tekstiä ja taustalla Ahon teoksiin viittaavia kuvioita. Lastujen oikealla puolella on pilkku-välimerkki, ja sen yläpuolella pystysuunnassa, vasemmalta oikealle vuosiluku 2011. Lastujen vasemmalla puolella on arvomerkintä 10 €, ja rahan alareunassa kaarevasti teksti SUOMI FINLAND.</p>
+                            <block name="image">
+                                <img alt="" height="88" src="media/6001.gif" width="184"/>
+                            </block>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_7">
+                    <num>7 §</num>
+                    <subsection eId="sec_7__subsec_1">
+                        <content>
+                            <p>Juhlarahojen tarkemmat yksityiskohdat ilmenevät Suomen Rahapaja Oy:n hallussa olevista perusmalleista ja -työkaluista.</p>
+                        </content>
+                    </subsection>
+                </section>
+                <section eId="sec_8">
+                    <num>8 §</num>
+                    <subsection eId="sec_8__subsec_1">
+                        <content>
+                            <p>Tämä asetus tulee voimaan 17 päivänä elokuuta 2011.</p>
+                        </content>
+                    </subsection>
+                </section>
+            </hcontainer>
+            <hcontainer finlex:outline="Esityöt ja allekirjoitukset" name="conclusions">
+                <hcontainer finlex:outline="Allekirjoitukset" name="signatures">
+                    <content>
+                        <p>  Helsingissä 8 päivänä elokuuta 2011</p>
+                        <p>
+                            <signature>
+                                <role refersTo="">Valtiovarainministeri</role>
+                                <person refersTo="">Jutta Urpilainen</person>
+                            </signature>
+                            <signature>
+                                <role refersTo="">Hallitusneuvos</role>
+                                <person refersTo="">Raine Vairimaa</person>
+                            </signature>
+                        </p>
+                    </content>
+                </hcontainer>
+            </hcontainer>
+        </body>
+    </act>
+</akomaNtoso>
