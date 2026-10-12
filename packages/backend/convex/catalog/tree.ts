@@ -7,7 +7,13 @@ import {
   type QueryCtx,
   internalMutation,
 } from "../_generated/server";
-import { clearWantsOfEntry, unkeyWantsOfEntry } from "../wants";
+import { unkeyWantsOfEntry } from "../wants";
+import {
+  blockedByChanges,
+  changeLimits,
+  changesRunning,
+  startRetype,
+} from "./changes";
 import { denominationCountChanges } from "./denominationCounts";
 import {
   type CatalogItemType,
@@ -27,12 +33,7 @@ import {
   searchTextOf,
   valuesFromFields,
 } from "./fields";
-import {
-  countLinkedItems,
-  detachLinkedItems,
-  hasLinkedItems,
-  retypeLinkedItems,
-} from "./linkedItems";
+import { hasLinkedItems } from "./linkedItems";
 import { slimEntryChanges } from "./slimEntries";
 
 /**
@@ -40,7 +41,10 @@ import { slimEntryChanges } from "./slimEntries";
  * once. Every write here keeps `path` (the keys from the root down),
  * `searchText`, the denomination counts (catalog/denominationCounts.ts) and
  * the slim entries (catalog/slimEntries.ts) in step with the node, so
- * browsing, Sets, search and the Collection can rely on them.
+ * browsing, Sets, search and the Collection can rely on them. Deleting
+ * nodes and giving many linked Items a new Item type run in batches
+ * (catalog/changes.ts), which keep them in step too; no save here touches
+ * a node such a change is running on.
  */
 
 /** What an import does, or would do. */
@@ -74,7 +78,11 @@ export type Plan = {
   /** Catalog nodes the file refers to, by key. */
   stored: Map<string, Doc<"catalogNodes">>;
   /** Entries given another Item type, which the Items linked to them take too. */
-  retyped: Array<{ entryId: Id<"catalogNodes">; type: CatalogItemType }>;
+  retyped: Array<{
+    key: string;
+    entryId: Id<"catalogNodes">;
+    type: CatalogItemType;
+  }>;
 };
 
 const segments = (path: string) => path.split("/");
@@ -265,7 +273,7 @@ export async function planRows(
 
   /** Entries whose Item type changes, for their linked Items to follow. */
   const retyped: Plan["retyped"] = [];
-  let linkedItemsToRetype = 0;
+  const running = await changesRunning(ctx);
   /** Nodes below moved nodes (or roots that change kind), which follow them. */
   let nodesToMove = 0;
   for (const node of planned.values()) {
@@ -289,6 +297,14 @@ export async function planRows(
     }
 
     pathOf(node.key);
+    // Nothing a deletion or Item type change is still running on.
+    if (
+      blockedByChanges(running, {
+        from: node.existing?.path,
+        to: pathOf(node.key),
+      })
+    )
+      fail(catalogErrors.changeInProgress);
     if (inCycle.has(node.key)) fail(catalogErrors.parentCycle, "parent_id");
     else if (segments(pathOf(node.key)).length > catalogLimits.depth)
       fail(catalogErrors.tooDeep, "parent_id");
@@ -342,7 +358,7 @@ export async function planRows(
     }
 
     // Items link to entries (ADR 0001): an entry they link to stays one, and
-    // a new Item type reaches them, as many as one save can update.
+    // a new Item type reaches them, in the background when they're many.
     if (node.existing?.kind === "entry") {
       const entryId = node.existing._id;
       if (node.kind !== "entry") {
@@ -352,14 +368,7 @@ export async function planRows(
         node.values.itemType !== undefined &&
         node.values.itemType !== (node.existing.itemType ?? "coin")
       ) {
-        linkedItemsToRetype += await countLinkedItems(
-          ctx,
-          entryId,
-          Math.max(0, catalogLimits.linkedItems - linkedItemsToRetype),
-        );
-        if (linkedItemsToRetype > catalogLimits.linkedItems)
-          fail(catalogErrors.tooManyLinkedItems, "item_type");
-        else retyped.push({ entryId, type: node.values.itemType });
+        retyped.push({ key: node.key, entryId, type: node.values.itemType });
       }
     }
   }
@@ -560,8 +569,12 @@ export async function applyPlan(
   await denominationCounts.store(ctx);
   await slimEntries.store(ctx);
 
-  for (const { entryId, type } of retyped) {
-    await retypeLinkedItems(ctx, entryId, type);
+  // The linked Items of retyped entries follow: as many as one batch takes
+  // now, the rest in the background.
+  let budget: number = changeLimits.batch;
+  for (const { key, entryId, type } of retyped) {
+    const entry = { id: entryId, path: pathOf(key) };
+    budget -= await startRetype(ctx, entry, type, budget);
   }
   return { ...report, applied: true };
 }
@@ -589,84 +602,4 @@ export async function exportCatalogPage(
     isDone: page.isDone,
     continueCursor: page.continueCursor,
   };
-}
-
-/** What deleting a node takes with it. */
-export type Deletion = {
-  /** Every node below it, root first; at most `catalogLimits.deleteNodes`. */
-  below: Doc<"catalogNodes">[];
-  /** Items linked to it or to the entries below it, counted up to just past the limit. */
-  linkedItems: number;
-  /** Whether it takes more nodes or Items than one delete may. */
-  tooLarge: boolean;
-};
-
-/** Works out what deleting a node would take with it, without changing anything. */
-export async function planDeletion(
-  ctx: QueryCtx,
-  node: Doc<"catalogNodes">,
-): Promise<Deletion> {
-  const below = await ctx.db
-    .query("catalogNodes")
-    .withIndex("by_path", (q) =>
-      q.gt("path", `${node.path}/`).lt("path", `${node.path}0`),
-    )
-    .take(catalogLimits.deleteNodes);
-  let linkedItems = 0;
-  for (const each of [node, ...below]) {
-    if (each.kind !== "entry") continue;
-    linkedItems += await countLinkedItems(
-      ctx,
-      each._id,
-      catalogLimits.linkedItems - linkedItems,
-    );
-    if (linkedItems > catalogLimits.linkedItems) break;
-  }
-  return {
-    below,
-    linkedItems,
-    tooLarge:
-      below.length + 1 > catalogLimits.deleteNodes ||
-      linkedItems > catalogLimits.linkedItems,
-  };
-}
-
-/**
- * Deletes a node and everything below it, with their uploaded images and
- * slim entries. The Items linked to entries there take those entries' facts
- * as their own first, and the entry and denomination counts follow. The deletion must
- * not be too large (`planDeletion`).
- */
-export async function deleteSubtree(
-  ctx: MutationCtx,
-  node: Doc<"catalogNodes">,
-  { below }: Deletion,
-) {
-  const removed = [node, ...below];
-  const denominationCounts = denominationCountChanges();
-  const slimEntries = slimEntryChanges();
-  for (const each of removed) {
-    denominationCounts.count(each, -1);
-    slimEntries.note(each._id, each, null);
-    if (each.kind === "entry") {
-      await detachLinkedItems(ctx, each);
-      await clearWantsOfEntry(ctx, each._id);
-    }
-    if (each.imageFiles) {
-      await ctx.storage.delete(each.imageFiles.full);
-      await ctx.storage.delete(each.imageFiles.thumbnail);
-    }
-    await ctx.db.delete("catalogNodes", each._id);
-  }
-  await denominationCounts.store(ctx);
-  await slimEntries.store(ctx);
-  const entries = removed.filter((each) => each.kind === "entry").length;
-  if (entries === 0) return;
-  for (const key of ancestorKeysOf(node.path)) {
-    const ancestor = await nodeByKey(ctx, key);
-    if (!ancestor || ancestor.kind === "entry") continue;
-    await ctx.db.patch("catalogNodes", ancestor._id, {
-      entryCount: Math.max(0, (ancestor.entryCount ?? 0) - entries),
-    });
-  }
 }

@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { type CatalogFacts, entryFacts, slimEntryOf } from "./catalogFacts";
+import {
+  type CatalogFacts,
+  detachedFields,
+  entryFacts,
+  slimEntryOf,
+} from "./catalogFacts";
 
 /** A Catalog entry as stored, with the long notes the Collection never shows. */
 const morganDollar = {
@@ -101,5 +106,70 @@ describe("the slim entry an Item is resolved from", () => {
     expect(
       slimEntryOf({ key: "euro-2", kind: "theme", title: "2 euro" }),
     ).toBeNull();
+  });
+});
+
+describe("an Item whose Catalog entry leaves the Catalog", () => {
+  test("keeps its own facts, takes the entry's as its own, keeps the Catalog-only facts and drops the link", () => {
+    const item = {
+      type: "coin" as const,
+      title: "Morgan dollar 1881-S",
+      quantity: 2,
+      // The person's own: they read the mint mark differently.
+      mintMark: "CC",
+      catalogEntryId: "entry-id",
+    };
+    const detached: object = detachedFields(item, morganDollar);
+    expect(detached).toEqual({
+      type: "coin",
+      title: "Morgan dollar 1881-S",
+      quantity: 2,
+      mintMark: "CC",
+      country: "US",
+      year: 1881,
+      denomination: "1 dollar",
+      series: "Morgan dollar",
+      material: "silver",
+      strike: "circulation",
+      diameter: 38.1,
+      thickness: 2.4,
+      mintage: 12760000,
+      numistaNumber: 1492,
+      metal: "silver",
+      weight: 26.73,
+      purity: 0.9,
+      catalogDetails: {
+        mint: "San Francisco",
+        composition: [
+          { metal: "silver", percent: 90 },
+          { metal: "copper", percent: 10 },
+        ],
+        edge: "reeded",
+        designers: ["George T. Morgan"],
+        issueDate: "1881",
+      },
+      catalogEntryId: undefined,
+    });
+  });
+
+  test("has no Catalog-only facts to keep from an entry without any", () => {
+    const item = {
+      type: "banknote" as const,
+      year: 1977,
+      catalogEntryId: "entry-id",
+    };
+    const detached: object = detachedFields(item, {
+      itemType: "banknote",
+      country: "NO",
+      denomination: "100 kroner",
+    });
+    expect(detached).toEqual({
+      type: "banknote",
+      year: 1977,
+      country: "NO",
+      denomination: "100 kroner",
+      catalogDetails: undefined,
+      catalogEntryId: undefined,
+    });
   });
 });

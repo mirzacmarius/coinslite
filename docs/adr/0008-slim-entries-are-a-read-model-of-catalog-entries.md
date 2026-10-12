@@ -2,7 +2,7 @@
 
 Items read their descriptive facts from their Catalog entry (ADR 0001), and the Collection list resolves every Item in a Collection on each run. Reading whole entries also read their notes in every language, which pushed Collections of a few thousand linked Items past what one query may read. Each Catalog entry therefore has a slim entry beside it (`catalogSlimEntries`): its key, title and the fields Items take facts from, nothing else. Every reader of resolved Items goes through `items/resolve.ts`, which reads slim entries instead of entries.
 
-A slim entry is a read model of its entry, not a second source of truth. Nobody edits it: `catalog/tree.ts`, which every Catalog write goes through (CSV import, editor, seed, delete), works it out from the entry it has just written (`slimEntryOf`), and deletes it when the node stops being an entry or leaves the Catalog. A slim entry that disagrees with its entry is a bug, fixed by running `catalog/slimEntries:backfill` again. Readers fall back to the whole entry while an entry has no slim entry yet, which is only the case before that backfill has run once.
+A slim entry is a read model of its entry, not a second source of truth. Nobody edits it: `catalog/tree.ts`, which every Catalog save goes through (CSV import, editor, seed), works it out from the entry it has just written (`slimEntryOf`) and deletes it when the node stops being an entry; `catalog/changes.ts`, which deletes nodes a batch at a time, deletes it when the node leaves the Catalog. A slim entry that disagrees with its entry is a bug, fixed by running `catalog/slimEntries:backfill` again. Readers fall back to the whole entry while an entry has no slim entry yet, which is only the case before that backfill has run once.
 
 ## Considered options
 

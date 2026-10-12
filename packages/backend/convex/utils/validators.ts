@@ -30,6 +30,12 @@ function literalUnion<T extends string>(values: readonly [T, T, ...T[]]) {
 export const language = literalUnion(locales);
 export const homeCurrency = literalUnion(homeCurrencies);
 
+/** A Catalog change running in the background (catalog/changes.ts): a deletion, or linked Items taking an entry's new Item type. */
+export const catalogChangeKind = v.union(
+  v.literal("delete"),
+  v.literal("retype"),
+);
+
 /** Coin, banknote or stamp. */
 export const itemType = v.union(
   v.literal("coin"),

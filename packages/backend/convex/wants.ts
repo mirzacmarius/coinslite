@@ -88,17 +88,14 @@ export async function clearWant(
   if (want) await ctx.db.delete(want._id);
 }
 
-/** Removes everyone's wants of a Catalog entry, as it leaves the Catalog (catalog/tree.ts). */
-export async function clearWantsOfEntry(
-  ctx: MutationCtx,
-  entryId: Id<"catalogNodes">,
-) {
-  for await (const want of ctx.db
+/**
+ * Everyone's wants of a Catalog entry, which go a batch at a time as the
+ * entry leaves the Catalog (catalog/changes.ts).
+ */
+export const wantsOfEntry = (ctx: QueryCtx, entryId: Id<"catalogNodes">) =>
+  ctx.db
     .query("wants")
-    .withIndex("by_catalogEntryId", (q) => q.eq("catalogEntryId", entryId))) {
-    await ctx.db.delete(want._id);
-  }
-}
+    .withIndex("by_catalogEntryId", (q) => q.eq("catalogEntryId", entryId));
 
 /**
  * Makes everyone's wants of a Catalog entry that's turned into a grouping

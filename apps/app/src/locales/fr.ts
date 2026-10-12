@@ -821,8 +821,8 @@ export default {
         "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste. Gardez is_addable à true.",
       TOO_MANY_NODES_BELOW:
         "Plus de 2 000 nœuds se trouvent sous ceux que ce fichier déplace. Déplacez-en moins à la fois.",
-      TOO_MANY_LINKED_ITEMS:
-        "Plus de 1 000 objets sont liés aux entrées dont le type d’objet change. Modifiez-en moins à la fois.",
+      CHANGE_IN_PROGRESS:
+        "Une suppression ou un changement de type d’objet est encore en cours sur ce nœud. Importez à nouveau le fichier une fois terminé.",
     },
   },
   collection: {
@@ -1696,12 +1696,11 @@ export default {
     saved: "«\u00a0{title}\u00a0» enregistré",
     deleteTitle: "Supprimer «\u00a0{title}\u00a0»\u00a0?",
     deleteCounting: "Calcul de ce qui sera supprimé avec…",
-    deleteTooLarge:
-      "Cela emporterait plus de {nodes} nœuds ou {items} objets liés. Supprimez d’abord les nœuds en dessous.",
     "deleteBelow#zero": "Rien en dessous n’est supprimé avec.",
     "deleteBelow#one": "1 nœud en dessous est supprimé avec.",
     "deleteBelow#few": "{count} nœuds en dessous sont supprimés avec.",
     "deleteBelow#other": "{count} nœuds en dessous sont supprimés avec.",
+    deleteBelowMore: "Plus de {nodes} nœuds en dessous sont supprimés avec.",
     "deleteItems#zero": "Aucun objet n’y est lié.",
     "deleteItems#one":
       "1 objet est lié à une entrée du catalogue ici et garde ses données comme les siennes.",
@@ -1709,8 +1708,26 @@ export default {
       "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
     "deleteItems#other":
       "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
+    deleteItemsUncounted:
+      "Les objets liés à des entrées du catalogue ici gardent leurs données comme les leurs.",
+    deleteItemsMore:
+      "Plus de {items} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
+    deleteInProgress:
+      "Une suppression ou un changement de type d’objet est encore en cours ici. Supprimez-le une fois terminé.",
     deleted: "«\u00a0{title}\u00a0» supprimé",
     deleteFailed: "Impossible de supprimer. Réessayez.",
+    deleting:
+      "Suppression de « {title} » en cours. La suite se termine en arrière-plan.",
+    changes: {
+      delete: "En cours de suppression",
+      retype: "Les objets prennent le nouveau type d’objet",
+    },
+    changeNotice: {
+      delete:
+        "Ce nœud est en cours de suppression. Les objets qui y sont liés gardent ses données comme les leurs. Il ne peut pas être modifié entre-temps.",
+      retype:
+        "Les objets liés à cette entrée du catalogue prennent son nouveau type d’objet. Elle ne peut pas être modifiée avant qu’ils l’aient tous.",
+    },
     errors: {
       TITLE_REQUIRED: "Donnez-lui un titre.",
       TOO_LONG: "C’est trop long.",
@@ -1745,8 +1762,8 @@ export default {
         "Des objets sont liés à cette entrée du catalogue\u00a0: elle le reste.",
       TOO_MANY_NODES_BELOW:
         "Plus de 2 000 nœuds se trouvent sous celui-ci, trop pour les déplacer en une fois.",
-      TOO_MANY_LINKED_ITEMS:
-        "Plus de 1 000 objets sont liés à cette entrée, trop pour changer leur type d’objet d’un coup.",
+      CHANGE_IN_PROGRESS:
+        "Une suppression ou un changement de type d’objet est encore en cours ici. Réessayez une fois terminé.",
       ID_REQUIRED: "Donnez-lui un identifiant.",
       INVALID_ID:
         "Utilisez jusqu’à 64 lettres minuscules, chiffres, points, tirets et tirets bas.",

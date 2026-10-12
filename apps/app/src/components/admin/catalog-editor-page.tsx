@@ -12,6 +12,7 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import {
   DropdownMenu,
@@ -37,6 +38,7 @@ import {
   Flag,
   Layers,
   ListTree,
+  Loader2,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -64,8 +66,11 @@ const useTreeActions = () => useContext(TreeActionsContext) as TreeActions;
 
 /**
  * The admins' Catalog editor: every node in a collapsible tree, where they
- * add countries and Themes, add below any of them, edit and delete. Everyone
- * else finds nothing here; the backend refuses them too.
+ * add countries and Themes, add below any of them, edit and delete. A
+ * deletion or Item type change still running in the background shows on its
+ * node, which can't be changed meanwhile, nor can anything below a node
+ * being deleted. Everyone else finds nothing here; the backend refuses them
+ * too.
  */
 export function CatalogEditorPage() {
   const t = useI18n();
@@ -187,9 +192,12 @@ function TreeSkeleton({ level }: { level: number }) {
 function TreeLevel({
   parentKey,
   level,
+  locked = false,
 }: {
   parentKey: string | null;
   level: number;
+  /** The parent or a node above it is being deleted, so none of these can be changed. */
+  locked?: boolean;
 }) {
   const t = useI18n();
   const actions = useTreeActions();
@@ -237,7 +245,12 @@ function TreeLevel({
     <>
       <ul className={cn(level === 0 && "divide-y border-b")}>
         {results.map((node) => (
-          <TreeRow key={node.key} node={node} level={level} />
+          <TreeRow
+            key={node.key}
+            node={node}
+            level={level}
+            parentLocked={locked}
+          />
         ))}
       </ul>
       {status === "CanLoadMore" && (
@@ -259,7 +272,15 @@ const kindIcons = {
 const itemTypeIcons = { coin: Coins, banknote: Banknote } as const;
 
 /** One node: open or close what's below it, add below it, edit or delete it. */
-function TreeRow({ node, level }: { node: TreeNode; level: number }) {
+function TreeRow({
+  node,
+  level,
+  parentLocked,
+}: {
+  node: TreeNode;
+  level: number;
+  parentLocked: boolean;
+}) {
   const t = useI18n();
   const format = useFormatters();
   const catalogFormat = useCatalogFormat();
@@ -267,6 +288,8 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
   const [expanded, setExpanded] = useState(false);
   const title = catalogFormat.nodeTitle({ ...node });
   const isEntry = node.kind === "entry";
+  /** A change runs on it or above it: it opens, but nothing can change it. */
+  const locked = parentLocked || node.change !== undefined;
   const Icon =
     node.kind === "entry"
       ? itemTypeIcons[node.itemType ?? "coin"]
@@ -327,10 +350,16 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
         >
           {title}
         </button>
+        {node.change && (
+          <Badge className="shrink-0">
+            <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+            {t(`catalogEditor.changes.${node.change}`)}
+          </Badge>
+        )}
         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
           {facts.join(" · ")}
         </span>
-        {!isEntry && (
+        {!isEntry && !locked && (
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -372,7 +401,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
               {t("catalogEditor.edit")}
             </DropdownMenuItem>
             {!isEntry && (
-              <DropdownMenuItem onSelect={addBelow}>
+              <DropdownMenuItem disabled={locked} onSelect={addBelow}>
                 <Plus strokeWidth={1.75} />
                 {t("catalogEditor.addBelow")}
               </DropdownMenuItem>
@@ -385,6 +414,7 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              disabled={locked}
               onSelect={() => actions.remove({ key: node.key, title })}
               className="text-destructive focus:text-destructive"
             >
@@ -395,7 +425,11 @@ function TreeRow({ node, level }: { node: TreeNode; level: number }) {
         </DropdownMenu>
       </div>
       {expanded && !isEntry && (
-        <TreeLevel parentKey={node.key} level={level + 1} />
+        <TreeLevel
+          parentKey={node.key}
+          level={level + 1}
+          locked={parentLocked || node.change === "delete"}
+        />
       )}
     </li>
   );
