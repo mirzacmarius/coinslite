@@ -51,6 +51,17 @@ const documentsKept = 500;
 const bytesKept = 2 * 1024 * 1024;
 const lookupsKept = 2 * readCheckEvery + 100;
 
+/** Whether the query still has more than it keeps back for the rest of it. */
+async function roomLeft(ctx: QueryCtx) {
+  const { documentsRead, bytesRead, databaseQueries } =
+    await ctx.meta.getTransactionMetrics();
+  return (
+    documentsRead.remaining >= documentsKept &&
+    bytesRead.remaining >= bytesKept &&
+    databaseQueries.remaining >= lookupsKept
+  );
+}
+
 /**
  * Every Item in a person's Collection, as added, with its facts resolved
  * (items/resolve.ts) from the slim entries of the Catalog entries they link
@@ -69,16 +80,8 @@ async function readCollection(ctx: QueryCtx, ownerId: Id<"users">) {
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
     items.push(await resolver.resolve(item));
-    if (items.length % readCheckEvery === 0) {
-      const { documentsRead, bytesRead, databaseQueries } =
-        await ctx.meta.getTransactionMetrics();
-      if (
-        documentsRead.remaining < documentsKept ||
-        bytesRead.remaining < bytesKept ||
-        databaseQueries.remaining < lookupsKept
-      )
-        return { items, complete: false };
-    }
+    if (items.length % readCheckEvery === 0 && !(await roomLeft(ctx)))
+      return { items, complete: false };
   }
   return { items, complete: true };
 }
@@ -97,15 +100,8 @@ async function readMorePhotoItems(ctx: QueryCtx, ownerId: Id<"users">) {
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
     itemIds.add(photo.itemId);
     read += 1;
-    if (read % readCheckEvery === 0) {
-      const { documentsRead, bytesRead } =
-        await ctx.meta.getTransactionMetrics();
-      if (
-        documentsRead.remaining < documentsKept ||
-        bytesRead.remaining < bytesKept
-      )
-        return { itemIds, complete: false };
-    }
+    if (read % readCheckEvery === 0 && !(await roomLeft(ctx)))
+      return { itemIds, complete: false };
   }
   return { itemIds, complete: true };
 }

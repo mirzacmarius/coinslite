@@ -5,7 +5,7 @@ import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import {
-  type SetProgress as Progressed,
+  type SetProgress,
   closestSets,
 } from "@coinslite/backend/convex/catalog/setProgress";
 import { Progress } from "@coinslite/ui/progress";
@@ -18,7 +18,7 @@ import { useId, useMemo } from "react";
  * entry of (catalog/setProgress.ts), each with held / total and % as its
  * Set view shows them, and opening it. Absent when there are none.
  */
-export function SetProgress({ progress }: { progress: Progressed }) {
+export function SetProgressCard({ progress }: { progress: SetProgress }) {
   const t = useI18n();
   const format = useFormatters();
   const { nodeTitle } = useCatalogFormat();

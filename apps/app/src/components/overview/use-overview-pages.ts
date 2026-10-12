@@ -19,7 +19,7 @@ import { useEffect, useMemo, useRef } from "react";
  */
 export function useOverviewPages(): OverviewPage | undefined {
   const { results, status, loadMore } = usePaginatedQuery(
-    api.overview.page,
+    api.overview.attentionAndSetsPage,
     {},
     { initialNumItems: OVERVIEW_PAGE_SIZE },
   );

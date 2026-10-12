@@ -16,8 +16,8 @@ import { StartCard } from "@/components/collection/start-card";
 import { AddShortcuts } from "@/components/overview/add-shortcuts";
 import { isFirstRun } from "@/components/overview/first-run";
 import { LatestItems } from "@/components/overview/latest-items";
-import { NeedsAttention } from "@/components/overview/needs-attention";
-import { SetProgress } from "@/components/overview/set-progress";
+import { NeedsAttentionCard } from "@/components/overview/needs-attention";
+import { SetProgressCard } from "@/components/overview/set-progress";
 import { useOverviewPages } from "@/components/overview/use-overview-pages";
 import { WantlistCard } from "@/components/overview/wantlist-card";
 import { OverviewPlanUsage } from "@/components/plans/plan-usage";
@@ -100,8 +100,8 @@ export function Overview() {
             <LatestItems items={deciding ? undefined : latest} />
             {firstRun === false && pages && (
               <>
-                <SetProgress progress={pages.setProgress} />
-                <NeedsAttention counts={pages.needsAttention} />
+                <SetProgressCard progress={pages.setProgress} />
+                <NeedsAttentionCard counts={pages.needsAttention} />
               </>
             )}
           </div>

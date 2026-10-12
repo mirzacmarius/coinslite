@@ -2,16 +2,22 @@ import {
   paginationOptsValidator,
   paginationResultValidator,
 } from "convex/server";
-import { v } from "convex/values";
+import { type VFloat64, v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { type QueryCtx, query } from "./_generated/server";
 import { setProgress, setsOfEntries } from "./catalog/sets";
 import { catalogVisibleTo } from "./featureFlags";
-import { hasSidePhoto, needsAttention } from "./items/attention";
+import {
+  type AttentionKind,
+  attentionKinds,
+  hasSidePhoto,
+  needsAttention,
+} from "./items/attention";
 import { itemResolver } from "./items/resolve";
 import { withThumbnail } from "./items/thumbnail";
 import { OVERVIEW_PAGE_SIZE } from "./overview/pages";
 import { requireSetUpUser } from "./utils/auth";
+import { capped } from "./utils/pagination";
 import { homeCurrency, itemType } from "./utils/validators";
 
 /**
@@ -82,6 +88,19 @@ export const latestItems = query({
   },
 });
 
+/** How many Items lack each of `attentionKinds`, for return values. */
+const needsAttentionCounts = v.object(
+  Object.fromEntries(attentionKinds.map((kind) => [kind, v.number()])) as {
+    [kind in AttentionKind]: VFloat64<number>;
+  },
+);
+
+/**
+ * The most bytes of Items one page reads, so a page of large Items ends
+ * early rather than the query failing (utils/pagination.ts).
+ */
+const OVERVIEW_PAGE_BYTES = 4 * 1024 * 1024;
+
 /** Whether an Item has any photo; its more photos are looked at only without a side photo. */
 async function hasPhoto(ctx: QueryCtx, item: Doc<"items">) {
   if (hasSidePhoto(item)) return true;
@@ -98,19 +117,15 @@ async function hasPhoto(ctx: QueryCtx, item: Doc<"items">) {
  * or a Grade (items/attention.ts), and the Sets of the Catalog entries they
  * hold (catalog/setProgress.ts; none while the Catalog is hidden from them).
  * Like the totals, the app reads page after page (`OVERVIEW_PAGE_SIZE`
- * Items each) and adds them up with `combineOverviewPages`
- * (overview/pages.ts), so a Collection of any size stays inside the read
- * limits.
+ * Items each, and at most `OVERVIEW_PAGE_BYTES`) and adds them up with
+ * `combineOverviewPages` (overview/pages.ts), so a Collection of any size
+ * stays inside the read limits.
  */
-export const page = query({
+export const attentionAndSetsPage = query({
   args: { paginationOpts: paginationOptsValidator },
   returns: paginationResultValidator(
     v.object({
-      needsAttention: v.object({
-        marketValue: v.number(),
-        photo: v.number(),
-        grade: v.number(),
-      }),
+      needsAttention: needsAttentionCounts,
       setProgress,
     }),
   ),
@@ -121,10 +136,12 @@ export const page = query({
       .withIndex("by_ownerId_and_soldOn", (q) =>
         q.eq("ownerId", owner._id).eq("soldOn", undefined),
       )
-      .paginate({
-        ...paginationOpts,
-        numItems: Math.min(paginationOpts.numItems, OVERVIEW_PAGE_SIZE),
-      });
+      .paginate(
+        capped(paginationOpts, {
+          numItems: OVERVIEW_PAGE_SIZE,
+          bytes: OVERVIEW_PAGE_BYTES,
+        }),
+      );
     const attention = needsAttention(
       await Promise.all(
         items.page.map(async (item) => ({

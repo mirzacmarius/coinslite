@@ -4,7 +4,7 @@ import { collectionHref } from "@/components/collection/collection-url";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import {
-  type NeedsAttention as Counts,
+  type NeedsAttention,
   attentionKinds,
 } from "@coinslite/backend/convex/items/attention";
 import { ChevronRight } from "lucide-react";
@@ -17,7 +17,7 @@ import { useId } from "react";
  * Items. A count of none isn't listed; with nothing to point out, the card
  * is absent.
  */
-export function NeedsAttention({ counts }: { counts: Counts }) {
+export function NeedsAttentionCard({ counts }: { counts: NeedsAttention }) {
   const t = useI18n();
   const format = useFormatters();
   const titleId = useId();

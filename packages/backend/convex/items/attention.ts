@@ -34,6 +34,13 @@ export type AttentionKind = (typeof attentionKinds)[number];
 /** How many Items lack each. */
 export type NeedsAttention = Record<AttentionKind, number>;
 
+/** No Item lacking anything. */
+const noneNeeded = (): NeedsAttention => ({
+  marketValue: 0,
+  photo: 0,
+  grade: 0,
+});
+
 /** Whether an Item lacks this. Stamps have no Grade to lack. */
 export function lacks(kind: AttentionKind, item: AttentionItem) {
   switch (kind) {
@@ -51,7 +58,7 @@ export function lacks(kind: AttentionKind, item: AttentionItem) {
  * only those still owned.
  */
 export function needsAttention(items: Iterable<AttentionItem>): NeedsAttention {
-  const counts: NeedsAttention = { marketValue: 0, photo: 0, grade: 0 };
+  const counts = noneNeeded();
   for (const item of items) {
     if (item.soldOn !== undefined) continue;
     for (const kind of attentionKinds) if (lacks(kind, item)) counts[kind] += 1;
@@ -64,9 +71,7 @@ export function combineNeedsAttention(
   a: NeedsAttention,
   b: NeedsAttention,
 ): NeedsAttention {
-  return {
-    marketValue: a.marketValue + b.marketValue,
-    photo: a.photo + b.photo,
-    grade: a.grade + b.grade,
-  };
+  const counts = noneNeeded();
+  for (const kind of attentionKinds) counts[kind] = a[kind] + b[kind];
+  return counts;
 }

@@ -398,19 +398,22 @@ async function entrySet(
       ? { scope: { key: parent.key }, node: parent, total }
       : null;
   }
-  const total = await reads.entryCount({
+  const group = {
     countryNodeKey: parent.key,
     denomination: entry.denomination,
     series: entry.series,
-  });
-  if (total === null || !isSet(total)) return null;
-  const scope = {
-    key: parent.key,
-    denomination: entry.denomination ?? null,
-    series: entry.series ?? null,
   };
-  return { scope, node: parent, total };
+  const total = await reads.entryCount(group);
+  if (total === null || !isSet(total)) return null;
+  return { scope: denominationSet(group), node: parent, total };
 }
+
+/** A country's entries of one denomination and series, as a Set. */
+const denominationSet = (group: DenominationGroup): SetScope => ({
+  key: group.countryNodeKey,
+  denomination: group.denomination ?? null,
+  series: group.series ?? null,
+});
 
 /** A Catalog node as the app names it (setProgress.ts NodeName). */
 function nameOf(node: Doc<"catalogNodes">): NodeName {
@@ -474,11 +477,11 @@ function readOnce<A, T>(
 /** An entry's own denomination and series in its country, as a Set; null outside any country. */
 function denominationPathOf(entry: Doc<"catalogNodes">): SetScope | null {
   if (entry.countryNodeKey === undefined) return null;
-  return {
-    key: entry.countryNodeKey,
-    denomination: entry.denomination ?? null,
-    series: entry.series ?? null,
-  };
+  return denominationSet({
+    countryNodeKey: entry.countryNodeKey,
+    denomination: entry.denomination,
+    series: entry.series,
+  });
 }
 
 /**
@@ -501,12 +504,7 @@ export async function setsOfEntries(
   const reads: SetReads = {
     node,
     entryCount: readOnce(
-      (group: DenominationGroup) =>
-        setIdOf({
-          key: group.countryNodeKey,
-          denomination: group.denomination ?? null,
-          series: group.series ?? null,
-        }),
+      (group: DenominationGroup) => setIdOf(denominationSet(group)),
       (group) => storedDenominationCount(ctx, group),
     ),
   };

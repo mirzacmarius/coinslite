@@ -3,7 +3,7 @@ import { type NeedsAttention, combineNeedsAttention } from "../items/attention";
 
 /**
  * The Overview reads a Collection a page of owned Items at a time
- * (overview.ts `page`), as the totals do. Pure, so the app adds the pages up.
+ * (overview.ts `attentionAndSetsPage`), as the totals do. Pure, so the app adds the pages up.
  */
 
 /**

@@ -305,7 +305,7 @@ export function useFilters(
       });
     }
 
-    // The Overview's Needs attention links narrow to what one kind lacks.
+    // The Overview's Needs attention links narrow to the Items lacking one thing.
     if (view.without) {
       const label = t(`collection.without.${view.without}`);
       filters.push({
