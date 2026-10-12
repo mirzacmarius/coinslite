@@ -7,7 +7,7 @@ import { calledOffReasons } from "@coinslite/backend/convex/homeCurrency/rules";
 import type { HomeCurrency, MoneyFormatOptions } from "@coinslite/i18n";
 import { toast } from "@coinslite/ui/toaster";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * The currency a Home currency change is converting the Collection's amounts
@@ -20,6 +20,29 @@ export function useConvertingTo(): HomeCurrency | undefined {
   return change?.state === "converting" || change?.state === "stalled"
     ? change.to
     : undefined;
+}
+
+/**
+ * For a form with amount fields: the Home currency its amounts are in (the
+ * one when it opened, sent with them as `amountsIn`), and why they can't be
+ * edited now, if they can't: a change of the Home currency is converting
+ * them, or changed it while the form was open.
+ */
+export function useAmountsCurrency(open: boolean) {
+  const t = useI18n();
+  const home = useQuery(api.users.getUser)?.homeCurrency;
+  const convertingTo = useConvertingTo();
+  const [amountsIn, setAmountsIn] = useState<HomeCurrency>();
+  useEffect(() => {
+    if (!open) setAmountsIn(undefined);
+    else if (home) setAmountsIn((pinned) => pinned ?? home);
+  }, [open, home]);
+  const locked = convertingTo
+    ? t("homeCurrency.amountsWait", { currency: convertingTo })
+    : home && amountsIn && home !== amountsIn
+      ? t("homeCurrency.changedWhileOpen", { currency: home })
+      : undefined;
+  return { amountsIn, currency: amountsIn ?? home, locked };
 }
 
 /**

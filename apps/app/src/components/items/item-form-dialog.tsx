@@ -1,6 +1,6 @@
 "use client";
 
-import { useConvertingTo } from "@/components/account/home-currency-change";
+import { useAmountsCurrency } from "@/components/account/home-currency-change";
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useAlbums } from "@/components/albums/use-albums";
 import {
@@ -43,12 +43,7 @@ import {
 } from "@coinslite/backend/convex/items/rules";
 import { photoSides } from "@coinslite/backend/convex/photos/rules";
 import { metals } from "@coinslite/backend/convex/spotPrices/rates";
-import {
-  type HomeCurrency,
-  countryCodes,
-  formatCountry,
-  parseMoney,
-} from "@coinslite/i18n";
+import { countryCodes, formatCountry, parseMoney } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   Collapsible,
@@ -212,21 +207,9 @@ export function ItemFormDialog({
   const attachPhoto = useAction(api.photos.attach);
   const user = useQuery(api.users.getUser);
   const home = user?.homeCurrency;
-  // The Home currency the form's amounts are in: the one when it opened.
-  const [amountsIn, setAmountsIn] = useState<HomeCurrency>();
-  useEffect(() => {
-    if (!open) setAmountsIn(undefined);
-    else if (home) setAmountsIn((pinned) => pinned ?? home);
-  }, [open, home]);
-  const currency = amountsIn ?? home ?? "";
-  const convertingTo = useConvertingTo();
-  // Why the amounts can't be edited now, if they can't: a change of the Home
-  // currency is converting them, or changed it while the form was open.
-  const amountsLocked = convertingTo
-    ? t("homeCurrency.amountsWait", { currency: convertingTo })
-    : home && amountsIn && home !== amountsIn
-      ? t("homeCurrency.changedWhileOpen", { currency: home })
-      : undefined;
+  const amounts = useAmountsCurrency(open);
+  const { amountsIn, locked: amountsLocked } = amounts;
+  const currency = amounts.currency ?? "";
   const titleRef = useRef<HTMLInputElement>(null);
   const baseId = useId();
   const labels = useGradeLabels();

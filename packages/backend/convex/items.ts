@@ -26,6 +26,7 @@ import {
   checkAmountsWrite,
   holdsAmount,
   homeCurrencyErrors,
+  refuseWhileChanging,
 } from "./homeCurrency/rules";
 import {
   bulkErrors,
@@ -734,14 +735,15 @@ export const undoGrade = mutation({
  * Item had, for `undoPurchase`.
  */
 export const setPurchase = mutation({
-  args: { itemIds: v.array(v.id("items")), ...purchase },
+  args: { itemIds: v.array(v.id("items")), ...purchase, amountsIn },
   returns: v.object({
     set: v.object(purchase),
     before: v.array(purchasedItem),
   }),
-  handler: async (ctx, { itemIds, ...input }) => {
+  handler: async (ctx, { itemIds, amountsIn, ...input }) => {
     const set = purchasePatch(input, latestPurchaseDate());
-    const { items } = await requireOwnItems(ctx, itemIds);
+    const { owner, items } = await requireOwnItems(ctx, itemIds);
+    if (set.purchasePrice !== undefined) checkAmountsWrite(owner, amountsIn);
     for (const item of items) await ctx.db.patch("items", item._id, set);
     return {
       set,
@@ -766,6 +768,8 @@ export const undoPurchase = mutation({
   returns: undone,
   handler: async (ctx, { before, set }) => {
     const owner = await requireSetUpUser(ctx);
+    // Putting Purchase prices back writes amounts.
+    if (set.purchasePrice !== undefined) refuseWhileChanging(owner);
     const now = await ownItemsNow(ctx, owner._id, before);
     const { restore, skipped } = planPurchaseUndo({
       before,

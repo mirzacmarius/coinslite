@@ -1,5 +1,6 @@
 "use client";
 
+import { useAmountsCurrency } from "@/components/account/home-currency-change";
 import { FormDialog } from "@/components/form-dialog";
 import { localToday } from "@/components/items/item-fields";
 import { formChanged } from "@/lib/discard-changes";
@@ -7,6 +8,7 @@ import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { bulkErrors } from "@coinslite/backend/convex/items/bulkRules";
 import { itemErrors, itemLimits } from "@coinslite/backend/convex/items/rules";
 import { parseMoney } from "@coinslite/i18n";
@@ -26,7 +28,7 @@ import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { MoneyInput } from "@coinslite/ui/money-input";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import { ConvexError } from "convex/values";
 import { Loader2, Receipt, X } from "lucide-react";
@@ -114,7 +116,7 @@ function SetPurchaseDialog({
   const locale = useCurrentLocale();
   const mod = useModifierKey();
   const baseId = useId();
-  const user = useQuery(api.users.getUser, open ? {} : "skip");
+  const { amountsIn, currency, locked } = useAmountsCurrency(open);
   const setPurchase = useMutation(api.items.setPurchase);
   const undoPurchase = useMutation(api.items.undoPurchase);
   const [failed, setFailed] = useState<string>();
@@ -156,7 +158,7 @@ function SetPurchaseDialog({
       }
       let done: FunctionReturnType<typeof api.items.setPurchase>;
       try {
-        done = await setPurchase({ itemIds, ...purchase });
+        done = await setPurchase({ itemIds, ...purchase, amountsIn });
       } catch (failure) {
         const code = failure instanceof ConvexError ? failure.data : undefined;
         setFailed(
@@ -166,7 +168,11 @@ function SetPurchaseDialog({
               ? t("items.errors.date")
               : code === bulkErrors.emptyPurchase
                 ? t("collection.purchaseEmpty")
-                : t("collection.purchaseFailed"),
+                : code === homeCurrencyErrors.changing
+                  ? t("homeCurrency.moneyBusy")
+                  : code === homeCurrencyErrors.otherCurrency
+                    ? locked ?? t("collection.purchaseFailed")
+                    : t("collection.purchaseFailed"),
         );
         return;
       }
@@ -236,13 +242,14 @@ function SetPurchaseDialog({
                   <Field
                     id={`${baseId}-purchasePrice`}
                     label={t("items.purchasePrice")}
-                    hint={t("items.perPiece")}
+                    hint={locked ?? t("items.perPiece")}
                     error={errorOf(field.state.meta.errors)}
                   >
                     {(control) => (
                       <MoneyInput
                         {...control}
-                        currency={user?.homeCurrency ?? ""}
+                        currency={currency ?? ""}
+                        disabled={locked !== undefined}
                         value={field.state.value}
                         onChange={(event) =>
                           field.handleChange(event.target.value)
