@@ -37,7 +37,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type * as React from "react";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 const accept = "image/jpeg,image/png,image/webp,image/gif";
 
@@ -129,6 +129,19 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
     photos === undefined
       ? item.frontPhoto !== undefined || item.backPhoto !== undefined
       : Boolean(photos?.front || photos?.back || more.length > 0);
+  // The compact row goes once its first photo is in. Focus on its button
+  // then moves on to the photos that replace it instead of being lost.
+  const section = useRef<HTMLElement>(null);
+  const focusAfterRow = useRef(false);
+  useEffect(() => {
+    if (!hasPhotos || !focusAfterRow.current) return;
+    focusAfterRow.current = false;
+    if (document.activeElement && document.activeElement !== document.body)
+      return;
+    section.current
+      ?.querySelector<HTMLElement>("button:not(:disabled)")
+      ?.focus();
+  }, [hasPhotos]);
   const urlOf = (side: PhotoSide) =>
     photos === undefined ? undefined : photos?.[side] ?? null;
   const moreLabel = (n: number) => t("photos.more.label", { n });
@@ -176,12 +189,18 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
       setBusy((slots) => ({ ...slots, [slot]: false }));
     }
   };
+  const addFromRow = (side: PhotoSide | undefined, file: File) => {
+    focusAfterRow.current =
+      section.current?.contains(document.activeElement) ?? false;
+    void add(side, file);
+  };
   const removalTitle = isPhotoSide(removal.target)
     ? t(`photos.removeTitles.${names[removal.target]}`)
     : t("photos.more.removeTitle");
 
   return (
     <section
+      ref={section}
       aria-label={t("photos.title")}
       className={cn("flex flex-col gap-4", hasPhotos ? "max-w-sm" : "max-w-xl")}
     >
@@ -260,13 +279,13 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
               key={side}
               label={t(`photos.sides.${names[side]}`)}
               busy={busy[side]}
-              onFile={(file) => void add(side, file)}
+              onFile={(file) => addFromRow(side, file)}
             />
           ))}
           <AddPhotoButton
             label={t("photos.more.title")}
             busy={busy.more}
-            onFile={(file) => void add(undefined, file)}
+            onFile={(file) => addFromRow(undefined, file)}
           />
           <span className="ml-auto hidden text-xs text-muted-foreground sm:inline">
             {t("photos.formats")}

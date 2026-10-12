@@ -1075,7 +1075,7 @@ export default {
     gainLossNone:
       "S’affiche dès qu’un objet a un prix d’achat et une valeur de marché",
     salePrice: "Prix de vente total",
-    realised: "Plus-value/moins-value réalisée",
+    realised: "Gain/perte réalisée",
     realisedNone:
       "S’affiche dès qu’un objet vendu a un prix d’achat et un prix de vente",
     realisedPartial:

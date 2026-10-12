@@ -10,7 +10,10 @@ import { Badge } from "@coinslite/ui/badge";
 import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import type * as React from "react";
 
-/** The Item page's way of showing an amount of the Item's money. */
+/**
+ * How the Item page shows an amount in the Item's Home currency, undefined
+ * for none. Every amount on the page goes through the one the page makes.
+ */
 export type ItemMoney = (
   amount: number | undefined,
   options?: MoneyFormatOptions,
@@ -20,10 +23,11 @@ const headerLayout = "flex flex-col gap-3 border-b p-4";
 
 /**
  * What the Item page leads with: the title, the key facts (year ·
- * denomination · country), the Market value and the Gain/loss, read as the
- * Collection totals read them (itemFigures): a sold Item shows what it sold
- * for and its realised Gain/loss. The bar above already holds the page's
- * heading, so the title here isn't a second one.
+ * denomination · country), the Market value (the total, with the value per
+ * piece, when there are several) and the Gain/loss, by the Collection totals'
+ * rules (itemFigures): a sold Item shows what it sold for and its realised
+ * Gain/loss. The bar above already holds the page's heading, so the title
+ * here isn't a second one.
  */
 export function ItemHeader({
   item,
@@ -35,6 +39,7 @@ export function ItemHeader({
   const t = useI18n();
   const format = useFormatters();
   const { value, gainLoss } = itemFigures(item);
+  const several = item.quantity > 1;
   const keyFacts = [
     item.year,
     item.denomination,
@@ -61,11 +66,13 @@ export function ItemHeader({
           label={t(
             value.kind === "salePrice"
               ? "collectionTotals.summarySalePrice"
-              : "items.marketValue",
+              : several
+                ? "collectionTotals.marketValue"
+                : "items.marketValue",
           )}
           value={money(value.total) ?? missing}
           hint={
-            item.quantity > 1 && value.perPiece !== undefined
+            several && value.perPiece !== undefined
               ? `${format.number(item.quantity)} × ${money(value.perPiece)}`
               : undefined
           }

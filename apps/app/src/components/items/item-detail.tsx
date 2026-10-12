@@ -583,7 +583,7 @@ export function ItemDetail() {
  */
 export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
   const t = useI18n();
-  const bar = (size: string) => (
+  const placeholder = (size: string) => (
     <span className={cn("animate-pulse rounded bg-muted", size)} />
   );
   return (
@@ -610,22 +610,22 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
         <ItemHeaderSkeleton />
         <div className="flex flex-1 flex-col lg:flex-row" aria-hidden="true">
           <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
-            {bar("h-11 w-full max-w-xl rounded-lg")}
+            {placeholder("h-11 w-full max-w-xl rounded-lg")}
             <div className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3">
               {[0, 1, 2, 3].map((fact) => (
                 <div key={fact} className="flex flex-col gap-1.5">
-                  {bar("h-3 w-16")}
-                  {bar("h-4 w-24")}
+                  {placeholder("h-3 w-16")}
+                  {placeholder("h-4 w-24")}
                 </div>
               ))}
             </div>
           </div>
           <div className="flex w-full shrink-0 flex-col gap-3 border-t bg-card p-4 lg:w-[280px] lg:border-l lg:border-t-0 xl:w-[300px]">
-            {bar("h-3 w-20")}
+            {placeholder("h-3 w-20")}
             {[0, 1, 2, 3, 4].map((row) => (
               <div key={row} className="grid grid-cols-[112px_1fr] gap-2">
-                {bar("h-3 w-16")}
-                {bar("h-3.5 w-24")}
+                {placeholder("h-3 w-16")}
+                {placeholder("h-3.5 w-24")}
               </div>
             ))}
           </div>

@@ -128,8 +128,9 @@ export function itemRealised({
 }
 
 /**
- * The figures one Item's page leads with, read as the Collection totals of
- * the view it shows in read it. Amounts in minor units of the Home currency.
+ * The figures one Item's page leads with, by the same rules as the
+ * Collection totals: an owned Item's as the Collection shows them, a sold
+ * one's as the sold view does. Amounts in minor units of the Home currency.
  */
 export type ItemFigures = {
   /**
