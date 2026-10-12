@@ -53,6 +53,7 @@ import type * as catalog_searchWords from "../catalog/searchWords.js";
 import type * as catalog_seed from "../catalog/seed.js";
 import type * as catalog_setRules from "../catalog/setRules.js";
 import type * as catalog_sets from "../catalog/sets.js";
+import type * as catalog_slimEntries from "../catalog/slimEntries.js";
 import type * as catalog_tree from "../catalog/tree.js";
 import type * as collection from "../collection.js";
 import type * as collection_browse from "../collection/browse.js";
@@ -178,6 +179,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/seed": typeof catalog_seed;
   "catalog/setRules": typeof catalog_setRules;
   "catalog/sets": typeof catalog_sets;
+  "catalog/slimEntries": typeof catalog_slimEntries;
   "catalog/tree": typeof catalog_tree;
   collection: typeof collection;
   "collection/browse": typeof collection_browse;

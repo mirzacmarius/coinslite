@@ -8,6 +8,7 @@ import {
   internalMutation,
 } from "../_generated/server";
 import { clearWantsOfEntry, unkeyWantsOfEntry } from "../wants";
+import { denominationCountChanges } from "./denominationCounts";
 import {
   type CatalogItemType,
   type CatalogKind,
@@ -32,13 +33,14 @@ import {
   hasLinkedItems,
   retypeLinkedItems,
 } from "./linkedItems";
-import { denominationCountChanges } from "./denominationCounts";
+import { slimEntryChanges } from "./slimEntries";
 
 /**
  * The Catalog tree: where each node sits, and bringing a whole CSV file in at
  * once. Every write here keeps `path` (the keys from the root down),
- * `searchText` and the denomination counts (catalog/denominationCounts.ts)
- * in step with the node, so browsing, Sets and search can rely on them.
+ * `searchText`, the denomination counts (catalog/denominationCounts.ts) and
+ * the slim entries (catalog/slimEntries.ts) in step with the node, so
+ * browsing, Sets, search and the Collection can rely on them.
  */
 
 /** What an import does, or would do. */
@@ -439,7 +441,7 @@ export async function importCatalogFile(
 
 /**
  * Makes the changes a plan works out, keeping every node's path, entry count,
- * country and search words right. A plan with any problem changes nothing.
+ * country, search words and slim entry right. A plan with any problem changes nothing.
  */
 export async function applyPlan(
   ctx: MutationCtx,
@@ -465,6 +467,7 @@ export async function applyPlan(
   // changes by the entries that leave or join the paths below it. Each
   // denomination and series in a country counts its entries likewise.
   const denominationCounts = denominationCountChanges();
+  const slimEntries = slimEntryChanges();
   const entryCountChanges = new Map<string, number>();
   const countEntry = (path: string, isEntry: boolean, change: 1 | -1) => {
     if (!isEntry) return;
@@ -498,7 +501,9 @@ export async function applyPlan(
     countEntry(path, node.kind === "entry", 1);
     denominationCounts.count(document, 1);
     if (!node.existing) {
-      ids.set(node.key, await ctx.db.insert("catalogNodes", document));
+      const id = await ctx.db.insert("catalogNodes", document);
+      ids.set(node.key, id);
+      slimEntries.note(id, null, document);
       continue;
     }
     if (imageFiles && !keepsUploadedImage(node)) {
@@ -515,6 +520,7 @@ export async function applyPlan(
     else if (node.parentKey === null && node.existing.kind !== node.kind)
       refresh.push(path);
     await ctx.db.replace("catalogNodes", node.existing._id, document);
+    slimEntries.note(node.existing._id, node.existing, document);
   }
 
   // Nodes the file doesn't mention move along with their moved ancestors,
@@ -552,6 +558,7 @@ export async function applyPlan(
     });
   }
   await denominationCounts.store(ctx);
+  await slimEntries.store(ctx);
 
   for (const { entryId, type } of retyped) {
     await retypeLinkedItems(ctx, entryId, type);
@@ -625,9 +632,9 @@ export async function planDeletion(
 }
 
 /**
- * Deletes a node and everything below it, with their uploaded images. The
- * Items linked to entries there take those entries' facts as their own
- * first, and the entry and denomination counts follow. The deletion must
+ * Deletes a node and everything below it, with their uploaded images and
+ * slim entries. The Items linked to entries there take those entries' facts
+ * as their own first, and the entry and denomination counts follow. The deletion must
  * not be too large (`planDeletion`).
  */
 export async function deleteSubtree(
@@ -637,8 +644,10 @@ export async function deleteSubtree(
 ) {
   const removed = [node, ...below];
   const denominationCounts = denominationCountChanges();
+  const slimEntries = slimEntryChanges();
   for (const each of removed) {
     denominationCounts.count(each, -1);
+    slimEntries.note(each._id, each, null);
     if (each.kind === "entry") {
       await detachLinkedItems(ctx, each);
       await clearWantsOfEntry(ctx, each._id);
@@ -650,6 +659,7 @@ export async function deleteSubtree(
     await ctx.db.delete("catalogNodes", each._id);
   }
   await denominationCounts.store(ctx);
+  await slimEntries.store(ctx);
   const entries = removed.filter((each) => each.kind === "entry").length;
   if (entries === 0) return;
   for (const key of ancestorKeysOf(node.path)) {

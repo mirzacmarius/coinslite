@@ -2,6 +2,11 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import type { CatalogItemType } from "../catalog/fields";
 import {
+  type FoundSlimEntry,
+  slimEntryById,
+  slimEntryByKey,
+} from "../catalog/slimEntries";
+import {
   type CatalogFacts,
   entryFacts,
   withCatalogFacts,
@@ -17,6 +22,10 @@ import {
  * `itemResolver` when reading Items one by one: the Item page, the
  * Collection and its exports, Album lists, totals, Metal values, reports.
  * Reading `ctx.db` Items directly shows a linked Item without its facts.
+ *
+ * Entries are read through their slim entries (catalog/slimEntries.ts):
+ * their key, title and facts without notes, so a whole Collection resolves
+ * in a fraction of the bytes.
  */
 
 /** An Item with its descriptive facts resolved: the same fields as stored, filled in from its Catalog entry. */
@@ -32,33 +41,28 @@ export type CatalogEntryLink = {
   facts: CatalogFacts;
 };
 
-/** A Catalog node as a link for Items, or null when it isn't a Catalog entry. */
-export function entryLinkOf(
-  node: Doc<"catalogNodes"> | null,
-): CatalogEntryLink | null {
-  if (!node || node.kind !== "entry") return null;
+/** A Catalog entry's slim entry as a link for Items. */
+function entryLinkOf(found: FoundSlimEntry | null): CatalogEntryLink | null {
+  if (!found) return null;
+  const { entryId, slim } = found;
   return {
-    _id: node._id,
-    key: node.key,
-    title: node.title,
-    itemType: node.itemType ?? "coin",
-    facts: entryFacts(node),
+    _id: entryId,
+    key: slim.key,
+    title: slim.title,
+    itemType: slim.itemType ?? "coin",
+    facts: entryFacts(slim),
   };
 }
 
 /** The Catalog entry with this key; null for any other node, or none. */
 export async function catalogEntryByKey(ctx: QueryCtx, key: string) {
-  const node = await ctx.db
-    .query("catalogNodes")
-    .withIndex("by_key", (q) => q.eq("key", key))
-    .unique();
-  return entryLinkOf(node);
+  return entryLinkOf(await slimEntryByKey(ctx, key));
 }
 
 /**
- * Resolves Items one at a time, reading each Catalog entry once however
- * many Items link to it. For loops that watch their read budget; otherwise
- * use `resolveItems`.
+ * Resolves Items one at a time, reading each Catalog entry's slim entry
+ * once however many Items link to it. For loops that watch their read
+ * budget; otherwise use `resolveItems`.
  */
 export function itemResolver(ctx: QueryCtx) {
   const entries = new Map<
@@ -68,7 +72,7 @@ export function itemResolver(ctx: QueryCtx) {
   const entry = (id: Id<"catalogNodes">) => {
     let found = entries.get(id);
     if (!found) {
-      found = ctx.db.get(id).then(entryLinkOf);
+      found = slimEntryById(ctx, id).then(entryLinkOf);
       entries.set(id, found);
     }
     return found;

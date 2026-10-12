@@ -1,6 +1,7 @@
 import {
   type AlloyMetal,
   type CatalogItemType,
+  type CatalogKind,
   type CoinEdge,
   type PreciousMetal,
   noMintMark,
@@ -62,6 +63,57 @@ export type CatalogEntryFacts = {
   yearTo?: number;
   numistaId?: number;
 };
+
+/** Each field `entryFacts` reads; the compiler keeps the list whole. */
+const entryFactFields: Record<keyof CatalogEntryFacts, true> = {
+  itemType: true,
+  country: true,
+  denomination: true,
+  series: true,
+  material: true,
+  strike: true,
+  metal: true,
+  weight: true,
+  fineness: true,
+  diameter: true,
+  thickness: true,
+  mintMark: true,
+  mintage: true,
+  yearFrom: true,
+  yearTo: true,
+  numistaId: true,
+};
+
+/**
+ * A Catalog entry as Items are resolved from it: its key and title, to link
+ * to it, and the fields `entryFacts` reads. No notes, image or sources, so
+ * reading one for every Item in a Collection stays small. A read model of
+ * the entry (catalog/slimEntries.ts), never edited on its own.
+ */
+export type SlimEntry = CatalogEntryFacts & { key: string; title: string };
+
+const slimFields = ["key", "title", ...Object.keys(entryFactFields)] as Array<
+  keyof SlimEntry
+>;
+
+/**
+ * A Catalog node's slim entry: only the fields it keeps, and only those set.
+ * Null for any node but an entry, as Items link only to entries.
+ */
+export function slimEntryOf(
+  node: SlimEntry & { kind: CatalogKind },
+): SlimEntry | null {
+  if (node.kind !== "entry") return null;
+  const slim: Partial<Record<keyof SlimEntry, unknown>> = {};
+  for (const field of slimFields) {
+    if (node[field] !== undefined) slim[field] = node[field];
+  }
+  return slim as SlimEntry;
+}
+
+/** Whether two slim entries say the same, so an unchanged one isn't written again. */
+export const sameSlimEntry = (a: SlimEntry, b: SlimEntry) =>
+  slimFields.every((field) => a[field] === b[field]);
 
 const isItemMetal = (metal: PreciousMetal | undefined): metal is Metal =>
   (metals as readonly string[]).includes(metal ?? "");
