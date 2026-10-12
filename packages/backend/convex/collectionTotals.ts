@@ -10,9 +10,7 @@ import { historyOf } from "./items/valueHistory";
 import {
   VALUE_OVER_TIME_PAGE_SIZE,
   lastDayOf,
-  monthOf,
-  monthsBetween,
-  startOf,
+  seriesMonths,
   valueOverTime,
 } from "./items/valueOverTime";
 import { latestRates, ratesForDays } from "./spotPrices";
@@ -89,7 +87,7 @@ function requireUtcOffset(utcOffsetMinutes: number) {
  * The totals of one page of the signed-in person's Items, as the only entry
  * in `page`: the ones they own, or with `status` "sold" the ones they sold.
  * `utcOffsetMinutes` is how far ahead of UTC the person's clock is, for the
- * months of Value by date added.
+ * months of Value by date acquired.
  */
 export const page = query({
   args: {
@@ -132,11 +130,11 @@ const monthValue = v.object({
 
 /**
  * "Value over time" for one page of the signed-in person's Items, owned and
- * sold, as the only entry in `page`: each month from the page's first Item
- * through `throughMonth` (the person's current month, "YYYY-MM"), from their
- * Market value history and each month's Spot prices (items/valueOverTime.ts).
- * The app adds the pages up with `combineValueOverTime`, as it does the
- * totals.
+ * sold, as the only entry in `page`: each month from when the page's
+ * earliest Item was acquired through `throughMonth` (the person's current
+ * month, "YYYY-MM"), from their Market value history and each month's Spot
+ * prices (items/valueOverTime.ts). The app adds the pages up with
+ * `combineValueOverTime`, as it does the totals.
  */
 export const valueOverTimePage = query({
   args: {
@@ -166,11 +164,7 @@ export const valueOverTimePage = query({
         history: await historyOf(ctx, item._id),
       })),
     );
-    const firstMonth = withHistory
-      .map((item) => monthOf(startOf(item), utcOffsetMinutes))
-      .reduce((a, b) => (a < b ? a : b));
-    const months =
-      firstMonth <= throughMonth ? monthsBetween(firstMonth, throughMonth) : [];
+    const months = seriesMonths(withHistory, throughMonth, utcOffsetMinutes);
     const rates = await ratesForDays(ctx, months.map(lastDayOf));
     const series = valueOverTime(withHistory, {
       months,
