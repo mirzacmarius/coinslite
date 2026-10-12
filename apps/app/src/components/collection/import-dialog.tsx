@@ -4,6 +4,7 @@ import { upgradeHref } from "@/components/plans/plan-usage";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { albumErrors } from "@coinslite/backend/convex/albums/rules";
 import {
   type ImportRow,
@@ -12,8 +13,11 @@ import {
   rowErrors,
 } from "@coinslite/backend/convex/collection/importRows";
 import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
+import { bulkLimits } from "@coinslite/backend/convex/items/bulkRules";
+import { suggestionLimits } from "@coinslite/backend/convex/items/catalogSuggestions";
 import { itemErrors } from "@coinslite/backend/convex/items/rules";
 import { Button } from "@coinslite/ui/button";
+import { Checkbox } from "@coinslite/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -25,7 +29,7 @@ import {
 } from "@coinslite/ui/dialog";
 import { IconButton } from "@coinslite/ui/icon-button";
 import { toast } from "@coinslite/ui/toaster";
-import { useAction, useMutation } from "convex/react";
+import { useAction, useConvex, useMutation } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import { ConvexError } from "convex/values";
 import { FileUp, Loader2, Sparkles, X } from "lucide-react";
@@ -33,12 +37,28 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 type Preview = FunctionReturnType<typeof api.collectionImport.preview>;
+type Suggested = FunctionReturnType<typeof api.catalogSuggestions.forItems>;
 
 type Stage =
   | { stage: "pick"; error?: string }
   | { stage: "reading" }
   | { stage: "preview"; fileName: string; preview: Preview; error?: string }
-  | { stage: "importing"; done: number; total: number };
+  | { stage: "importing"; done: number; total: number }
+  | { stage: "finding"; added: number }
+  | {
+      stage: "linking";
+      added: number;
+      suggested: Suggested;
+      ticked: ReadonlySet<Id<"items">>;
+      reviewing: boolean;
+      busy: boolean;
+    };
+
+/** Splits a list into runs of at most `size`, for calls that take that many. */
+const chunks = <T,>(list: readonly T[], size: number) =>
+  Array.from({ length: Math.ceil(list.length / size) }, (_, index) =>
+    list.slice(index * size, (index + 1) * size),
+  );
 
 /** The rows that fit the plan: in file order, sold ones taking no room. */
 function rowsThatFit(rows: ImportRow[], itemsLeft: number | null) {
@@ -92,10 +112,16 @@ export function ImportDialog({
   const t = useI18n();
   const format = useFormatters();
   const preview = useAction(api.collectionImport.preview);
-  const addBatch = useMutation(api.collectionImport.addBatch);
+  const importBatch = useMutation(api.collectionImport.importBatch);
+  const linkMany = useMutation(api.catalogSuggestions.linkMany);
+  const convex = useConvex();
   const fileInput = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<Stage>({ stage: "pick" });
-  const busy = state.stage === "reading" || state.stage === "importing";
+  const busy =
+    state.stage === "reading" ||
+    state.stage === "importing" ||
+    state.stage === "finding" ||
+    (state.stage === "linking" && state.busy);
 
   const reason = (code: string) =>
     code in reasonKeys
@@ -145,12 +171,13 @@ export function ImportDialog({
   const run = async (current: Extract<Stage, { stage: "preview" }>) => {
     const rows = rowsThatFit(current.preview.rows, current.preview.itemsLeft);
     let done = 0;
+    const itemIds: Id<"items">[] = [];
     setState({ stage: "importing", done, total: rows.length });
     try {
-      for (let start = 0; start < rows.length; start += importLimits.batch) {
-        done += await addBatch({
-          rows: rows.slice(start, start + importLimits.batch),
-        });
+      for (const batch of chunks(rows, importLimits.batch)) {
+        const added = await importBatch({ rows: batch });
+        itemIds.push(...added);
+        done += added.length;
         setState({ stage: "importing", done, total: rows.length });
       }
     } catch (failure) {
@@ -183,6 +210,54 @@ export function ImportDialog({
       return;
     }
     toast.success(t("collectionImport.imported", { count: done }));
+    setState({ stage: "finding", added: done });
+    const suggested = await suggestionsFor(itemIds);
+    if (suggested.length === 0) {
+      setState({ stage: "pick" });
+      onOpenChange(false);
+      return;
+    }
+    setState({
+      stage: "linking",
+      added: done,
+      suggested,
+      ticked: new Set(suggested.map(({ itemId }) => itemId)),
+      reviewing: false,
+      busy: false,
+    });
+  };
+
+  /**
+   * The best Catalog entry for each imported Item that has one. A look-up
+   * that fails just suggests less: the Items are imported either way.
+   */
+  const suggestionsFor = async (itemIds: Id<"items">[]) => {
+    const found = await Promise.all(
+      chunks(itemIds, suggestionLimits.items).map((chunk) =>
+        convex
+          .query(api.catalogSuggestions.forItems, { itemIds: chunk })
+          .catch((): Suggested => []),
+      ),
+    );
+    return found.flat();
+  };
+
+  const link = async (current: Extract<Stage, { stage: "linking" }>) => {
+    const links = current.suggested
+      .filter(({ itemId }) => current.ticked.has(itemId))
+      .map(({ itemId, entry }) => ({ itemId, catalogEntryKey: entry.key }));
+    setState({ ...current, busy: true });
+    let linked = 0;
+    try {
+      for (const chunk of chunks(links, bulkLimits.items))
+        linked += await linkMany({ links: chunk });
+    } catch {
+      // Linking again is harmless: Items already linked are left as they are.
+      toast.error(t("catalogSuggestion.afterImport.failed"));
+      setState({ ...current, busy: false });
+      return;
+    }
+    toast.success(t("catalogSuggestion.afterImport.linked", { count: linked }));
     setState({ stage: "pick" });
     onOpenChange(false);
   };
@@ -284,6 +359,26 @@ export function ImportDialog({
               error={state.error}
             />
           )}
+          {state.stage === "finding" && (
+            <>
+              <p className="font-medium">
+                {t("collectionImport.imported", { count: state.added })}
+              </p>
+              <p
+                className="flex items-center gap-2 text-muted-foreground"
+                aria-live="polite"
+              >
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                {t("catalogSuggestion.afterImport.finding")}
+              </p>
+            </>
+          )}
+          {state.stage === "linking" && (
+            <LinkSuggestions
+              state={state}
+              onTick={(ticked) => setState({ ...state, ticked })}
+            />
+          )}
         </div>
 
         <DialogFooter>
@@ -303,6 +398,47 @@ export function ImportDialog({
                   onConfirm={() => void run(state)}
                 />
               </>
+            ) : state.stage === "linking" ? (
+              state.reviewing ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={state.busy}
+                    onClick={() => setState({ ...state, reviewing: false })}
+                  >
+                    {t("catalogSuggestion.afterImport.back")}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={state.busy || state.ticked.size === 0}
+                    onClick={() => void link(state)}
+                  >
+                    {state.busy && (
+                      <Loader2 className="animate-spin" aria-hidden="true" />
+                    )}
+                    {t("catalogSuggestion.afterImport.confirm", {
+                      count: state.ticked.size,
+                    })}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <DialogClose asChild>
+                    <Button type="button" variant="ghost">
+                      {t("catalogSuggestion.afterImport.done")}
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    type="button"
+                    onClick={() => setState({ ...state, reviewing: true })}
+                  >
+                    {t("catalogSuggestion.afterImport.offer", {
+                      count: state.suggested.length,
+                    })}
+                  </Button>
+                </>
+              )
             ) : (
               <DialogClose asChild>
                 <Button type="button" variant="ghost" disabled={busy}>
@@ -398,6 +534,87 @@ function PreviewSummary({
           {error}
         </p>
       )}
+    </>
+  );
+}
+
+/**
+ * After an import: how many Items went in and how many look like Catalog
+ * entries, then, to review, one row per Item with its best entry, each
+ * ticked until the person unticks it.
+ */
+function LinkSuggestions({
+  state,
+  onTick,
+}: {
+  state: Extract<Stage, { stage: "linking" }>;
+  onTick: (ticked: ReadonlySet<Id<"items">>) => void;
+}) {
+  const t = useI18n();
+  const { suggested, ticked } = state;
+  if (!state.reviewing)
+    return (
+      <>
+        <p className="font-medium">
+          {t("collectionImport.imported", { count: state.added })}
+        </p>
+        <p className="text-muted-foreground">
+          {t("catalogSuggestion.afterImport.offerHint")}
+        </p>
+      </>
+    );
+  const tick = (itemId: Id<"items">, on: boolean) => {
+    const next = new Set(ticked);
+    if (on) next.add(itemId);
+    else next.delete(itemId);
+    onTick(next);
+  };
+  return (
+    <>
+      <p className="text-muted-foreground">
+        {t("catalogSuggestion.afterImport.reviewHint")}
+      </p>
+      <div className="overflow-hidden rounded-md border">
+        <label className="flex h-9 cursor-pointer items-center gap-2 border-b bg-muted/40 px-3 text-muted-foreground">
+          <Checkbox
+            checked={
+              ticked.size === suggested.length
+                ? true
+                : ticked.size > 0
+                  ? "indeterminate"
+                  : false
+            }
+            disabled={state.busy}
+            onCheckedChange={(checked) =>
+              onTick(
+                checked === true
+                  ? new Set(suggested.map(({ itemId }) => itemId))
+                  : new Set(),
+              )
+            }
+          />
+          {t("catalogSuggestion.afterImport.all")}
+        </label>
+        <ul className="divide-y">
+          {suggested.map(({ itemId, title, entry }) => (
+            <li key={itemId}>
+              <label className="flex min-h-9 cursor-pointer items-center gap-2 px-3 py-1.5 transition-colors duration-100 hover:bg-muted">
+                <Checkbox
+                  checked={ticked.has(itemId)}
+                  disabled={state.busy}
+                  onCheckedChange={(checked) => tick(itemId, checked === true)}
+                />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate">{title}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {entry.title}
+                  </span>
+                </span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

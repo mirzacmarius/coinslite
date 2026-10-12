@@ -7,6 +7,7 @@ import {
   noMintMark,
 } from "../catalog/fields";
 import { type Metal, metals } from "../spotPrices/rates";
+import { sameDenomination } from "./denominations";
 import type { Strike } from "./grades";
 import { type ItemInput, type Material, fieldSuits, itemLimits } from "./rules";
 
@@ -214,6 +215,31 @@ export function overridesOnly<T extends CatalogFacts>(
     }
   }
   return kept as T;
+}
+
+/**
+ * The facts an Item added without a Catalog entry keeps as its own when
+ * it's linked to one (a suggestion, catalogSuggestions.ts): those the entry
+ * says differently or not at all. A fact the entry says the same of follows
+ * the entry from then on; a denomination does when it names the same face
+ * value, however it's written.
+ */
+export function overridesOnLink(
+  item: CatalogFacts,
+  facts: CatalogFacts,
+): CatalogFacts {
+  const kept: Partial<Record<CatalogFactName, unknown>> = {};
+  for (const name of catalogFactNames) {
+    const own = item[name];
+    if (own === undefined) continue;
+    const entry = facts[name];
+    const same =
+      name === "denomination" && entry !== undefined
+        ? sameDenomination(String(own), String(entry))
+        : own === entry;
+    if (!same) kept[name] = own;
+  }
+  return kept as CatalogFacts;
 }
 
 function definedOnly<T extends object>(value: T): T {

@@ -163,7 +163,7 @@ async function visibleCatalogEntry(
   return await catalogEntryByKey(ctx, key);
 }
 
-async function requireCatalogEntry(
+export async function requireCatalogEntry(
   ctx: QueryCtx,
   user: Doc<"users">,
   key: string,

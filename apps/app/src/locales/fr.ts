@@ -1427,6 +1427,35 @@ export default {
         "Les {count} objets avant cette ligne ont été ajoutés.",
     },
   },
+  catalogSuggestion: {
+    label: "Suggestion du catalogue",
+    looksLike: "Cela ressemble à {title} dans le catalogue. Le lier ?",
+    link: "Lier",
+    notThis: "Pas celle-ci",
+    linked: "Lié à l’entrée du catalogue",
+    failed: "Une erreur s’est produite. Réessayez.",
+    afterImport: {
+      finding: "Recherche des entrées du catalogue…",
+      "offer#one": "Lier 1 objet au catalogue",
+      "offer#few": "Lier {count} objets au catalogue",
+      "offer#other": "Lier {count} objets au catalogue",
+      offerHint:
+        "Ils ressemblent à des entrées du catalogue. Une fois liés, ils reprennent les informations de l’entrée et comptent dans ses ensembles.",
+      reviewHint:
+        "Chaque objet avec l’entrée du catalogue à laquelle il ressemble. Décochez ceux qui ne conviennent pas.",
+      all: "Tous",
+      "confirm#zero": "Lier",
+      "confirm#one": "Lier 1 objet",
+      "confirm#few": "Lier {count} objets",
+      "confirm#other": "Lier {count} objets",
+      "linked#one": "1 objet lié au catalogue",
+      "linked#few": "{count} objets liés au catalogue",
+      "linked#other": "{count} objets liés au catalogue",
+      failed: "Les objets n’ont pas pu être liés. Réessayez.",
+      done: "Terminé",
+      back: "Retour",
+    },
+  },
   catalogPicker: {
     title: "Choisir dans le catalogue",
     placeholder: {

@@ -1450,6 +1450,35 @@ export default {
         "Die {count} Objekte vor dieser Zeile wurden hinzugefügt.",
     },
   },
+  catalogSuggestion: {
+    label: "Vorschlag aus dem Katalog",
+    looksLike: "Das sieht aus wie {title} im Katalog. Verknüpfen?",
+    link: "Verknüpfen",
+    notThis: "Nicht dieser",
+    linked: "Mit dem Katalogeintrag verknüpft",
+    failed: "Etwas ist schiefgelaufen. Versuche es erneut.",
+    afterImport: {
+      finding: "Katalogeinträge werden gesucht …",
+      "offer#one": "1 Objekt mit dem Katalog verknüpfen",
+      "offer#few": "{count} Objekte mit dem Katalog verknüpfen",
+      "offer#other": "{count} Objekte mit dem Katalog verknüpfen",
+      offerHint:
+        "Sie sehen aus wie Katalogeinträge. Verknüpft übernehmen sie die Angaben des Eintrags und zählen zu seinen Sets.",
+      reviewHint:
+        "Jedes Objekt mit dem Katalogeintrag, dem es ähnelt. Entferne den Haken bei allen, die nicht stimmen.",
+      all: "Alle",
+      "confirm#zero": "Verknüpfen",
+      "confirm#one": "1 Objekt verknüpfen",
+      "confirm#few": "{count} Objekte verknüpfen",
+      "confirm#other": "{count} Objekte verknüpfen",
+      "linked#one": "1 Objekt mit dem Katalog verknüpft",
+      "linked#few": "{count} Objekte mit dem Katalog verknüpft",
+      "linked#other": "{count} Objekte mit dem Katalog verknüpft",
+      failed: "Die Objekte konnten nicht verknüpft werden. Versuche es erneut.",
+      done: "Fertig",
+      back: "Zurück",
+    },
+  },
   catalogPicker: {
     title: "Aus dem Katalog wählen",
     placeholder: {

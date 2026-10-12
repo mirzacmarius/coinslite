@@ -1400,6 +1400,35 @@ export default {
       "addedBefore#other": "De {count} objektene før den raden ble lagt til.",
     },
   },
+  catalogSuggestion: {
+    label: "Forslag fra katalogen",
+    looksLike: "Dette ser ut som {title} i katalogen. Vil du koble det til?",
+    link: "Koble til",
+    notThis: "Ikke denne",
+    linked: "Koblet til katalogoppføringen",
+    failed: "Noe gikk galt. Prøv igjen.",
+    afterImport: {
+      finding: "Ser etter katalogoppføringer …",
+      "offer#one": "Koble 1 objekt til katalogen",
+      "offer#few": "Koble {count} objekter til katalogen",
+      "offer#other": "Koble {count} objekter til katalogen",
+      offerHint:
+        "De ser ut som katalogoppføringer. Koblet til får de oppføringens fakta og teller med i settene.",
+      reviewHint:
+        "Hvert objekt med katalogoppføringen det ser ut som. Fjern haken ved dem som ikke stemmer.",
+      all: "Alle",
+      "confirm#zero": "Koble til",
+      "confirm#one": "Koble til 1 objekt",
+      "confirm#few": "Koble til {count} objekter",
+      "confirm#other": "Koble til {count} objekter",
+      "linked#one": "1 objekt koblet til katalogen",
+      "linked#few": "{count} objekter koblet til katalogen",
+      "linked#other": "{count} objekter koblet til katalogen",
+      failed: "Objektene kunne ikke kobles til. Prøv igjen.",
+      done: "Ferdig",
+      back: "Tilbake",
+    },
+  },
   catalogPicker: {
     title: "Velg fra katalogen",
     placeholder: {

@@ -237,6 +237,10 @@ export default defineSchema({
     // the Catalog (catalog/linkedItems.ts), so the Item page still shows
     // them. A linked Item reads them live from its entry instead.
     catalogDetails: v.optional(catalogDetails),
+    // Catalog entries suggested for the Item that the person turned down
+    // ("Not this", catalogSuggestions.ts), so they aren't suggested again.
+    // The latest `suggestionLimits.dismissed` only.
+    dismissedCatalogEntryIds: v.optional(v.array(v.id("catalogNodes"))),
   })
     .index("by_ownerId", ["ownerId"])
     // Owned Items are those without a sold-on date, for the Free plan count.
@@ -446,7 +450,16 @@ export default defineSchema({
     yearFrom: v.optional(v.number()),
     yearTo: v.optional(v.number()),
     numistaId: v.optional(v.number()),
-  }).index("by_entryId", ["entryId"]),
+  })
+    .index("by_entryId", ["entryId"])
+    // A country's entries of one Item type by denomination, then first
+    // year: the Catalog entries suggested for an Item (catalogSuggestions.ts).
+    .index("by_country_and_itemType_and_denomination_and_yearFrom", [
+      "country",
+      "itemType",
+      "denomination",
+      "yearFrom",
+    ]),
 
   /**
    * How many Catalog entries a country holds of one denomination and series
