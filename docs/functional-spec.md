@@ -115,7 +115,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - Accepted: JPEG, PNG, WebP or GIF, up to 10 MB. The type is checked from the file's content, not only its name.
 - Stored privately and only visible to the owner.
 - Each side can be added, replaced or removed independently. A photo opens in a full-screen viewer.
-- The list thumbnail is the front photo, else the back photo, else a placeholder for the Item type.
+- With each photo the browser also uploads a thumbnail it makes of it: WebP (JPEG in browsers that can't write WebP), at most 256 px on its longest side and never enlarged. Lists, grids, the Overview's latest Items and Album pages show thumbnails; the Item page and the full-screen viewer show the original, which is kept as uploaded. Replacing or removing a photo, or deleting its Item or account, takes its thumbnail with it.
+- The list thumbnail is that of the front photo, else of the back photo, else of the first more photo, else a placeholder for the Item type. A photo from before thumbnails shows as itself.
 
 ### 5.7 Item detail
 - Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Purchase price, Market value, purchase date and source, notes and Album.

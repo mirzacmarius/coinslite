@@ -12,8 +12,12 @@ import { discardUpload, fileInUse, uploadLifetime } from "./utils/files";
  * and the hourly clean-up of uploads nobody used.
  */
 
+/**
+ * Each photo and each Catalog image is two uploads (the file and its
+ * thumbnail): 30 in a row, then 60 an hour.
+ */
 export const rateLimiter = new RateLimiter(components.rateLimiter, {
-  upload: { kind: "token bucket", rate: 60, period: HOUR, capacity: 30 },
+  upload: { kind: "token bucket", rate: 120, period: HOUR, capacity: 60 },
 });
 
 /** Counts one upload address against the person's pace; throws past it. */
@@ -30,7 +34,8 @@ const sweepWindow = 3 * HOUR;
 /**
  * Deletes uploads that outlived their hour unused (crons.ts): those someone
  * registered, and files uploaded in the hours before that nobody did. Photos,
- * Catalog images and older files are left alone. Continues in further
+ * their thumbnails, Catalog images and older files are left alone
+ * (utils/files.ts fileInUse). Continues in further
  * transactions while there's more.
  */
 export const sweep = internalMutation({

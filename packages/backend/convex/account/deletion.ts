@@ -66,7 +66,7 @@ export const accountDataByTable = {
   albums: "deleted: the Albums",
   wants: "deleted: the Wantlist",
   items:
-    "deleted: the Items, with their stored photos and their links to Catalog entries",
+    "deleted: the Items, with their stored photos and the photos' thumbnails, and their links to Catalog entries",
   subscriptions:
     "deleted at once: the subscription link, once Polar has ended any subscription that would charge again",
   pendingCheckouts: "deleted at once: the checkout left open, if any",
@@ -74,7 +74,7 @@ export const accountDataByTable = {
     "deleted: each Item's Market value history, as the Item goes",
   spotPriceDays: "kept: the daily Spot prices everyone shares",
   itemPhotos:
-    "deleted: the Items' more photos, with their stored files, as each Item goes",
+    "deleted: the Items' more photos, with their stored files and thumbnails, as each Item goes",
   uploads: "deleted: files they uploaded but never made a photo or an image",
   accountClosures:
     "kept: that the account id was deleted, naming no one, so Polar's late events about it end the subscription they report",
@@ -269,8 +269,9 @@ const deleteAlbums: Step = async (ctx, { userId }, budget) =>
 
 /**
  * Items go the one way Items are deleted, which takes their stored photos
- * too. Each more photo counts against the budget like a document of its own,
- * so a batch stays about the planned size however many photos Items carry.
+ * and thumbnails too. Each more photo counts against the budget like a
+ * document of its own, so a batch stays about the planned size however many
+ * photos Items carry.
  */
 const deleteItems: Step = async (ctx, { userId }, budget) => {
   const items = await ctx.db

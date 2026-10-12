@@ -21,5 +21,6 @@
     "noEmit": true
   },
   "include": ["./**/*"],
-  "exclude": ["./_generated"]
+  /* Tests run with `bun test`, which brings its own types for `bun:test`. */
+  "exclude": ["./_generated", "./**/*.test.ts"]
 }
