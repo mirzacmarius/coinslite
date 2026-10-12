@@ -23,7 +23,9 @@ import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { EmptyState } from "@coinslite/ui/empty-state";
 import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
+import { Kbd } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
 import {
@@ -48,6 +50,7 @@ import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
+import { useKeyShortcut } from "./use-key-shortcut";
 
 /**
  * One Item, every recorded fact: its title, value and Gain/loss first, then
@@ -78,6 +81,9 @@ export function ItemDetail() {
   const itemLimitMessage = useItemLimitMessage();
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
+  const openEdit = () =>
+    setEditing(({ key }) => ({ open: true, key: key + 1 }));
+  useKeyShortcut("e", openEdit, Boolean(item));
   const parent = (
     <Link
       href={view ? collectionHref(view) : "/collection"}
@@ -320,16 +326,25 @@ export function ItemDetail() {
               <Copy aria-hidden="true" />
               <ActionLabel>{t("items.duplicate")}</ActionLabel>
             </Button>
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() =>
-                setEditing(({ key }) => ({ open: true, key: key + 1 }))
-              }
-            >
-              <Pencil aria-hidden="true" />
-              <ActionLabel>{t("items.edit")}</ActionLabel>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={openEdit}
+                  aria-keyshortcuts="E"
+                >
+                  <Pencil aria-hidden="true" />
+                  <ActionLabel>{t("items.edit")}</ActionLabel>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="flex items-center gap-2">
+                {t("items.edit")}
+                <Kbd className="border-background/20 bg-background/10 text-background">
+                  E
+                </Kbd>
+              </TooltipContent>
+            </Tooltip>
             <Button variant="ghost" size="xs" onClick={() => setDeleting(true)}>
               <Trash2 aria-hidden="true" />
               <ActionLabel>{t("deleteItem.delete")}</ActionLabel>
