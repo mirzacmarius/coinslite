@@ -7,7 +7,7 @@ import {
   type QueryCtx,
   internalMutation,
 } from "../_generated/server";
-import { clearWantsOfEntry } from "../wants";
+import { clearWantsOfEntry, unkeyWantsOfEntry } from "../wants";
 import {
   type CatalogItemType,
   type CatalogKind,
@@ -32,12 +32,13 @@ import {
   hasLinkedItems,
   retypeLinkedItems,
 } from "./linkedItems";
+import { denominationCountChanges } from "./denominationCounts";
 
 /**
  * The Catalog tree: where each node sits, and bringing a whole CSV file in at
- * once. Every write here keeps `path` (the keys from the root down) and
- * `searchText` in step with the node, so browsing, Sets and search can rely
- * on them.
+ * once. Every write here keeps `path` (the keys from the root down),
+ * `searchText` and the denomination counts (catalog/denominationCounts.ts)
+ * in step with the node, so browsing, Sets and search can rely on them.
  */
 
 /** What an import does, or would do. */
@@ -119,6 +120,7 @@ export const refreshBrowseFields = internalMutation({
       )
       .take(browseRefreshBatch);
     const rootKinds = new Map<string, Doc<"catalogNodes">["kind"]>();
+    const denominationCounts = denominationCountChanges();
     let last: string | undefined;
     for (const node of nodes) {
       const rootKey = segments(node.path)[0] as string;
@@ -138,6 +140,8 @@ export const refreshBrowseFields = internalMutation({
         countryNodeKey: countryNodeKeyOf(node.path, rootKind),
       };
       if (browseFieldsChanged(node, fields)) {
+        denominationCounts.count(node, -1);
+        denominationCounts.count({ ...node, ...fields }, 1);
         await ctx.db.patch("catalogNodes", node._id, fields);
       }
       last = node.path;
@@ -149,6 +153,7 @@ export const refreshBrowseFields = internalMutation({
       )
         break;
     }
+    await denominationCounts.store(ctx);
     const more =
       last !== nodes.at(-1)?.path || nodes.length === browseRefreshBatch;
     if (last !== undefined && more) {
@@ -457,7 +462,9 @@ export async function applyPlan(
   };
 
   // Each root and grouping counts the entries below it. A node's count
-  // changes by the entries that leave or join the paths below it.
+  // changes by the entries that leave or join the paths below it. Each
+  // denomination and series in a country counts its entries likewise.
+  const denominationCounts = denominationCountChanges();
   const entryCountChanges = new Map<string, number>();
   const countEntry = (path: string, isEntry: boolean, change: 1 | -1) => {
     if (!isEntry) return;
@@ -489,6 +496,7 @@ export async function applyPlan(
       ...(countryNodeKey !== undefined && { countryNodeKey }),
     };
     countEntry(path, node.kind === "entry", 1);
+    denominationCounts.count(document, 1);
     if (!node.existing) {
       ids.set(node.key, await ctx.db.insert("catalogNodes", document));
       continue;
@@ -499,6 +507,10 @@ export async function applyPlan(
       await ctx.storage.delete(imageFiles.thumbnail);
     }
     countEntry(node.existing.path, node.existing.kind === "entry", -1);
+    denominationCounts.count(node.existing, -1);
+    // No longer an entry: its wants stay, but no longer name it (wants.ts).
+    if (node.existing.kind === "entry" && node.kind !== "entry")
+      await unkeyWantsOfEntry(ctx, node.existing._id);
     if (node.existing.path !== path) refresh.push(node.existing.path);
     else if (node.parentKey === null && node.existing.kind !== node.kind)
       refresh.push(path);
@@ -524,6 +536,8 @@ export async function applyPlan(
     const countryNodeKey = countryNodeKeyOf(path, await rootKindOf(path));
     countEntry(node.path, node.kind === "entry", -1);
     countEntry(path, node.kind === "entry", 1);
+    denominationCounts.count(node, -1);
+    denominationCounts.count({ ...node, countryNodeKey }, 1);
     if (path !== node.path || countryNodeKey !== node.countryNodeKey)
       await ctx.db.patch("catalogNodes", node._id, { path, countryNodeKey });
   }
@@ -537,6 +551,7 @@ export async function applyPlan(
       entryCount: (node.entryCount ?? 0) + change,
     });
   }
+  await denominationCounts.store(ctx);
 
   for (const { entryId, type } of retyped) {
     await retypeLinkedItems(ctx, entryId, type);
@@ -612,8 +627,8 @@ export async function planDeletion(
 /**
  * Deletes a node and everything below it, with their uploaded images. The
  * Items linked to entries there take those entries' facts as their own
- * first, and the entry counts above follow. The deletion must not be too
- * large (`planDeletion`).
+ * first, and the entry and denomination counts follow. The deletion must
+ * not be too large (`planDeletion`).
  */
 export async function deleteSubtree(
   ctx: MutationCtx,
@@ -621,7 +636,9 @@ export async function deleteSubtree(
   { below }: Deletion,
 ) {
   const removed = [node, ...below];
+  const denominationCounts = denominationCountChanges();
   for (const each of removed) {
+    denominationCounts.count(each, -1);
     if (each.kind === "entry") {
       await detachLinkedItems(ctx, each);
       await clearWantsOfEntry(ctx, each._id);
@@ -632,6 +649,7 @@ export async function deleteSubtree(
     }
     await ctx.db.delete("catalogNodes", each._id);
   }
+  await denominationCounts.store(ctx);
   const entries = removed.filter((each) => each.kind === "entry").length;
   if (entries === 0) return;
   for (const key of ancestorKeysOf(node.path)) {

@@ -14,6 +14,7 @@ import {
   nullable,
   stored,
 } from "./browse";
+import { storedDenominationCount } from "./denominationCounts";
 import { completion, isSet, setErrors, setLimits } from "./setRules";
 
 /**
@@ -333,6 +334,8 @@ export const setScope = v.object({
  * grouping right above the entry, or for an entry right below a country,
  * its denomination and series on the country's denomination path. Null
  * when that is too small or too large to be a Set (setRules.ts isSet).
+ * Decided from stored entry counts, so it reads the parent and at most one
+ * denomination count, however large the Set.
  */
 export async function setOfEntry(
   ctx: QueryCtx,
@@ -345,13 +348,13 @@ export async function setOfEntry(
     return isSet(parent.entryCount ?? 0) ? { key: parent.key } : null;
   const denomination = entry.denomination ?? null;
   const series = entry.series ?? null;
-  const entries = await denominationEntries(
-    ctx,
-    parent.key,
-    denomination,
-    series,
-  );
-  return isSet(entries.length)
-    ? { key: parent.key, denomination, series }
-    : null;
+  const entryCount =
+    (await storedDenominationCount(ctx, {
+      countryNodeKey: parent.key,
+      denomination: entry.denomination,
+      series: entry.series,
+    })) ??
+    // Not counted yet, until catalog/denominationCounts:backfill has run.
+    (await denominationEntries(ctx, parent.key, denomination, series)).length;
+  return isSet(entryCount) ? { key: parent.key, denomination, series } : null;
 }

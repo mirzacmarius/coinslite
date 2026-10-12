@@ -42,6 +42,7 @@ import type * as catalog_datasets_euroCommemorativeCoinsRo from "../catalog/data
 import type * as catalog_datasets_euroCommemoratives from "../catalog/datasets/euroCommemoratives.js";
 import type * as catalog_datasets_norway from "../catalog/datasets/norway.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
+import type * as catalog_denominationCounts from "../catalog/denominationCounts.js";
 import type * as catalog_editor from "../catalog/editor.js";
 import type * as catalog_fields from "../catalog/fields.js";
 import type * as catalog_imageRules from "../catalog/imageRules.js";
@@ -166,6 +167,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/datasets/euroCommemoratives": typeof catalog_datasets_euroCommemoratives;
   "catalog/datasets/norway": typeof catalog_datasets_norway;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
+  "catalog/denominationCounts": typeof catalog_denominationCounts;
   "catalog/editor": typeof catalog_editor;
   "catalog/fields": typeof catalog_fields;
   "catalog/imageRules": typeof catalog_imageRules;

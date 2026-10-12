@@ -119,6 +119,13 @@ export default defineSchema({
   wants: defineTable({
     ownerId: v.id("users"),
     catalogEntryId: v.id("catalogNodes"),
+    /**
+     * The entry's key, which never changes, so listing what a person wants
+     * reads no Catalog entries. Absent on wants from before it was stored
+     * (until `wants:backfillKeys` has run), and on wants of an entry since
+     * turned into a grouping.
+     */
+    catalogEntryKey: v.optional(v.string()),
     note: v.optional(v.string()),
   })
     .index("by_ownerId_and_catalogEntryId", ["ownerId", "catalogEntryId"])
@@ -403,6 +410,26 @@ export default defineSchema({
       searchField: "searchText",
       filterFields: ["kind", "itemType", "country"],
     }),
+
+  /**
+   * How many Catalog entries a country holds of one denomination and series
+   * of it, on its denomination path (catalog/denominationCounts.ts): the Set
+   * "View as Set" opens from an entry right below a country. Absent
+   * denomination or series is "none", as on the entries. catalog/tree.ts
+   * keeps it in step; one without a count isn't counted yet (before
+   * `catalog/denominationCounts:backfill`).
+   */
+  catalogDenominationCounts: defineTable({
+    countryNodeKey: v.string(),
+    denomination: v.optional(v.string()),
+    series: v.optional(v.string()),
+    /** At most one past `setLimits.entries` (setRules.ts): any more is too large to be a Set. */
+    entryCount: v.number(),
+  }).index("by_countryNodeKey_and_denomination_and_series", [
+    "countryNodeKey",
+    "denomination",
+    "series",
+  ]),
 
   /**
    * Market value history (items/valueHistory.ts): an Item's Market value per

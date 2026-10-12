@@ -1,8 +1,10 @@
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   type MutationCtx,
   type QueryCtx,
+  internalMutation,
   mutation,
   query,
 } from "./_generated/server";
@@ -99,6 +101,23 @@ export async function clearWantsOfEntry(
 }
 
 /**
+ * Makes everyone's wants of a Catalog entry that's turned into a grouping
+ * (catalog/tree.ts) stop naming it by their stored key. The wants stay, and
+ * are read through the node again, which skips it while it isn't an entry.
+ */
+export async function unkeyWantsOfEntry(
+  ctx: MutationCtx,
+  entryId: Id<"catalogNodes">,
+) {
+  for await (const want of ctx.db
+    .query("wants")
+    .withIndex("by_catalogEntryId", (q) => q.eq("catalogEntryId", entryId))) {
+    if (want.catalogEntryKey !== undefined)
+      await ctx.db.patch("wants", want._id, { catalogEntryKey: undefined });
+  }
+}
+
+/**
  * Wants a Catalog entry, or stops wanting it. Wanting one already wanted, or
  * unwanting one that isn't, changes nothing. Past `wantLimits.wants` a new
  * want is refused.
@@ -120,6 +139,7 @@ export const setWanted = mutation({
     await ctx.db.insert("wants", {
       ownerId: user._id,
       catalogEntryId: entry._id,
+      catalogEntryKey: entry.key,
     });
     return null;
   },
@@ -138,31 +158,80 @@ export const wantMany = mutation({
     const user = await wantingUser(ctx);
     if (keys.length > setLimits.bulkAdd)
       throw new ConvexError(setErrors.tooManyEntries);
-    const wanting: Id<"catalogNodes">[] = [];
+    const wanting: Doc<"catalogNodes">[] = [];
     for (const key of new Set(keys)) {
       const entry = await nodeByKey(ctx, key);
       if (entry?.kind !== "entry") continue;
       if ((await heldCount(ctx, user._id, entry._id)).held > 0) continue;
       if (await wantOf(ctx, user._id, entry._id)) continue;
-      wanting.push(entry._id);
+      wanting.push(entry);
     }
     if (wanting.length === 0) return 0;
     if ((await wantCount(ctx, user._id)) + wanting.length > wantLimits.wants)
       throw new ConvexError(wantErrors.tooManyWants);
-    for (const catalogEntryId of wanting)
-      await ctx.db.insert("wants", { ownerId: user._id, catalogEntryId });
+    for (const entry of wanting)
+      await ctx.db.insert("wants", {
+        ownerId: user._id,
+        catalogEntryId: entry._id,
+        catalogEntryKey: entry.key,
+      });
     return wanting.length;
   },
 });
 
-/** The keys of the Catalog entries the person wants, for marking them wherever entries are listed. */
+/**
+ * The keys of the Catalog entries the person wants, for marking them
+ * wherever entries are listed. Read from the wants alone: a want stores its
+ * entry's key while the entry is one (`unkeyWantsOfEntry`).
+ */
 export const keys = query({
   args: {},
   returns: v.array(v.string()),
   handler: async (ctx) => {
     const user = await browsingUser(ctx);
     if (!user) return [];
-    return (await wantedEntries(ctx, user._id)).map((entry) => entry.key);
+    const wants = await wantsOf(ctx, user._id).take(wantLimits.wants);
+    const keys = await Promise.all(
+      wants.map(async (want) => {
+        if (want.catalogEntryKey !== undefined) return want.catalogEntryKey;
+        // From before keys were stored (until backfillKeys has run), or of
+        // an entry since turned into a grouping: read the node.
+        const entry = await ctx.db.get("catalogNodes", want.catalogEntryId);
+        return entry?.kind === "entry" ? entry.key : null;
+      }),
+    );
+    return keys.filter((key): key is string => key !== null);
+  },
+});
+
+/** Wants one backfill batch reads. */
+const backfillBatch = 200;
+
+/**
+ * The one-off backfill for wants from before they stored their entry's key:
+ * each still wanting an entry gets its key. Works through every want a
+ * batch at a time, each batch scheduling the next; running it again changes
+ * nothing. Run once per deployment: `npx convex run wants:backfillKeys`
+ * (add `--prod` for production).
+ */
+export const backfillKeys = internalMutation({
+  args: { cursor: v.optional(v.union(v.string(), v.null())) },
+  returns: v.null(),
+  handler: async (ctx, { cursor }) => {
+    const wants = await ctx.db
+      .query("wants")
+      .paginate({ cursor: cursor ?? null, numItems: backfillBatch });
+    for (const want of wants.page) {
+      if (want.catalogEntryKey !== undefined) continue;
+      const entry = await ctx.db.get("catalogNodes", want.catalogEntryId);
+      if (entry?.kind === "entry")
+        await ctx.db.patch("wants", want._id, { catalogEntryKey: entry.key });
+    }
+    if (!wants.isDone)
+      await ctx.scheduler.runAfter(0, internal.wants.backfillKeys, {
+        cursor: wants.continueCursor,
+      });
+    return null;
   },
 });
 
