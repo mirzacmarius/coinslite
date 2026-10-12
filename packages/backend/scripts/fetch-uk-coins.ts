@@ -9,10 +9,15 @@
 // as data.xml. The Gazette's notices as data begin in 1998; earlier
 // proclamations are only scanned pages, which this doesn't read.
 //
+// Proclamations altering earlier ones are applied where they change the
+// words of a base-metal coin's design ("for ‘2018’ there shall be substituted
+// ‘and the date of the year’") or substitute its design whole.
+//
 // Left out, and listed when the script ends: proclamations that make no
 // base-metal coin of 1 penny to 2 pounds (gold, silver and platinum coins,
-// five-pound crowns and up, alterations and calling-in notices), and any
-// reverse a proclamation allows only on precious-metal coins.
+// five-pound crowns and up, calling-in notices), alterations that change no
+// fact the Catalog keeps of one, and any reverse a proclamation allows only
+// on precious-metal coins. The applied alterations are listed too.
 //
 // Nothing here runs on a deployment; run it by hand, then review the diff.
 // Usage: bun scripts/fetch-uk-coins.ts [cache-dir]
@@ -110,6 +115,7 @@ type Design = {
   series: "definitive" | "commemorative";
   denomination: Denomination;
   year: number;
+  coinDate?: number;
   metal: string;
   weight?: number;
   diameter?: number;
@@ -149,18 +155,56 @@ function seriesOf(
   return several ? "commemorative" : "definitive";
 }
 
+/**
+ * The year a design puts on the coin, where the proclamation fixes it: in
+ * the obverse's inscription, unless it says "the date of the year", or as
+ * "the date “2015”" or "the date 31 January 2020" in the reverse, in the
+ * year the proclamation came into force or the next. Undefined where it
+ * gives none, or several.
+ */
+function coinDateOf(inForce: string, obverse: string, reverse: string) {
+  const years = (text: string) =>
+    new Set(
+      [...text.matchAll(/(?<![\d.])((?:19|20)\d\d)(?![\d])/g)].map((match) =>
+        Number(match[1]),
+      ),
+    );
+  if (!/date of the year/i.test(obverse)) {
+    const stated = years(obverse);
+    if (stated.size === 1) return [...stated][0];
+    if (stated.size > 1) return undefined;
+  }
+  const from = Number(inForce.slice(0, 4));
+  const dated = new Set(
+    [
+      ...reverse.matchAll(
+        /\b(?:the date|bear(?:ing)? the date)\s+(?:“([^”]*)”|"([^"]*)"|((?:\d{1,2}(?:st|nd|rd|th)? [A-Z][a-z]+ )?(?:19|20)\d\d))/g,
+      ),
+    ]
+      .flatMap((match) => [...years(match[1] ?? match[2] ?? match[3] ?? "")])
+      .filter((year) => year === from || year === from + 1),
+  );
+  return dated.size === 1 ? [...dated][0] : undefined;
+}
+
 /** The design a proclamation gives a coin. */
 const designOf = (proclamation: Proclamation, coin: ProclaimedCoin) =>
   coin.design === undefined ? undefined : proclamation.designs[coin.design];
 
-const designs: Design[] = [];
-const used: string[] = [];
+const baseMetalOf = (proclamation: Proclamation) =>
+  proclamation.coins.filter(
+    (coin) =>
+      isDenomination(coin.denomination) && !preciousMetal.test(coin.metal),
+  );
+
+const used: Proclamation[] = [];
 const leftOut: string[] = [];
-/** Proclamations that alter earlier ones; their changes aren't applied. */
-const alterations: string[] = [];
+/** Proclamations that alter earlier ones, and what came of each. */
+const altering: Proclamation[] = [];
+const alterationsApplied: string[] = [];
+const alterationsNotApplying: string[] = [];
 const reversesLeftOut: string[] = [];
 const problems: string[] = [];
-const seen = new Set<string>();
 
 /** A Markdown list item: "- 2017-02-16 [2712446](…/notice/2712446) DETERMINING …". */
 const listItem = (proclamation: Proclamation) => {
@@ -170,74 +214,157 @@ const listItem = (proclamation: Proclamation) => {
       : proclamation.title;
   return `- ${proclamation.inForce ?? proclamation.published ?? "?"} [${proclamation.notice}](${gazette}/notice/${proclamation.notice}) ${title}`;
 };
+const noticeLink = (proclamation: Proclamation) =>
+  `[${proclamation.notice}](${gazette}/notice/${proclamation.notice})`;
 
 for (const id of await noticeIds()) {
   const xml = await cached(`notice-${id}.xml`, () =>
     fetched(`${gazette}/notice/${id}/data.xml`),
   );
   for (const proclamation of parseNotice(xml)) {
-    const baseMetal = proclamation.coins.filter(
-      (coin) =>
-        isDenomination(coin.denomination) && !preciousMetal.test(coin.metal),
-    );
-    if (baseMetal.length === 0) {
-      (/^ALTERING\b/i.test(proclamation.title) ? alterations : leftOut).push(
-        listItem(proclamation),
+    if (proclamation.alters) altering.push(proclamation);
+    else if (baseMetalOf(proclamation).length === 0)
+      leftOut.push(listItem(proclamation));
+    else if (!proclamation.inForce)
+      problems.push(`${listItem(proclamation)}: no date it came into force`);
+    else used.push(proclamation);
+  }
+}
+
+/** Metals of base-metal coins and of precious ones, as headings name them. */
+const baseMetalWords = /cupro-nickel|nickel-brass|steel|bronze/i;
+const preciousWords = /\b(?:gold|silver|platinum)\b/i;
+const words = (text: string) =>
+  new Set(text.toLowerCase().match(/[a-z]{4,}/g) ?? []);
+
+/**
+ * Applies an altering proclamation to the base-metal coins of those it
+ * alters, where it changes the words of their designs ("for ‘2018’ there
+ * shall be substituted ‘and the date of the year’") or substitutes a whole
+ * design. One whose heading names only gold, silver or platinum coins
+ * changes none of them; nor do changes of remedy or of precious coins'
+ * specifications, which the Catalog doesn't keep.
+ */
+function applyAlteration(alteration: Proclamation) {
+  const targets = used.filter(
+    (proclamation) =>
+      proclamation.given && alteration.alters?.includes(proclamation.given),
+  );
+  const forBaseMetal =
+    baseMetalWords.test(alteration.title) ||
+    !preciousWords.test(alteration.title);
+  const changes: string[] = [];
+  if (targets.length > 0 && forBaseMetal) {
+    for (const target of targets) {
+      const designs = new Set(
+        baseMetalOf(target).flatMap((coin) => designOf(target, coin) ?? []),
+      );
+      for (const { from, to } of alteration.substitutions ?? []) {
+        const swap = (text: string) => text.split(from).join(to);
+        let changed = false;
+        for (const design of designs) {
+          const before = JSON.stringify(design);
+          if (design.obverse) design.obverse = swap(design.obverse);
+          for (const reverse of design.reverses) {
+            reverse.description = swap(reverse.description);
+            if (reverse.obverse) reverse.obverse = swap(reverse.obverse);
+            if (reverse.edge?.edge === "lettered")
+              reverse.edge.lettering = swap(reverse.edge.lettering);
+          }
+          if (design.edge?.edge === "lettered")
+            design.edge.lettering = swap(design.edge.lettering);
+          changed ||= JSON.stringify(design) !== before;
+        }
+        if (changed)
+          changes.push(`${noticeLink(target)}: “${from}” became “${to}”`);
+      }
+    }
+    // A whole design substituted, for the proclamation it alters most alike.
+    const [substituted] = alteration.designs;
+    if (substituted && alteration.designs.length === 1) {
+      const heading = words(alteration.title);
+      const [target] = targets
+        .map((proclamation) => ({
+          proclamation,
+          alike: [...words(proclamation.title)].filter((word) =>
+            heading.has(word),
+          ).length,
+        }))
+        .sort((a, b) => b.alike - a.alike)
+        .map(({ proclamation }) => proclamation);
+      if (target) {
+        target.designs.push(substituted);
+        for (const coin of baseMetalOf(target))
+          coin.design = target.designs.length - 1;
+        changes.push(`${noticeLink(target)}: its design substituted`);
+      }
+    }
+  }
+  if (changes.length > 0)
+    alterationsApplied.push(`${listItem(alteration)}: ${changes.join("; ")}`);
+  else alterationsNotApplying.push(listItem(alteration));
+}
+
+for (const alteration of altering.sort((a, b) =>
+  (a.given ?? "").localeCompare(b.given ?? ""),
+))
+  applyAlteration(alteration);
+
+const designs: Design[] = [];
+const seen = new Set<string>();
+for (const proclamation of used) {
+  const inForce = proclamation.inForce as string;
+  const baseMetal = baseMetalOf(proclamation);
+  const series = seriesOf(proclamation, baseMetal);
+  for (const coin of baseMetal) {
+    const design = designOf(proclamation, coin);
+    if (!design || design.reverses.length === 0) {
+      problems.push(
+        `${listItem(proclamation)}: no design for ${coin.denomination}`,
       );
       continue;
     }
-    if (!proclamation.inForce) {
-      problems.push(`${listItem(proclamation)}: no date it came into force`);
-      continue;
-    }
-    used.push(listItem(proclamation));
-    const series = seriesOf(proclamation, baseMetal);
-    for (const coin of baseMetal) {
-      const design = designOf(proclamation, coin);
-      if (!design || design.reverses.length === 0) {
-        problems.push(
-          `${listItem(proclamation)}: no design for ${coin.denomination}`,
+    for (const reverse of design.reverses) {
+      if (reverse.onlyFor && !reverse.onlyFor.includes(coin.metal)) {
+        reversesLeftOut.push(
+          `${listItem(proclamation)}: “${reverse.description}”, only for ${reverse.onlyFor}`,
         );
         continue;
       }
-      for (const reverse of design.reverses) {
-        if (reverse.onlyFor && !reverse.onlyFor.includes(coin.metal)) {
-          reversesLeftOut.push(
-            `${listItem(proclamation)}: “${reverse.description}”, only for ${reverse.onlyFor}`,
-          );
-          continue;
-        }
-        const year = Number(proclamation.inForce.slice(0, 4));
-        // A reverse proclaimed again for the same year, alone or with another obverse, is the same design.
-        const same = [
-          coin.denomination,
-          year,
-          reverse.description.toLowerCase(),
-        ].join("|");
-        if (seen.has(same)) continue;
-        seen.add(same);
-        const edge = reverse.edge ?? design.edge;
-        designs.push({
-          notice: proclamation.notice,
-          link: `${gazette}/notice/${proclamation.notice}`,
-          proclamation: proclamation.title,
-          ...(proclamation.given && { given: proclamation.given }),
-          inForce: proclamation.inForce,
-          ...(proclamation.occasion && { purpose: proclamation.occasion }),
-          series,
-          denomination: coin.denomination as Denomination,
-          year,
-          metal: coin.metal,
-          ...(coin.weight && { weight: coin.weight }),
-          ...(coin.diameter && { diameter: coin.diameter }),
-          ...(coin.composition && { composition: coin.composition }),
-          ...(coin.sections && { sections: coin.sections }),
-          ...(coin.shape && { shape: coin.shape }),
-          ...(design.obverse && { obverse: design.obverse }),
-          reverse: reverse.description,
-          ...(edge && { edge }),
-        });
-      }
+      const obverse = reverse.obverse ?? design.obverse;
+      const coinDate = coinDateOf(inForce, obverse ?? "", reverse.description);
+      const year = coinDate ?? Number(inForce.slice(0, 4));
+      // A reverse proclaimed again for the same year, alone or with another
+      // obverse, is the same design.
+      const same = [
+        coin.denomination,
+        coinDate ?? `in force ${year}`,
+        reverse.description.toLowerCase(),
+      ].join("|");
+      if (seen.has(same)) continue;
+      seen.add(same);
+      const edge = reverse.edge ?? design.edge;
+      designs.push({
+        notice: proclamation.notice,
+        link: `${gazette}/notice/${proclamation.notice}`,
+        proclamation: proclamation.title,
+        ...(proclamation.given && { given: proclamation.given }),
+        inForce,
+        ...(proclamation.occasion && { purpose: proclamation.occasion }),
+        series,
+        denomination: coin.denomination as Denomination,
+        year,
+        ...(coinDate && { coinDate }),
+        metal: coin.metal,
+        ...(coin.weight && { weight: coin.weight }),
+        ...(coin.diameter && { diameter: coin.diameter }),
+        ...(coin.composition && { composition: coin.composition }),
+        ...(coin.sections && { sections: coin.sections }),
+        ...(coin.shape && { shape: coin.shape }),
+        ...(obverse && { obverse }),
+        reverse: reverse.description,
+        ...(edge && { edge }),
+      });
     }
   }
 }
@@ -290,8 +417,10 @@ export type UkCoinDesign = {
     | "50 pence"
     | "1 pound"
     | "2 pounds";
-  /** The year the proclamation came into force. */
+  /** The year on the coin where the proclamation fixes it, else the year it came into force. */
   year: number;
+  /** The year on the coin, where the proclamation fixes it. */
+  coinDate?: number;
   /** The coin's metal, in the proclamation's words: "cupro-nickel". */
   metal: string;
   /** Standard weight, grams. */
@@ -330,13 +459,16 @@ for (const line of [
   `${designs.length} designs (${counts.join(", ")})`,
   "",
   `Proclamations used (${used.length}):`,
-  ...used.sort(),
+  ...used.map(listItem).sort(),
   "",
   `Left out, no base-metal coin of 1 penny to 2 pounds (${leftOut.length}):`,
   ...leftOut.sort(),
   "",
-  `Left out, altering an earlier proclamation (${alterations.length}):`,
-  ...alterations.sort(),
+  `Alterations applied (${alterationsApplied.length}):`,
+  ...alterationsApplied.sort(),
+  "",
+  `Alterations changing no base-metal coin's facts the Catalog keeps (${alterationsNotApplying.length}):`,
+  ...alterationsNotApplying.sort(),
   "",
   `Reverses left out (${reversesLeftOut.length}):`,
   ...reversesLeftOut,

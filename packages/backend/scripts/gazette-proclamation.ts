@@ -45,6 +45,8 @@ export type Reverse = {
   onlyFor?: string;
   /** Its own edge, where each reverse has one. */
   edge?: Edge;
+  /** Its own obverse, where an option restates the obverse differently. */
+  obverse?: string;
 };
 
 export type ProclaimedDesign = {
@@ -57,6 +59,9 @@ export type ProclaimedDesign = {
   /** The design clause in full, in the proclamation's words. */
   text: string;
 };
+
+/** Words an altering proclamation puts in place of others. */
+export type Substitution = { from: string; to: string };
 
 export type Proclamation = {
   /** The Gazette's notice ID. */
@@ -75,6 +80,10 @@ export type Proclamation = {
   commemorative: boolean;
   /** Why they are made, as the recital words it: "to commemorate the life and work of Beatrix Potter". */
   occasion?: string;
+  /** For a proclamation altering earlier ones: the days those were given, YYYY-MM-DD. */
+  alters?: string[];
+  /** Its changes to their words: "for ‘2018’ there shall be substituted ‘and the date of the year’". */
+  substitutions?: Substitution[];
   coins: ProclaimedCoin[];
   designs: ProclaimedDesign[];
 };
@@ -272,6 +281,36 @@ function dateAfter(text: string, lead: string) {
   );
 }
 
+/**
+ * The days of the proclamations an altering proclamation's heading names:
+ * "ALTERING THE PROCLAMATIONS OF THE ELEVENTH DAY OF OCTOBER AND THE
+ * FIFTEENTH DAY OF NOVEMBER 2023" names 2023-10-11 and 2023-11-15.
+ */
+function altered(title: string) {
+  const named = [
+    ...title.matchAll(
+      new RegExp(
+        `\\bTHE\\s+${dayPattern}\\s+(?:(?:DAY\\s+)?OF\\s+)?${monthPattern}(?:,?\\s+(\\d{4}))?`,
+        "gi",
+      ),
+    ),
+  ].map((match) => ({
+    day: dayIn(match[1] as string),
+    month: months.indexOf((match[2] as string).toLowerCase()) + 1,
+    year: match[3] === undefined ? undefined : Number(match[3]),
+  }));
+  // A day named without its year takes the year of the next one named.
+  return named
+    .map(({ day, month, year }, index) =>
+      isoDate(
+        year ?? named.slice(index + 1).find((next) => next.year)?.year,
+        month,
+        day,
+      ),
+    )
+    .filter((date): date is string => date !== undefined);
+}
+
 /** "fifty pence" reads "50 pence", "one pound" "1 pound", "two-pounds" "2 pounds". */
 function denominationIn(words: string) {
   const match = /^(.+?)[\s-](penny|pence|pounds?)$/i.exec(words.trim());
@@ -407,15 +446,27 @@ const restriction =
   /[;,]?\s*(?:or\s*,?\s*)?(?:and\s+)?for the ([a-z ,-]+? coins?)(?: only)?:?\s*$/i;
 
 /** The end of an option: its joining "; or", a closing quotation mark, a full stop. */
-const trimOption = (text: string) =>
-  text
+function trimOption(text: string): string {
+  const trimmed = text
     .replace(/^[\s‘,;:—–-]+/, "")
     // The number of the clause after the design: "… “TWO POUNDS”. 6."
     .replace(/([.”’])[\s’]*\d{1,2}\.?\s*$/, "$1")
     .replace(/(?:[\s.;,’]|\bor|\band)+$/i, "")
     .trim();
+  // The close of a section an altering proclamation substitutes, in quotes.
+  const opened = trimmed.split("“").length;
+  const closed = trimmed.split("”").length;
+  return closed > opened && trimmed.endsWith("”")
+    ? trimOption(trimmed.slice(0, -1))
+    : trimmed;
+}
 
-type Option = { text: string; onlyFor?: string; edge?: Edge };
+type Option = {
+  text: string;
+  onlyFor?: string;
+  edge?: Edge;
+  obverse?: string;
+};
 
 /** Options, each with the coins the option before it restricted it to, and the edge it gives. */
 function optionsIn(chunks: string[]): Option[] {
@@ -487,10 +538,12 @@ function designFrom(clause: string): ProclaimedDesign {
         reverses: reverses.map((reverse) => ({
           ...reverse,
           ...(!reverse.edge && edge && { edge }),
+          ...(obverse && { obverse }),
         })),
       };
     },
   );
+  const obverse = sides.find((side) => side.obverse)?.obverse;
   const reverses = sides.flatMap((side) => side.reverses);
   // An edge said once, after the last option, is every option's.
   const withEdge = reverses.filter((reverse) => reverse.edge);
@@ -500,14 +553,17 @@ function designFrom(clause: string): ProclaimedDesign {
       : withEdge.length === 1 && reverses.at(-1)?.edge
         ? reverses.at(-1)?.edge
         : undefined;
-  const obverse = sides.find((side) => side.obverse)?.obverse;
   return {
     ...(obverse && { obverse }),
-    reverses: reverses.map(({ text: description, onlyFor, edge }) => ({
-      description,
-      ...(onlyFor && { onlyFor }),
-      ...(edge && !shared && { edge }),
-    })),
+    reverses: reverses.map(
+      ({ text: description, onlyFor, edge, obverse: own }) => ({
+        description,
+        ...(onlyFor && { onlyFor }),
+        ...(edge && !shared && { edge }),
+        // An option that restates the obverse differently keeps its own.
+        ...(own && own !== obverse && { obverse: own }),
+      }),
+    ),
     ...(shared && { edge: shared }),
     text,
   };
@@ -599,6 +655,15 @@ function proclamationIn(
     )?.[1];
   const given = dateAfter(text, "this");
   const inForce = dateAfter(text, "come into force on");
+  const alters = /^ALTERING\b/i.test(title) ? altered(title) : [];
+  const substitutions = [
+    ...text.matchAll(
+      /\bfor\s+(?:‘(.+?)’|“(.+?)”)\s+there shall be substituted:?\s+(?:‘(.+?)’|“(.+?)”)\s*\.?\s*(?=¶|$)/gi,
+    ),
+  ].map((match) => ({
+    from: squash((match[1] ?? match[2]) as string),
+    to: squash((match[3] ?? match[4]) as string),
+  }));
   return {
     title,
     ...(given && { given }),
@@ -607,6 +672,8 @@ function proclamationIn(
       `${title} ${recital ?? ""}`,
     ),
     ...(occasion && { occasion: squash(occasion) }),
+    ...(alters.length > 0 && { alters }),
+    ...(substitutions.length > 0 && { substitutions }),
     coins,
     designs,
   };

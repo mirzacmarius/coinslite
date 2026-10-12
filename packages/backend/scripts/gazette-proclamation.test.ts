@@ -187,8 +187,23 @@ describe("a saved royal proclamation from The Gazette", () => {
         description:
           "an interpretation of elements of Newton’s Proposition 11 from Book One of Principia Mathematica, accompanied by the inscription “SIR ISAAC NEWTON” and the denomination “FIFTY PENCE”",
         onlyFor: "cupro-nickel coins",
+        // Its option restates the obverse, with the date the coin bears.
+        obverse:
+          "Our effigy with the inscription “· ELIZABETH II · DEI · GRA · REG · FID · DEF · 2018”",
       },
     ]);
+  });
+
+  test("reads which proclamation an altering one alters and the words it changes", () => {
+    const proclamation = only("gazette-3450928.xml");
+
+    expect(proclamation).toMatchObject({
+      given: "2019-12-17",
+      alters: ["2019-10-08"],
+      substitutions: [{ from: "31 October 2019", to: "31 January 2020" }],
+      coins: [],
+      designs: [],
+    });
   });
 
   test("reads each of the proclamations an early notice prints together", () => {

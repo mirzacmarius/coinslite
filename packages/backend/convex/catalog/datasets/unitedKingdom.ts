@@ -21,11 +21,13 @@ import {
  * nor how many it struck. Gold, silver and platinum coins and the five-pound
  * crowns and up are left out.
  *
- * An entry's year is the year its proclamation came into force, which can
- * be a year before the date on the coin (a proclamation of late 2017 for
- * coins dated 2018); the obverse in its details gives the date where the
- * proclamation fixes it. Its issue date is the day the proclamation was
- * given.
+ * An entry's year is the date the coin bears where its proclamation states
+ * it (in the obverse's inscription, or "the date “2015”" in the reverse),
+ * and its title shows it. Where the proclamation gives "the date of the
+ * year" instead, the year is the one the proclamation came into force and
+ * the title shows none, as the coins may bear a later one. Later
+ * proclamations altering a design's words are applied (fetch-uk-coins.ts).
+ * Its issue date is the day the proclamation was given.
  *
  * Not yet: coins proclaimed before 1998, when The Gazette began publishing
  * notices as data; their proclamations are only scanned pages.
@@ -226,7 +228,7 @@ function differenceOf(design: UkCoinDesign, alike: UkCoinDesign[]) {
 function titlesOf(designs: UkCoinDesign[]) {
   const plain = designs.map(
     (design) =>
-      `${design.denomination} ${design.year} – ${subjectOf(design.reverse)}`,
+      `${design.denomination}${design.coinDate ? ` ${design.coinDate}` : ""} – ${subjectOf(design.reverse)}`,
   );
   return designs.map((design, index) => {
     const title = plain[index] as string;

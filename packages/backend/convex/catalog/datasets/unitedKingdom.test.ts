@@ -110,6 +110,37 @@ describe("the United Kingdom circulating coins dataset", () => {
     );
   });
 
+  test("titles a design with the date its coin bears, or with none where its proclamation gives none", () => {
+    const titles = entries.map((row) => row.values.title);
+    // "for ‘31 October 2019’ there shall be substituted ‘31 January 2020’"
+    // (notice 3450928) is applied.
+    const brexit = entries.find(
+      (row) =>
+        row.values.factsLink === "https://www.thegazette.co.uk/notice/3402773",
+    );
+    expect(brexit?.values).toMatchObject({
+      title:
+        "50 pence 2020 – “PEACE, PROSPERITY AND FRIENDSHIP WITH ALL NATIONS”",
+      yearFrom: 2020,
+    });
+    expect(brexit?.values.technicalDetails).toContain("31 January 2020");
+    // "and the date of the year": the year the proclamation came into force,
+    // and no year in the title.
+    expect(titles).toContain("1 penny – Dormouse");
+    expect(below("gb-1-penny-definitive-2023")[0]?.values.yearFrom).toBe(2023);
+    // The Newton 50p's "2018" was altered to "the date of the year" (notice 3204632).
+    const newton = entries.find(
+      (row) =>
+        row.values.factsLink ===
+          "https://www.thegazette.co.uk/notice/2929909" &&
+        String(row.values.title).includes("Newton"),
+    );
+    expect(newton?.values.title).toStartWith("50 pence – ");
+    expect(newton?.values.technicalDetails).not.toContain("2018");
+    for (const title of titles)
+      expect(title).toMatch(/^\d+ (?:penny|pence|pounds?)(?: \d{4})? – /);
+  });
+
   test("gives the bimetallic two pounds and plated steel coins the metals the Catalog knows", () => {
     const twoPounds = entries.find(
       (row) =>
