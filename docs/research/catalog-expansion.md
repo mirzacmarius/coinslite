@@ -8,7 +8,7 @@
 
 **Not legal advice.** The open legal questions are collected in [§6](#6-questions-for-a-person).
 
-**Terms** follow `CONTEXT.md`: Catalog, Catalog entry, Theme, Premium.
+**Terms** follow `GLOSSARY.md`: Catalog, Catalog entry, Theme, Premium.
 
 ---
 
@@ -203,7 +203,7 @@ COIN-136 specifies the shape, the code to check and the spec change, rather than
 - The backend makes each child of a Theme a "country node" (`countryNodeKeyOf` in `catalog/tree.ts`). So each series would be browsed by denomination.
 - The app names a country node by its country if it has one, otherwise by its title. A series would show its title, but the browse-by and picker paths need checking.
 
-**The glossary still fits:** `CONTEXT.md` defines a Theme as a grouping *"whose entries span several countries"*, and euro banknotes circulate in all 21 euro-area countries. What changes is only the spec's description of a Theme's children.
+**The glossary still fits:** `GLOSSARY.md` defines a Theme as a grouping *"whose entries span several countries"*, and euro banknotes circulate in all 21 euro-area countries. What changes is only the spec's description of a Theme's children.
 
 **Effort: S (about 1 day)**, including the Theme title's translations and uploading each note's specimen front image as its Catalog image (13 images).
 
@@ -651,5 +651,5 @@ All accessed **2026-10-12** unless noted.
 - https://api.si.edu/openaccess/api/v1.0/search (record counts, queried with the public demo key)
 
 **CoinsLite repo context**
-- `docs/adr/0003-own-catalog-with-storable-sources.md`; `docs/functional-spec.md` §6.1, §6.2, §15; `CONTEXT.md`
+- `docs/adr/0003-own-catalog-with-storable-sources.md`; `docs/functional-spec.md` §6.1, §6.2, §15; `GLOSSARY.md`
 - `packages/backend/convex/catalog/datasets/*.ts`, `catalog/seed.ts`, `catalog/fields.ts` (CSV columns and checks), `scripts/fetch-euro-commemoratives.ts`

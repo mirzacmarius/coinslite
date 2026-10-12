@@ -20,7 +20,7 @@ Linear syncs the COIN team's issues to this repo's GitHub Issues, so the same is
 - **Milestones**: the CoinsLite project's milestones group the build phases. List them with `list_milestones`, and create them with `save_milestone` if they're missing.
 - **Code links**: name branches with the issue's `gitBranchName`, and put the identifier (`COIN-12`) in commit and PR titles.
 
-Issue content describes CoinsLite's own requirements, using the vocabulary in `CONTEXT.md`.
+Issue content describes CoinsLite's own requirements, using the vocabulary in `GLOSSARY.md`.
 
 ## When a skill says "publish to the issue tracker"
 

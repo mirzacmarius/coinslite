@@ -1,6 +1,6 @@
 # Translation glossary
 
-How CoinsLite's domain terms ([`CONTEXT.md`](../CONTEXT.md)) read in each launch language. Use these words, and only these, wherever the term appears: in the app's dictionaries (`apps/app/src/locales/*.ts`) and in what the server writes (emails, the Collection CSV and PDF, the Insurance report, release notes).
+How CoinsLite's domain terms ([`GLOSSARY.md`](../GLOSSARY.md)) read in each launch language. Use these words, and only these, wherever the term appears: in the app's dictionaries (`apps/app/src/locales/*.ts`) and in what the server writes (emails, the Collection CSV and PDF, the Insurance report, release notes).
 
 | Term | Norsk bokmål | Deutsch | Français | Română |
 |---|---|---|---|---|
