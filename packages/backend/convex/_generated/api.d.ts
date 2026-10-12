@@ -56,6 +56,8 @@ import type * as catalog_datasets_norway from "../catalog/datasets/norway.js";
 import type * as catalog_datasets_romania from "../catalog/datasets/romania.js";
 import type * as catalog_datasets_romaniaBnr from "../catalog/datasets/romaniaBnr.js";
 import type * as catalog_datasets_romaniaBnrCoins from "../catalog/datasets/romaniaBnrCoins.js";
+import type * as catalog_datasets_unitedKingdom from "../catalog/datasets/unitedKingdom.js";
+import type * as catalog_datasets_unitedKingdomCoins from "../catalog/datasets/unitedKingdomCoins.js";
 import type * as catalog_datasets_usCoinProgrammeCoins from "../catalog/datasets/usCoinProgrammeCoins.js";
 import type * as catalog_datasets_usCoinProgrammes from "../catalog/datasets/usCoinProgrammes.js";
 import type * as catalog_datasets_usSilverDollars from "../catalog/datasets/usSilverDollars.js";
@@ -75,6 +77,7 @@ import type * as catalog_seeds_euroCommemoratives from "../catalog/seeds/euroCom
 import type * as catalog_seeds_finland from "../catalog/seeds/finland.js";
 import type * as catalog_seeds_norway from "../catalog/seeds/norway.js";
 import type * as catalog_seeds_romania from "../catalog/seeds/romania.js";
+import type * as catalog_seeds_unitedKingdom from "../catalog/seeds/unitedKingdom.js";
 import type * as catalog_seeds_usCoinProgrammes from "../catalog/seeds/usCoinProgrammes.js";
 import type * as catalog_seeds_usSilverDollars from "../catalog/seeds/usSilverDollars.js";
 import type * as catalog_setProgress from "../catalog/setProgress.js";
@@ -217,6 +220,8 @@ declare const fullApi: ApiFromModules<{
   "catalog/datasets/romania": typeof catalog_datasets_romania;
   "catalog/datasets/romaniaBnr": typeof catalog_datasets_romaniaBnr;
   "catalog/datasets/romaniaBnrCoins": typeof catalog_datasets_romaniaBnrCoins;
+  "catalog/datasets/unitedKingdom": typeof catalog_datasets_unitedKingdom;
+  "catalog/datasets/unitedKingdomCoins": typeof catalog_datasets_unitedKingdomCoins;
   "catalog/datasets/usCoinProgrammeCoins": typeof catalog_datasets_usCoinProgrammeCoins;
   "catalog/datasets/usCoinProgrammes": typeof catalog_datasets_usCoinProgrammes;
   "catalog/datasets/usSilverDollars": typeof catalog_datasets_usSilverDollars;
@@ -236,6 +241,7 @@ declare const fullApi: ApiFromModules<{
   "catalog/seeds/finland": typeof catalog_seeds_finland;
   "catalog/seeds/norway": typeof catalog_seeds_norway;
   "catalog/seeds/romania": typeof catalog_seeds_romania;
+  "catalog/seeds/unitedKingdom": typeof catalog_seeds_unitedKingdom;
   "catalog/seeds/usCoinProgrammes": typeof catalog_seeds_usCoinProgrammes;
   "catalog/seeds/usSilverDollars": typeof catalog_seeds_usSilverDollars;
   "catalog/setProgress": typeof catalog_setProgress;
