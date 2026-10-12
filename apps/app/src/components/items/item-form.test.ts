@@ -6,9 +6,9 @@ import {
   blankItem,
   factValues,
   fillForm,
-  formArgs,
   valuesFromItem,
 } from "./item-form";
+import { formArgs } from "./item-form-submit";
 
 /** A stored Item, as the Item page reads it. */
 const morgan: Doc<"items"> = {
