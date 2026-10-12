@@ -49,18 +49,36 @@ export function narrowsView(view: CollectionView) {
   );
 }
 
+/** The browser window's viewport (`innerWidth` × `innerHeight`), in CSS pixels. */
+export type ViewportSize = { width: number; height: number };
+
+/**
+ * The smallest viewport the totals start open in: below it, the open totals
+ * would push the Item list out of view. `CollectionTotalsSection` repeats it
+ * in CSS for the first paint.
+ */
+const roomyViewport: ViewportSize = { width: 1024, height: 1000 };
+
 /**
  * Whether the Collection page shows its totals open. A searched or filtered
  * view keeps them collapsed, so a link to one shows its Items first;
- * otherwise they're as this device last left them, else collapsed on a
- * phone and open on anything wider. Undefined while the screen size isn't
- * known yet (on the server), when the page's CSS decides by width.
+ * otherwise they're as this device last left them, else open only in a
+ * viewport wide and tall enough for the list to still start in view.
+ * Undefined while the viewport isn't known yet (on the server), when the
+ * page's CSS decides by the same size.
  */
 export function totalsOpen(
   display: CollectionDisplay,
-  { narrowed, phone }: { narrowed: boolean; phone: boolean | undefined },
+  {
+    narrowed,
+    viewport,
+  }: { narrowed: boolean; viewport: ViewportSize | undefined },
 ) {
   if (narrowed) return false;
   if (display.totalsOpen !== undefined) return display.totalsOpen;
-  return phone === undefined ? undefined : !phone;
+  if (viewport === undefined) return undefined;
+  return (
+    viewport.width >= roomyViewport.width &&
+    viewport.height >= roomyViewport.height
+  );
 }

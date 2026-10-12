@@ -871,8 +871,10 @@ export default {
     pagination: "Seiten",
     range: "{from}–{to} von {total}",
     pageOf: "Seite {page} von {pages}",
+    firstPage: "Erste Seite",
     previousPage: "Vorherige Seite",
     nextPage: "Nächste Seite",
+    lastPage: "Letzte Seite",
     incomplete:
       "Deine Sammlung ist zu groß, um sie auf einmal zu durchsuchen. Diese Ansicht umfasst die ersten {count} Objekte, die du hinzugefügt hast.",
     showInCollection: "In der Sammlung zeigen",

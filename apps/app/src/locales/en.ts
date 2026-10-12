@@ -829,8 +829,10 @@ export default {
     pagination: "Pages",
     range: "{from}–{to} of {total}",
     pageOf: "Page {page} of {pages}",
+    firstPage: "First page",
     previousPage: "Previous page",
     nextPage: "Next page",
+    lastPage: "Last page",
     incomplete:
       "Your Collection is too large to search at once, so this view covers the first {count} Items you added.",
     showInCollection: "Show in Collection",

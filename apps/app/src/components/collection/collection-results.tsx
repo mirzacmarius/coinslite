@@ -8,7 +8,13 @@ import { useFormatters } from "@/locales/use-formatters";
 import { Button } from "@coinslite/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
 import type { CollectionLayout } from "./collection-display";
@@ -185,6 +191,11 @@ function ItemList({
                     </span>
                   )}
                 </span>
+                <PhoneFigures
+                  marketValue={about.marketValue}
+                  quantity={item.quantity}
+                  grade={about.grade}
+                />
                 <span className="hidden w-24 truncate text-right text-xs text-muted-foreground md:block">
                   {about.grade && (
                     <>
@@ -193,7 +204,7 @@ function ItemList({
                     </>
                   )}
                 </span>
-                <span className="shrink-0 text-right text-xs tabular-nums text-muted-foreground md:w-16">
+                <span className="hidden w-16 shrink-0 text-right text-xs tabular-nums text-muted-foreground md:block">
                   {item.quantity > 1 && (
                     <>
                       <span className="sr-only">{t("items.quantity")} </span>×
@@ -213,6 +224,49 @@ function ItemList({
         })}
       </ul>
     </div>
+  );
+}
+
+/**
+ * A row's figures on a phone, where there's no room for columns: the Market
+ * value of one piece (× Quantity when there's more than one) on the right,
+ * the Grade under it. The value never truncates; the title gives way instead.
+ */
+function PhoneFigures({
+  marketValue,
+  quantity,
+  grade,
+}: {
+  marketValue: string | undefined;
+  quantity: number;
+  grade: string | undefined;
+}) {
+  const t = useI18n();
+  return (
+    <span className="flex shrink-0 flex-col items-end text-right md:hidden">
+      {(marketValue || quantity > 1) && (
+        <span className="whitespace-nowrap text-[13px] tabular-nums">
+          {marketValue && (
+            <>
+              <span className="sr-only">{t("items.marketValue")} </span>
+              {marketValue}
+            </>
+          )}
+          {quantity > 1 && (
+            <span className="text-xs text-muted-foreground">
+              {marketValue && " "}
+              <span className="sr-only">{t("items.quantity")} </span>×{quantity}
+            </span>
+          )}
+        </span>
+      )}
+      {grade && (
+        <span className="max-w-28 truncate text-xs text-muted-foreground">
+          <span className="sr-only">{t("items.grade")} </span>
+          {grade}
+        </span>
+      )}
+    </span>
   );
 }
 
@@ -307,7 +361,7 @@ function ItemGrid({
   );
 }
 
-/** "26–50 of 134" and the previous and next page. */
+/** "26–50 of 134", "Page 2 of 6" and the first, previous, next and last page. */
 export function Pagination({
   result,
   pageSize,
@@ -336,6 +390,13 @@ export function Pagination({
       {result.pageCount > 1 && (
         <span className="flex items-center gap-1">
           <PageButton
+            label={t("collection.firstPage")}
+            disabled={result.page <= 1}
+            onClick={() => onPageChange(1)}
+          >
+            <ChevronsLeft strokeWidth={1.75} aria-hidden="true" />
+          </PageButton>
+          <PageButton
             label={t("collection.previousPage")}
             disabled={result.page <= 1}
             onClick={() => onPageChange(result.page - 1)}
@@ -354,6 +415,13 @@ export function Pagination({
             onClick={() => onPageChange(result.page + 1)}
           >
             <ChevronRight strokeWidth={1.75} aria-hidden="true" />
+          </PageButton>
+          <PageButton
+            label={t("collection.lastPage")}
+            disabled={result.page >= result.pageCount}
+            onClick={() => onPageChange(result.pageCount)}
+          >
+            <ChevronsRight strokeWidth={1.75} aria-hidden="true" />
           </PageButton>
         </span>
       )}

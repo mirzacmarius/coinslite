@@ -849,8 +849,10 @@ export default {
     pagination: "Pagini",
     range: "{from}–{to} din {total}",
     pageOf: "Pagina {page} din {pages}",
+    firstPage: "Prima pagină",
     previousPage: "Pagina anterioară",
     nextPage: "Pagina următoare",
+    lastPage: "Ultima pagină",
     incomplete:
       "Colecția ta e prea mare pentru a fi căutată dintr-odată, așa că această vizualizare cuprinde primele {count} de obiecte pe care le-ai adăugat.",
     showInCollection: "Arată în colecție",

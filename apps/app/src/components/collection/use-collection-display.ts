@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { type CollectionDisplay, readDisplay } from "./collection-display";
+import {
+  type CollectionDisplay,
+  type ViewportSize,
+  readDisplay,
+} from "./collection-display";
 
 const storageKey = "collection.display";
 const changed = "collection-display-change";
@@ -43,20 +47,29 @@ export function useCollectionDisplay() {
   return [display, change] as const;
 }
 
-/** Narrower than Tailwind's `sm` breakpoint. */
-const phoneQuery = "(max-width: 639.98px)";
-
-function subscribeToWidth(onChange: () => void) {
-  const query = window.matchMedia(phoneQuery);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
+function subscribeToResize(onChange: () => void) {
+  window.addEventListener("resize", onChange);
+  return () => window.removeEventListener("resize", onChange);
 }
 
-/** Whether the screen is phone-sized; undefined on the server and the first paint. */
-export function usePhoneWidth() {
-  return useSyncExternalStore<boolean | undefined>(
-    subscribeToWidth,
-    () => window.matchMedia(phoneQuery).matches,
+/** The last size read, so an unchanged viewport gives the same object. */
+let lastSize: ViewportSize | undefined;
+
+function viewportSize() {
+  const { innerWidth: width, innerHeight: height } = window;
+  if (lastSize?.width !== width || lastSize.height !== height)
+    lastSize = { width, height };
+  return lastSize;
+}
+
+/**
+ * The viewport's size, kept current as the window resizes; undefined on the
+ * server and the first paint.
+ */
+export function useViewportSize() {
+  return useSyncExternalStore<ViewportSize | undefined>(
+    subscribeToResize,
+    viewportSize,
     () => undefined,
   );
 }

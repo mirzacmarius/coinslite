@@ -3,7 +3,7 @@
 import { totalsOpen } from "@/components/collection/collection-display";
 import {
   useCollectionDisplay,
-  usePhoneWidth,
+  useViewportSize,
 } from "@/components/collection/use-collection-display";
 import { SpotPrices } from "@/components/spot-prices/spot-prices";
 import { useI18n } from "@/locales/client";
@@ -32,11 +32,24 @@ import { ValueDistributionChart } from "./value-distribution-chart";
 const itemTypes = ["coin", "banknote", "stamp"] as const;
 
 /**
+ * Until the viewport's size is known (on the server and the first paint),
+ * CSS opens the section where `totalsOpen` would: in a viewport at least
+ * 1024 px wide and 1000 px tall.
+ */
+const firstPaint = {
+  chevron: "[@media(min-width:1024px)_and_(min-height:1000px)]:rotate-90",
+  summary: "[@media(min-width:1024px)_and_(min-height:1000px)]:hidden",
+  details: "hidden [@media(min-width:1024px)_and_(min-height:1000px)]:block",
+  skeleton: "hidden [@media(min-width:1024px)_and_(min-height:1000px)]:flex",
+};
+
+/**
  * What the whole Collection holds and is worth (spec 7), whatever the list
  * is filtered to: totals, today's Spot prices and two charts, under a row
  * that opens and collapses them and sums them up while they're collapsed.
- * When they start open is `totalsOpen`'s call; a choice made here sticks for
- * the rest of the visit and is remembered on the device. An empty Collection
+ * When they start open is `totalsOpen`'s call, which follows the window as it
+ * resizes; a choice made here sticks for the rest of the visit and is
+ * remembered on the device. An empty Collection
  * shows only the Spot prices.
  */
 export function CollectionTotalsSection({
@@ -51,10 +64,10 @@ export function CollectionTotalsSection({
   const titleId = useId();
   const totals = useCollectionTotals(sold ? "sold" : undefined);
   const [display, changeDisplay] = useCollectionDisplay();
-  const phone = usePhoneWidth();
+  const viewport = useViewportSize();
   const [chosen, setChosen] = useState<boolean>();
-  // Undefined until the screen size is known: CSS then opens it from `sm` up.
-  const open = chosen ?? totalsOpen(display, { narrowed, phone });
+  // Undefined until the viewport's size is known: `firstPaint` then decides.
+  const open = chosen ?? totalsOpen(display, { narrowed, viewport });
 
   return (
     <Collapsible
@@ -76,7 +89,7 @@ export function CollectionTotalsSection({
               className={cn(
                 "size-3.5 shrink-0 text-muted-foreground transition-transform duration-150",
                 open === true && "rotate-90",
-                open === undefined && "sm:rotate-90",
+                open === undefined && firstPaint.chevron,
               )}
               aria-hidden="true"
             />
@@ -92,14 +105,14 @@ export function CollectionTotalsSection({
               sold={sold}
               className={cn(
                 open === true && "hidden",
-                open === undefined && "sm:hidden",
+                open === undefined && firstPaint.summary,
               )}
             />
           </CollapsibleTrigger>
         </h2>
         {/* A display class here would beat the hidden attribute a collapsed section gets. */}
         <CollapsibleContent
-          className={cn(open === undefined && "max-sm:hidden")}
+          className={cn(open === undefined && firstPaint.details)}
         >
           <div className="flex flex-col gap-4 px-4 pb-4">
             <TotalsDetails totals={totals} sold={sold} />
@@ -248,8 +261,8 @@ function ChartsSkeleton() {
 }
 
 /**
- * CollectionTotalsSection before the page knows its URL: collapsed on a
- * phone and open on anything wider, as it opens when nothing says otherwise.
+ * CollectionTotalsSection before the page knows its URL: open only in a
+ * viewport at least 1024 × 1000 px, as it opens when nothing says otherwise.
  */
 export function CollectionTotalsSkeleton() {
   return (
@@ -257,7 +270,7 @@ export function CollectionTotalsSkeleton() {
       <div className="flex h-10 items-center px-4">
         <span className="h-3.5 w-48 animate-pulse rounded bg-muted" />
       </div>
-      <div className="flex flex-col gap-4 px-4 pb-4 max-sm:hidden">
+      <div className={cn("flex-col gap-4 px-4 pb-4", firstPaint.skeleton)}>
         <FiguresSkeleton />
         <ChartsSkeleton />
       </div>

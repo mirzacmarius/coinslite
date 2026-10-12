@@ -844,8 +844,10 @@ export default {
     pagination: "Sider",
     range: "{from}–{to} av {total}",
     pageOf: "Side {page} av {pages}",
+    firstPage: "Første side",
     previousPage: "Forrige side",
     nextPage: "Neste side",
+    lastPage: "Siste side",
     incomplete:
       "Samlingen er for stor til å søke i på én gang, så denne visningen gjelder de første {count} objektene du la til.",
     showInCollection: "Vis i samlingen",
