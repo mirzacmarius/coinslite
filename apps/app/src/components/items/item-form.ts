@@ -32,7 +32,12 @@ import {
   parseMoney,
 } from "@coinslite/i18n";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
-import type { FormApi, Validator } from "@tanstack/react-form";
+import type {
+  DeepKeys,
+  DeepValue,
+  UpdateMetaOptions,
+  Updater,
+} from "@tanstack/react-form";
 import type { FunctionArgs } from "convex/server";
 
 /** The Item form's fields as typed: numbers stay text until the form is sent. */
@@ -334,10 +339,14 @@ export function matchingPreset<P extends BullionPreset>(
 }
 
 /** The parts of the Item form that filling it uses. */
-type FillableForm = Pick<
-  FormApi<ItemFormValues, Validator<ItemFormValues, unknown> | undefined>,
-  "getFieldMeta" | "setFieldValue"
->;
+type FillableForm = {
+  getFieldMeta: (name: keyof ItemFormValues) => object | undefined;
+  setFieldValue: <Name extends DeepKeys<ItemFormValues>>(
+    name: Name,
+    value: Updater<DeepValue<ItemFormValues, Name>>,
+    options?: UpdateMetaOptions,
+  ) => void;
+};
 
 /**
  * Writes values the app supplies (a Catalog entry's facts, a scan's

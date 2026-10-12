@@ -1,5 +1,6 @@
 "use client";
 
+import { errorText } from "@/lib/form-errors";
 import { Field } from "@coinslite/ui/field";
 import { Input, type InputProps } from "@coinslite/ui/input";
 import { useId } from "react";
@@ -34,11 +35,7 @@ export function TextField({
   showErrors: boolean;
 } & Omit<InputProps, "id" | "name" | "value" | "onChange" | "onBlur">) {
   const id = useId();
-  const error = showErrors
-    ? field.state.meta.errors
-        .filter((message) => typeof message === "string")
-        .join(" ") || undefined
-    : undefined;
+  const error = showErrors ? errorText(field.state.meta.errors) : undefined;
   return (
     <Field
       id={id}

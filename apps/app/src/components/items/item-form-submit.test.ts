@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { blankItem } from "./item-form";
-import { itemFormRules, itemSave } from "./item-form-submit";
+import { itemFormRules, itemSave, refusedDetails } from "./item-form-submit";
 
 /** A coin typed in by hand. */
 const typed = {
@@ -205,5 +205,34 @@ describe("what the Item form accepts", () => {
     expect(errorOf("purchaseDate", "2024-05-01")).toBeUndefined();
     expect(errorOf("purchaseDate", "")).toBeUndefined();
     expect(errorOf("purchaseDate", "2999-01-01")).toBe("items.errors.date");
+  });
+});
+
+describe('what "More details" holds that its rules refuse', () => {
+  const rules = itemFormRules((key) => key, "nb");
+
+  test("nothing, when every detail is fine or left blank", () => {
+    expect(refusedDetails(typed, rules)).toEqual([]);
+  });
+
+  test("each detail its rule refuses, in the order they show", () => {
+    expect(
+      refusedDetails(
+        {
+          ...typed,
+          year: "18810",
+          diameter: "0",
+          purchasePrice: "a lot",
+          purchaseDate: "2999-01-01",
+        },
+        rules,
+      ),
+    ).toEqual(["year", "diameter", "purchasePrice", "purchaseDate"]);
+  });
+
+  test("a weight and purity beyond what a coin can hold", () => {
+    expect(
+      refusedDetails({ ...typed, weight: "0", purity: "1,5" }, rules),
+    ).toEqual(["weight", "purity"]);
   });
 });

@@ -4,7 +4,6 @@ import { nextQuery } from "@/lib/next-path";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import Link from "next/link";
 import { useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
@@ -16,7 +15,7 @@ import {
 } from "./auth-panel";
 import { ResendCodeButton } from "./code-step";
 import { TextField } from "./text-field";
-import { useAuthSchemas, useSubmitState } from "./use-auth-form";
+import { useAuthRules, useSubmitState } from "./use-auth-form";
 import { type AuthStepResult, useAuthStep } from "./use-auth-step";
 
 /**
@@ -27,7 +26,7 @@ export function LinkSignInFlow({ next }: { next: string }) {
   const t = useI18n();
   const locale = useCurrentLocale();
   const attempt = useAuthStep("magic-link");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const [sentTo, setSentTo] = useState<string>();
   const [message, setMessage] = useState<FormMessageState>();
 
@@ -37,7 +36,6 @@ export function LinkSignInFlow({ next }: { next: string }) {
 
   const form = useForm({
     defaultValues: { email: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       const email = normalizeEmail(value.email);
       if ((await send(email)) === "failed") {
@@ -83,7 +81,7 @@ export function LinkSignInFlow({ next }: { next: string }) {
       footer={footer}
     >
       <AuthForm form={form}>
-        <form.Field name="email" validators={{ onChange: schemas.email }}>
+        <form.Field name="email" validators={{ onChange: rules.email }}>
           {(field) => (
             <TextField
               field={field}

@@ -8,6 +8,7 @@ import {
 import { metals } from "@coinslite/backend/convex/spotPrices/rates";
 import { CheckboxField, Field } from "@coinslite/ui/field";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
+import { useSelector } from "@tanstack/react-form";
 import { Gem, Sparkles } from "lucide-react";
 import { fillForm, matchingPreset, presetValues } from "./item-form";
 import { DetailGroup, TextField, useItemFields } from "./item-form-fields";
@@ -23,8 +24,9 @@ export function PreciousMetalSection() {
   const { form, baseId, fromEntry } = useItemFields();
   // A linked Item's cleared metal is its Catalog entry's.
   const metal =
-    form.useStore((state) => state.values.metal) ?? fromEntry?.metal;
-  const preset = form.useStore(
+    useSelector(form.store, (state) => state.values.metal) ?? fromEntry?.metal;
+  const preset = useSelector(
+    form.store,
     (state) => matchingPreset(bullionPresets, state.values)?.id,
   );
   const metalOptions = metals.map((metal) => ({
@@ -115,7 +117,6 @@ export function PreciousMetalSection() {
       <TextField
         name="weight"
         label={t("preciousMetal.weight")}
-        rule="weight"
         hint={
           metal
             ? t("preciousMetal.weightHint")
@@ -127,7 +128,6 @@ export function PreciousMetalSection() {
       <TextField
         name="purity"
         label={t("preciousMetal.purity")}
-        rule="purity"
         hint={
           metal
             ? t("preciousMetal.purityHint")

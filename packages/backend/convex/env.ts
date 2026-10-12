@@ -3,9 +3,9 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    CONVEX_SITE_URL: z.string().url(),
+    CONVEX_SITE_URL: z.url(),
     RESEND_API_KEY: z.optional(z.string().min(1)),
-    RESEND_SENDER_EMAIL_AUTH: z.optional(z.string().email()),
+    RESEND_SENDER_EMAIL_AUTH: z.optional(z.email()),
   },
   runtimeEnv: {
     CONVEX_SITE_URL: process.env.CONVEX_SITE_URL,

@@ -4,16 +4,11 @@ import { goTo } from "@/lib/go-to";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useEffect, useRef, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, type FormMessageState } from "./auth-panel";
 import { TextField } from "./text-field";
-import {
-  codeInputProps,
-  useAuthSchemas,
-  useSubmitState,
-} from "./use-auth-form";
+import { codeInputProps, useAuthRules, useSubmitState } from "./use-auth-form";
 import { type AuthStepResult, useAuthStep } from "./use-auth-step";
 
 /**
@@ -33,14 +28,13 @@ export function CodeStep({
 }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const [message, setMessage] = useState<FormMessageState>();
   const codeInput = useRef<HTMLInputElement>(null);
   useEffect(() => codeInput.current?.focus(), []);
 
   const form = useForm({
     defaultValues: { code: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setMessage(undefined);
       const result = await attempt({
@@ -74,7 +68,7 @@ export function CodeStep({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="code" validators={{ onChange: schemas.code }}>
+        <form.Field name="code" validators={{ onChange: rules.code }}>
           {(field) => (
             <TextField
               inputRef={codeInput}

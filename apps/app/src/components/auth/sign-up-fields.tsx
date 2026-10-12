@@ -7,7 +7,6 @@ import { CheckboxField, Field } from "@coinslite/ui/field";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { Wallet } from "lucide-react";
 import { useId, useMemo } from "react";
-import { z } from "zod";
 import { authLink } from "./auth-panel";
 
 /** The parts of a TanStack form field these components read. */
@@ -50,18 +49,6 @@ export function HomeCurrencyField({
         />
       )}
     </Field>
-  );
-}
-
-/** The rule for the terms checkbox: it must be ticked. */
-export function useAcceptTermsRule() {
-  const t = useI18n();
-  return useMemo(
-    () =>
-      z.literal(true, {
-        errorMap: () => ({ message: t("auth.signUp.termsRequired") }),
-      }),
-    [t],
   );
 }
 

@@ -1,46 +1,36 @@
 "use client";
 
 import { useI18n } from "@/locales/client";
-import {
-  CODE_LENGTH,
-  PASSWORD_MIN_LENGTH,
-} from "@coinslite/backend/convex/accounts/credentials";
+import { CODE_LENGTH } from "@coinslite/backend/convex/accounts/credentials";
+import { useSelector } from "@tanstack/react-form";
 import { useMemo } from "react";
-import { z } from "zod";
+import { authRules } from "./auth-rules";
 
-/** Field rules shared by the auth forms, in the current language. They mirror the backend's. */
-export function useAuthSchemas() {
+/** Field rules shared by the auth forms, in the current language (auth-rules.ts). */
+export function useAuthRules() {
   const t = useI18n();
-  return useMemo(
-    () => ({
-      email: z.string().trim().email(t("auth.fields.emailInvalid")),
-      password: z.string().min(1, t("auth.fields.passwordRequired")),
-      newPassword: z
-        .string()
-        .min(PASSWORD_MIN_LENGTH, t("auth.fields.passwordTooShort")),
-      code: z
-        .string()
-        .trim()
-        .regex(
-          new RegExp(`^\\d{${CODE_LENGTH}}$`),
-          t("auth.fields.codeInvalid"),
-        ),
-    }),
-    [t],
-  );
+  return useMemo(() => authRules((key) => t(key)), [t]);
 }
 
-/** The parts of a TanStack form's state the auth forms show. */
-type FormStore = {
-  useStore: <T>(
-    select: (state: { submissionAttempts: number; isSubmitting: boolean }) => T,
-  ) => T;
+/** A TanStack form's store, as far as a component reads `State` from it. */
+export type FormStore<State> = {
+  store: {
+    get: () => State;
+    subscribe: (listener: (state: State) => void) => {
+      unsubscribe: () => void;
+    };
+  };
 };
 
 /** Whether to show field errors yet (after the first submit), and whether it's sending now. */
-export function useSubmitState(form: FormStore) {
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
+export function useSubmitState(
+  form: FormStore<{ submissionAttempts: number; isSubmitting: boolean }>,
+) {
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
+  );
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
   return { submitted, submitting };
 }
 

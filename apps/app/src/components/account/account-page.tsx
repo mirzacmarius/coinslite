@@ -10,6 +10,7 @@ import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
 import { formChanged } from "@/lib/discard-changes";
+import { errorText } from "@/lib/form-errors";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
@@ -28,8 +29,7 @@ import {
   SettingsRow,
 } from "@coinslite/ui/settings-group";
 import { toast } from "@coinslite/ui/toaster";
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Globe, Loader2 } from "lucide-react";
@@ -113,7 +113,6 @@ function ContactSection({ account }: { account: Account }) {
   const [sent, setSent] = useState(stored);
   const form = useForm({
     defaultValues: stored,
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(false);
       try {
@@ -125,19 +124,20 @@ function ContactSection({ account }: { account: Account }) {
       }
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
+  );
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
   // A new deployment's reload waits while the details differ from both.
   useUnsavedInput(
-    form.useStore(
+    useSelector(
+      form.store,
       (state) => formChanged(state, stored) && formChanged(state, sent),
     ),
   );
   const errorOf = (errors: unknown[]) =>
-    submitted
-      ? errors.filter((error) => typeof error === "string").join(" ") ||
-        undefined
-      : undefined;
+    submitted ? errorText(errors) : undefined;
 
   const text = (
     name:
@@ -149,7 +149,7 @@ function ContactSection({ account }: { account: Account }) {
       | "contactPhone",
     label: string,
     options: {
-      rule?: z.ZodTypeAny;
+      rule?: z.ZodType<string, string>;
       className?: string;
       autoComplete?: string;
       type?: string;
@@ -316,7 +316,6 @@ function EmailSection({ account }: { account: Account }) {
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const form = useForm({
     defaultValues: noNewEmail,
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setError(undefined);
       setNeedsSignIn(false);
@@ -336,9 +335,14 @@ function EmailSection({ account }: { account: Account }) {
       }
     },
   });
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
-  const submitting = form.useStore((state) => state.isSubmitting);
-  useUnsavedInput(form.useStore((state) => formChanged(state, noNewEmail)));
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
+  );
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
+  useUnsavedInput(
+    useSelector(form.store, (state) => formChanged(state, noNewEmail)),
+  );
 
   return (
     <SettingsGroup
@@ -366,7 +370,10 @@ function EmailSection({ account }: { account: Account }) {
           <form.Field
             name="newEmail"
             validators={{
-              onChange: z.string().trim().email(t("account.email.invalid")),
+              onChange: z
+                .string()
+                .trim()
+                .pipe(z.email(t("account.email.invalid"))),
             }}
           >
             {(field) => (
@@ -374,11 +381,7 @@ function EmailSection({ account }: { account: Account }) {
                 id="account-new-email"
                 label={t("account.email.newEmail")}
                 error={
-                  (submitted &&
-                    field.state.meta.errors
-                      .filter((e) => typeof e === "string")
-                      .join(" ")) ||
-                  error
+                  (submitted && errorText(field.state.meta.errors)) || error
                 }
                 className="flex-1"
               >

@@ -39,7 +39,7 @@ import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { SegmentedControl } from "@coinslite/ui/segmented-control";
 import { toast } from "@coinslite/ui/toaster";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import { ConvexError } from "convex/values";
@@ -370,9 +370,11 @@ function NodeForm({
       onDone();
     },
   });
-  const values = form.useStore((state) => state.values);
-  const submitting = form.useStore((state) => state.isSubmitting);
-  const changed = form.useStore((state) => formChanged(state, defaults));
+  const values = useSelector(form.store, (state) => state.values);
+  const submitting = useSelector(form.store, (state) => state.isSubmitting);
+  const changed = useSelector(form.store, (state) =>
+    formChanged(state, defaults),
+  );
   useEffect(() => onChanged(changed), [changed, onChanged]);
   const problems = useMemo(
     () => problemsOf(values, { creating }),

@@ -18,6 +18,7 @@ import {
 import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Switch } from "@coinslite/ui/switch";
+import { useSelector } from "@tanstack/react-form";
 import { ChevronRight, Library, Loader2, X } from "lucide-react";
 import { isCatalogType } from "./item-fields";
 import { ItemFieldsProvider, useItemFields } from "./item-form-fields";
@@ -57,7 +58,7 @@ export function ItemFormDialog(props: ItemFormProps) {
   const mod = useModifierKey();
   const itemForm = useItemForm(props);
   const { form, titleRef, linked, submit } = itemForm;
-  const type = form.useStore((state) => state.values.type);
+  const type = useSelector(form.store, (state) => state.values.type);
 
   return (
     <FormDialog
@@ -123,7 +124,11 @@ export function ItemFormDialog(props: ItemFormProps) {
             </DialogDescription>
           )}
 
-          <ItemFieldsProvider form={form} fromEntry={itemForm.fromEntry}>
+          <ItemFieldsProvider
+            form={form}
+            rules={itemForm.rules}
+            fromEntry={itemForm.fromEntry}
+          >
             <div className="flex flex-col gap-2 overflow-y-auto px-4 pb-3 pt-1">
               {!item && <ItemLimitNotice />}
               {!item && itemForm.scanned && (

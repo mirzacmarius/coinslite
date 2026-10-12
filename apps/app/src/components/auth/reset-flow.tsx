@@ -4,7 +4,6 @@ import { goTo } from "@/lib/go-to";
 import { useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
@@ -17,11 +16,7 @@ import {
 import { ResendCodeButton } from "./code-step";
 import { takeLinkFragment } from "./link-fragment";
 import { TextField } from "./text-field";
-import {
-  codeInputProps,
-  useAuthSchemas,
-  useSubmitState,
-} from "./use-auth-form";
+import { codeInputProps, useAuthRules, useSubmitState } from "./use-auth-form";
 import { useAuthStep } from "./use-auth-step";
 
 /** Forgot password: email a code, then choose a new password with it. */
@@ -62,10 +57,9 @@ function RequestStep({
 }: { next: string; onSent: (email: string) => void }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const form = useForm({
     defaultValues: { email: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       const email = normalizeEmail(value.email);
       // Whether or not the address has an account, the next step looks the same.
@@ -85,7 +79,7 @@ function RequestStep({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="email" validators={{ onChange: schemas.email }}>
+        <form.Field name="email" validators={{ onChange: rules.email }}>
           {(field) => (
             <TextField
               field={field}
@@ -111,7 +105,7 @@ function NewPasswordStep({
 }: { email: string; code: string; next: string }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const [message, setMessage] = useState<FormMessageState | undefined>(
     code
       ? undefined
@@ -119,7 +113,6 @@ function NewPasswordStep({
   );
   const form = useForm({
     defaultValues: { code, newPassword: "" },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setMessage(undefined);
       const result = await attempt({
@@ -144,7 +137,7 @@ function NewPasswordStep({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="code" validators={{ onChange: schemas.code }}>
+        <form.Field name="code" validators={{ onChange: rules.code }}>
           {(field) => (
             <TextField
               field={field}
@@ -156,7 +149,7 @@ function NewPasswordStep({
         </form.Field>
         <form.Field
           name="newPassword"
-          validators={{ onChange: schemas.newPassword }}
+          validators={{ onChange: rules.newPassword }}
         >
           {(field) => (
             <TextField

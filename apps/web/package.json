@@ -15,13 +15,13 @@
     "@coinslite/backend": "workspace:*",
     "@coinslite/i18n": "workspace:*",
     "@coinslite/ui": "workspace:*",
-    "@t3-oss/env-nextjs": "^0.11.1",
+    "@t3-oss/env-nextjs": "^0.13.11",
     "geist": "^1.3.1",
     "lucide-react": "^1.53.0",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "zod": "^3.23.8"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^22",

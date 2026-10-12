@@ -15,6 +15,7 @@ import { localToday } from "./item-fields";
 import {
   type FactValues,
   type ItemFormValues,
+  detailFields,
   factValues,
   parseDecimal,
   parseWholeNumber,
@@ -95,6 +96,34 @@ export function itemFormRules(t: (key: RuleMessage) => string, locale: Locale) {
 
 /** The Item form's rules, one per kind of field. */
 export type ItemFormRules = ReturnType<typeof itemFormRules>;
+
+/** The rule that checks each field under "More details" that has one. */
+export const detailRules: Partial<
+  Record<(typeof detailFields)[number], keyof ItemFormRules>
+> = {
+  year: "year",
+  mintage: "whole",
+  numistaNumber: "whole",
+  diameter: "size",
+  thickness: "size",
+  weight: "weight",
+  purity: "purity",
+  purchasePrice: "money",
+  marketValue: "money",
+  purchaseDate: "purchaseDate",
+};
+
+/**
+ * The fields under "More details" holding something their rule refuses, in
+ * the order they show. A closed "More details" has no fields to check
+ * themselves (TanStack drops a hidden field's errors), so the form asks this.
+ */
+export function refusedDetails(values: ItemFormValues, rules: ItemFormRules) {
+  return detailFields.filter((name) => {
+    const rule = detailRules[name];
+    return rule !== undefined && !rules[rule].safeParse(values[name]).success;
+  });
+}
 
 /**
  * What a form linked to a Catalog entry sends: only the facts the person

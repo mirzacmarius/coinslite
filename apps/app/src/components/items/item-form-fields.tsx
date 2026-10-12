@@ -1,13 +1,15 @@
 "use client";
 
-import { useCurrentLocale, useI18n } from "@/locales/client";
+import { errorText } from "@/lib/form-errors";
+import { useI18n } from "@/locales/client";
 import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
 import { MoneyInput } from "@coinslite/ui/money-input";
+import { useSelector } from "@tanstack/react-form";
 import type * as React from "react";
-import { createContext, useContext, useId, useMemo } from "react";
+import { createContext, useContext, useId } from "react";
 import { type FactValues, scaleOf } from "./item-form";
-import { type ItemFormRules, itemFormRules } from "./item-form-submit";
+import { type ItemFormRules, detailRules } from "./item-form-submit";
 import type { ItemForm } from "./use-item-form";
 
 /** What every field of the Item form reads. */
@@ -34,26 +36,22 @@ export function useItemFields() {
 /** Gives the Item form's sections its form, rules and the linked entry's facts. */
 export function ItemFieldsProvider({
   form,
+  rules,
   fromEntry,
   children,
 }: {
   form: ItemForm;
+  rules: ItemFormRules;
   fromEntry: FactValues | undefined;
   children: React.ReactNode;
 }) {
-  const t = useI18n();
-  const locale = useCurrentLocale();
   const baseId = useId();
-  const rules = useMemo(
-    () => itemFormRules((key) => t(key), locale),
-    [t, locale],
+  const submitted = useSelector(
+    form.store,
+    (state) => state.submissionAttempts > 0,
   );
-  const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const errorOf = (errors: unknown[]) =>
-    submitted
-      ? errors.filter((error) => typeof error === "string").join(" ") ||
-        undefined
-      : undefined;
+    submitted ? errorText(errors) : undefined;
   return (
     <ItemFieldsContext.Provider
       value={{ form, baseId, fromEntry, rules, errorOf }}
@@ -70,18 +68,18 @@ export function ItemFieldsProvider({
  */
 export function useItemKind() {
   const { form, fromEntry } = useItemFields();
-  const values = form.useStore(
-    ({
-      values: { type, country, gradingScale, strike, grader, stampCatalogue },
-    }) => ({
-      type,
-      country,
-      gradingScale,
-      strike,
-      grader,
-      stampCatalogue,
-    }),
-  );
+  // One value each: only a change to one of these redraws the sections.
+  const values = {
+    type: useSelector(form.store, (state) => state.values.type),
+    country: useSelector(form.store, (state) => state.values.country),
+    gradingScale: useSelector(form.store, (state) => state.values.gradingScale),
+    strike: useSelector(form.store, (state) => state.values.strike),
+    grader: useSelector(form.store, (state) => state.values.grader),
+    stampCatalogue: useSelector(
+      form.store,
+      (state) => state.values.stampCatalogue,
+    ),
+  };
   const scale = scaleOf({
     ...values,
     country: values.country ?? fromEntry?.country,
@@ -125,7 +123,6 @@ export type TextFieldName =
 export function TextField({
   name,
   label,
-  rule,
   hint,
   placeholder,
   maxLength,
@@ -136,8 +133,6 @@ export function TextField({
 }: {
   name: TextFieldName;
   label: string;
-  /** The rule that checks it, if any (item-form-submit.ts). */
-  rule?: Exclude<keyof ItemFormRules, "title" | "quantity" | "money">;
   hint?: string;
   placeholder?: string;
   maxLength?: number;
@@ -149,6 +144,7 @@ export function TextField({
   const { form, baseId, fromEntry, rules, errorOf } = useItemFields();
   const fact = fromEntry?.[name as keyof FactValues];
   const entryText = typeof fact === "string" ? fact : undefined;
+  const rule = detailRules[name];
   return (
     <form.Field
       name={name}
