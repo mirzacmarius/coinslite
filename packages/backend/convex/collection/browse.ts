@@ -2,6 +2,7 @@ import type { Locale } from "@coinslite/i18n";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
+import { attentionKinds } from "../items/attention";
 import { catalogEntryByKey, itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
 import { gradingScale, itemType } from "../utils/validators";
@@ -27,6 +28,9 @@ export const collectionView = v.object({
   album: v.optional(v.string()),
   notInAlbum: v.optional(v.string()),
   entry: v.optional(v.string()),
+  without: v.optional(
+    v.union(...attentionKinds.map((kind) => v.literal(kind))),
+  ),
   status: v.optional(v.literal("sold")),
   sort: v.optional(v.union(...collectionSorts.map((sort) => v.literal(sort)))),
 });
@@ -47,6 +51,17 @@ const documentsKept = 500;
 const bytesKept = 2 * 1024 * 1024;
 const lookupsKept = 2 * readCheckEvery + 100;
 
+/** Whether the query still has more than it keeps back for the rest of it. */
+async function roomLeft(ctx: QueryCtx) {
+  const { documentsRead, bytesRead, databaseQueries } =
+    await ctx.meta.getTransactionMetrics();
+  return (
+    documentsRead.remaining >= documentsKept &&
+    bytesRead.remaining >= bytesKept &&
+    databaseQueries.remaining >= lookupsKept
+  );
+}
+
 /**
  * Every Item in a person's Collection, as added, with its facts resolved
  * (items/resolve.ts) from the slim entries of the Catalog entries they link
@@ -65,18 +80,30 @@ async function readCollection(ctx: QueryCtx, ownerId: Id<"users">) {
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
     items.push(await resolver.resolve(item));
-    if (items.length % readCheckEvery === 0) {
-      const { documentsRead, bytesRead, databaseQueries } =
-        await ctx.meta.getTransactionMetrics();
-      if (
-        documentsRead.remaining < documentsKept ||
-        bytesRead.remaining < bytesKept ||
-        databaseQueries.remaining < lookupsKept
-      )
-        return { items, complete: false };
-    }
+    if (items.length % readCheckEvery === 0 && !(await roomLeft(ctx)))
+      return { items, complete: false };
   }
   return { items, complete: true };
+}
+
+/**
+ * Which of a person's Items have more photos besides their sides, for the
+ * view of Items without any photo: one range of their more photos rather
+ * than a lookup per Item, read within what's left of the query's allowance
+ * as `readCollection` reads Items.
+ */
+async function readMorePhotoItems(ctx: QueryCtx, ownerId: Id<"users">) {
+  const itemIds = new Set<Id<"items">>();
+  let read = 0;
+  for await (const photo of ctx.db
+    .query("itemPhotos")
+    .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
+    itemIds.add(photo.itemId);
+    read += 1;
+    if (read % readCheckEvery === 0 && !(await roomLeft(ctx)))
+      return { itemIds, complete: false };
+  }
+  return { itemIds, complete: true };
 }
 
 /** A person's Collection, read for a view. */
@@ -101,13 +128,16 @@ export async function readForView(
   const { items, complete } = await readCollection(ctx, owner._id);
   const entry =
     view.entry === undefined ? null : await catalogEntryByKey(ctx, view.entry);
+  const morePhotos =
+    view.without === "photo" ? await readMorePhotoItems(ctx, owner._id) : null;
   return {
     items,
-    complete,
+    complete: complete && (morePhotos?.complete ?? true),
     context: {
       ownCountry: ownCountryOf(owner),
       entryId: entry?._id ?? null,
       locale,
+      ...(morePhotos && { withMorePhotos: morePhotos.itemIds }),
     },
     entry: entry && { key: entry.key, title: entry.title },
   };

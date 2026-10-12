@@ -854,7 +854,13 @@ export default {
       grade: "Erhaltung",
       album: "Album",
       entry: "Katalogeintrag",
+      without: "Zu ergänzen",
       status: "Status",
+    },
+    without: {
+      marketValue: "Ohne Marktwert",
+      photo: "Ohne Foto",
+      grade: "Ohne Erhaltung",
     },
     bullionCoins: "Anlagemünzen",
     origins: {
@@ -1268,6 +1274,13 @@ export default {
     firstRunTitle: "Beginne deine Sammlung",
     firstRunDescription:
       "Wähle, wie du beginnen möchtest. Danach erscheinen hier deine Summen und neuesten Objekte.",
+    setProgress: "Fortschritt deiner Sets",
+    needsAttention: "Zu ergänzen",
+    attention: {
+      marketValue: "Ohne Marktwert",
+      photo: "Ohne Foto",
+      grade: "Münzen und Banknoten ohne Erhaltung",
+    },
   },
   startCard: {
     addItem: "Ein Objekt hinzufügen",

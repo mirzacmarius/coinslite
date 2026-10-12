@@ -1,5 +1,6 @@
 import { type HomeCurrency, type Locale, formatCountry } from "@coinslite/i18n";
 import type { Doc, Id } from "../_generated/dataModel";
+import { hasSidePhoto, lacks } from "../items/attention";
 import { compareDenominations } from "../items/denominations";
 import { type GradingScale, gradeRank, gradingScaleIds } from "../items/grades";
 import {
@@ -179,6 +180,7 @@ const dimensions = [
   "grade",
   "album",
   "entry",
+  "without",
   "status",
 ] as const;
 type Dimension = (typeof dimensions)[number];
@@ -186,8 +188,7 @@ type Dimension = (typeof dimensions)[number];
 /** Each dimension's filter: true when the Item passes, or when it isn't set. */
 function filtersFor(
   view: CollectionView,
-  ownCountry: string | null,
-  entryId: Id<"catalogNodes"> | null,
+  { ownCountry, entryId, withMorePhotos }: ViewContext,
 ): Record<Dimension, Matcher> {
   const all = () => true;
   const country = view.country?.toUpperCase();
@@ -225,6 +226,14 @@ function filtersFor(
     entry: (item) =>
       view.entry === undefined ||
       (entryId !== null && item.catalogEntryId === entryId),
+    // As the Overview counts them (items/attention.ts).
+    without: (item) =>
+      view.without === undefined ||
+      lacks(view.without, {
+        ...item,
+        hasPhoto:
+          hasSidePhoto(item) || (withMorePhotos?.has(item._id) ?? false),
+      }),
     status: (item) => (item.soldOn !== undefined) === (view.status === "sold"),
   };
 }
@@ -244,16 +253,22 @@ export type ViewContext = {
   entryId: Id<"catalogNodes"> | null;
   /** The language country names are searched in. */
   locale: Locale;
+  /**
+   * The Items with more photos besides their sides, read only for a view
+   * of the Items without any photo.
+   */
+  withMorePhotos?: ReadonlySet<Id<"items">>;
 };
 
 /** The Items a view shows, in its order. */
 export function itemsInView(
   items: Item[],
   view: CollectionView,
-  { ownCountry, entryId, locale }: ViewContext,
+  context: ViewContext,
 ): Item[] {
+  const { locale } = context;
   const searched = searchFor(view.search, locale);
-  const filters = filtersFor(view, ownCountry, entryId);
+  const filters = filtersFor(view, context);
   return items
     .filter(
       (item) =>
@@ -270,10 +285,11 @@ export function itemsInView(
 export function countFilterOptions(
   items: Item[],
   view: CollectionView,
-  { ownCountry, entryId, locale }: ViewContext,
+  context: ViewContext,
 ) {
+  const { ownCountry, entryId, locale } = context;
   const searched = searchFor(view.search, locale);
-  const filters = filtersFor(view, ownCountry, entryId);
+  const filters = filtersFor(view, context);
   const types = { coin: 0, banknote: 0, stamp: 0, bullion: 0 };
   const origins = { own: 0, foreign: 0 };
   const countries = new Map<string, number>();

@@ -164,3 +164,56 @@ describe("how many Items each filter option would show, from slim entries as fro
     expect(counted(fromSlimEntries)).toEqual(expected);
   });
 });
+
+describe("the Items the Overview's Needs attention links show", () => {
+  const photo = "photo" as Id<"_storage">;
+  const attention = [
+    item("valued", 1, {
+      title: "Valued, graded, photographed",
+      marketValue: 10,
+      gradingScale: "european",
+      grade: "XF",
+      frontPhoto: photo,
+    }),
+    item("bare-coin", 2, { title: "Bare coin" }),
+    item("bare-stamp", 3, { title: "Bare stamp", type: "stamp" }),
+    item("back-only", 4, {
+      title: "Back photo only",
+      marketValue: 5,
+      backPhoto: photo,
+    }),
+    item("more-only", 5, { title: "More photos only", marketValue: 5 }),
+    item("sold", 6, { title: "Sold and bare", soldOn: "2026-09-30" }),
+  ];
+  const ids = (view: CollectionView) =>
+    itemsInView(attention, view, {
+      ...context,
+      withMorePhotos: new Set(["more-only" as Id<"items">]),
+    }).map((each) => each._id as string);
+
+  test("without a Market value: owned Items of any type", () => {
+    expect(ids({ without: "marketValue", sort: "oldest" })).toEqual([
+      "bare-coin",
+      "bare-stamp",
+    ]);
+  });
+
+  test("without a photo: no side photo and no more photos", () => {
+    expect(ids({ without: "photo", sort: "oldest" })).toEqual([
+      "bare-coin",
+      "bare-stamp",
+    ]);
+  });
+
+  test("without a Grade: coins and banknotes only", () => {
+    expect(ids({ without: "grade", sort: "oldest" })).toEqual([
+      "bare-coin",
+      "back-only",
+      "more-only",
+    ]);
+  });
+
+  test("on the sold view, the sold Items that lack it", () => {
+    expect(ids({ without: "photo", status: "sold" })).toEqual(["sold"]);
+  });
+});

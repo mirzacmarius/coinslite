@@ -841,7 +841,13 @@ export default {
       grade: "État",
       album: "Album",
       entry: "Entrée du catalogue",
+      without: "À compléter",
       status: "Statut",
+    },
+    without: {
+      marketValue: "Sans valeur de marché",
+      photo: "Sans photo",
+      grade: "Sans état",
     },
     bullionCoins: "Pièces d’investissement",
     origins: {
@@ -1245,6 +1251,13 @@ export default {
     firstRunTitle: "Commencez votre collection",
     firstRunDescription:
       "Choisissez comment commencer. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
+    setProgress: "Progression des ensembles",
+    needsAttention: "À compléter",
+    attention: {
+      marketValue: "Sans valeur de marché",
+      photo: "Sans photo",
+      grade: "Pièces et billets sans état",
+    },
   },
   startCard: {
     addItem: "Ajouter un objet",
