@@ -334,7 +334,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - **Images** are converted to WebP: full size (longest side ≤ 800 px) and a thumbnail (≤ 128 px), never upscaled.
   - **An image from Wikimedia Commons:** the admin pastes a Commons file page's address instead of choosing a file.
     - CoinsLite reads the file page's licence templates and categories, not only the API's summary, which often names only the design's licence. It also reads the creator named on the page (not the uploader).
-    - **Accepted:** public domain (PD templates, the Public Domain Mark), CC0, CC BY and CC BY-SA. **Refused with a message:** non-commercial (NC), no-derivatives (ND), non-free or fair use, files tagged as missing a licence or permission, any other licence, or no licence found.
+    - **Accepted:** public domain (PD templates, the Public Domain Mark), CC0, CC BY and CC BY-SA. **Refused with a message:** non-commercial (NC), no-derivatives (ND), non-free or fair use, files tagged as missing a licence, source or permission or nominated for deletion, any other licence or copyright notice, or no licence found.
     - **Two licences:** where a file has a CC photo licence and a PD template for its design, the photo's licence governs the credit.
     - **The credit is filled in and stays editable:** source "Wikimedia Commons"; the creator; the licence's name and deed, for example "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); resized and converted to WebP"; and the file page as the link.
     - The browser downloads the picture and converts it like a chosen file, so it's stored in CoinsLite, never linked to Wikimedia's servers.

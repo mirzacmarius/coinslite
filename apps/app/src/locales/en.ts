@@ -1158,24 +1158,24 @@ export default {
       read: "Filled in from {title} under {licence}. Check the credit before saving.",
       noAuthor: "The file page names no creator. Enter the author.",
       designReminder:
-        "A free photo doesn't free the design. Use it only if the design is free too: in the public domain, excluded from copyright, expired, or used with permission.",
+        "A free photo doesn’t free the design. Use it only if the design is free too: in the public domain, excluded from copyright, expired, or used with permission.",
       errors: {
         notCommonsFile:
           "Paste the address of a file page on Wikimedia Commons, such as https://commons.wikimedia.org/wiki/File:….",
         notFound: "Wikimedia Commons has no such file.",
-        notPicture: "This file isn't a picture.",
+        notPicture: "This file isn’t a picture.",
         nonCommercial:
-          "This file may only be used non-commercially (NC), so it can't be added.",
+          "This file may only be used non-commercially (NC), so it can’t be added.",
         noDerivatives:
-          "This file may not be changed (ND). Converting it to WebP is a change, so it can't be added.",
+          "This file may not be changed (ND). Converting it to WebP is a change, so it can’t be added.",
         nonFree:
-          "This file is non-free or used under fair use, so it can't be added.",
+          "This file is non-free or used under fair use, so it can’t be added.",
         disputed:
-          "This file is tagged as missing a licence or permission, or as a copyright violation, so it can't be added.",
+          "This file is tagged as missing a licence, source or permission, as a copyright violation, or for deletion, so it can’t be added.",
         otherLicence:
-          "This file isn't in the public domain or under CC0, CC BY or CC BY-SA, so it can't be added.",
-        none: "No licence was found on this file page, so it can't be added.",
-        failed: "Couldn't read the file from Wikimedia Commons. Try again.",
+          "This file carries a licence or copyright notice other than public domain, CC0, CC BY or CC BY-SA, so it can’t be added.",
+        none: "No licence was found on this file page, so it can’t be added.",
+        failed: "Couldn’t read the file from Wikimedia Commons. Try again.",
       },
     },
     errors: {

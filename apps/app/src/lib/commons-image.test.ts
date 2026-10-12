@@ -22,6 +22,32 @@ const signals = (overrides: Partial<LicenceSignals>): LicenceSignals => ({
   ...overrides,
 });
 
+/** An API answer for a JPEG file page with this wikitext and extmetadata. */
+const commonsPage = (
+  wikitext: string,
+  extmetadata: Record<string, { value: string }> = {},
+) => ({
+  query: {
+    pages: [
+      {
+        title: "File:Example.jpg",
+        categories: [],
+        revisions: [{ slots: { main: { content: wikitext } } }],
+        imageinfo: [
+          {
+            url: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg",
+            descriptionurl:
+              "https://commons.wikimedia.org/wiki/File:Example.jpg",
+            size: 1000,
+            mime: "image/jpeg",
+            extmetadata,
+          },
+        ],
+      },
+    ],
+  },
+});
+
 describe("governingLicence", () => {
   test("a CC photo licence governs over the design's PD template, whatever extmetadata says", () => {
     expect(governingLicence(licenceSignals(morgan1893S))).toEqual({
@@ -115,6 +141,54 @@ describe("governingLicence", () => {
         }),
       ),
     ).toEqual({ accepted: false, reason: "otherLicence" });
+    // A licence not known by name counts too.
+    expect(
+      governingLicence(
+        signals({
+          templates: ["Licence Ouverte", "PD-USGov-money"],
+          categories: ["Licence Ouverte", "PD US money"],
+        }),
+      ),
+    ).toEqual({ accepted: false, reason: "otherLicence" });
+  });
+
+  test("files nominated for deletion or awaiting a source or permission are refused", () => {
+    for (const tag of [
+      "Deletion requests October 2026",
+      "No source since",
+      "Permission pending",
+    ])
+      expect(
+        governingLicence(signals({ templates: [tag, "PD-USGov-money"] })),
+      ).toEqual({ accepted: false, reason: "disputed" });
+  });
+
+  test("ported and IGO CC licences link their own deeds", () => {
+    expect(
+      governingLicence(signals({ categories: ["CC-BY-SA-3.0-IGO"] })),
+    ).toEqual({
+      accepted: true,
+      licence: {
+        name: "CC BY-SA 3.0 IGO",
+        url: "https://creativecommons.org/licenses/by-sa/3.0/igo/",
+      },
+    });
+  });
+
+  test("text in the description isn't read as a licence", () => {
+    const page = commonsPage(
+      "{{Information|description={{en|Fair use? No: public domain coin}}|author=X}}\n{{self|cc-by-4.0}}",
+    );
+    expect(governingLicence(licenceSignals(page))).toEqual({
+      accepted: true,
+      licence: {
+        name: "CC BY 4.0",
+        url: "https://creativecommons.org/licenses/by/4.0/",
+      },
+    });
+    expect(
+      governingLicence(licenceSignals(commonsPage("{{en|Public domain}}"))),
+    ).toEqual({ accepted: false, reason: "none" });
   });
 
   test("a file with no licence found is refused", () => {
@@ -159,6 +233,18 @@ describe("readCommonsFile", () => {
           link: "https://commons.wikimedia.org/wiki/File:NNC-US-1878-CC-1$-Morgan_dollar.jpg",
         },
       },
+    });
+  });
+
+  test("credits the author as the licence's attribution asks, when it does", () => {
+    const page = commonsPage("{{self|cc-by-sa-4.0|attribution=Jane Doe}}", {
+      Artist: {
+        value: '<a href="//commons.wikimedia.org/wiki/User:JD">JD</a>',
+      },
+      Attribution: { value: "Jane Doe" },
+    });
+    expect(readCommonsFile(page)).toMatchObject({
+      file: { credit: { author: "Jane Doe" } },
     });
   });
 

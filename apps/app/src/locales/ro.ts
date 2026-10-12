@@ -1194,9 +1194,9 @@ export default {
         nonFree:
           "Acest fișier nu e liber sau e folosit ca „fair use”, deci nu poate fi adăugat.",
         disputed:
-          "Acest fișier e marcat ca fără licență sau permisiune ori ca încălcare a drepturilor de autor, deci nu poate fi adăugat.",
+          "Acest fișier e marcat ca fără licență, sursă sau permisiune, ca încălcare a drepturilor de autor ori pentru ștergere, deci nu poate fi adăugat.",
         otherLicence:
-          "Acest fișier nu e în domeniul public și nici sub CC0, CC BY sau CC BY-SA, deci nu poate fi adăugat.",
+          "Acest fișier are o altă licență sau mențiune de drepturi de autor decât domeniul public, CC0, CC BY sau CC BY-SA, deci nu poate fi adăugat.",
         none: "Nu s-a găsit nicio licență pe pagina acestui fișier, deci nu poate fi adăugat.",
         failed:
           "Fișierul nu a putut fi citit de pe Wikimedia Commons. Încearcă din nou.",

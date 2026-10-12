@@ -31,13 +31,13 @@ type Status =
  */
 export function CatalogImageCommons({
   disabled,
-  read,
+  filledFrom,
   onBusyChange,
   onPicture,
 }: {
   disabled: boolean;
-  /** The file whose picture and credit were taken, once one was. */
-  read?: CommonsFile;
+  /** The file whose picture and credit the dialog took, once it took one. */
+  filledFrom?: CommonsFile;
   onBusyChange: (busy: boolean) => void;
   onPicture: (file: CommonsFile, picture: Blob) => Promise<void>;
 }) {
@@ -48,7 +48,7 @@ export function CatalogImageCommons({
   const busy = status.step === "reading" || status.step === "downloading";
 
   const fetchFile = async () => {
-    if (busy || disabled) return;
+    if (busy || disabled || !address.trim()) return;
     const title = commonsFileTitle(address);
     if (!title) {
       setStatus({ step: "failed", problem: "notCommonsFile" });
@@ -57,15 +57,15 @@ export function CatalogImageCommons({
     onBusyChange(true);
     try {
       setStatus({ step: "reading" });
-      const reading = await fetchCommonsFile(title);
-      if ("problem" in reading) {
-        setStatus({ step: "failed", problem: reading.problem });
+      const result = await fetchCommonsFile(title);
+      if ("problem" in result) {
+        setStatus({ step: "failed", problem: result.problem });
         return;
       }
       setStatus({ step: "downloading" });
-      const picture = await downloadCommonsPicture(reading.file);
+      const picture = await downloadCommonsPicture(result.file.imageUrl);
       setStatus({ step: "idle" });
-      await onPicture(reading.file, picture);
+      await onPicture(result.file, picture);
     } catch {
       setStatus({ step: "failed", problem: "failed" });
     } finally {
@@ -124,14 +124,14 @@ export function CatalogImageCommons({
           ? t("catalogImages.commons.reading")
           : status.step === "downloading"
             ? t("catalogImages.commons.downloading")
-            : read
+            : filledFrom
               ? t("catalogImages.commons.read", {
-                  title: read.title,
-                  licence: read.licence.name,
+                  title: filledFrom.title,
+                  licence: filledFrom.licence.name,
                 })
               : null}
       </p>
-      {read && !read.credit.author && (
+      {filledFrom && !filledFrom.credit.author && (
         <p className="text-xs text-muted-foreground">
           {t("catalogImages.commons.noAuthor")}
         </p>

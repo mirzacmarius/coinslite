@@ -24,11 +24,12 @@ export type CommonsRefusal =
   | "noDerivatives"
   /** Non-free or fair use. */
   | "nonFree"
-  /** Tagged as missing a licence or permission, or as a copyright violation. */
+  /** Tagged as missing a licence, source or permission, as a copyright violation, or for deletion. */
   | "disputed"
   /**
-   * The photo is under another licence (such as the GFDL alone), which a
-   * PD template for its design doesn't lift.
+   * Another licence or copyright notice (the GFDL alone, "no known
+   * copyright restrictions", …), which a PD template for the design
+   * doesn't lift.
    */
   | "otherLicence"
   /** No public-domain, CC0, CC BY or CC BY-SA licence found. */
@@ -79,17 +80,20 @@ const normalize = (name: string) =>
     .replace(/[\s_]+/g, "-");
 
 const patterns = {
-  nonCommercial: /^cc-.*\bnc\b|non-?commercial/,
-  noDerivatives: /^cc-.*\bnd\b|no-?derivative/,
-  nonFree: /^non-?free|fair-?use/,
+  nonCommercial: /^cc-.*\bnc\b|^non-?commercial/,
+  noDerivatives: /^cc-.*\bnd\b|^no-?derivative/,
+  nonFree: /^(non-?free|fair-?use)/,
   disputed:
-    /^(no-licen[cs]e|no-permission|media-without-a-licen[cs]e|media-missing-permission|copyvio|copyright-violation)/,
+    /^(no-licen[cs]e|no-permission|no-source|media-without-a-(licen[cs]e|source)|media-missing-permission|(otrs|vrts)-pending|permission-pending|items-with-(otrs|vrts)-permission-pending|copyvio|copyright-violation|speedy|delete(-|$)|deletion-request)/,
   cc0: /^(cc-?zero|cc0)(-|$)/,
   pd: /^(cc-pd-mark|pdm|pd|public-domain)(-|$)/,
+  // cc-by-sa-4.0, cc-by-3.0-de, cc-by-sa-3.0-igo, cc-by-sa-4.0,3.0,2.5, cc-by-sa-all
+  cc: /^cc-(by-sa|by)(?:-(\d\.\d|all))?[,.\d]*(?:-([a-z]{2,3}))?(?:-|$)/,
+  /** Headings ({{int:license-header}}) and tracking categories that name licences without being one. */
+  tracking: /^int:|machine-readable|licen[cs]e-(migration|review)/,
+  /** Any other licence, named or not (GFDL, Free Art, Licence Ouverte, …). */
   other:
-    /^(gfdl|fal|free-art|attribution|copyrighted-free-use|ogl|cc-sa|odbl)(-|$)/,
-  // cc-by-sa-4.0, cc-by-3.0-de, cc-by-sa-4.0,3.0,2.5, cc-by-sa-all
-  cc: /^cc-(by-sa|by)(?:-(\d\.\d|all))?[,.\d]*(?:-([a-z]{2}))?(?:-|$)/,
+    /^(gfdl|fal|free-art|attribution|copyrighted-free-use|ogl|odbl|gpl|lgpl|cc-)|licen[cs]e|lizenz|copyright/,
 };
 
 /**
@@ -102,14 +106,16 @@ function readLicence(name: string): Reading {
     if (patterns[refusal].test(token)) return { refusal };
   if (patterns.cc0.test(token)) return { kind: "cc0" };
   if (patterns.pd.test(token)) return { kind: "pd" };
-  if (patterns.other.test(token)) return { kind: "other" };
   const cc = patterns.cc.exec(token);
-  if (!cc) return undefined;
-  return {
-    kind: cc[1] === "by-sa" ? "cc-by-sa" : "cc-by",
-    version: cc[2] === "all" ? "4.0" : cc[2],
-    port: cc[3],
-  };
+  if (cc)
+    return {
+      kind: cc[1] === "by-sa" ? "cc-by-sa" : "cc-by",
+      version: cc[2] === "all" ? "4.0" : cc[2],
+      port: cc[3],
+    };
+  if (patterns.tracking.test(token)) return undefined;
+  if (patterns.other.test(token)) return { kind: "other" };
+  return undefined;
 }
 
 /**
@@ -181,18 +187,25 @@ function licenceOf(
   };
 }
 
+/** Templates whose positional values name licences: {{self|cc-by-sa-4.0}}. */
+const licenceWrappers =
+  /^(self\d?|licen[cs]ed-|pd-art|pd-scan|multi-?licen[cs]e|dual-?licen[cs]e)/;
+
 /**
  * The names of the templates used on a file page, and the licences named in
- * {{self|…}}, {{Licensed-PD-Art|…}} and the like: positional values only.
+ * {{self|…}}, {{Licensed-PD-Art|…}} and the like (their positional values;
+ * other templates' values are text, such as a description).
  */
-export function licenceTemplates(wikitext: string): string[] {
+function licenceTemplates(wikitext: string): string[] {
   const names: string[] = [];
   let text = wikitext;
   // Innermost templates first, until none are left, so nested ones count too.
   while (/\{\{[^{}]*\}\}/.test(text)) {
     text = text.replace(/\{\{([^{}]*)\}\}/g, (_, body: string) => {
       const [name = "", ...values] = body.split("|");
-      names.push(name, ...values.filter((value) => !value.includes("=")));
+      names.push(name);
+      if (licenceWrappers.test(normalize(name)))
+        names.push(...values.filter((value) => !value.includes("=")));
       return "";
     });
   }
@@ -277,7 +290,7 @@ export function plainText(html: string): string {
 }
 
 /** The credit's source for every image from Commons. */
-export const commonsSource = "Wikimedia Commons";
+const commonsSource = "Wikimedia Commons";
 
 /** Picture formats the browser converts, as Commons names them. */
 const readableTypes = new Set([
@@ -307,8 +320,8 @@ export type CommonsProblem =
 /**
  * A Commons file read for a Catalog image, from the API's answer for its
  * file page (see `commonsQueryUrl`), or why it can't be added. The credit
- * names the creator from the file page (not the uploader; empty when it
- * names none), the governing licence with its deed and the change made,
+ * names the creator as the file page credits them (not the uploader; empty
+ * when it names none), the governing licence with its deed and the change made,
  * and the file page.
  */
 export function readCommonsFile(
@@ -335,7 +348,11 @@ export function readCommonsFile(
       licence,
       credit: {
         source: commonsSource,
-        author: plainText(metadata(page, "Artist") ?? ""),
+        // The attribution a CC licence asks for, if the page gives one, else
+        // the creator from its {{Information}}.
+        author: plainText(
+          metadata(page, "Attribution") ?? metadata(page, "Artist") ?? "",
+        ),
         licence: `${licence.name} (${licence.url}); resized and converted to WebP`,
         link: info.descriptionurl,
       },
@@ -438,10 +455,10 @@ export async function fetchCommonsFile(title: string) {
  * and store it in CoinsLite's own storage: images are never linked to
  * Wikimedia's servers.
  */
-export async function downloadCommonsPicture(file: CommonsFile) {
+export async function downloadCommonsPicture(imageUrl: string) {
   // A plain request: Wikimedia's file servers don't accept Api-User-Agent
   // from browsers.
-  const response = await fetch(file.imageUrl);
+  const response = await fetch(imageUrl);
   if (!response.ok)
     throw new Error(`Commons download failed (${response.status})`);
   return await response.blob();

@@ -1183,9 +1183,9 @@ export default {
         nonFree:
           "Denne filen er ikke fri eller brukes som «fair use», så den kan ikke legges til.",
         disputed:
-          "Denne filen er merket som uten lisens eller tillatelse, eller som brudd på opphavsretten, så den kan ikke legges til.",
+          "Denne filen er merket som uten lisens, kilde eller tillatelse, som brudd på opphavsretten eller for sletting, så den kan ikke legges til.",
         otherLicence:
-          "Denne filen er verken allemannseie eller under CC0, CC BY eller CC BY-SA, så den kan ikke legges til.",
+          "Denne filen har en annen lisens eller opphavsrettsmerknad enn allemannseie, CC0, CC BY eller CC BY-SA, så den kan ikke legges til.",
         none: "Fant ingen lisens på denne filsiden, så filen kan ikke legges til.",
         failed: "Kunne ikke lese filen fra Wikimedia Commons. Prøv igjen.",
       },

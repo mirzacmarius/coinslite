@@ -1200,12 +1200,12 @@ export default {
         noDerivatives:
           "Ce fichier ne peut pas être modifié (ND). Le convertir en WebP est une modification\u00a0: il ne peut pas être ajouté.",
         nonFree:
-          "Ce fichier n’est pas libre ou relève du fair use\u00a0: il ne peut pas être ajouté.",
+          "Ce fichier n’est pas libre ou relève du «\u00a0fair use\u00a0»\u00a0: il ne peut pas être ajouté.",
         disputed:
-          "Ce fichier est signalé comme sans licence ni autorisation, ou comme violation du droit d’auteur\u00a0: il ne peut pas être ajouté.",
+          "Ce fichier est signalé comme sans licence, source ou autorisation, comme violation du droit d’auteur ou à supprimer\u00a0: il ne peut pas être ajouté.",
         otherLicence:
-          "Ce fichier n’est ni dans le domaine public ni sous CC0, CC BY ou CC BY-SA\u00a0: il ne peut pas être ajouté.",
-        none: "Aucune licence n’a été trouvée sur cette page de fichier\u00a0: il ne peut pas être ajouté.",
+          "Ce fichier porte une licence ou une mention de droit d’auteur autre que le domaine public, CC0, CC BY ou CC BY-SA\u00a0: il ne peut pas être ajouté.",
+        none: "Aucune licence n’a été trouvée sur cette page de fichier\u00a0: le fichier ne peut pas être ajouté.",
         failed:
           "Impossible de lire le fichier depuis Wikimedia Commons. Réessayez.",
       },

@@ -240,7 +240,7 @@ export function CatalogImageDialog({
   };
 
   /** Converts a picture to the sizes stored; whether it could be. */
-  const choose = async (file: Blob) => {
+  const convertPicture = async (file: Blob) => {
     setImageError(undefined);
     if (file.size > catalogImageLimits.originalBytes) {
       setImageError(t("catalogImages.errors.ORIGINAL_TOO_LARGE"));
@@ -266,7 +266,7 @@ export function CatalogImageDialog({
 
   /** Takes a Commons file's picture, and its credit in place of the one shown. */
   const chooseFromCommons = async (file: CommonsFile, picture: Blob) => {
-    if (!(await choose(picture))) return;
+    if (!(await convertPicture(picture))) return;
     setCommonsFile(file);
     for (const [name] of fields) form.setFieldValue(name, file.credit[name]);
   };
@@ -277,7 +277,7 @@ export function CatalogImageDialog({
    * picture.
    */
   const chooseFile = async (file: File) => {
-    if (!(await choose(file)) || !commonsFile) return;
+    if (!(await convertPicture(file)) || !commonsFile) return;
     const values = form.state.values;
     if (fields.every(([name]) => values[name] === commonsFile.credit[name]))
       for (const [name] of fields) form.setFieldValue(name, defaults[name]);
@@ -346,7 +346,7 @@ export function CatalogImageDialog({
             />
             <CatalogImageCommons
               disabled={converting || submitting}
-              read={commonsFile}
+              filledFrom={commonsFile}
               onBusyChange={setFetching}
               onPicture={chooseFromCommons}
             />

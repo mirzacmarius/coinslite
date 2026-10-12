@@ -1220,9 +1220,9 @@ export default {
         nonFree:
           "Diese Datei ist nicht frei oder wird als Fair Use genutzt und kann daher nicht hinzugefügt werden.",
         disputed:
-          "Diese Datei ist als ohne Lizenz oder Erlaubnis oder als Urheberrechtsverletzung markiert und kann daher nicht hinzugefügt werden.",
+          "Diese Datei ist als ohne Lizenz, Quelle oder Erlaubnis, als Urheberrechtsverletzung oder zur Löschung markiert und kann daher nicht hinzugefügt werden.",
         otherLicence:
-          "Diese Datei ist weder gemeinfrei noch unter CC0, CC BY oder CC BY-SA und kann daher nicht hinzugefügt werden.",
+          "Diese Datei trägt eine andere Lizenz oder einen anderen Urheberrechtshinweis als gemeinfrei, CC0, CC BY oder CC BY-SA und kann daher nicht hinzugefügt werden.",
         none: "Auf dieser Dateiseite wurde keine Lizenz gefunden, daher kann sie nicht hinzugefügt werden.",
         failed:
           "Die Datei konnte nicht von Wikimedia Commons gelesen werden. Versuche es noch einmal.",
