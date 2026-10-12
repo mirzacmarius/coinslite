@@ -4,6 +4,7 @@ import {
   type CatalogKind,
   type CoinEdge,
   type PreciousMetal,
+  type Provenance,
   noMintMark,
 } from "../catalog/fields";
 import { type Metal, metals } from "../spotPrices/rates";
@@ -281,6 +282,30 @@ export function entryDetails(entry: {
   });
 }
 export type EntryDetails = ReturnType<typeof entryDetails>;
+
+/**
+ * The credit an Item page shows for the facts it takes from its Catalog
+ * entry: the entry's facts credit, as long as the Item shows at least one of
+ * the entry's facts, or of the details only the entry holds. None for an
+ * Item without an entry, or one whose own facts (the person's overrides)
+ * replace every fact the entry gives.
+ */
+export function factsCreditFor(
+  item: CatalogFacts,
+  entry: {
+    facts: CatalogFacts;
+    details: Partial<EntryDetails>;
+    credit?: Provenance;
+  } | null,
+): Provenance | null {
+  if (!entry?.credit) return null;
+  const fromEntry =
+    Object.values(entry.details).some((detail) => detail !== undefined) ||
+    catalogFactNames.some(
+      (name) => item[name] === undefined && entry.facts[name] !== undefined,
+    );
+  return fromEntry ? entry.credit : null;
+}
 
 /**
  * What an Item linked to a Catalog entry becomes as the entry leaves the

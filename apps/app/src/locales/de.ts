@@ -102,6 +102,7 @@ export default {
     description: "Beschreibung",
     physical: "Beschaffenheit",
     fromCatalog: "Aus dem Katalog",
+    factsSource: "Quelle der Fakten",
     references: "Katalog und Zertifizierung",
     grader: "Grading-Dienst",
     setGrader: "Grading-Dienst wählen",

@@ -102,6 +102,7 @@ export default {
     description: "Description",
     physical: "Caractéristiques",
     fromCatalog: "Du catalogue",
+    factsSource: "Source des données",
     references: "Catalogue et certification",
     grader: "Société de gradation",
     setGrader: "Choisir la société",

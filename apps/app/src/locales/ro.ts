@@ -100,6 +100,7 @@ export default {
     description: "Descriere",
     physical: "Caracteristici fizice",
     fromCatalog: "Din catalog",
+    factsSource: "Sursa datelor",
     references: "Catalog și certificare",
     grader: "Firmă de gradare",
     setGrader: "Alege firma de gradare",
