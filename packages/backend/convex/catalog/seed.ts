@@ -4,6 +4,7 @@ import { internalAction, internalMutation } from "../_generated/server";
 import { euroCirculationCoins } from "./datasets/euroCirculationCoins";
 import { euroCommemoratives } from "./datasets/euroCommemoratives";
 import { norway } from "./datasets/norway";
+import { usCoinProgrammes } from "./datasets/usCoinProgrammes";
 import { usSilverDollars } from "./datasets/usSilverDollars";
 import { importCatalogFile } from "./tree";
 
@@ -14,6 +15,7 @@ import { importCatalogFile } from "./tree";
  */
 const datasets = {
   usSilverDollars,
+  usCoinProgrammes,
   euroCommemoratives,
   norway,
   euroCirculationCoins,
@@ -31,6 +33,7 @@ export const loadDataset = internalMutation({
   args: {
     dataset: v.union(
       v.literal("usSilverDollars"),
+      v.literal("usCoinProgrammes"),
       v.literal("euroCommemoratives"),
       v.literal("norway"),
       v.literal("euroCirculationCoins"),

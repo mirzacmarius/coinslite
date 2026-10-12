@@ -13,7 +13,7 @@ import { catalogCsvColumns } from "../fields";
  * placeholder until a licensed photo is added.
  */
 
-const usMint = {
+export const usMint = {
   source: "United States Mint",
   author: "United States Mint",
   licence: "Public domain (17 U.S.C. § 105)",
