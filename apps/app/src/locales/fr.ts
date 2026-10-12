@@ -886,6 +886,9 @@ export default {
     "takenOut#few": "{count} objets retirés de leurs albums",
     "takenOut#other": "{count} objets retirés de leurs albums",
     moveFailed: "Les objets n’ont pas pu être déplacés. Réessayez.",
+    moveUndone: "Déplacement annulé",
+    moveUndoneSkipped:
+      "{restored} remis en place, {skipped} ignorés : eux ou leurs albums ont changé depuis.",
     setGrade: "Attribuer un état",
     "gradeApply#one": "Attribuer à {count} objet",
     "gradeApply#few": "Attribuer à {count} objets",
@@ -896,6 +899,11 @@ export default {
     gradedSkipped:
       "{graded} évalués, {skipped} ignorés : l’échelle ne convient pas à leur type d’objet.",
     gradeFailed: "Impossible d’attribuer l’état. Réessayez.",
+    gradeUndone: "Attribution de l’état annulée",
+    gradeUndoneSkipped:
+      "{restored} rétablis, {skipped} ignorés : ils ont changé depuis.",
+    undo: "Annuler",
+    undoFailed: "Impossible d’annuler la modification. Réessayez.",
     delete: "Supprimer",
     "deleteTitle#one": "Supprimer {count} objet ?",
     "deleteTitle#few": "Supprimer {count} objets ?",

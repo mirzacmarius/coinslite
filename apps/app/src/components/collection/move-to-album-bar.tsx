@@ -12,6 +12,7 @@ import { bulkLimits } from "@coinslite/backend/convex/items/bulkRules";
 import { Button } from "@coinslite/ui/button";
 import { toast } from "@coinslite/ui/toaster";
 import { useConvex, useMutation } from "convex/react";
+import type { FunctionReturnType } from "convex/server";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteItemsButton } from "./delete-items-button";
@@ -19,11 +20,18 @@ import type { BrowseResult } from "./filter-options";
 import { SetGradeButton } from "./set-grade-button";
 import type { ItemSelection } from "./use-item-selection";
 
+/** How an undo went: Items put back, and Items skipped as changed since. */
+type Undone = FunctionReturnType<typeof api.items.undoMove>;
+
+/** How long a toast offering Undo stays, in milliseconds. */
+const undoOfferedFor = 10_000;
+
 /**
  * Select mode's bar on the Collection page: select the page or the whole
  * view, pick an Album (or none) and move every selected Item there at once,
- * set a Grade on them, or delete them. With `addTo`, the Album is set and
- * moving into it is the only action; `onLeave` ends picking either way.
+ * set a Grade on them, or delete them. A move or a Grade can be undone from
+ * its toast. With `addTo`, the Album is set and moving into it is the only
+ * action; `onLeave` ends picking either way.
  */
 export function MoveToAlbumBar({
   selection,
@@ -44,6 +52,7 @@ export function MoveToAlbumBar({
   const convex = useConvex();
   const albums = useAlbums();
   const moveToAlbum = useMutation(api.items.moveToAlbum);
+  const undoMove = useMutation(api.items.undoMove);
   // The Album picked to move into; `albumId` undefined means out of any Album.
   const [picked, setTarget] = useState<{ albumId?: Id<"albums"> }>();
   const target = addTo ? { albumId: addTo } : picked;
@@ -79,12 +88,34 @@ export function MoveToAlbumBar({
           (albumId) => albumId !== null && albumId !== target.albumId,
         ).length;
 
+  /**
+   * A toast's Undo, offered while it shows: runs `undo`, then says it's
+   * done, or how many Items were skipped as changed since.
+   */
+  const offerUndo = (
+    undo: () => Promise<Undone>,
+    undone: string,
+    undoneSkipped: (counts: Undone) => string,
+  ) => ({
+    duration: undoOfferedFor,
+    action: {
+      label: t("collection.undo"),
+      onClick: () => {
+        undo().then(
+          (counts) =>
+            toast.success(counts.skipped > 0 ? undoneSkipped(counts) : undone),
+          () => toast.error(t("collection.undoFailed")),
+        );
+      },
+    },
+  });
+
   const move = async () => {
     if (!target || count === 0) return;
     setSaving(true);
     setFailed(undefined);
     try {
-      await moveToAlbum({
+      const { before } = await moveToAlbum({
         itemIds: [...selected.keys()],
         albumId: target.albumId,
       });
@@ -92,6 +123,13 @@ export function MoveToAlbumBar({
         album
           ? t("collection.movedTo", { album: album.name })
           : t("collection.takenOut", { count }),
+        before.length > 0
+          ? offerUndo(
+              () => undoMove({ before, albumId: target.albumId }),
+              t("collection.moveUndone"),
+              (counts) => t("collection.moveUndoneSkipped", counts),
+            )
+          : undefined,
       );
       selection.stop();
       onLeave?.();
@@ -174,11 +212,15 @@ export function MoveToAlbumBar({
         <>
           <SetGradeButton
             selection={selection}
-            onGraded={({ graded, skipped }) => {
+            onGraded={({ graded, skipped, undo }) => {
               toast.success(
                 skipped > 0
                   ? t("collection.gradedSkipped", { graded, skipped })
                   : t("collection.graded", { count: graded }),
+                undo &&
+                  offerUndo(undo, t("collection.gradeUndone"), (counts) =>
+                    t("collection.gradeUndoneSkipped", counts),
+                  ),
               );
               selection.stop();
             }}

@@ -877,6 +877,9 @@ export default {
     "takenOut#few": "{count} obiecte scoase din albume",
     "takenOut#other": "{count} de obiecte scoase din albume",
     moveFailed: "Obiectele nu au putut fi mutate. Încearcă din nou.",
+    moveUndone: "Mutarea a fost anulată",
+    moveUndoneSkipped:
+      "Mutate înapoi {restored}, sărite {skipped}: ele sau albumele lor s-au schimbat între timp.",
     setGrade: "Stabilește starea",
     "gradeApply#one": "Aplică la 1 obiect",
     "gradeApply#few": "Aplică la {count} obiecte",
@@ -887,6 +890,11 @@ export default {
     gradedSkipped:
       "Stabilită pentru {graded}, sărite {skipped}: scala nu se potrivește tipului lor de obiect.",
     gradeFailed: "Starea nu a putut fi stabilită. Încearcă din nou.",
+    gradeUndone: "Stabilirea stării a fost anulată",
+    gradeUndoneSkipped:
+      "Restabilite {restored}, sărite {skipped}: s-au schimbat între timp.",
+    undo: "Anulează",
+    undoFailed: "Modificarea nu a putut fi anulată. Încearcă din nou.",
     delete: "Șterge",
     "deleteTitle#one": "Ștergi 1 obiect?",
     "deleteTitle#few": "Ștergi {count} obiecte?",

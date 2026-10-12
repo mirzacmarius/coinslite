@@ -21,7 +21,12 @@ import { setErrors, setLimits } from "./catalog/setRules";
 import { setOfEntry, setScope } from "./catalog/sets";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
-import { bulkErrors, bulkLimits } from "./items/bulkRules";
+import {
+  bulkErrors,
+  bulkLimits,
+  planGradeUndo,
+  planMoveUndo,
+} from "./items/bulkRules";
 import { entryDetails, overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
 import { isGrade, scalesFor } from "./items/grades";
@@ -471,17 +476,34 @@ export const markOwned = mutation({
   },
 });
 
+/** An Item a move took, with the Album it was in before: what undoing it needs. */
+const movedItem = v.object({
+  itemId: v.id("items"),
+  albumId: v.optional(v.id("albums")),
+});
+
+/** An Item a bulk grading set, with the Grade it had before: what undoing it needs. */
+const gradedItem = v.object({
+  itemId: v.id("items"),
+  gradingScale: v.optional(gradingScale),
+  grade: v.optional(v.string()),
+});
+
+/** How an undo went: Items put back, and Items skipped as changed since. */
+const undone = v.object({ restored: v.number(), skipped: v.number() });
+
 /**
  * Moves several of the signed-in person's Items into one of their Albums, or
  * out of any Album. Every Item is checked before anything is written, so the
- * move happens to all of them or to none.
+ * move happens to all of them or to none. Returns the Items it moved with the
+ * Album each was in, for `undoMove`.
  */
 export const moveToAlbum = mutation({
   args: {
     itemIds: v.array(v.id("items")),
     albumId: v.optional(v.id("albums")),
   },
-  returns: v.null(),
+  returns: v.object({ before: v.array(movedItem) }),
   handler: async (ctx, { itemIds, albumId }) => {
     const { owner, items } = await requireOwnItems(ctx, itemIds);
     const album = await ownAlbumId(ctx, owner._id, albumId);
@@ -495,9 +517,75 @@ export const moveToAlbum = mutation({
         sold: item.soldOn !== undefined,
       })),
     );
-    return null;
+    return {
+      before: moving.map((item) => ({
+        itemId: item._id,
+        albumId: item.albumId,
+      })),
+    };
   },
 });
+
+/**
+ * Undoes `moveToAlbum`: puts each Item it moved (`before`) back in the Album
+ * it was in, or in none, if it's still in the Album it was moved to
+ * (`albumId`) and that Album still exists (items/bulkRules.ts). The others are
+ * skipped and counted.
+ */
+export const undoMove = mutation({
+  args: {
+    before: v.array(movedItem),
+    albumId: v.optional(v.id("albums")),
+  },
+  returns: undone,
+  handler: async (ctx, { before, albumId }) => {
+    const owner = await requireSetUpUser(ctx);
+    const now = await ownItemsNow(ctx, owner._id, before);
+    const albums = new Set<Id<"albums">>();
+    for (const id of new Set(before.flatMap((item) => item.albumId ?? []))) {
+      const album = await ctx.db.get("albums", id);
+      if (album?.ownerId === owner._id) albums.add(id);
+    }
+    const { restore, skipped } = planMoveUndo({
+      before,
+      after: { albumId },
+      now,
+      albums,
+    });
+    for (const { itemId, albumId: to } of restore)
+      await ctx.db.patch("items", itemId, { albumId: to });
+    await moveManyBetweenAlbums(
+      ctx,
+      restore.map(({ itemId, albumId: to }) => {
+        const item = now.get(itemId)!;
+        return { from: item.albumId, to, sold: item.soldOn !== undefined };
+      }),
+    );
+    return { restored: restore.length, skipped };
+  },
+});
+
+/**
+ * The signed-in person's Items an undo names, as they are now, by id; one
+ * deleted since, or not theirs, is left out. At most `bulkLimits.items`, as
+ * many as the action it undoes took.
+ */
+async function ownItemsNow(
+  ctx: QueryCtx,
+  ownerId: Id<"users">,
+  before: ReadonlyArray<{ itemId: Id<"items"> }>,
+) {
+  if (before.length > bulkLimits.items)
+    throw new ConvexError(bulkErrors.tooManyItems);
+  const items = await Promise.all(
+    before.map(({ itemId }) => ctx.db.get("items", itemId)),
+  );
+  return new Map(
+    items.flatMap((item) =>
+      item?.ownerId === ownerId ? [[item._id, item] as const] : [],
+    ),
+  );
+}
 
 /**
  * The signed-in person's Items for a bulk action: each distinct id once, at
@@ -527,6 +615,8 @@ async function requireOwnItems(
  * Sets one Grade on several of the signed-in person's Items: those whose Item
  * type the Grading scale suits; the others are skipped and counted. Grade
  * notes stay as they are. Every Item is checked before anything is written.
+ * Returns the Items it graded with the Grade and Grading scale each had, for
+ * `undoGrade`.
  */
 export const setGrade = mutation({
   args: {
@@ -534,7 +624,11 @@ export const setGrade = mutation({
     gradingScale,
     grade: v.string(),
   },
-  returns: v.object({ graded: v.number(), skipped: v.number() }),
+  returns: v.object({
+    graded: v.number(),
+    skipped: v.number(),
+    before: v.array(gradedItem),
+  }),
   handler: async (ctx, { itemIds, gradingScale, grade }) => {
     if (!isGrade(gradingScale, grade))
       throw new ConvexError(itemErrors.invalidGrade);
@@ -544,7 +638,42 @@ export const setGrade = mutation({
     );
     for (const item of grading)
       await ctx.db.patch(item._id, { gradingScale, grade });
-    return { graded: grading.length, skipped: items.length - grading.length };
+    return {
+      graded: grading.length,
+      skipped: items.length - grading.length,
+      before: grading.map((item) => ({
+        itemId: item._id,
+        gradingScale: item.gradingScale,
+        grade: item.grade,
+      })),
+    };
+  },
+});
+
+/**
+ * Undoes `setGrade`: gives each Item it graded (`before`) the Grade and
+ * Grading scale it had, or no Grade, if it still has the Grade that was set
+ * and its own still suits its Item type (items/bulkRules.ts). The others are
+ * skipped and counted.
+ */
+export const undoGrade = mutation({
+  args: {
+    before: v.array(gradedItem),
+    gradingScale,
+    grade: v.string(),
+  },
+  returns: undone,
+  handler: async (ctx, { before, gradingScale, grade }) => {
+    const owner = await requireSetUpUser(ctx);
+    const now = await ownItemsNow(ctx, owner._id, before);
+    const { restore, skipped } = planGradeUndo({
+      before,
+      after: { gradingScale, grade },
+      now,
+    });
+    for (const { itemId, gradingScale, grade } of restore)
+      await ctx.db.patch("items", itemId, { gradingScale, grade });
+    return { restored: restore.length, skipped };
   },
 });
 

@@ -11,14 +11,19 @@ import { Button } from "@coinslite/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@coinslite/ui/popover";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { useMutation } from "convex/react";
+import type { FunctionReturnType } from "convex/server";
 import { Award, Loader2, Ruler } from "lucide-react";
 import { useState } from "react";
 import type { ItemSelection } from "./use-item-selection";
 
+/** Undoes a bulk grading; says how many Items got their Grade back and skipped. */
+type UndoGrade = () => Promise<FunctionReturnType<typeof api.items.undoGrade>>;
+
 /**
  * Select mode's Set Grade: pick a Grading scale and a Grade, then set it on
  * every selected Item the scale suits. Says how many were graded and skipped
- * through `onGraded`, failures through `onFailed`.
+ * through `onGraded`, with `undo` when any were graded, and failures through
+ * `onFailed`.
  */
 export function SetGradeButton({
   selection,
@@ -26,12 +31,17 @@ export function SetGradeButton({
   onFailed,
 }: {
   selection: ItemSelection;
-  onGraded: (result: { graded: number; skipped: number }) => void;
+  onGraded: (result: {
+    graded: number;
+    skipped: number;
+    undo?: UndoGrade;
+  }) => void;
   onFailed: (message: string) => void;
 }) {
   const t = useI18n();
   const labels = useGradeLabels();
   const setGrade = useMutation(api.items.setGrade);
+  const undoGrade = useMutation(api.items.undoGrade);
   const [open, setOpen] = useState(false);
   const [scale, setScale] = useState<GradingScale>();
   const [grade, setGradeValue] = useState<string>();
@@ -42,13 +52,19 @@ export function SetGradeButton({
     if (!scale || !grade) return;
     setSaving(true);
     try {
-      onGraded(
-        await setGrade({
-          itemIds: [...selected.keys()],
-          gradingScale: scale,
-          grade,
-        }),
-      );
+      const { graded, skipped, before } = await setGrade({
+        itemIds: [...selected.keys()],
+        gradingScale: scale,
+        grade,
+      });
+      onGraded({
+        graded,
+        skipped,
+        undo:
+          before.length > 0
+            ? () => undoGrade({ before, gradingScale: scale, grade })
+            : undefined,
+      });
       setOpen(false);
     } catch {
       onFailed(t("collection.gradeFailed"));

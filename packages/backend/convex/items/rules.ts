@@ -5,9 +5,8 @@ import {
   type GradingScale,
   type ItemType,
   type Strike,
-  gradingScales,
   hasStrike,
-  isGrade,
+  suitsGrade,
 } from "./grades";
 import type { Grader, StampCatalogue } from "./references";
 
@@ -359,11 +358,7 @@ function checkGrade({
 }: ItemInput) {
   if (grade !== undefined) {
     const fits =
-      gradingScale !== undefined &&
-      (gradingScales[gradingScale].itemTypes as readonly ItemType[]).includes(
-        type,
-      ) &&
-      isGrade(gradingScale, grade);
+      gradingScale !== undefined && suitsGrade(type, gradingScale, grade);
     if (!fits) fail(itemErrors.invalidGrade);
   }
   if (strike !== undefined && !hasStrike(type)) fail(itemErrors.invalidStrike);
