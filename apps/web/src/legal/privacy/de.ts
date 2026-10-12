@@ -35,11 +35,11 @@ export default {
         [
           "Um CoinsLite nach unserer Vereinbarung mit dir bereitzustellen (Vertragserfüllung): dein Konto, deine Sammlung und ihre Summen, die Berichte und Exporte, die du anforderst, die E-Mails, die dich anmelden oder eine Änderung bestätigen, und Premium, wenn du es kaufst.",
           "Um CoinsLite sicher und funktionsfähig zu halten (unser berechtigtes Interesse): fehlgeschlagene Anmeldungen begrenzen und wie schnell Uploads und Nachrichten gesendet werden können, Fehler finden und beheben, Missbrauch verhindern.",
-          "Um zu erfahren, welche Teile von CoinsLite genutzt werden, damit wir sie verbessern können (unser berechtigtes Interesse): Nutzungsstatistik, über OpenPanel erfasst, ohne Cookies und ohne zu wissen, wer du bist. Ein Inhaltsblocker in deinem Browser verhindert sie.",
+          "Um zu erfahren, welche Teile von CoinsLite genutzt werden, damit wir sie verbessern können (unser berechtigtes Interesse): Nutzungsstatistik, die wir über OpenPanel ohne Cookies erfassen, ohne dass wir wissen, wer du bist. Ein Inhaltsblocker in deinem Browser verhindert sie.",
           "Um dir zu antworten (unser berechtigtes Interesse): Antworten auf Feedback und Anfragen.",
           "Um rechtliche Pflichten zu erfüllen (rechtliche Verpflichtung): etwa Unterlagen aufzubewahren, die wir aufbewahren müssen.",
         ],
-        "Wir verkaufen deine Daten nicht, zeigen keine Werbung und nutzen deine Daten weder für Profiling noch für Marketing. Unsere Nutzungsstatistik identifiziert dich nicht, und nichts verfolgt dich auf andere Websites.",
+        "Wir verkaufen deine Daten nicht, zeigen keine Werbung und nutzen deine Daten weder für Profiling noch für Marketing. Unsere Nutzungsstatistik identifiziert dich nicht, und nichts verfolgt dich auf anderen Websites.",
       ],
     },
     {
@@ -54,7 +54,7 @@ export default {
           "Google: nur, wenn du dich mit Google anmeldest, nach Googles eigener Datenschutzerklärung.",
           "Polar: verkauft Premium als Händler (Merchant of Record). Wenn du auf Premium umsteigst, erhält Polar deine E-Mail-Adresse, deine Konto-ID und deine IP-Adresse (um Währung und Steuer zu bestimmen) und erhebt deine Zahlungsdaten direkt. Polar ist für die Zahlung selbst verantwortlich, nach seiner eigenen Datenschutzerklärung.",
           "Anthropic: nur, wenn du den Münzscanner nutzt (eine Beta in Premium), erhält Anthropic die beiden Fotos, die du aufnimmst, und die infrage kommenden Katalogeinträge, um vorzuschlagen, welche Münze es ist. Nichts, was dich identifiziert, wird übermittelt.",
-          "OpenPanel: zählt, wie die App und diese Website genutzt werden. Bei jedem Seitenaufruf erhält es die Seitenadresse (ohne die IDs deiner Objekte und Alben, Suchbegriffe oder Anmeldecodes), die verweisende Website, Angaben zu deinem Browser und Gerät sowie deine IP-Adresse. Es ermittelt daraus deinen ungefähren Standort und eine Besucherkennung, die sich täglich ändert, und verwirft dann die IP-Adresse. Es setzt keine Cookies und speichert die Daten in Deutschland.",
+          "OpenPanel: zählt, wie die App und diese Website genutzt werden. Bei jedem Seitenaufruf erhält es den Seitentitel und die Seitenadresse (ohne die IDs deiner Objekte und Alben, Suchbegriffe oder Anmeldecodes), die verweisende Website, Angaben zu deinem Browser und Gerät sowie deine IP-Adresse. Es ermittelt daraus deinen ungefähren Standort und eine Besucherkennung, die sich täglich ändert, und verwirft dann die IP-Adresse. Es setzt keine Cookies und speichert die Daten in Deutschland.",
           "MetalpriceAPI: liefert Spotpreise und Wechselkurse. Unsere Anfragen enthalten keine personenbezogenen Daten.",
         ],
       ],

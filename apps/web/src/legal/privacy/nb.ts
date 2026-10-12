@@ -54,7 +54,7 @@ export default {
           "Google: bare hvis du velger å logge inn med Google, etter Googles egen personvernerklæring.",
           "Polar: selger Premium som forhandler (merchant of record). Når du oppgraderer, mottar Polar e-postadressen din, konto-ID-en din og IP-adressen din (for å velge valuta og avgift), og samler inn betalingsopplysningene dine direkte. Polar er selvstendig behandlingsansvarlig for betalingen, etter sin egen personvernerklæring.",
           "Anthropic: bare når du bruker myntskanneren (en betaversjon i Premium), mottar Anthropic de to bildene du tar og de mulige katalogoppføringene, for å foreslå hvilken mynt det er. Ingenting som identifiserer deg, sendes.",
-          "OpenPanel: teller hvordan appen og dette nettstedet brukes. Ved hver sidevisning mottar den sideadressen (uten ID-ene til objektene og albumene dine, søkeord eller innloggingskoder), nettstedet som lenket dit, opplysninger om nettleseren og enheten og IP-adressen din. Den utleder omtrent hvor du er og en besøks-ID som endres hver dag, og forkaster deretter IP-adressen. Den setter ingen informasjonskapsler og lagrer dataene i Tyskland.",
+          "OpenPanel: teller hvordan appen og dette nettstedet brukes. Ved hver sidevisning mottar den sidetittelen og sideadressen (uten ID-ene til objektene og albumene dine, søkeord eller innloggingskoder), nettstedet som lenket dit, opplysninger om nettleseren og enheten og IP-adressen din. Den utleder din omtrentlige plassering og en besøkende-ID som endres hver dag, og forkaster deretter IP-adressen. Den setter ingen informasjonskapsler og lagrer dataene i Tyskland.",
           "MetalpriceAPI: leverer spotpriser og valutakurser. Forespørslene våre inneholder ingen personopplysninger.",
         ],
       ],

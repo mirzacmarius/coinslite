@@ -78,7 +78,7 @@ export default {
     },
     noAds: {
       title: "Sans publicité",
-      text: "Aucune publicité, quelle que soit la formule, et aucun cookie de suivi : les pages vues sont comptées sans savoir qui vous êtes.",
+      text: "Aucune publicité, quelle que soit la formule, et aucun cookie de suivi : les pages vues sont comptées sans que nous sachions qui vous êtes.",
     },
   },
   plans: {

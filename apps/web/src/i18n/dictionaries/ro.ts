@@ -78,7 +78,7 @@ export default {
     },
     noAds: {
       title: "Fără reclame",
-      text: "Fără reclame în niciun plan și fără cookie-uri de urmărire: vizitele paginilor sunt numărate fără să știm cine ești.",
+      text: "Fără reclame în niciun plan și fără cookie-uri de urmărire: vizualizările paginilor sunt numărate fără să știm cine ești.",
     },
   },
   plans: {

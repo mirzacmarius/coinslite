@@ -1,7 +1,7 @@
 "use client";
 
 import { env } from "@/env";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 type OpenPanel = ((...args: unknown[]) => void) & { q?: unknown[][] };
@@ -45,10 +45,13 @@ function referringSite() {
 
 function ScreenViews({ clientId }: { clientId: string }) {
   const pathname = usePathname();
+  const params = useParams<{ locale: string; missing?: string[] }>();
   useEffect(() => {
-    // The page's address without its query string or hash.
-    openPanel(clientId)("screenView", `${window.location.origin}${pathname}`);
-  }, [clientId, pathname]);
+    // The page's address without its query string or hash. A mistyped address
+    // that reached the not-found page counts as that page, not as typed.
+    const path = params?.missing ? `/${params.locale}/[missing]` : pathname;
+    openPanel(clientId)("screenView", `${window.location.origin}${path}`);
+  }, [clientId, pathname, params]);
   return null;
 }
 

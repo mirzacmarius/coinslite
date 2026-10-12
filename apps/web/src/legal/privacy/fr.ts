@@ -35,7 +35,7 @@ export default {
         [
           "Pour fournir CoinsLite selon notre accord avec vous (exécution d’un contrat) : votre compte, votre collection et ses totaux, les rapports et exports que vous demandez, les e-mails qui vous connectent ou confirment un changement, et Premium si vous l’achetez.",
           "Pour que CoinsLite reste sûr et fonctionne (notre intérêt légitime) : limiter les connexions échouées et la fréquence des envois de fichiers et de messages, trouver et corriger les erreurs, prévenir les abus.",
-          "Pour savoir quelles parties de CoinsLite sont utilisées, afin de les améliorer (notre intérêt légitime) : des statistiques d’utilisation, comptées via OpenPanel sans cookies et sans savoir qui vous êtes. Un bloqueur de contenu dans votre navigateur les empêche.",
+          "Pour savoir quelles parties de CoinsLite sont utilisées, afin de les améliorer (notre intérêt légitime) : des statistiques d’utilisation, comptées via OpenPanel sans cookies et sans que nous sachions qui vous êtes. Un bloqueur de contenu dans votre navigateur les empêche.",
           "Pour vous répondre (notre intérêt légitime) : réponses à vos messages et demandes.",
           "Pour respecter nos obligations légales (obligation légale) : par exemple conserver les documents que nous sommes tenus de conserver.",
         ],
@@ -54,7 +54,7 @@ export default {
           "Google : seulement si vous choisissez de vous connecter avec Google, selon la politique de confidentialité de Google.",
           "Polar : vend Premium en tant que revendeur officiel (merchant of record). Quand vous passez à Premium, Polar reçoit votre adresse e-mail, votre identifiant de compte et votre adresse IP (pour choisir la devise et la taxe), et collecte directement vos données de paiement. Polar agit comme responsable de traitement indépendant pour le paiement, selon sa propre politique de confidentialité.",
           "Anthropic : seulement quand vous utilisez le scanner de pièces (une bêta de Premium), Anthropic reçoit les deux photos que vous prenez et les entrées du catalogue possibles, pour suggérer de quelle pièce il s’agit. Rien qui vous identifie n’est envoyé.",
-          "OpenPanel : compte la façon dont l’application et ce site sont utilisés. À chaque page vue, il reçoit l’adresse de la page (sans les identifiants de vos objets et albums, ni termes de recherche ni codes de connexion), le site d’origine, des informations sur votre navigateur et votre appareil, et votre adresse IP. Il en déduit votre localisation approximative et un identifiant de visiteur qui change chaque jour, puis supprime l’adresse IP. Il ne dépose aucun cookie et conserve les données en Allemagne.",
+          "OpenPanel : compte la façon dont l’application et ce site sont utilisés. À chaque page vue, il reçoit le titre et l’adresse de la page (sans les identifiants de vos objets et albums, ni les termes de recherche, ni les codes de connexion), le site d’origine, des informations sur votre navigateur et votre appareil, et votre adresse IP. Il en déduit votre localisation approximative et un identifiant de visiteur qui change chaque jour, puis supprime l’adresse IP. Il ne dépose aucun cookie et conserve les données en Allemagne.",
           "MetalpriceAPI : fournit les cours spot et les taux de change. Nos requêtes ne contiennent aucune donnée personnelle.",
         ],
       ],

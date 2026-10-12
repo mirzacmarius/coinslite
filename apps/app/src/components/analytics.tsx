@@ -15,7 +15,7 @@ declare global {
 /**
  * OpenPanel's script-tag install: calls are queued on window.op until op1.js
  * loads and replays them, taking the first as its init. Queuing init here,
- * before any event, keeps that order whichever component asks first.
+ * before any event, keeps that order.
  */
 function openPanel(clientId: string): OpenPanel {
   if (!window.op) {
@@ -47,28 +47,34 @@ function referringSite() {
 const untracked = ["/admin", "/design"];
 
 /**
- * The page as it's counted: the path the browser shows, with each route
- * parameter's value replaced by its name (/collection/[itemId]), so no Item,
- * Album or account id leaves the app. The query string and hash, which carry
- * sign-in codes, email-confirmation tokens and admin searches, never do.
+ * The page as it's counted: the path the browser shows, without a language
+ * prefix (/ro/collection is /collection) and with each route parameter's value
+ * replaced by its name (/collection/[itemId]), so no Item, Album or account id
+ * leaves the app. The query string and hash, which carry sign-in codes,
+ * email-confirmation tokens and admin searches, never do.
  */
 function countedPath(
   pathname: string,
   params: Record<string, string | string[] | undefined>,
 ) {
-  const names = new Map<string, string>();
+  const placeholders = new Map<string, string>();
   for (const [name, value] of Object.entries(params)) {
     if (name === "locale" || value === undefined) continue;
     for (const part of Array.isArray(value) ? value : [value]) {
-      names.set(part, `[${name}]`);
+      placeholders.set(part, `[${name}]`);
     }
   }
-  return pathname
-    .split("/")
+  const segments = pathname.split("/");
+  if (segments[1] === params.locale) segments.splice(1, 1);
+  const path = segments
     .map(
-      (segment) => names.get(segment) ?? names.get(decoded(segment)) ?? segment,
+      (segment) =>
+        placeholders.get(segment) ??
+        placeholders.get(decoded(segment)) ??
+        segment,
     )
     .join("/");
+  return path || "/";
 }
 
 function decoded(segment: string) {
@@ -85,15 +91,12 @@ function ScreenViews({ clientId }: { clientId: string }) {
   const pathname = usePathname();
   const params = useParams();
   useEffect(() => {
-    const { origin, pathname: shown } = window.location;
-    if (untracked.some((p) => shown === p || shown.startsWith(`${p}/`))) return;
+    const path = countedPath(window.location.pathname, params ?? {});
+    if (untracked.some((p) => path === p || path.startsWith(`${p}/`))) return;
     // OpenPanel skips a path it just counted, so changing only the query
     // string (a filter, a sort) isn't another view. The page title it adds
     // names only the section: "Collection", never the Item.
-    openPanel(clientId)(
-      "screenView",
-      `${origin}${countedPath(shown, params ?? {})}`,
-    );
+    openPanel(clientId)("screenView", `${window.location.origin}${path}`);
   }, [clientId, pathname, params]);
   return null;
 }
