@@ -1,3 +1,4 @@
+import type { AttentionKind } from "../items/attention";
 import type { GradingScale, ItemType } from "../items/grades";
 
 /**
@@ -54,6 +55,11 @@ export type CollectionView = {
   notInAlbum?: string;
   /** A Catalog entry's key: only the Items made from it. */
   entry?: string;
+  /**
+   * Only the Items without a Market value, without any photo, or (coins and
+   * banknotes) without a Grade, as the Overview counts them (items/attention.ts).
+   */
+  without?: AttentionKind;
   /** Only sold Items; owned ones when left out. */
   status?: "sold";
   sort?: CollectionSort;

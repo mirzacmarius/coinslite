@@ -832,7 +832,13 @@ export default {
       grade: "Stare",
       album: "Album",
       entry: "Intrare de catalog",
+      without: "De completat",
       status: "Stare",
+    },
+    without: {
+      marketValue: "Fără valoare de piață",
+      photo: "Fără fotografie",
+      grade: "Fără stare",
     },
     bullionCoins: "Monede de investiție",
     origins: {
@@ -1234,6 +1240,13 @@ export default {
     firstRunTitle: "Începe-ți colecția",
     firstRunDescription:
       "Alege cum vrei să începi. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
+    setProgress: "Progresul seturilor",
+    needsAttention: "De completat",
+    attention: {
+      marketValue: "Fără valoare de piață",
+      photo: "Fără fotografie",
+      grade: "Monede și bancnote fără stare",
+    },
   },
   startCard: {
     addItem: "Adaugă un obiect",

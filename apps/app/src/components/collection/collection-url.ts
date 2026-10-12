@@ -11,6 +11,10 @@ import {
   searchLimit,
 } from "@coinslite/backend/convex/collection/view";
 import {
+  type AttentionKind,
+  attentionKinds,
+} from "@coinslite/backend/convex/items/attention";
+import {
   type GradingScale,
   type ItemType,
   gradingScaleIds,
@@ -26,7 +30,8 @@ import { itemTypes } from "../items/item-fields";
  * &denomination=1%20krone&grade=european:XF&album=…&status=sold&sort=price&page=2.
  * ?addTo=<Album> picks Items to add to that Album: the view leaves out the
  * Items already in it. ?entry=<key> shows the Items made from one Catalog
- * entry.
+ * entry, and ?without=marketValue|photo|grade the Items the Overview says
+ * need attention for that.
  * Defaults are left out. Anything that doesn't parse is ignored.
  */
 
@@ -58,6 +63,8 @@ export function readCollectionUrl(params: URLSearchParams) {
   if (addTo) view.notInAlbum = addTo;
   const entry = params.get("entry")?.trim();
   if (entry) view.entry = entry.slice(0, searchLimit);
+  const without = oneOf<AttentionKind>(attentionKinds, params.get("without"));
+  if (without) view.without = without;
   if (params.get("status") === "sold") view.status = "sold";
   const sort = oneOf<CollectionSort>(collectionSorts, params.get("sort"));
   if (sort && sort !== defaultSort) view.sort = sort;
@@ -129,6 +136,7 @@ export function writeCollectionUrl(view: CollectionView, page: number) {
   if (view.album) params.set("album", view.album);
   if (view.notInAlbum) params.set("addTo", view.notInAlbum);
   if (view.entry) params.set("entry", view.entry);
+  if (view.without) params.set("without", view.without);
   if (view.status) params.set("status", view.status);
   if (view.sort && view.sort !== defaultSort) params.set("sort", view.sort);
   if (page > 1) params.set("page", String(page));

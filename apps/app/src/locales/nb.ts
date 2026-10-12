@@ -827,7 +827,13 @@ export default {
       grade: "Kvalitet",
       album: "Album",
       entry: "Katalogoppføring",
+      without: "Bør fylles ut",
       status: "Status",
+    },
+    without: {
+      marketValue: "Uten markedsverdi",
+      photo: "Uten bilde",
+      grade: "Uten kvalitet",
     },
     bullionCoins: "Investeringsmynter",
     origins: {
@@ -1226,6 +1232,13 @@ export default {
     firstRunTitle: "Start samlingen din",
     firstRunDescription:
       "Velg hvordan du vil begynne. Etterpå vises totalene og de nyeste objektene her.",
+    setProgress: "Fremdrift i sett",
+    needsAttention: "Bør fylles ut",
+    attention: {
+      marketValue: "Uten markedsverdi",
+      photo: "Uten bilde",
+      grade: "Mynter og sedler uten kvalitet",
+    },
   },
   startCard: {
     addItem: "Legg til et objekt",

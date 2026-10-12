@@ -15,6 +15,7 @@ import type { FunctionReturnType } from "convex/server";
 import {
   Award,
   BookOpen,
+  CircleAlert,
   CircleCheck,
   CircleDollarSign,
   FolderOpen,
@@ -41,6 +42,7 @@ export type FilterDimension =
   | "grade"
   | "album"
   | "entry"
+  | "without"
   | "status";
 
 export type FilterOption = {
@@ -298,6 +300,28 @@ export function useFilters(
           },
         ],
         clear: { entry: undefined },
+        inMenu: false,
+        active: { label },
+      });
+    }
+
+    // The Overview's Needs attention links narrow to what one kind lacks.
+    if (view.without) {
+      const label = t(`collection.without.${view.without}`);
+      filters.push({
+        dimension: "without",
+        label: t("collection.filters.without"),
+        icon: CircleAlert,
+        options: [
+          {
+            key: view.without,
+            label,
+            count: result?.total ?? 0,
+            selected: true,
+            change: { without: view.without },
+          },
+        ],
+        clear: { without: undefined },
         inMenu: false,
         active: { label },
       });

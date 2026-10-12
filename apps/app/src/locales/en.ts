@@ -812,7 +812,13 @@ export default {
       grade: "Grade",
       album: "Album",
       entry: "Catalog entry",
+      without: "Needs attention",
       status: "Status",
+    },
+    without: {
+      marketValue: "Without a Market value",
+      photo: "Without a photo",
+      grade: "Without a Grade",
     },
     bullionCoins: "Bullion coins",
     origins: {
@@ -1209,6 +1215,13 @@ export default {
     firstRunTitle: "Start your Collection",
     firstRunDescription:
       "Choose how to begin. Your totals and latest Items then show here.",
+    setProgress: "Set progress",
+    needsAttention: "Needs attention",
+    attention: {
+      marketValue: "Without a Market value",
+      photo: "Without a photo",
+      grade: "Coins and banknotes without a Grade",
+    },
   },
   startCard: {
     addItem: "Add an Item",
