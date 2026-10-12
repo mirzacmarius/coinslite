@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { catalogErrors, checkNode } from "./fields";
 import {
   ecbSpecimenLicence,
   fitWithin,
@@ -62,6 +63,26 @@ describe("how large a full-size image may be", () => {
   test("a reproduction under the ECB's rules needs the note's real size", () => {
     expect(fullImageBounds({ width: 160 }, ecbSpecimenLicence)).toBeNull();
     expect(fullImageBounds({}, ecbSpecimenLicence)).toBeNull();
+  });
+
+  test("a reproduction under the ECB's rules can't be linked, only uploaded", () => {
+    const credit = {
+      imageSource: "European Central Bank",
+      imageAuthor: "European Central Bank",
+      imageLicence: ecbSpecimenLicence,
+      imageLink:
+        "https://www.ecb.europa.eu/euro/banknotes/images/html/index.en.html",
+    };
+    const banknote = { itemType: "banknote", title: "5 euro 2002" } as const;
+    expect(checkNode({ ...banknote, ...credit }, "entry")).toEqual([]);
+    expect(
+      checkNode(
+        { ...banknote, ...credit, imageUrl: "https://example.org/5.jpg" },
+        "entry",
+      ),
+    ).toEqual([
+      { column: "image_url", code: catalogErrors.reproductionLinked },
+    ]);
   });
 
   test("an image fits when neither side is over its bound", () => {

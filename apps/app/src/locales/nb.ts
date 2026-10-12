@@ -790,6 +790,8 @@ export default {
       SAME_LANGUAGE:
         "Notatene er allerede på dette språket. Bruk technical_details og historical_notes, eller endre notes_language.",
       YEARS_REVERSED: "Siste år kommer før det første.",
+      REPRODUCTION_LINKED:
+        "Et bilde gjengitt etter beslutning ESB/2013/10 lastes opp, slik at størrelsen følger ESBs regler. La image_url stå tom.",
       SOURCE_REQUIRED:
         "Oppgi kilden til disse faktaene, notatene eller bildet.",
       CREDIT_REQUIRED:

@@ -804,6 +804,8 @@ export default {
       SAME_LANGUAGE:
         "Les notes sont déjà dans cette langue. Utilisez technical_details et historical_notes, ou modifiez notes_language.",
       YEARS_REVERSED: "La dernière année précède la première.",
+      REPRODUCTION_LINKED:
+        "Une image reproduite selon la décision BCE/2013/10 est téléversée, afin que sa taille respecte les règles de la BCE. Laissez image_url vide.",
       SOURCE_REQUIRED:
         "Indiquez la source de ces faits, de ces notes ou de cette image.",
       CREDIT_REQUIRED:

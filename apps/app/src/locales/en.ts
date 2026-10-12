@@ -776,6 +776,8 @@ export default {
       SAME_LANGUAGE:
         "The notes are already in this language. Use technical_details and historical_notes, or change notes_language.",
       YEARS_REVERSED: "The last year comes before the first.",
+      REPRODUCTION_LINKED:
+        "An image reproduced under Decision ECB/2013/10 is uploaded, so its size keeps to the ECB's rules. Leave image_url empty.",
       SOURCE_REQUIRED: "Name the source of these facts, notes or image.",
       CREDIT_REQUIRED:
         "Facts, notes and images each need their source, author, licence and link.",

@@ -816,6 +816,8 @@ export default {
       SAME_LANGUAGE:
         "Die Hinweise sind bereits in dieser Sprache. Verwende technical_details und historical_notes oder ändere notes_language.",
       YEARS_REVERSED: "Das letzte Jahr liegt vor dem ersten.",
+      REPRODUCTION_LINKED:
+        "Ein nach dem Beschluss EZB/2013/10 wiedergegebenes Bild wird hochgeladen, damit seine Größe den Regeln der EZB entspricht. Lass image_url leer.",
       SOURCE_REQUIRED:
         "Nenne die Quelle dieser Fakten, Notizen oder dieses Bildes.",
       CREDIT_REQUIRED:

@@ -1,3 +1,5 @@
+import type { CatalogKind } from "./fields";
+
 /**
  * Which Catalog nodes are countries, and the order browsing lists a node's
  * groupings in (no Convex imports, so the rules can be tested alone).
@@ -38,7 +40,7 @@ export const byEntryCount = (a: CountedNode, b: CountedNode) =>
  */
 export function inBrowseOrder<
   T extends { entryCount: number; title: string; countryNode: boolean },
->(kind: string, groupings: T[]): T[] {
+>(kind: CatalogKind, groupings: T[]): T[] {
   const countries =
     kind === "theme" && groupings.every((grouping) => grouping.countryNode);
   return countries ? [...groupings].sort(byEntryCount) : groupings;

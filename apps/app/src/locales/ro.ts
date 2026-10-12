@@ -794,6 +794,8 @@ export default {
       SAME_LANGUAGE:
         "Notele sunt deja în această limbă. Folosește technical_details și historical_notes sau schimbă notes_language.",
       YEARS_REVERSED: "Ultimul an este înaintea primului.",
+      REPRODUCTION_LINKED:
+        "O imagine reprodusă conform Deciziei BCE/2013/10 se încarcă, ca dimensiunea ei să respecte regulile BCE. Lasă image_url gol.",
       SOURCE_REQUIRED:
         "Precizează sursa acestor date, note sau a acestei imagini.",
       CREDIT_REQUIRED:

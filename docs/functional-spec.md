@@ -155,7 +155,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - official central-bank material, plus our own editing
   - Every stored group of facts records its source. Catalog data of unknown origin is never imported.
 - **Images** are shown only where they're clearly permitted: public-domain designs, money that is excluded from copyright, designs whose copyright has expired, and Creative Commons photos of those. Every other entry shows a neutral placeholder until a licence is held.
-  - **Banknotes an issuer allows images of under its reproduction rules**, such as the ECB's specimen images of euro banknotes (Decision ECB/2013/10): an image credited as reproduced under that Decision is stored at no more than 72 dpi at the note's real width and height, and only for an entry that has them.
+  - **Banknotes an issuer allows images of under its reproduction rules**, such as the ECB's specimen images of euro banknotes (Decision ECB/2013/10): an image credited as reproduced under that Decision is uploaded, never linked, and stored at no more than 72 dpi at the note's real width and height, so only for an entry that has them.
 - **Numista:** an entry may keep its Numista ID as a cross-reference, shown as an attributed link to Numista. No Numista data is stored.
 
 ### 6.2 Catalog picker (used when adding Items)

@@ -1,4 +1,11 @@
-import { catalogEntryNotFound, catalogErrors, catalogLimits } from "./fields";
+import {
+  catalogEntryNotFound,
+  catalogErrors,
+  catalogLimits,
+  reproducedUnderEcbRules,
+} from "./fields";
+
+export { reproducedUnderEcbRules };
 
 /**
  * Catalog entry image rules, shared by the backend and the app (no Convex
@@ -97,8 +104,11 @@ export function withinBounds(size: ImageSize, bounds: ImageBounds) {
 /**
  * The licence the euro banknotes' specimen images are credited with. The ECB
  * lets anyone use images of euro banknotes within its reproduction rules,
- * Decision ECB/2013/10, Art. 2: an electronic reproduction "in its 100 %
- * size does not exceed 72 dots per inch".
+ * Decision ECB/2013/10, Art. 2: an electronic reproduction marked
+ * "specimen" whose resolution "in its 100 % size does not exceed 72 dots per
+ * inch". The size is kept to here; the marking comes with the ECB's own
+ * specimen files, which are the only pictures credited this way. Such an
+ * image is uploaded, never linked (fields.ts checkNode).
  */
 export const ecbSpecimenLicence =
   "Reproduced under Decision ECB/2013/10: specimen image, 72 dpi";
@@ -106,10 +116,6 @@ export const ecbSpecimenLicence =
 /** The resolution Decision ECB/2013/10 allows a banknote's image at its real size. */
 const reproductionDpi = 72;
 const millimetresPerInch = 25.4;
-
-/** Whether an image's licence is the ECB's reproduction rules: it names Decision ECB/2013/10. */
-export const reproducedUnderEcbRules = (licence: string | undefined) =>
-  /\bECB\/2013\/10\b/i.test(licence ?? "");
 
 /**
  * The most pixels an entry's full-size image may have, given its licence:
