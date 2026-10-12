@@ -350,4 +350,42 @@ describe("the series for an Item without a purchase date", () => {
       },
     ]);
   });
+
+  test("leaves it from the month it was sold in, even when sold on the month's last day", () => {
+    // Recorded in January 2026: a coin at 100.00 kr, worth 150.00 kr, sold
+    // on 28 February; a banknote at 50.00 kr, worth 80.00 kr, kept.
+    const sold = coin({
+      _creationTime: Date.parse("2026-01-10T12:00:00Z"),
+      purchasePrice: 10_000,
+      marketValue: 15_000,
+      salePrice: 18_000,
+      soldOn: "2026-02-28",
+    });
+    const kept = coin({
+      _creationTime: Date.parse("2026-01-20T12:00:00Z"),
+      type: "banknote",
+      purchasePrice: 5_000,
+      marketValue: 8_000,
+    });
+    expect(seriesOf([sold, kept], ["2026-01", "2026-02", "2026-03"])).toEqual([
+      {
+        month: "2026-01",
+        purchasePrice: 15_000,
+        marketValue: 23_000,
+        metalValue: null,
+      },
+      {
+        month: "2026-02",
+        purchasePrice: 5_000,
+        marketValue: 8_000,
+        metalValue: null,
+      },
+      {
+        month: "2026-03",
+        purchasePrice: 5_000,
+        marketValue: 8_000,
+        metalValue: null,
+      },
+    ]);
+  });
 });

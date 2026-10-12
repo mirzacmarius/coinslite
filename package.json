@@ -16,6 +16,7 @@
     "lint:repo": "sherif --fail-on-warnings",
     "lint:repo:fix": "sherif --fix --fail-on-warnings",
     "typecheck": "turbo typecheck",
+    "test": "bun test",
     "dev:backend": "turbo dev --filter=@coinslite/backend",
     "setup": "bun --filter @coinslite/backend setup",
     "format:check": "biome format ."
