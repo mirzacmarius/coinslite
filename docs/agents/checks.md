@@ -6,4 +6,4 @@ The summary uses every task Turbo returns in its dry-run JSON, including depende
 
 Dependency tasks such as `topo` can intentionally have no script: Turbo uses them to order other tasks. A `Missing script` row is evidence about the graph, not by itself a defect.
 
-This covers workspace tasks scheduled by Turbo. Root-only checks such as `sherif` and `format:check`, along with CI e2e steps, are separate and do not appear in this graph.
+This covers workspace tasks scheduled by Turbo. Root-only checks such as `sherif` and `format:check` are separate and do not appear in this graph.
