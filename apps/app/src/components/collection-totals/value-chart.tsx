@@ -69,15 +69,16 @@ function axisTicks(max: number) {
   return ticks;
 }
 
-type Mode = "overTime" | "byDateAdded";
+type Mode = "overTime" | "byDateAcquired";
 
 /**
  * The Collection's value by month (spec 7), two ways: "over time", what it
  * was worth at the end of each month (Purchase price, the latest Market value
  * and, with gold or silver, the Metal value at that month's Spot price); or
- * "by date added", the cumulative Purchase price and Market value by the
- * month Items were added. Hover, or focus and use the arrow keys, to read a
- * month. `overTime` is undefined while it loads.
+ * "by date acquired", the cumulative Purchase price and Market value by the
+ * month Items were acquired: their purchase date, or when they were added if
+ * that is earlier or there is none. Hover, or focus and use the arrow keys,
+ * to read a month. `overTime` is undefined while it loads.
  */
 export function ValueChart({
   totals,
@@ -91,7 +92,7 @@ export function ValueChart({
   const monthLabel = useMonthFormat();
   const [mode, setMode] = useState<Mode>("overTime");
   const series: Point[] | undefined = useMemo(() => {
-    if (mode === "byDateAdded") return valueByDateAdded(totals);
+    if (mode === "byDateAcquired") return valueByDateAdded(totals);
     return overTime?.map(({ metalValue, ...point }) =>
       metalValue === null ? point : { ...point, metalValue },
     );
@@ -110,7 +111,7 @@ export function ValueChart({
   const title = t(
     mode === "overTime"
       ? "collectionTotals.valueOverTime"
-      : "collectionTotals.valueByDateAdded",
+      : "collectionTotals.valueByDateAcquired",
   );
 
   return (
@@ -119,14 +120,17 @@ export function ValueChart({
       description={t(
         mode === "overTime"
           ? "collectionTotals.valueOverTimeDescription"
-          : "collectionTotals.valueByDateAddedDescription",
+          : "collectionTotals.valueByDateAcquiredDescription",
       )}
       controls={
         <SegmentedControl
           label={t("collectionTotals.valueMode")}
           options={[
             { value: "overTime", label: t("collectionTotals.overTime") },
-            { value: "byDateAdded", label: t("collectionTotals.byDateAdded") },
+            {
+              value: "byDateAcquired",
+              label: t("collectionTotals.byDateAcquired"),
+            },
           ]}
           value={mode}
           onChange={setMode}

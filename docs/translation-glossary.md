@@ -7,6 +7,7 @@ How CoinsLite's domain terms ([`CONTEXT.md`](../CONTEXT.md)) read in each launch
 | Item | objekt | Objekt | objet | obiect |
 | Item type | objekttype | Objektart | type d’objet | tip de obiect |
 | Quantity | antall | Anzahl | quantité | cantitate |
+| Date acquired | anskaffelsesdato | Erwerbsdatum | date d’acquisition | data dobândirii |
 | Collection | samling | Sammlung | collection | colecție |
 | Album | album (pl. album) | Album (pl. Alben) | album | album (pl. albume) |
 | Grade | kvalitet | Erhaltung | état | stare |

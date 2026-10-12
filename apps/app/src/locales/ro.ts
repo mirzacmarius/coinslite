@@ -1064,10 +1064,10 @@ export default {
       "Cât valora colecția ta la sfârșitul fiecărei luni, metalul la prețul spot al lunii",
     valueMode: "Arată",
     overTime: "În timp",
-    byDateAdded: "După data adăugării",
-    valueByDateAdded: "Valoare după data adăugării",
-    valueByDateAddedDescription:
-      "Prețul de achiziție și valoarea de piață ale tuturor obiectelor adăugate până la sfârșitul fiecărei luni",
+    byDateAcquired: "După data dobândirii",
+    valueByDateAcquired: "Valoare după data dobândirii",
+    valueByDateAcquiredDescription:
+      "Prețul de achiziție și valoarea de piață ale tuturor obiectelor dobândite până la sfârșitul fiecărei luni: cumpărate sau adăugate, oricare a fost mai devreme",
     month: "Luna",
     monthKeys: "Folosește săgețile pentru a trece de la o lună la alta.",
     valueDistribution: "Distribuția valorii",

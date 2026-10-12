@@ -1,9 +1,9 @@
 import type { HomeCurrency } from "@coinslite/i18n";
 import type { MarketRates } from "../spotPrices/rates";
 import { metalValue } from "./preciousMetal";
-import { type TotalsItem, nextMonth } from "./totals";
+import { type TotalsItem, acquiredAt, monthOf, nextMonth } from "./totals";
 
-export { monthOf } from "./totals";
+export { monthOf };
 
 /**
  * "Value over time" (spec 7): what the Collection was worth at the end of
@@ -27,7 +27,7 @@ export type ValuePoint = {
 
 /** What the series reads from an Item. */
 export type SeriesItem = TotalsItem & {
-  /** When its pieces were first added, for an Item split off by a sale. */
+  /** When its pieces were first recorded, for an Item split off by a sale. */
   addedAt?: number;
   /** "YYYY-MM-DD"; an Item leaves the series from the month it was sold. */
   soldOn?: string;
@@ -40,7 +40,10 @@ export type MonthValue = {
   month: string;
   /** Purchase price × Quantity of what was owned at the month's end. */
   purchasePrice: number;
-  /** The latest Market value as of the month's end × Quantity. */
+  /**
+   * The latest Market value as of the month's end × Quantity; before an
+   * Item's first, its Purchase price if it has a purchase date.
+   */
   marketValue: number;
   /** Gold and silver at the month's Spot price; null without Spot prices. */
   metalValue: number | null;
@@ -64,9 +67,39 @@ export const lastDayOf = (month: string) =>
     .toISOString()
     .slice(0, 10);
 
-/** When an Item's pieces were first added. */
-export const startOf = (item: Pick<SeriesItem, "addedAt" | "_creationTime">) =>
+/** When an Item's pieces were first recorded in CoinsLite. */
+const recordedAt = (item: Pick<SeriesItem, "addedAt" | "_creationTime">) =>
   item.addedAt ?? item._creationTime;
+
+/**
+ * When an Item enters the series: when it was acquired (acquiredAt), on its
+ * purchase date or when its pieces were first recorded, whichever is
+ * earlier.
+ */
+export const startOf = (
+  item: Pick<SeriesItem, "addedAt" | "_creationTime" | "purchaseDate">,
+  utcOffsetMinutes: number,
+) => acquiredAt(recordedAt(item), item.purchaseDate, utcOffsetMinutes);
+
+/**
+ * The months a series over `items` covers: from the month the earliest of
+ * them started (startOf) through `throughMonth`, the person's current month;
+ * none when they all started later, or there are none.
+ */
+export function seriesMonths(
+  items: Pick<SeriesItem, "addedAt" | "_creationTime" | "purchaseDate">[],
+  throughMonth: string,
+  utcOffsetMinutes: number,
+) {
+  let firstMonth: string | undefined;
+  for (const item of items) {
+    const month = monthOf(startOf(item, utcOffsetMinutes), utcOffsetMinutes);
+    if (firstMonth === undefined || month < firstMonth) firstMonth = month;
+  }
+  return firstMonth === undefined
+    ? []
+    : monthsBetween(firstMonth, throughMonth);
+}
 
 /**
  * Where an Item stood at `end`: its Market value per piece and Quantity then,
@@ -88,10 +121,24 @@ function standingAt(item: SeriesItem, end: number) {
 }
 
 /**
+ * When an Item's first Market value was recorded; undefined if it never had
+ * one. Without history, when its pieces were recorded, as the backfill dates
+ * it.
+ */
+function firstValuedAt(item: SeriesItem) {
+  if (item.history.length === 0)
+    return item.marketValue === undefined ? undefined : recordedAt(item);
+  return item.history.find((point) => point.marketValue !== undefined)?.at;
+}
+
+/**
  * The series over `items` for each of `months`: the Items owned at each
- * month's end (added by then, and not sold by its last day), their Purchase
- * price, latest Market value and Metal value at that month's Spot price
- * (`ratesFor`), each × the Quantity they had then.
+ * month's end (acquired by then, and not sold by its last day), their
+ * Purchase price, latest Market value and Metal value at that month's Spot
+ * price (`ratesFor`), each × the Quantity they had then. Until its first
+ * recorded Market value, an Item with a purchase date counts at its Purchase
+ * price, the only value known for that time; one that never had a Market
+ * value counts none, as in the totals.
  */
 export function valueOverTime(
   items: Iterable<SeriesItem>,
@@ -117,12 +164,22 @@ export function valueOverTime(
     metalValue: 0,
   }));
   for (const item of items) {
-    const start = startOf(item);
+    const start = startOf(item, utcOffsetMinutes);
+    const purchasePrice = item.purchasePrice ?? 0;
+    // Months ending by its first recorded Market value count it at its
+    // Purchase price; undefined when none do.
+    const atPurchasePriceUntil =
+      item.purchaseDate === undefined ? undefined : firstValuedAt(item);
     for (const point of series) {
       if (start >= point.end) continue;
       if (item.soldOn !== undefined && item.soldOn <= point.lastDay) continue;
-      const { marketValue, quantity } = standingAt(item, point.end);
-      point.purchasePrice += (item.purchasePrice ?? 0) * quantity;
+      const standing = standingAt(item, point.end);
+      const { quantity } = standing;
+      const marketValue =
+        atPurchasePriceUntil !== undefined && point.end <= atPurchasePriceUntil
+          ? purchasePrice
+          : standing.marketValue;
+      point.purchasePrice += purchasePrice * quantity;
       point.marketValue += marketValue * quantity;
       if (point.rates)
         point.metalValue +=

@@ -60,6 +60,9 @@ export async function ratesForDays(ctx: QueryCtx, lastDays: string[]) {
   }
   return await Promise.all(
     lastDays.map(async (lastDay) => {
+      // Months before the first kept day, back to the earliest purchase
+      // date, need no read each.
+      if (lastDay < earliest.day) return ratesOfDay(earliest);
       const day = await ctx.db
         .query("spotPriceDays")
         .withIndex("by_day", (q) => q.lte("day", lastDay))

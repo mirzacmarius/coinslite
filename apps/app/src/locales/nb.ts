@@ -1055,10 +1055,10 @@ export default {
       "Hva samlingen din var verdt ved slutten av hver måned, metall etter månedens spotpris",
     valueMode: "Vis",
     overTime: "Over tid",
-    byDateAdded: "Etter dato lagt til",
-    valueByDateAdded: "Verdi etter dato lagt til",
-    valueByDateAddedDescription:
-      "Innkjøpspris og markedsverdi for alt som var lagt til ved slutten av hver måned",
+    byDateAcquired: "Etter anskaffelsesdato",
+    valueByDateAcquired: "Verdi etter anskaffelsesdato",
+    valueByDateAcquiredDescription:
+      "Innkjøpspris og markedsverdi for alt som var anskaffet ved slutten av hver måned: kjøpt eller lagt til, det som kom først",
     month: "Måned",
     monthKeys: "Bruk piltastene for å gå mellom månedene.",
     valueDistribution: "Verdifordeling",

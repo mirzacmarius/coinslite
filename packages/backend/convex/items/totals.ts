@@ -21,9 +21,11 @@ const itemTypes = ["coin", "banknote", "stamp"] as const satisfies ItemType[];
 
 /** What totals read from an Item. */
 export type TotalsItem = MetalContent & {
-  /** When the Item was added. */
+  /** When the Item was recorded in CoinsLite. */
   _creationTime: number;
   type: ItemType;
+  /** "YYYY-MM-DD"; it counts as acquired then when that is earlier (acquiredAt). */
+  purchaseDate?: string;
   /** Per piece, in minor units of the Home currency. */
   purchasePrice?: number;
   /** Per piece, in minor units of the Home currency. */
@@ -72,8 +74,9 @@ export type CollectionTotals = {
   /** Each precious metal the Items hold. */
   metals: Record<Metal, MetalTotal>;
   /**
-   * Purchase price and Market value (× Quantity) of the Items added in each
-   * month, oldest first, only months with Items. See valueByDateAdded.
+   * Purchase price and Market value (× Quantity) of the Items acquired in
+   * each month (acquiredAt), oldest first, only months with Items. See
+   * valueByDateAdded.
    */
   addedByMonth: MonthAmounts[];
 };
@@ -149,6 +152,32 @@ export const emptyTotals = ({
 export const monthOf = (moment: number, utcOffsetMinutes: number) =>
   new Date(moment + utcOffsetMinutes * 60_000).toISOString().slice(0, 7);
 
+/**
+ * The earliest purchase date the charts go by: a date mistyped centuries
+ * back (the year 202) would otherwise stretch them over every month since.
+ */
+const EARLIEST_PURCHASE_DATE = "1900-01-01";
+
+/**
+ * When an Item was acquired: at the start of its purchase date ("YYYY-MM-DD",
+ * in the person's time zone, `utcOffsetMinutes` ahead of UTC; 1900 at the
+ * earliest) when that is earlier than `recordedAt`, when it was recorded in
+ * CoinsLite; otherwise then.
+ */
+export function acquiredAt(
+  recordedAt: number,
+  purchaseDate: string | undefined,
+  utcOffsetMinutes: number,
+) {
+  if (purchaseDate === undefined) return recordedAt;
+  const day =
+    purchaseDate < EARLIEST_PURCHASE_DATE
+      ? EARLIEST_PURCHASE_DATE
+      : purchaseDate;
+  const bought = Date.parse(`${day}T00:00:00Z`) - utcOffsetMinutes * 60_000;
+  return Math.min(bought, recordedAt);
+}
+
 /** Totals over `items`. */
 export function collectionTotals(
   items: Iterable<TotalsItem>,
@@ -168,7 +197,10 @@ export function collectionTotals(
     totals.byType[type].purchasePrice += purchasePrice;
     totals.byType[type].marketValue += marketValue;
 
-    const month = monthOf(item._creationTime, utcOffsetMinutes);
+    const month = monthOf(
+      acquiredAt(item._creationTime, item.purchaseDate, utcOffsetMinutes),
+      utcOffsetMinutes,
+    );
     const added = byMonth.get(month) ?? { month, ...noAmounts() };
     added.purchasePrice += purchasePrice;
     added.marketValue += marketValue;
@@ -268,9 +300,9 @@ export function nextMonth(month: string) {
 }
 
 /**
- * The "Value by date added" chart: for every month from the first Item added
- * to the last, including months without any, the Purchase price and Market
- * value of everything added by the end of that month.
+ * The "Value by date acquired" chart: for every month from the first Item
+ * acquired to the last, including months without any, the Purchase price and
+ * Market value of everything acquired by the end of that month.
  */
 export function valueByDateAdded({
   addedByMonth,

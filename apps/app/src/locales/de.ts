@@ -1090,10 +1090,10 @@ export default {
       "Was deine Sammlung am Ende jedes Monats wert war, Metall zum Spotpreis des Monats",
     valueMode: "Anzeigen",
     overTime: "Im Zeitverlauf",
-    byDateAdded: "Nach Hinzufügedatum",
-    valueByDateAdded: "Wert nach Hinzufügedatum",
-    valueByDateAddedDescription:
-      "Kaufpreis und Marktwert von allem, was bis zum Ende jedes Monats hinzugefügt wurde",
+    byDateAcquired: "Nach Erwerbsdatum",
+    valueByDateAcquired: "Wert nach Erwerbsdatum",
+    valueByDateAcquiredDescription:
+      "Kaufpreis und Marktwert von allem, was bis zum Ende jedes Monats erworben wurde: gekauft oder hinzugefügt, je nachdem, was früher war",
     month: "Monat",
     monthKeys: "Mit den Pfeiltasten zwischen den Monaten wechseln.",
     valueDistribution: "Wertverteilung",

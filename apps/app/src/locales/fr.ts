@@ -1073,10 +1073,10 @@ export default {
       "Ce que valait votre collection à la fin de chaque mois, le métal au cours spot du mois",
     valueMode: "Afficher",
     overTime: "Dans le temps",
-    byDateAdded: "Par date d’ajout",
-    valueByDateAdded: "Valeur par date d’ajout",
-    valueByDateAddedDescription:
-      "Prix d’achat et valeur de marché de tout ce qui a été ajouté à la fin de chaque mois",
+    byDateAcquired: "Par date d’acquisition",
+    valueByDateAcquired: "Valeur par date d’acquisition",
+    valueByDateAcquiredDescription:
+      "Prix d’achat et valeur de marché de tout ce qui a été acquis à la fin de chaque mois : acheté ou ajouté, selon ce qui est arrivé en premier",
     month: "Mois",
     monthKeys: "Utilisez les flèches pour passer d’un mois à l’autre.",
     valueDistribution: "Répartition de la valeur",
