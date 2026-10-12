@@ -10467,7 +10467,6 @@ export const numismaticCoins: BnrIssue[] = [
         metal: "gold",
         fineness: 0.999,
         weight: 6.22,
-        diameter: 9,
         edge: "plain",
         strike: "proof",
         details:
@@ -10484,7 +10483,6 @@ export const numismaticCoins: BnrIssue[] = [
         metal: "gold",
         fineness: 0.999,
         weight: 6.22,
-        diameter: 9,
         edge: "plain",
         strike: "proof",
         details:
@@ -10501,7 +10499,6 @@ export const numismaticCoins: BnrIssue[] = [
         metal: "gold",
         fineness: 0.999,
         weight: 6.22,
-        diameter: 9,
         edge: "plain",
         strike: "proof",
         details:
@@ -10518,7 +10515,6 @@ export const numismaticCoins: BnrIssue[] = [
         metal: "gold",
         fineness: 0.999,
         weight: 6.22,
-        diameter: 9,
         edge: "plain",
         strike: "proof",
         details:

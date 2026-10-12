@@ -9,6 +9,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { catalogLimits } from "../convex/catalog/fields";
 import {
   circulationDateOf,
   clean,
@@ -105,11 +106,16 @@ async function request(name: string, url: string, form?: URLSearchParams) {
 /** A page's number, the start of its slug: "25745" for "25745-pictori-romani-nicolae-tonitza". */
 const pageId = (slug: string) => slug.split("-")[0] as string;
 
+/** Pages already read this run, by slug: several notes share a circular. */
+const pageCache = new Map<string, string>();
+
 /**
  * A page's content. bnr.ro renders client-side: the page is a shell of
  * numbered blocks, and POST /blocks returns each block's HTML.
  */
-export async function pageOf(slug: string) {
+async function pageOf(slug: string) {
+  const known = pageCache.get(slug);
+  if (known !== undefined) return known;
   const shell = await request(`${pageId(slug)}.html`, `${site}/${slug}`);
   const blocks: string[] = [];
   for (const [, bid = ""] of shell.matchAll(
@@ -123,11 +129,13 @@ export async function pageOf(slug: string) {
       ),
     );
   }
-  return blocks.join("\n");
+  const html = blocks.join("\n");
+  pageCache.set(slug, html);
+  return html;
 }
 
 /** Every page of a paged list: POST /getpaginare returns each page's HTML. */
-export async function listOf(slug: string) {
+async function listOf(slug: string) {
   const first = await pageOf(slug);
   const controls = /class="pagination-controls[^>]*>/.exec(first)?.[0] ?? "";
   const pages = Number(/data-total-pages="(\d+)"/.exec(controls)?.[1] ?? 1);
@@ -186,19 +194,18 @@ const keyOf = (text: string) =>
 const yearOf = (date: string | undefined) =>
   date ? Number(date.slice(0, 4)) : undefined;
 
-/** Notes are 5000 characters at most: whole paragraphs up to that, saying so when some are left out. */
-function detailsOf(lines: string[], where: string) {
-  const kept: string[] = [];
-  let length = 0;
-  for (const line of lines) {
-    if (length + line.length + 1 > 5000) {
-      report.push(`${where}: description cut to 5000 characters`);
-      break;
-    }
-    kept.push(line);
-    length += line.length + 1;
-  }
-  return kept.join("\n");
+/**
+ * The BNR's description, one paragraph a line. Notes hold 5000 characters;
+ * cutting a longer one would alter the BNR's text, which its terms say must
+ * then be stated, so a person decides instead.
+ */
+function detailsOf(lines: Array<string | undefined>, where: string) {
+  const details = lines.filter(Boolean).join("\n");
+  if (details.length > catalogLimits.notes)
+    throw new Error(
+      `${where}: description longer than ${catalogLimits.notes} characters`,
+    );
+  return details;
 }
 
 // The numismatic catalogue: coins (and medals, which aren't money, so left out).
@@ -215,10 +222,10 @@ for (const { slug, html } of await detailPagesOf("2271-monede-si-medalii")) {
   const pieces: Coin[] = [];
   for (const piece of issue.pieces) {
     const facts = coinFacts(piece);
-    const value = labelledValue(piece, "Valoare nominală");
+    const nominal = labelledValue(piece, "Valoare nominală");
     if (!facts.denomination) {
       report.push(
-        `${slug}: left out "${piece.heading}" (nominal value ${JSON.stringify(value ?? null)})`,
+        `${slug}: left out "${piece.heading}" (nominal value ${JSON.stringify(nominal ?? null)})`,
       );
       continue;
     }
@@ -234,6 +241,7 @@ for (const { slug, html } of await detailPagesOf("2271-monede-si-medalii")) {
       ["Margine", facts.edge],
       ["Calitate", facts.strike],
       ["Greutate", facts.weight],
+      ["Dimensiune", facts.diameter],
     ] as const) {
       const text = labelledValue(piece, label);
       if (text && known === undefined)
@@ -247,19 +255,20 @@ for (const { slug, html } of await detailPagesOf("2271-monede-si-medalii")) {
       year,
       ...(issue.date && { issueDate: issue.date }),
       ...facts,
-      strike: facts.strike,
-      details: [
-        // Values the BNR's page failed to fill in are left out.
-        piece.lines
-          .filter((line) => !isBroken(line))
-          .join(" "),
-        piece.obverse,
-        piece.reverse,
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      denomination: facts.denomination,
+      details: detailsOf(
+        [
+          // Values the BNR's page failed to fill in are left out.
+          piece.lines
+            .filter((line) => !isBroken(line))
+            .join(" "),
+          piece.obverse,
+          piece.reverse,
+        ],
+        slug,
+      ),
       link: link(slug),
-    } as Coin);
+    });
   }
   if (pieces.length === 0) {
     report.push(`${slug}: no coin, left out (${issue.title})`);
@@ -272,14 +281,16 @@ for (const { slug, html } of await detailPagesOf("2271-monede-si-medalii")) {
     pieces.filter((other) => other.denomination === piece.denomination);
   for (const piece of pieces) {
     const base = `${id}-${keyOf(piece.denomination)}`;
-    const value = sameValue(piece);
-    const sameTitle = value.filter((other) => other.title === piece.title);
+    const sameValueAs = sameValue(piece);
+    const sameTitle = sameValueAs.filter(
+      (other) => other.title === piece.title,
+    );
     piece.key =
-      value.length === 1
+      sameValueAs.length === 1
         ? base
         : sameTitle.length === 1
           ? keyOf(`${base}-${piece.title.split(", ")[1] ?? ""}`)
-          : `${base}-${value.indexOf(piece) + 1}`;
+          : `${base}-${sameValueAs.indexOf(piece) + 1}`;
   }
   const titles = pieces.map((piece) => {
     const sameTitle = pieces.filter((other) => other.title === piece.title);
@@ -342,6 +353,12 @@ for (const { slug, html } of await detailPagesOf("1066-bancnote")) {
   });
 }
 
+/** A set whose page names its commemorative coin in a sentence rather than in brackets. */
+const commemorativesNamedOtherwise: Record<string, string[]> = {
+  // "inclusiv moneda comemorativă de 50 bani dedicată aniversării a 100 de ani de la primul zbor românesc efectuat de Aurel Vlaicu"
+  "21974": ["Aurel Vlaicu"],
+};
+
 // Mint sets: the coins of the year, with a medal, which isn't money.
 const mintSets: Issue[] = [];
 for (const { slug, html } of await detailPagesOf("1069-seturi-de-monetarie")) {
@@ -350,12 +367,15 @@ for (const { slug, html } of await detailPagesOf("1069-seturi-de-monetarie")) {
   const lines = [...new Set(page.lines)];
   const text = lines.join(" ");
   const year = yearOf(page.date);
+  // What the set holds is said before its medal is.
+  const contents = text.split(/medali/i)[0] ?? "";
   const coins = [
     ...new Set(
       [
-        ...(text.split(/medali/i)[0] ?? "").matchAll(
-          /(\d[\d.]*)\s*(?:de\s+)?(bani|ban|lei|leu)\b/gi,
-        ),
+        ...contents
+          // The commemoratives come after, by name.
+          .replace(/(monede(le)?\s+)?comemorativ[\s\S]*$/i, "")
+          .matchAll(/(\d[\d.]*)\s*(?:de\s+)?(bani|ban|lei|leu)\b/gi),
       ].map(([, value, unit]) => formatDenomination(value ?? "", unit ?? "")),
     ),
   ];
@@ -364,6 +384,39 @@ for (const { slug, html } of await detailPagesOf("1069-seturi-de-monetarie")) {
     continue;
   }
   const key = `ro-bnr-${pageId(slug)}`;
+  // Its commemorative 50 bani coins, as the set's page names them: "comemorative de 50 bani (Aurel Vlaicu, …)".
+  const named =
+    /comemorative de 50 bani \(([^)]+)\)/i
+      .exec(contents)?.[1]
+      ?.split(/,\s*|\s+(?:și|şi)\s+/)
+      .map((name) => name.trim())
+      .filter(Boolean) ??
+    commemorativesNamedOtherwise[pageId(slug)] ??
+    [];
+  for (const name of named)
+    if (!text.includes(name))
+      throw new Error(`${slug}: doesn't name the commemorative ${name}`);
+  if (/comemorativ/i.test(contents) && named.length === 0)
+    throw new Error(`${slug}: holds commemoratives it doesn't name`);
+  // The coins' quality, where the page gives it for them rather than for the medal alone.
+  const proof =
+    /calitate proof(?![- ]?like)/i.test(contents) ||
+    /(atât medalia, cât şi monedele|toate monedele)[^.]*calitate proof(?![- ]?like)/i.test(
+      text,
+    );
+  const piece = (denomination: string, title: string, suffix: string) => ({
+    // Ids hold 64 characters: a longer one ends at its last whole word.
+    key: `${key}-${suffix}`.replace(/^(.{0,64})-.*$/, (whole, kept) =>
+      whole.length > 64 ? kept : whole,
+    ),
+    title,
+    denomination,
+    year,
+    ...(page.date && { issueDate: page.date }),
+    ...(proof && { strike: "proof" }),
+    details: "",
+    link: link(slug),
+  });
   mintSets.push({
     key,
     title: page.title,
@@ -371,15 +424,14 @@ for (const { slug, html } of await detailPagesOf("1069-seturi-de-monetarie")) {
     ...(page.date && { issueDate: page.date }),
     link: link(slug),
     details: detailsOf(lines, slug),
-    pieces: coins.map((denomination) => ({
-      key: `${key}-${keyOf(denomination)}`,
-      title: denomination,
-      denomination,
-      year,
-      ...(page.date && { issueDate: page.date }),
-      details: "",
-      link: link(slug),
-    })),
+    pieces: [
+      ...coins.map((denomination) =>
+        piece(denomination, denomination, keyOf(denomination)),
+      ),
+      ...named.map((name) =>
+        piece("50 bani", `50 bani – ${name}`, keyOf(`50 bani ${name}`)),
+      ),
+    ],
   });
 }
 
@@ -394,8 +446,8 @@ const circulationCoins: Coin[] = parseCircularCoins(circularHtml).map(
     const shown = listed.find(
       (each) => each.denomination === coin.denomination,
     );
-    if (!shown || !issued2005)
-      throw new Error(`${coin.denomination} isn't on ${coinsPage}`);
+    if (!shown) throw new Error(`${coin.denomination} isn't on ${coinsPage}`);
+    if (!issued2005) throw new Error(`${coinsCircular} gives no date`);
     const { material } = metalOf(shown.lines[0]);
     return {
       key: `ro-coin-2005-${keyOf(coin.denomination)}`,
@@ -412,7 +464,7 @@ const circulationCoins: Coin[] = parseCircularCoins(circularHtml).map(
       }),
       ...(coin.edge && { edge: coin.edge }),
       strike: "circulation",
-      details: coin.lines.join("\n"),
+      details: detailsOf(coin.lines, `${coinsCircular} ${coin.denomination}`),
       link: link(coinsCircular),
     };
   },
@@ -467,7 +519,11 @@ for (const note of parseCirculationBanknotes(notesHtml)) {
   const circularPage = await pageOf(circular);
   const issueDate = circulationDateOf(circularPage);
   const year = yearOf(issueDate);
-  if (!issueDate || !year || !clean(circularPage).includes(note.denomination))
+  // "valoarea nominală de 5 lei", not the 5 lei of "25 lei".
+  const names = new RegExp(`(^|[^\\d.])${note.denomination}\\b`).test(
+    clean(circularPage),
+  );
+  if (!issueDate || !year || !names)
     throw new Error(`${note.denomination}: ${circular} doesn't issue it`);
   const title = circularTitles.get(circular);
   circulationBanknotes.push({
@@ -480,21 +536,27 @@ for (const note of parseCirculationBanknotes(notesHtml)) {
     year,
     issueDate,
     ...(note.width && { width: note.width, height: note.height }),
-    details: [
-      ...note.facts,
-      `Avers: ${note.obverse.join("; ")}.`,
-      `Revers: ${note.reverse.join("; ")}.`,
-      ...(title ? [title] : []),
-    ].join("\n"),
+    details: detailsOf(
+      [
+        ...note.facts,
+        `Avers: ${note.obverse.join("; ")}.`,
+        `Revers: ${note.reverse.join("; ")}.`,
+        title,
+      ],
+      `${notesPage} ${note.denomination}`,
+    ),
     link: link(notesPage),
   });
 }
-const value = (denomination: string) =>
+const amountOf = (denomination: string) =>
   Number(denomination.replace(/\D+$/, "").replace(/\./g, "").trim());
 circulationBanknotes.sort(
-  (a, b) => value(a.denomination) - value(b.denomination) || a.year - b.year,
+  (a, b) =>
+    amountOf(a.denomination) - amountOf(b.denomination) || a.year - b.year,
 );
-circulationCoins.sort((a, b) => value(a.denomination) - value(b.denomination));
+circulationCoins.sort(
+  (a, b) => amountOf(a.denomination) - amountOf(b.denomination),
+);
 
 // The 2000–2003 polymer notes, withdrawn when the leu was redenominated.
 const polymerPage = "2275-prima-emisiune-bnr-realizata-din-polimer-2000-2003";
@@ -520,7 +582,9 @@ for (const slug of linksOf(await pageOf(polymerPage)).filter((each) =>
     link: link(slug),
   });
 }
-polymerBanknotes.sort((a, b) => value(a.denomination) - value(b.denomination));
+polymerBanknotes.sort(
+  (a, b) => amountOf(a.denomination) - amountOf(b.denomination),
+);
 
 const header = `// Generated by packages/backend/scripts/fetch-bnr.ts from the National Bank of
 // Romania's website, ${site}. Run the script again rather than editing by hand.

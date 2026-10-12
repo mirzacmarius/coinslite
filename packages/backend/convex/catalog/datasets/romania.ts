@@ -23,8 +23,9 @@ import { numismaticCoins } from "./romaniaBnrCoins";
  * rebuilt by scripts/fetch-bnr.ts). Its terms allow redistributing its
  * content in any form with the source named; changes must be stated, and
  * where the information serves a paid service, users must be told it comes
- * from bnr.ro, where it is free. Every row's credit says all three, and the
- * app shows it with the facts. Notes stay in the BNR's Romanian.
+ * from bnr.ro, where it is free. Every row's credit says all three, and a
+ * Catalog entry's page shows it with the facts. Notes stay in the BNR's
+ * Romanian.
  *
  * Left out: medals, which aren't money, and values the BNR's pages fail to
  * fill in. The BNR's "Tiraj maxim" is a ceiling, not a mintage, so it stays
@@ -56,7 +57,7 @@ const grouping = (
   title: string,
   sortOrder: number,
   link: string,
-  more: Row = {},
+  values: Row = {},
 ): Row => ({
   id,
   parent_id: parent,
@@ -64,7 +65,7 @@ const grouping = (
   country: "RO",
   sort_order: String(sortOrder),
   is_addable: "false",
-  ...more,
+  ...values,
   ...credit("facts", link),
 });
 
@@ -78,8 +79,15 @@ const notes = (details: string | undefined, link: string): Row =>
       }
     : {};
 
-const number = (value: number | undefined) =>
+/** A number as its CSV cell, empty when there is none. */
+const cell = (value: number | undefined) =>
   value === undefined ? "" : String(value);
+
+/** A year as the first and last of a node's years. */
+const inYear = (year: number) => ({
+  year_from: String(year),
+  year_to: String(year),
+});
 
 function coinRow(
   coin: BnrCoin,
@@ -98,14 +106,13 @@ function coinRow(
     material: coin.material ?? "",
     strike: coin.strike ?? "",
     metal: coin.metal ?? "",
-    weight_g: number(coin.weight),
-    fineness: number(coin.fineness),
-    diameter_mm: number(coin.diameter),
-    thickness_mm: number(coin.thickness),
+    weight_g: cell(coin.weight),
+    fineness: cell(coin.fineness),
+    diameter_mm: cell(coin.diameter),
+    thickness_mm: cell(coin.thickness),
     composition: coin.composition ?? "",
     edge: coin.edge ?? "",
-    year_from: String(coin.year),
-    year_to: String(coin.year),
+    ...inYear(coin.year),
     issue_date: coin.issueDate ?? "",
     sort_order: String(sortOrder),
     is_addable: "true",
@@ -128,8 +135,8 @@ function banknoteRow(
     country: "RO",
     denomination: note.denomination,
     series,
-    width_mm: number(note.width),
-    height_mm: number(note.height),
+    width_mm: cell(note.width),
+    height_mm: cell(note.height),
     year_from: String(note.year),
     issue_date: note.issueDate ?? "",
     sort_order: String(sortOrder),
@@ -139,15 +146,15 @@ function banknoteRow(
   };
 }
 
-/** An issue of one coin is an entry; of several, a grouping with one entry per coin. */
+/** An issue of one coin is an entry; of several, or a mint set, a grouping with one entry per coin. */
 function issueRows(issue: BnrIssue, parent: string, sortOrder: number): Row[] {
-  const [only] = issue.pieces;
-  if (issue.pieces.length === 1 && only)
-    return [coinRow({ ...only, title: issue.title }, parent, sortOrder)];
+  const [single] = issue.pieces;
+  if (issue.pieces.length === 1 && single)
+    return [coinRow({ ...single, title: issue.title }, parent, sortOrder)];
   return [
     grouping(issue.key, parent, issue.title, sortOrder, issue.link, {
-      year_from: String(issue.year),
-      year_to: String(issue.year),
+      ...inYear(issue.year),
+      issue_date: issue.issueDate ?? "",
       ...notes(issue.details, issue.link),
     }),
     ...issue.pieces.map((coin, index) => coinRow(coin, issue.key, index + 1)),
@@ -241,7 +248,7 @@ const rows: Row[] = [
         String(year),
         yearIndex + 1,
         `${pages}/2271-monede-si-medalii`,
-        { year_from: String(year), year_to: String(year) },
+        inYear(year),
       ),
       ...issues.flatMap((issue, index) => issueRows(issue, key, index + 1)),
     ];
@@ -263,17 +270,7 @@ const rows: Row[] = [
     3,
     `${pages}/1069-seturi-de-monetarie`,
   ),
-  ...mintSets.flatMap((set, index) => [
-    grouping(set.key, mintSetsKey, set.title, index + 1, set.link, {
-      year_from: String(set.year),
-      year_to: String(set.year),
-      issue_date: set.issueDate ?? "",
-      ...notes(set.details, set.link),
-    }),
-    ...set.pieces.map((coin, pieceIndex) =>
-      coinRow(coin, set.key, pieceIndex + 1),
-    ),
-  ]),
+  ...mintSets.flatMap((set, index) => issueRows(set, mintSetsKey, index + 1)),
 ];
 
 export const romania = [

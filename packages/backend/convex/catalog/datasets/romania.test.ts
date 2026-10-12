@@ -120,6 +120,21 @@ describe("the Romania dataset", () => {
     ).toBe(true);
   });
 
+  test("a mint set has an entry per coin, its commemoratives included, in the quality its page gives them", () => {
+    const set = rows.filter((row) => row.parentKey === "ro-bnr-21968");
+    expect(set.map((row) => row.values.title)).toEqual([
+      "1 ban",
+      "5 bani",
+      "10 bani",
+      "50 bani",
+      "50 bani – Aurel Vlaicu",
+      "50 bani – Mircea cel Bătrân",
+      "50 bani – Neagoe Basarab",
+    ]);
+    expect(set.every((row) => row.values.strike === "proof")).toBe(true);
+    expect(set.every((row) => row.values.yearFrom === 2012)).toBe(true);
+  });
+
   test("a spot check: the 2026 Nicolae Tonitza silver 10 lei", () => {
     const tonitza = rows.find((row) => row.key === "ro-bnr-25745-10-lei");
     expect(tonitza?.values).toMatchObject({

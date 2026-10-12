@@ -2,6 +2,8 @@
  * Reading the National Bank of Romania's pages into Catalog facts. Pure: the
  * pages come in as HTML, as POST https://www.bnr.ro/blocks returns them.
  */
+import type { PreciousMetal } from "../convex/catalog/fields";
+import type { Material } from "../convex/items/rules";
 
 const entities: Record<string, string> = {
   amp: "&",
@@ -102,24 +104,19 @@ export function parseCoinIssue(html: string): CoinIssue {
     const lines = paragraphs(
       rest.slice("</strong>".length, factsEnd >= 0 ? factsEnd : undefined),
     ).filter((line) => /^[^:]{2,40}:/.test(line));
+    const obverse = side("Avers");
+    const reverse = side("Revers");
     pieces.push({
       heading,
       lines,
-      ...(side("Avers") && { obverse: side("Avers") }),
-      ...(side("Revers") && { reverse: side("Revers") }),
+      ...(obverse && { obverse }),
+      ...(reverse && { reverse }),
     });
   }
-  return {
-    title: titleOf(html),
-    ...(dateOf(
-      /Data emisiunii:?\s*([\d.]+)/.exec(clean(before))?.[0] ?? "",
-    ) && {
-      date: dateOf(
-        /Data emisiunii:?\s*([\d.]+)/.exec(clean(before))?.[0] ?? "",
-      ),
-    }),
-    pieces,
-  };
+  const date = dateOf(
+    /Data emisiunii:?\s*([\d.]+)/.exec(clean(before))?.[0] ?? "",
+  );
+  return { title: titleOf(html), ...(date && { date }), pieces };
 }
 
 /** A label's value on a piece, without its closing punctuation. */
@@ -158,29 +155,11 @@ export function denominationOf(value: string | undefined) {
   return match ? formatDenomination(match[1] ?? "", match[2] ?? "") : undefined;
 }
 
-type Material =
-  | "gold"
-  | "silver"
-  | "platinum"
-  | "palladium"
-  | "copper"
-  | "bronze"
-  | "brass"
-  | "cupronickel"
-  | "nickelBrass"
-  | "nickel"
-  | "steel"
-  | "aluminium"
-  | "aluminiumBronze"
-  | "zinc"
-  | "bimetallic"
-  | "other";
-
 /** The metals the BNR names, as Catalog materials, with the precious ones' Spot metal. */
 const metals: Array<{
   pattern: RegExp;
   material: Material;
-  metal?: "gold" | "silver" | "platinum" | "palladium";
+  metal?: PreciousMetal;
 }> = [
   { pattern: /^aur\b/i, material: "gold", metal: "gold" },
   { pattern: /^argint\b/i, material: "silver", metal: "silver" },
@@ -202,7 +181,7 @@ const metals: Array<{
 /** "Argint 999/1000" as silver, 0.999 fine; "Oţel placat cu nichel -/1000" as steel. */
 export function metalOf(value: string | undefined): {
   material?: Material;
-  metal?: "gold" | "silver" | "platinum" | "palladium";
+  metal?: PreciousMetal;
   fineness?: number;
 } {
   if (!value || isBroken(value)) return {};
@@ -238,13 +217,23 @@ export function weightOf(value: string | undefined) {
   return weight && weight > 0 && weight < heaviestCoin ? weight : undefined;
 }
 
-/** "rotundă - diametru 37 mm" as 37; other shapes have no diameter. */
+/**
+ * Below this a diameter has lost a digit: the catalogue's smallest coins
+ * measure 13.91 mm, and the one page that says "diametru 9 mm" gives 6.22 g
+ * of gold, which can't be struck that small.
+ */
+const smallestCoin = 10;
+
+/** "rotundă - diametru 37 mm" as 37, as the BNR measures any shape; a diameter that has lost a digit as nothing. */
 export function diameterOf(value: string | undefined) {
   if (!value || isBroken(value)) return undefined;
   const match = /diametru(?:l)?\s*(?:de\s*)?(\d+(?:[.,]\d+)?)\s*mm/i.exec(
     value,
   );
-  return match ? Number(match[1]?.replace(",", ".")) : undefined;
+  const diameter = match ? Number(match[1]?.replace(",", ".")) : undefined;
+  return diameter !== undefined && diameter >= smallestCoin
+    ? diameter
+    : undefined;
 }
 
 /** How the BNR words an edge, as the Catalog's edges. */
@@ -255,7 +244,7 @@ export function edgeOf(value: string | undefined) {
   if (/(sector|grup|alternând|discontinu|întrerup)/.test(text))
     return "interruptedReeding" as const;
   if (/^(zim[țţt]at|zim[țţt]uit)/.test(text)) return "reeded" as const;
-  if (/^neted|^neted[ăa]$/.test(text)) return "plain" as const;
+  if (/^neted/.test(text)) return "plain" as const;
   return undefined;
 }
 
