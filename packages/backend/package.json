@@ -27,6 +27,7 @@
     "standardwebhooks": "^1.0.0"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.3",
     "jose": "^5.10.0",
     "typescript": "^5.5.4"
   }
