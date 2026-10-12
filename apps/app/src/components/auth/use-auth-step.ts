@@ -8,8 +8,10 @@ export type AuthStepResult = "signedIn" | "codeSent" | "failed";
 
 /**
  * Runs one step of a sign-in flow with the given Convex Auth provider. Through
- * the Next.js auth proxy a rejected step arrives without its reason, so each
- * form explains the likely cause itself; the backend still enforces every rule.
+ * the Next.js auth proxy a rejected step arrives as a plain Error carrying the
+ * server's message but not its ConvexError data, and in production most
+ * messages are just "Server Error", so each form explains the likely cause
+ * itself; the backend still enforces every rule.
  */
 export function useAuthStep(provider: "password" | "magic-link") {
   const { signIn } = useAuthActions();
