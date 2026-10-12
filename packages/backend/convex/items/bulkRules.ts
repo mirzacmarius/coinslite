@@ -1,4 +1,4 @@
-import type { GradingScale } from "./grades";
+import { type GradingScale, type ItemType, suitsGrade } from "./grades";
 
 /**
  * Acting on several Items at once (spec 5.x, MUS-739), and undoing a move or
@@ -23,31 +23,31 @@ export const bulkErrors = {
 /**
  * Plans undoing a move: each Item the move took (`before`, with the Album it
  * was in) goes back to that Album, or to none. One already where the move put
- * it (`done`) wasn't changed by it and is left out. One deleted (missing from
- * `now`) or no longer where the move put it has changed since, and one whose
- * Album is no longer among `albums` has nowhere to go back to: both are
+ * it (`after`) wasn't changed by it and is left out. One deleted (missing
+ * from `now`) or no longer where the move put it has changed since, and one
+ * whose Album is no longer among `albums` has nowhere to go back to: both are
  * skipped and counted.
  */
 export function planMoveUndo<ItemId, AlbumId>({
   before,
-  done,
+  after,
   now,
   albums,
 }: {
   before: ReadonlyArray<{ itemId: ItemId; albumId?: AlbumId }>;
-  done: { albumId?: AlbumId };
+  after: { albumId?: AlbumId };
   now: ReadonlyMap<ItemId, { albumId?: AlbumId }>;
   albums: ReadonlySet<AlbumId>;
 }) {
   const moved = firstOfEach(before).filter(
-    ({ albumId }) => albumId !== done.albumId,
+    ({ albumId }) => albumId !== after.albumId,
   );
   const restore = moved
     .filter(({ itemId, albumId }) => {
       const item = now.get(itemId);
       return (
         item !== undefined &&
-        item.albumId === done.albumId &&
+        item.albumId === after.albumId &&
         (albumId === undefined || albums.has(albumId))
       );
     })
@@ -55,48 +55,65 @@ export function planMoveUndo<ItemId, AlbumId>({
   return { restore, skipped: moved.length - restore.length };
 }
 
-/** An Item's Grade on its Grading scale; both or neither are set. */
-type GradeState = { gradingScale?: GradingScale; grade?: string };
+/** An Item's Grade with its Grading scale; neither when it has no Grade. */
+type ItemGrade = { gradingScale?: GradingScale; grade?: string };
 
-const sameGrade = (a: GradeState, b: GradeState) =>
+/** Whether two are the same Grade on the same scale, or both no Grade. */
+const sameGrade = (a: ItemGrade, b: ItemGrade) =>
   a.gradingScale === b.gradingScale && a.grade === b.grade;
+
+/**
+ * Whether an Item of this type can have this Grade back: no Grade, or one on
+ * a scale that suits the type, as the Item form checks (items/rules.ts).
+ */
+const canHaveGrade = (type: ItemType, { gradingScale, grade }: ItemGrade) =>
+  grade === undefined ||
+  (gradingScale !== undefined && suitsGrade(type, gradingScale, grade));
 
 /**
  * Plans undoing a bulk grading: each Item graded (`before`, with the Grade
  * and Grading scale it had) gets them back, or no Grade. One that already had
- * the Grade set (`done`) wasn't changed by it and is left out. One deleted
- * (missing from `now`) or no longer with the Grade set has changed since:
- * it's skipped and counted.
+ * the Grade set (`after`) wasn't changed by it and is left out. One deleted
+ * (missing from `now`) or no longer with the Grade set has changed since,
+ * and one whose own Grade no longer suits its Item type can't have it back:
+ * both are skipped and counted.
  */
 export function planGradeUndo<ItemId>({
   before,
-  done,
+  after,
   now,
 }: {
-  before: ReadonlyArray<{ itemId: ItemId } & GradeState>;
-  done: Required<GradeState>;
-  now: ReadonlyMap<ItemId, GradeState>;
+  before: ReadonlyArray<{ itemId: ItemId } & ItemGrade>;
+  after: Required<ItemGrade>;
+  now: ReadonlyMap<ItemId, ItemGrade & { type: ItemType }>;
 }) {
-  const regraded = firstOfEach(before).filter((item) => !sameGrade(item, done));
+  const regraded = firstOfEach(before).filter(
+    (item) => !sameGrade(item, after),
+  );
   const restore = regraded
-    .filter(({ itemId }) => {
+    .filter(({ itemId, ...was }) => {
       const item = now.get(itemId);
-      return item !== undefined && sameGrade(item, done);
+      return (
+        item !== undefined &&
+        sameGrade(item, after) &&
+        canHaveGrade(item.type, was)
+      );
     })
     .map(({ itemId, gradingScale, grade }) => ({
       itemId,
-      gradingScale,
+      // A scale without a Grade isn't kept, as the Item form has it.
+      gradingScale: grade === undefined ? undefined : gradingScale,
       grade,
     }));
   return { restore, skipped: regraded.length - restore.length };
 }
 
 /** Each Item once, as first listed, so none is restored twice. */
-function firstOfEach<Entry extends { itemId: unknown }>(
-  entries: readonly Entry[],
+function firstOfEach<Listed extends { itemId: unknown }>(
+  listed: readonly Listed[],
 ) {
-  const seen = new Set<Entry["itemId"]>();
-  return entries.filter(({ itemId }) => {
+  const seen = new Set<Listed["itemId"]>();
+  return listed.filter(({ itemId }) => {
     if (seen.has(itemId)) return false;
     seen.add(itemId);
     return true;

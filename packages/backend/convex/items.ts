@@ -29,7 +29,7 @@ import {
 } from "./items/bulkRules";
 import { entryDetails, overridesOnly } from "./items/catalogFacts";
 import { deleteItem } from "./items/deletion";
-import { type GradingScale, isGrade, scalesFor } from "./items/grades";
+import { isGrade, scalesFor } from "./items/grades";
 import {
   type CatalogEntryLink,
   catalogEntryByKey,
@@ -543,17 +543,17 @@ export const undoMove = mutation({
     const now = await ownItemsNow(ctx, owner._id, before);
     const albums = new Set<Id<"albums">>();
     for (const id of new Set(before.flatMap((item) => item.albumId ?? []))) {
-      const album = await ctx.db.get(id);
+      const album = await ctx.db.get("albums", id);
       if (album?.ownerId === owner._id) albums.add(id);
     }
     const { restore, skipped } = planMoveUndo({
       before,
-      done: { albumId },
+      after: { albumId },
       now,
       albums,
     });
     for (const { itemId, albumId: to } of restore)
-      await ctx.db.patch(itemId, { albumId: to });
+      await ctx.db.patch("items", itemId, { albumId: to });
     await moveManyBetweenAlbums(
       ctx,
       restore.map(({ itemId, albumId: to }) => {
@@ -577,12 +577,14 @@ async function ownItemsNow(
 ) {
   if (before.length > bulkLimits.items)
     throw new ConvexError(bulkErrors.tooManyItems);
-  const now = new Map<Id<"items">, Doc<"items">>();
-  for (const { itemId } of before) {
-    const item = await ctx.db.get(itemId);
-    if (item?.ownerId === ownerId) now.set(itemId, item);
-  }
-  return now;
+  const items = await Promise.all(
+    before.map(({ itemId }) => ctx.db.get("items", itemId)),
+  );
+  return new Map(
+    items.flatMap((item) =>
+      item?.ownerId === ownerId ? [[item._id, item] as const] : [],
+    ),
+  );
 }
 
 /**
@@ -648,21 +650,11 @@ export const setGrade = mutation({
   },
 });
 
-/** Whether an Item of this type may have this Grade, or no Grade at all. */
-function fitsGrade(
-  type: Doc<"items">["type"],
-  { gradingScale, grade }: { gradingScale?: GradingScale; grade?: string },
-) {
-  if (gradingScale === undefined || grade === undefined)
-    return gradingScale === undefined && grade === undefined;
-  return scalesFor(type).includes(gradingScale) && isGrade(gradingScale, grade);
-}
-
 /**
  * Undoes `setGrade`: gives each Item it graded (`before`) the Grade and
  * Grading scale it had, or no Grade, if it still has the Grade that was set
- * (items/bulkRules.ts). The others are skipped and counted. Each Grade put
- * back is checked before anything is written.
+ * and its own still suits its Item type (items/bulkRules.ts). The others are
+ * skipped and counted.
  */
 export const undoGrade = mutation({
   args: {
@@ -676,14 +668,11 @@ export const undoGrade = mutation({
     const now = await ownItemsNow(ctx, owner._id, before);
     const { restore, skipped } = planGradeUndo({
       before,
-      done: { gradingScale, grade },
+      after: { gradingScale, grade },
       now,
     });
-    for (const { itemId, ...was } of restore)
-      if (!fitsGrade(now.get(itemId)!.type, was))
-        throw new ConvexError(itemErrors.invalidGrade);
     for (const { itemId, gradingScale, grade } of restore)
-      await ctx.db.patch(itemId, { gradingScale, grade });
+      await ctx.db.patch("items", itemId, { gradingScale, grade });
     return { restored: restore.length, skipped };
   },
 });

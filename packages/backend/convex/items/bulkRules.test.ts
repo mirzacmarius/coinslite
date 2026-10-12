@@ -10,7 +10,7 @@ describe("planMoveUndo", () => {
           { itemId: "note", albumId: "sweden" },
           { itemId: "stamp" },
         ],
-        done: { albumId: "favourites" },
+        after: { albumId: "favourites" },
         now: new Map([
           ["coin", { albumId: "favourites" }],
           ["note", { albumId: "favourites" }],
@@ -36,7 +36,7 @@ describe("planMoveUndo", () => {
           { itemId: "note", albumId: "sweden" },
           { itemId: "stamp", albumId: "norway" },
         ],
-        done: { albumId: "favourites" },
+        after: { albumId: "favourites" },
         now: new Map([
           ["coin", { albumId: "favourites" }],
           ["note", { albumId: "denmark" }],
@@ -57,7 +57,7 @@ describe("planMoveUndo", () => {
           { itemId: "coin", albumId: "norway" },
           { itemId: "note", albumId: "sweden" },
         ],
-        done: {},
+        after: {},
         now: new Map([["coin", {}]]),
         albums: new Set(["norway", "sweden"]),
       }),
@@ -75,7 +75,7 @@ describe("planMoveUndo", () => {
           { itemId: "note", albumId: "sweden" },
           { itemId: "stamp" },
         ],
-        done: { albumId: "favourites" },
+        after: { albumId: "favourites" },
         now: new Map([
           ["coin", { albumId: "favourites" }],
           ["note", { albumId: "favourites" }],
@@ -100,7 +100,7 @@ describe("planMoveUndo", () => {
           { itemId: "note", albumId: "favourites" },
           { itemId: "stamp", albumId: "favourites" },
         ],
-        done: { albumId: "favourites" },
+        after: { albumId: "favourites" },
         now: new Map([
           ["coin", { albumId: "favourites" }],
           ["note", { albumId: "favourites" }],
@@ -121,7 +121,7 @@ describe("planMoveUndo", () => {
           { itemId: "coin", albumId: "norway" },
           { itemId: "coin", albumId: "sweden" },
         ],
-        done: { albumId: "favourites" },
+        after: { albumId: "favourites" },
         now: new Map([["coin", { albumId: "favourites" }]]),
         albums: new Set(["norway", "sweden"]),
       }),
@@ -141,11 +141,11 @@ describe("planGradeUndo", () => {
           { itemId: "dime", gradingScale: "sheldon", grade: "63" },
           { itemId: "penny" },
         ],
-        done: { gradingScale: "european", grade: "VF" },
+        after: { gradingScale: "european", grade: "VF" },
         now: new Map([
-          ["krone", { gradingScale: "european", grade: "VF" }],
-          ["dime", { gradingScale: "european", grade: "VF" }],
-          ["penny", { gradingScale: "european", grade: "VF" }],
+          ["krone", { type: "coin", gradingScale: "european", grade: "VF" }],
+          ["dime", { type: "coin", gradingScale: "european", grade: "VF" }],
+          ["penny", { type: "coin", gradingScale: "european", grade: "VF" }],
         ]),
       }),
     ).toEqual({
@@ -167,11 +167,14 @@ describe("planGradeUndo", () => {
           { itemId: "note", gradingScale: "international", grade: "XF" },
           { itemId: "penny" },
         ],
-        done: { gradingScale: "european", grade: "UNC" },
+        after: { gradingScale: "european", grade: "UNC" },
         now: new Map([
-          ["krone", { gradingScale: "european", grade: "UNC" }],
-          ["dollar", { gradingScale: "european", grade: "XF" }],
-          ["note", { gradingScale: "international", grade: "UNC" }],
+          ["krone", { type: "coin", gradingScale: "european", grade: "UNC" }],
+          ["dollar", { type: "coin", gradingScale: "european", grade: "XF" }],
+          [
+            "note",
+            { type: "banknote", gradingScale: "international", grade: "UNC" },
+          ],
         ]),
       }),
     ).toEqual({
@@ -188,11 +191,11 @@ describe("planGradeUndo", () => {
           { itemId: "ore", gradingScale: "norwegian", grade: "01" },
           { itemId: "dime", gradingScale: "norwegian", grade: "01" },
         ],
-        done: { gradingScale: "norwegian", grade: "01" },
+        after: { gradingScale: "norwegian", grade: "01" },
         now: new Map([
-          ["krone", { gradingScale: "norwegian", grade: "01" }],
-          ["ore", { gradingScale: "norwegian", grade: "01" }],
-          ["dime", { gradingScale: "norwegian", grade: "2" }],
+          ["krone", { type: "coin", gradingScale: "norwegian", grade: "01" }],
+          ["ore", { type: "coin", gradingScale: "norwegian", grade: "01" }],
+          ["dime", { type: "coin", gradingScale: "norwegian", grade: "2" }],
         ]),
       }),
     ).toEqual({
@@ -208,11 +211,53 @@ describe("planGradeUndo", () => {
           { itemId: "krone", gradingScale: "norwegian", grade: "1+" },
           { itemId: "krone", gradingScale: "norwegian", grade: "3" },
         ],
-        done: { gradingScale: "european", grade: "VF" },
-        now: new Map([["krone", { gradingScale: "european", grade: "VF" }]]),
+        after: { gradingScale: "european", grade: "VF" },
+        now: new Map([
+          ["krone", { type: "coin", gradingScale: "european", grade: "VF" }],
+        ]),
       }),
     ).toEqual({
       restore: [{ itemId: "krone", gradingScale: "norwegian", grade: "1+" }],
+      skipped: 0,
+    });
+  });
+
+  test("Items whose own Grade no longer suits their Item type are skipped and counted", () => {
+    expect(
+      planGradeUndo({
+        before: [
+          { itemId: "krone", gradingScale: "norwegian", grade: "1+" },
+          { itemId: "dime", gradingScale: "sheldon", grade: "63" },
+        ],
+        after: { gradingScale: "norwegian", grade: "01" },
+        now: new Map([
+          [
+            "krone",
+            { type: "banknote", gradingScale: "norwegian", grade: "01" },
+          ],
+          [
+            "dime",
+            { type: "banknote", gradingScale: "norwegian", grade: "01" },
+          ],
+        ]),
+      }),
+    ).toEqual({
+      restore: [{ itemId: "krone", gradingScale: "norwegian", grade: "1+" }],
+      skipped: 1,
+    });
+  });
+
+  test("A Grading scale without a Grade comes back as no Grade", () => {
+    expect(
+      planGradeUndo({
+        before: [{ itemId: "krone", gradingScale: "norwegian" }],
+        after: { gradingScale: "european", grade: "VF" },
+        now: new Map([
+          ["krone", { type: "coin", gradingScale: "european", grade: "VF" }],
+        ]),
+      }),
+    ).toEqual({
+      restore: [{ itemId: "krone", gradingScale: undefined, grade: undefined }],
       skipped: 0,
     });
   });

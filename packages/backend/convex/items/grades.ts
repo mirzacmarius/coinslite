@@ -64,6 +64,13 @@ export function defaultScale(type: ItemType, country?: string): GradingScale {
 export const isGrade = (scale: GradingScale, grade: string) =>
   (gradingScales[scale].grades as readonly string[]).includes(grade);
 
+/** Whether an Item of this type can have this Grade: its scale suits the type. */
+export const suitsGrade = (
+  type: ItemType,
+  scale: GradingScale,
+  grade: string,
+) => scalesFor(type).includes(scale) && isGrade(scale, grade);
+
 /**
  * Where a Grade sits on its scale, from 0 (worst) to 1 (best), so Items on
  * different scales sort together. Sheldon is already numeric (1–70).

@@ -12,6 +12,7 @@ import { bulkLimits } from "@coinslite/backend/convex/items/bulkRules";
 import { Button } from "@coinslite/ui/button";
 import { toast } from "@coinslite/ui/toaster";
 import { useConvex, useMutation } from "convex/react";
+import type { FunctionReturnType } from "convex/server";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { DeleteItemsButton } from "./delete-items-button";
@@ -20,7 +21,7 @@ import { SetGradeButton } from "./set-grade-button";
 import type { ItemSelection } from "./use-item-selection";
 
 /** How an undo went: Items put back, and Items skipped as changed since. */
-type Undone = { restored: number; skipped: number };
+type Undone = FunctionReturnType<typeof api.items.undoMove>;
 
 /** How long a toast offering Undo stays, in milliseconds. */
 const undoOfferedFor = 10_000;

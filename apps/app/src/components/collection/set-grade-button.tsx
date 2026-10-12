@@ -11,12 +11,13 @@ import { Button } from "@coinslite/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@coinslite/ui/popover";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { useMutation } from "convex/react";
+import type { FunctionReturnType } from "convex/server";
 import { Award, Loader2, Ruler } from "lucide-react";
 import { useState } from "react";
 import type { ItemSelection } from "./use-item-selection";
 
 /** Undoes a bulk grading; says how many Items got their Grade back and skipped. */
-type UndoGrade = () => Promise<{ restored: number; skipped: number }>;
+type UndoGrade = () => Promise<FunctionReturnType<typeof api.items.undoGrade>>;
 
 /**
  * Select mode's Set Grade: pick a Grading scale and a Grade, then set it on
