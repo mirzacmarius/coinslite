@@ -5,7 +5,7 @@ Both Next.js apps enable Cache Components and Partial Prefetching. Each route is
 ## Consequences
 
 - The session is read from cookies, so the product app's root layout wraps the Convex auth provider in Suspense and marks it per request with `connection()`: a page load paints the static frame first, then streams the rest. Moving between pages never re-renders that layout. The same goes for the deleted-account check in the dashboard layout; anything that reads the session and then touches the clock or random numbers must sit below `connection()`.
-- A screen that only shows translated text is a client component (`Overview`, `PlaceholderPage`): the dictionary is already in the browser, so it renders the moment a link is clicked. Page titles still come from the server.
+- A screen that only shows translated text is a client component (`Overview`, `PlaceholderPage`): the dictionary is already in the browser, so it renders the moment a link is clicked. Page titles still come from the server; a page that shows one Item, Album or Catalog entry adds its name in the browser once its data is in.
 - The language is session data (the proxy sets it in a header), not URL data, so server-rendered text can be part of a route's prefetched shell. The five languages are prerendered with `generateStaticParams`.
 - Sign-in, sign-up, verify and reset read `next` (and sign-up the browser's languages) inside Suspense; a page load shows a skeleton until the form streams in.
 - Nothing may read the clock or random numbers while a shell is prerendered. Cache such values with `"use cache"` and `cacheLife`, as the marketing site's footer does for the year.
