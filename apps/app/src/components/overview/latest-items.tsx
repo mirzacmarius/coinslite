@@ -1,8 +1,8 @@
 "use client";
 
+import { useMoney } from "@/components/account/home-currency-change";
 import { ItemThumbnail } from "@/components/items/item-thumbnail";
 import { useI18n } from "@/locales/client";
-import { useFormatters } from "@/locales/use-formatters";
 import type { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import type { FunctionReturnType } from "convex/server";
@@ -18,7 +18,7 @@ type LatestItem = FunctionReturnType<typeof api.overview.latestItems>[number];
  */
 function ItemFigures({ item }: { item: LatestItem }) {
   const t = useI18n();
-  const format = useFormatters();
+  const money = useMoney();
   const { marketValue, quantity } = item;
   if (marketValue === undefined && quantity === 1) return null;
   return (
@@ -26,7 +26,7 @@ function ItemFigures({ item }: { item: LatestItem }) {
       {marketValue !== undefined && (
         <>
           <span className="sr-only">{t("items.marketValue")} </span>
-          {format.money(marketValue, item.currency)}
+          {money(marketValue, item.currency)}
         </>
       )}
       {quantity > 1 && (
