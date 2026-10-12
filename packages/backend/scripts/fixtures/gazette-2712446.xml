@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml" IdURI="https://www.thegazette.co.uk/id/notice/2712446" prefix="gaz: https://www.thegazette.co.uk/def/publication#       gzw: https://www.thegazette.co.uk/def/working#       person: https://www.thegazette.co.uk/def/person#       personal-legal: https://www.thegazette.co.uk/def/personal-legal#       court: https://www.thegazette.co.uk/def/court#       insolvency: https://www.thegazette.co.uk/def/insolvency#       org: http://www.w3.org/ns/org#       gazorg: https://www.thegazette.co.uk/def/organisation#       leg: https://www.thegazette.co.uk/def/legislation#       societies: https://www.thegazette.co.uk/def/societies#       loc: https://www.thegazette.co.uk/def/location#       dc11: http://purl.org/dc/elements/1.1/       this: https://www.thegazette.co.uk/id/notice/2712446#             prov: http://www.w3.org/ns/prov#        "><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>BY THE QUEEN
+         
+         A PROCLAMATION
+         
+         DETERMINING THE SPECIFICATIONS AND DESIGNS FOR  FIFTY PENCE COINS COMMEMORATING THE
+         LIFE AND WORK OF BEATRIX POTTER
+         
+         ELIZABETH R.
+         
+         
+      </title><link href="https://www.thegazette.co.uk/notice/2712446/data.xml/data.htm" rel="self" title="HTML" type="application/xhtml+xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data.jsonld" rel="alternate" title="JSON-LD" type="application/json" /><link href="https://www.thegazette.co.uk/notice/2712446/version/2" rel="alternate" title="XML" type="application/xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data.ttl" rel="alternate" title="TURTLE" type="text/turtle" /><link href="https://www.thegazette.co.uk/notice/2712446/version/1" rel="alternate" title="XML" type="application/xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data.rdf" rel="alternate" title="RDF/XML" type="application/rdf+xml" /><link href="https://www.thegazette.co.uk/id/notice/2712446/provenance" rel="http://www.w3.org/ns/prov#has_provenance" title="PROVENANCE" type="" /><link href="https://www.thegazette.co.uk/notice/2712446/data.pdf" rel="alternate" title="PDF" type="application/pdf" /><link href="https://www.thegazette.co.uk/notice/2712446/data.rdf?view=linked-data" rel="alternate" title="RDF/XML" type="application/rdf+xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data.ttl?view=linked-data" rel="alternate" title="TURTLE" type="text/turtle" /><link href="https://www.thegazette.co.uk/notice/2712446/data.json?view=linked-data" rel="alternate" title="JSON-SIMPLE" type="application/json" /><link href="https://www.thegazette.co.uk/notice/2712446/data_xml/sig.xml?download=true" rel="alternate" title="XML" type="application/xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data.html?view=linked-data" rel="alternate" title="HTML" type="application/html" /><link href="https://www.thegazette.co.uk/notice/2712446/data.rdfjson?view=linked-data" rel="alternate" title="JSON-RDF" type="application/rdf+json" /><link href="https://www.thegazette.co.uk/notice/2712446/data.xml?view=linked-data" rel="alternate" title="XML" type="application/xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data_rdf/sig.trig?download=true" rel="alternate" title="XML" type="application/xml" /><link href="https://www.thegazette.co.uk/notice/2712446/data_xml/provenance/data_rdf/sig.trig?download=true" rel="alternate" title="XML" type="application/xml" /><link href="https://www.thegazette.co.uk/id/notice/2712446" rel="http://www.w3.org/ns/prov#has_anchor" title="" type="" /></head><body>
+      <article class="full-notice full-notice-1101">
+         <div class="rdfa-data"><span about="this:notifiableThing" property="https://www.thegazette.co.uk/def/publication#relatedLegislation" resource="http://www.legislation.gov.uk/id/ukpga/1971/24"></span><span about="this:notifiableThing" content="2017-02-17" datatype="http://www.w3.org/2001/XMLSchema#date" property="https://www.thegazette.co.uk/def/publication#relatedDate"></span><span about="this:notifiableThing" content="2017-02-10" datatype="http://www.w3.org/2001/XMLSchema#date" property="https://www.thegazette.co.uk/def/publication#relatedDate"></span><span resource="http://www.legislation.gov.uk/id/ukpga/1971/24" typeof="https://www.thegazette.co.uk/def/legislation#Legislation"></span><span about="http://www.legislation.gov.uk/id/ukpga/1971/24" content="Coinage Act 1971" property="http://www.w3.org/2000/01/rdf-schema#label"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" content="TSO (The Stationery Office), St Crispins, Duke Street, Norwich, NR3 1PD, 01603 622211, customer.services@tso.co.uk" property="dc11:publisher"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" property="gaz:isAbout" resource="this:notifiableThing"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" property="prov:has_provenance" resource="https://www.thegazette.co.uk/id/notice/2712446/provenance"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" property="prov:has_anchor" resource="https://www.thegazette.co.uk/id/notice/2712446"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" content="2712446" datatype="xsd:integer" property="gaz:hasNoticeNumber"></span><span resource="https://www.thegazette.co.uk/id/notice/2712446" typeof="https://www.thegazette.co.uk/def/publication#Notice"></span><span resource="https://www.thegazette.co.uk/id/notice/2712446" typeof="https://www.thegazette.co.uk/def/state#ProclamationNotice"></span><span resource="this:notifiableThing" typeof="https://www.thegazette.co.uk/def/publication#NotifiableThing"></span><span resource="this:notifiableThing" typeof="https://www.thegazette.co.uk/def/state#Proclamation"></span><span resource="https://www.thegazette.co.uk/id/edition/London/issue/61851" typeof="gaz:Issue"></span><span about="https://www.thegazette.co.uk/id/edition/London/issue/61851" property="gaz:hasEdition" resource="https://www.thegazette.co.uk/id/edition/London"></span><span about="https://www.thegazette.co.uk/id/edition/London/issue/61851" content="61851" datatype="xsd:string" property="gaz:hasIssueNumber"></span><span resource="https://www.thegazette.co.uk/id/edition/London" typeof="gaz:Edition"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" property="gaz:isInIssue" resource="https://www.thegazette.co.uk/id/edition/London/issue/61851"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" property="owl:sameAs" resource="https://www.thegazette.co.uk/id/edition/London/issue/61851/notice/2712446" typeof="gaz:Notice"></span><span about="https://www.thegazette.co.uk/id/notice/2712446" property="prov:alternateOf" resource="http://www.london-gazette.co.uk/id/issues/61851/notices/2712446" typeof="gaz:Notice"></span></div>
+         <dl class="metadata"><dt>Notice category:</dt><dd data-ui-class="category">State</dd><dt>Notice type:</dt><dd data-ui-class="notice-type">Proclamations</dd><dt>Publication date:</dt><dd about="https://www.thegazette.co.uk/id/notice/2712446" content="2017-02-17T05:30:22" datatype="xsd:dateTime" property="gaz:hasPublicationDate">
+               <time datetime="2017-02-17T05:30:22">17 February 2017</time>
+            </dd><dt>Edition:</dt><dd>The <span about="https://www.thegazette.co.uk/id/edition/London" datatype="xsd:string" property="gaz:editionName">London</span> Gazette
+            </dd><dt>Notice ID:</dt><dd about="https://www.thegazette.co.uk/id/notice/2712446" property="gaz:hasNoticeID">2712446</dd><dt>Notice code:</dt><dd about="https://www.thegazette.co.uk/id/notice/2712446" datatype="xsd:integer" property="gaz:hasNoticeCode">1101</dd><dt>Issue number:</dt><dd about="https://www.thegazette.co.uk/id/edition/London/issue/61851" datatype="xsd:string" property="gaz:hasIssueNumber">61851</dd><dt>Page number:</dt><dd about="https://www.thegazette.co.uk/id/notice/2712446" datatype="xsd:string" property="gaz:hasPageNumber">3633</dd></dl>
+         <div about="this:notifiableThing" class="content" data-gazettes="Notice" data-gazettes-type="1101">
+            <h3><span data-gazettes="Title" property="gaz:hasTitle">BY THE QUEEN
+                  
+                  A PROCLAMATION
+                  
+                  DETERMINING THE SPECIFICATIONS AND DESIGNS FOR  FIFTY PENCE COINS COMMEMORATING THE
+                  LIFE AND WORK OF BEATRIX POTTER
+                  
+                  ELIZABETH R.
+                  
+                  </span></h3>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">Whereas under section 3(1)(a), (b), (cc), (cd), (d) and (dd) of the Coinage Act 1971
+                  We have power, with the advice of Our Privy Council, by Proclamation to determine
+                  the denomination, the design and dimensions of coins to be made at Our Mint, to determine
+                  the weight and composition of coins other than gold coins or coins of silver of Our
+                  Maundy money and the remedy to be allowed in the making of such coins, to provide
+                  for the manner of measurement of the variation from the standard weight of coins,
+                  and to determine the percentage of impurities which such coins may contain:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">And Whereas under section 3(1)(ff) of the Coinage Act 1971 We have power, with the
+                  advice of Our Privy Council, by Proclamation to direct that any coin shall be legal
+                  tender for the payment of any amount:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">And Whereas it appears to Us desirable to order that, to commemorate the life and
+                  work of Beatrix Potter, there should be made at Our Mint coins of the denomination
+                  of fifty pence in silver and in cupro-nickel:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">We, therefore, in pursuance of the said section 3(1)(a), (b), (cc), (cd), (d), (dd)
+                  and (ff), and of all other powers enabling Us in that behalf, do hereby, by and with
+                  the advice of Our Privy Council, proclaim, direct and ordain as follows:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text"><strong>SILVER COIN</strong></p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text"> 1.     	(1) A new coin of silver of the denomination of fifty pence shall be made,
+                  being a coin of a standard weight of 8 grammes, a standard diameter of 27.3 millimetres,
+                  a standard composition of 925 parts per thousand fine silver, and being in the shape
+                  of an equilateral curve heptagon.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">        	(2) In the making of the said silver coin a remedy (that is, a variation
+                  from the standard weight, diameter or composition specified above) shall be allowed
+                  of an amount not exceeding the following, that is to say:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">        	(a) a variation from the said standard weight of an amount per coin of 0.17
+                  grammes;
+                  
+                  	
+               </p>
+               <p data-gazettes="Text">(b) a variation from the said standard diameter of 0.125 millimetres per coin; and
+                  	
+               </p>
+               <p data-gazettes="Text">(c) a variation from the said standard composition of five parts per thousand fine
+                  silver.
+                  
+                  
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">(3) The variation from the standard weight will be measured as the average of a sample
+                  of not more than one kilogram of the coin.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">(4) The said silver coin shall be legal tender for the payment of any amount in any
+                  part of Our United Kingdom.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text"><strong>CUPRO-NICKEL COIN</strong></p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text"> 2.     	(1) A new coin of cupro-nickel of the denomination of fifty pence shall be
+                  made, being a coin of a standard weight of 8 grammes, a standard diameter of 27.3
+                  millimetres, a standard composition of seventy-five per centum copper and twenty-five
+                  per centum nickel, and being in the shape of an equilateral curve heptagon.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">        	(2) In the making of the said cupro-nickel coin a remedy (that is, a variation
+                  from the standard weight, diameter or composition specified above) shall be allowed
+                  of an amount not exceeding the following, that is to say:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">(a) a variation from the said standard weight of an amount per coin of 0.35 grammes;
+                  
+                  	
+               </p>
+               <p data-gazettes="Text">(b) a variation from the said standard diameter of 0.125 millimetres per coin; and
+                  
+                  	
+               </p>
+               <p data-gazettes="Text">(c) a variation from the said standard composition of two per centum copper and two
+                  per centum nickel.
+                  
+                  
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">        	(3) The said cupro-nickel coin may contain impurities of three-quarters of
+                  one per centum.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">(4) The variation from the standard weight will be measured as the average of a sample
+                  of not more than one kilogram of the coin.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">(5) The said cupro-nickel coin shall be legal tender for the payment of any amount
+                  in any part of Our United Kingdom.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text"><strong>DESIGNS OF THE COINS</strong></p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">3.     	The design of the said coins shall be as follows:</p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">        	‘For the obverse impression either Our effigy with the inscription “· ELIZABETH
+                  II · D · G · REG · F · D · 50 PENCE · 2017” and for the reverse designs either:
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">(a) a portrait of Benjamin Bunny with the inscription “BENJAMIN BUNNY”;</p>
+               <p data-gazettes="Text">
+                  
+                  	(b) a portrait of Mr Jeremy Fisher with the inscription “MR JEREMY FISHER”;
+                  
+                  
+               </p>
+               <p data-gazettes="Text">(c) a portrait of Tom Kitten with the inscription “TOM KITTEN”; or
+                  
+                  	
+               </p>
+               <p data-gazettes="Text">(d) a depiction of Peter Rabbit running with the inscription “THE TALE OF PETER RABBIT”.
+                  	        	
+                  
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">        	The coins shall have a plain edge.’</p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">4.     	This Proclamation shall come into force on the sixteenth day of February Two
+                  thousand and seventeen.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text">Given at Our Court at Buckingham Palace, this fifteenth day of February in the year
+                  of Our Lord Two thousand and seventeen and in the sixty-sixth year of Our Reign.
+               </p>
+            </div>
+            <div data-gazettes="P">
+               <p data-gazettes="Text"><strong>GOD SAVE THE QUEEN</strong></p>
+            </div>
+         </div>
+      </article>
+   </body></html>
