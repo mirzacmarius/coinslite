@@ -185,6 +185,11 @@ function ItemList({
                     </span>
                   )}
                 </span>
+                <PhoneFigures
+                  marketValue={about.marketValue}
+                  quantity={item.quantity}
+                  grade={about.grade}
+                />
                 <span className="hidden w-24 truncate text-right text-xs text-muted-foreground md:block">
                   {about.grade && (
                     <>
@@ -193,7 +198,7 @@ function ItemList({
                     </>
                   )}
                 </span>
-                <span className="shrink-0 text-right text-xs tabular-nums text-muted-foreground md:w-16">
+                <span className="hidden w-16 shrink-0 text-right text-xs tabular-nums text-muted-foreground md:block">
                   {item.quantity > 1 && (
                     <>
                       <span className="sr-only">{t("items.quantity")} </span>×
@@ -213,6 +218,49 @@ function ItemList({
         })}
       </ul>
     </div>
+  );
+}
+
+/**
+ * A row's figures on a phone, where there's no room for columns: the Market
+ * value (× Quantity when there's more than one piece) on the right, the Grade
+ * under it. An amount never truncates; the title gives way instead.
+ */
+function PhoneFigures({
+  marketValue,
+  quantity,
+  grade,
+}: {
+  marketValue: string | undefined;
+  quantity: number;
+  grade: string | undefined;
+}) {
+  const t = useI18n();
+  return (
+    <span className="flex shrink-0 flex-col items-end text-right md:hidden">
+      {(marketValue || quantity > 1) && (
+        <span className="whitespace-nowrap text-[13px] tabular-nums">
+          {marketValue && (
+            <>
+              <span className="sr-only">{t("items.marketValue")} </span>
+              {marketValue}
+            </>
+          )}
+          {quantity > 1 && (
+            <span className="text-xs text-muted-foreground">
+              {marketValue && " "}
+              <span className="sr-only">{t("items.quantity")} </span>×{quantity}
+            </span>
+          )}
+        </span>
+      )}
+      {grade && (
+        <span className="max-w-28 truncate text-xs text-muted-foreground">
+          <span className="sr-only">{t("items.grade")} </span>
+          {grade}
+        </span>
+      )}
+    </span>
   );
 }
 
