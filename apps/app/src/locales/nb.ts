@@ -1649,12 +1649,11 @@ export default {
     saved: "«{title}» er lagret",
     deleteTitle: "Slette «{title}»?",
     deleteCounting: "Teller hva som følger med…",
-    deleteTooLarge:
-      "Dette ville tatt med seg over {nodes} noder. Slett nodene under den først.",
     "deleteBelow#zero": "Ingenting under den følger med.",
     "deleteBelow#one": "1 node under den følger med.",
     "deleteBelow#few": "{count} noder under den følger med.",
     "deleteBelow#other": "{count} noder under den følger med.",
+    deleteBelowMore: "Over {nodes} noder under den følger med.",
     "deleteItems#zero": "Ingen objekter er knyttet til den.",
     "deleteItems#one":
       "1 objekt er knyttet til en katalogoppføring her og beholder faktaene som sine egne.",
@@ -1662,6 +1661,8 @@ export default {
       "{count} objekter er knyttet til katalogoppføringer her og beholder faktaene som sine egne.",
     "deleteItems#other":
       "{count} objekter er knyttet til katalogoppføringer her og beholder faktaene som sine egne.",
+    deleteItemsUncounted:
+      "Objekter som er knyttet til katalogoppføringer her, beholder faktaene som sine egne.",
     deleteItemsMore:
       "Over {items} objekter er knyttet til katalogoppføringer her og beholder faktaene som sine egne.",
     deleteInProgress:

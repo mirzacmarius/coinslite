@@ -43,7 +43,7 @@ import { slimEntryChanges } from "./slimEntries";
  * the slim entries (catalog/slimEntries.ts) in step with the node, so
  * browsing, Sets, search and the Collection can rely on them. Deleting
  * nodes and giving many linked Items a new Item type run in batches
- * (catalog/changes.ts), which keep them in step too; no write here touches
+ * (catalog/changes.ts), which keep them in step too; no save here touches
  * a node such a change is running on.
  */
 

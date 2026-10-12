@@ -1665,12 +1665,12 @@ export default {
     saved: "„{title}” a fost salvat",
     deleteTitle: "Ștergi „{title}”?",
     deleteCounting: "Se numără ce se șterge odată cu el…",
-    deleteTooLarge:
-      "Odată cu el s-ar șterge peste {nodes} de noduri. Șterge mai întâi nodurile de dedesubt.",
     "deleteBelow#zero": "Nimic de dedesubt nu se șterge odată cu el.",
     "deleteBelow#one": "1 nod de dedesubt se șterge odată cu el.",
     "deleteBelow#few": "{count} noduri de dedesubt se șterg odată cu el.",
     "deleteBelow#other": "{count} de noduri de dedesubt se șterg odată cu el.",
+    deleteBelowMore:
+      "Peste {nodes} de noduri de dedesubt se șterg odată cu el.",
     "deleteItems#zero": "Niciun obiect nu este legat de el.",
     "deleteItems#one":
       "1 obiect este legat de o intrare de catalog de aici și îi păstrează datele ca fiind ale lui.",
@@ -1678,6 +1678,8 @@ export default {
       "{count} obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
     "deleteItems#other":
       "{count} de obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
+    deleteItemsUncounted:
+      "Obiectele legate de intrări de catalog de aici le păstrează datele ca fiind ale lor.",
     deleteItemsMore:
       "Peste {items} de obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
     deleteInProgress:

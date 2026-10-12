@@ -5,6 +5,7 @@ import { statsFigures, statsTable } from "./admin/statsFigures";
 import { changeProgress, homeCurrencyChange } from "./homeCurrency/rules";
 import {
   albumColour,
+  catalogChangeKind,
   catalogDetails,
   catalogItemType,
   catalogKind,
@@ -471,14 +472,15 @@ export default defineSchema({
    * A Catalog change running in the background, a batch per transaction
    * (catalog/changes.ts): a node being deleted with everything below it, or
    * an entry whose linked Items are taking its new Item type. Gone once the
-   * change is done. Meanwhile the editor shows it, and no write may touch
-   * the node, anything below it, or move a node above it.
+   * change is done. Meanwhile the editor shows it, and no Catalog save,
+   * import or delete may touch the node or anything below it, or move a
+   * node above it.
    */
   catalogChanges: defineTable({
     nodeId: v.id("catalogNodes"),
     /** The node's path, which can't change while the change runs. */
     path: v.string(),
-    kind: v.union(v.literal("delete"), v.literal("retype")),
+    kind: catalogChangeKind,
     /** For "retype": the Item type the entry's Items take. */
     itemType: v.optional(catalogItemType),
   }).index("by_path", ["path"]),

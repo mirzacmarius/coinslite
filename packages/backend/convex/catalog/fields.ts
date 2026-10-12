@@ -136,7 +136,7 @@ export const catalogLimits = {
   sortOrder: 1_000_000_000,
   /** Linked Items the delete confirmation counts; past that it says there are more. */
   linkedItems: 1000,
-  /** Nodes one delete removes, the node and everything below it. */
+  /** Nodes below the delete confirmation counts; past that it says there are more. */
   deleteNodes: 2000,
   /** Nodes below that one save moves along with the nodes it moves. */
   moveNodes: 2000,

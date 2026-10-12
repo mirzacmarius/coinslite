@@ -27,10 +27,11 @@ import { slimEntryChanges } from "./slimEntries";
  * small one is done at once; a larger one records itself in
  * `catalogChanges` and goes on in the background, each batch scheduling the
  * next (changeRules.ts plans each one). While it runs, the editor shows it
- * and no write may touch the node, anything below it, or move a node above
- * it (`changeBlocks`). Should a batch ever stop for good, running
- * `catalog/changes:continueChange` with the change's id goes on from where
- * it stopped.
+ * and no Catalog save, import or delete may touch the node or anything
+ * below it, or move a node above it (`changeBlocks`). Should a batch ever
+ * stop for good, running `catalog/changes:continueChange` with the change's
+ * id goes on: a deletion from where it stopped, an Item type change from
+ * its first Item.
  */
 
 export const changeLimits = {
@@ -300,24 +301,13 @@ export const blockedByChanges = (
 export type Deletion = {
   /** The nodes below it, counted up to `catalogLimits.deleteNodes`. */
   nodesBelow: number;
+  /** More nodes are below it than were counted. */
+  moreNodesBelow: boolean;
   /** Items linked to it or to the entries below it, counted up to `catalogLimits.linkedItems`. */
   linkedItems: number;
   /** More Items link there than were counted. */
   moreLinkedItems: boolean;
-  /** Whether it takes more nodes than one delete may. */
-  tooLarge: boolean;
 };
-
-/** Whether deleting a node would take more nodes with it than one delete may. */
-export async function deletionTooLarge(
-  ctx: QueryCtx,
-  node: Doc<"catalogNodes">,
-) {
-  const below = await nodesBelow(ctx, node.path).take(
-    catalogLimits.deleteNodes,
-  );
-  return below.length + 1 > catalogLimits.deleteNodes;
-}
 
 /** Works out what deleting a node would take with it, without changing anything. */
 export async function planDeletion(
@@ -325,10 +315,10 @@ export async function planDeletion(
   node: Doc<"catalogNodes">,
 ): Promise<Deletion> {
   const below = await nodesBelow(ctx, node.path).take(
-    catalogLimits.deleteNodes,
+    catalogLimits.deleteNodes + 1,
   );
   let linkedItems = 0;
-  for (const each of [node, ...below]) {
+  for (const each of [node, ...below.slice(0, catalogLimits.deleteNodes)]) {
     if (each.kind !== "entry") continue;
     linkedItems += await countLinkedItems(
       ctx,
@@ -338,9 +328,9 @@ export async function planDeletion(
     if (linkedItems > catalogLimits.linkedItems) break;
   }
   return {
-    nodesBelow: below.length,
+    nodesBelow: Math.min(below.length, catalogLimits.deleteNodes),
+    moreNodesBelow: below.length > catalogLimits.deleteNodes,
     linkedItems: Math.min(linkedItems, catalogLimits.linkedItems),
     moreLinkedItems: linkedItems > catalogLimits.linkedItems,
-    tooLarge: below.length + 1 > catalogLimits.deleteNodes,
   };
 }

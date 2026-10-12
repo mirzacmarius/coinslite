@@ -8,6 +8,7 @@ import type { Doc } from "../_generated/dataModel";
 import { type QueryCtx, mutation, query } from "../_generated/server";
 import { requireAdmin } from "../utils/auth";
 import {
+  catalogChangeKind,
   catalogItemType,
   catalogKind,
   coinEdge,
@@ -21,7 +22,6 @@ import {
   changeAround,
   changeAt,
   changeOver,
-  deletionTooLarge,
   planDeletion,
   startDeletion,
 } from "./changes";
@@ -104,8 +104,6 @@ const editorRow = 2;
 export const catalogEditorErrors = {
   /** No Catalog node has the key. */
   nodeNotFound: "CATALOG_NODE_NOT_FOUND",
-  /** The node takes more nodes with it than one delete may. */
-  deleteTooLarge: "DELETE_TOO_LARGE",
 } as const;
 
 async function requireNode(ctx: QueryCtx, key: string) {
@@ -174,9 +172,6 @@ export const create = mutation({
   },
 });
 
-/** A change running in the background on a node: being deleted, or its Items taking its new Item type. */
-const runningChange = v.union(v.literal("delete"), v.literal("retype"));
-
 const treeRow = v.object({
   key: v.string(),
   kind: catalogKind,
@@ -189,7 +184,7 @@ const treeRow = v.object({
   /** Roots and groupings: the Catalog entries anywhere below. */
   entryCount: v.optional(v.number()),
   /** A change running on the node itself, if any. */
-  change: v.optional(runningChange),
+  change: v.optional(catalogChangeKind),
 });
 
 const treeRowOf = (
@@ -269,7 +264,7 @@ export const node = query({
       imageUrl: v.optional(v.string()),
       imageProvenance: v.optional(provenance),
       /** A change running on the node or above it: it can't be saved until that's done. */
-      change: v.optional(runningChange),
+      change: v.optional(catalogChangeKind),
     }),
   ),
   handler: async (ctx, { key }) => {
@@ -305,13 +300,14 @@ export const deletion = query({
   returns: v.union(
     v.null(),
     v.object({
+      /** Counted up to `catalogLimits.deleteNodes`. */
       nodesBelow: v.number(),
+      /** More nodes are below it than were counted. */
+      moreNodesBelow: v.boolean(),
       /** Counted up to `catalogLimits.linkedItems`. */
       linkedItems: v.number(),
       /** More Items link there than were counted. */
       moreLinkedItems: v.boolean(),
-      /** More than one delete may take: delete what's below first. */
-      tooLarge: v.boolean(),
       /** A deletion or Item type change is running on it, above or below it: wait until it's done. */
       inProgress: v.boolean(),
     }),
@@ -339,8 +335,6 @@ export const remove = mutation({
     const node = await requireNode(ctx, key);
     if (await changeAround(ctx, node.path))
       throw new ConvexError(catalogErrors.changeInProgress);
-    if (await deletionTooLarge(ctx, node))
-      throw new ConvexError(catalogEditorErrors.deleteTooLarge);
     return await startDeletion(ctx, node);
   },
 });

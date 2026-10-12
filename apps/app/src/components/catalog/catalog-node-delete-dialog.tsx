@@ -43,19 +43,22 @@ export function CatalogNodeDeleteDialog({
     description = t("catalogEditor.errors.CATALOG_NODE_NOT_FOUND");
   else if (deletion.inProgress)
     description = t("catalogEditor.deleteInProgress");
-  else if (deletion.tooLarge)
-    description = t("catalogEditor.deleteTooLarge", {
-      nodes: number(catalogLimits.deleteNodes),
-    });
   else
-    description = `${t("catalogEditor.deleteBelow", {
-      count: deletion.nodesBelow,
-    })} ${
+    description = `${
+      deletion.moreNodesBelow
+        ? t("catalogEditor.deleteBelowMore", {
+            nodes: number(catalogLimits.deleteNodes),
+          })
+        : t("catalogEditor.deleteBelow", { count: deletion.nodesBelow })
+    } ${
       deletion.moreLinkedItems
         ? t("catalogEditor.deleteItemsMore", {
             items: number(catalogLimits.linkedItems),
           })
-        : t("catalogEditor.deleteItems", { count: deletion.linkedItems })
+        : // Items are counted on the nodes counted only.
+          deletion.moreNodesBelow
+          ? t("catalogEditor.deleteItemsUncounted")
+          : t("catalogEditor.deleteItems", { count: deletion.linkedItems })
     }`;
 
   return (
@@ -70,10 +73,10 @@ export function CatalogNodeDeleteDialog({
       confirmLabel={t("catalogEditor.delete")}
       cancelLabel={t("items.cancel")}
       destructive
-      confirmDisabled={!deletion || deletion.tooLarge || deletion.inProgress}
+      confirmDisabled={!deletion || deletion.inProgress}
       onConfirm={async () => {
         setFailed(undefined);
-        let gone: boolean;
+        let gone: boolean | null;
         try {
           gone = await remove({ key: node.key });
         } catch (failure) {
@@ -87,9 +90,13 @@ export function CatalogNodeDeleteDialog({
           throw failure;
         }
         toast.success(
-          t(gone ? "catalogEditor.deleted" : "catalogEditor.deleting", {
-            title: node.title,
-          }),
+          // Null from a backend from before deletions could go on in the background.
+          t(
+            gone === false ? "catalogEditor.deleting" : "catalogEditor.deleted",
+            {
+              title: node.title,
+            },
+          ),
         );
       }}
     >

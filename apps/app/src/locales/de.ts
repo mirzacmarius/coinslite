@@ -1713,12 +1713,11 @@ export default {
     saved: "„{title}“ gespeichert",
     deleteTitle: "„{title}“ löschen?",
     deleteCounting: "Zählt, was mitgelöscht wird…",
-    deleteTooLarge:
-      "Damit würden mehr als {nodes} Knoten mitgelöscht. Lösche zuerst die Knoten darunter.",
     "deleteBelow#zero": "Darunter wird nichts mitgelöscht.",
     "deleteBelow#one": "1 Knoten darunter wird mitgelöscht.",
     "deleteBelow#few": "{count} Knoten darunter werden mitgelöscht.",
     "deleteBelow#other": "{count} Knoten darunter werden mitgelöscht.",
+    deleteBelowMore: "Mehr als {nodes} Knoten darunter werden mitgelöscht.",
     "deleteItems#zero": "Keine Objekte sind damit verknüpft.",
     "deleteItems#one":
       "1 Objekt ist mit einem Katalogeintrag hier verknüpft und behält dessen Fakten als eigene.",
@@ -1726,6 +1725,8 @@ export default {
       "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
     "deleteItems#other":
       "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    deleteItemsUncounted:
+      "Objekte, die mit Katalogeinträgen hier verknüpft sind, behalten deren Fakten als eigene.",
     deleteItemsMore:
       "Mehr als {items} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
     deleteInProgress:

@@ -1628,12 +1628,11 @@ export default {
     saved: "“{title}” saved",
     deleteTitle: "Delete “{title}”?",
     deleteCounting: "Counting what goes with it…",
-    deleteTooLarge:
-      "This would take more than {nodes} nodes with it. Delete the nodes below it first.",
     "deleteBelow#zero": "Nothing below it goes with it.",
     "deleteBelow#one": "1 node below it goes with it.",
     "deleteBelow#few": "{count} nodes below it go with it.",
     "deleteBelow#other": "{count} nodes below it go with it.",
+    deleteBelowMore: "More than {nodes} nodes below it go with it.",
     "deleteItems#zero": "No Items link to it.",
     "deleteItems#one":
       "1 Item links to a Catalog entry here and keeps its facts as its own.",
@@ -1641,6 +1640,8 @@ export default {
       "{count} Items link to Catalog entries here and keep their facts as their own.",
     "deleteItems#other":
       "{count} Items link to Catalog entries here and keep their facts as their own.",
+    deleteItemsUncounted:
+      "Items that link to Catalog entries here keep their facts as their own.",
     deleteItemsMore:
       "More than {items} Items link to Catalog entries here and keep their facts as their own.",
     deleteInProgress:

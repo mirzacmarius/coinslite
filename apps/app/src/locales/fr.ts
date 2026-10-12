@@ -1696,12 +1696,11 @@ export default {
     saved: "«\u00a0{title}\u00a0» enregistré",
     deleteTitle: "Supprimer «\u00a0{title}\u00a0»\u00a0?",
     deleteCounting: "Calcul de ce qui sera supprimé avec…",
-    deleteTooLarge:
-      "Cela emporterait plus de {nodes} nœuds. Supprimez d’abord les nœuds en dessous.",
     "deleteBelow#zero": "Rien en dessous n’est supprimé avec.",
     "deleteBelow#one": "1 nœud en dessous est supprimé avec.",
     "deleteBelow#few": "{count} nœuds en dessous sont supprimés avec.",
     "deleteBelow#other": "{count} nœuds en dessous sont supprimés avec.",
+    deleteBelowMore: "Plus de {nodes} nœuds en dessous sont supprimés avec.",
     "deleteItems#zero": "Aucun objet n’y est lié.",
     "deleteItems#one":
       "1 objet est lié à une entrée du catalogue ici et garde ses données comme les siennes.",
@@ -1709,6 +1708,8 @@ export default {
       "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
     "deleteItems#other":
       "{count} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
+    deleteItemsUncounted:
+      "Les objets liés à des entrées du catalogue ici gardent leurs données comme les leurs.",
     deleteItemsMore:
       "Plus de {items} objets sont liés à des entrées du catalogue ici et gardent leurs données comme les leurs.",
     deleteInProgress:
