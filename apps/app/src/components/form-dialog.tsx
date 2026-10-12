@@ -6,14 +6,14 @@ import { useI18n } from "@/locales/client";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { Dialog } from "@coinslite/ui/dialog";
 import type * as React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 /**
  * The dialog around a form. While the form has changes, closing it (Esc, the
  * backdrop, the close button or Cancel) first asks "Discard changes?", a new
  * deployment's reload waits, and leaving the page asks too. An unchanged form
  * closes straight away. Closing after a save calls `onOpenChange` itself, so
- * it doesn't ask.
+ * it doesn't ask. Keep editing puts focus back where it was in the form.
  */
 export function FormDialog({
   open,
@@ -29,6 +29,8 @@ export function FormDialog({
 }) {
   const t = useI18n();
   const [asking, setAsking] = useState(false);
+  // What had focus when the question opened, to return to on Keep editing.
+  const focusedBefore = useRef<HTMLElement | null>(null);
   useUnsavedInput(open && changed);
   return (
     <>
@@ -37,9 +39,13 @@ export function FormDialog({
         onOpenChange={
           onOpenChange &&
           ((next) => {
-            if (asksBeforeClosing({ open: next, changed, keepsDraft }))
+            if (asksBeforeClosing({ open: next, changed, keepsDraft })) {
+              focusedBefore.current =
+                document.activeElement instanceof HTMLElement
+                  ? document.activeElement
+                  : null;
               setAsking(true);
-            else onOpenChange(next);
+            } else onOpenChange(next);
           })
         }
       >
@@ -47,13 +53,26 @@ export function FormDialog({
       </Dialog>
       <ConfirmDialog
         open={asking}
-        onOpenChange={setAsking}
+        onOpenChange={(next) => {
+          setAsking(next);
+          if (next) return;
+          // Kept editing: the question returns focus to <body> otherwise, and
+          // then typing, Cmd/Ctrl+Enter and Esc no longer reach the form.
+          const target = focusedBefore.current;
+          focusedBefore.current = null;
+          requestAnimationFrame(() => {
+            if (target?.isConnected) target.focus();
+          });
+        }}
         title={t("discardChanges.title")}
         description={t("discardChanges.description")}
         confirmLabel={t("discardChanges.discard")}
         cancelLabel={t("discardChanges.keepEditing")}
         destructive
-        onConfirm={() => onOpenChange?.(false)}
+        onConfirm={() => {
+          focusedBefore.current = null;
+          onOpenChange?.(false);
+        }}
       />
     </>
   );
