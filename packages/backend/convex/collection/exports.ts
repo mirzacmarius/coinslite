@@ -3,6 +3,7 @@ import { ConvexError, type Infer, v } from "convex/values";
 import type { Doc } from "../_generated/dataModel";
 import { internalQuery, query } from "../_generated/server";
 import { formatCsvFile } from "../catalog/csvText";
+import { refuseWhileChanging } from "../homeCurrency/rules";
 import { gradeCode, type gradingScales } from "../items/grades";
 import {
   graderNames,
@@ -115,6 +116,8 @@ export const csv = query({
   returns: v.string(),
   handler: async (ctx, { view, locale }) => {
     const owner = await requirePremium(ctx);
+    // Mid-change, its amounts would be in two currencies.
+    refuseWhileChanging(owner);
     const written = locale ?? owner.language ?? defaultLocale;
     const { items, complete } = await findItems(ctx, owner, view, written);
     if (!complete) throw new ConvexError(collectionExportErrors.incomplete);
@@ -189,6 +192,8 @@ export const pdf = internalQuery({
   returns: pdfContents,
   handler: async (ctx, { view, locale }) => {
     const owner = await requirePremium(ctx);
+    // Mid-change, its amounts would be in two currencies.
+    refuseWhileChanging(owner);
     const written = locale ?? owner.language ?? defaultLocale;
     const { items, ownCountry, complete } = await findItems(
       ctx,

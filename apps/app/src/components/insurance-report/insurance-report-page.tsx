@@ -7,6 +7,7 @@ import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import {
   type ReportColumn,
   baseColumns,
@@ -155,6 +156,7 @@ const errorKeys = {
   PREMIUM_REQUIRED: "insuranceReport.errors.PREMIUM_REQUIRED",
   REPORT_TOO_LARGE: "insuranceReport.errors.REPORT_TOO_LARGE",
   ALBUM_NOT_FOUND: "insuranceReport.errors.ALBUM_NOT_FOUND",
+  [homeCurrencyErrors.changing]: "homeCurrency.busy",
 } as const;
 
 function ReportBuilder({ account }: { account: Account }) {

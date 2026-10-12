@@ -20,7 +20,8 @@ export const homeCurrencyErrors = {
   amountTooLarge: "AMOUNT_TOO_LARGE",
   /**
    * The Home currency is being changed in the background: until it's done,
-   * anything that writes an amount, and another change, wait.
+   * anything that writes an amount, the files that list amounts (the
+   * Collection exports, the Insurance report) and another change wait.
    */
   changing: "HOME_CURRENCY_CHANGING",
   /**
@@ -77,6 +78,18 @@ export const changingHomeCurrency = (
   user.homeCurrencyChange?.state === "stalled";
 
 /**
+ * Turns away what has to wait while a change is under way (`changing`):
+ * writes of amounts, and the files that list them (the Collection exports,
+ * the Insurance report), which would mix two currencies.
+ */
+export function refuseWhileChanging(
+  user: Pick<HomeCurrencyState, "homeCurrencyChange">,
+) {
+  if (changingHomeCurrency(user))
+    throw new ConvexError(homeCurrencyErrors.changing);
+}
+
+/**
  * Checks a write of amounts: turned away while a change is under way
  * (`changing`), or when they were entered in a Home currency the person no
  * longer has (`otherCurrency`). `enteredIn` is the currency the form showed
@@ -86,8 +99,7 @@ export function checkAmountsWrite(
   user: HomeCurrencyState,
   enteredIn: HomeCurrency | undefined,
 ) {
-  if (changingHomeCurrency(user))
-    throw new ConvexError(homeCurrencyErrors.changing);
+  refuseWhileChanging(user);
   if (enteredIn !== undefined && enteredIn !== user.homeCurrency)
     throw new ConvexError(homeCurrencyErrors.otherCurrency);
 }
