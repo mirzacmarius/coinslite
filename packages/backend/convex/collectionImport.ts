@@ -294,42 +294,62 @@ async function albumFor(
  * Adds a batch of previewed rows (at most `importLimits.batch`) as Items,
  * all or nothing: every row is checked again, the owned ones must fit the
  * person's plan, and a row that fails refuses the whole batch with its row
- * number and reason. Imported Items have no photos. Returns how many were
- * added.
+ * number and reason. Imported Items have no photos. Returns the new Items'
+ * ids, in row order.
  */
-export const addBatch = mutation({
-  args: { rows: v.array(importRow) },
-  returns: v.number(),
-  handler: async (ctx, { rows }) => {
-    const owner = await requireSetUpUser(ctx);
-    if (rows.length > importLimits.batch)
-      throw new ConvexError(importErrors.batchTooLarge);
-    const checked = await checkRows(ctx, owner, rows);
-    const failed = checked.find((result) => "reason" in result);
-    if (failed && "reason" in failed)
-      throw new ConvexError({ row: failed.row, reason: failed.reason });
-    await requireRoomForItems(
-      ctx,
-      owner._id,
-      rows.filter((row) => row.soldOn === undefined).length,
-    );
-    const albums = await albumsOf(ctx, owner._id);
-    for (const result of checked) {
-      if ("reason" in result) continue;
-      const { row, entry, fields, sale } = result;
-      const albumId = row.album
-        ? await albumFor(ctx, owner._id, albums, row.album)
-        : undefined;
+async function addRows(ctx: MutationCtx, rows: ImportRow[]) {
+  const owner = await requireSetUpUser(ctx);
+  if (rows.length > importLimits.batch)
+    throw new ConvexError(importErrors.batchTooLarge);
+  const checked = await checkRows(ctx, owner, rows);
+  const failed = checked.find((result) => "reason" in result);
+  if (failed && "reason" in failed)
+    throw new ConvexError({ row: failed.row, reason: failed.reason });
+  await requireRoomForItems(
+    ctx,
+    owner._id,
+    rows.filter((row) => row.soldOn === undefined).length,
+  );
+  const albums = await albumsOf(ctx, owner._id);
+  const itemIds: Id<"items">[] = [];
+  for (const result of checked) {
+    if ("reason" in result) continue;
+    const { row, entry, fields, sale } = result;
+    const albumId = row.album
+      ? await albumFor(ctx, owner._id, albums, row.album)
+      : undefined;
+    itemIds.push(
       await storeNewItem(ctx, {
         ownerId: owner._id,
         ...fields,
         ...(entry && { catalogEntryId: entry._id }),
         ...(albumId && { albumId }),
         ...(sale && defined(sale)),
-      });
-      // An owned Item made from a wanted entry takes it off the Wantlist.
-      if (entry && !sale) await clearWant(ctx, owner._id, entry._id);
-    }
-    return rows.length;
-  },
+      }),
+    );
+    // An owned Item made from a wanted entry takes it off the Wantlist.
+    if (entry && !sale) await clearWant(ctx, owner._id, entry._id);
+  }
+  return itemIds;
+}
+
+/**
+ * Adds a batch of previewed rows as Items (`addRows`) and returns the new
+ * Items' ids, so the import can offer to link them to the Catalog
+ * (catalogSuggestions.ts).
+ */
+export const importBatch = mutation({
+  args: { rows: v.array(importRow) },
+  returns: v.array(v.id("items")),
+  handler: async (ctx, { rows }) => await addRows(ctx, rows),
+});
+
+/**
+ * Adds a batch of previewed rows as Items (`addRows`) and returns how many
+ * were added. Kept for apps still open from before `importBatch`.
+ */
+export const addBatch = mutation({
+  args: { rows: v.array(importRow) },
+  returns: v.number(),
+  handler: async (ctx, { rows }) => (await addRows(ctx, rows)).length,
 });

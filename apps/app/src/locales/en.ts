@@ -1379,6 +1379,35 @@ export default {
       "addedBefore#other": "The {count} Items before that row were added.",
     },
   },
+  catalogSuggestion: {
+    label: "Catalog suggestion",
+    looksLike: "This looks like {title} in the Catalog. Link it?",
+    link: "Link",
+    notThis: "Not this",
+    linked: "Linked to the Catalog entry",
+    failed: "Something went wrong. Try again.",
+    afterImport: {
+      finding: "Looking for Catalog entries…",
+      "offer#one": "Link 1 Item to the Catalog",
+      "offer#few": "Link {count} Items to the Catalog",
+      "offer#other": "Link {count} Items to the Catalog",
+      offerHint:
+        "They look like Catalog entries. Linked, they take the entry's facts and count toward its Sets.",
+      reviewHint:
+        "Each Item with the Catalog entry it looks like. Untick any that aren't right.",
+      all: "All",
+      "confirm#zero": "Link",
+      "confirm#one": "Link 1 Item",
+      "confirm#few": "Link {count} Items",
+      "confirm#other": "Link {count} Items",
+      "linked#one": "1 Item linked to the Catalog",
+      "linked#few": "{count} Items linked to the Catalog",
+      "linked#other": "{count} Items linked to the Catalog",
+      failed: "The Items couldn't be linked. Try again.",
+      done: "Done",
+      back: "Back",
+    },
+  },
   catalogPicker: {
     title: "Pick from the Catalog",
     placeholder: {

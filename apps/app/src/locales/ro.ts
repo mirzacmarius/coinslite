@@ -1409,6 +1409,35 @@ export default {
         "Cele {count} de obiecte dinaintea acelui rând au fost adăugate.",
     },
   },
+  catalogSuggestion: {
+    label: "Sugestie din catalog",
+    looksLike: "Pare să fie {title} din catalog. Îl legi?",
+    link: "Leagă",
+    notThis: "Nu aceasta",
+    linked: "Legat de intrarea de catalog",
+    failed: "Ceva n-a mers. Încearcă din nou.",
+    afterImport: {
+      finding: "Se caută intrări de catalog…",
+      "offer#one": "Leagă 1 obiect de catalog",
+      "offer#few": "Leagă {count} obiecte de catalog",
+      "offer#other": "Leagă {count} de obiecte de catalog",
+      offerHint:
+        "Seamănă cu intrări de catalog. Odată legate, preiau datele intrării și contează la seturile ei.",
+      reviewHint:
+        "Fiecare obiect cu intrarea de catalog cu care seamănă. Debifează-le pe cele care nu se potrivesc.",
+      all: "Toate",
+      "confirm#zero": "Leagă",
+      "confirm#one": "Leagă 1 obiect",
+      "confirm#few": "Leagă {count} obiecte",
+      "confirm#other": "Leagă {count} de obiecte",
+      "linked#one": "1 obiect legat de catalog",
+      "linked#few": "{count} obiecte legate de catalog",
+      "linked#other": "{count} de obiecte legate de catalog",
+      failed: "Obiectele nu au putut fi legate. Încearcă din nou.",
+      done: "Gata",
+      back: "Înapoi",
+    },
+  },
   catalogPicker: {
     title: "Alege din catalog",
     placeholder: {

@@ -44,6 +44,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import type * as React from "react";
 import { useId, useMemo, useState } from "react";
 import { isItemLimitError, useItemLimitMessage } from "../plans/plan-usage";
+import { CatalogSuggestion } from "./catalog-suggestion";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
@@ -392,6 +393,9 @@ export function ItemDetail() {
       <ItemHeader item={item} money={money} />
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
+          {!item.catalogEntryId && item.type !== "stamp" && (
+            <CatalogSuggestion itemId={item._id} />
+          )}
           <ItemPhotos item={item} />
           {shownFacts.length > 0 && (
             <dl className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3 text-sm">

@@ -110,14 +110,23 @@ function amountOf(match: RegExpMatchArray) {
 }
 
 /**
+ * A denomination as it's read: without accents or capitals, its words one
+ * space apart. "50  Øre" reads "50 øre".
+ */
+export const denominationText = (denomination: string) =>
+  denomination
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
+
+/**
  * A denomination's value in its currency's main unit: "50 øre" is 0.5,
  * "2½ kroner" 2.5, "dollar" 1. Undefined when there's nothing to read.
  */
 export function faceValue(denomination: string): number | undefined {
-  const text = denomination
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase();
+  const text = denominationText(denomination);
   const match = text.match(amountPattern);
   const words = new Set(text.split(/[^\p{L}]+/u).filter(Boolean));
   if (!match && words.size === 0) return undefined;
@@ -128,6 +137,47 @@ export function faceValue(denomination: string): number | undefined {
     else value *= shares[word] ?? 1;
   }
   return value;
+}
+
+/** The words naming a denomination's main unit: "krone" of "½ krone", none of "50 øre". */
+const unitWords = (text: string) =>
+  text
+    .split(/[^\p{L}]+/u)
+    .filter(
+      (word) =>
+        word.length > 1 &&
+        !minorUnits.has(word) &&
+        !Object.prototype.hasOwnProperty.call(shares, word),
+    );
+
+/**
+ * Whether two words could name one unit: one holds the other ("kr" and
+ * "krone", "mark" and "reichsmark"), or they start alike, as a word's
+ * forms do ("krone" and "kroner", "krona" and "krone").
+ */
+const sameUnit = (a: string, b: string) =>
+  a.includes(b) || b.includes(a) || a.slice(0, 3) === b.slice(0, 3);
+
+/**
+ * Whether two denominations name the same face value: they read alike, or
+ * both have a face value and it's the same ("1 kroner" and "1 krone", "½
+ * krone" and "50 øre"), in what could be one unit where both name a main
+ * unit ("1 shilling" isn't "1 pound"). Within one country, that's the same
+ * coin or note.
+ */
+export function sameDenomination(a: string, b: string): boolean {
+  const [first, second] = [denominationText(a), denominationText(b)];
+  if (first !== "" && first === second) return true;
+  const [value, other] = [faceValue(a), faceValue(b)];
+  if (value === undefined || other === undefined) return false;
+  if (Math.abs(value - other) > 1e-9 * Math.max(1, Math.abs(value)))
+    return false;
+  const [units, otherUnits] = [unitWords(first), unitWords(second)];
+  return (
+    units.length === 0 ||
+    otherUnits.length === 0 ||
+    units.some((unit) => otherUnits.some((word) => sameUnit(unit, word)))
+  );
 }
 
 /**

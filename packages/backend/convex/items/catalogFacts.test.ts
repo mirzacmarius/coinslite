@@ -3,6 +3,7 @@ import {
   type CatalogFacts,
   detachedFields,
   entryFacts,
+  overridesOnLink,
   slimEntryOf,
 } from "./catalogFacts";
 
@@ -170,6 +171,68 @@ describe("an Item whose Catalog entry leaves the Catalog", () => {
       denomination: "100 kroner",
       catalogDetails: undefined,
       catalogEntryId: undefined,
+    });
+  });
+});
+
+describe("the facts an Item keeps when it's linked to a Catalog entry", () => {
+  /** "1 krone 1958–1972": several years, so it gives no year. */
+  const krone: CatalogFacts = {
+    country: "NO",
+    denomination: "1 krone",
+    series: "Olav V",
+    material: "cupronickel",
+    diameter: 25,
+  };
+
+  test("a fact the entry says the same of follows the entry; the rest stay the Item's", () => {
+    expect(
+      overridesOnLink(
+        {
+          country: "NO",
+          year: 1960,
+          denomination: "1 krone",
+          material: "cupronickel",
+          diameter: 25.5,
+          mintMark: "K",
+        },
+        krone,
+      ),
+    ).toEqual({ year: 1960, diameter: 25.5, mintMark: "K" });
+  });
+
+  test("a denomination written differently but of the same face value follows the entry", () => {
+    expect(
+      overridesOnLink({ country: "NO", denomination: "1 Kroner" }, krone),
+    ).toEqual({});
+    expect(
+      overridesOnLink({ country: "NO", denomination: "2 kroner" }, krone),
+    ).toEqual({ denomination: "2 kroner" });
+  });
+
+  test("a precious metal the entry gives follows it", () => {
+    const morgan: CatalogFacts = {
+      country: "US",
+      year: 1881,
+      metal: "silver",
+      weight: 26.73,
+      purity: 0.9,
+    };
+    expect(
+      overridesOnLink(
+        {
+          country: "US",
+          year: 1881,
+          metal: "silver",
+          weight: 26.73,
+          purity: 0.9,
+        },
+        morgan,
+      ),
+    ).toEqual({});
+    expect(overridesOnLink({ year: 1882, weight: 26.7 }, morgan)).toEqual({
+      year: 1882,
+      weight: 26.7,
     });
   });
 });
