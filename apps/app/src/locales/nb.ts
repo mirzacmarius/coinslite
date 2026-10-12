@@ -619,9 +619,10 @@ export default {
       "Ingen av objektene dine har innkjøpspris eller markedsverdi, så det er ingenting å regne om.",
     noRate:
       "Vi har ingen vekslingskurs å regne om beløpene med ennå. Prøv igjen om noen minutter.",
-    tooLarge:
-      "Samlingen din har mer enn {limit} objekter, for mange til å regne om i én endring. Send oss en tilbakemelding, så hjelper vi deg.",
+    inBackground:
+      "Samlingen din er stor, så dette skjer i bakgrunnen og kan ta et minutt. Til det er ferdig, kan ikke beløp endres.",
     amounts: "Beløp som regnes om",
+    amountsAtLeast: "Minst {count}",
     rate: "Vekslingskurs",
     rateValue: "1 {from} = {rate} {to}",
     rateFrom: "Kurs per",
@@ -635,6 +636,23 @@ export default {
     sameCurrency: "Det er allerede hjemmevalutaen din.",
     failed:
       "Kunne ikke endre hjemmevalutaen, og ingenting ble regnet om. Prøv igjen.",
+    converting: "Regner om til {currency}…",
+    convertingTotals:
+      "Beløpene dine regnes om til {currency}. Totalene og diagrammene kommer tilbake når det er ferdig.",
+    convertingStarted:
+      "Regner om beløpene dine til {currency}. Det kan ta et minutt.",
+    calledOff:
+      "Hjemmevalutaen kunne ikke endres til {currency}: et av beløpene dine ville blitt for stort i den valutaen. Ingenting ble regnet om.",
+    busy: "Hjemmevalutaen din endres nå. Prøv igjen når det er ferdig.",
+    moneyBusy:
+      "Hjemmevalutaen din endres nå, så beløp kan ikke endres før det er ferdig.",
+    stalled:
+      "Omregningen av beløpene dine til {currency} stoppet underveis. Prøv igjen for å fullføre den.",
+    retry: "Prøv igjen",
+    changedWhileOpen:
+      "Hjemmevalutaen din er nå {currency}. Lukk dette og åpne det igjen for å skrive inn beløp i den.",
+    amountsWait:
+      "Beløpene dine regnes om til {currency}. Du kan endre dem når det er ferdig.",
   },
   preciousMetal: {
     title: "Edelmetall",
@@ -1341,6 +1359,7 @@ export default {
       invalidDate:
         "en dato er ikke en ekte dato tilbake i tid, skrevet ÅÅÅÅ-MM-DD",
       otherCurrency: "valutaen er ikke hjemmevalutaen din",
+      homeCurrencyChanging: "den har et beløp mens hjemmevalutaen din endres",
       unknownCatalogEntry: "katalogoppføringen finnes ikke",
       tooManyAlbums: "det ville gitt ett album for mye",
       titleRequired: "den mangler tittel",

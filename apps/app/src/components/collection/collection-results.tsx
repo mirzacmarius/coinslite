@@ -1,5 +1,6 @@
 "use client";
 
+import { useMoney } from "@/components/account/home-currency-change";
 import { useGradeLabels } from "@/components/items/grade-labels";
 import { itemTypeIcons } from "@/components/items/item-fields";
 import { ItemThumbnail } from "@/components/items/item-thumbnail";
@@ -28,6 +29,8 @@ type Item = BrowseResult["items"][number];
 function useItemFacts(currency: BrowseResult["currency"]) {
   const labels = useGradeLabels();
   const format = useFormatters();
+  const formatMoney = useMoney();
+  const money = (amount: number) => formatMoney(amount, currency);
   return (item: Item) => ({
     facts: [
       item.year === undefined ? undefined : String(item.year),
@@ -44,13 +47,9 @@ function useItemFacts(currency: BrowseResult["currency"]) {
         ? labels.strike(item.strike)
         : undefined,
     purchasePrice:
-      item.purchasePrice === undefined
-        ? undefined
-        : format.money(item.purchasePrice, currency),
+      item.purchasePrice === undefined ? undefined : money(item.purchasePrice),
     marketValue:
-      item.marketValue === undefined
-        ? undefined
-        : format.money(item.marketValue, currency),
+      item.marketValue === undefined ? undefined : money(item.marketValue),
   });
 }
 

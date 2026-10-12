@@ -1,5 +1,6 @@
 "use client";
 
+import { useConvertingTo } from "@/components/account/home-currency-change";
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useAlbums } from "@/components/albums/use-albums";
 import {
@@ -22,6 +23,7 @@ import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import type { CatalogItemType } from "@coinslite/backend/convex/catalog/fields";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import type { CatalogFacts } from "@coinslite/backend/convex/items/catalogFacts";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
 import {
@@ -41,7 +43,12 @@ import {
 } from "@coinslite/backend/convex/items/rules";
 import { photoSides } from "@coinslite/backend/convex/photos/rules";
 import { metals } from "@coinslite/backend/convex/spotPrices/rates";
-import { countryCodes, formatCountry, parseMoney } from "@coinslite/i18n";
+import {
+  type HomeCurrency,
+  countryCodes,
+  formatCountry,
+  parseMoney,
+} from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   Collapsible,
@@ -68,6 +75,7 @@ import { toast } from "@coinslite/ui/toaster";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import {
   Award,
   BadgeCheck,
@@ -203,7 +211,22 @@ export function ItemFormDialog({
   const updateItem = useMutation(api.items.update);
   const attachPhoto = useAction(api.photos.attach);
   const user = useQuery(api.users.getUser);
-  const currency = user?.homeCurrency ?? "";
+  const home = user?.homeCurrency;
+  // The Home currency the form's amounts are in: the one when it opened.
+  const [amountsIn, setAmountsIn] = useState<HomeCurrency>();
+  useEffect(() => {
+    if (!open) setAmountsIn(undefined);
+    else if (home) setAmountsIn((pinned) => pinned ?? home);
+  }, [open, home]);
+  const currency = amountsIn ?? home ?? "";
+  const convertingTo = useConvertingTo();
+  // Why the amounts can't be edited now, if they can't: a change of the Home
+  // currency is converting them, or changed it while the form was open.
+  const amountsLocked = convertingTo
+    ? t("homeCurrency.amountsWait", { currency: convertingTo })
+    : home && amountsIn && home !== amountsIn
+      ? t("homeCurrency.changedWhileOpen", { currency: home })
+      : undefined;
   const titleRef = useRef<HTMLInputElement>(null);
   const baseId = useId();
   const labels = useGradeLabels();
@@ -355,17 +378,23 @@ export function ItemFormDialog({
       const wanted = !item && link !== undefined && wantedKeys?.has(link.key);
       let added: Id<"items"> | undefined;
       try {
-        if (item) await updateItem({ itemId: item._id, ...args });
+        if (item) await updateItem({ itemId: item._id, ...args, amountsIn });
         else
           added = await addItem({
             ...args,
             ...(link && { catalogEntryKey: link.key }),
+            amountsIn,
           });
       } catch (failure) {
+        const code = failure instanceof ConvexError ? failure.data : undefined;
         setFailed(
           isItemLimitError(failure)
             ? itemLimitMessage
-            : t(item ? "items.errors.saveFailed" : "items.errors.failed"),
+            : code === homeCurrencyErrors.changing
+              ? t("homeCurrency.moneyBusy")
+              : code === homeCurrencyErrors.otherCurrency && home
+                ? t("homeCurrency.changedWhileOpen", { currency: home })
+                : t(item ? "items.errors.saveFailed" : "items.errors.failed"),
         );
         return;
       }
@@ -660,13 +689,14 @@ export function ItemFormDialog({
         <Field
           id={`${baseId}-${name}`}
           label={label}
-          hint={t("items.perPiece")}
+          hint={amountsLocked ?? t("items.perPiece")}
           error={errorOf(field.state.meta.errors)}
         >
           {(control) => (
             <MoneyInput
               {...control}
               currency={currency}
+              disabled={amountsLocked !== undefined}
               value={field.state.value}
               onChange={(event) => field.handleChange(event.target.value)}
               onBlur={field.handleBlur}

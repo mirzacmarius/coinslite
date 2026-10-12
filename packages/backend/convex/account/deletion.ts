@@ -22,6 +22,7 @@ import {
 import { chargesAgain } from "../billing/rules";
 import { deleteCollectionCountsOf } from "../collectionCounts";
 import { rateLimiter as feedbackLimits } from "../feedback";
+import { deleteHomeCurrencyChangeOf } from "../homeCurrency";
 import { deleteItem } from "../items/deletion";
 import { deleteUploadsOf, rateLimiter as uploadLimits } from "../uploads";
 import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
@@ -72,6 +73,8 @@ export const accountDataByTable = {
   pendingCheckouts: "deleted at once: the checkout left open, if any",
   marketValueHistory:
     "deleted: each Item's Market value history, as the Item goes",
+  homeCurrencyChanges:
+    "deleted at once: how far a Home currency change in the background had got",
   spotPriceDays: "kept: the daily Spot prices everyone shares",
   itemPhotos:
     "deleted: the Items' more photos, with their stored files and thumbnails, as each Item goes",
@@ -409,6 +412,7 @@ export const closeAccount = internalMutation({
     await deleteSubscriptionsOf(ctx, userId);
     await markClosed(ctx, userId);
     await deleteCollectionCountsOf(ctx, userId);
+    await deleteHomeCurrencyChangeOf(ctx, userId);
     await deleteSignInMethods(ctx, userId);
     await forgetPerson(ctx, user);
     // A profile picture from before CoinsLite, still on some old accounts.

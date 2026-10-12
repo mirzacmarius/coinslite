@@ -20,6 +20,7 @@ import {
 } from "./collection/importRows";
 import { countAlbumCreated } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
+import { checkAmountsWrite, holdsAmount } from "./homeCurrency/rules";
 import { checkFields, latestPurchaseDate, storeNewItem } from "./items";
 import { type CatalogEntryLink, catalogEntryByKey } from "./items/resolve";
 import { checkSale } from "./items/rules";
@@ -115,8 +116,9 @@ async function albumsOf(ctx: QueryCtx, ownerId: Id<"users">) {
 
 /**
  * Checks rows against the person's Collection and the rules every Item meets:
- * the Home currency, the Catalog entry, the fields and the sale. Each row's
- * stored fields, or the reason it's left out.
+ * the Home currency (and that it isn't being changed, for a row with an
+ * amount), the Catalog entry, the fields and the sale. Each row's stored
+ * fields, or the reason it's left out.
  */
 async function checkRows(
   ctx: QueryCtx,
@@ -157,6 +159,8 @@ async function checkRows(
     try {
       if (currency !== undefined && currency !== owner.homeCurrency)
         throw new ConvexError(rowErrors.otherCurrency);
+      // Its currency column, if any, was just checked.
+      if (holdsAmount(row)) checkAmountsWrite(owner, undefined);
       const entry = catalogEntry ? await entryOf(catalogEntry) : null;
       if (catalogEntry && !entry)
         throw new ConvexError(rowErrors.unknownCatalogEntry);

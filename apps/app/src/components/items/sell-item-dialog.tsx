@@ -1,13 +1,15 @@
 "use client";
 
+import { useConvertingTo } from "@/components/account/home-currency-change";
 import { FormDialog } from "@/components/form-dialog";
 import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc } from "@coinslite/backend/convex/_generated/dataModel";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { itemErrors, itemLimits } from "@coinslite/backend/convex/items/rules";
-import { formatNumber, parseMoney } from "@coinslite/i18n";
+import { type HomeCurrency, formatNumber, parseMoney } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   DialogClose,
@@ -49,7 +51,7 @@ export function SellItemDialog({
   open,
   onOpenChange,
 }: {
-  item: Doc<"items"> & { currency: string };
+  item: Doc<"items"> & { currency: HomeCurrency };
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -58,6 +60,16 @@ export function SellItemDialog({
   const mod = useModifierKey();
   const baseId = useId();
   const sell = useMutation(api.items.sell);
+  // The Home currency the sale price is in: the one when the dialog opened.
+  const [amountsIn] = useState(item.currency);
+  const convertingTo = useConvertingTo();
+  // Why the sale price can't be edited now, if it can't: a change of the Home
+  // currency is converting the amounts, or changed it while this was open.
+  const amountsLocked = convertingTo
+    ? t("homeCurrency.amountsWait", { currency: convertingTo })
+    : item.currency !== amountsIn
+      ? t("homeCurrency.changedWhileOpen", { currency: item.currency })
+      : undefined;
   const editing = item.soldOn !== undefined;
   // Some pieces can be sold, and the rest kept, while the Item is owned.
   const splittable = !editing && item.quantity > 1;
@@ -122,6 +134,7 @@ export function SellItemDialog({
             ? parseMoney(value.salePrice, locale) ?? undefined
             : undefined,
           saleNote: value.saleNote,
+          amountsIn,
         });
       } catch (failure) {
         const code = failure instanceof ConvexError ? failure.data : undefined;
@@ -132,7 +145,13 @@ export function SellItemDialog({
               ? t("sale.errors.beforePurchase")
               : code === itemErrors.invalidQuantity
                 ? t("sale.errors.quantity", { max: item.quantity })
-                : t("sale.failed"),
+                : code === homeCurrencyErrors.changing
+                  ? t("homeCurrency.moneyBusy")
+                  : code === homeCurrencyErrors.otherCurrency
+                    ? t("homeCurrency.changedWhileOpen", {
+                        currency: item.currency,
+                      })
+                    : t("sale.failed"),
         );
         return;
       }
@@ -261,13 +280,14 @@ export function SellItemDialog({
                   <Field
                     id={`${baseId}-salePrice`}
                     label={t("sale.salePrice")}
-                    hint={t("items.perPiece")}
+                    hint={amountsLocked ?? t("items.perPiece")}
                     error={errorOf(field.state.meta.errors)}
                   >
                     {(control) => (
                       <MoneyInput
                         {...control}
-                        currency={item.currency}
+                        currency={amountsIn}
+                        disabled={amountsLocked !== undefined}
                         value={field.state.value}
                         onChange={(event) =>
                           field.handleChange(event.target.value)

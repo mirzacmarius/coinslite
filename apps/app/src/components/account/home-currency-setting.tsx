@@ -3,11 +3,9 @@
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
-import {
-  homeCurrencyErrors,
-  homeCurrencyLimits,
-} from "@coinslite/backend/convex/homeCurrency/rules";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { type HomeCurrency, homeCurrencies } from "@coinslite/i18n";
+import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { toast } from "@coinslite/ui/toaster";
@@ -22,6 +20,8 @@ type Preview = FunctionReturnType<typeof api.homeCurrency.preview>;
 /**
  * The Home currency as a pill. Picking another one asks for confirmation,
  * stating how many stored amounts get converted and at which exchange rate.
+ * While a change converts in the background, it says so instead, and offers
+ * to try again if that stopped part-way.
  */
 export function HomeCurrencySetting({
   current,
@@ -37,6 +37,8 @@ export function HomeCurrencySetting({
   const [target, setTarget] = useState<HomeCurrency>(current);
   // Each pick starts a fresh confirmation.
   const [attempt, setAttempt] = useState(0);
+  const change = useQuery(api.users.getUser)?.homeCurrencyChange;
+  const retry = useMutation(api.homeCurrency.retryChange);
   const options = useMemo(() => {
     const names = new Intl.DisplayNames(locale, { type: "currency" });
     return homeCurrencies.map((code) => ({
@@ -45,6 +47,34 @@ export function HomeCurrencySetting({
       hint: names.of(code),
     }));
   }, [locale]);
+
+  if (change?.state === "converting")
+    return (
+      <p
+        role="status"
+        aria-describedby={hintId}
+        className="text-[13px] text-muted-foreground"
+      >
+        {t("homeCurrency.converting", { currency: change.to })}
+      </p>
+    );
+  if (change?.state === "stalled")
+    return (
+      <div role="status" className="flex flex-col items-start gap-1.5">
+        <p className="text-[13px] text-muted-foreground">
+          {t("homeCurrency.stalled", { currency: change.to })}
+        </p>
+        <Button
+          size="xs"
+          variant="subtle"
+          onClick={() =>
+            retry().catch(() => toast.error(t("homeCurrency.failed")))
+          }
+        >
+          {t("homeCurrency.retry")}
+        </Button>
+      </div>
+    );
 
   return (
     <>
@@ -82,7 +112,6 @@ function ChangeDialog({
   to: HomeCurrency;
 }) {
   const t = useI18n();
-  const format = useFormatters();
   const change = useMutation(api.homeCurrency.change);
   const [error, setError] = useState<string>();
   // What was confirmed: shown unchanged while the dialog closes, even though
@@ -99,9 +128,9 @@ function ChangeDialog({
   });
   const preview = confirmed ?? (open ? live : last.current);
 
-  const limit = format.number(homeCurrencyLimits.items);
+  // Amounts to convert, counted or not, need a rate to convert at.
   const blocked =
-    !preview || preview.tooLarge || (preview.amounts > 0 && !preview.rate);
+    !preview || ((preview.amounts > 0 || !preview.countedAll) && !preview.rate);
 
   const errorMessage = (code: string) => {
     switch (code) {
@@ -109,8 +138,8 @@ function ChangeDialog({
         return t("homeCurrency.rateChanged");
       case homeCurrencyErrors.rateUnavailable:
         return t("homeCurrency.noRate");
-      case homeCurrencyErrors.collectionTooLarge:
-        return t("homeCurrency.tooLarge", { limit });
+      case homeCurrencyErrors.changing:
+        return t("homeCurrency.busy");
       case homeCurrencyErrors.amountTooLarge:
         return t("homeCurrency.amountTooLarge");
       case homeCurrencyErrors.sameCurrency:
@@ -128,16 +157,14 @@ function ChangeDialog({
       description={
         !preview
           ? t("homeCurrency.checking")
-          : preview.tooLarge
-            ? t("homeCurrency.tooLarge", { limit })
-            : preview.amounts === 0
-              ? t("homeCurrency.nothingToConvert")
-              : !preview.rate
-                ? t("homeCurrency.noRate")
-                : t("homeCurrency.willConvert", {
-                    from: preview.from,
-                    to: preview.to,
-                  })
+          : preview.amounts === 0 && preview.countedAll
+            ? t("homeCurrency.nothingToConvert")
+            : !preview.rate
+              ? t("homeCurrency.noRate")
+              : t("homeCurrency.willConvert", {
+                  from: preview.from,
+                  to: preview.to,
+                })
       }
       confirmLabel={t("homeCurrency.confirm", { currency: to })}
       cancelLabel={t("homeCurrency.cancel")}
@@ -146,8 +173,12 @@ function ChangeDialog({
         if (!preview) return;
         setError(undefined);
         setConfirmed(preview);
+        let inBackground: boolean;
         try {
-          await change({ homeCurrency: to, rate: preview.rate?.value });
+          ({ inBackground } = await change({
+            homeCurrency: to,
+            rate: preview.rate?.value,
+          }));
         } catch (failure) {
           const code =
             failure instanceof ConvexError ? String(failure.data) : "";
@@ -156,10 +187,13 @@ function ChangeDialog({
           // Keeps the dialog open, showing the latest rate and the error.
           throw failure;
         }
-        toast.success(t("homeCurrency.changed", { currency: to }));
+        // One in the background says when it's done (HomeCurrencyChangeNotices).
+        if (inBackground)
+          toast.info(t("homeCurrency.convertingStarted", { currency: to }));
+        else toast.success(t("homeCurrency.changed", { currency: to }));
       }}
     >
-      {preview && !preview.tooLarge && preview.amounts > 0 && (
+      {preview && (preview.amounts > 0 || !preview.countedAll) && (
         <ConversionFacts preview={preview} />
       )}
       {error && (
@@ -180,7 +214,13 @@ function ConversionFacts({ preview }: { preview: Preview }) {
     <div className="flex flex-col gap-2">
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md border px-3 py-2 text-[13px]">
         <dt className="text-muted-foreground">{t("homeCurrency.amounts")}</dt>
-        <dd className="text-right">{format.number(preview.amounts)}</dd>
+        <dd className="text-right">
+          {preview.countedAll
+            ? format.number(preview.amounts)
+            : t("homeCurrency.amountsAtLeast", {
+                count: format.number(preview.amounts),
+              })}
+        </dd>
         {rate && (
           <>
             <dt className="text-muted-foreground">{t("homeCurrency.rate")}</dt>
@@ -200,6 +240,11 @@ function ConversionFacts({ preview }: { preview: Preview }) {
           </>
         )}
       </dl>
+      {preview.inBackground && (
+        <p className="text-xs text-muted-foreground">
+          {t("homeCurrency.inBackground")}
+        </p>
+      )}
       {rate?.stale && (
         <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
           <Clock

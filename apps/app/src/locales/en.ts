@@ -610,9 +610,10 @@ export default {
       "None of your Items has a Purchase price or Market value, so there's nothing to convert.",
     noRate:
       "There's no exchange rate to convert your amounts with yet. Try again in a few minutes.",
-    tooLarge:
-      "Your Collection has more than {limit} Items, too many to convert in one change. Send feedback and we'll help.",
+    inBackground:
+      "Your Collection is large, so this happens in the background and can take a minute. Until it's done, amounts can't be edited.",
     amounts: "Amounts to convert",
+    amountsAtLeast: "At least {count}",
     rate: "Exchange rate",
     rateValue: "1 {from} = {rate} {to}",
     rateFrom: "Rate as of",
@@ -626,6 +627,23 @@ export default {
     sameCurrency: "That's already your Home currency.",
     failed:
       "Couldn't change your Home currency, and nothing was converted. Try again.",
+    converting: "Converting to {currency}…",
+    convertingTotals:
+      "Your amounts are being converted to {currency}. The totals and charts are back once that's done.",
+    convertingStarted:
+      "Converting your amounts to {currency}. This can take a minute.",
+    calledOff:
+      "Your Home currency couldn't be changed to {currency}: one of your amounts would be too large in it. Nothing was converted.",
+    busy: "Your Home currency is being changed. Try again once that's done.",
+    moneyBusy:
+      "Your Home currency is being changed, so amounts can't be edited until that's done.",
+    stalled:
+      "Converting your amounts to {currency} stopped part-way. Try again to finish it.",
+    retry: "Try again",
+    changedWhileOpen:
+      "Your Home currency is now {currency}. Close this and open it again to enter amounts in it.",
+    amountsWait:
+      "Your amounts are being converted to {currency}. You can edit them once that's done.",
   },
   preciousMetal: {
     title: "Precious metal",
@@ -1320,6 +1338,8 @@ export default {
       invalidQuantity: "the Quantity isn't a whole number of at least 1",
       invalidDate: "a date isn't a real date in the past, written YYYY-MM-DD",
       otherCurrency: "the currency isn't your Home currency",
+      homeCurrencyChanging:
+        "it has an amount while your Home currency is being changed",
       unknownCatalogEntry: "the Catalog entry doesn't exist",
       tooManyAlbums: "it would make one Album too many",
       titleRequired: "it has no title",

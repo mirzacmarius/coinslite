@@ -22,6 +22,12 @@ import { setOfEntry, setScope } from "./catalog/sets";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
 import {
+  changingHomeCurrency,
+  checkAmountsWrite,
+  holdsAmount,
+  homeCurrencyErrors,
+} from "./homeCurrency/rules";
+import {
   bulkErrors,
   bulkLimits,
   planGradeUndo,
@@ -46,6 +52,7 @@ import {
 } from "./items/rules";
 import { withThumbnail } from "./items/thumbnail";
 import {
+  historyOf,
   recordIfChanged,
   recordNewItem,
   splitHistory,
@@ -114,6 +121,13 @@ const itemFields = {
   albumId: v.optional(v.id("albums")),
 };
 const fieldNames = Object.keys(itemFields) as Array<keyof typeof itemFields>;
+
+/**
+ * The Home currency a form showed its amounts in. Amounts entered in one the
+ * person no longer has (it changed while the form was open) are turned away
+ * rather than stored unconverted. Older apps don't send it.
+ */
+const amountsIn = v.optional(homeCurrency);
 
 export const itemNotFound = "ITEM_NOT_FOUND";
 
@@ -231,10 +245,11 @@ async function insertItem(
  * Catalog entry and keeps only the facts the person changed.
  */
 export const add = mutation({
-  args: { ...itemFields, catalogEntryKey: v.optional(v.string()) },
+  args: { ...itemFields, catalogEntryKey: v.optional(v.string()), amountsIn },
   returns: v.id("items"),
-  handler: async (ctx, { albumId, catalogEntryKey, ...fields }) => {
+  handler: async (ctx, { albumId, catalogEntryKey, amountsIn, ...fields }) => {
     const owner = await requireSetUpUser(ctx);
+    if (holdsAmount(fields)) checkAmountsWrite(owner, amountsIn);
     await requireRoomForItems(ctx, owner._id);
     const entry =
       catalogEntryKey === undefined
@@ -377,13 +392,20 @@ async function otherItemsOf(
  * the entry again; only the facts that differ are kept as the person's.
  */
 export const update = mutation({
-  args: { itemId: v.id("items"), ...itemFields },
+  args: { itemId: v.id("items"), ...itemFields, amountsIn },
   returns: v.null(),
-  handler: async (ctx, { itemId, albumId, ...fields }) => {
+  handler: async (ctx, { itemId, albumId, amountsIn, ...fields }) => {
     const item = await requireOwnItem(ctx, itemId);
     const album = await ownAlbumId(ctx, item.ownerId, albumId);
     const entry = await itemResolver(ctx).entryOf(item);
     const checked = checkFields(fields, entry, item);
+    // The form sends its amounts each time; only amounts that differ from
+    // the stored ones are written.
+    if (
+      checked.purchasePrice !== item.purchasePrice ||
+      checked.marketValue !== item.marketValue
+    )
+      checkAmountsWrite(await requireSetUpUser(ctx), amountsIn);
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
@@ -418,11 +440,15 @@ export const sell = mutation({
     soldOn: v.string(),
     salePrice: v.optional(v.number()),
     saleNote: v.optional(v.string()),
+    amountsIn,
   },
   returns: v.id("items"),
-  handler: async (ctx, { itemId, quantity, ...input }) => {
+  handler: async (ctx, { itemId, quantity, amountsIn, ...input }) => {
     const item = await requireOwnItem(ctx, itemId);
+    const owner = await requireSetUpUser(ctx);
     const sale = checkSale(input, latestPurchaseDate(), item.purchaseDate);
+    if (sale.salePrice !== undefined && sale.salePrice !== item.salePrice)
+      checkAmountsWrite(owner, amountsIn);
     const pieces = quantity ?? item.quantity;
     if (!Number.isSafeInteger(pieces) || pieces < 1 || pieces > item.quantity)
       throw new ConvexError(itemErrors.invalidQuantity);
@@ -434,6 +460,14 @@ export const sell = mutation({
     }
     if (item.soldOn !== undefined)
       throw new ConvexError(itemErrors.invalidQuantity);
+    // The split-off Item gets copies of the amounts and their history: made
+    // while a change converts in the background, they could be converted
+    // twice.
+    if (
+      changingHomeCurrency(owner) &&
+      (holdsAmount(item) || (await historyOf(ctx, itemId)).some(holdsAmount))
+    )
+      throw new ConvexError(homeCurrencyErrors.changing);
     // Photos stay with the original: each stored file is on one Item only.
     const {
       _id,

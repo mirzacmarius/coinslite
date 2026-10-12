@@ -2,6 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { statsFigures, statsTable } from "./admin/statsFigures";
+import { changeProgress, homeCurrencyChange } from "./homeCurrency/rules";
 import {
   albumColour,
   catalogDetails,
@@ -53,6 +54,8 @@ export default defineSchema({
     /** When `language` last changed, so a device can tell a newer choice from an old one. */
     languageChangedAt: v.optional(v.number()),
     homeCurrency: v.optional(homeCurrency),
+    /** A Home currency change in the background, or one called off (homeCurrency/rules.ts). */
+    homeCurrencyChange: v.optional(homeCurrencyChange),
     termsAcceptedAt: v.optional(v.number()),
 
     // Contact and address, for the Insurance report
@@ -478,6 +481,24 @@ export default defineSchema({
   })
     .index("by_itemId_and_at", ["itemId", "at"])
     .index("by_ownerId", ["ownerId"]),
+
+  /**
+   * How far a Home currency change converting in the background has got
+   * (homeCurrency.ts), one per person while it runs. Kept off the profile,
+   * which nearly every screen reads, since each batch moves it on.
+   */
+  homeCurrencyChanges: defineTable({
+    userId: v.id("users"),
+    ...changeProgress.fields,
+    /** When a batch last moved it on; one that stops is retried (crons.ts). */
+    updatedAt: v.number(),
+    /** How many times it was retried since it last moved. */
+    retries: v.number(),
+    /** Its retries ran out part-way: it waits for the person to try again. */
+    waiting: v.boolean(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_waiting_and_updatedAt", ["waiting", "updatedAt"]),
 
   /**
    * The first good Spot prices of each day, kept for good (spotPrices.ts

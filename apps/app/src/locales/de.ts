@@ -641,9 +641,10 @@ export default {
       "Keines deiner Objekte hat einen Kaufpreis oder Marktwert, es gibt also nichts umzurechnen.",
     noRate:
       "Es gibt noch keinen Wechselkurs, um deine Beträge umzurechnen. Versuche es in ein paar Minuten noch einmal.",
-    tooLarge:
-      "Deine Sammlung hat mehr als {limit} Objekte, zu viele für eine einzige Umrechnung. Schick uns Feedback, dann helfen wir dir.",
+    inBackground:
+      "Deine Sammlung ist groß, daher geschieht das im Hintergrund und kann eine Minute dauern. Bis es erledigt ist, lassen sich Beträge nicht bearbeiten.",
     amounts: "Umzurechnende Beträge",
+    amountsAtLeast: "Mindestens {count}",
     rate: "Wechselkurs",
     rateValue: "1 {from} = {rate} {to}",
     rateFrom: "Stand",
@@ -657,6 +658,23 @@ export default {
     sameCurrency: "Das ist bereits deine Heimatwährung.",
     failed:
       "Die Heimatwährung konnte nicht geändert werden, und nichts wurde umgerechnet. Versuche es noch einmal.",
+    converting: "Wird in {currency} umgerechnet…",
+    convertingTotals:
+      "Deine Beträge werden in {currency} umgerechnet. Summen und Diagramme sind wieder da, sobald das erledigt ist.",
+    convertingStarted:
+      "Deine Beträge werden in {currency} umgerechnet. Das kann eine Minute dauern.",
+    calledOff:
+      "Deine Heimatwährung konnte nicht zu {currency} geändert werden: Einer deiner Beträge wäre darin zu groß. Es wurde nichts umgerechnet.",
+    busy: "Deine Heimatwährung wird gerade geändert. Versuche es noch einmal, sobald das erledigt ist.",
+    moneyBusy:
+      "Deine Heimatwährung wird gerade geändert, daher lassen sich Beträge erst danach bearbeiten.",
+    stalled:
+      "Die Umrechnung deiner Beträge in {currency} ist unterwegs stehen geblieben. Versuche es noch einmal, um sie abzuschließen.",
+    retry: "Noch einmal versuchen",
+    changedWhileOpen:
+      "Deine Heimatwährung ist jetzt {currency}. Schließe das und öffne es erneut, um Beträge darin einzugeben.",
+    amountsWait:
+      "Deine Beträge werden in {currency} umgerechnet. Du kannst sie bearbeiten, sobald das erledigt ist.",
   },
   preciousMetal: {
     title: "Edelmetall",
@@ -1388,6 +1406,8 @@ export default {
       invalidDate:
         "ein Datum ist kein echtes vergangenes Datum im Format JJJJ-MM-TT",
       otherCurrency: "die Währung ist nicht deine Heimatwährung",
+      homeCurrencyChanging:
+        "ein Betrag ist angegeben, während deine Heimatwährung geändert wird",
       unknownCatalogEntry: "den Katalogeintrag gibt es nicht",
       tooManyAlbums: "sie würde ein Album zu viel anlegen",
       titleRequired: "sie hat keinen Titel",
