@@ -277,10 +277,10 @@ describe("the facts credit an Item page shows", () => {
     expect(
       factsCreditFor(
         {
-          country: "RO",
+          country: "MD",
           year: 2006,
-          denomination: "50 bani",
-          series: "Leu 2005",
+          denomination: "1 leu",
+          series: "Leu 2006",
           diameter: 23.7,
         },
         fiftyBani,
@@ -292,10 +292,10 @@ describe("the facts credit an Item page shows", () => {
     expect(
       factsCreditFor(
         {
-          country: "RO",
+          country: "MD",
           year: 2006,
-          denomination: "50 bani",
-          series: "Leu 2005",
+          denomination: "1 leu",
+          series: "Leu 2006",
         },
         fiftyBani,
       )?.source,
@@ -304,10 +304,10 @@ describe("the facts credit an Item page shows", () => {
 
   test("facts the Item has no field for, shown from the entry, keep its credit", () => {
     const overridden = {
-      country: "RO",
+      country: "MD",
       year: 2006,
-      denomination: "50 bani",
-      series: "Leu 2005",
+      denomination: "1 leu",
+      series: "Leu 2006",
       diameter: 23.7,
     };
     expect(
