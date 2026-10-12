@@ -1,11 +1,13 @@
 "use client";
 
+import { useMoney } from "@/components/account/home-currency-change";
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import {
   type ReportColumn,
   baseColumns,
@@ -154,12 +156,14 @@ const errorKeys = {
   PREMIUM_REQUIRED: "insuranceReport.errors.PREMIUM_REQUIRED",
   REPORT_TOO_LARGE: "insuranceReport.errors.REPORT_TOO_LARGE",
   ALBUM_NOT_FOUND: "insuranceReport.errors.ALBUM_NOT_FOUND",
+  [homeCurrencyErrors.changing]: "homeCurrency.busy",
 } as const;
 
 function ReportBuilder({ account }: { account: Account }) {
   const t = useI18n();
   const locale = useCurrentLocale();
   const format = useFormatters();
+  const money = useMoney();
   const albums = useAlbums();
   const downloadReport = useAction(api.insuranceReportPdf.download);
   const [scopeKind, setScopeKind] = useState<ScopeKind>("collection");
@@ -382,7 +386,7 @@ function ReportBuilder({ account }: { account: Account }) {
                   {/* A column just ticked has no total until the new preview arrives. */}
                   {preview.totals[column] === undefined
                     ? "…"
-                    : format.money(preview.totals[column], preview.currency)}
+                    : money(preview.totals[column], preview.currency)}
                 </PreviewRow>
               ))}
             </dl>

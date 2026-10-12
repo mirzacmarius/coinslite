@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { type QueryCtx, internalQuery, query } from "./_generated/server";
 import { albumErrors } from "./albums/rules";
+import { refuseWhileChanging } from "./homeCurrency/rules";
 import {
   type ReportColumn,
   checkColumns,
@@ -174,6 +175,8 @@ export const contents = internalQuery({
   handler: async (ctx, { scope, columns }) => {
     const report = await valueReport(ctx, scope, columns);
     const { owner, rates } = report;
+    // Mid-change, its amounts would be in two currencies.
+    refuseWhileChanging(owner);
     const currency = owner.homeCurrency;
     const priceOf = (metal: Metal) =>
       spotPriceOf(rates?.spotPricePerGram(metal, currency) ?? 0);

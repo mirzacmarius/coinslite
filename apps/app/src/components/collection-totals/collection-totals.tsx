@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  useConvertingTo,
+  useMoney,
+} from "@/components/account/home-currency-change";
 import { totalsOpen } from "@/components/collection/collection-display";
 import {
   useCollectionDisplay,
@@ -16,6 +20,7 @@ import {
   TROY_OUNCE_GRAMS,
   metals,
 } from "@coinslite/backend/convex/spotPrices/rates";
+import type { HomeCurrency } from "@coinslite/i18n";
 import {
   Collapsible,
   CollapsibleContent,
@@ -143,7 +148,9 @@ function TotalsSummary({
   className?: string;
 }) {
   const t = useI18n();
-  const format = useFormatters();
+  const formatMoney = useMoney();
+  // While a Home currency change converts the amounts, only that's said of them.
+  const converting = useConvertingTo() !== undefined;
   if (totals === undefined)
     return (
       <span
@@ -153,7 +160,7 @@ function TotalsSummary({
     );
   if (totals.items === 0) return null;
 
-  const money = (amount: number) => format.money(amount, totals.currency);
+  const money = (amount: number) => formatMoney(amount, totals.currency);
   const gainLoss = sold ? totals.realised : totals.gainLoss;
   const figures: { key: string; label?: string; value: ReactNode }[] = [
     {
@@ -172,7 +179,7 @@ function TotalsSummary({
           value: money(totals.marketValue),
         },
   ];
-  if (gainLoss.items > 0)
+  if (gainLoss.items > 0 && !converting)
     figures.push({
       key: "gainLoss",
       label: t(
@@ -182,7 +189,7 @@ function TotalsSummary({
         <SignedMoney amount={gainLoss.amount} currency={totals.currency} />
       ),
     });
-  for (const metal of sold ? [] : metals) {
+  for (const metal of sold || converting ? [] : metals) {
     const { value } = totals.metals[metal];
     if (value)
       figures.push({
@@ -213,6 +220,7 @@ function TotalsSummary({
 /**
  * The totals, Spot prices and charts, with placeholders while they load. The
  * sold view's are its sale figures, with no charts: those show what's owned.
+ * While a Home currency change converts the amounts, the charts wait too.
  */
 function TotalsDetails({
   totals,
@@ -221,6 +229,7 @@ function TotalsDetails({
   totals: ShownTotals | undefined;
   sold?: boolean;
 }) {
+  const converting = useConvertingTo() !== undefined;
   const empty = totals?.items === 0;
   return (
     <>
@@ -238,7 +247,7 @@ function TotalsDetails({
         )}
         <SpotPrices className={cn(empty && "max-w-xl xl:col-span-2")} />
       </div>
-      {sold ? null : totals === undefined ? (
+      {sold || converting ? null : totals === undefined ? (
         <ChartsSkeleton />
       ) : (
         !empty && <Charts totals={totals} />
@@ -333,6 +342,8 @@ export function TotalsFigures({
 }) {
   const t = useI18n();
   const format = useFormatters();
+  const convertingTo = useConvertingTo();
+  if (convertingTo) return <ConvertingNotice currency={convertingTo} />;
   const money = (amount: number) => format.money(amount, totals.currency);
   /**
    * Gain/loss over what's owned, or realised over what's sold, with a dash
@@ -486,6 +497,22 @@ function Figure({
       </dd>
       {hint && <dd className="text-xs text-muted-foreground">{hint}</dd>}
     </div>
+  );
+}
+
+/**
+ * In place of the totals while a Home currency change converts the
+ * Collection's amounts in the background: added up, they'd mix currencies.
+ */
+function ConvertingNotice({ currency }: { currency: HomeCurrency }) {
+  const t = useI18n();
+  return (
+    <p
+      role="status"
+      className="rounded-xl bg-card px-4 py-3 text-[13px] text-muted-foreground"
+    >
+      {t("homeCurrency.convertingTotals", { currency })}
+    </p>
   );
 }
 

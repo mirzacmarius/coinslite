@@ -12,6 +12,7 @@ import {
   collectionPdfLimits,
 } from "@coinslite/backend/convex/collection/exportRules";
 import type { CollectionView } from "@coinslite/backend/convex/collection/view";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { planErrors } from "@coinslite/backend/convex/plans/rules";
 import { Button } from "@coinslite/ui/button";
 import {
@@ -92,6 +93,8 @@ export function ExportMenu({
         toast.error(t("collectionExport.pdfTooLarge", { limit: pdfLimit }));
       } else if (code === collectionExportErrors.incomplete) {
         toast.error(t("collectionExport.tooLarge"));
+      } else if (code === homeCurrencyErrors.changing) {
+        toast.error(t("homeCurrency.busy"));
       } else {
         toast.error(t("collectionExport.failed"));
       }

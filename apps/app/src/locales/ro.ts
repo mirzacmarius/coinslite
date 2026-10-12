@@ -623,9 +623,10 @@ export default {
       "Niciunul dintre obiectele tale nu are preț de achiziție sau valoare de piață, deci nu e nimic de convertit.",
     noRate:
       "Încă nu avem un curs de schimb cu care să convertim sumele. Încearcă din nou peste câteva minute.",
-    tooLarge:
-      "Colecția ta are peste {limit} de obiecte, prea multe pentru a fi convertite într-o singură schimbare. Trimite-ne feedback și te ajutăm.",
+    inBackground:
+      "Colecția ta e mare, așa că asta se face în fundal și poate dura un minut. Până atunci, sumele nu pot fi modificate.",
     amounts: "Sume de convertit",
+    amountsAtLeast: "Cel puțin {count}",
     rate: "Curs de schimb",
     rateValue: "1 {from} = {rate} {to}",
     rateFrom: "Curs la",
@@ -639,6 +640,23 @@ export default {
     sameCurrency: "Aceasta este deja moneda ta de bază.",
     failed:
       "Moneda de bază nu a putut fi schimbată și nu s-a convertit nimic. Încearcă din nou.",
+    converting: "Se convertește în {currency}…",
+    convertingTotals:
+      "Sumele tale sunt convertite în {currency}. Totalurile și graficele revin după ce se termină.",
+    convertingStarted:
+      "Sumele tale se convertesc în {currency}. Poate dura un minut.",
+    calledOff:
+      "Moneda de bază nu a putut fi schimbată în {currency}: una dintre sumele tale ar fi prea mare în această monedă. Nu s-a convertit nimic.",
+    busy: "Moneda ta de bază se schimbă acum. Încearcă din nou după ce se termină.",
+    moneyBusy:
+      "Moneda ta de bază se schimbă acum, așa că sumele nu pot fi modificate până se termină.",
+    stalled:
+      "Conversia sumelor tale în {currency} s-a oprit la jumătate. Încearcă din nou ca să o termini.",
+    retry: "Încearcă din nou",
+    changedWhileOpen:
+      "Moneda ta de bază este acum {currency}. Închide și deschide din nou ca să introduci sume în ea.",
+    amountsWait:
+      "Sumele tale sunt convertite în {currency}. Le poți modifica după ce se termină.",
   },
   preciousMetal: {
     title: "Metal prețios",
@@ -1347,6 +1365,8 @@ export default {
       invalidQuantity: "cantitatea nu e un număr întreg de cel puțin 1",
       invalidDate: "o dată nu e o dată reală din trecut, scrisă AAAA-LL-ZZ",
       otherCurrency: "moneda nu e moneda ta de bază",
+      homeCurrencyChanging:
+        "are o sumă în timp ce moneda ta de bază se schimbă",
       unknownCatalogEntry: "intrarea din catalog nu există",
       tooManyAlbums: "ar crea un album în plus peste limită",
       titleRequired: "nu are titlu",

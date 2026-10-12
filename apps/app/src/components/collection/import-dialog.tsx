@@ -11,6 +11,7 @@ import {
   importLimits,
   rowErrors,
 } from "@coinslite/backend/convex/collection/importRows";
+import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { itemErrors } from "@coinslite/backend/convex/items/rules";
 import { Button } from "@coinslite/ui/button";
 import {
@@ -64,6 +65,7 @@ const reasonKeys = {
   [itemErrors.invalidQuantity]: "invalidQuantity",
   [itemErrors.invalidDate]: "invalidDate",
   [rowErrors.otherCurrency]: "otherCurrency",
+  [homeCurrencyErrors.changing]: "homeCurrencyChanging",
   [rowErrors.unknownCatalogEntry]: "unknownCatalogEntry",
   [rowErrors.tooManyAlbums]: "tooManyAlbums",
   [itemErrors.titleRequired]: "titleRequired",

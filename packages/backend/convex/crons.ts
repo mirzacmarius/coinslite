@@ -27,6 +27,14 @@ crons.interval(
   {},
 );
 
+/** Home currency changes whose background conversion stopped, retried (homeCurrency.ts). */
+crons.interval(
+  "resume stalled Home currency changes",
+  { minutes: 15 },
+  internal.homeCurrency.resumeStalled,
+  {},
+);
+
 /** Uploads that never became a photo or a Catalog image (uploads.ts). */
 crons.interval(
   "delete unused uploads",

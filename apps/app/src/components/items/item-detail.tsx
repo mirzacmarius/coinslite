@@ -1,5 +1,6 @@
 "use client";
 
+import { useMoney } from "@/components/account/home-currency-change";
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
 import { catalogNodeHref, setHref } from "@/components/catalog/catalog-levels";
@@ -67,6 +68,7 @@ export function ItemDetail() {
     [params],
   );
   const format = useFormatters();
+  const formatMoney = useMoney();
   const labels = useGradeLabels();
   const catalogFormat = useCatalogFormat();
   const albums = useAlbums();
@@ -126,10 +128,11 @@ export function ItemDetail() {
   }
 
   const album = albums?.find(({ _id }) => _id === item.albumId);
+  // "Converting to …" while a Home currency change converts the amounts.
   const money: ItemMoney = (amount, options) =>
     amount === undefined
       ? undefined
-      : format.money(amount, item.currency, options);
+      : formatMoney(amount, item.currency, options);
   const millimetres = (value: number | undefined) =>
     value === undefined
       ? undefined

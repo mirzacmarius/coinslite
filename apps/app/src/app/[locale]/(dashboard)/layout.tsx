@@ -1,3 +1,4 @@
+import { HomeCurrencyChangeNotices } from "@/components/account/home-currency-change";
 import { ProfileLanguage } from "@/components/account/profile-language";
 import { EndSession, UntilSessionEnds } from "@/components/end-session";
 import {
@@ -63,6 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <AccountCheck />
           </Suspense>
           <ProfileLanguage />
+          <HomeCurrencyChangeNotices />
           <ReleaseHighlights />
           <UntilSessionEnds>{children}</UntilSessionEnds>
         </AppShell>

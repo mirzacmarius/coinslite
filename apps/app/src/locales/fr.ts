@@ -630,9 +630,10 @@ export default {
       "Aucun de vos objets n’a de prix d’achat ni de valeur de marché\u00a0: il n’y a rien à convertir.",
     noRate:
       "Nous n’avons pas encore de taux de change pour convertir vos montants. Réessayez dans quelques minutes.",
-    tooLarge:
-      "Votre collection compte plus de {limit} objets, trop pour les convertir en une seule fois. Donnez-nous votre avis et nous vous aiderons.",
+    inBackground:
+      "Votre collection est volumineuse\u00a0: la conversion se fait en arrière-plan et peut prendre une minute. D’ici là, les montants ne peuvent pas être modifiés.",
     amounts: "Montants à convertir",
+    amountsAtLeast: "Au moins {count}",
     rate: "Taux de change",
     rateValue: "1 {from} = {rate} {to}",
     rateFrom: "Taux au",
@@ -646,6 +647,23 @@ export default {
     sameCurrency: "C’est déjà votre devise de référence.",
     failed:
       "Impossible de changer la devise de référence\u00a0; aucun montant n’a été converti. Réessayez.",
+    converting: "Conversion en {currency}…",
+    convertingTotals:
+      "Vos montants sont en cours de conversion en {currency}. Les totaux et graphiques reviendront une fois la conversion terminée.",
+    convertingStarted:
+      "Conversion de vos montants en {currency}. Cela peut prendre une minute.",
+    calledOff:
+      "Impossible de passer la devise de référence en {currency}\u00a0: l’un de vos montants y serait trop élevé. Aucun montant n’a été converti.",
+    busy: "Votre devise de référence est en cours de changement. Réessayez une fois le changement terminé.",
+    moneyBusy:
+      "Votre devise de référence est en cours de changement\u00a0: les montants ne peuvent pas être modifiés avant la fin.",
+    stalled:
+      "La conversion de vos montants en {currency} s’est arrêtée en cours de route. Réessayez pour la terminer.",
+    retry: "Réessayer",
+    changedWhileOpen:
+      "Votre devise de référence est désormais {currency}. Fermez cette fenêtre et rouvrez-la pour y saisir des montants.",
+    amountsWait:
+      "Vos montants sont en cours de conversion en {currency}. Vous pourrez les modifier une fois la conversion terminée.",
   },
   preciousMetal: {
     title: "Métal précieux",
@@ -1365,6 +1383,8 @@ export default {
       invalidDate:
         "une date n’est pas une vraie date passée au format AAAA-MM-JJ",
       otherCurrency: "la devise n’est pas votre devise de référence",
+      homeCurrencyChanging:
+        "un montant est indiqué alors que votre devise de référence est en cours de changement",
       unknownCatalogEntry: "la fiche du catalogue n’existe pas",
       tooManyAlbums: "elle créerait un album de trop",
       titleRequired: "elle n’a pas de titre",
