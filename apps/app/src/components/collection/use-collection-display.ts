@@ -3,7 +3,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import {
   type CollectionDisplay,
-  type ScreenSize,
+  type ViewportSize,
   readDisplay,
 } from "./collection-display";
 
@@ -47,26 +47,29 @@ export function useCollectionDisplay() {
   return [display, change] as const;
 }
 
-function subscribeToSize(onChange: () => void) {
+function subscribeToResize(onChange: () => void) {
   window.addEventListener("resize", onChange);
   return () => window.removeEventListener("resize", onChange);
 }
 
-/** The last size read, so an unchanged window gives the same object. */
-let lastSize: ScreenSize | undefined;
+/** The last size read, so an unchanged viewport gives the same object. */
+let lastSize: ViewportSize | undefined;
 
-function screenSize() {
+function viewportSize() {
   const { innerWidth: width, innerHeight: height } = window;
   if (lastSize?.width !== width || lastSize.height !== height)
     lastSize = { width, height };
   return lastSize;
 }
 
-/** The window's size; undefined on the server and the first paint. */
-export function useScreenSize() {
-  return useSyncExternalStore<ScreenSize | undefined>(
-    subscribeToSize,
-    screenSize,
+/**
+ * The viewport's size, kept current as the window resizes; undefined on the
+ * server and the first paint.
+ */
+export function useViewportSize() {
+  return useSyncExternalStore<ViewportSize | undefined>(
+    subscribeToResize,
+    viewportSize,
     () => undefined,
   );
 }

@@ -49,32 +49,36 @@ export function narrowsView(view: CollectionView) {
   );
 }
 
-/** The size of the browser window, in CSS pixels. */
-export type ScreenSize = { width: number; height: number };
+/** The browser window's viewport (`innerWidth` × `innerHeight`), in CSS pixels. */
+export type ViewportSize = { width: number; height: number };
 
 /**
- * The smallest screen the totals start open on: below it, the open totals
- * would push the Item list out of view. The page's CSS repeats it for the
- * first paint, as `(min-width: 1024px) and (min-height: 1000px)`.
+ * The smallest viewport the totals start open in: below it, the open totals
+ * would push the Item list out of view. `CollectionTotalsSection` repeats it
+ * in CSS for the first paint.
  */
-const roomyScreen: ScreenSize = { width: 1024, height: 1000 };
+const roomyViewport: ViewportSize = { width: 1024, height: 1000 };
 
 /**
  * Whether the Collection page shows its totals open. A searched or filtered
  * view keeps them collapsed, so a link to one shows its Items first;
- * otherwise they're as this device last left them, else open only on a
- * screen wide and tall enough for the list to still start in view. Undefined
- * while the screen size isn't known yet (on the server), when the page's CSS
- * decides by the same size.
+ * otherwise they're as this device last left them, else open only in a
+ * viewport wide and tall enough for the list to still start in view.
+ * Undefined while the viewport isn't known yet (on the server), when the
+ * page's CSS decides by the same size.
  */
 export function totalsOpen(
   display: CollectionDisplay,
-  { narrowed, screen }: { narrowed: boolean; screen: ScreenSize | undefined },
+  {
+    narrowed,
+    viewport,
+  }: { narrowed: boolean; viewport: ViewportSize | undefined },
 ) {
   if (narrowed) return false;
   if (display.totalsOpen !== undefined) return display.totalsOpen;
-  if (screen === undefined) return undefined;
+  if (viewport === undefined) return undefined;
   return (
-    screen.width >= roomyScreen.width && screen.height >= roomyScreen.height
+    viewport.width >= roomyViewport.width &&
+    viewport.height >= roomyViewport.height
   );
 }

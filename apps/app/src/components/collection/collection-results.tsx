@@ -229,8 +229,8 @@ function ItemList({
 
 /**
  * A row's figures on a phone, where there's no room for columns: the Market
- * value (× Quantity when there's more than one piece) on the right, the Grade
- * under it. An amount never truncates; the title gives way instead.
+ * value of one piece (× Quantity when there's more than one) on the right,
+ * the Grade under it. The value never truncates; the title gives way instead.
  */
 function PhoneFigures({
   marketValue,
