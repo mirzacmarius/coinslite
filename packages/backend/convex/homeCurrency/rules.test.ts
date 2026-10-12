@@ -23,7 +23,7 @@ describe("tooLargeToConvert", () => {
     );
   });
 
-  test("5,000 history points fit, with or without Market values", () => {
+  test("5,000 Items and 5,000 history points fit, with or without Market values", () => {
     expect(
       tooLargeToConvert({ items: items(5000), history: points(4000, 1000) }),
     ).toBe(false);

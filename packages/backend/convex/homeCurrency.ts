@@ -25,14 +25,14 @@ async function collectionOf(ctx: QueryCtx, ownerId: Id<"users">) {
     .query("items")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
     .take(homeCurrencyLimits.items + 1);
-  const history = await ctx.db
+  const historyRead = await ctx.db
     .query("marketValueHistory")
     .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
     .take(homeCurrencyLimits.historyPoints + 1);
   return {
     items,
-    history: history.filter((point) => point.marketValue !== undefined),
-    tooLarge: tooLargeToConvert({ items, history }),
+    history: historyRead.filter((point) => point.marketValue !== undefined),
+    tooLarge: tooLargeToConvert({ items, history: historyRead }),
   };
 }
 
