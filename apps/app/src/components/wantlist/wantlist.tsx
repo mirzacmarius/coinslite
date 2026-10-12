@@ -17,12 +17,9 @@ import { useMemo } from "react";
 /** Where the Wantlist lives: beside the Catalog it lists entries of. */
 export const wantlistHref = "/catalog/wantlist";
 
-/**
- * The keys of the Catalog entries the person wants; undefined while loading,
- * or while `enabled` is false (e.g. a closed dialog).
- */
-export function useWantedKeys(enabled = true) {
-  const keys = useQuery(api.wants.keys, enabled ? {} : "skip");
+/** The keys of the Catalog entries the person wants; undefined while loading. */
+export function useWantedKeys() {
+  const keys = useQuery(api.wants.keys, {});
   return useMemo(() => keys && new Set(keys), [keys]);
 }
 

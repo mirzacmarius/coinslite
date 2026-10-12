@@ -1741,13 +1741,6 @@ export default {
       "Nu există nimic la această adresă. Poate a fost mutată sau linkul este greșit.",
     home: "Mergi la prezentare",
   },
-  error: {
-    title: "Ceva nu a mers",
-    description:
-      "Pagina nu a putut fi afișată. Încearcă din nou sau mergi la prezentare.",
-    retry: "Încearcă din nou",
-    home: "Mergi la prezentare",
-  },
   scanner: {
     scan: "Scanează moneda",
     title: "Scanează moneda",

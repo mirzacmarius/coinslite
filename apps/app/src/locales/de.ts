@@ -1790,13 +1790,6 @@ export default {
       "Unter dieser Adresse gibt es nichts. Vielleicht wurde die Seite verschoben, oder der Link ist falsch.",
     home: "Zur Übersicht",
   },
-  error: {
-    title: "Etwas ist schiefgelaufen",
-    description:
-      "Diese Seite konnte nicht angezeigt werden. Versuche es noch einmal oder geh zur Übersicht.",
-    retry: "Erneut versuchen",
-    home: "Zur Übersicht",
-  },
   scanner: {
     scan: "Münze scannen",
     title: "Münze scannen",

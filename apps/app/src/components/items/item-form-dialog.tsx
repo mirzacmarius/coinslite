@@ -207,10 +207,9 @@ export function ItemFormDialog({
   const titleRef = useRef<HTMLInputElement>(null);
   const baseId = useId();
   const labels = useGradeLabels();
-  // Only while open: the "New Item" dialog is mounted on every page, also
-  // while the session ends, when these would fail signed out.
+  // Only while open: the "New Item" dialog is mounted on every page.
   const albums = useAlbums(open);
-  const wantedKeys = useWantedKeys(open);
+  const wantedKeys = useWantedKeys();
   // One object for the dialog's life: the form resets when it sees new defaults.
   const [defaults] = useState(() => {
     const from = item ?? copyOf;

@@ -16,7 +16,7 @@ import {
   marketRates,
   spotPriceOf,
 } from "./spotPrices/rates";
-import { setUpUserOrNull } from "./utils/auth";
+import { requireSetUpUser } from "./utils/auth";
 import { homeCurrency, perDollar } from "./utils/validators";
 
 /** The one stored snapshot, or null before the first successful refresh. */
@@ -78,9 +78,7 @@ const spotPrice = v.object({ perGram: v.number(), perOunce: v.number() });
 
 /**
  * Gold and silver Spot prices in the caller's Home currency, per gram and per
- * troy ounce, with the time they were quoted. Null until the first refresh,
- * and without a set-up account: the sidebar asks on every signed-in screen,
- * so it never throws, not even while signing out or deleting the account.
+ * troy ounce, with the time they were quoted. Null until the first refresh.
  */
 export const current = query({
   args: {},
@@ -95,9 +93,7 @@ export const current = query({
     }),
   ),
   handler: async (ctx) => {
-    const user = await setUpUserOrNull(ctx);
-    if (!user) return null;
-    const currency = user.homeCurrency;
+    const { homeCurrency: currency } = await requireSetUpUser(ctx);
     const rates = await latestRates(ctx);
     if (!rates) return null;
     const priceOf = (metal: Metal) =>
