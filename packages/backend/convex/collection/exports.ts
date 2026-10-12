@@ -18,10 +18,11 @@ import {
   language,
   strike,
 } from "../utils/validators";
-import { collectionView, countryName, findItems } from "./browse";
+import { collectionView, findItems } from "./browse";
 import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
 import { collectionExportErrors, collectionPdfLimits } from "./exportRules";
 import { withoutAlbum } from "./view";
+import { countryName } from "./viewRules";
 
 /**
  * The Collection exports (Premium): a file of exactly the Items a Collection

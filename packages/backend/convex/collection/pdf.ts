@@ -8,11 +8,11 @@ import {
   type PdfFacts,
   renderTableDocument,
 } from "../pdf/tableDocument";
-import { countryName } from "./browse";
 import { type ExportLabels, exportLabels } from "./exportLabels";
 import type { PdfContents } from "./exports";
 import { collectionPdfMessages } from "./pdfMessages";
 import { defaultSort, withoutAlbum } from "./view";
+import { countryName } from "./viewRules";
 
 /** A Grade as the PDF prints it: "PF-65", "1−", or a stamp's Grade in words. */
 function gradeText(

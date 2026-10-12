@@ -26,7 +26,12 @@ import {
 import type * as React from "react";
 import { useMemo } from "react";
 
-export type BrowseResult = FunctionReturnType<typeof api.collection.browse>;
+/** One page of the Collection being browsed, as `collection.page` reads it. */
+export type BrowseResult = FunctionReturnType<typeof api.collection.page>;
+/** How many Items each filter option would show, read only while the filters are open. */
+export type FilterCounts = FunctionReturnType<
+  typeof api.collection.filterCounts
+>;
 
 export type FilterDimension =
   | "type"
@@ -43,8 +48,8 @@ export type FilterOption = {
   label: string;
   icon?: React.ReactNode;
   hint?: string;
-  /** How many Items picking it would show. */
-  count: number;
+  /** How many Items picking it would show; undefined while the counts load. */
+  count?: number;
   selected: boolean;
   /** What picking it changes in the view. */
   change: Partial<CollectionView>;
@@ -61,6 +66,8 @@ export type Filter = {
   active?: { label: string; icon?: React.ReactNode };
   /** False for a filter only links turn on: it shows as a chip, not in the menu. */
   inMenu?: false;
+  /** While the counts load, options found only from them (countries, denominations, Grades) aren't listed yet. */
+  counting: boolean;
 };
 
 const optionIcon = (Icon: LucideIcon) => (
@@ -76,12 +83,14 @@ const sameText = (a: string | undefined, b: string) =>
   a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 
 /**
- * Every filter the Collection offers, each with its options and their counts
- * from the latest result, and which option is on. Origin is offered only
- * when the person has an own country to compare with.
+ * Every filter the Collection offers, each with its options, their counts
+ * once they're loaded (only while the filters are open), and which option
+ * is on. Origin is offered only when the person has an own country to
+ * compare with.
  */
 export function useFilters(
   result: BrowseResult | undefined,
+  counts: FilterCounts | undefined,
   view: CollectionView,
 ): Filter[] {
   const t = useI18n();
@@ -91,16 +100,18 @@ export function useFilters(
   const albums = useAlbums();
 
   return useMemo(() => {
-    const options = result?.options;
     const ownCountry = result?.ownCountry ?? null;
-    const filters: Filter[] = [];
+    const counting = counts === undefined;
+    // What an option counts while it isn't in the counts: none, once known.
+    const uncounted = counting ? undefined : 0;
+    const filters: Omit<Filter, "counting">[] = [];
 
     const typeOptions: FilterOption[] = itemTypes.flatMap((type) => {
       const plain: FilterOption = {
         key: type,
         label: t(`items.types.${type}`),
         icon: optionIcon(itemTypeIcons[type]),
-        count: options?.types[type] ?? 0,
+        count: counts?.types[type] ?? uncounted,
         selected: view.type === type && !view.bullionOnly,
         change: { type, bullionOnly: undefined },
       };
@@ -111,7 +122,7 @@ export function useFilters(
           key: "bullion",
           label: t("collection.bullionCoins"),
           icon: optionIcon(itemTypeIcons.coin),
-          count: options?.types.bullion ?? 0,
+          count: counts?.types.bullion ?? uncounted,
           selected: view.bullionOnly === true,
           change: { type: "coin", bullionOnly: true },
         },
@@ -136,14 +147,14 @@ export function useFilters(
             label: t("collection.origins.own", {
               country: format.country(ownCountry),
             }),
-            count: options?.origins.own ?? 0,
+            count: counts?.origins.own ?? uncounted,
             selected: view.origin === "own",
             change: { origin: "own" },
           },
           {
             key: "foreign",
             label: t("collection.origins.foreign"),
-            count: options?.origins.foreign ?? 0,
+            count: counts?.origins.foreign ?? uncounted,
             selected: view.origin === "foreign",
             change: { origin: "foreign" },
           },
@@ -152,11 +163,11 @@ export function useFilters(
       });
     }
 
-    const countries = options?.countries ?? [];
+    const countries = counts?.countries ?? [];
     const countryOptions = [
       ...countries,
       ...(view.country && !countries.some((c) => c.country === view.country)
-        ? [{ country: view.country, count: 0 }]
+        ? [{ country: view.country, count: uncounted }]
         : []),
     ]
       .map(
@@ -177,12 +188,12 @@ export function useFilters(
       clear: { country: undefined },
     });
 
-    const denominations = options?.denominations ?? [];
+    const denominations = counts?.denominations ?? [];
     const denominationOptions = [
       ...denominations,
       ...(view.denomination &&
       !denominations.some((d) => sameText(view.denomination, d.denomination))
-        ? [{ denomination: view.denomination, count: 0 }]
+        ? [{ denomination: view.denomination, count: uncounted }]
         : []),
     ].map(
       ({ denomination, count }): FilterOption => ({
@@ -201,7 +212,7 @@ export function useFilters(
       clear: { denomination: undefined },
     });
 
-    const grades = options?.grades ?? [];
+    const grades = counts?.grades ?? [];
     const chosenGrade = view.grade;
     const gradeOptions = [
       ...grades,
@@ -211,7 +222,7 @@ export function useFilters(
           g.gradingScale === chosenGrade.gradingScale &&
           g.grade === chosenGrade.grade,
       )
-        ? [{ ...chosenGrade, count: 0 }]
+        ? [{ ...chosenGrade, count: uncounted }]
         : []),
     ].map(
       ({ gradingScale, grade, count }): FilterOption => ({
@@ -234,21 +245,21 @@ export function useFilters(
     });
 
     const albumCounts = new Map(
-      options?.albums.map(({ albumId, count }) => [albumId as string, count]),
+      counts?.albums.map(({ albumId, count }) => [albumId as string, count]),
     );
     const albumOptions: FilterOption[] = [
       ...(albums ?? []).map((album) => ({
         key: album._id,
         label: album.name,
         icon: <AlbumDot colour={album.colour} />,
-        count: albumCounts.get(album._id) ?? 0,
+        count: albumCounts.get(album._id) ?? uncounted,
         selected: view.album === album._id,
         change: { album: album._id },
       })),
       {
         key: withoutAlbum,
         label: t("collection.withoutAlbum"),
-        count: options?.withoutAlbum ?? 0,
+        count: counts?.withoutAlbum ?? uncounted,
         selected: view.album === withoutAlbum,
         change: { album: withoutAlbum },
       },
@@ -281,7 +292,7 @@ export function useFilters(
           {
             key: view.entry,
             label,
-            count: options?.entry ?? 0,
+            count: counts?.entry ?? uncounted,
             selected: true,
             change: { entry: view.entry },
           },
@@ -301,14 +312,14 @@ export function useFilters(
         {
           key: "owned",
           label: t("collection.statuses.owned"),
-          count: options?.statuses.owned ?? 0,
+          count: counts?.statuses.owned ?? uncounted,
           selected: view.status === undefined,
           change: { status: undefined },
         },
         {
           key: "sold",
           label: t("collection.statuses.sold"),
-          count: options?.statuses.sold ?? 0,
+          count: counts?.statuses.sold ?? uncounted,
           selected: view.status === "sold",
           change: { status: "sold" },
         },
@@ -320,12 +331,14 @@ export function useFilters(
     });
 
     return filters.map((filter) => {
-      if (filter.dimension === "status") return filter;
-      if (filter.active) return filter;
+      if (filter.dimension === "status" || filter.active)
+        return { ...filter, counting };
       const chosen = filter.options.find((option) => option.selected);
-      return chosen
-        ? { ...filter, active: { label: chosen.label, icon: chosen.icon } }
-        : filter;
+      return {
+        ...filter,
+        counting,
+        ...(chosen && { active: { label: chosen.label, icon: chosen.icon } }),
+      };
     });
-  }, [result, view, t, locale, format, labels, albums]);
+  }, [result, counts, view, t, locale, format, labels, albums]);
 }

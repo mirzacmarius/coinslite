@@ -86,6 +86,8 @@ export const accountDataByTable = {
   catalogNodes: "kept: the Catalog everyone shares",
   catalogDenominationCounts:
     "kept: the Catalog's entry counts, which name no one",
+  catalogSlimEntries:
+    "kept: the Catalog entries' slim copies, part of the Catalog",
   photoLinkKeys:
     "kept: when photo links are issued and the deployment's own signing secret, which name no one",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",

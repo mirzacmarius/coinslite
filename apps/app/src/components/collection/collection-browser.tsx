@@ -27,7 +27,11 @@ import { useCollectionUrl } from "./collection-url";
 import { DisplayMenu } from "./display-menu";
 import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
-import { type BrowseResult, useFilters } from "./filter-options";
+import {
+  type BrowseResult,
+  type FilterDimension,
+  useFilters,
+} from "./filter-options";
 import { ImportDialog } from "./import-dialog";
 import { MoveToAlbumBar } from "./move-to-album-bar";
 import { StartCard } from "./start-card";
@@ -69,15 +73,22 @@ export function CollectionBrowser() {
   const { view, page, update, goToPage, clearAll } = useCollectionUrl();
   const [display, changeDisplay] = useCollectionDisplay();
   const { shown: result, loading } = useLatest(
-    useQuery(api.collection.browse, {
+    useQuery(api.collection.page, {
       view,
       page,
       pageSize: display.pageSize,
       locale,
     }),
   );
-  const filters = useFilters(result, view);
+  // The filter options' counts are read only while a list of them shows:
+  // the Filter menu's, or an active filter's chip's.
   const [filterOpen, setFilterOpen] = useState(false);
+  const [openChip, setOpenChip] = useState<FilterDimension | null>(null);
+  const counts = useQuery(
+    api.collection.filterCounts,
+    filterOpen || openChip !== null ? { view, locale } : "skip",
+  );
+  const filters = useFilters(result, counts, view);
   const [importing, setImporting] = useState(false);
   // Keyed and first in every branch below, so it stays mounted (and keeps
   // its progress) as the first imported batch fills an empty Collection.
@@ -175,7 +186,7 @@ export function CollectionBrowser() {
   }
 
   // Nothing narrows the default view, yet it's empty: every Item is sold.
-  const allSold = !narrowsView(view) && result.options.statuses.sold > 0;
+  const allSold = !narrowsView(view) && result.soldCount > 0;
 
   // A Collection with nothing in it yet: no toolbar, just the ways to start.
   if (result.collectionSize === 0 && !narrowed) {
@@ -243,7 +254,17 @@ export function CollectionBrowser() {
           </Button>
         </div>
       </div>
-      <FilterChips filters={filters} onChange={update} onClearAll={clearAll} />
+      <FilterChips
+        filters={filters}
+        onChange={update}
+        onClearAll={clearAll}
+        open={openChip}
+        onOpenChange={(dimension, open) =>
+          setOpenChip((current) =>
+            open ? dimension : current === dimension ? null : current,
+          )
+        }
+      />
       {totals}
       {!result.complete && (
         <p className="border-b px-4 py-2 text-xs text-muted-foreground">

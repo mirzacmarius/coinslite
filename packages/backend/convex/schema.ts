@@ -412,6 +412,38 @@ export default defineSchema({
     }),
 
   /**
+   * Each Catalog entry's slim entry (items/catalogFacts.ts SlimEntry): its
+   * key, title and the facts Items take from it, without notes, image or
+   * sources, so resolving every Item in a Collection reads little
+   * (items/resolve.ts). A read model of the entry, never edited on its own
+   * (ADR 0008): catalog/tree.ts writes it with every entry it writes, and
+   * deletes it when the node stops being an entry or leaves the Catalog.
+   * Entries from before it existed have none until
+   * `catalog/slimEntries:backfill` has run; readers then read the entry.
+   */
+  catalogSlimEntries: defineTable({
+    entryId: v.id("catalogNodes"),
+    key: v.string(),
+    title: v.string(),
+    itemType: v.optional(catalogItemType),
+    country: v.optional(v.string()),
+    denomination: v.optional(v.string()),
+    series: v.optional(v.string()),
+    material: v.optional(material),
+    strike: v.optional(strike),
+    metal: v.optional(preciousMetal),
+    weight: v.optional(v.number()),
+    fineness: v.optional(v.number()),
+    diameter: v.optional(v.number()),
+    thickness: v.optional(v.number()),
+    mintMark: v.optional(v.string()),
+    mintage: v.optional(v.number()),
+    yearFrom: v.optional(v.number()),
+    yearTo: v.optional(v.number()),
+    numistaId: v.optional(v.number()),
+  }).index("by_entryId", ["entryId"]),
+
+  /**
    * How many Catalog entries a country holds of one denomination and series
    * of it, on its denomination path (catalog/denominationCounts.ts): the Set
    * "View as Set" opens from an entry right below a country. Absent
