@@ -1,6 +1,14 @@
 import { formatCsvRecord } from "../csvText";
 import { catalogCsvColumns } from "../fields";
 import {
+  colon,
+  credit,
+  ecb,
+  ecbPages,
+  officialJournal,
+  translated,
+} from "./ecbCredit";
+import {
   type EuroCommemorativeCoin,
   type EuroCommemorativeTranslation,
   euroCommemorativeCoins,
@@ -33,56 +41,10 @@ import { ro } from "./euroCommemorativeCoinsRo";
  * the ECB's terms don't cover showing them, so entries show the placeholder.
  */
 
-const ecbPages = "https://www.ecb.europa.eu/euro/coins";
-const changes =
-  "Changes by CoinsLite: arranged into Catalog fields; capitals and typography tidied.";
-
-const ecb = (link: string) => ({
-  source: "European Central Bank",
-  author: "European Central Bank",
-  licence: `Reused under the ECB's copyright terms, citing the ECB. Available free of charge at www.ecb.europa.eu. ${changes}`,
-  link,
-});
-const officialJournal = (notice: string, link: string) => ({
-  source: `Official Journal of the European Union, notice ${notice}`,
-  author: "European Commission",
-  licence: `© European Union. Reuse allowed with the source acknowledged (Commission Decision 2011/833/EU). ${changes}`,
-  link,
-});
-
-type Provenance = ReturnType<typeof ecb>;
-const credit = (group: "facts" | "notes", from: Provenance) => ({
-  [`${group}_source`]: from.source,
-  [`${group}_author`]: from.author,
-  [`${group}_licence`]: from.licence,
-  [`${group}_link`]: from.link,
-});
-
 /** The app's languages besides English that the ECB publishes in, with its pages in each. */
 const translations = { de, fr, ro } as const;
 type Translation = keyof typeof translations;
 const translationLanguages = Object.keys(translations) as Translation[];
-
-/** Notes in one of those languages, credited to the ECB's page in it. */
-const translated = (
-  language: Translation,
-  notes: { technical_details?: string; historical_notes?: string },
-  link: string,
-) => {
-  const from = ecb(link);
-  return {
-    ...(notes.technical_details && {
-      [`technical_details_${language}`]: notes.technical_details,
-    }),
-    ...(notes.historical_notes && {
-      [`historical_notes_${language}`]: notes.historical_notes,
-    }),
-    [`notes_source_${language}`]: from.source,
-    [`notes_author_${language}`]: from.author,
-    [`notes_licence_${language}`]: from.licence,
-    [`notes_link_${language}`]: from.link,
-  };
-};
 
 /** How the ECB's pages label a coin's issuing volume and date, in each language. */
 const factLabels: Record<"en" | Translation, [string, string]> = {
@@ -91,8 +53,6 @@ const factLabels: Record<"en" | Translation, [string, string]> = {
   fr: ["Volume d’émission", "Date d’émission"],
   ro: ["Tirajul emisiunii", "Data emiterii"],
 };
-/** French sets a colon apart. */
-const colon = (language: string) => (language === "fr" ? "\u00a0: " : ": ");
 
 /** "50 million coins", "1,4 million coins", "100,000 coins" or "1 000 000 coins" as a number. */
 function mintageOf(volume: string) {
