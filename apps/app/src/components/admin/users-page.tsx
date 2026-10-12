@@ -1,7 +1,8 @@
 "use client";
 
-import { isTyping } from "@/components/items/add-item";
 import { useHydrated } from "@/lib/use-hydrated";
+import { useLatest } from "@/lib/use-latest";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -31,7 +32,7 @@ import type { FunctionReturnType } from "convex/server";
 import { ChevronDown, ChevronUp, Loader2, ShieldOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { UserSearch } from "./user-search";
 import { type UsersView, useUsersUrl } from "./users-url";
 
@@ -84,16 +85,6 @@ export function NotAvailable() {
   );
 }
 
-/**
- * The latest rows, kept on screen while the next ones load, so changing the
- * search, the plan or the sort doesn't flash a skeleton.
- */
-function useLatest(rows: ListedUser[] | undefined) {
-  const [latest, setLatest] = useState(rows);
-  if (rows !== undefined && rows !== latest) setLatest(rows);
-  return { shown: rows ?? latest, loading: rows === undefined };
-}
-
 /** The toolbar and the users the URL's view asks for. */
 function UsersBrowser({ ready }: { ready: boolean }) {
   const t = useI18n();
@@ -119,24 +110,8 @@ function UsersBrowser({ ready }: { ready: boolean }) {
   );
   const narrowed = searching || view.plan !== "all";
 
-  // "/" finds, unless someone is typing or a dialog is open.
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key !== "/" ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey ||
-        isTyping(event.target) ||
-        document.querySelector('[role=dialog][data-state="open"]')
-      )
-        return;
-      event.preventDefault();
-      search.current?.focus();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  // "/" finds.
+  useShortcut("/", () => search.current?.focus());
 
   return (
     <>

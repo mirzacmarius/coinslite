@@ -1,19 +1,14 @@
 "use client";
 
 import type { ScanPreset } from "@/components/scanner/scan-preset";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd } from "@coinslite/ui/kbd";
 import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { Plus } from "lucide-react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { ItemFormDialog } from "./item-form-dialog";
 
 /** What the "New Item" dialog opens with. */
@@ -34,13 +29,7 @@ const AddItemContext = createContext<(preset?: NewItemPreset) => void>(
  */
 export const useAddItem = () => useContext(AddItemContext);
 
-/** Whether a key press lands in a text field, so single-key shortcuts leave it alone. */
-export const isTyping = (target: EventTarget | null) =>
-  target instanceof HTMLElement &&
-  (target.isContentEditable ||
-    ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
-
-/** Holds the one "New Item" dialog; C opens it unless someone is typing. */
+/** Holds the one "New Item" dialog; C opens it (lib/use-shortcut.ts). */
 export function AddItemProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [preset, setPreset] = useState<NewItemPreset>({});
@@ -48,24 +37,7 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
     setPreset(next);
     setOpen(true);
   }, []);
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key.toLowerCase() === "c" &&
-        !event.metaKey &&
-        !event.ctrlKey &&
-        !event.altKey &&
-        !isTyping(event.target) &&
-        // A dialog that's still fading out doesn't count.
-        !document.querySelector('[role=dialog][data-state="open"]')
-      ) {
-        event.preventDefault();
-        addItem();
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [addItem]);
+  useShortcut("c", addItem);
   return (
     <AddItemContext.Provider value={addItem}>
       {children}

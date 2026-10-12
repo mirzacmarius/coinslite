@@ -3,6 +3,7 @@
 import { useMoney } from "@/components/account/home-currency-change";
 import { AlbumDot } from "@/components/albums/album-colours";
 import { useAlbums } from "@/components/albums/use-albums";
+import { useLatest } from "@/lib/use-latest";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -25,7 +26,7 @@ import { ConvexError } from "convex/values";
 import { Download, Loader2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
-import { useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 type Account = NonNullable<FunctionReturnType<typeof api.account.get>>;
 type ScopeKind = "collection" | "albums";
@@ -104,16 +105,6 @@ function LockedReport() {
       </Button>
     </section>
   );
-}
-
-/**
- * The latest value that has arrived: while a query with new arguments loads,
- * the previous result stays on screen instead of a skeleton.
- */
-function useLatest<T>(value: T | undefined) {
-  const latest = useRef(value);
-  if (value !== undefined) latest.current = value;
-  return latest.current;
 }
 
 /** A tickable row in a bordered list: an Album, a value column. */
@@ -195,8 +186,8 @@ function ReportBuilder({ account }: { account: Account }) {
     api.insuranceReport.preview,
     scopeChosen ? { scope, columns: chosenColumns } : "skip",
   );
-  const preview = useLatest(current);
-  const refreshing = current === undefined && preview !== undefined;
+  const { shown: preview, loading } = useLatest(current);
+  const refreshing = loading && preview !== undefined;
   const ready = preview?.status === "ready" ? preview : undefined;
 
   const tickAlbum = (albumId: Id<"albums">, checked: boolean) =>

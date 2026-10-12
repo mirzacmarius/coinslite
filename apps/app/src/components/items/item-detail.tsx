@@ -10,6 +10,7 @@ import {
   entryItemsHref,
   viewOfItemUrl,
 } from "@/components/collection/collection-url";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -51,7 +52,6 @@ import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
-import { useKeyShortcut } from "./use-key-shortcut";
 
 /**
  * One Item, every recorded fact: its title, value and Gain/loss first, then
@@ -85,7 +85,7 @@ export function ItemDetail() {
   const [leaving, setLeaving] = useState(false);
   const openEdit = () =>
     setEditing(({ key }) => ({ open: true, key: key + 1 }));
-  useKeyShortcut("e", openEdit, Boolean(item));
+  useShortcut("e", openEdit, Boolean(item));
   const parent = (
     <Link
       href={view ? collectionHref(view) : "/collection"}
