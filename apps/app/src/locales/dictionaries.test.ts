@@ -13,11 +13,13 @@ import {
   sharedWithEnglish,
 } from "@coinslite/i18n";
 import en from "./en";
+import { globalErrorTexts } from "./global-error";
 import { loaders } from "./loaders";
 
 /**
- * The missing-translation check for the app's dictionaries: every language
- * says everything in its own words (the rule and its short list of words
+ * The missing-translation check for the app's dictionaries, and the global
+ * error screen's words that live beside them: every language says
+ * everything in its own words (the rule and its short list of words
  * shared with English are in @coinslite/i18n). The server's own texts get the
  * same check in packages/backend/convex/translations.test.ts.
  */
@@ -25,13 +27,18 @@ import { loaders } from "./loaders";
 const otherLanguages = locales.filter(
   (locale): locale is Exclude<Locale, "en"> => locale !== "en",
 );
-const english = keyedTexts(en);
+/** A language's dictionary, plus the global error screen's words. */
+const textsOf = (locale: Locale, dictionary: unknown) => [
+  ...keyedTexts(dictionary),
+  ...keyedTexts(globalErrorTexts[locale], "globalError"),
+];
+const english = textsOf("en", en);
 const englishText = new Map(english);
 const dictionaries = Object.fromEntries(
   await Promise.all(
     locales.map(async (locale) => [
       locale,
-      keyedTexts((await loaders[locale]()).default),
+      textsOf(locale, (await loaders[locale]()).default),
     ]),
   ),
 ) as Record<Locale, ReturnType<typeof keyedTexts>>;
