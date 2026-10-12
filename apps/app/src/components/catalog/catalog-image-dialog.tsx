@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  ShrinkError,
+  type ShrinkTarget,
+  type ShrunkImage,
+  shrinkImage,
+} from "@/lib/shrink-image";
 import { submitForm } from "@/lib/submit-form";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
@@ -11,6 +17,7 @@ import {
   type CatalogImageError,
   type ImageCredit,
   catalogImageErrors,
+  catalogImageLimits,
   commonLicences,
   isWebAddress,
 } from "@coinslite/backend/convex/catalog/imageRules";
@@ -39,7 +46,26 @@ import { ChevronRight, ImageIcon, ImagePlus, Loader2, X } from "lucide-react";
 import type * as React from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { type ConvertedImage, convertToWebp } from "./convert-image";
+
+/** A picture an admin chose, converted to WebP at full size and as a thumbnail. */
+type PickedImage = { full: ShrunkImage; thumbnail: ShrunkImage };
+
+/**
+ * The sizes a Catalog image is stored at, both WebP (the server accepts
+ * nothing else), so the original never uploads.
+ */
+const catalogImageSizes = {
+  full: {
+    longest: catalogImageLimits.full,
+    types: ["image/webp"],
+    qualities: [0.85],
+  },
+  thumbnail: {
+    longest: catalogImageLimits.thumbnail,
+    types: ["image/webp"],
+    qualities: [0.85],
+  },
+} satisfies Record<keyof PickedImage, ShrinkTarget>;
 
 /** The Catalog entry whose image is edited, as it is now. */
 export type CatalogImageEntry = {
@@ -51,7 +77,7 @@ export type CatalogImageEntry = {
 
 const accept = "image/jpeg,image/png,image/webp,image/gif";
 
-/** The codes an image function or the conversion can fail with, each with its message. */
+/** The codes an image function can fail with, each with its message. */
 const failureCodes = new Set<string>([
   ...Object.values(catalogImageErrors),
   uploadErrors.tooMany,
@@ -107,7 +133,7 @@ export function CatalogImageDialog({
   const storeFile = useStoreFile();
   const attach = useAction(api.catalog.images.attach);
   const updateCredit = useMutation(api.catalog.images.updateCredit);
-  const [picked, setPicked] = useState<ConvertedImage>();
+  const [picked, setPicked] = useState<PickedImage>();
   const [converting, setConverting] = useState(false);
   const [imageError, setImageError] = useState<string>();
   const [failed, setFailed] = useState<string>();
@@ -166,8 +192,8 @@ export function CatalogImageDialog({
       try {
         if (picked) {
           const [full, thumbnail] = await Promise.all([
-            storeFile(picked.full),
-            storeFile(picked.thumbnail),
+            storeFile(picked.full.blob),
+            storeFile(picked.thumbnail.blob),
           ]);
           await attach({ key: entry.key, full, thumbnail, credit: value });
         } else {
@@ -201,13 +227,21 @@ export function CatalogImageDialog({
   };
 
   const choose = async (file: File) => {
-    setConverting(true);
     setImageError(undefined);
+    if (file.size > catalogImageLimits.originalBytes) {
+      setImageError(t("catalogImages.errors.ORIGINAL_TOO_LARGE"));
+      return;
+    }
+    setConverting(true);
     try {
-      setPicked(await convertToWebp(file));
+      setPicked(await shrinkImage(file, catalogImageSizes));
     } catch (failure) {
+      const unwritable =
+        failure instanceof ShrinkError && failure.reason === "unwritable";
       setImageError(
-        failureMessage(failure, t("catalogImages.errors.IMAGE_UNREADABLE")),
+        unwritable
+          ? t("catalogImages.errors.WEBP_UNSUPPORTED")
+          : t("catalogImages.errors.IMAGE_UNREADABLE"),
       );
     } finally {
       setConverting(false);
@@ -376,7 +410,7 @@ function ImagePicker({
   onFile,
 }: {
   currentUrl?: string;
-  picked?: ConvertedImage;
+  picked?: PickedImage;
   converting: boolean;
   error?: string;
   onFile: (file: File) => void;
@@ -385,7 +419,7 @@ function ImagePicker({
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const [dropping, setDropping] = useState(false);
-  const previewUrl = usePreviewUrl(picked?.full);
+  const previewUrl = usePreviewUrl(picked?.full.blob);
   const shown = previewUrl ?? currentUrl;
   const pick = () => input.current?.click();
   const onDragOver = (event: React.DragEvent) => {
@@ -456,8 +490,8 @@ function ImagePicker({
             ? t("catalogImages.converting")
             : picked
               ? t("catalogImages.converted", {
-                  full: size(picked.fullSize),
-                  thumbnail: size(picked.thumbnailSize),
+                  full: size(picked.full),
+                  thumbnail: size(picked.thumbnail),
                 })
               : currentUrl
                 ? t("catalogImages.current")

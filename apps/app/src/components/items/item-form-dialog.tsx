@@ -539,7 +539,12 @@ export function ItemFormDialog({
       for (const side of photoSides) {
         const photo = photos[side];
         if (photo)
-          await attachPhoto({ itemId, side, storageId: photo.storageId });
+          await attachPhoto({
+            itemId,
+            side,
+            storageId: photo.storageId,
+            thumbnailId: photo.thumbnailId,
+          });
       }
     } catch {
       toast.error(t("scanner.photosFailed"));

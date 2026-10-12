@@ -2,12 +2,13 @@ import type { Doc } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { moveBetweenAlbums } from "../albums/membership";
 import { countItemRemoved } from "../collectionCounts";
+import { deleteFiles } from "../utils/files";
 import { deleteHistory } from "./valueHistory";
 
 /**
  * Deletes an Item for good, together with its stored photos (sides and more)
- * and its Market value history, and takes it out of its Album's Item count
- * and its owner's Collection counts. The one
+ * and their thumbnails, and its Market value history, and takes it out of
+ * its Album's Item count and its owner's Collection counts. The one
  * way to delete Items: deleting one Item, an Album with chosen Items, or a
  * whole account all go through here so no photo is left behind and nothing
  * miscounts.
@@ -18,16 +19,20 @@ import { deleteHistory } from "./valueHistory";
  * callers that budget their writes.
  */
 export async function deleteItem(ctx: MutationCtx, item: Doc<"items">) {
-  for (const photo of [item.frontPhoto, item.backPhoto]) {
-    if (photo) await ctx.storage.delete(photo);
-  }
+  const { frontPhoto, frontThumbnail, backPhoto, backThumbnail } = item;
+  await deleteFiles(ctx, [
+    frontPhoto,
+    frontThumbnail,
+    backPhoto,
+    backThumbnail,
+  ]);
   // Bounded by the per-Item limit, so all of them, whatever the limit was.
   const more = await ctx.db
     .query("itemPhotos")
     .withIndex("by_itemId", (q) => q.eq("itemId", item._id))
     .collect();
   for (const photo of more) {
-    await ctx.storage.delete(photo.storageId);
+    await deleteFiles(ctx, [photo.storageId, photo.thumbnailId]);
     await ctx.db.delete(photo._id);
   }
   const points = await deleteHistory(ctx, item._id);

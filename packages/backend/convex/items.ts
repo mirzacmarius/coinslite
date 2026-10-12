@@ -426,7 +426,16 @@ export const sell = mutation({
     }
     if (item.soldOn !== undefined)
       throw new ConvexError(itemErrors.invalidQuantity);
-    const { _id, _creationTime, frontPhoto, backPhoto, ...fields } = item;
+    // Photos stay with the original: each stored file is on one Item only.
+    const {
+      _id,
+      _creationTime,
+      frontPhoto,
+      frontThumbnail,
+      backPhoto,
+      backThumbnail,
+      ...fields
+    } = item;
     const soldId = await storeNewItem(ctx, {
       ...fields,
       quantity: pieces,
@@ -613,7 +622,8 @@ const listedItem = schema
 
 /**
  * The signed-in person's Items, newest first, a page at a time, their facts
- * resolved. Each comes with its thumbnail: the front photo, else the back
+ * resolved. Each comes with its thumbnail (items/thumbnail.ts): the small
+ * copy of the front photo, else of the back photo, else of the first more
  * photo, else null.
  */
 export const list = query({

@@ -203,9 +203,12 @@ export default defineSchema({
 
     // Photos, one file per side, private to the owner (photos.ts); more
     // photos are in itemPhotos. The indexes keep each stored file on at most
-    // one Item side.
+    // one Item side. Each photo's thumbnail is the small copy lists show
+    // (photos/rules.ts listImageFile); photos from before thumbnails have none.
     frontPhoto: v.optional(v.id("_storage")),
+    frontThumbnail: v.optional(v.id("_storage")),
     backPhoto: v.optional(v.id("_storage")),
+    backThumbnail: v.optional(v.id("_storage")),
 
     // When the pieces were first added, for an Item split off by a sale
     // (items.ts sell): the original's start, so its months before the sale
@@ -229,6 +232,8 @@ export default defineSchema({
     .index("by_ownerId_and_soldOn", ["ownerId", "soldOn"])
     .index("by_frontPhoto", ["frontPhoto"])
     .index("by_backPhoto", ["backPhoto"])
+    .index("by_frontThumbnail", ["frontThumbnail"])
+    .index("by_backThumbnail", ["backThumbnail"])
     .index("by_ownerId_and_albumId", ["ownerId", "albumId"])
     // With `soldOn` undefined, what a person still owns of one Catalog entry
     // (held counts, Set completion) or in one Album (the Insurance report's
@@ -252,15 +257,19 @@ export default defineSchema({
    * An Item's photos besides its two sides, at most `photoLimits.more` per
    * Item, shown in the order they were added (photos.ts). Private to the
    * owner like the sides; each stored file is on at most one document.
+   * `thumbnailId` is the photo's small copy, absent on photos from before
+   * thumbnails.
    */
   itemPhotos: defineTable({
     itemId: v.id("items"),
     ownerId: v.id("users"),
     storageId: v.id("_storage"),
+    thumbnailId: v.optional(v.id("_storage")),
   })
     .index("by_itemId", ["itemId"])
     .index("by_ownerId", ["ownerId"])
-    .index("by_storageId", ["storageId"]),
+    .index("by_storageId", ["storageId"])
+    .index("by_thumbnailId", ["thumbnailId"]),
 
   /**
    * A named group of Items within a Collection. `itemCount` and

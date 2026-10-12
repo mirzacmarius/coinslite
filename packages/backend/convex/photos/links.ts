@@ -127,12 +127,15 @@ export const serve = httpAction(async (ctx, request) => {
   const photo = await ctx.storage.get(file as Id<"_storage">);
   if (!photo) return new Response("Not found", { status: 404 });
   const head = await photo.slice(0, photoSignatureLength).arrayBuffer();
+  // The browser keeps the file for as long as the link works, without asking
+  // again even on a reload: a stored file never changes, so neither does
+  // what a link shows. Shared caches keep nothing.
   const maxAge = Math.floor((issuedAt + photoLinkLifetime - now) / 1000);
   return new Response(photo, {
     headers: {
       "Content-Type":
         photoType(new Uint8Array(head)) ?? "application/octet-stream",
-      "Cache-Control": `private, max-age=${maxAge}`,
+      "Cache-Control": `private, max-age=${maxAge}, immutable`,
       "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "default-src 'none'",
     },

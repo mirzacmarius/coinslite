@@ -1,5 +1,7 @@
 "use client";
 
+import { useStorePhotoFile } from "@/components/items/use-store-photo-file";
+import { photoThumbnail, shrinkImage } from "@/lib/shrink-image";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -64,27 +66,37 @@ async function checkFile(file: File) {
 }
 
 /**
- * Uploads a file to storage, then has the server check it and put it on the
- * Item: on `side`, or as one more photo when no side is given.
+ * The thumbnail lists show of a photo, or undefined when this browser can't
+ * make one (of a picture too large for it to read, say): the photo then
+ * lists as itself, like photos from before thumbnails.
+ */
+async function thumbnailOf(photo: File) {
+  try {
+    const { thumbnail } = await shrinkImage(photo, {
+      thumbnail: photoThumbnail,
+    });
+    return thumbnail.blob;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Uploads a photo file to storage as it is, along with the thumbnail the
+ * browser makes of it for lists, then has the server check both and put them
+ * on the Item: on `side`, or as one more photo when no side is given.
  */
 function usePhotoUpload(itemId: Id<"items">) {
-  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
-  const register = useMutation(api.photos.register);
+  const store = useStorePhotoFile();
   const attach = useAction(api.photos.attach);
   return async (side: PhotoSide | undefined, file: File) => {
     const type = await checkFile(file);
-    const response = await fetch(await generateUploadUrl(), {
-      method: "POST",
-      headers: { "Content-Type": type },
-      body: file,
-    });
-    if (!response.ok) throw new Error(`Upload failed (${response.status})`);
-    const { storageId } = (await response.json()) as {
-      storageId: Id<"_storage">;
-    };
-    // At once, so the upload is ours before anything else can use it.
-    await register({ storageId });
-    await attach({ itemId, side, storageId });
+    const thumbnail = await thumbnailOf(file);
+    const [storageId, thumbnailId] = await Promise.all([
+      store(file, type),
+      thumbnail && store(thumbnail),
+    ]);
+    await attach({ itemId, side, storageId, thumbnailId });
   };
 }
 

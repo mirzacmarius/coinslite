@@ -9,8 +9,15 @@ export type ScanSuggestion = Extract<
   { outcome: "suggested" }
 >;
 
-/** A scan photo, uploaded and registered to the person, with a local address to show it. */
-export type ScannedPhoto = { storageId: Id<"_storage">; url: string };
+/**
+ * A scan photo and its thumbnail, uploaded and registered to the person,
+ * with a local address to show the photo.
+ */
+export type ScannedPhoto = {
+  storageId: Id<"_storage">;
+  thumbnailId: Id<"_storage">;
+  url: string;
+};
 
 /**
  * What a scan hands the "New Item" form: the photos taken, which become the

@@ -1,6 +1,13 @@
 "use client";
 
 import { useAddItem } from "@/components/items/add-item";
+import { useStorePhotoFile } from "@/components/items/use-store-photo-file";
+import {
+  ShrinkError,
+  type ShrinkTarget,
+  photoThumbnail,
+  shrinkImage,
+} from "@/lib/shrink-image";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -11,7 +18,10 @@ import {
   photoSides,
   uploadErrors,
 } from "@coinslite/backend/convex/photos/rules";
-import { scannerErrors } from "@coinslite/backend/convex/scanner/rules";
+import {
+  scannerErrors,
+  scannerLimits,
+} from "@coinslite/backend/convex/scanner/rules";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import {
@@ -27,7 +37,7 @@ import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { cn } from "@coinslite/ui/utils";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
   Camera,
@@ -48,7 +58,19 @@ import {
   useState,
 } from "react";
 import type { ScanPreset, ScannedPhoto } from "./scan-preset";
-import { shrinkPhoto } from "./shrink-photo";
+
+/**
+ * A photo made small enough to scan: a JPEG whose longest side is at most
+ * `scannerLimits.photoPixels`, at the best quality that fits the vision
+ * model. Phone cameras take far larger photos than a coin needs. It also
+ * becomes the Item's photo.
+ */
+const scanPhoto: ShrinkTarget = {
+  longest: scannerLimits.photoPixels,
+  types: ["image/jpeg"],
+  qualities: [0.9, 0.8, 0.7, 0.6],
+  maxBytes: scannerLimits.photoBytes,
+};
 
 /**
  * The coin scanner (spec §16): photograph a coin's front, then its back, and
@@ -123,8 +145,16 @@ export function ScanCoinButton() {
   );
 }
 
-/** A side's photo, shrunk for scanning, and its upload once there is one. */
-type TakenPhoto = { blob: Blob; url: string; storageId?: Id<"_storage"> };
+/**
+ * A side's photo, shrunk for scanning, with the thumbnail lists will show of
+ * it, and their uploads once there are some.
+ */
+type TakenPhoto = {
+  blob: Blob;
+  thumbnail: Blob;
+  url: string;
+  uploaded?: { storageId: Id<"_storage">; thumbnailId: Id<"_storage"> };
+};
 
 type Status =
   | { state: "idle" }
@@ -134,24 +164,26 @@ type Status =
   | { state: "failed"; message: string };
 
 const codeOf = (failure: unknown) =>
-  failure instanceof ConvexError ? String(failure.data) : "";
+  failure instanceof ConvexError
+    ? String(failure.data)
+    : failure instanceof ShrinkError
+      ? failure.reason === "tooLarge"
+        ? photoErrors.tooLarge
+        : photoErrors.notAnImage
+      : "";
 
-/** Uploads a scan photo and registers it to the person, so only they can use it. */
+/**
+ * Uploads a scan photo and its thumbnail and registers them to the person,
+ * so only they can use them.
+ */
 function useScanUpload() {
-  const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
-  const register = useMutation(api.photos.register);
-  return async (blob: Blob) => {
-    const response = await fetch(await generateUploadUrl(), {
-      method: "POST",
-      headers: { "Content-Type": blob.type },
-      body: blob,
-    });
-    if (!response.ok) throw new Error(`Upload failed (${response.status})`);
-    const { storageId } = (await response.json()) as {
-      storageId: Id<"_storage">;
-    };
-    await register({ storageId });
-    return storageId;
+  const store = useStorePhotoFile();
+  return async ({ blob, thumbnail }: TakenPhoto) => {
+    const [storageId, thumbnailId] = await Promise.all([
+      store(blob),
+      store(thumbnail),
+    ]);
+    return { storageId, thumbnailId };
   };
 }
 
@@ -195,10 +227,17 @@ function ScanCoinDialog({
 
   const take = async (side: PhotoSide, file: File) => {
     try {
-      const blob = await shrinkPhoto(file);
+      const { photo, thumbnail } = await shrinkImage(file, {
+        photo: scanPhoto,
+        thumbnail: photoThumbnail,
+      });
       setPhotos((taken) => ({
         ...taken,
-        [side]: { blob, url: URL.createObjectURL(blob) },
+        [side]: {
+          blob: photo.blob,
+          thumbnail: thumbnail.blob,
+          url: URL.createObjectURL(photo.blob),
+        },
       }));
       setStatus({ state: "idle" });
     } catch (failure) {
@@ -206,16 +245,19 @@ function ScanCoinDialog({
     }
   };
 
-  /** Uploads the photos not uploaded yet; returns them all as uploaded. */
+  /** Uploads the photos (with their thumbnails) not uploaded yet; returns them all as uploaded. */
   const uploaded = async () => {
     const done: ScanPreset["photos"] = {};
     for (const side of photoSides) {
       const photo = photos[side];
       if (!photo) continue;
-      const storageId = photo.storageId ?? (await upload(photo.blob));
-      if (!photo.storageId)
-        setPhotos((taken) => ({ ...taken, [side]: { ...photo, storageId } }));
-      done[side] = { storageId, url: photo.url } satisfies ScannedPhoto;
+      const files = photo.uploaded ?? (await upload(photo));
+      if (!photo.uploaded)
+        setPhotos((taken) => ({
+          ...taken,
+          [side]: { ...photo, uploaded: files },
+        }));
+      done[side] = { ...files, url: photo.url } satisfies ScannedPhoto;
     }
     return done;
   };

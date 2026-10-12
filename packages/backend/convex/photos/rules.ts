@@ -21,6 +21,12 @@ export const photoLimits = {
   bytes: 10 * 1024 * 1024,
   /** How many more photos an Item can have besides its sides. */
   more: 6,
+  /**
+   * The small copy of each photo that lists and grids show: its longest side
+   * in pixels (the browser makes it, never scaling a photo up), and its bytes.
+   */
+  thumbnailPixels: 256,
+  thumbnailBytes: 128 * 1024,
 };
 
 /** Error codes the photo functions throw (ConvexError data). */
@@ -31,6 +37,8 @@ export const photoErrors = {
   notAnImage: "PHOTO_NOT_AN_IMAGE",
   /** The Item already has as many more photos as it can hold. */
   tooManyPhotos: "TOO_MANY_PHOTOS",
+  /** The thumbnail sent with a photo isn't one `thumbnailProblem` accepts. */
+  badThumbnail: "PHOTO_BAD_THUMBNAIL",
 } as const;
 
 /** Error codes for uploads of any kind, photos and Catalog images alike. */
@@ -69,4 +77,53 @@ export function photoType(head: Uint8Array): PhotoType | undefined {
   return (Object.keys(signatures) as PhotoType[]).find((type) =>
     signatures[type].some(matches),
   );
+}
+
+/**
+ * The formats a thumbnail is made in: WebP, or JPEG in browsers that can't
+ * write WebP (Safari, on every iPhone).
+ */
+export const thumbnailTypes = [
+  "image/webp",
+  "image/jpeg",
+] as const satisfies readonly PhotoType[];
+
+/**
+ * Why a file can't be a photo's thumbnail, or undefined when it can: it must
+ * be a WebP or JPEG file, judged by its first bytes (`photoSignatureLength`
+ * of them), of at most `photoLimits.thumbnailBytes`.
+ */
+export function thumbnailProblem(head: Uint8Array, bytes: number) {
+  const type = photoType(head);
+  const accepted = thumbnailTypes.some((each) => each === type);
+  if (!accepted || bytes > photoLimits.thumbnailBytes)
+    return photoErrors.badThumbnail;
+  return undefined;
+}
+
+/** An Item's side photos, each with its thumbnail when it has one, by stored file id. */
+type SidePhotos<File> = {
+  frontPhoto?: File;
+  frontThumbnail?: File;
+  backPhoto?: File;
+  backThumbnail?: File;
+};
+
+/** One of an Item's more photos, with its thumbnail when it has one. */
+type MorePhoto<File> = { storageId: File; thumbnailId?: File };
+
+/**
+ * The stored file an Item's list image is (spec §5.6): of its front photo,
+ * else its back photo, else its first more photo, the thumbnail, or the
+ * photo itself when it has none (photos from before thumbnails). Undefined
+ * without photos. `firstMore` matters only without side photos, so it can be
+ * left out when the Item has one.
+ */
+export function listImageFile<File>(
+  item: SidePhotos<File>,
+  firstMore?: MorePhoto<File>,
+): File | undefined {
+  if (item.frontPhoto) return item.frontThumbnail ?? item.frontPhoto;
+  if (item.backPhoto) return item.backThumbnail ?? item.backPhoto;
+  if (firstMore) return firstMore.thumbnailId ?? firstMore.storageId;
 }
