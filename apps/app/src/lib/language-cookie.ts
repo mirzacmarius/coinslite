@@ -13,12 +13,17 @@ export function rememberLanguage(locale: Locale) {
   document.cookie = `${LANGUAGE_COOKIE}=${locale}; Max-Age=${ONE_YEAR_IN_SECONDS}; Path=/; SameSite=Lax${secure}`;
 }
 
-/** The language this browser last picked, if any. */
-export function rememberedLanguage() {
-  return document.cookie
+/** The language stored in a list of cookies (as in `document.cookie`), if any. */
+export function languageInCookies(cookies: string) {
+  return cookies
     .split("; ")
     .find((cookie) => cookie.startsWith(`${LANGUAGE_COOKIE}=`))
     ?.slice(LANGUAGE_COOKIE.length + 1);
+}
+
+/** The language this browser last picked, if any. */
+export function rememberedLanguage() {
+  return languageInCookies(document.cookie);
 }
 
 /** sessionStorage: this tab is saving a language to the profile. */
