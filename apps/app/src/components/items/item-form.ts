@@ -174,7 +174,7 @@ export const detailFields = [
 /** Whether a fact as typed says the same as the Catalog entry's. */
 export const sameFact = (typed: unknown, fromEntry: unknown) => {
   const text = (value: unknown) =>
-    typeof value === "string" ? value.trim() : value ?? "";
+    typeof value === "string" ? value.trim() : (value ?? "");
   return text(typed) === text(fromEntry);
 };
 

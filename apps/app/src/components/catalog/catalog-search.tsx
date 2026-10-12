@@ -138,7 +138,7 @@ export function CatalogSearch({
       />
       <CommandList className="max-h-[min(440px,60dvh)]">
         {!searching ? (
-          idle ?? <Note>{t("catalogSearch.minLength")}</Note>
+          (idle ?? <Note>{t("catalogSearch.minLength")}</Note>)
         ) : shown === undefined ? (
           <LoadingRows />
         ) : shown.results.groups.length === 0 ? (

@@ -211,7 +211,10 @@ const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 function Section({
   title,
   children,
-}: { title: string; children: React.ReactNode }) {
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   const id = `design-${slug(title)}`;
   return (
     <section className="flex flex-col gap-3" aria-labelledby={id}>
@@ -226,7 +229,10 @@ function Section({
 function PropertyRow({
   label,
   children,
-}: { label: string; children: React.ReactNode }) {
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="grid h-7 grid-cols-[96px_1fr] items-center gap-2">
       <span className="truncate text-xs text-muted-foreground">{label}</span>

@@ -49,7 +49,10 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 function StoredTheme({
   storageKey,
   defaultTheme,
-}: { storageKey: string; defaultTheme: string }) {
+}: {
+  storageKey: string;
+  defaultTheme: string;
+}) {
   const { theme, setTheme } = useTheme();
   useLayoutEffect(() => {
     let stored: string | null = null;

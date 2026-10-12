@@ -175,10 +175,10 @@ export function parseCoinPage(html: string): CoinPage {
   const yearText =
     yearHeading >= 0
       ? all[yearHeading + 1]?.text
-      : all
+      : (all
           .find((block) => /^Year of Issue:/.test(block.text))
           ?.text.replace(/^Year of Issue:\s*/, "") ??
-        /^The (\d{4}) /.exec(paragraphs("Background")[0] ?? "")?.[1];
+        /^The (\d{4}) /.exec(paragraphs("Background")[0] ?? "")?.[1]);
   const year = Number(yearText);
   if (!/^\d{4}$/.test(yearText ?? ""))
     throw new Error(`${title}: no year of issue`);

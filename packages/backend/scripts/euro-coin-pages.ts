@@ -88,9 +88,7 @@ export function commonSides(html: string): CommonSide[] {
       picture:
         /common_(\d+(?:euro|cent))/.exec(box)?.[1] ??
         // Some pages name the 10-cent pictures "10common.jpg".
-        /\/(\d+)common\./
-          .exec(box)?.[1]
-          ?.concat("cent") ??
+        /\/(\d+)common\./.exec(box)?.[1]?.concat("cent") ??
         "",
       facts: [
         ...box

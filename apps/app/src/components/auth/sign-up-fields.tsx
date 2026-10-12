@@ -18,7 +18,9 @@ type FormField<T> = {
 /** The Home currency pill, with every supported currency named in the current language. */
 export function HomeCurrencyField({
   field,
-}: { field: FormField<HomeCurrency> }) {
+}: {
+  field: FormField<HomeCurrency>;
+}) {
   const t = useI18n();
   const locale = useCurrentLocale();
   const id = useId();

@@ -669,7 +669,11 @@ function PanelSection({
   title,
   action,
   children,
-}: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   const titleId = useId();
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-1 p-4">
@@ -701,7 +705,11 @@ function PropertyRow({
   label,
   wrap = false,
   children,
-}: { label: string; wrap?: boolean; children: React.ReactNode }) {
+}: {
+  label: string;
+  wrap?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div
       className={cn(

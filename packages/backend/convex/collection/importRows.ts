@@ -255,11 +255,11 @@ function readRow(row: number, cells: Map<Column, string>): ImportRow {
 
   const typeText = text("type");
   const type = typeText
-    ? typeOf(typeText) ?? problem(rowErrors.unknownType)
+    ? (typeOf(typeText) ?? problem(rowErrors.unknownType))
     : problem(rowErrors.unknownType);
   const countryText = text("country");
   const country = countryText
-    ? countryOf(countryText) ?? problem(rowErrors.invalidCountry)
+    ? (countryOf(countryText) ?? problem(rowErrors.invalidCountry))
     : undefined;
   const scaleText = text("gradingScale");
   const gradeText = text("grade");
@@ -267,13 +267,13 @@ function readRow(row: number, cells: Map<Column, string>): ImportRow {
   let grade: string | undefined;
   if (gradeText !== undefined) {
     gradingScale = scaleText
-      ? scaleOf(scaleText) ?? problem(rowErrors.unknownScale)
+      ? (scaleOf(scaleText) ?? problem(rowErrors.unknownScale))
       : defaultScale(type, country);
     grade = gradeOf(gradingScale, gradeText) ?? problem(rowErrors.invalidGrade);
   }
   const strikeText = text("strike");
   const strike = strikeText
-    ? strikeOf(strikeText) ?? problem(rowErrors.unknownStrike)
+    ? (strikeOf(strikeText) ?? problem(rowErrors.unknownStrike))
     : undefined;
   // As the export writes it: the material, then " · " and the note about it.
   const materialText = text("material");

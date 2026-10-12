@@ -327,7 +327,7 @@ function NodeForm({
   const updateNode = useMutation(api.catalog.editor.update);
   const creating = node === undefined;
   const isRoot = creating ? parent === null : node.parentKey === null;
-  const parentKey = creating ? parent?.key ?? null : node.parentKey;
+  const parentKey = creating ? (parent?.key ?? null) : node.parentKey;
   // One object for the sheet's life: the form resets when it sees new defaults.
   const [defaults] = useState<NodeFormValues>(() =>
     node ? valuesFromNode(node, locale) : blankNode(parent),
@@ -623,8 +623,8 @@ function NodeForm({
   );
 
   const crumb = creating
-    ? parent?.title ?? t("nav.catalog")
-    : node.ancestors.at(-1)?.title ?? t("nav.catalog");
+    ? (parent?.title ?? t("nav.catalog"))
+    : (node.ancestors.at(-1)?.title ?? t("nav.catalog"));
   const coin = hasCoinFacts(values);
   const storedEntry = node?.kind === "entry";
 

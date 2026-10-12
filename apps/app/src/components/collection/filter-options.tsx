@@ -284,7 +284,7 @@ export function useFilters(
     if (view.entry) {
       // Named once the result says which entry the key is.
       const label = result
-        ? result.entry?.title ?? t("collection.unknownEntry")
+        ? (result.entry?.title ?? t("collection.unknownEntry"))
         : "…";
       filters.push({
         dimension: "entry",

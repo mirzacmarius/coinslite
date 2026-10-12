@@ -140,7 +140,7 @@ export const refreshBrowseFields = internalMutation({
         rootKind =
           rootKey === node.key
             ? node.kind
-            : (await nodeByKey(ctx, rootKey))?.kind ?? node.kind;
+            : ((await nodeByKey(ctx, rootKey))?.kind ?? node.kind);
         rootKinds.set(rootKey, rootKind);
       }
       const fields: BrowseFields = {
@@ -486,7 +486,7 @@ export async function applyPlan(
     const path = pathOf(node.key);
     const keptCount =
       node.existing && node.existing.kind !== "entry"
-        ? node.existing.entryCount ?? 0
+        ? (node.existing.entryCount ?? 0)
         : 0;
     const countryNodeKey = countryNodeKeyOf(path, await rootKindOf(path));
     const imageFiles = node.existing?.imageFiles;

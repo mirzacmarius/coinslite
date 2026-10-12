@@ -19,7 +19,10 @@ export const albumColourValues: Record<AlbumColour, string> = {
 export function AlbumDot({
   colour,
   className,
-}: { colour: AlbumColour; className?: string }) {
+}: {
+  colour: AlbumColour;
+  className?: string;
+}) {
   return (
     <span
       aria-hidden="true"

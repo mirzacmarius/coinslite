@@ -93,7 +93,7 @@ export function readDecree(xml: string): Decree {
     throw new Error(`Not a statute: ${uri || xml.slice(0, 200)}`);
   const affected = /<affectedDocument href="([^"]+)"/.exec(xml)?.[1];
   const [, amendsYear, amendsNumber] = affected
-    ? statutePath.exec(affected) ?? []
+    ? (statutePath.exec(affected) ?? [])
     : [];
   const sections = [...xml.matchAll(/<section\b[^>]*>([\s\S]*?)<\/section>/g)]
     .map(([, section = ""]) => ({

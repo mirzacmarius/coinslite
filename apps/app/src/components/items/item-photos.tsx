@@ -143,7 +143,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
       ?.focus();
   }, [hasPhotos]);
   const urlOf = (side: PhotoSide) =>
-    photos === undefined ? undefined : photos?.[side] ?? null;
+    photos === undefined ? undefined : (photos?.[side] ?? null);
   const moreLabel = (n: number) => t("photos.more.label", { n });
   const shown = [
     ...photoSides.flatMap((side) => {

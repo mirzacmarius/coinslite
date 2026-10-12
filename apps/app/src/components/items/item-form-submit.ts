@@ -152,11 +152,11 @@ export function argsFromValues(
 ): ItemArgs {
   const { type } = values;
   const money = (text: string) =>
-    text.trim() ? parseMoney(text, locale) ?? undefined : undefined;
+    text.trim() ? (parseMoney(text, locale) ?? undefined) : undefined;
   const whole = (text: string) =>
-    text.trim() ? parseWholeNumber(text) ?? undefined : undefined;
+    text.trim() ? (parseWholeNumber(text) ?? undefined) : undefined;
   const decimal = (text: string) =>
-    text.trim() ? parseDecimal(text) ?? undefined : undefined;
+    text.trim() ? (parseDecimal(text) ?? undefined) : undefined;
   const onlyFor = <T>(field: keyof typeof typeOnlyFields, value: T) =>
     fieldSuits(field, type) ? value : undefined;
   const scale = scaleOf(values);

@@ -53,7 +53,7 @@ export function referenceName<K extends string>(
   other: string,
 ) {
   return chosen === "other"
-    ? typed ?? other
+    ? (typed ?? other)
     : names[chosen as Exclude<K, "other">];
 }
 

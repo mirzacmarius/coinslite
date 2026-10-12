@@ -54,7 +54,10 @@ export function ResetFlow({ next }: { next: string }) {
 function RequestStep({
   next,
   onSent,
-}: { next: string; onSent: (email: string) => void }) {
+}: {
+  next: string;
+  onSent: (email: string) => void;
+}) {
   const t = useI18n();
   const attempt = useAuthStep("password");
   const rules = useAuthRules();
@@ -102,7 +105,11 @@ function NewPasswordStep({
   email,
   code,
   next,
-}: { email: string; code: string; next: string }) {
+}: {
+  email: string;
+  code: string;
+  next: string;
+}) {
   const t = useI18n();
   const attempt = useAuthStep("password");
   const rules = useAuthRules();

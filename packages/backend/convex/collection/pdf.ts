@@ -63,7 +63,7 @@ function scopeLines({ view, albumName, ownCountry, locale }: PdfContents) {
       messages.album,
       view.album === withoutAlbum
         ? messages.withoutAlbum
-        : albumName ?? messages.unknownAlbum,
+        : (albumName ?? messages.unknownAlbum),
     );
   return lines.length > 0 ? lines : [messages.wholeCollection];
 }
