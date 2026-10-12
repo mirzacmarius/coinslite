@@ -106,10 +106,3 @@ export async function canUseScanner(ctx: QueryCtx) {
     (await planOf(ctx, user._id)) === "premium"
   );
 }
-
-/** Whether the signed-in person may use the scanner (see canUseScanner). */
-export const scannerAvailable = query({
-  args: {},
-  returns: v.boolean(),
-  handler: async (ctx) => canUseScanner(ctx),
-});

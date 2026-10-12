@@ -10,7 +10,7 @@ import {
 import type { CollectionView } from "./collection/view";
 import { countFilterOptions } from "./collection/viewRules";
 import { bulkLimits } from "./items/bulkRules";
-import schema from "./schema";
+import { itemWithThumbnail } from "./items/thumbnail";
 import { requireSetUpUser } from "./utils/auth";
 import { gradingScale, homeCurrency, language } from "./utils/validators";
 
@@ -24,9 +24,7 @@ const pageArgs = {
 };
 
 const pageFields = {
-  items: v.array(
-    schema.doc("items").extend({ thumbnailUrl: v.union(v.string(), v.null()) }),
-  ),
+  items: v.array(itemWithThumbnail),
   /** How many Items match the view, over all pages. */
   total: v.number(),
   /** The page shown: the one asked for, or the nearest that exists. */
