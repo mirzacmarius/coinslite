@@ -1160,6 +1160,36 @@ export default {
     removeBody:
       "Filene og krediteringen slettes. Oppføringen viser en plassholder til et nytt bilde legges til.",
     removed: "Bildet er fjernet",
+    commons: {
+      title: "Fra Wikimedia Commons",
+      address: "Filside",
+      hint: "Lim inn adressen til en filside på Commons. Filer som er allemannseie eller har CC0, CC BY eller CC BY-SA, godtas. Bildet kopieres til CoinsLite, det lenkes ikke.",
+      fetch: "Hent",
+      reading: "Leser filsiden…",
+      downloading: "Laster ned bildet…",
+      read: "Fylt ut fra {title} under {licence}. Sjekk krediteringen før du lagrer.",
+      noAuthor: "Filsiden oppgir ingen opphavsperson. Oppgi opphavspersonen.",
+      designReminder:
+        "Et fritt foto gjør ikke motivet fritt. Bruk det bare hvis motivet også er fritt: allemannseie, unntatt fra opphavsrett, utløpt eller brukt med tillatelse.",
+      errors: {
+        notCommonsFile:
+          "Lim inn adressen til en filside på Wikimedia Commons, for eksempel https://commons.wikimedia.org/wiki/File:….",
+        notFound: "Wikimedia Commons har ingen slik fil.",
+        notPicture: "Denne filen er ikke et bilde.",
+        nonCommercial:
+          "Denne filen kan bare brukes ikke-kommersielt (NC), så den kan ikke legges til.",
+        noDerivatives:
+          "Denne filen kan ikke endres (ND). Å konvertere den til WebP er en endring, så den kan ikke legges til.",
+        nonFree:
+          "Denne filen er ikke fri eller brukes som «fair use», så den kan ikke legges til.",
+        disputed:
+          "Denne filen er merket som uten lisens eller tillatelse, eller som brudd på opphavsretten, så den kan ikke legges til.",
+        otherLicence:
+          "Denne filen er verken allemannseie eller under CC0, CC BY eller CC BY-SA, så den kan ikke legges til.",
+        none: "Fant ingen lisens på denne filsiden, så filen kan ikke legges til.",
+        failed: "Kunne ikke lese filen fra Wikimedia Commons. Prøv igjen.",
+      },
+    },
     errors: {
       imageRequired: "Velg et bilde.",
       sourceRequired: "Oppgi kilden.",

@@ -1,0 +1,173 @@
+{
+  "continue": {
+    "iistart": "2015-08-20T22:09:57Z",
+    "continue": "||categories|revisions"
+  },
+  "query": {
+    "pages": [
+      {
+        "pageid": 42528188,
+        "ns": 6,
+        "title": "File:NNC-US-1878-CC-1$-Morgan dollar.jpg",
+        "imagerepository": "local",
+        "imageinfo": [
+          {
+            "size": 17879709,
+            "width": 9883,
+            "height": 4972,
+            "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/NNC-US-1878-CC-1%24-Morgan_dollar.jpg/1280px-NNC-US-1878-CC-1%24-Morgan_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+            "thumbwidth": 1280,
+            "thumbheight": 644,
+            "responsiveUrls": {
+              "2": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/NNC-US-1878-CC-1%24-Morgan_dollar.jpg/3840px-NNC-US-1878-CC-1%24-Morgan_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+            },
+            "thumbattribs": {
+              "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/NNC-US-1878-CC-1%24-Morgan_dollar.jpg/1280px-NNC-US-1878-CC-1%24-Morgan_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+              "decoding": "async",
+              "loading": "lazy",
+              "width": 1280,
+              "height": 644,
+              "srcset": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/NNC-US-1878-CC-1%24-Morgan_dollar.jpg/3840px-NNC-US-1878-CC-1%24-Morgan_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail 2x"
+            },
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/NNC-US-1878-CC-1%24-Morgan_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/File:NNC-US-1878-CC-1$-Morgan_dollar.jpg",
+            "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=42528188",
+            "extmetadata": {
+              "DateTime": {
+                "value": "2015-08-29 04:20:28",
+                "source": "mediawiki-metadata",
+                "hidden": ""
+              },
+              "ObjectName": {
+                "value": "NNC-US-1878-CC-1$-Morgan dollar",
+                "source": "mediawiki-metadata"
+              },
+              "CommonsMetadataExtension": {
+                "value": 1.2,
+                "source": "extension",
+                "hidden": ""
+              },
+              "Categories": {
+                "value": "Morgan dollar|PD US money|Items with VRTS permission confirmed|PD US SI|NNC coins uploaded by User:Godot13|All Images by User:Godot13|Carson City Mint coins|Coins by George T. Morgan|Coins (NNC)|2015 User:Godot13",
+                "source": "commons-categories",
+                "hidden": ""
+              },
+              "Assessments": {
+                "value": "",
+                "source": "commons-categories",
+                "hidden": ""
+              },
+              "ImageDescription": {
+                "value": "JN2015-6704-05, minted in CC - Carson City",
+                "source": "commons-desc-page"
+              },
+              "DateTimeOriginal": {
+                "value": "1878",
+                "source": "commons-desc-page"
+              },
+              "Credit": {
+                "value": "National Numismatic Collection, National Museum of American History",
+                "source": "commons-desc-page"
+              },
+              "Artist": {
+                "value": "US Mint (coin), National Numismatic Collection (photograph by Jaclyn Nash)",
+                "source": "commons-desc-page"
+              },
+              "Permission": {
+                "value": "Use of this image should give credit to the <b><a href=\"https://en.wikipedia.org/wiki/National_Numismatic_Collection\" class=\"extiw\" title=\"w:National Numismatic Collection\">National Numismatic Collection</a>, <a href=\"https://en.wikipedia.org/wiki/National_Museum_of_American_History\" class=\"extiw\" title=\"w:National Museum of American History\">National Museum of American History</a></b>.",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "LicenseShortName": {
+                "value": "Public domain",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "UsageTerms": {
+                "value": "Public domain",
+                "source": "commons-desc-page"
+              },
+              "AttributionRequired": {
+                "value": "false",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "Copyrighted": {
+                "value": "False",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "Restrictions": {
+                "value": "",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "License": {
+                "value": "pd",
+                "source": "commons-templates",
+                "hidden": ""
+              }
+            },
+            "mime": "image/jpeg"
+          }
+        ],
+        "categories": [
+          {
+            "ns": 14,
+            "title": "Category:2015 User:Godot13"
+          },
+          {
+            "ns": 14,
+            "title": "Category:All Images by User:Godot13"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Carson City Mint coins"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Coins (NNC)"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Coins by George T. Morgan"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Items with VRTS permission confirmed"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Morgan dollar"
+          },
+          {
+            "ns": 14,
+            "title": "Category:NNC coins uploaded by User:Godot13"
+          },
+          {
+            "ns": 14,
+            "title": "Category:PD US SI"
+          },
+          {
+            "ns": 14,
+            "title": "Category:PD US money"
+          }
+        ],
+        "revisions": [
+          {
+            "slots": {
+              "main": {
+                "contentmodel": "wikitext",
+                "contentformat": "text/x-wiki",
+                "content": "=={{int:filedesc}}==\n{{Information\n|description={{en|1=JN2015-6704-05, minted in CC - Carson City}}\n|date=1878 (coin), 2015 (image)\n|source=National Numismatic Collection, National Museum of American History\n|author=US Mint (coin), National Numismatic Collection (photograph by Jaclyn Nash)\n|permission=Use of this image should give credit to the '''[[w:National Numismatic Collection|National Numismatic Collection]], [[w:National Museum of American History|National Museum of American History]]'''.\n|other versions=\n}}\n{{PermissionTicket|id=2013030510011547}}\n\n=={{int:license-header}}==\n\n{{PD-USGov-money}}\n{{PD-USGov-SI}}\n\n[[Category:2015 User:Godot13]]\n[[Category:All Images by User:Godot13]]\n[[Category:NNC coins uploaded by User:Godot13]]\n[[Category:Coins (NNC)]]\n[[Category:Coins by George T. Morgan]]\n[[Category:Morgan dollar]]\n[[Category:Carson City Mint coins]]"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "categories": 500
+  }
+}

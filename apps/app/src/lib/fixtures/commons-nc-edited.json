@@ -1,0 +1,150 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "pages": [
+      {
+        "pageid": 137402447,
+        "ns": 6,
+        "title": "File:1893-S Morgan dollar obverse.jpg",
+        "imagerepository": "local",
+        "imageinfo": [
+          {
+            "size": 466146,
+            "width": 1151,
+            "height": 1183,
+            "thumburl": "https://upload.wikimedia.org/wikipedia/commons/7/73/1893-S_Morgan_dollar_obverse.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+            "thumbwidth": 1280,
+            "thumbheight": 1316,
+            "thumbattribs": {
+              "src": "https://upload.wikimedia.org/wikipedia/commons/7/73/1893-S_Morgan_dollar_obverse.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "decoding": "async",
+              "loading": "lazy",
+              "width": 1280,
+              "height": 1316
+            },
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/1893-S_Morgan_dollar_obverse.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/File:1893-S_Morgan_dollar_obverse.jpg",
+            "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=137402447",
+            "extmetadata": {
+              "DateTime": {
+                "value": "2023-09-11 15:49:12",
+                "source": "mediawiki-metadata",
+                "hidden": ""
+              },
+              "ObjectName": {
+                "value": "1893-S Morgan dollar obverse",
+                "source": "mediawiki-metadata"
+              },
+              "CommonsMetadataExtension": {
+                "value": 1.2,
+                "source": "extension",
+                "hidden": ""
+              },
+              "Categories": {
+                "value": "Morgan dollar|PD US money|1893-S Morgan dollar|Self-published work|Obverses of United States coins|Coins of the United States, 1893",
+                "source": "commons-categories",
+                "hidden": ""
+              },
+              "Assessments": {
+                "value": "",
+                "source": "commons-categories",
+                "hidden": ""
+              },
+              "ImageDescription": {
+                "value": "1893-S Morgan dollar obverse",
+                "source": "commons-desc-page"
+              },
+              "DateTimeOriginal": {
+                "value": "2023-08-22 16:30:56",
+                "source": "commons-desc-page"
+              },
+              "Credit": {
+                "value": "<span class=\"int-own-work\" lang=\"en\">Own work</span>",
+                "source": "commons-desc-page"
+              },
+              "Artist": {
+                "value": "<a href=\"//commons.wikimedia.org/wiki/User:Bruxton\" title=\"User:Bruxton\">Bruxton</a>",
+                "source": "commons-desc-page"
+              },
+              "LicenseShortName": {
+                "value": "Public domain",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "UsageTerms": {
+                "value": "Public domain",
+                "source": "commons-desc-page"
+              },
+              "AttributionRequired": {
+                "value": "false",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "Copyrighted": {
+                "value": "False",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "Restrictions": {
+                "value": "",
+                "source": "commons-desc-page",
+                "hidden": ""
+              },
+              "License": {
+                "value": "pd",
+                "source": "commons-templates",
+                "hidden": ""
+              }
+            },
+            "mime": "image/jpeg"
+          }
+        ],
+        "categories": [
+          {
+            "ns": 14,
+            "title": "Category:1893-S Morgan dollar"
+          },
+          {
+            "ns": 14,
+            "title": "Category:CC-BY-NC-SA-4.0"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Coins of the United States, 1893"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Morgan dollar"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Obverses of United States coins"
+          },
+          {
+            "ns": 14,
+            "title": "Category:PD US money"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Self-published work"
+          }
+        ],
+        "revisions": [
+          {
+            "slots": {
+              "main": {
+                "contentmodel": "wikitext",
+                "contentformat": "text/x-wiki",
+                "content": "=={{int:filedesc}}==\n{{Information\n|description={{en|1=1893-S Morgan dollar obverse}}\n|date=2023-08-22 16:30:56\n|source={{own}}\n|author=[[User:Bruxton|Bruxton]]\n|permission=\n|other versions=\n}}\n\n=={{int:license-header}}==\n{{self|cc-by-nc-sa-4.0}}\n{{PD-USGov-money}}\n\n[[Category:Morgan dollar]]\n[[Category:1893-S Morgan dollar]]\n[[Category:Coins of the United States, 1893]]\n[[Category:Obverses of United States coins]]"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "categories": 500
+  },
+  "_note": "Edited from commons-1893-s-morgan-dollar.json: the photo licence is CC BY-NC-SA 4.0 instead of CC BY-SA 4.0 (Commons itself deletes NC files)."
+}

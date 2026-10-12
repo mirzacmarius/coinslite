@@ -1170,6 +1170,38 @@ export default {
     removeBody:
       "Fișierele și creditul ei se șterg. Intrarea afișează un substituent până când se adaugă altă imagine.",
     removed: "Imaginea a fost eliminată",
+    commons: {
+      title: "Din Wikimedia Commons",
+      address: "Pagina fișierului",
+      hint: "Lipește adresa paginii unui fișier de pe Commons. Se acceptă fișiere din domeniul public sau sub CC0, CC BY și CC BY-SA. Imaginea se copiază în CoinsLite, nu se leagă.",
+      fetch: "Preia",
+      reading: "Se citește pagina fișierului…",
+      downloading: "Se descarcă imaginea…",
+      read: "Completat din {title}, sub {licence}. Verifică creditul înainte de a salva.",
+      noAuthor:
+        "Pagina fișierului nu numește niciun autor. Precizează autorul.",
+      designReminder:
+        "O fotografie liberă nu face liber și designul. Folosește-o doar dacă și designul e liber: în domeniul public, exclus de la drepturile de autor, expirat sau folosit cu permisiune.",
+      errors: {
+        notCommonsFile:
+          "Lipește adresa paginii unui fișier de pe Wikimedia Commons, de exemplu https://commons.wikimedia.org/wiki/File:….",
+        notFound: "Wikimedia Commons nu are un astfel de fișier.",
+        notPicture: "Acest fișier nu este o imagine.",
+        nonCommercial:
+          "Acest fișier poate fi folosit doar necomercial (NC), deci nu poate fi adăugat.",
+        noDerivatives:
+          "Acest fișier nu poate fi modificat (ND). Conversia în WebP e o modificare, deci nu poate fi adăugat.",
+        nonFree:
+          "Acest fișier nu e liber sau e folosit ca „fair use”, deci nu poate fi adăugat.",
+        disputed:
+          "Acest fișier e marcat ca fără licență sau permisiune ori ca încălcare a drepturilor de autor, deci nu poate fi adăugat.",
+        otherLicence:
+          "Acest fișier nu e în domeniul public și nici sub CC0, CC BY sau CC BY-SA, deci nu poate fi adăugat.",
+        none: "Nu s-a găsit nicio licență pe pagina acestui fișier, deci nu poate fi adăugat.",
+        failed:
+          "Fișierul nu a putut fi citit de pe Wikimedia Commons. Încearcă din nou.",
+      },
+    },
     errors: {
       imageRequired: "Alege o imagine.",
       sourceRequired: "Precizează sursa.",
