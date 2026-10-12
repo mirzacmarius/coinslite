@@ -1,11 +1,13 @@
 import {
+  type PaginationOptions,
   paginationOptsValidator,
   paginationResultValidator,
 } from "convex/server";
 import { ConvexError, v } from "convex/values";
-import { query } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
+import { type QueryCtx, query } from "./_generated/server";
 import { resolveItems } from "./items/resolve";
-import { collectionTotals } from "./items/totals";
+import { collectionTotals, pageTotals } from "./items/totals";
 import { historyOf } from "./items/valueHistory";
 import {
   VALUE_OVER_TIME_PAGE_SIZE,
@@ -13,9 +15,9 @@ import {
   seriesMonths,
   valueOverTime,
 } from "./items/valueOverTime";
-import { latestRates, ratesForDays } from "./spotPrices";
+import { latestRates, latestSnapshot, ratesForDays } from "./spotPrices";
 import { requireSetUpUser } from "./utils/auth";
-import { homeCurrency } from "./utils/validators";
+import { homeCurrency, perDollar } from "./utils/validators";
 
 /**
  * Totals over the whole Collection (spec 7), read a page of Items at a time.
@@ -24,12 +26,18 @@ import { homeCurrency } from "./utils/validators";
  *
  * Why pages: a Premium Collection can hold many thousands of Items, more than
  * one query may read. A stored running total would need every way of adding,
- * editing, deleting and converting Items to keep it in step, and Metal values
- * move with every Spot price refresh anyway. Instead each page of Items is
- * summed here with the pure `collectionTotals`, and the app reads page after
- * page (TOTALS_PAGE_SIZE Items each) and adds them up with `combineTotals`.
- * Every page stays well inside the read limits however large the Collection,
- * stays live, and a Free plan Collection (at most 50 Items) is one page.
+ * editing, deleting and converting Items to keep it in step. Instead each
+ * page of Items is summed here with the pure `pageTotals`, and the app reads
+ * page after page (TOTALS_PAGE_SIZE Items each) and adds them up with
+ * `combineTotals`. Every page stays well inside the read limits however
+ * large the Collection, stays live, and a Free plan Collection (at most 50
+ * Items) is one page.
+ *
+ * Why no Metal values in the pages: they move with every Spot price refresh.
+ * Each page says how much of each metal its Items hold instead, and the app
+ * works the Metal values out once, at the Spot prices from `spotPrices`
+ * (`withMetalValues`). A refresh then re-runs that one small query rather
+ * than every page of every Collection on screen.
  */
 
 const amounts = v.object({
@@ -42,7 +50,14 @@ const metalTotal = v.object({
   value: v.union(v.number(), v.null()),
 });
 
-const totals = v.object({
+const metalHolding = v.object({
+  finePerPiece: v.number(),
+  quantity: v.number(),
+  items: v.number(),
+});
+
+/** What every page's totals hold, whether or not they have Metal values. */
+const totalsFields = {
   currency: homeCurrency,
   items: v.number(),
   pieces: v.object({
@@ -56,7 +71,6 @@ const totals = v.object({
   salePrice: v.number(),
   realised: v.object({ amount: v.number(), items: v.number() }),
   byType: v.object({ coin: amounts, banknote: amounts, stamp: amounts }),
-  metals: v.object({ gold: metalTotal, silver: metalTotal }),
   addedByMonth: v.array(
     v.object({
       month: v.string(),
@@ -64,6 +78,21 @@ const totals = v.object({
       marketValue: v.number(),
     }),
   ),
+};
+
+/** CollectionTotals in items/totals.ts. */
+const totals = v.object({
+  ...totalsFields,
+  metals: v.object({ gold: metalTotal, silver: metalTotal }),
+});
+
+/** PageTotals in items/totals.ts. */
+const unpricedTotals = v.object({
+  ...totalsFields,
+  holdings: v.object({
+    gold: v.array(metalHolding),
+    silver: v.array(metalHolding),
+  }),
 });
 
 export const collectionTotalsErrors = {
@@ -84,40 +113,91 @@ function requireUtcOffset(utcOffsetMinutes: number) {
 }
 
 /**
- * The totals of one page of the signed-in person's Items, as the only entry
- * in `page`: the ones they own, or with `status` "sold" the ones they sold.
- * `utcOffsetMinutes` is how far ahead of UTC the person's clock is, for the
- * months of Value by date acquired.
+ * A page of the person's Items: the ones they own, or with `status` "sold"
+ * the ones they sold.
+ */
+const itemsPage = (
+  ctx: QueryCtx,
+  ownerId: Id<"users">,
+  status: "sold" | undefined,
+  paginationOpts: PaginationOptions,
+) =>
+  ctx.db
+    .query("items")
+    .withIndex("by_ownerId_and_soldOn", (q) =>
+      status === "sold"
+        ? // Every sold-on date is a non-empty "YYYY-MM-DD".
+          q
+            .eq("ownerId", ownerId)
+            .gt("soldOn", "")
+        : q.eq("ownerId", ownerId).eq("soldOn", undefined),
+    )
+    .paginate(paginationOpts);
+
+const pageArgs = {
+  paginationOpts: paginationOptsValidator,
+  utcOffsetMinutes: v.number(),
+  status: v.optional(v.literal("sold")),
+};
+
+/**
+ * The totals of one page of the signed-in person's Items, before any Spot
+ * price (PageTotals), as the only entry in `page`: the ones they own, or with
+ * `status` "sold" the ones they sold. `utcOffsetMinutes` is how far ahead of
+ * UTC the person's clock is, for the months of Value by date acquired.
+ */
+export const unpricedPage = query({
+  args: pageArgs,
+  returns: paginationResultValidator(unpricedTotals),
+  handler: async (ctx, { paginationOpts, utcOffsetMinutes, status }) => {
+    const owner = await requireSetUpUser(ctx);
+    requireUtcOffset(utcOffsetMinutes);
+    const items = await itemsPage(ctx, owner._id, status, paginationOpts);
+    // Linked Items' metal facts come from their Catalog entries.
+    const sum = pageTotals(await resolveItems(ctx, items.page), {
+      currency: owner.homeCurrency,
+      utcOffsetMinutes,
+    });
+    return { ...items, page: [sum] };
+  },
+});
+
+/**
+ * The Spot prices the totals' Metal values are worked out at: the stored
+ * table of what one US dollar buys, from which the app takes the Spot prices
+ * in the totals' currency (`spotPricesPerGram`); null before the first
+ * successful refresh. It reads only the prices, so only a successful refresh
+ * re-runs it.
+ */
+export const spotPrices = query({
+  args: {},
+  returns: v.union(v.null(), perDollar),
+  handler: async (ctx) => {
+    await requireSetUpUser(ctx);
+    return (await latestSnapshot(ctx))?.perDollar ?? null;
+  },
+});
+
+/**
+ * `unpricedPage` with the Metal values worked out here, at the latest Spot
+ * prices, so every refresh re-runs it. Kept for app tabs opened before
+ * `unpricedPage` came; nothing calls it once those have reloaded.
  */
 export const page = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-    utcOffsetMinutes: v.number(),
-    status: v.optional(v.literal("sold")),
-  },
+  args: pageArgs,
   returns: paginationResultValidator(totals),
   handler: async (ctx, { paginationOpts, utcOffsetMinutes, status }) => {
     const owner = await requireSetUpUser(ctx);
     requireUtcOffset(utcOffsetMinutes);
     const rates = await latestRates(ctx);
-    const items = await ctx.db
-      .query("items")
-      .withIndex("by_ownerId_and_soldOn", (q) =>
-        status === "sold"
-          ? // Every sold-on date is a non-empty "YYYY-MM-DD".
-            q
-              .eq("ownerId", owner._id)
-              .gt("soldOn", "")
-          : q.eq("ownerId", owner._id).eq("soldOn", undefined),
-      )
-      .paginate(paginationOpts);
+    const items = await itemsPage(ctx, owner._id, status, paginationOpts);
     // Linked Items' metal facts come from their Catalog entries.
-    const pageTotals = collectionTotals(await resolveItems(ctx, items.page), {
+    const pageSum = collectionTotals(await resolveItems(ctx, items.page), {
       currency: owner.homeCurrency,
       rates,
       utcOffsetMinutes,
     });
-    return { ...items, page: [pageTotals] };
+    return { ...items, page: [pageSum] };
   },
 });
 
@@ -130,10 +210,12 @@ const monthValue = v.object({
 
 /**
  * "Value over time" for one page of the signed-in person's Items, owned and
- * sold, as the only entry in `page`: each month from when the page's
- * earliest Item was acquired through `throughMonth` (the person's current
- * month, "YYYY-MM"), from their Market value history and each month's Spot
- * prices (items/valueOverTime.ts). The app adds the pages up with
+ * sold, up to VALUE_OVER_TIME_PAGE_SIZE, as the only entry in `page`: each
+ * month from when the page's earliest Item was acquired through
+ * `throughMonth` (the person's current month, "YYYY-MM"), from their Market
+ * value history and each month's Spot prices (items/valueOverTime.ts). Those
+ * are the prices kept once a day (spotPriceDays), not the latest, so the
+ * refreshes in between re-run no page. The app adds the pages up with
  * `combineValueOverTime`, as it does the totals.
  */
 export const valueOverTimePage = query({

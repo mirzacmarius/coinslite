@@ -1,13 +1,15 @@
 import type { HomeCurrency } from "@coinslite/i18n";
 import { type MarketRates, type Metal, metals } from "../spotPrices/rates";
 import type { ItemType } from "./grades";
-import { type MetalContent, metalValue } from "./preciousMetal";
+import { type MetalContent, roundedMetalValue } from "./preciousMetal";
 
 /**
  * Totals over a list of Items (spec 7, 9) and the Collection charts built from
- * them. Pure: the server sums each page of a Collection with
- * `collectionTotals`, the app adds the pages up with `combineTotals`, and any
- * other list of Items (a filtered view, an export) is summed the same way.
+ * them. Pure: the server sums each page of a Collection with `pageTotals`,
+ * the app adds the pages up with `combineTotals` and works out the Metal
+ * values at the current Spot prices with `withMetalValues`; any other list of
+ * Items (a filtered view, an export) is summed in one go with
+ * `collectionTotals`.
  */
 
 /**
@@ -81,6 +83,34 @@ export type CollectionTotals = {
   addedByMonth: MonthAmounts[];
 };
 
+/** Items that hold the same amount of one precious metal. */
+export type MetalHolding = {
+  /** Grams of the pure metal in one piece: weight × purity. */
+  finePerPiece: number;
+  /** Each of these Items' Quantity. */
+  quantity: number;
+  /** How many Items hold this much. */
+  items: number;
+};
+
+/**
+ * The totals before any Spot price: everything CollectionTotals holds but the
+ * metals, and instead the Items holding each metal, by how much each holds.
+ * The server sums each page of a Collection this way, so a Spot price refresh
+ * re-runs none of them; the app adds the pages up (combineTotals) and works
+ * out the Metal values once, at the current Spot prices (withMetalValues).
+ */
+export type PageTotals = Omit<CollectionTotals, "metals"> & {
+  /** Grouped by fine weight per piece, then Quantity, both ascending. */
+  holdings: Record<Metal, MetalHolding[]>;
+};
+
+/**
+ * The Spot prices to work Metal values out at: a gram of each metal in minor
+ * units of the totals' currency, not rounded (MarketRates.spotPricePerGram).
+ */
+export type SpotPrices = Record<Metal, number>;
+
 /** What the totals need besides the Items. */
 export type TotalsContext = {
   currency: HomeCurrency;
@@ -127,11 +157,8 @@ export const totalPieces = ({ pieces }: CollectionTotals) =>
 
 const noAmounts = (): Amounts => ({ purchasePrice: 0, marketValue: 0 });
 
-/** Totals over no Items. */
-export const emptyTotals = ({
-  currency,
-  rates,
-}: TotalsContext): CollectionTotals => ({
+/** Totals over no Items, before any Spot price. */
+const emptyPageTotals = (currency: HomeCurrency): PageTotals => ({
   currency,
   items: 0,
   pieces: { coin: 0, banknote: 0, stamp: 0 },
@@ -141,10 +168,7 @@ export const emptyTotals = ({
   salePrice: 0,
   realised: { amount: 0, items: 0 },
   byType: { coin: noAmounts(), banknote: noAmounts(), stamp: noAmounts() },
-  metals: {
-    gold: { fineWeight: 0, value: rates && 0 },
-    silver: { fineWeight: 0, value: rates && 0 },
-  },
+  holdings: { gold: [], silver: [] },
   addedByMonth: [],
 });
 
@@ -178,14 +202,27 @@ export function acquiredAt(
   return Math.min(bought, recordedAt);
 }
 
-/** Totals over `items`. */
-export function collectionTotals(
+/** Totals over `items`, at `context.rates`. */
+export const collectionTotals = (
   items: Iterable<TotalsItem>,
   context: TotalsContext,
-): CollectionTotals {
-  const { currency, rates, utcOffsetMinutes = 0 } = context;
-  const totals = emptyTotals(context);
+): CollectionTotals =>
+  withMetalValues(
+    pageTotals(items, context),
+    context.rates && {
+      gold: context.rates.spotPricePerGram("gold", context.currency),
+      silver: context.rates.spotPricePerGram("silver", context.currency),
+    },
+  );
+
+/** Totals over `items` before any Spot price, as a page of a Collection sums them. */
+export function pageTotals(
+  items: Iterable<TotalsItem>,
+  { currency, utcOffsetMinutes = 0 }: Omit<TotalsContext, "rates">,
+): PageTotals {
+  const totals = emptyPageTotals(currency);
   const byMonth = new Map<string, MonthAmounts>();
+  const holdings: Record<Metal, MetalHolding[]> = { gold: [], silver: [] };
   for (const item of items) {
     const { type, quantity } = item;
     const purchasePrice = (item.purchasePrice ?? 0) * quantity;
@@ -221,22 +258,72 @@ export function collectionTotals(
 
     const { metal, weight, purity } = item;
     if (metal !== undefined && weight !== undefined && purity !== undefined) {
-      const sum = totals.metals[metal];
-      sum.fineWeight += weight * purity * quantity;
-      if (rates && sum.value !== null) {
-        sum.value += metalValue(item, rates, currency) ?? 0;
-      }
+      holdings[metal].push({
+        finePerPiece: weight * purity,
+        quantity,
+        items: 1,
+      });
     }
   }
+  totals.holdings = {
+    gold: groupHoldings(holdings.gold),
+    silver: groupHoldings(holdings.silver),
+  };
   totals.addedByMonth = combineMonths([...byMonth.values()], []);
   return totals;
 }
 
-/** The totals of two separate lists of Items as one, e.g. two pages of a Collection. */
-export function combineTotals(
-  a: CollectionTotals,
-  b: CollectionTotals,
+/**
+ * Holdings as one list: those of the same amount added together, by fine
+ * weight per piece, then Quantity.
+ */
+function groupHoldings(holdings: MetalHolding[]): MetalHolding[] {
+  const byAmount = new Map<string, MetalHolding>();
+  for (const holding of holdings) {
+    const key = `${holding.finePerPiece} ${holding.quantity}`;
+    const same = byAmount.get(key);
+    byAmount.set(
+      key,
+      same ? { ...same, items: same.items + holding.items } : holding,
+    );
+  }
+  return [...byAmount.values()].sort(
+    (a, b) => a.finePerPiece - b.finePerPiece || a.quantity - b.quantity,
+  );
+}
+
+/**
+ * The totals as shown: each metal's fine weight, and its Metal value at
+ * `spotPrices`, worked out Item by Item and rounded as each Item shows it,
+ * then added up. Metal values are null without Spot prices.
+ */
+export function withMetalValues(
+  { holdings, ...totals }: PageTotals,
+  spotPrices: SpotPrices | null,
 ): CollectionTotals {
+  const totalOf = (metal: Metal): MetalTotal => {
+    let fineWeight = 0;
+    let value = 0;
+    for (const { finePerPiece, quantity, items } of holdings[metal]) {
+      fineWeight += finePerPiece * quantity * items;
+      if (spotPrices)
+        value +=
+          roundedMetalValue(finePerPiece, spotPrices[metal], quantity) * items;
+    }
+    return { fineWeight, value: spotPrices && value };
+  };
+  return {
+    ...totals,
+    metals: { gold: totalOf("gold"), silver: totalOf("silver") },
+  };
+}
+
+/**
+ * The totals of two separate lists of Items as one, e.g. two pages of a
+ * Collection. However the Items are split into pages, they add up to the
+ * same as one page.
+ */
+export function combineTotals(a: PageTotals, b: PageTotals): PageTotals {
   return {
     currency: b.currency,
     items: a.items + b.items,
@@ -261,9 +348,9 @@ export function combineTotals(
       banknote: addAmounts(a.byType.banknote, b.byType.banknote),
       stamp: addAmounts(a.byType.stamp, b.byType.stamp),
     },
-    metals: {
-      gold: addMetal(a.metals.gold, b.metals.gold),
-      silver: addMetal(a.metals.silver, b.metals.silver),
+    holdings: {
+      gold: groupHoldings([...a.holdings.gold, ...b.holdings.gold]),
+      silver: groupHoldings([...a.holdings.silver, ...b.holdings.silver]),
     },
     addedByMonth: combineMonths(a.addedByMonth, b.addedByMonth),
   };
@@ -272,11 +359,6 @@ export function combineTotals(
 const addAmounts = (a: Amounts, b: Amounts): Amounts => ({
   purchasePrice: a.purchasePrice + b.purchasePrice,
   marketValue: a.marketValue + b.marketValue,
-});
-
-const addMetal = (a: MetalTotal, b: MetalTotal): MetalTotal => ({
-  fineWeight: a.fineWeight + b.fineWeight,
-  value: a.value === null || b.value === null ? null : a.value + b.value,
 });
 
 /** Two lists of months' amounts as one, oldest first, adding up months in both. */

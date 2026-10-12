@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import {
+  type MutationCtx,
   type QueryCtx,
   env,
   internalAction,
@@ -19,19 +20,50 @@ import {
 import { requireSetUpUser } from "./utils/auth";
 import { homeCurrency, perDollar } from "./utils/validators";
 
-/** The one stored snapshot, or null before the first successful refresh. */
-async function latestSnapshot(ctx: QueryCtx) {
+/**
+ * The one stored snapshot, or null before the first successful refresh. Only
+ * a successful refresh changes it, so a query that reads the prices this way
+ * isn't re-run by a failed one.
+ */
+export async function latestSnapshot(ctx: QueryCtx) {
   return await ctx.db.query("spotPriceSnapshots").order("desc").first();
+}
+
+/**
+ * When a refresh was last attempted, kept apart from the prices
+ * (spotPriceChecks); before that is first written, where the snapshot kept it.
+ */
+async function lastCheckedAt(
+  ctx: QueryCtx,
+  snapshot: Doc<"spotPriceSnapshots">,
+) {
+  const check = await ctx.db.query("spotPriceChecks").first();
+  return check?.checkedAt ?? snapshot.checkedAt ?? snapshot.fetchedAt;
+}
+
+/** Notes a refresh attempt, successful or not. */
+async function recordCheck(ctx: MutationCtx, checkedAt: number) {
+  const check = await ctx.db.query("spotPriceChecks").first();
+  if (check) {
+    await ctx.db.patch("spotPriceChecks", check._id, { checkedAt });
+  } else {
+    await ctx.db.insert("spotPriceChecks", { checkedAt });
+  }
 }
 
 /**
  * The latest Spot prices and exchange rates, or null before the first
  * successful refresh. Every conversion uses these stored values: Metal values
- * (`spotPricePerGram`) and Home currency changes (`rate`, `convert`).
+ * (`spotPricePerGram`) and Home currency changes (`rate`, `convert`). Knowing
+ * whether they're out of date (`stale`) means reading when a refresh was
+ * last attempted, so every attempt re-runs a query that calls this.
  */
 export async function latestRates(ctx: QueryCtx): Promise<MarketRates | null> {
   const snapshot = await latestSnapshot(ctx);
-  return snapshot && marketRates(snapshot);
+  return (
+    snapshot &&
+    marketRates({ ...snapshot, checkedAt: await lastCheckedAt(ctx, snapshot) })
+  );
 }
 
 /** Spot prices and exchange rates as kept for one day; never stale. */
@@ -137,7 +169,7 @@ export const lastRequest = internalQuery({
     const snapshot = await latestSnapshot(ctx);
     return (
       snapshot && {
-        checkedAt: snapshot.checkedAt,
+        checkedAt: await lastCheckedAt(ctx, snapshot),
         requestsPerMonth: snapshot.requestsPerMonth,
       }
     );
@@ -198,13 +230,14 @@ export const record = internalMutation({
   returns: v.null(),
   handler: async (ctx, quote) => {
     const now = Date.now();
-    const snapshot = { ...quote, fetchedAt: now, checkedAt: now };
+    const snapshot = { ...quote, fetchedAt: now };
     const latest = await latestSnapshot(ctx);
     if (latest) {
       await ctx.db.replace("spotPriceSnapshots", latest._id, snapshot);
     } else {
       await ctx.db.insert("spotPriceSnapshots", snapshot);
     }
+    await recordCheck(ctx, now);
     const day = new Date(now).toISOString().slice(0, 10);
     const kept = await ctx.db
       .query("spotPriceDays")
@@ -221,17 +254,15 @@ export const record = internalMutation({
   },
 });
 
-/** Notes a failed refresh; the stored prices stay, and age into being out of date. */
+/**
+ * Notes a failed refresh; the stored prices stay untouched, and age into
+ * being out of date.
+ */
 export const recordFailedRefresh = internalMutation({
   args: {},
   returns: v.null(),
   handler: async (ctx) => {
-    const latest = await latestSnapshot(ctx);
-    if (latest) {
-      await ctx.db.patch("spotPriceSnapshots", latest._id, {
-        checkedAt: Date.now(),
-      });
-    }
+    await recordCheck(ctx, Date.now());
     return null;
   },
 });

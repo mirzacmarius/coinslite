@@ -89,6 +89,7 @@ export const accountDataByTable = {
   photoLinkKeys:
     "kept: when photo links are issued and the deployment's own signing secret, which name no one",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",
+  spotPriceChecks: "kept: when the shared Spot prices were last asked for",
   featureFlags: "kept: the feature flags that apply to everyone",
 } as const satisfies Record<TableNames, `${"deleted" | "kept"}${string}`>;
 

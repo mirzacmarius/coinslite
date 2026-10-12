@@ -3,8 +3,10 @@
 import { api } from "@coinslite/backend/convex/_generated/api";
 import {
   type CollectionTotals,
+  type PageTotals,
   TOTALS_PAGE_SIZE,
   combineTotals,
+  withMetalValues,
 } from "@coinslite/backend/convex/items/totals";
 import {
   type MonthValue,
@@ -12,7 +14,8 @@ import {
   combineValueOverTime,
   monthOf,
 } from "@coinslite/backend/convex/items/valueOverTime";
-import { usePaginatedQuery } from "convex/react";
+import { spotPricesPerGram } from "@coinslite/backend/convex/spotPrices/rates";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 
 const subscribeToNothing = () => () => {};
@@ -31,21 +34,27 @@ function useUtcOffsetMinutes() {
 
 /**
  * Totals over the Items the signed-in person owns, or with `status` "sold"
- * over the ones they sold, live, or undefined while they first load. The server sums a page of Items at a time; this
- * reads every page and adds them up (collectionTotals.ts explains why). When
- * the Collection grows past a page, the previous totals stay on screen until
- * the next page is in.
+ * over the ones they sold, live, or undefined while they first load. The
+ * server sums a page of Items at a time; this reads every page and adds them
+ * up (collectionTotals.ts explains why). When the Collection grows past a
+ * page, the previous totals stay on screen until the next page is in. The
+ * Metal values are worked out here, at the latest Spot prices, so a Spot
+ * price refresh re-reads no page.
  */
 export function useCollectionTotals(
   sold?: "sold",
 ): CollectionTotals | undefined {
   const utcOffsetMinutes = useUtcOffsetMinutes();
   const { results, status, loadMore } = usePaginatedQuery(
-    api.collectionTotals.page,
+    api.collectionTotals.unpricedPage,
     utcOffsetMinutes === null
       ? "skip"
       : { utcOffsetMinutes, ...(sold && { status: sold }) },
     { initialNumItems: TOTALS_PAGE_SIZE },
+  );
+  const perDollar = useQuery(
+    api.collectionTotals.spotPrices,
+    utcOffsetMinutes === null ? "skip" : {},
   );
 
   useEffect(() => {
@@ -60,15 +69,24 @@ export function useCollectionTotals(
     [results, status],
   );
   // Kept per status: owned totals never stand in for sold ones.
-  const previous = useRef<{ sold?: "sold"; totals: CollectionTotals }>(
-    undefined,
-  );
+  const previous = useRef<{ sold?: "sold"; totals: PageTotals }>(undefined);
   useEffect(() => {
     if (complete) previous.current = { sold, totals: complete };
   }, [complete, sold]);
 
-  const kept = previous.current;
-  return complete ?? (kept && kept.sold === sold ? kept.totals : undefined);
+  const prior = previous.current;
+  const shown =
+    complete ?? (prior && prior.sold === sold ? prior.totals : undefined);
+  return useMemo(
+    () =>
+      shown === undefined || perDollar === undefined
+        ? undefined
+        : withMetalValues(
+            shown,
+            perDollar && spotPricesPerGram(perDollar, shown.currency),
+          ),
+    [shown, perDollar],
+  );
 }
 
 /**
