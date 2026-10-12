@@ -7,6 +7,7 @@ import {
   type PickedCatalogEntry,
 } from "@/components/catalog/catalog-picker";
 import { useCatalogVisible } from "@/components/catalog/use-catalog-visible";
+import { FormDialog } from "@/components/form-dialog";
 import {
   ItemLimitNotice,
   isItemLimitError,
@@ -16,7 +17,6 @@ import { ScanNotice } from "@/components/scanner/scan-notice";
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useWantedKeys } from "@/components/wantlist/wantlist";
 import { submitForm } from "@/lib/submit-form";
-import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -48,7 +48,6 @@ import {
   CollapsibleTrigger,
 } from "@coinslite/ui/collapsible";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -552,9 +551,11 @@ export function ItemFormDialog({
   };
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
-  const isDirty = form.useStore((state) => state.isDirty);
-  // A new deployment waits while an Item is half entered.
-  useUnsavedInput(open && isDirty);
+  // A scan's photos are input too: closing the form drops them.
+  const changed =
+    form.useStore((state) => state.isDirty) || scanned !== undefined;
+  // A new Item's form stays as it was for next time, unless it holds a scan.
+  const keepsDraft = !item && !copyOf && scanned === undefined;
   const values = form.useStore(
     ({
       values: { type, country, gradingScale, strike, grader, stampCatalogue },
@@ -674,7 +675,12 @@ export function ItemFormDialog({
   );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      changed={changed}
+      keepsDraft={keepsDraft}
+    >
       <DialogContent
         className="sm:max-w-[600px]"
         onOpenAutoFocus={(event) => {
@@ -684,7 +690,7 @@ export function ItemFormDialog({
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }
         }}
       >
@@ -693,7 +699,7 @@ export function ItemFormDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }}
           className="flex min-h-0 flex-col"
         >
@@ -1264,7 +1270,13 @@ export function ItemFormDialog({
               <Button
                 type="button"
                 disabled={submitting}
-                onClick={() => void submitForm(form, t("common.saveFailed"))}
+                onClick={(event) =>
+                  void submitForm(
+                    form,
+                    t("common.saveFailed"),
+                    event.currentTarget,
+                  )
+                }
               >
                 {submitting && (
                   <Loader2 className="animate-spin" aria-hidden="true" />
@@ -1309,7 +1321,7 @@ export function ItemFormDialog({
           }}
         />
       )}
-    </Dialog>
+    </FormDialog>
   );
 }
 

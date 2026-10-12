@@ -7,6 +7,13 @@ export default {
     appDescription:
       "Înregistrează monedele, bancnotele și timbrele pe care le deții.",
   },
+  discardChanges: {
+    title: "Renunți la modificări?",
+    description:
+      "Ce ai modificat aici nu e salvat și, dacă renunți, nu mai poate fi recuperat.",
+    discard: "Renunță",
+    keepEditing: "Continuă editarea",
+  },
   nav: {
     overview: "Prezentare",
     collection: "Colecție",

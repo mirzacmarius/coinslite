@@ -33,7 +33,7 @@ export function AuthForm({
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        void submitForm(form, t("common.saveFailed"));
+        void submitForm(form, t("common.saveFailed"), event.currentTarget);
       }}
     >
       <fieldset disabled={!interactive} className="flex min-w-0 flex-col gap-4">

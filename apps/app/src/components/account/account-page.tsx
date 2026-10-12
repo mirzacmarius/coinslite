@@ -10,6 +10,7 @@ import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
 import { submitForm } from "@/lib/submit-form";
+import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { contactLimits } from "@coinslite/backend/convex/account/rules";
@@ -97,16 +98,19 @@ function ContactSection({ account }: { account: Account }) {
         .sort((a, b) => a.label.localeCompare(b.label, locale)),
     [locale],
   );
+  // The details as last saved, one object until the next save: the form
+  // resets when it sees new defaults.
+  const [saved, setSaved] = useState(() => ({
+    displayName: account.displayName ?? "",
+    fullName: account.fullName ?? "",
+    streetAddress: account.streetAddress ?? "",
+    postalCode: account.postalCode ?? "",
+    city: account.city ?? "",
+    country: account.country as CountryCode | undefined,
+    contactPhone: account.contactPhone ?? "",
+  }));
   const form = useForm({
-    defaultValues: {
-      displayName: account.displayName ?? "",
-      fullName: account.fullName ?? "",
-      streetAddress: account.streetAddress ?? "",
-      postalCode: account.postalCode ?? "",
-      city: account.city ?? "",
-      country: account.country as CountryCode | undefined,
-      contactPhone: account.contactPhone ?? "",
-    },
+    defaultValues: saved,
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(false);
@@ -115,11 +119,18 @@ function ContactSection({ account }: { account: Account }) {
         toast.success(t("account.contact.saved"));
       } catch {
         setFailed(true);
+        return;
       }
+      // What's on screen is saved: the form starts over from it, unchanged.
+      form.update({ ...form.options, defaultValues: value });
+      form.reset();
+      setSaved(value);
     },
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
+  // An update reload waits while the details are being typed.
+  useUnsavedInput(form.useStore((state) => state.isDirty));
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -181,7 +192,7 @@ function ContactSection({ account }: { account: Account }) {
           className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }}
         >
           {text("displayName", t("account.contact.displayName"), {
@@ -322,6 +333,7 @@ function EmailSection({ account }: { account: Account }) {
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
+  useUnsavedInput(form.useStore((state) => state.isDirty));
 
   return (
     <SettingsGroup
@@ -343,7 +355,7 @@ function EmailSection({ account }: { account: Account }) {
           className="flex flex-col gap-3 sm:flex-row sm:items-start"
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }}
         >
           <form.Field

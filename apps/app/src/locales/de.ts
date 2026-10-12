@@ -8,6 +8,13 @@ export default {
     appDescription:
       "Erfasse die Münzen, Banknoten und Briefmarken, die du besitzt.",
   },
+  discardChanges: {
+    title: "Änderungen verwerfen?",
+    description:
+      "Was du hier geändert hast, ist nicht gespeichert. Verwerfen lässt sich nicht rückgängig machen.",
+    discard: "Verwerfen",
+    keepEditing: "Weiter bearbeiten",
+  },
   nav: {
     overview: "Übersicht",
     collection: "Sammlung",

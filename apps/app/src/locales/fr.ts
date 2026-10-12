@@ -8,6 +8,13 @@ export default {
     appDescription:
       "Enregistrez les pièces, billets et timbres que vous possédez.",
   },
+  discardChanges: {
+    title: "Abandonner les modifications ?",
+    description:
+      "Vos modifications ici ne sont pas enregistrées, et les abandonner est irréversible.",
+    discard: "Abandonner",
+    keepEditing: "Continuer la modification",
+  },
   nav: {
     overview: "Aperçu",
     collection: "Collection",

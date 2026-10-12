@@ -4,6 +4,13 @@ export default {
     saveFailed: "Something went wrong, so nothing was saved. Try again.",
     appDescription: "Record the coins, banknotes and stamps you own.",
   },
+  discardChanges: {
+    title: "Discard changes?",
+    description:
+      "What you changed here isn’t saved, and discarding it can’t be undone.",
+    discard: "Discard",
+    keepEditing: "Keep editing",
+  },
   nav: {
     overview: "Overview",
     collection: "Collection",

@@ -1,5 +1,6 @@
 "use client";
 
+import { FormDialog } from "@/components/form-dialog";
 import {
   ShrinkError,
   type ShrinkTarget,
@@ -7,7 +8,6 @@ import {
   shrinkImage,
 } from "@/lib/shrink-image";
 import { submitForm } from "@/lib/submit-form";
-import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -24,7 +24,6 @@ import {
 import { uploadErrors } from "@coinslite/backend/convex/photos/rules";
 import { Button } from "@coinslite/ui/button";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -212,18 +211,17 @@ export function CatalogImageDialog({
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
   const isDirty = form.useStore((state) => state.isDirty);
-  useUnsavedInput(open && (isDirty || picked !== undefined));
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
         undefined
       : undefined;
 
-  const submit = () => {
+  const submit = (from: Element) => {
     if (converting) return;
     if (!picked && !hasImage)
       setImageError(t("catalogImages.errors.imageRequired"));
-    void submitForm(form, t("common.saveFailed"));
+    void submitForm(form, t("common.saveFailed"), from);
   };
 
   const choose = async (file: File) => {
@@ -256,13 +254,17 @@ export function CatalogImageDialog({
   ] as const;
 
   return (
-    <Dialog open={open} onOpenChange={submitting ? undefined : onOpenChange}>
+    <FormDialog
+      open={open}
+      onOpenChange={submitting ? undefined : onOpenChange}
+      changed={isDirty || picked !== undefined}
+    >
       <DialogContent
         className="sm:max-w-[600px]"
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
-            submit();
+            submit(event.currentTarget);
           }
         }}
       >
@@ -271,7 +273,7 @@ export function CatalogImageDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            submit();
+            submit(event.currentTarget);
           }}
           className="flex min-h-0 flex-col"
         >
@@ -394,7 +396,7 @@ export function CatalogImageDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </FormDialog>
   );
 }
 

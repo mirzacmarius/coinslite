@@ -6,6 +6,13 @@ export default {
     saveFailed: "Noe gikk galt, så ingenting ble lagret. Prøv igjen.",
     appDescription: "Registrer myntene, sedlene og frimerkene du eier.",
   },
+  discardChanges: {
+    title: "Forkaste endringene?",
+    description:
+      "Det du har endret her, er ikke lagret, og kan ikke hentes tilbake når du forkaster det.",
+    discard: "Forkast",
+    keepEditing: "Fortsett å redigere",
+  },
   nav: {
     overview: "Oversikt",
     collection: "Samling",
