@@ -34,10 +34,14 @@ import { useId, useMemo, useState } from "react";
 import { z } from "zod";
 import type { ItemSelection } from "./use-item-selection";
 
-/** Undoes a Set purchase; says how many Items got their purchase back and skipped. */
-type UndoPurchase = () => Promise<
-  FunctionReturnType<typeof api.items.undoPurchase>
->;
+/**
+ * A Set purchase done: on how many Items, and how to undo it, which says how
+ * many Items got their purchase back and how many were skipped.
+ */
+type PurchaseSet = {
+  count: number;
+  undo: () => Promise<FunctionReturnType<typeof api.items.undoPurchase>>;
+};
 
 /**
  * Select mode's Set purchase, for a bought lot: a Purchase price per piece,
@@ -49,7 +53,7 @@ export function SetPurchaseButton({
   onSet,
 }: {
   selection: ItemSelection;
-  onSet: (result: { count: number; undo: UndoPurchase }) => void;
+  onSet: (result: PurchaseSet) => void;
 }) {
   const t = useI18n();
   // Each opening starts the form afresh.
@@ -104,7 +108,7 @@ function SetPurchaseDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   itemIds: Id<"items">[];
-  onSet: (result: { count: number; undo: UndoPurchase }) => void;
+  onSet: (result: PurchaseSet) => void;
 }) {
   const t = useI18n();
   const locale = useCurrentLocale();

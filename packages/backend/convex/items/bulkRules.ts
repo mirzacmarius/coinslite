@@ -1,11 +1,12 @@
 import { ConvexError } from "convex/values";
 import { type GradingScale, type ItemType, suitsGrade } from "./grades";
-import { type PurchaseInput, checkPurchase } from "./rules";
+import { type PurchaseInput, checkPurchase, purchaseFields } from "./rules";
 
 /**
- * Acting on several Items at once (spec 5.x, MUS-739), setting a bought
- * lot's purchase on them (COIN-119), and undoing a move, a grading or a
- * purchase (COIN-120). Pure, so the app shares the limit with the backend.
+ * Acting on several Items at once (spec 7, MUS-739), undoing a move or a
+ * grading (COIN-120), and setting a bought lot's purchase on them, which can
+ * be undone too (COIN-119). Pure, so the app shares the limit with the
+ * backend.
  */
 
 export const bulkLimits = {
@@ -126,45 +127,54 @@ export function purchasePatch(input: PurchaseInput, today: string) {
   return patch;
 }
 
-/** An Item's purchase: what Set purchase writes, and undoing it restores. */
-type Purchase = PurchaseInput;
-
-const purchaseFields = ["purchasePrice", "purchaseDate", "source"] as const;
-
 /**
  * Plans undoing a Set purchase: each Item it was set on (`before`, with the
  * purchase it had) gets back its own value, or none, for each field the
  * purchase set (`after`); the fields it left alone aren't touched. One that
  * already had those values wasn't changed by it and is left out. One deleted
- * (missing from `now`) or no longer holding the values set has changed since:
- * it's skipped and counted.
+ * (missing from `now`) or no longer holding the values set has changed since,
+ * and one whose own values the Item form wouldn't store as they are (`today`
+ * being the latest purchase date) can't have them back: both are skipped and
+ * counted.
  */
 export function planPurchaseUndo<ItemId>({
   before,
   after,
   now,
+  today,
 }: {
-  before: ReadonlyArray<{ itemId: ItemId } & Purchase>;
-  after: Purchase;
-  now: ReadonlyMap<ItemId, Purchase>;
+  before: ReadonlyArray<{ itemId: ItemId } & PurchaseInput>;
+  after: PurchaseInput;
+  now: ReadonlyMap<ItemId, PurchaseInput>;
+  today: string;
 }) {
   const fields = purchaseFields.filter((field) => after[field] !== undefined);
-  const holdsSet = (item: Purchase) =>
+  const holdsSet = (item: PurchaseInput) =>
     fields.every((field) => item[field] === after[field]);
   const changed = firstOfEach(before).filter((item) => !holdsSet(item));
   const restore = changed
-    .filter(({ itemId }) => {
-      const item = now.get(itemId);
-      return item !== undefined && holdsSet(item);
-    })
     .map((was) => ({
       itemId: was.itemId,
       // Each field set, even one the Item had no value for: that clears it.
       ...(Object.fromEntries(
         fields.map((field) => [field, was[field]]),
-      ) as Purchase),
-    }));
+      ) as PurchaseInput),
+    }))
+    .filter(({ itemId, ...own }) => {
+      const item = now.get(itemId);
+      return item !== undefined && holdsSet(item) && storable(own, today);
+    });
   return { restore, skipped: changed.length - restore.length };
+}
+
+/** Whether the Item form would store this purchase just as it is (items/rules.ts). */
+function storable(purchase: PurchaseInput, today: string) {
+  try {
+    const checked: PurchaseInput = checkPurchase(purchase, today);
+    return purchaseFields.every((field) => checked[field] === purchase[field]);
+  } catch {
+    return false;
+  }
 }
 
 /** Each Item once, as first listed, so none is restored twice. */

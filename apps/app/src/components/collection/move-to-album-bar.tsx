@@ -31,8 +31,9 @@ const undoOfferedFor = 10_000;
  * Select mode's bar on the Collection page: select the page or the whole
  * view, pick an Album (or none) and move every selected Item there at once,
  * set a Grade or a bought lot's purchase on them, or delete them. A move, a
- * Grade or a purchase can be undone from its toast. With `addTo`, the Album is set and moving into it is the only
- * action; `onLeave` ends picking either way.
+ * Grade or a purchase can be undone from its toast. With `addTo`, the Album
+ * is set and moving into it is the only action; `onLeave` ends picking
+ * either way.
  */
 export function MoveToAlbumBar({
   selection,

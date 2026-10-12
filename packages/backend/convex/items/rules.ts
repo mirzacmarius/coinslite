@@ -275,11 +275,15 @@ export function checkItem(input: ItemInput, today: string) {
   };
 }
 
-/** An Item's purchase as typed: Purchase price per piece, purchase date and source. */
-export type PurchaseInput = Pick<
-  ItemInput,
-  "purchasePrice" | "purchaseDate" | "source"
->;
+/** The fields of an Item's purchase: Purchase price per piece, purchase date and source. */
+export const purchaseFields = [
+  "purchasePrice",
+  "purchaseDate",
+  "source",
+] as const satisfies ReadonlyArray<keyof ItemInput>;
+
+/** An Item's purchase as typed, or as stored. */
+export type PurchaseInput = Pick<ItemInput, (typeof purchaseFields)[number]>;
 
 /**
  * Checks and tidies an Item's purchase, as `checkItem` does: a field left

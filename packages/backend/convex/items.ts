@@ -491,6 +491,16 @@ const gradedItem = v.object({
   grade: v.optional(v.string()),
 });
 
+/** An Item's purchase as Set purchase takes it: Purchase price per piece, purchase date and source. */
+const purchase = {
+  purchasePrice: v.optional(v.number()),
+  purchaseDate: v.optional(v.string()),
+  source: v.optional(v.string()),
+};
+
+/** An Item Set purchase was set on, with the purchase it had before: what undoing it needs. */
+const purchasedItem = v.object({ itemId: v.id("items"), ...purchase });
+
 /** How an undo went: Items put back, and Items skipped as changed since. */
 const undone = v.object({ restored: v.number(), skipped: v.number() });
 
@@ -679,16 +689,6 @@ export const undoGrade = mutation({
   },
 });
 
-/** An Item's purchase as Set purchase takes it: Purchase price per piece, purchase date and source. */
-const purchase = {
-  purchasePrice: v.optional(v.number()),
-  purchaseDate: v.optional(v.string()),
-  source: v.optional(v.string()),
-};
-
-/** An Item Set purchase was set on, with the purchase it had before: what undoing it needs. */
-const purchasedItem = v.object({ itemId: v.id("items"), ...purchase });
-
 /**
  * Sets a bought lot's purchase on several of the signed-in person's Items:
  * the Purchase price per piece, purchase date and source filled in, checked
@@ -723,8 +723,8 @@ export const setPurchase = mutation({
 /**
  * Undoes `setPurchase`: gives each Item it was set on (`before`) its own
  * value back, or none, for each field the purchase set (`set`), if the Item
- * still holds the values set (items/bulkRules.ts). The others are skipped
- * and counted.
+ * still holds the values set and the Item form would store its own as they
+ * are (items/bulkRules.ts). The others are skipped and counted.
  */
 export const undoPurchase = mutation({
   args: { before: v.array(purchasedItem), set: v.object(purchase) },
@@ -732,7 +732,12 @@ export const undoPurchase = mutation({
   handler: async (ctx, { before, set }) => {
     const owner = await requireSetUpUser(ctx);
     const now = await ownItemsNow(ctx, owner._id, before);
-    const { restore, skipped } = planPurchaseUndo({ before, after: set, now });
+    const { restore, skipped } = planPurchaseUndo({
+      before,
+      after: set,
+      now,
+      today: latestPurchaseDate(),
+    });
     for (const { itemId, ...was } of restore)
       await ctx.db.patch("items", itemId, was);
     return { restored: restore.length, skipped };

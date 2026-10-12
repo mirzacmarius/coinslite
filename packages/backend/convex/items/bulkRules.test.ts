@@ -356,6 +356,7 @@ describe("planPurchaseUndo", () => {
             },
           ],
         ]),
+        today: "2026-10-12",
       }),
     ).toStrictEqual({
       restore: [
@@ -379,6 +380,7 @@ describe("planPurchaseUndo", () => {
           ["krone", { purchasePrice: 12500, source: "Oslo Myntgalleri" }],
           ["ore", { purchasePrice: 11000, source: "Oslo Myntgalleri" }],
         ]),
+        today: "2026-10-12",
       }),
     ).toStrictEqual({
       restore: [{ itemId: "krone", purchasePrice: 9900, source: undefined }],
@@ -400,10 +402,40 @@ describe("planPurchaseUndo", () => {
           ["ore", { purchaseDate: "2026-09-30", source: "Auction" }],
           ["dime", { purchaseDate: "2025-01-01" }],
         ]),
+        today: "2026-10-12",
       }),
     ).toStrictEqual({
       restore: [{ itemId: "krone", purchaseDate: "2024-05-01" }],
       skipped: 0,
+    });
+  });
+
+  test("Items whose own purchase the Item form wouldn't store as it is are skipped and counted", () => {
+    expect(
+      planPurchaseUndo({
+        before: [
+          { itemId: "krone", purchasePrice: 9900, source: "Auction" },
+          { itemId: "ore", purchasePrice: -5, source: "Auction" },
+          { itemId: "dime", purchasePrice: 500, source: "x".repeat(201) },
+          { itemId: "dollar", purchasePrice: 500, source: " Auction " },
+          { itemId: "penny", purchaseDate: "2026-10-13" },
+        ],
+        after: { purchasePrice: 12500, source: "Oslo Myntgalleri" },
+        now: new Map(
+          ["krone", "ore", "dime", "dollar", "penny"].map((itemId) => [
+            itemId,
+            { purchasePrice: 12500, source: "Oslo Myntgalleri" },
+          ]),
+        ),
+        today: "2026-10-12",
+      }),
+    ).toStrictEqual({
+      restore: [
+        { itemId: "krone", purchasePrice: 9900, source: "Auction" },
+        // Only the fields set are put back, so only they are checked.
+        { itemId: "penny", purchasePrice: undefined, source: undefined },
+      ],
+      skipped: 3,
     });
   });
 
@@ -416,6 +448,7 @@ describe("planPurchaseUndo", () => {
         ],
         after: { source: "Oslo Myntgalleri" },
         now: new Map([["krone", { source: "Oslo Myntgalleri" }]]),
+        today: "2026-10-12",
       }),
     ).toStrictEqual({
       restore: [{ itemId: "krone", source: "Auction" }],
