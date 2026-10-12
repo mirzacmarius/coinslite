@@ -73,11 +73,11 @@ const denominations = [
   ...new Set(finlandCollectorCoins.map((coin) => coin.denomination)),
 ].sort((a, b) => denominationOrder(a) - denominationOrder(b));
 
-const variantTitles = {
-  proof: "erikoislyönti",
-  goldAndSilver: "kulta ja hopea",
+/** A decree's second coin of one denomination: its key's ending, and its title's in the decree's words. */
+const variants = {
+  proof: { key: "proof", title: "erikoislyöntinen" },
+  goldAndSilver: { key: "gold-and-silver", title: "kulta- ja hopeaseosta" },
 } as const;
-const variantKeys = { proof: "proof", goldAndSilver: "gold-and-silver" };
 
 const yearsOf = (coins: FinlandCollectorCoin[]) => {
   const years = coins.map((coin) => coin.year);
@@ -93,13 +93,13 @@ function entry(coin: FinlandCollectorCoin, position: number): Row {
     coin.decreeYear,
     coin.decreeNumber,
     slug(coin.denomination),
-    ...(coin.variant ? [variantKeys[coin.variant]] : []),
+    ...(coin.variant ? [variants[coin.variant].key] : []),
   ].join("-");
   return {
     id: key,
     parent_id: denominationKey(coin.denomination),
     title: coin.variant
-      ? `${coin.subject}, ${variantTitles[coin.variant]}`
+      ? `${coin.subject}, ${variants[coin.variant].title}`
       : coin.subject,
     sort_order: String(position + 1),
     is_addable: "true",

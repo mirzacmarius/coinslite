@@ -142,6 +142,17 @@ describe("a saved Finlex coin decree", () => {
     );
   });
 
+  test("reads a reeded edge", () => {
+    const [coin] = coinsOf(decree("2011-10"));
+    expect(coin).toMatchObject({
+      subject: "Pehr Kalm",
+      denomination: "10 euro",
+      edge: "reeded",
+      weight: 17,
+      diameter: 33,
+    });
+  });
+
   test("applies an amending decree's sections to the decree it amends", () => {
     const amendment = decree("2025-107");
     expect(amendment.amends).toEqual({ year: 2025, number: 58 });

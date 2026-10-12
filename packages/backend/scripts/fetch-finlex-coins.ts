@@ -9,6 +9,11 @@
 // with scripts/finlex-decree.ts. The Act on the Independence Jubilee Fund
 // ("juhlarahasto") matches the search and is left out.
 //
+// Not read yet: decrees titled in the plural, "… juhlarahoista", which issue
+// several coins of different designs (the 5 euro provinces, the 1 000
+// markkaa gold coins). Their titles contain neither search word; the script
+// lists them at the end so they stay in view.
+//
 // Nothing here runs on a deployment; run it by hand, then review the diff.
 // Usage: bun scripts/fetch-finlex-coins.ts [cache-dir]
 // With a cache directory, lists and decrees saved there are read instead of
@@ -37,7 +42,7 @@ const searches = ["juhlaraha", "keräilyraha"];
  * Years of issue for decrees that neither state one nor date the design in
  * a way the parser reads, taken from the decree's own words.
  */
-const years: Record<string, number> = {
+const issueYears: Record<string, number> = {
   // The design splits the date: "vuosiluvun alkuosa "19"" and "vuosiluvun
   // loppuosa "98"".
   "1177/1997": 1998,
@@ -153,7 +158,7 @@ for (const address of addresses) {
   decrees.push(decree);
 }
 
-const name = (decree: { year: number; number: number }) =>
+const citation = (decree: { year: number; number: number }) =>
   `${decree.number}/${decree.year}`;
 const amendments = decrees.filter((decree) => decree.amends);
 const bases = decrees
@@ -161,18 +166,20 @@ const bases = decrees
   .sort((a, b) => a.year - b.year || a.number - b.number);
 for (const amendment of amendments) {
   const base = amendment.amends;
-  if (!base || !bases.some((decree) => name(decree) === name(base)))
-    throw new Error(`${name(amendment)} amends a decree not found`);
+  if (!base || !bases.some((decree) => citation(decree) === citation(base)))
+    throw new Error(`${citation(amendment)} amends a decree not found`);
 }
 
 type Coin = DecreeCoin & { decreeYear: number; decreeNumber: number };
 const coins: Coin[] = [];
 for (const decree of bases) {
   const changes = amendments.filter(
-    (amendment) => amendment.amends && name(amendment.amends) === name(decree),
+    (amendment) =>
+      amendment.amends && citation(amendment.amends) === citation(decree),
   );
   const read = (one: Decree) =>
-    handRead[name(one)]?.(one) ?? coinsOf(one, { year: years[name(one)] });
+    handRead[citation(one)]?.(one) ??
+    coinsOf(one, { year: issueYears[citation(one)] });
   const found = read(amended(decree, changes));
   // Each entry links its decree alone, so an amendment may change no fact.
   if (
@@ -180,11 +187,11 @@ for (const decree of bases) {
     JSON.stringify(found) !== JSON.stringify(read(decree))
   )
     throw new Error(
-      `${changes.map(name).join(", ")} change the facts of ${name(decree)}; credit the amendment too`,
+      `${changes.map(citation).join(", ")} change the facts of ${citation(decree)}; credit the amendment too`,
     );
   if (changes.length > 0)
     report.push(
-      `${name(decree)}: applied ${changes.map(name).join(", ")}, no fact changed`,
+      `${citation(decree)}: applied ${changes.map(citation).join(", ")}, no fact changed`,
     );
   coins.push(
     ...found.map((coin) => ({
@@ -226,7 +233,7 @@ export type FinlandCollectorCoin = {
   composition?: string;
   weight: number;
   diameter: number;
-  edge?: "plain" | "lettered";
+  edge?: "plain" | "reeded" | "lettered";
   edgeLettering?: string;
   mint?: string;
   /** The mint master's initial. */
@@ -250,3 +257,8 @@ console.info(
   `${addresses.length} statutes found, ${bases.length} coin decrees (${bases[0]?.year}–${bases.at(-1)?.year}), ${amendments.length} amendments, ${coins.length} coins issued ${Math.min(...issued)}–${Math.max(...issued)}`,
 );
 for (const line of report) console.info(line);
+
+const plural = await statutesTitled("juhlarahoista");
+console.info(
+  `Not read yet: ${plural.length} statutes titled "… juhlarahoista":\n${plural.join("\n")}`,
+);

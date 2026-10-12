@@ -22,7 +22,7 @@ export type FinlandCollectorCoin = {
   composition?: string;
   weight: number;
   diameter: number;
-  edge?: "plain" | "lettered";
+  edge?: "plain" | "reeded" | "lettered";
   edgeLettering?: string;
   mint?: string;
   /** The mint master's initial. */
@@ -918,6 +918,7 @@ export const finlandCollectorCoins: FinlandCollectorCoin[] = [
     composition: "silver 92.5%; copper 7.5%",
     weight: 17,
     diameter: 33,
+    edge: "reeded",
     mint: "Suomen Rahapaja Oy",
     design:
       "Rahan arvopuolella on kuvattuna hahmo maanmittauslaitteineen sekä taustalla Niagaran putousta kuvaava maisema. Arvomerkintä 10 € on rahan oikeassa reunassa. Rahan vasemmalla puolella on teksti PEHR KALM 1716–1779. Rahan yläreunassa on teksti APOSTOLVS LINNAEI. Rahan tunnuspuolella on kuvattu vuorilaakeri. Kukissa on violetti väripainatus. Kasvin yläpuolella on teksti SUOMI FINLAND 2011. Kasvin alapuolella on teksti KALMIA LATIFOLIA.",

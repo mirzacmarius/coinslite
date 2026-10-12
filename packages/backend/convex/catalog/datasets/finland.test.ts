@@ -120,14 +120,14 @@ describe("the Finland collector coins dataset", () => {
     expect(
       byKey.get("fi-collector-2011-959-10-euro-proof")?.values,
     ).toMatchObject({
-      title: "Juhani Aho ja suomalainen kirjallisuus, erikoislyönti",
+      title: "Juhani Aho ja suomalainen kirjallisuus, erikoislyöntinen",
       fineness: 0.925,
       strike: "proof",
     });
     expect(
       byKey.get("fi-collector-1995-1265-10-markkaa-gold-and-silver")?.values,
     ).toMatchObject({
-      title: "EU-juhlaraha, kulta ja hopea",
+      title: "EU-juhlaraha, kulta- ja hopeaseosta",
       material: "bimetallic",
       weight: 12.2,
     });

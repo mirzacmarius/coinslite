@@ -9,8 +9,8 @@
  * denominations gives the facts that differ in paragraphs beginning
  * "Nimellisarvoltaan 20 euron …", and one whose proofs are struck in another
  * alloy says so in a paragraph beginning "Erikoislyöntinen juhlaraha …".
- * Anything outside the pattern throws, so the script's report shows what to
- * read by hand rather than storing a wrong fact.
+ * Anything outside the pattern throws and stops the script, so a person
+ * reads that decree by hand rather than a wrong fact being stored.
  */
 
 export type DecreeSection = {
@@ -52,7 +52,7 @@ export type DecreeCoin = {
   weight: number;
   /** Millimetres. */
   diameter: number;
-  edge?: "plain" | "lettered";
+  edge?: "plain" | "reeded" | "lettered";
   edgeLettering?: string;
   mint?: string;
   /** The mint master's initial, where the decree gives it. */
@@ -115,10 +115,16 @@ export function readDecree(xml: string): Decree {
   };
 }
 
-/** The decree as its amendments left it: each amending section replaces the section of that number. */
+/**
+ * The decree as its amendments left it, applied oldest first: each amending
+ * section replaces the section of that number.
+ */
 export function amended(decree: Decree, amendments: Decree[]): Decree {
   const sections = decree.sections.map((section) => ({ ...section }));
-  for (const amendment of amendments) {
+  const oldestFirst = [...amendments].sort(
+    (a, b) => a.year - b.year || a.number - b.number,
+  );
+  for (const amendment of oldestFirst) {
     for (const change of amendment.sections) {
       const index = sections.findIndex(({ num }) => num === change.num);
       if (index === -1)
@@ -164,6 +170,7 @@ const decimal = (text: string) => Number(text.replace(",", "."));
 
 /** "Valtiovarainministeriön asetus Tove Jansson -juhlarahasta": "Tove Jansson". */
 function subjectOf(title: string, intro: string) {
+  // "Valtioministeriön" is decree 231/2023's own spelling.
   const name = title
     .replace(
       /^(?:Valtiovarainministeriön|Valtioministeriön) (?:asetus|päätös) |^Asetus /,
@@ -197,7 +204,6 @@ const metalNames: Record<string, string> = {
   sinkkiä: "zinc",
   tinaa: "tin",
   nikkeliä: "nickel",
-  rautaa: "iron",
 };
 
 type Alloy = Pick<
@@ -266,18 +272,35 @@ function edgeOf(
   }
   if (paragraphs.some((p) => /täysin sileä syrjä|lieriöpinta on sileä/.test(p)))
     return { edge: "plain" };
+  if (paragraphs.some((p) => /(?:reuna|syrjä) on rihlattu/.test(p)))
+    return { edge: "reeded" };
   return {};
 }
 
-/** The design described: the paragraphs after the one introducing the description. */
-export function designOf(decree: Decree) {
-  return decree.sections
-    .flatMap((section) => {
-      const start = section.paragraphs.findIndex((p) => /selitelmän/.test(p));
-      return start === -1 ? [] : section.paragraphs.slice(start + 1);
-    })
-    .join(" ");
+/**
+ * The sections describing the design: the paragraphs after the one that
+ * introduces the description ("… on seuraavan selitelmän ja kuvan
+ * mukainen"), with the denomination that paragraph names, if only one.
+ */
+function designSectionsOf(decree: Decree) {
+  return decree.sections.flatMap((section) => {
+    const start = section.paragraphs.findIndex((p) => /selitelmän/.test(p));
+    if (start === -1) return [];
+    const named = denominationsIn(section.paragraphs[start] ?? "");
+    return [
+      {
+        paragraphs: section.paragraphs.slice(start + 1),
+        denomination: named.length === 1 ? named[0] : undefined,
+      },
+    ];
+  });
 }
+
+/** The whole design described, for a decree read by hand. */
+export const designOf = (decree: Decree) =>
+  designSectionsOf(decree)
+    .flatMap((section) => section.paragraphs)
+    .join(" ");
 
 /**
  * Each coin the decree issues, one per denomination, and a second for a
@@ -300,31 +323,16 @@ export function coinsOf(
   if (denominations.length === 0)
     throw new Error(`${decree.number}/${decree.year} names no denomination`);
 
-  /** The design sections, each with the denomination its first paragraph names, if only one. */
-  const designSections = decree.sections.flatMap((section) => {
-    const start = section.paragraphs.findIndex((p) => /selitelmän/.test(p));
-    if (start === -1) return [];
-    const named = denominationsIn(section.paragraphs[start] ?? "");
-    return [
-      {
-        paragraphs: section.paragraphs.slice(start + 1),
-        denomination: named.length === 1 ? named[0] : undefined,
-      },
-    ];
-  });
+  const designSections = designSectionsOf(decree);
   const designParagraphs = new Set(
     designSections.flatMap((section) => section.paragraphs),
   );
   const factParagraphs = all.filter((p) => !designParagraphs.has(p));
-
   const proofAlloy = (p: string) => /^Erikoislyöntinen juhlaraha/.test(p);
-  const variants: Array<"proof" | undefined> = factParagraphs.some(proofAlloy)
-    ? [undefined, "proof"]
-    : [undefined];
 
   return denominations.flatMap((denomination) => {
     /** The paragraphs about this coin: those naming it, then those naming no other denomination. */
-    const about = (paragraphs: string[]) => {
+    const aboutThisCoin = (paragraphs: string[]) => {
       const specific: string[] = [];
       const general: string[] = [];
       for (const paragraph of paragraphs) {
@@ -336,7 +344,7 @@ export function coinsOf(
       }
       return [...specific, ...general];
     };
-    const facts = about(factParagraphs);
+    const facts = aboutThisCoin(factParagraphs);
     const design = designSections
       .filter(
         (section) =>
@@ -380,13 +388,17 @@ export function coinsOf(
       .map(
         (p) =>
           !/voi (?:lisäksi )?olla/.test(p) &&
-          /johtajan sukunim(?:en|ien) alkukirjai(?:n|met) (?:[A-ZÅÄÖ]+ ja )?([A-ZÅÄÖ])\b/.exec(
+          // The mint master's initial comes after the artist's: "P ja M".
+          /johtajan sukunim(?:en|ien) alkukirjai(?:n|met) (?:[A-ZÅÄÖ]+ ja )?([A-ZÅÄÖ])(?![\p{L}])/u.exec(
             p,
           )?.[1],
       )
       .find(Boolean);
     const mint = mintOf(text);
-    const edge = edgeOf(all);
+    const edge = edgeOf([...facts, ...design]);
+    const variants: Array<"proof" | undefined> = facts.some(proofAlloy)
+      ? [undefined, "proof"]
+      : [undefined];
 
     // The finish may be given among the facts or at the end of the design.
     const finish = [...facts, ...design];
