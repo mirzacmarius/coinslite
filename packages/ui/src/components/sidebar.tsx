@@ -203,7 +203,7 @@ const Sidebar = React.forwardRef<
     side?: "left" | "right";
     variant?: "sidebar" | "floating" | "inset";
     collapsible?: "offcanvas" | "icon" | "none";
-    /** Its name, for screen readers when it opens as a sheet on phones. */
+    /** Its name, for screen readers: its landmark's, or its sheet's on phones. */
     label: string;
   }
 >(
@@ -293,12 +293,14 @@ const Sidebar = React.forwardRef<
           )}
           {...props}
         >
-          <div
+          {/* A landmark, so all it holds (logo, plan usage) sits in one. */}
+          <aside
+            aria-label={label}
             data-sidebar="sidebar"
             className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
           >
             {children}
-          </div>
+          </aside>
         </div>
       </div>
     );

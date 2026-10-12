@@ -147,9 +147,10 @@ export function AppShell({
         }
       >
         <SidebarInset className="min-w-0 md:overflow-hidden">
-          <div className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
+          {/* The phone top bar; a landmark (banner), as everything outside `main` is. */}
+          <header className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
             <WorkspaceMenu className="h-8" />
-          </div>
+          </header>
           <main
             id="main"
             tabIndex={-1}

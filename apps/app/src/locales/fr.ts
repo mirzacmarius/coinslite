@@ -25,6 +25,7 @@ export default {
   shell: {
     skipToContent: "Aller au contenu",
     primaryNavigation: "Menu principal",
+    sidebar: "Barre latérale",
     signOut: "Se déconnecter",
     workspaceMenu: "Compte et préférences",
     plans: "Formules",

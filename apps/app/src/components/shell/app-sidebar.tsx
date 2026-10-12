@@ -84,7 +84,7 @@ export function AppSidebar({
     <Sidebar
       collapsible="icon"
       variant="inset"
-      label={t("shell.primaryNavigation")}
+      label={t("shell.sidebar")}
       // Clear of a notch or the rounded corners of a phone held sideways.
       className="pl-[max(0.5rem,env(safe-area-inset-left))] pt-[max(0.5rem,env(safe-area-inset-top))]"
     >
