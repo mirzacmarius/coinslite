@@ -45,30 +45,47 @@ describe("totalsOpen", () => {
   const open = { ...unchosen, totalsOpen: true };
   const collapsed = { ...unchosen, totalsOpen: false };
 
-  test("unchosen, they're collapsed on a phone and open on wider screens", () => {
-    expect(totalsOpen(unchosen, { narrowed: false, phone: true })).toBe(false);
-    expect(totalsOpen(unchosen, { narrowed: false, phone: false })).toBe(true);
+  test("unchosen, they're open only where the list still starts in view", () => {
+    const at = (width: number, height: number) =>
+      totalsOpen(unchosen, { narrowed: false, screen: { width, height } });
+    expect(at(390, 844)).toBe(false);
+    expect(at(1280, 800)).toBe(false);
+    expect(at(1440, 1100)).toBe(true);
   });
 
-  test("the screen decides while its size isn't known", () => {
+  test("the screen needs to be at least 1024 px wide and 1000 px tall", () => {
+    const at = (width: number, height: number) =>
+      totalsOpen(unchosen, { narrowed: false, screen: { width, height } });
+    expect(at(1024, 1000)).toBe(true);
+    expect(at(1023, 1400)).toBe(false);
+    expect(at(2560, 999)).toBe(false);
+  });
+
+  test("the page's CSS decides while the screen size isn't known", () => {
     expect(
-      totalsOpen(unchosen, { narrowed: false, phone: undefined }),
+      totalsOpen(unchosen, { narrowed: false, screen: undefined }),
     ).toBeUndefined();
   });
 
   test("the device's choice wins over the screen size", () => {
-    expect(totalsOpen(open, { narrowed: false, phone: true })).toBe(true);
-    expect(totalsOpen(collapsed, { narrowed: false, phone: false })).toBe(
+    const phone = { width: 390, height: 844 };
+    const desktop = { width: 1440, height: 1100 };
+    expect(totalsOpen(open, { narrowed: false, screen: phone })).toBe(true);
+    expect(totalsOpen(collapsed, { narrowed: false, screen: desktop })).toBe(
       false,
     );
-    expect(totalsOpen(collapsed, { narrowed: false, phone: undefined })).toBe(
+    expect(totalsOpen(collapsed, { narrowed: false, screen: undefined })).toBe(
       false,
     );
   });
 
   test("a searched or filtered view starts collapsed, whatever was chosen", () => {
-    expect(totalsOpen(open, { narrowed: true, phone: false })).toBe(false);
-    expect(totalsOpen(unchosen, { narrowed: true, phone: undefined })).toBe(
+    const desktop = { width: 1440, height: 1100 };
+    expect(totalsOpen(open, { narrowed: true, screen: desktop })).toBe(false);
+    expect(totalsOpen(unchosen, { narrowed: true, screen: desktop })).toBe(
+      false,
+    );
+    expect(totalsOpen(unchosen, { narrowed: true, screen: undefined })).toBe(
       false,
     );
   });
