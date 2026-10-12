@@ -22,8 +22,3 @@ export function safeNextPath(
 /** "?next=…" for links between the auth pages, or nothing when it's the home page. */
 export const nextQuery = (next: string) =>
   next === "/" ? "" : `?next=${encodeURIComponent(next)}`;
-
-/** A full page load, so the server sees the new session before rendering. */
-export function goTo(path: string) {
-  window.location.assign(path);
-}

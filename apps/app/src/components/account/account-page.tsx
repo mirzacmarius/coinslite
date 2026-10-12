@@ -9,7 +9,9 @@ import { AppearancePicker } from "@/components/preferences";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
+import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
+import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { contactLimits } from "@coinslite/backend/convex/account/rules";
@@ -97,22 +99,27 @@ function ContactSection({ account }: { account: Account }) {
         .sort((a, b) => a.label.localeCompare(b.label, locale)),
     [locale],
   );
+  // The details as stored; an untouched form follows them.
+  const stored = {
+    displayName: account.displayName ?? "",
+    fullName: account.fullName ?? "",
+    streetAddress: account.streetAddress ?? "",
+    postalCode: account.postalCode ?? "",
+    city: account.city ?? "",
+    country: account.country as CountryCode | undefined,
+    contactPhone: account.contactPhone ?? "",
+  };
+  // The details last sent, as typed: the stored copy is trimmed.
+  const [sent, setSent] = useState(stored);
   const form = useForm({
-    defaultValues: {
-      displayName: account.displayName ?? "",
-      fullName: account.fullName ?? "",
-      streetAddress: account.streetAddress ?? "",
-      postalCode: account.postalCode ?? "",
-      city: account.city ?? "",
-      country: account.country as CountryCode | undefined,
-      contactPhone: account.contactPhone ?? "",
-    },
+    defaultValues: stored,
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setFailed(false);
       try {
         await updateContact(value);
         toast.success(t("account.contact.saved"));
+        setSent(value);
       } catch {
         setFailed(true);
       }
@@ -120,6 +127,12 @@ function ContactSection({ account }: { account: Account }) {
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
+  // A new deployment's reload waits while the details differ from both.
+  useUnsavedInput(
+    form.useStore(
+      (state) => formChanged(state, stored) && formChanged(state, sent),
+    ),
+  );
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -181,7 +194,7 @@ function ContactSection({ account }: { account: Account }) {
           className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }}
         >
           {text("displayName", t("account.contact.displayName"), {
@@ -292,6 +305,9 @@ const emailErrorKeys = {
   TOO_MANY_REQUESTS: "account.email.tooMany",
 } as const;
 
+/** The change-email form before anything is typed. */
+const noNewEmail = { newEmail: "" };
+
 function EmailSection({ account }: { account: Account }) {
   const t = useI18n();
   const requestEmailChange = useMutation(api.account.requestEmailChange);
@@ -299,7 +315,7 @@ function EmailSection({ account }: { account: Account }) {
   const [error, setError] = useState<string>();
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const form = useForm({
-    defaultValues: { newEmail: "" },
+    defaultValues: noNewEmail,
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setError(undefined);
@@ -322,6 +338,7 @@ function EmailSection({ account }: { account: Account }) {
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
+  useUnsavedInput(form.useStore((state) => formChanged(state, noNewEmail)));
 
   return (
     <SettingsGroup
@@ -343,7 +360,7 @@ function EmailSection({ account }: { account: Account }) {
           className="flex flex-col gap-3 sm:flex-row sm:items-start"
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }}
         >
           <form.Field

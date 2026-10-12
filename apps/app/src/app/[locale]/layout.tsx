@@ -1,5 +1,6 @@
 import "@coinslite/ui/globals.css";
 import { Analytics } from "@/components/analytics";
+import { LeavePageGuard } from "@/components/leave-page-guard";
 import { NewDeploymentReload } from "@/components/new-deployment-reload";
 import { ThemeProvider } from "@/components/theme-provider";
 import { brand } from "@/lib/brand";
@@ -89,6 +90,7 @@ export default async function RootLayout({
           </TooltipProvider>
           <Toaster />
           <NewDeploymentReload />
+          <LeavePageGuard />
           <Analytics />
         </ThemeProvider>
       </body>

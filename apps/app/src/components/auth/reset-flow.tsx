@@ -1,6 +1,6 @@
 "use client";
 
-import { goTo } from "@/lib/next-path";
+import { goTo } from "@/lib/go-to";
 import { useI18n } from "@/locales/client";
 import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { useForm } from "@tanstack/react-form";

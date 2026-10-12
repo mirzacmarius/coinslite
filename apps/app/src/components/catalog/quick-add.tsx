@@ -2,6 +2,7 @@
 
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useAlbums } from "@/components/albums/use-albums";
+import { FormDialog } from "@/components/form-dialog";
 import { useGradeLabels } from "@/components/items/grade-labels";
 import {
   ItemLimitNotice,
@@ -21,7 +22,6 @@ import {
 import { itemLimits } from "@coinslite/backend/convex/items/rules";
 import { Button } from "@coinslite/ui/button";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -140,7 +140,11 @@ function QuickAddDialog({
 
   const submit = async () => {
     setSubmitted(true);
-    if (!quantityValid || saving) return;
+    if (!quantityValid) {
+      document.getElementById(quantityId)?.focus();
+      return;
+    }
+    if (saving) return;
     setSaving(true);
     setFailed(undefined);
     // Adding it clears the want (wants.ts), which the toast says.
@@ -184,7 +188,11 @@ function QuickAddDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      changed={quantity !== "1" || grade !== undefined || album !== undefined}
+    >
       <DialogContent
         className="sm:max-w-[480px]"
         onKeyDown={(event) => {
@@ -311,6 +319,6 @@ function QuickAddDialog({
           </div>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+    </FormDialog>
   );
 }

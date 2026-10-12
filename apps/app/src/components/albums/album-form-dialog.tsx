@@ -1,7 +1,8 @@
 "use client";
 
+import { FormDialog } from "@/components/form-dialog";
+import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
-import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -12,7 +13,6 @@ import {
 } from "@coinslite/backend/convex/albums/rules";
 import { Button } from "@coinslite/ui/button";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -127,8 +127,7 @@ export function AlbumFormDialog({
   });
   const submitted = form.useStore((state) => state.submissionAttempts > 0);
   const submitting = form.useStore((state) => state.isSubmitting);
-  const isDirty = form.useStore((state) => state.isDirty);
-  useUnsavedInput(open && isDirty);
+  const changed = form.useStore((state) => formChanged(state, defaults));
   const errorOf = (errors: unknown[]) =>
     submitted
       ? errors.filter((error) => typeof error === "string").join(" ") ||
@@ -136,7 +135,7 @@ export function AlbumFormDialog({
       : undefined;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>
       <DialogContent
         className="sm:max-w-[560px]"
         onOpenAutoFocus={(event) => {
@@ -146,7 +145,7 @@ export function AlbumFormDialog({
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }
         }}
       >
@@ -155,7 +154,7 @@ export function AlbumFormDialog({
           noValidate
           onSubmit={(event) => {
             event.preventDefault();
-            void submitForm(form, t("common.saveFailed"));
+            void submitForm(form, t("common.saveFailed"), event.currentTarget);
           }}
           className="flex min-h-0 flex-col"
         >
@@ -320,6 +319,6 @@ export function AlbumFormDialog({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </FormDialog>
   );
 }

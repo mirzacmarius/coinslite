@@ -1,7 +1,8 @@
 "use client";
 
+import { FormDialog } from "@/components/form-dialog";
 import { useGradeLabels } from "@/components/items/grade-labels";
-import { useUnsavedInput } from "@/lib/unsaved-input";
+import { formChanged } from "@/lib/discard-changes";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import {
@@ -24,7 +25,6 @@ import {
 } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -57,7 +57,7 @@ import {
   X,
 } from "lucide-react";
 import type * as React from "react";
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { CatalogImageAdmin } from "./catalog-image-admin";
 import {
   type NodeFormField,
@@ -150,6 +150,7 @@ export function CatalogNodeSheet({
     open && target.mode === "edit" ? { key: target.key } : "skip",
   );
   const titleRef = useRef<HTMLInputElement>(null);
+  const [changed, setChanged] = useState(false);
 
   let body: React.ReactNode;
   if (target.mode === "create") {
@@ -157,6 +158,7 @@ export function CatalogNodeSheet({
       <NodeForm
         parent={target.parent}
         titleRef={titleRef}
+        onChanged={setChanged}
         onDone={() => onOpenChange(false)}
       />
     );
@@ -183,13 +185,14 @@ export function CatalogNodeSheet({
       <NodeForm
         node={node}
         titleRef={titleRef}
+        onChanged={setChanged}
         onDone={() => onOpenChange(false)}
       />
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>
       <DialogContent
         className={sheetClass}
         onOpenAutoFocus={(event) => {
@@ -201,7 +204,7 @@ export function CatalogNodeSheet({
       >
         {body}
       </DialogContent>
-    </Dialog>
+    </FormDialog>
   );
 }
 
@@ -304,11 +307,14 @@ function NodeForm({
   parent = null,
   node,
   titleRef,
+  onChanged,
   onDone,
 }: {
   parent?: ParentNode | null;
   node?: EditedNode;
   titleRef: React.RefObject<HTMLInputElement | null>;
+  /** Told whether the form holds changes, so closing the sheet can ask first. */
+  onChanged: (changed: boolean) => void;
   onDone: () => void;
 }) {
   const t = useI18n();
@@ -366,8 +372,8 @@ function NodeForm({
   });
   const values = form.useStore((state) => state.values);
   const submitting = form.useStore((state) => state.isSubmitting);
-  const isDirty = form.useStore((state) => state.isDirty);
-  useUnsavedInput(isDirty);
+  const changed = form.useStore((state) => formChanged(state, defaults));
+  useEffect(() => onChanged(changed), [changed, onChanged]);
   const problems = useMemo(
     () => problemsOf(values, { creating }),
     [values, creating],
