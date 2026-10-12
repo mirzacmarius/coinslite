@@ -858,8 +858,10 @@ export default {
     pagination: "Pages",
     range: "{from}–{to} sur {total}",
     pageOf: "Page {page} sur {pages}",
+    firstPage: "Première page",
     previousPage: "Page précédente",
     nextPage: "Page suivante",
+    lastPage: "Dernière page",
     incomplete:
       "Votre collection est trop grande pour être parcourue en une fois\u00a0: cette vue porte sur les {count} premiers objets que vous avez ajoutés.",
     showInCollection: "Afficher dans la collection",

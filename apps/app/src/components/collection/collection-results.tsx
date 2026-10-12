@@ -8,7 +8,13 @@ import { useFormatters } from "@/locales/use-formatters";
 import { Button } from "@coinslite/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
 import type { CollectionLayout } from "./collection-display";
@@ -355,7 +361,7 @@ function ItemGrid({
   );
 }
 
-/** "26–50 of 134" and the previous and next page. */
+/** "26–50 of 134", "Page 2 of 6" and the first, previous, next and last page. */
 export function Pagination({
   result,
   pageSize,
@@ -384,6 +390,13 @@ export function Pagination({
       {result.pageCount > 1 && (
         <span className="flex items-center gap-1">
           <PageButton
+            label={t("collection.firstPage")}
+            disabled={result.page <= 1}
+            onClick={() => onPageChange(1)}
+          >
+            <ChevronsLeft strokeWidth={1.75} aria-hidden="true" />
+          </PageButton>
+          <PageButton
             label={t("collection.previousPage")}
             disabled={result.page <= 1}
             onClick={() => onPageChange(result.page - 1)}
@@ -402,6 +415,13 @@ export function Pagination({
             onClick={() => onPageChange(result.page + 1)}
           >
             <ChevronRight strokeWidth={1.75} aria-hidden="true" />
+          </PageButton>
+          <PageButton
+            label={t("collection.lastPage")}
+            disabled={result.page >= result.pageCount}
+            onClick={() => onPageChange(result.pageCount)}
+          >
+            <ChevronsRight strokeWidth={1.75} aria-hidden="true" />
           </PageButton>
         </span>
       )}
