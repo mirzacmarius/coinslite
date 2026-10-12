@@ -65,7 +65,8 @@ export const CollectionSearch = forwardRef<
             setText("");
             onChange("");
           }}
-          className="absolute right-1 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+          // 24 × 24 px at least: the smallest target WCAG 2.2 allows.
+          className="absolute right-0.5 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-3.5" aria-hidden="true" />
         </button>
