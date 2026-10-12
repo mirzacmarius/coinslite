@@ -1716,6 +1716,12 @@ export default {
       "Det finnes ingenting på denne adressen. Den kan ha blitt flyttet, eller lenken kan være feil.",
     home: "Gå til oversikten",
   },
+  error: {
+    title: "Noe gikk galt",
+    description: "Siden kunne ikke vises. Prøv igjen, eller gå til oversikten.",
+    retry: "Prøv igjen",
+    home: "Gå til oversikten",
+  },
   scanner: {
     scan: "Skann mynt",
     title: "Skann mynt",

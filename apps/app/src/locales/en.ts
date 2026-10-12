@@ -1691,6 +1691,13 @@ export default {
       "There's nothing at this address. It may have moved, or the link may be wrong.",
     home: "Go to the Overview",
   },
+  error: {
+    title: "Something went wrong",
+    description:
+      "This page couldn't be shown. Try again, or go to the Overview.",
+    retry: "Try again",
+    home: "Go to the Overview",
+  },
   scanner: {
     scan: "Scan coin",
     title: "Scan coin",

@@ -1763,6 +1763,13 @@ export default {
       "Il n’y a rien à cette adresse. La page a peut-être été déplacée, ou le lien est erroné.",
     home: "Aller à l’aperçu",
   },
+  error: {
+    title: "Une erreur s’est produite",
+    description:
+      "Cette page n’a pas pu s’afficher. Réessayez ou allez à l’aperçu.",
+    retry: "Réessayer",
+    home: "Aller à l’aperçu",
+  },
   scanner: {
     scan: "Scanner une pièce",
     title: "Scanner une pièce",
