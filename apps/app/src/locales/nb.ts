@@ -23,6 +23,7 @@ export default {
   shell: {
     skipToContent: "Hopp til innhold",
     primaryNavigation: "Hovedmeny",
+    sidebar: "Sidepanel",
     signOut: "Logg ut",
     workspaceMenu: "Konto og innstillinger",
     plans: "Abonnement",

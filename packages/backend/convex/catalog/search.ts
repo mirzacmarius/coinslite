@@ -9,7 +9,7 @@ import {
   catalogKind,
   preciousMetal,
 } from "../utils/validators";
-import { isCountryNode } from "./browse";
+import { heldCount, isCountryNode } from "./browse";
 import { catalogLimits, searchTextOf, valuesFromFields } from "./fields";
 import {
   catalogSearchLimits,
@@ -43,6 +43,8 @@ const hit = v.object({
   metal: v.optional(preciousMetal),
   weight: v.optional(v.number()),
   fineness: v.optional(v.number()),
+  /** With `withHeld`, how many pieces of a Catalog entry the person holds. */
+  held: v.optional(v.number()),
 });
 
 export type CatalogSearchHit = typeof hit.type;
@@ -70,14 +72,17 @@ const hitOf = (node: Doc<"catalogNodes">): CatalogSearchHit => ({
  * The nodes matching every word typed (each word starts a word of the title,
  * denomination, series or country), best matches first, grouped by country
  * and then series. At most 50; `capped` says there were more. The Catalog
- * picker asks for one Item type's Catalog entries only. Nothing matches while
- * the Catalog is hidden from the person (featureFlags.ts).
+ * picker asks for one Item type's Catalog entries only, and while selecting
+ * several, `withHeld`, how many of each the person holds, so the results
+ * come complete in one answer. Nothing matches while the Catalog is hidden
+ * from the person (featureFlags.ts).
  */
 export const find = query({
   args: {
     text: v.string(),
     itemType: v.optional(catalogItemType),
     entriesOnly: v.optional(v.boolean()),
+    withHeld: v.optional(v.boolean()),
   },
   returns: v.object({
     groups: v.array(
@@ -89,7 +94,7 @@ export const find = query({
     ),
     capped: v.boolean(),
   }),
-  handler: async (ctx, { text, itemType, entriesOnly }) => {
+  handler: async (ctx, { text, itemType, entriesOnly, withHeld }) => {
     const user = await ctx.db.get("users", await requireUserId(ctx));
     const words = searchQueryWords(text);
     if (words.length === 0 || !(await catalogVisibleTo(ctx, user)))
@@ -108,8 +113,18 @@ export const find = query({
       matchesEveryWord(words, node.searchText),
     );
     const shown = matches.slice(0, catalogSearchLimits.results);
+    const hits = await Promise.all(
+      shown.map(async (node) =>
+        withHeld && user && node.kind === "entry"
+          ? {
+              ...hitOf(node),
+              held: (await heldCount(ctx, user._id, node._id)).held,
+            }
+          : hitOf(node),
+      ),
+    );
     return {
-      groups: groupByCountryAndSeries(shown.map(hitOf)),
+      groups: groupByCountryAndSeries(hits),
       capped: matches.length > shown.length,
     };
   },

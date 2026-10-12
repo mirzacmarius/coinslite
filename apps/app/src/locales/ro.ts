@@ -24,6 +24,7 @@ export default {
   shell: {
     skipToContent: "Sari la conținut",
     primaryNavigation: "Meniu principal",
+    sidebar: "Bară laterală",
     signOut: "Deconectare",
     workspaceMenu: "Cont și preferințe",
     plans: "Planuri",

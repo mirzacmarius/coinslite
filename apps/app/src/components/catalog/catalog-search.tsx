@@ -30,12 +30,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HeldCount } from "./catalog-rows";
 import { useCatalogFormat } from "./use-catalog-format";
 import type { SelectableEntry } from "./use-entry-selection";
 
 export type { CatalogSearchHit };
+
+/** How long typing pauses before the search runs, as in the Collection's search. */
+const pause = 250;
 
 /**
  * Selecting several Catalog entries instead of picking one (the Catalog
@@ -83,29 +86,50 @@ export function CatalogSearch({
 }: CatalogSearchProps) {
   const t = useI18n();
   const [text, setText] = useState("");
+  // What's searched for: the text, once typing pauses.
+  const [query, setQuery] = useState("");
+  useEffect(() => {
+    if (text === query) return;
+    const timer = setTimeout(() => setQuery(text), pause);
+    return () => clearTimeout(timer);
+  }, [text, query]);
   const searching = searchQueryWords(text).length > 0;
+  // While selecting, each entry found comes with how many the person holds.
   const latest = useQuery(
     api.catalog.search.find,
-    searching ? { text, itemType, entriesOnly } : "skip",
+    searching && searchQueryWords(query).length > 0
+      ? {
+          text: query,
+          itemType,
+          entriesOnly,
+          withHeld: selection ? true : undefined,
+        }
+      : "skip",
   );
-  // While the next keystroke's results load, keep showing the last ones.
-  const previous = useRef(latest);
-  if (latest !== undefined) previous.current = latest;
-  const results = searching ? latest ?? previous.current : undefined;
-  // While selecting, how many of each entry found the person holds.
-  const entryKeys = selection
-    ? (results?.groups ?? []).flatMap((group) =>
-        group.nodes.flatMap((hit) => (hit.kind === "entry" ? [hit.key] : [])),
-      )
-    : [];
-  const heldRows = useQuery(
-    api.catalog.sets.heldCounts,
-    entryKeys.length > 0 ? { keys: entryKeys } : "skip",
+  // While the next search's results load, keep showing the last ones, with
+  // the text they were found for.
+  const last = useRef<{ text: string; results: NonNullable<typeof latest> }>(
+    undefined,
   );
-  const held = new Map(heldRows?.map((row) => [row.key, row.held]));
+  if (latest !== undefined) last.current = { text: query, results: latest };
+  const shown = searching ? last.current : undefined;
+  // Showing results for other text than what's typed, or none yet.
+  const behind = searching && (text !== query || latest === undefined);
 
   return (
-    <Command shouldFilter={false} loop label={placeholder}>
+    <Command
+      shouldFilter={false}
+      loop
+      label={placeholder}
+      onKeyDown={(event) => {
+        // Enter doesn't pick from results for older text: it searches at
+        // once, and picks once the results for what's typed are in.
+        if (event.key === "Enter" && behind && !event.nativeEvent.isComposing) {
+          event.preventDefault();
+          setQuery(text);
+        }
+      }}
+    >
       <CommandInput
         value={text}
         onValueChange={setText}
@@ -115,26 +139,26 @@ export function CatalogSearch({
       <CommandList className="max-h-[min(440px,60dvh)]">
         {!searching ? (
           idle ?? <Note>{t("catalogSearch.minLength")}</Note>
-        ) : results === undefined ? (
+        ) : shown === undefined ? (
           <LoadingRows />
-        ) : results.groups.length === 0 ? (
-          <Note>{t("catalogSearch.noResults", { text: text.trim() })}</Note>
+        ) : shown.results.groups.length === 0 ? (
+          <Note>
+            {t("catalogSearch.noResults", { text: shown.text.trim() })}
+          </Note>
         ) : (
-          results.groups.map((group) => (
+          shown.results.groups.map((group) => (
             <ResultGroup
               key={`${group.country ?? ""}/${group.series ?? ""}`}
               group={group}
               onPick={onPick}
               selection={selection}
-              held={held}
             />
           ))
         )}
       </CommandList>
       <div className="flex min-h-8 shrink-0 items-center gap-3 border-t px-3 py-1.5 text-xs text-muted-foreground">
         <p aria-live="polite" className="min-w-0 flex-1">
-          {searching &&
-            results?.capped &&
+          {shown?.results.capped &&
             t("catalogSearch.capped", { count: catalogSearchLimits.results })}
         </p>
         <span className="hidden shrink-0 items-center gap-3 sm:flex">
@@ -182,12 +206,10 @@ function ResultGroup({
   group,
   onPick,
   selection,
-  held,
 }: {
   group: Group;
   onPick: (hit: CatalogSearchHit) => void;
   selection?: HitSelection;
-  held: ReadonlyMap<string, number>;
 }) {
   const t = useI18n();
   const { country } = useFormatters();
@@ -203,7 +225,7 @@ function ResultGroup({
             key={hit._id}
             hit={hit}
             selection={selection}
-            held={held.get(hit.key)}
+            held={hit.held}
           />
         ) : (
           <ResultRow key={hit._id} hit={hit} onPick={onPick} />

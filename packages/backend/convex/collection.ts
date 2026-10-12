@@ -171,9 +171,10 @@ const neighbour = v.union(
 
 /**
  * The Items either side of one in a view, in the view's order across its
- * pages, for moving through it from the Item page: null on either end. Null
- * when the view doesn't show the Item. Reads what `page` reads, less the
- * thumbnails.
+ * pages, for moving through it from the Item page: null on either end. Also
+ * where the Item stands in the view (from 0) and how many the view shows,
+ * so deleting it can go back to its page. Null when the view doesn't show
+ * the Item. Reads what `page` reads, less the thumbnails.
  */
 export const neighbours = query({
   args: {
@@ -183,7 +184,12 @@ export const neighbours = query({
   },
   returns: v.union(
     v.null(),
-    v.object({ previous: neighbour, next: neighbour }),
+    v.object({
+      previous: neighbour,
+      next: neighbour,
+      position: v.number(),
+      total: v.number(),
+    }),
   ),
   handler: async (ctx, { view, itemId, locale }) => {
     const owner = await requireSetUpUser(ctx);
@@ -197,6 +203,11 @@ export const neighbours = query({
     if (at === -1) return null;
     const near = (item: (typeof items)[number] | undefined) =>
       item ? { _id: item._id, title: item.title } : null;
-    return { previous: near(items[at - 1]), next: near(items[at + 1]) };
+    return {
+      previous: near(items[at - 1]),
+      next: near(items[at + 1]),
+      position: at,
+      total: items.length,
+    };
   },
 });

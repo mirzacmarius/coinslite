@@ -298,8 +298,9 @@ export const get = query({
 
 /**
  * How many pieces of each of these Catalog entries the person holds, for
- * marking search results while selecting several. Keys that aren't Catalog
- * entries are left out. At most `setLimits.bulkAdd` keys.
+ * marking recently picked entries while selecting several (search results
+ * bring their own: search.ts `withHeld`). Keys that aren't Catalog entries
+ * are left out. At most `setLimits.bulkAdd` keys.
  */
 export const heldCounts = query({
   args: { keys: v.array(v.string()) },

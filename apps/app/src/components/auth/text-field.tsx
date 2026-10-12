@@ -14,7 +14,8 @@ type FormFieldApi = {
 
 /**
  * A labelled text input bound to a form field. Errors show once the form has
- * been submitted, then update as the user types.
+ * been submitted, then update as the user types; an error takes the hint's
+ * place, so the two never say the same thing twice.
  */
 export function TextField({
   field,
@@ -42,7 +43,7 @@ export function TextField({
     <Field
       id={id}
       label={label}
-      hint={hint}
+      hint={error ? undefined : hint}
       error={error}
       labelAction={labelAction}
     >

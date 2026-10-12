@@ -11,6 +11,7 @@ import type { CollectionView } from "@coinslite/backend/convex/collection/view";
 import { bulkLimits } from "@coinslite/backend/convex/items/bulkRules";
 import { Button } from "@coinslite/ui/button";
 import { toast } from "@coinslite/ui/toaster";
+import { cn } from "@coinslite/ui/utils";
 import { useConvex, useMutation } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
 import { Loader2 } from "lucide-react";
@@ -89,6 +90,13 @@ export function MoveToAlbumBar({
       : [...selected.values()].filter(
           (albumId) => albumId !== null && albumId !== target.albumId,
         ).length;
+  const note = capped ? (
+    t("collection.selectedFirst", { limit: format.number(bulkLimits.items) })
+  ) : inOtherAlbum > 0 ? (
+    <span className="text-muted-foreground">
+      {t("collection.inOtherAlbum", { count: inOtherAlbum })}
+    </span>
+  ) : null;
 
   /**
    * A toast's Undo, offered while it shows: runs `undo`, then says it's
@@ -186,17 +194,8 @@ export function MoveToAlbumBar({
           onCreateFailed={setFailed}
         />
       )}
-      <span aria-live="polite" className="min-w-0 flex-1 text-xs">
-        {capped ? (
-          t("collection.selectedFirst", {
-            limit: format.number(bulkLimits.items),
-          })
-        ) : inOtherAlbum > 0 ? (
-          <span className="text-muted-foreground">
-            {t("collection.inOtherAlbum", { count: inOtherAlbum })}
-          </span>
-        ) : null}
-      </span>
+      {/* Keeps the actions after it at the end of the line. */}
+      <span className="flex-1" />
       {target && (
         <Button
           type="button"
@@ -258,6 +257,14 @@ export function MoveToAlbumBar({
       >
         {addTo ? t("collection.cancel") : t("collection.done")}
       </Button>
+      {/* A line of its own, so it never squeezes the actions; while empty
+        it takes no room but stays there to announce what comes. */}
+      <p
+        aria-live="polite"
+        className={cn("text-xs", note ? "w-full" : "sr-only")}
+      >
+        {note}
+      </p>
       {failed && (
         <p role="alert" className="w-full text-xs text-destructive">
           {failed}

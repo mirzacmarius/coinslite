@@ -1,6 +1,7 @@
 "use client";
 
 import { env } from "@/env.mjs";
+import { sectionTitle } from "@/lib/use-page-title";
 import { useParams, usePathname } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
@@ -45,6 +46,9 @@ function referringSite() {
 
 /** Admin and the design gallery are the team's own pages, not product use. */
 const untracked = ["/admin", "/design"];
+
+/** The screen counted last, so a repeat isn't counted again. */
+let lastCounted: string | undefined;
 
 /**
  * The page as it's counted: the path the browser shows, without a language
@@ -93,10 +97,17 @@ function ScreenViews({ clientId }: { clientId: string }) {
   useEffect(() => {
     const path = countedPath(window.location.pathname, params ?? {});
     if (untracked.some((p) => path === p || path.startsWith(`${p}/`))) return;
-    // OpenPanel skips a path it just counted, so changing only the query
-    // string (a filter, a sort) isn't another view. The page title it adds
-    // names only the section: "Collection", never the Item.
-    openPanel(clientId)("screenView", `${window.location.origin}${path}`);
+    const screen = `${window.location.origin}${path}`;
+    // Changing only the query string (a filter, a sort) isn't another view.
+    if (screen === lastCounted) return;
+    lastCounted = screen;
+    // Sent as OpenPanel's screenView sends it, but with a title that names
+    // only the section ("Collection"): screenView would add the tab's, which
+    // can name an Item or Album (usePageTitle).
+    openPanel(clientId)("track", "screen_view", {
+      __path: screen,
+      __title: sectionTitle(),
+    });
   }, [clientId, pathname, params]);
   return null;
 }

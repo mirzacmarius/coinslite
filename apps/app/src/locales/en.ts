@@ -21,6 +21,7 @@ export default {
   shell: {
     skipToContent: "Skip to content",
     primaryNavigation: "Main",
+    sidebar: "Sidebar",
     signOut: "Sign out",
     workspaceMenu: "Account and preferences",
     plans: "Plans",
