@@ -247,11 +247,11 @@ export type ViewContext = {
 };
 
 /** The Items a view shows, in its order. */
-export function itemsInView<T extends Item>(
-  items: T[],
+export function itemsInView(
+  items: Item[],
   view: CollectionView,
   { ownCountry, entryId, locale }: ViewContext,
-): T[] {
+): Item[] {
   const searched = searchFor(view.search, locale);
   const filters = filtersFor(view, ownCountry, entryId);
   return items
@@ -267,7 +267,7 @@ export function itemsInView<T extends Item>(
  * How many Items each filter option would show: those the search and every
  * other filter let through, so picking an option shows exactly its count.
  */
-export function filterCounts(
+export function countFilterOptions(
   items: Item[],
   view: CollectionView,
   { ownCountry, entryId, locale }: ViewContext,

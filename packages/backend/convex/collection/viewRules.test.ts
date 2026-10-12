@@ -7,7 +7,7 @@ import {
   withCatalogFacts,
 } from "../items/catalogFacts";
 import type { CollectionView } from "./view";
-import { type ViewContext, filterCounts, itemsInView } from "./viewRules";
+import { type ViewContext, countFilterOptions, itemsInView } from "./viewRules";
 
 /** Catalog entries as stored, notes and all. */
 const longNotes = "Struck in 1881 at the San Francisco Mint. ".repeat(500);
@@ -66,7 +66,7 @@ function item(
     quantity: 1,
     ...fields,
     ...(entry && {
-      catalogEntryId: entries[entry].key as unknown as Id<"catalogNodes">,
+      catalogEntryId: entries[entry].key as Id<"catalogNodes">,
       entry,
     }),
   };
@@ -138,7 +138,7 @@ describe("the Items a view shows, from slim entries as from whole ones", () => {
 describe("how many Items each filter option would show, from slim entries as from whole ones", () => {
   const view: CollectionView = { country: "US" };
   const counted = (items: Doc<"items">[]) => {
-    const { origins, countries, denominations } = filterCounts(
+    const { origins, countries, denominations } = countFilterOptions(
       items,
       view,
       context,

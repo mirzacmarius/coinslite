@@ -441,9 +441,7 @@ export default defineSchema({
     yearFrom: v.optional(v.number()),
     yearTo: v.optional(v.number()),
     numistaId: v.optional(v.number()),
-  })
-    .index("by_entryId", ["entryId"])
-    .index("by_key", ["key"]),
+  }).index("by_entryId", ["entryId"]),
 
   /**
    * How many Catalog entries a country holds of one denomination and series

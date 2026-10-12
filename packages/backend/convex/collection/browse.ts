@@ -42,7 +42,7 @@ type Item = Doc<"items">;
  * lookup more, or two while the entry has no slim entry and is read whole,
  * so between two checks at most twice `readCheckEvery` lookups are made.
  */
-const readCheckEvery = 100;
+const readCheckEvery = 50;
 const documentsKept = 500;
 const bytesKept = 2 * 1024 * 1024;
 const lookupsKept = 2 * readCheckEvery + 100;

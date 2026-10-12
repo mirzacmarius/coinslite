@@ -1,14 +1,11 @@
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import type { CatalogItemType } from "../catalog/fields";
-import {
-  type FoundSlimEntry,
-  slimEntryById,
-  slimEntryByKey,
-} from "../catalog/slimEntries";
+import { type FoundSlimEntry, slimEntryById } from "../catalog/slimEntries";
 import {
   type CatalogFacts,
   entryFacts,
+  slimEntryOf,
   withCatalogFacts,
 } from "./catalogFacts";
 
@@ -23,9 +20,9 @@ import {
  * Collection and its exports, Album lists, totals, Metal values, reports.
  * Reading `ctx.db` Items directly shows a linked Item without its facts.
  *
- * Entries are read through their slim entries (catalog/slimEntries.ts):
- * their key, title and facts without notes, so a whole Collection resolves
- * in a fraction of the bytes.
+ * Items find their entries through the entries' slim entries
+ * (catalog/slimEntries.ts): key, title and facts without notes, so a whole
+ * Collection resolves in a fraction of the bytes.
  */
 
 /** An Item with its descriptive facts resolved: the same fields as stored, filled in from its Catalog entry. */
@@ -54,9 +51,18 @@ function entryLinkOf(found: FoundSlimEntry | null): CatalogEntryLink | null {
   };
 }
 
-/** The Catalog entry with this key; null for any other node, or none. */
+/**
+ * The Catalog entry with this key; null for any other node, or none. Read
+ * from the entry itself: it's one document, and the slim entry of an entry
+ * just deleted may not be removed yet (catalog/slimEntries.ts).
+ */
 export async function catalogEntryByKey(ctx: QueryCtx, key: string) {
-  return entryLinkOf(await slimEntryByKey(ctx, key));
+  const node = await ctx.db
+    .query("catalogNodes")
+    .withIndex("by_key", (q) => q.eq("key", key))
+    .unique();
+  const slim = node && slimEntryOf(node);
+  return entryLinkOf(slim && { entryId: node._id, slim });
 }
 
 /**

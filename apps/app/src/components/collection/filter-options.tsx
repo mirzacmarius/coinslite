@@ -26,7 +26,9 @@ import {
 import type * as React from "react";
 import { useMemo } from "react";
 
+/** One page of the Collection being browsed, as `collection.page` reads it. */
 export type BrowseResult = FunctionReturnType<typeof api.collection.page>;
+/** How many Items each filter option would show, read only while the filters are open. */
 export type FilterCounts = FunctionReturnType<
   typeof api.collection.filterCounts
 >;
@@ -88,7 +90,7 @@ const sameText = (a: string | undefined, b: string) =>
  */
 export function useFilters(
   result: BrowseResult | undefined,
-  options: FilterCounts | undefined,
+  counts: FilterCounts | undefined,
   view: CollectionView,
 ): Filter[] {
   const t = useI18n();
@@ -99,9 +101,9 @@ export function useFilters(
 
   return useMemo(() => {
     const ownCountry = result?.ownCountry ?? null;
-    const counting = options === undefined;
+    const counting = counts === undefined;
     // What an option counts while it isn't in the counts: none, once known.
-    const zero = counting ? undefined : 0;
+    const uncounted = counting ? undefined : 0;
     const filters: Omit<Filter, "counting">[] = [];
 
     const typeOptions: FilterOption[] = itemTypes.flatMap((type) => {
@@ -109,7 +111,7 @@ export function useFilters(
         key: type,
         label: t(`items.types.${type}`),
         icon: optionIcon(itemTypeIcons[type]),
-        count: options?.types[type] ?? zero,
+        count: counts?.types[type] ?? uncounted,
         selected: view.type === type && !view.bullionOnly,
         change: { type, bullionOnly: undefined },
       };
@@ -120,7 +122,7 @@ export function useFilters(
           key: "bullion",
           label: t("collection.bullionCoins"),
           icon: optionIcon(itemTypeIcons.coin),
-          count: options?.types.bullion ?? zero,
+          count: counts?.types.bullion ?? uncounted,
           selected: view.bullionOnly === true,
           change: { type: "coin", bullionOnly: true },
         },
@@ -145,14 +147,14 @@ export function useFilters(
             label: t("collection.origins.own", {
               country: format.country(ownCountry),
             }),
-            count: options?.origins.own ?? zero,
+            count: counts?.origins.own ?? uncounted,
             selected: view.origin === "own",
             change: { origin: "own" },
           },
           {
             key: "foreign",
             label: t("collection.origins.foreign"),
-            count: options?.origins.foreign ?? zero,
+            count: counts?.origins.foreign ?? uncounted,
             selected: view.origin === "foreign",
             change: { origin: "foreign" },
           },
@@ -161,11 +163,11 @@ export function useFilters(
       });
     }
 
-    const countries = options?.countries ?? [];
+    const countries = counts?.countries ?? [];
     const countryOptions = [
       ...countries,
       ...(view.country && !countries.some((c) => c.country === view.country)
-        ? [{ country: view.country, count: zero }]
+        ? [{ country: view.country, count: uncounted }]
         : []),
     ]
       .map(
@@ -186,12 +188,12 @@ export function useFilters(
       clear: { country: undefined },
     });
 
-    const denominations = options?.denominations ?? [];
+    const denominations = counts?.denominations ?? [];
     const denominationOptions = [
       ...denominations,
       ...(view.denomination &&
       !denominations.some((d) => sameText(view.denomination, d.denomination))
-        ? [{ denomination: view.denomination, count: zero }]
+        ? [{ denomination: view.denomination, count: uncounted }]
         : []),
     ].map(
       ({ denomination, count }): FilterOption => ({
@@ -210,7 +212,7 @@ export function useFilters(
       clear: { denomination: undefined },
     });
 
-    const grades = options?.grades ?? [];
+    const grades = counts?.grades ?? [];
     const chosenGrade = view.grade;
     const gradeOptions = [
       ...grades,
@@ -220,7 +222,7 @@ export function useFilters(
           g.gradingScale === chosenGrade.gradingScale &&
           g.grade === chosenGrade.grade,
       )
-        ? [{ ...chosenGrade, count: zero }]
+        ? [{ ...chosenGrade, count: uncounted }]
         : []),
     ].map(
       ({ gradingScale, grade, count }): FilterOption => ({
@@ -243,21 +245,21 @@ export function useFilters(
     });
 
     const albumCounts = new Map(
-      options?.albums.map(({ albumId, count }) => [albumId as string, count]),
+      counts?.albums.map(({ albumId, count }) => [albumId as string, count]),
     );
     const albumOptions: FilterOption[] = [
       ...(albums ?? []).map((album) => ({
         key: album._id,
         label: album.name,
         icon: <AlbumDot colour={album.colour} />,
-        count: albumCounts.get(album._id) ?? zero,
+        count: albumCounts.get(album._id) ?? uncounted,
         selected: view.album === album._id,
         change: { album: album._id },
       })),
       {
         key: withoutAlbum,
         label: t("collection.withoutAlbum"),
-        count: options?.withoutAlbum ?? zero,
+        count: counts?.withoutAlbum ?? uncounted,
         selected: view.album === withoutAlbum,
         change: { album: withoutAlbum },
       },
@@ -290,7 +292,7 @@ export function useFilters(
           {
             key: view.entry,
             label,
-            count: options?.entry ?? zero,
+            count: counts?.entry ?? uncounted,
             selected: true,
             change: { entry: view.entry },
           },
@@ -310,14 +312,14 @@ export function useFilters(
         {
           key: "owned",
           label: t("collection.statuses.owned"),
-          count: options?.statuses.owned ?? zero,
+          count: counts?.statuses.owned ?? uncounted,
           selected: view.status === undefined,
           change: { status: undefined },
         },
         {
           key: "sold",
           label: t("collection.statuses.sold"),
-          count: options?.statuses.sold ?? zero,
+          count: counts?.statuses.sold ?? uncounted,
           selected: view.status === "sold",
           change: { status: "sold" },
         },
@@ -338,5 +340,5 @@ export function useFilters(
         ...(chosen && { active: { label: chosen.label, icon: chosen.icon } }),
       };
     });
-  }, [result, options, view, t, locale, format, labels, albums]);
+  }, [result, counts, view, t, locale, format, labels, albums]);
 }

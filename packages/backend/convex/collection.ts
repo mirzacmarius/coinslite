@@ -1,13 +1,14 @@
-import { defaultLocale } from "@coinslite/i18n";
+import { type Locale, defaultLocale } from "@coinslite/i18n";
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { type QueryCtx, query } from "./_generated/server";
 import {
   browsePage,
   collectionView,
   findItems,
   readForView,
 } from "./collection/browse";
-import { filterCounts as countFilterOptions } from "./collection/viewRules";
+import type { CollectionView } from "./collection/view";
+import { countFilterOptions } from "./collection/viewRules";
 import { bulkLimits } from "./items/bulkRules";
 import schema from "./schema";
 import { requireSetUpUser } from "./utils/auth";
@@ -68,6 +69,25 @@ const filterCountsResult = v.object({
 });
 
 /**
+ * The signed-in person's Collection read for a view, with country names in
+ * `locale` or else their own language.
+ */
+async function readOwnCollection(
+  ctx: QueryCtx,
+  view: CollectionView,
+  locale: Locale | undefined,
+) {
+  const owner = await requireSetUpUser(ctx);
+  const read = await readForView(
+    ctx,
+    owner,
+    view,
+    locale ?? owner.language ?? defaultLocale,
+  );
+  return { owner, read };
+}
+
+/**
  * One page of the signed-in person's Collection as a view shows it: searched,
  * filtered and sorted. The filter options' counts are `filterCounts`, read
  * only while the filters are open.
@@ -76,13 +96,7 @@ export const page = query({
   args: pageArgs,
   returns: v.object(pageFields),
   handler: async (ctx, { view, page, pageSize, locale }) => {
-    const owner = await requireSetUpUser(ctx);
-    const read = await readForView(
-      ctx,
-      owner,
-      view,
-      locale ?? owner.language ?? defaultLocale,
-    );
+    const { owner, read } = await readOwnCollection(ctx, view, locale);
     const found = await browsePage(ctx, read, { view, page, pageSize });
     return { ...found, currency: owner.homeCurrency };
   },
@@ -93,14 +107,8 @@ export const filterCounts = query({
   args: { view: collectionView, locale: v.optional(language) },
   returns: filterCountsResult,
   handler: async (ctx, { view, locale }) => {
-    const owner = await requireSetUpUser(ctx);
-    const { items, context } = await readForView(
-      ctx,
-      owner,
-      view,
-      locale ?? owner.language ?? defaultLocale,
-    );
-    return countFilterOptions(items, view, context);
+    const { read } = await readOwnCollection(ctx, view, locale);
+    return countFilterOptions(read.items, view, read.context);
   },
 });
 
@@ -113,13 +121,7 @@ export const browse = query({
   args: pageArgs,
   returns: v.object({ ...pageFields, options: filterCountsResult }),
   handler: async (ctx, { view, page, pageSize, locale }) => {
-    const owner = await requireSetUpUser(ctx);
-    const read = await readForView(
-      ctx,
-      owner,
-      view,
-      locale ?? owner.language ?? defaultLocale,
-    );
+    const { owner, read } = await readOwnCollection(ctx, view, locale);
     const found = await browsePage(ctx, read, { view, page, pageSize });
     return {
       ...found,

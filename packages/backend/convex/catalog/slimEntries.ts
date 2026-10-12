@@ -51,29 +51,6 @@ export async function slimEntryById(
 }
 
 /**
- * The slim entry of the Catalog entry with this key; null for any other
- * node, or none. One stored before slim entries existed is read whole.
- */
-export async function slimEntryByKey(
-  ctx: QueryCtx,
-  key: string,
-): Promise<FoundSlimEntry | null> {
-  const [stored, another] = await ctx.db
-    .query("catalogSlimEntries")
-    .withIndex("by_key", (q) => q.eq("key", key))
-    .take(2);
-  // Two only for a moment: a deleted entry's waiting to be removed
-  // (`refresh`) while a new entry has its key. The entry tells which.
-  if (stored && !another) return { entryId: stored.entryId, slim: stored };
-  const node = await ctx.db
-    .query("catalogNodes")
-    .withIndex("by_key", (q) => q.eq("key", key))
-    .unique();
-  const slim = node && slimEntryOf(node);
-  return slim && { entryId: node._id, slim };
-}
-
-/**
  * Makes a node's stored slim entry `slim`: adds, replaces or removes it,
  * and leaves it alone when it already says the same, so a Collection
  * reading it isn't run again for an entry's notes or image.
@@ -120,6 +97,11 @@ async function roomLeft(ctx: MutationCtx) {
  * stores them once. A new entry's is added without a lookup; the others
  * are looked up while the transaction has room, and any left are stored
  * straight after it. Nodes whose slim entry stays the same cost nothing.
+ *
+ * Until then a changed entry's Items show its old facts, and a new entry
+ * is read whole. A removed entry's slim entry is never read meanwhile: it
+ * is only read by id, for Items linked to the entry, and an entry leaves
+ * the Catalog or stops being one only once no Item links to it.
  */
 export function slimEntryChanges() {
   const changes = new Map<
