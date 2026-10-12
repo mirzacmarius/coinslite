@@ -1,16 +1,47 @@
 import { describe, expect, test } from "bun:test";
+import { exportLabels } from "@coinslite/backend/convex/collection/exportLabels";
 import { collectionPdfMessages } from "@coinslite/backend/convex/collection/pdfMessages";
 import { reportMessages } from "@coinslite/backend/convex/insuranceReport/messages";
 import { type Locale, locales } from "@coinslite/i18n";
 import { loaders } from "./loaders";
 
 /**
- * The PDFs are written on the server, which can't read these dictionaries, so
- * they keep their own words. They must be the app's words: an Item type, a
- * Grade or a column reads the same on screen and on paper.
+ * The CSV and the PDFs are written on the server, which can't read these
+ * dictionaries, so they keep their own words. They must be the app's words:
+ * an Item type, a Grade or a column reads the same on screen and on paper.
  */
 describe.each(locales)("%s", async (locale: Locale) => {
   const t = (await loaders[locale]()).default;
+
+  test("the Collection CSV names things as the app does", () => {
+    const csv = exportLabels[locale];
+    expect(csv.types).toEqual(t.items.types);
+    expect(csv.materials).toEqual(t.items.materials);
+    expect(csv.scales).toEqual(t.grades.scales);
+    expect(csv.strikes).toEqual(t.grades.strikes);
+    expect(csv.stampGrades).toEqual(t.grades.stamp);
+    // The columns added since (grader, stamp catalogue, banknote details…)
+    // aren't compared yet.
+    expect(csv.columns).toMatchObject({
+      type: t.items.type,
+      title: t.items.title,
+      year: t.items.year,
+      denomination: t.items.denomination,
+      grade: t.items.grade,
+      gradingScale: t.items.gradingScale,
+      strike: t.items.strike,
+      material: t.items.material,
+      country: t.items.country,
+      quantity: t.items.quantity,
+      purchasePrice: t.items.purchasePrice,
+      marketValue: t.items.marketValue,
+      purchaseDate: t.items.purchaseDate,
+      source: t.items.source,
+      soldOn: t.sale.soldOn,
+      salePrice: t.sale.salePrice,
+      saleNote: t.sale.note,
+    });
+  });
 
   test("the Collection PDF names things as the Collection page does", () => {
     const pdf = collectionPdfMessages[locale];
