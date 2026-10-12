@@ -1205,7 +1205,18 @@ export default {
     viewCollection: "Voir la collection",
     firstRunTitle: "Commencez votre collection",
     firstRunDescription:
-      "Ajoutez une pièce, un billet ou un timbre que vous possédez. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
+      "Choisissez comment commencer. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
+  },
+  firstRun: {
+    addItem: "Ajouter un objet",
+    addItemDescription:
+      "Enregistrez une pièce, un billet ou un timbre que vous possédez.",
+    addSet: "Ajouter un ensemble entier",
+    addSetDescription:
+      "Choisissez un ensemble dans le catalogue et ajoutez d’un coup ce que vous en possédez.",
+    import: "Importer une feuille de calcul",
+    importDescription:
+      "Reprenez une liste que vous tenez déjà, enregistrée au format CSV.",
   },
   adminStats: {
     menu: "Statistiques",
@@ -1277,7 +1288,6 @@ export default {
   },
   collectionImport: {
     menuItem: "Importer depuis un CSV…",
-    emptyAction: "Importer depuis un CSV",
     title: "Importer des objets",
     description:
       "Choisissez un fichier CSV organisé comme l’export de la collection, jusqu’à {size} et {rows} lignes. Rien n’est ajouté avant votre confirmation.",

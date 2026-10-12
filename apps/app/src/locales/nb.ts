@@ -1187,7 +1187,18 @@ export default {
     viewCollection: "Vis samlingen",
     firstRunTitle: "Start samlingen din",
     firstRunDescription:
-      "Legg til en mynt, en seddel eller et frimerke du eier. Da vises totalene og de nyeste objektene her.",
+      "Velg hvordan du vil begynne. Etterpå vises totalene og de nyeste objektene her.",
+  },
+  firstRun: {
+    addItem: "Legg til et objekt",
+    addItemDescription:
+      "Registrer en mynt, en seddel eller et frimerke du eier.",
+    addSet: "Legg til et helt sett",
+    addSetDescription:
+      "Velg et sett i katalogen og legg til alt du eier fra det, på én gang.",
+    import: "Importer et regneark",
+    importDescription:
+      "Hent inn en liste du allerede fører, lagret som CSV-fil.",
   },
   adminStats: {
     menu: "Statistikk",
@@ -1258,7 +1269,6 @@ export default {
   },
   collectionImport: {
     menuItem: "Importer fra CSV …",
-    emptyAction: "Importer fra CSV",
     title: "Importer objekter",
     description:
       "Velg en CSV-fil satt opp som eksporten av samlingen, opptil {size} og {rows} rader. Ingenting legges til før du bekrefter.",

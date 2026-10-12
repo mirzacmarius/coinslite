@@ -1228,7 +1228,18 @@ export default {
     viewCollection: "Sammlung ansehen",
     firstRunTitle: "Beginne deine Sammlung",
     firstRunDescription:
-      "Füge eine Münze, Banknote oder Briefmarke hinzu, die du besitzt. Dann erscheinen hier deine Summen und neuesten Objekte.",
+      "Wähle, wie du beginnen möchtest. Danach erscheinen hier deine Summen und neuesten Objekte.",
+  },
+  firstRun: {
+    addItem: "Ein Objekt hinzufügen",
+    addItemDescription:
+      "Erfasse eine Münze, Banknote oder Briefmarke, die du besitzt.",
+    addSet: "Ein ganzes Set hinzufügen",
+    addSetDescription:
+      "Wähle ein Set im Katalog und füge in einem Zug hinzu, was du davon besitzt.",
+    import: "Eine Tabelle importieren",
+    importDescription:
+      "Übernimm eine Liste, die du schon führst, als CSV-Datei gespeichert.",
   },
   adminStats: {
     menu: "Statistik",
@@ -1301,7 +1312,6 @@ export default {
   },
   collectionImport: {
     menuItem: "Aus CSV importieren …",
-    emptyAction: "Aus CSV importieren",
     title: "Objekte importieren",
     description:
       "Wähle eine CSV-Datei im Aufbau des Sammlungsexports, bis {size} und {rows} Zeilen. Erst wenn du bestätigst, wird etwas hinzugefügt.",

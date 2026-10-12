@@ -1194,7 +1194,17 @@ export default {
     viewCollection: "Vezi colecția",
     firstRunTitle: "Începe-ți colecția",
     firstRunDescription:
-      "Adaugă o monedă, o bancnotă sau un timbru pe care îl deții. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
+      "Alege cum vrei să începi. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
+  },
+  firstRun: {
+    addItem: "Adaugă un obiect",
+    addItemDescription:
+      "Înregistrează o monedă, o bancnotă sau un timbru pe care îl deții.",
+    addSet: "Adaugă un set întreg",
+    addSetDescription:
+      "Alege un set din catalog și adaugă dintr-odată ce deții din el.",
+    import: "Importă o foaie de calcul",
+    importDescription: "Adu o listă pe care o ții deja, salvată ca fișier CSV.",
   },
   adminStats: {
     menu: "Statistici",
@@ -1265,7 +1275,6 @@ export default {
   },
   collectionImport: {
     menuItem: "Importă din CSV…",
-    emptyAction: "Importă din CSV",
     title: "Importă obiecte",
     description:
       "Alege un fișier CSV organizat ca exportul colecției, de până la {size} și {rows} de rânduri. Nu se adaugă nimic până nu confirmi.",

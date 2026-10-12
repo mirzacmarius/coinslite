@@ -4,17 +4,16 @@ import {
   CollectionTotalsSection,
   CollectionTotalsSkeleton,
 } from "@/components/collection-totals/collection-totals";
-import { isTyping, useAddItem } from "@/components/items/add-item";
+import { isTyping } from "@/components/items/add-item";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { defaultSort } from "@coinslite/backend/convex/collection/view";
 import { Button } from "@coinslite/ui/button";
-import { EmptyState } from "@coinslite/ui/empty-state";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
-import { Coins, ListChecks } from "lucide-react";
+import { ListChecks } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { narrowsView } from "./collection-display";
@@ -31,6 +30,7 @@ import { FilterButton, FilterChips } from "./filter-menu";
 import { type BrowseResult, useFilters } from "./filter-options";
 import { ImportDialog } from "./import-dialog";
 import { MoveToAlbumBar } from "./move-to-album-bar";
+import { StartCard } from "./start-card";
 import { useCollectionDisplay } from "./use-collection-display";
 import { useItemSelection } from "./use-item-selection";
 
@@ -66,7 +66,6 @@ export function CollectionBrowser() {
   const t = useI18n();
   const locale = useCurrentLocale();
   const format = useFormatters();
-  const addItem = useAddItem();
   const { view, page, update, goToPage, clearAll } = useCollectionUrl();
   const [display, changeDisplay] = useCollectionDisplay();
   const { shown: result, loading } = useLatest(
@@ -178,27 +177,17 @@ export function CollectionBrowser() {
   // Nothing narrows the default view, yet it's empty: every Item is sold.
   const allSold = !narrowsView(view) && result.options.statuses.sold > 0;
 
-  // A Collection with nothing in it yet: no toolbar, just the way to start.
+  // A Collection with nothing in it yet: no toolbar, just the ways to start.
   if (result.collectionSize === 0 && !narrowed) {
     return (
       <>
         {importDialog}
         {totals}
         <div className="p-4">
-          <EmptyState
-            icon={
-              <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
-            }
+          <StartCard
             title={t("items.emptyTitle")}
             description={t("items.emptyDescription")}
-            action={
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                <Button onClick={() => addItem()}>{t("items.add")}</Button>
-                <Button variant="ghost" onClick={() => setImporting(true)}>
-                  {t("collectionImport.emptyAction")}
-                </Button>
-              </div>
-            }
+            onImport={() => setImporting(true)}
           />
         </div>
       </>
