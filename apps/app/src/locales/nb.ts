@@ -70,7 +70,7 @@ export default {
     addedToAlbum: "Objekt lagt til i {album}",
     emptyTitle: "Samlingen er tom",
     emptyDescription:
-      "Legg til din første mynt, seddel eller ditt første frimerke for å se det her.",
+      "Velg hvordan du vil begynne. Etterpå vises objektene dine her.",
     showMore: "Vis flere",
     notFoundTitle: "Fant ikke objektet",
     notFound: "Dette objektet finnes ikke, eller det er ikke i samlingen din.",
@@ -1189,13 +1189,13 @@ export default {
     firstRunDescription:
       "Velg hvordan du vil begynne. Etterpå vises totalene og de nyeste objektene her.",
   },
-  firstRun: {
+  startCard: {
     addItem: "Legg til et objekt",
     addItemDescription:
       "Registrer en mynt, en seddel eller et frimerke du eier.",
     addSet: "Legg til et helt sett",
     addSetDescription:
-      "Velg et sett i katalogen og legg til alt du eier fra det, på én gang.",
+      "Åpne et land eller et tema i katalogen, velg «Vis som sett» og legg til det du eier fra det.",
     import: "Importer et regneark",
     importDescription:
       "Hent inn en liste du allerede fører, lagret som CSV-fil.",

@@ -1,5 +1,6 @@
 "use client";
 
+import { catalogHref } from "@/components/catalog/catalog-levels";
 import { IconTile } from "@/components/catalog/catalog-rows";
 import { useCatalogVisible } from "@/components/catalog/use-catalog-visible";
 import { AddShortcuts } from "@/components/overview/add-shortcuts";
@@ -71,19 +72,19 @@ export function StartCard({
           <IconTile icon={Plus} />
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <WayText
-              title={t("firstRun.addItem")}
-              description={t("firstRun.addItemDescription")}
+              title={t("startCard.addItem")}
+              description={t("startCard.addItemDescription")}
             />
             <AddShortcuts />
           </div>
         </li>
         {catalogVisible !== false && (
           <li>
-            <Link href="/catalog" className={wayRow}>
+            <Link href={catalogHref} className={wayRow}>
               <IconTile icon={ListChecks} />
               <WayText
-                title={t("firstRun.addSet")}
-                description={t("firstRun.addSetDescription")}
+                title={t("startCard.addSet")}
+                description={t("startCard.addSetDescription")}
               />
               {chevron}
             </Link>
@@ -93,8 +94,8 @@ export function StartCard({
           <button type="button" className={wayRow} onClick={onImport}>
             <IconTile icon={FileUp} />
             <WayText
-              title={t("firstRun.import")}
-              description={t("firstRun.importDescription")}
+              title={t("startCard.import")}
+              description={t("startCard.importDescription")}
             />
             {chevron}
           </button>

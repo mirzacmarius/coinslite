@@ -72,7 +72,7 @@ export default {
     addedToAlbum: "Objekt zu {album} hinzugefügt",
     emptyTitle: "Deine Sammlung ist leer",
     emptyDescription:
-      "Füge deine erste Münze, Banknote oder Briefmarke hinzu, um sie hier zu sehen.",
+      "Wähle, wie du beginnen möchtest. Danach erscheinen deine Objekte hier.",
     showMore: "Mehr anzeigen",
     notFoundTitle: "Objekt nicht gefunden",
     notFound:
@@ -1230,13 +1230,13 @@ export default {
     firstRunDescription:
       "Wähle, wie du beginnen möchtest. Danach erscheinen hier deine Summen und neuesten Objekte.",
   },
-  firstRun: {
+  startCard: {
     addItem: "Ein Objekt hinzufügen",
     addItemDescription:
       "Erfasse eine Münze, Banknote oder Briefmarke, die du besitzt.",
     addSet: "Ein ganzes Set hinzufügen",
     addSetDescription:
-      "Wähle ein Set im Katalog und füge in einem Zug hinzu, was du davon besitzt.",
+      "Öffne ein Land oder Thema im Katalog, wähle „Als Set anzeigen“ und füge hinzu, was du davon besitzt.",
     import: "Eine Tabelle importieren",
     importDescription:
       "Übernimm eine Liste, die du schon führst, als CSV-Datei gespeichert.",

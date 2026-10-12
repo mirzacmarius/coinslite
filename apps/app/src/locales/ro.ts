@@ -71,7 +71,7 @@ export default {
     addedToAlbum: "Obiect adăugat în {album}",
     emptyTitle: "Colecția ta e goală",
     emptyDescription:
-      "Adaugă prima monedă, bancnotă sau primul timbru ca să-l vezi aici.",
+      "Alege cum vrei să începi. Obiectele tale vor apărea apoi aici.",
     showMore: "Arată mai multe",
     notFoundTitle: "Obiectul nu a fost găsit",
     notFound: "Acest obiect nu există sau nu face parte din colecția ta.",
@@ -1196,13 +1196,13 @@ export default {
     firstRunDescription:
       "Alege cum vrei să începi. Totalurile și cele mai noi obiecte vor apărea apoi aici.",
   },
-  firstRun: {
+  startCard: {
     addItem: "Adaugă un obiect",
     addItemDescription:
       "Înregistrează o monedă, o bancnotă sau un timbru pe care îl deții.",
     addSet: "Adaugă un set întreg",
     addSetDescription:
-      "Alege un set din catalog și adaugă dintr-odată ce deții din el.",
+      "Deschide o țară sau o temă din catalog, alege „Vezi ca set” și adaugă ce deții din el.",
     import: "Importă o foaie de calcul",
     importDescription: "Adu o listă pe care o ții deja, salvată ca fișier CSV.",
   },

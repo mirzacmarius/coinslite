@@ -72,7 +72,7 @@ export default {
     addedToAlbum: "Objet ajouté à {album}",
     emptyTitle: "Votre collection est vide",
     emptyDescription:
-      "Ajoutez votre première pièce, votre premier billet ou timbre pour le voir ici.",
+      "Choisissez comment commencer. Vos objets apparaîtront ensuite ici.",
     showMore: "Afficher plus",
     notFoundTitle: "Objet introuvable",
     notFound:
@@ -1207,13 +1207,13 @@ export default {
     firstRunDescription:
       "Choisissez comment commencer. Vos totaux et vos derniers objets apparaîtront ensuite ici.",
   },
-  firstRun: {
+  startCard: {
     addItem: "Ajouter un objet",
     addItemDescription:
       "Enregistrez une pièce, un billet ou un timbre que vous possédez.",
     addSet: "Ajouter un ensemble entier",
     addSetDescription:
-      "Choisissez un ensemble dans le catalogue et ajoutez d’un coup ce que vous en possédez.",
+      "Ouvrez un pays ou un thème dans le catalogue, choisissez « Voir comme ensemble » puis ajoutez ce que vous en possédez.",
     import: "Importer une feuille de calcul",
     importDescription:
       "Reprenez une liste que vous tenez déjà, enregistrée au format CSV.",
