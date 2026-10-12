@@ -8,7 +8,7 @@
 
 **Not legal advice.** The open legal questions are collected in [§6](#6-questions-for-a-person).
 
-**Terms** follow `CONTEXT.md`: Catalog, Catalog entry, Theme, Set.
+**Terms** follow `CONTEXT.md`: Catalog, Catalog entry, Theme, Premium.
 
 ---
 
@@ -46,33 +46,51 @@
 
 ## 2. Ranked shortlist
 
-Ranked by value per effort, best first. "Entries" counts Catalog entries, not grouping nodes. Effort means one agent or developer, including review of the generated file.
+Ranked by value per effort, best first.
+- **Value** combines three things:
+  - how many of CoinsLite's collectors the dataset serves (every eurozone collector uses euro coins; Romania is a launch market with its own app language);
+  - how many entries it adds;
+  - whether it brings images.
+- **Effort** means one agent or developer, including review of the generated file.
+- **Entries** counts Catalog entries, not grouping nodes.
+- Where two rank close, the one with the clearer licence and the existing pipeline goes first.
 
-| # | Dataset | Source | Licence verdict | Entries | Effort | Images in scope | Follow-up |
-|---|---|---|---|---|---|---|---|
-| 1 | Euro circulation coins, every issuer's national sides | ECB national-side pages + common-side specifications | **Allowed with attribution** (ECB terms, as the 2-euro dataset) | ~295 | M (2 days) | No (national sides need each country's consent) | COIN-135 |
-| 2 | Euro banknotes, first and Europa series | ECB pages, Decision ECB/2013/10, ECB press releases | **Allowed with attribution**; images **allowed** under ECB/2013/10 | 13 | S (1 day incl. images) | Yes: ECB specimen images, unmodified | COIN-136 |
-| 3 | Romania: numismatic issues 1995–2026, circulation coins and notes | BNR website | **Allowed with attribution** + "free at bnr.ro" notice for paid services | ~380 | M (2 days) | No (needs BNR confirmation) | COIN-137 |
-| 4 | US circulating coin programmes 1999–2025 | US Mint coin pages + coin specifications | **Allowed** (public domain, 17 U.S.C. § 105) | ~400 (design × mint) | M–L (3 days) | No (separate step; see §4) | COIN-138 |
-| 5 | Finland: collector and commemorative coins | Finlex decrees | **Allowed with attribution** (CC BY 4.0) | one per decree (count from the API) | M (2–3 days) | No (Ministry of Finance claims copyright) | COIN-139 |
-| 6 | Denmark: circulation coins, theme and commemorative coins | Danmarks Nationalbank website | **Allowed with attribution**, no changes to the material | ~60 | S (1 day) | No | COIN-140 |
-| 7 | UK circulating coins since 1968 | The Gazette, royal proclamations | **Allowed with attribution** (OGL v3.0) | one per circulating design | L (3–5 days) | No (Crown copyright, Royal Mint permission) | COIN-141 |
-| 8 | Sweden: banknotes since the 1890s, coins, commemoratives | Sveriges Riksbank website | **Unclear**: confirm the open-data clause covers these pages | ~100 | M (2 days) after confirmation | No | COIN-142 |
-| – | Images for the bundled US silver dollars | Wikimedia Commons files of public-domain designs | **Allowed per file** (PD, CC0, CC BY, CC BY-SA) | up to 120 | M (2 days, tool + curation) | Yes | COIN-143 |
+| # | Dataset | Source | Licence verdict | Entries | Effort | Entries a day | Images in scope | Follow-up |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Euro circulation coins, every issuer's national sides | ECB national-side pages + common-side specifications | **Allowed with attribution** (ECB terms, as the 2-euro dataset) | ~295 | M (2 days) | ~150 | No (national sides need each country's consent) | COIN-135 |
+| 2 | Romania: numismatic issues 1995–2026, circulation coins and notes | BNR website | **Allowed with attribution** + "free at bnr.ro" notice for paid services | ~380 | M (2 days) | ~190 | No (needs BNR confirmation) | COIN-137 |
+| 3 | Euro banknotes, first and Europa series | ECB pages, Decision ECB/2013/10, ECB press releases | **Allowed with attribution**; images **allowed** under ECB/2013/10 | 13 | S (1 day incl. images) | 13 | **Yes**: the Catalog's first clearly free images | COIN-136 |
+| 4 | US circulating coin programmes 1999–2025 | US Mint coin pages + coin specifications | **Allowed** (public domain, 17 U.S.C. § 105) | ~400 (design × mint) | M–L (3 days) | ~130 | No (separate step; see §4) | COIN-138 |
+| 5 | Denmark: circulation coins, theme and commemorative coins | Danmarks Nationalbank website | **Allowed with attribution**, no changes to the material | ~60 | S (1 day) | ~60 | No | COIN-140 |
+| 6 | Finland: collector and commemorative coins | Finlex decrees | **Allowed with attribution** (CC BY 4.0) | one per decree (count from the API) | M (2–3 days) | unknown | No (Ministry of Finance claims copyright) | COIN-139 |
+| 7 | UK circulating coins since 1968 | The Gazette, royal proclamations | **Allowed with attribution** (OGL v3.0) | one per circulating design | L (3–5 days) | low | No (Crown copyright, Royal Mint permission) | COIN-141 |
+| 8 | Sweden: banknotes since the 1890s, coins, commemoratives | Sveriges Riksbank website | **Unclear**: confirm the open-data clause covers these pages | ~100 | M (2 days) after confirmation | ~50 | No | COIN-142 |
+
+**Ranking notes:**
+- Euro coins come before Romania despite fewer entries a day: they serve the most collectors and reuse the bundled 2-euro pipeline and licence.
+- Euro banknotes rank on their images, not their entries.
+
+**Image follow-up (not a dataset):** COIN-143 lets an admin add a Catalog image from a Wikimedia Commons file with its credit read from the file page ([§4.3](#43-wikimedia-commons-in-practice)). The first use is the bundled US silver dollars: their 120 entries (96 Morgan, 24 Peace) have public-domain designs, and Commons has free photos of many of them.
 
 **Not shortlisted:**
-- **Iceland:** about 15 rows, and the pages render only in a browser ([§3.7](#37-iceland)).
-- **Per-year mintages for euro coins:** only the Bundesbank's are reusable, and they're minting orders, not mintages ([§3.1](#31-eurozone-circulation-coins)).
+- **Iceland:** about 15 entries, and the pages render only in a browser ([§3.7](#37-iceland)).
+- **Per-year mintages for euro coins:** the only reusable source found is the Bundesbank's PDF of minting orders. That PDF is a *search excerpt* (not read), and orders aren't mintages ([§3.1](#31-eurozone-circulation-coins)).
 - **UK banknotes:** the Bank of England's pages need a written licence.
 - **US banknotes:** the series-level facts are thin ([§3.4](#34-united-states)).
 
-**Dataset built in this pass: none.** The only candidate that is both small and unambiguously licensed is the euro banknotes. They need a new Catalog shape: a Theme whose children are series rather than countries, and entries without a country. That shape departs from spec §6.2 (*"For a Theme: its countries"*), so it's specified as a decision in COIN-136 rather than added silently.
+**Dataset built in this pass: none.** The only candidate that is both small and unambiguously licensed is the euro banknotes, and they need a new Catalog shape, not just a dataset:
+- **A Theme whose children are series, with entries that have no country.** The euro area has no ISO country code.
+- **Code that assumes a Theme's children are countries:** the backend treats every child of a Theme as a country node (`countryNodeKeyOf` in `catalog/tree.ts`), so the app would offer browsing by denomination on each series.
+- **A translated title:** the Theme's title would need translating, as the 2-euro Theme's is.
+- **A spec change:** this departs from spec §6.2 (*"For a Theme: its countries"*).
+
+COIN-136 specifies the shape, the code to check and the spec change, rather than slipping them in here.
 
 **Verdict key:** as in [catalog-data-sources.md](catalog-data-sources.md#2-summary-table): **Allowed**, **Allowed with attribution**, **Written licence**, **Not allowed**, **Unclear**.
 
 ---
 
-## 3. Candidates by area
+## 3. Candidates
 
 ### 3.1 Eurozone circulation coins
 
@@ -85,6 +103,10 @@ Ranked by value per effort, best first. "Entries" counts Catalog entries, not gr
   - Several issuers have more than one series: Vatican 5, Belgium 3, Monaco 3, Spain 3 (€1/€2) or 2, France 2 (€1 to 10c), the Netherlands 2, San Marino 2.
 - **Specifications:** the [common sides page](https://www.ecb.europa.eu/euro/coins/common/html/index.en.html) gives each denomination's diameter, thickness, weight, shape, colour, composition and edge. For example, €2 is 25.75 mm, 2.20 mm and 8.50 g, with *"Outer part: copper-nickel; inner part: three layers: nickel brass, nickel, nickel brass"*.
   - The exact alloy percentages, which the `composition` column needs, are in Council Regulation (EC) No 975/98 as amended, on EUR-Lex.
+  - **Reuse of EUR-Lex documents:** Commission Decision 2011/833/EU (read on [legislation.gov.uk's copy](https://www.legislation.gov.uk/eudn/2011/833/article/6/data.htm), because EUR-Lex blocked automated reading).
+    - Art. 3(2) defines reuse as use *"for commercial or non-commercial purposes"*.
+    - Art. 6(2) allows these conditions: *"the obligation for the reuser to acknowledge the source of the documents; (b) the obligation not to distort the original meaning or message of the documents"*.
+    - The bundled 2-euro dataset already credits Official Journal notices on this basis.
 - **First year per issuer:**
   - The 12 founding countries: *"On 1 January that year euro banknotes and coins were introduced in 12 countries"* ([2002 changeover](https://www.ecb.europa.eu/euro/changeover/2002/html/index.en.html)).
   - Later joiners: Slovenia 2007, Cyprus and Malta 2008, Slovakia 2009, Estonia 2011, Latvia 2014, Lithuania 2015, Croatia 2023, Bulgaria 2026 (ECB "Joining the euro area" pages).
@@ -177,6 +199,12 @@ Ranked by value per effort, best first. "Entries" counts Catalog entries, not gr
 - Its two series as groupings, then the 13 entries without a country.
 - Spec §6.1 and §6.2 updated to say a Theme's children may be series.
 
+**What the code does with it:**
+- The backend makes each child of a Theme a "country node" (`countryNodeKeyOf` in `catalog/tree.ts`). So each series would be browsed by denomination.
+- The app names a country node by its country if it has one, otherwise by its title. A series would show its title, but the browse-by and picker paths need checking.
+
+**The glossary still fits:** `CONTEXT.md` defines a Theme as a grouping *"whose entries span several countries"*, and euro banknotes circulate in all 21 euro-area countries. What changes is only the spec's description of a Theme's children.
+
 **Effort: S (about 1 day)**, including the Theme title's translations and uploading each note's specimen front image as its Catalog image (13 images).
 
 ### 3.3 Romania
@@ -186,7 +214,7 @@ Ranked by value per effort, best first. "Entries" counts Catalog entries, not gr
   - The terms point automated retrieval to *"recomandările specificate în pagina dedicată dezvoltatorilor de software"* (the recommendations on the page for software developers). That page now redirects to the homepage.
 - **Numismatic catalogue** ([monede și medalii](https://www.bnr.ro/2271-monede-si-medalii)): 37 pages, about **367** issues from 15 December 1995 to 24 August 2026.
   - Fields per piece: nominal value, metal and fineness (*"Argint 999/1000"*), weight, diameter, edge, quality (proof or BU), maximum mintage (*"Tiraj maxim"*), and descriptions of both sides.
-  - No designer field. Some entries are broken, for example *"Valoare nominală: [##1106##]"* on the 1996 entry.
+  - No designer field. Some BNR pages carry broken values, for example *"Valoare nominală: [##1106##]"* on a 1996 issue.
   - There are also numismatic banknotes and mint sets.
 - **Circulation coins** ([monede în circulație](https://www.bnr.ro/2267-monede-in-circulatie)): 1, 5, 10 and 50 bani, with alloy, colour, diameter and edge, but no weight.
 - **Circulation banknotes** ([bancnote în circulație](https://www.bnr.ro/764-bancnote-in-circulatie)): 1 to 500 lei, with size, colour, polymer substrate and both sides' design. They link the BNR circular for each issue (2005, 2006, 2008, 2017, 2021, 2026).
@@ -207,7 +235,7 @@ Ranked by value per effort, best first. "Entries" counts Catalog entries, not gr
 
 The terms also reserve third-party material: *"fotografii, materiale grafice sau alte elemente vizuale provenite de la furnizori autorizați de imagini (stock) sau de la alte părți terțe … copierea, reutilizarea sau redistribuirea acestora poate avea loc doar cu autorizarea prealabilă a acestora"* (photos, graphics or other visuals from stock providers or other third parties may be copied, reused or redistributed only with their owners' prior authorisation). They don't say which photos are the BNR's own.
 
-**Images: a person must confirm.**
+**Images: a person must confirm.** This changes the earlier research's verdict. That document called Romania *"the most image-friendly launch country"* (§6.8) and followed Commons in marking it "OK" (§6.2), before the BNR's registered-design statement below had been read.
 - **Copyright:** Law 8/1996 art. 9(d) excludes *"mijloacele de plată"* (means of payment) from copyright (quoted in the earlier research).
 - **Registered designs:** the BNR says ([bancnote și monede](https://www.bnr.ro/662-bancnote-si-monede)):
   > "Designul bancnotelor şi monedelor este înregistrat la O.S.I.M. și este protejat conform Legii nr. 129/1992 privind protecția desenelor şi modelelor. Banca centrală are un drept exclusiv de utilizare a acestuia şi de a împiedica utilizarea de o terță parte care nu dispune de consimțământul său."
@@ -241,9 +269,11 @@ The terms also reserve third-party material: *"fotografii, materiale grafice sau
 - The Mint's [terms of use](https://www.usmint.gov/resources/terms-of-use) still apply to using the website itself (*"You may not use this Web site for trading, sales or commercial purposes other than for making purchases from the United States Mint"*). They don't create rights in public-domain facts.
 - 18 U.S.C. § 709 bars using "United States Mint" in a way that implies endorsement.
 
-**Images: allowed only for some designs.** From the Mint's [image library](https://www.usmint.gov/news/image-library) (*Wayback copy*): *"At this time, the United States Mint is not accepting any new applications for commercial licenses."* It links four design-use policies:
+**Images: allowed only for some designs.** From the Mint's [image library](https://www.usmint.gov/news/image-library) (*Wayback copy*): *"At this time, the United States Mint is not accepting any new applications for commercial licenses."*
+
+It links four design-use policies, all read from Wayback copies: [circulating coins](https://www.usmint.gov/news/image-library/circulating-coin-design-use-policy), [50 State Quarters](https://www.usmint.gov/news/image-library/50-state-quarters-design-use-policy), [DC & Territories](https://www.usmint.gov/news/image-library/dc-and-territories-quarters-design-use-policy) and [Presidential $1](https://www.usmint.gov/news/image-library/presidential-dollar-coin-design-use-policy).
 1. **Circulating coin designs:** the Mint *"will not object to use of the obverse or reverse design"* of a listed set of older designs, credited *"United States Mint image."* This policy excludes the Sacagawea dollar, the 50 State Quarters and the Westward Journey nickels.
-2. **50 State Quarters:** *"will not object to use of the obverse or reverse design of any 50 State Quarters Program coin"*.
+2. **50 State Quarters:** *"will not object to use of the obverse or reverse design of any 50 State Quarters Program coin"*. The policy also notes that "50 State Quarters" is a registered trademark of the Mint (*search excerpt*). Use it only descriptively, as a series name.
 3. **DC & Territories:** all six designs, but *"Individual components of a coin's reverse design … may not be extracted"*.
 4. **Presidential $1:** obverse, reverse and edge. Credit only for *"noncommercial educational purposes … No credit should be provided for any other use."*
 
@@ -278,12 +308,14 @@ The design permission isn't a photo licence. The Mint's own photos include work 
 
   ("Material in the online service may be quoted to a limited extent, as the Copyright Act allows.")
 
-**Images: a person must confirm.**
+**Images: markka coins free; euro and collector coins need a person to confirm.**
 - **For:** the Copyright Council's statement 1989:13 ([okm.fi](https://okm.fi/documents/1410845/3974201/Lausunto+1989-13+Laki,+kolikko)):
   > "Koska liikkeelle laskettavien kolikoiden kuvat julkaistaan kuitenkin Suomen säädöskokoelmassa asetuksen osana ja koska tekijänoikeuslain 9 §:n mukaan lakeihin ja asetuksiin ei ole tekijänoikeutta, ei kolikon kuva ole tekijänoikeudellisesti suojattu."
 
   ("Because the images of coins put into circulation are published in the Statute Book as part of a decree, and laws and decrees have no copyright under §9 of the Copyright Act, the coin image is not protected by copyright.")
-- **Against:** the Commission's 2019 file says *"Ministry of Finance has copyrights. Reproduction is possible with the permission of Ministry of Finance"* and *"copyright law (Ministry of Finance has copyrights based on contracts)"*.
+
+  The statement was made in 1989 about markka coins, so markka coin designs are free.
+- **Against, for euro coins:** the Commission's 2019 file on the national sides of euro circulation coins says *"Ministry of Finance has copyrights. Reproduction is possible with the permission of Ministry of Finance"* and *"copyright law (Ministry of Finance has copyrights based on contracts)"*. Whether the 1989 reasoning still frees euro and collector coin images published in decrees is the question for the Ministry ([§6](#6-questions-for-a-person)).
 - **Markka banknotes:** protected where the designer died less than 70 years ago (the Bank of Finland's [2023 guide](https://www.suomenpankki.fi/globalassets/bof/fi/raha-ja-maksaminen/eurosetelit-ja--kolikot/rahojen-aiheiden-kaytto---ohje-17.11.2023.pdf)).
 
 **Effort: M (2–3 days)** to list and parse the coin decrees from the Finlex API.
@@ -314,7 +346,7 @@ Commercial use isn't excluded. These terms match Norges Bank's, which the Norway
 
 - **Data:** valid coins (1–100 kr) and notes (500–10,000 kr), plus the 1981 notes withdrawn later, on cb.is. That's about 15 entries. The pages render only in a browser, and older series aren't listed.
 - **Licence: Allowed with attribution, no changes.** From the [copyright and disclaimer](https://cb.is/copyright-and-disclaimer/) page (*Wayback copy*, 2026-06-21): *"Material on the Central Bank of Iceland's website may be freely accessed, stored, copied, and distributed, provided that the source is cited and that information is not changed or distorted."*
-- **Images:** Commons says *"Copyrights for coins designed after December 31, 1955 are held by the Central Bank of Iceland."*
+- **Images:** [Commons](https://commons.wikimedia.org/wiki/Commons:Copyright_rules_by_territory/Iceland#Currency) says *"Copyrights for coins designed after December 31, 1955 are held by the Central Bank of Iceland."*
 - **Not shortlisted:** too few entries for the effort of rendering the pages, and nothing before the current series.
 
 ### 3.8 Sweden
@@ -334,7 +366,7 @@ That page lists the data it covers: the archive, the diary, publications and rep
 
 **Images: Not free.**
 - Banknote motifs *"are based on works of art … that are protected by copyright"* ([copying and advertising](https://www.riksbank.se/en-gb/payments--cash/notes--coins/copying-and-advertising/)).
-- The images on its notes and coins pages *"får inte användas i kommersiella syften"* (may not be used for commercial purposes).
+- The images on its notes and coins pages *"får inte användas i kommersiella syften"* (may not be used for commercial purposes; [image bank](https://www.riksbank.se/sv/press-och-publicerat/presskontakt/bildbank/)).
 - The Riksbank says its *"coins do not feature any motifs based on protected works of art"*, but Commons still marks Swedish currency "Not OK" because of the designers' moral rights.
 
 **Effort: M (about 2 days) once confirmed**, scraping about 25 pages.
@@ -376,7 +408,7 @@ That page lists the data it covers: the archive, the diary, publications and rep
 A Catalog image may be shown only when all three of these hold:
 1. **The design is free:**
    - public domain (for example US federal works);
-   - excluded from copyright (Romanian money, Finnish decree images, subject to §6);
+   - excluded from copyright (Finnish markka coins; Romanian money and Finnish euro coin decree images only once §6 is answered);
    - expired (the artist died more than 70 years ago, or Crown copyright older than 50 years);
    - or covered by an explicit permission (euro banknotes, US Mint design policies).
 2. **The photo is free:** a photo of a coin can carry its own copyright, separate from the design's (DSM Directive art. 14 covers only reproductions of two-dimensional public-domain works; see the earlier research §6.2). Acceptable photos are public domain, CC0, CC BY or CC BY-SA, or the issuer's own image under a permission that covers it.
@@ -387,9 +419,11 @@ A Catalog image may be shown only when all three of these hold:
    - US: smaller than 75% or larger than 150% of real size, one-sided ([31 CFR 411.1](https://www.ecfr.gov/current/title-31/subtitle-B/chapter-IV/part-411/section-411.1));
    - UK: the Bank of England's conditions.
 
-### 4.2 By area
+### 4.2 By country
 
-| Area | Coins | Banknotes |
+A summary of each section's image verdict in §3; the sections hold the quotes.
+
+| Country or series | Coins | Banknotes |
 |---|---|---|
 | Euro common side | **OK, flat** (COM(2001) 600) | – |
 | Euro national sides | **Not OK** anywhere without the country's consent. Closest: the Netherlands ("no restrictions … but the Ministry may in certain cases prohibit"), Slovenia | – |
@@ -480,8 +514,8 @@ All three bundled datasets work the same way, and new ones should too:
 | `designers` | from text | Europa: from the ECB design page | – | Artist Credits | initial only; full names where given | portrait artist | – | artist |
 | `mintage` | – | – | "Tiraj maxim" is a maximum, keep in notes | production report if it goes back | – | – | – | "Antal sålda" in notes |
 | `issue_date`, `withdrawal_date` | – | issue date; none withdrawn | circular dates | release date | – | date into circulation | – | last valid date |
-| `technical_details`, `historical_notes` | ECB text (+ de/fr/ro pages) | colour, style | Romanian text, `notes_language` ro | Mint text | decree text (fi), `notes_language` fi | Danish text, unchanged | proclamation text | Swedish text |
-| `facts_*` / `notes_*` | ECB | ECB | BNR | US Mint | Finlex | Danmarks Nationalbank | The Gazette | Sveriges riksbank |
+| `technical_details`, `historical_notes` | ECB text (+ de/fr/ro pages) | colour, style | Romanian text, `notes_language` ro | Mint text | decree text (fi), `notes_language` fi | CoinsLite's own notes (the bank's text may not be changed) | proclamation text | Swedish text |
+| `facts_*` / `notes_*` | ECB | ECB | BNR | US Mint | Finlex | facts: Danmarks Nationalbank; notes: CoinsLite editorial | The Gazette | Sveriges riksbank |
 | `image_*` | – | ECB specimen | – | – | – | – | – | – |
 
 ---
@@ -531,6 +565,7 @@ All accessed **2026-10-12** unless noted.
 - https://www.ecb.europa.eu/press/pr/date/2013/html/pr130110_1.en.html, https://www.ecb.europa.eu/press/pr/date/2014/html/pr140113.en.html, https://www.ecb.europa.eu/press/pr/date/2015/html/pr150224.en.html, https://www.ecb.europa.eu/press/pr/date/2016/html/pr160705.en.html, https://www.ecb.europa.eu/press/pr/date/2016/html/pr160504.en.html, https://www.ecb.europa.eu/press/pr/date/2018/html/ecb.pr180917.en.html
 - https://www.ecb.europa.eu/stats/policy_and_exchange_rates/banknotes+coins/circulation/html/index.en.html
 - https://www.legislation.gov.uk/eudn/2013/10/article/1/data.htm (Decision ECB/2013/10, Art. 1, retained copy)
+- https://www.legislation.gov.uk/eudn/2011/833/article/3/data.htm and https://www.legislation.gov.uk/eudn/2011/833/article/6/data.htm (Commission Decision 2011/833/EU on reuse, retained copy; EUR-Lex blocked automated reading)
 - https://economy-finance.ec.europa.eu/euro/euro-coins-and-notes/copyright-and-reproduction-rules-euro-coins-and-notes_en
 - https://economy-finance.ec.europa.eu/document/download/2d5c4f98-07e0-450c-995a-d1655af47c72_en?filename=copyright_national_sides_euro_coins_info_for_europa_website.xlsx (10 September 2019)
 
@@ -549,7 +584,11 @@ All accessed **2026-10-12** unless noted.
 
 **United States**
 - https://www.usmint.gov/resources/terms-of-use (October 2016)
-- https://www.usmint.gov/news/image-library and its four design-use policies (Wayback copies, July–September 2026)
+- https://www.usmint.gov/news/image-library and its four design-use policies (Wayback copies, July–September 2026):
+  - https://www.usmint.gov/news/image-library/circulating-coin-design-use-policy
+  - https://www.usmint.gov/news/image-library/50-state-quarters-design-use-policy
+  - https://www.usmint.gov/news/image-library/dc-and-territories-quarters-design-use-policy
+  - https://www.usmint.gov/news/image-library/presidential-dollar-coin-design-use-policy
 - https://www.usmint.gov/learn/coins-and-medals/circulating-coins/quarter/50-state-quarters/delaware (Wayback copy) and the programme pages
 - https://www.usmint.gov/learn/coins-and-medals/circulating-coins/coin-specifications
 - https://www.usmint.gov/about/production-sales-figures/circulating-coins-production
