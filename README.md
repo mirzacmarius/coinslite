@@ -3,7 +3,7 @@
 A web app where collectors record the coins, banknotes and stamps they own, organise them, and track what they paid and what they're worth.
 
 - Product requirements: [`docs/functional-spec.md`](docs/functional-spec.md)
-- Domain glossary: [`CONTEXT.md`](CONTEXT.md)
+- Domain glossary: [`GLOSSARY.md`](GLOSSARY.md)
 - Architecture decisions: [`docs/adr/`](docs/adr/)
 - Issues: Linear, project CoinsLite (see [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md))
 

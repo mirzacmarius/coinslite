@@ -6,7 +6,7 @@
 
 **Not legal advice.** This is a research brief to hand to counsel. The legal risks are collected in [§9](#9-legal-risks-to-flag).
 
-**Terms** follow `CONTEXT.md`: Catalog, Catalog entry, Item, Grade, Premium.
+**Terms** follow `GLOSSARY.md`: Catalog, Catalog entry, Item, Grade, Premium.
 
 ---
 
@@ -543,4 +543,4 @@ All accessed **2026-10-08**. "(search excerpt)" means the page couldn't be opene
 - https://en.ucoin.net/terms (blocked; not evaluated)
 
 **CoinsLite repo context**
-- `CONTEXT.md` (glossary); `docs/adr/0001-items-link-to-catalog-entries.md`
+- `GLOSSARY.md` (glossary); `docs/adr/0001-items-link-to-catalog-entries.md`

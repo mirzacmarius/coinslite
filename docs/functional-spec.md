@@ -1,6 +1,6 @@
 # CoinsLite functional specification
 
-What CoinsLite must do for its first release. It covers behaviour only. Screen structure, navigation, visual design and all wording are decided by the design system (milestone M1) and written fresh. Terms follow [`CONTEXT.md`](../CONTEXT.md).
+What CoinsLite must do for its first release. It covers behaviour only. Screen structure, navigation, visual design and all wording are decided by the design system (milestone M1) and written fresh. Terms follow [`GLOSSARY.md`](../GLOSSARY.md).
 
 ---
 
