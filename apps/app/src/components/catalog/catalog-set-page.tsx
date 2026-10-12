@@ -6,6 +6,7 @@ import {
   useWantError,
   useWantedKeys,
 } from "@/components/wantlist/wantlist";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -26,13 +27,8 @@ import { ChevronRight, Heart, ListChecks, SearchX } from "lucide-react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import type * as React from "react";
-import { useEffect, useId, useMemo, useState } from "react";
-import {
-  BulkAddBar,
-  DuplicatesSwitch,
-  isAddShortcut,
-  useBulkAdd,
-} from "./bulk-add";
+import { useId, useMemo, useState } from "react";
+import { BulkAddBar, DuplicatesSwitch, useBulkAdd } from "./bulk-add";
 import { CatalogHeader, type Crumb } from "./catalog-header";
 import {
   type SetScope,
@@ -154,10 +150,6 @@ function useSetCrumbs(
   return crumbs;
 }
 
-/** Whether a dialog (a picker, a confirmation) has the keyboard. */
-const dialogOpen = () =>
-  document.querySelector('[role=dialog][data-state="open"]') !== null;
-
 function SetView({
   set,
   scope,
@@ -197,20 +189,8 @@ function SetView({
   const { add } = bulk;
   const { clear } = selection;
   const selecting = keys.length > 0;
-  useEffect(() => {
-    if (!selecting) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (dialogOpen()) return;
-      if (isAddShortcut(event)) {
-        event.preventDefault();
-        void add();
-      } else if (event.key === "Escape") {
-        clear();
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selecting, add, clear]);
+  useShortcut("mod+Enter", () => void add(), selecting);
+  useShortcut("Escape", clear, selecting);
 
   const wanted = useWantedKeys();
   const wantMany = useMutation(api.wants.wantMany);

@@ -1,22 +1,18 @@
 "use client";
 
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { ActionLabel } from "@coinslite/ui/header-bar";
 import { Kbd } from "@coinslite/ui/kbd";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { catalogNodeHref } from "./catalog-levels";
 import { CatalogSearchDialog } from "./catalog-search";
 
 /** Where a Catalog node is browsed: every level has its own page (catalog-levels.ts). */
 export { catalogNodeHref };
-
-const isTyping = (target: EventTarget | null) =>
-  target instanceof HTMLElement &&
-  (target.isContentEditable ||
-    ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
 
 /**
  * The Catalog page's search: a header button, or `/`, opens it; picking a
@@ -27,23 +23,7 @@ export function CatalogSearchButton() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === "/" &&
-        !event.metaKey &&
-        !event.ctrlKey &&
-        !event.altKey &&
-        !isTyping(event.target) &&
-        !document.querySelector('[role=dialog][data-state="open"]')
-      ) {
-        event.preventDefault();
-        setOpen(true);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  useShortcut("/", () => setOpen(true));
 
   return (
     <>

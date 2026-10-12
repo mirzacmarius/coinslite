@@ -4,7 +4,8 @@ import {
   CollectionTotalsSection,
   CollectionTotalsSkeleton,
 } from "@/components/collection-totals/collection-totals";
-import { isTyping } from "@/components/items/add-item";
+import { useLatest } from "@/lib/use-latest";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -37,16 +38,6 @@ import { MoveToAlbumBar } from "./move-to-album-bar";
 import { StartCard } from "./start-card";
 import { useCollectionDisplay } from "./use-collection-display";
 import { useItemSelection } from "./use-item-selection";
-
-/**
- * The latest result, kept on screen while the next one loads, so changing
- * the search, a filter or the page doesn't flash a skeleton.
- */
-function useLatest(result: BrowseResult | undefined) {
-  const [latest, setLatest] = useState(result);
-  if (result !== undefined && result !== latest) setLatest(result);
-  return { shown: result ?? latest, loading: result === undefined };
-}
 
 /** The toolbar's place while the Collection loads. */
 const toolbarSkeleton = <div className="h-10 border-b" aria-hidden="true" />;
@@ -113,58 +104,22 @@ export function CollectionBrowser() {
   }, [addTo, startSelecting]);
 
   // In select mode, Esc leaves it and Cmd/Ctrl+A selects the page.
-  useEffect(() => {
-    if (!selecting) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        isTyping(event.target) ||
-        document.querySelector('[role=dialog][data-state="open"]') ||
-        document.querySelector('[role=menu][data-state="open"]')
-      )
-        return;
-      if (event.key === "Escape") {
-        event.preventDefault();
-        stopSelecting();
-      } else if (
-        (event.metaKey || event.ctrlKey) &&
-        event.key.toLowerCase() === "a" &&
-        pageItems
-      ) {
-        event.preventDefault();
-        selectItems(pageItems);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selecting, stopSelecting, selectItems, pageItems]);
-
-  // "/" finds, "F" filters, unless someone is typing or a dialog is open.
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey ||
-        isTyping(event.target) ||
-        document.querySelector('[role=dialog][data-state="open"]') ||
-        // No toolbar while the Collection is empty.
-        !search.current
-      )
-        return;
-      if (event.key === "/") {
-        event.preventDefault();
-        search.current?.focus();
-      } else if (event.key.toLowerCase() === "f") {
-        event.preventDefault();
-        setFilterOpen(true);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  useShortcut("Escape", stopSelecting, selecting);
+  useShortcut(
+    "mod+a",
+    () => pageItems && selectItems(pageItems),
+    selecting && pageItems !== undefined,
+  );
 
   const narrowed =
     view.search !== undefined || filters.some((filter) => filter.active);
+  // No toolbar while the Collection loads or is empty (below).
+  const toolbar =
+    result !== undefined && (result.collectionSize > 0 || narrowed);
+  // "/" finds, "F" filters.
+  useShortcut("/", () => search.current?.focus(), toolbar);
+  useShortcut("f", () => setFilterOpen(true), toolbar);
+
   // Keyed, so it stays mounted (and open or collapsed) as the rest changes.
   const totals = (
     <CollectionTotalsSection

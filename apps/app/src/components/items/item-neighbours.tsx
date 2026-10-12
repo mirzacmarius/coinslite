@@ -1,6 +1,7 @@
 "use client";
 
 import { itemInViewHref } from "@/components/collection/collection-url";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { CollectionView } from "@coinslite/backend/convex/collection/view";
@@ -11,8 +12,6 @@ import { useQuery } from "convex/react";
 import { ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { isTyping } from "./add-item";
 
 type Neighbour = { _id: string; title: string } | null;
 
@@ -36,32 +35,11 @@ export function ItemNeighbours({
   const previous = near?.previous ?? null;
   const next = near?.next ?? null;
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey ||
-        event.shiftKey ||
-        isTyping(event.target) ||
-        document.querySelector('[role=dialog][data-state="open"]') ||
-        (event.target instanceof Element &&
-          event.target.closest("[role=menu],[role=listbox]"))
-      )
-        return;
-      const to =
-        event.key === "ArrowLeft"
-          ? previous
-          : event.key === "ArrowRight"
-            ? next
-            : null;
-      if (!to) return;
-      event.preventDefault();
-      router.push(itemInViewHref(to._id, view));
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [previous, next, router, view]);
+  const goTo = (to: Neighbour) => {
+    if (to) router.push(itemInViewHref(to._id, view));
+  };
+  useShortcut("ArrowLeft", () => goTo(previous), previous !== null);
+  useShortcut("ArrowRight", () => goTo(next), next !== null);
 
   if (!near) return null;
   return (
