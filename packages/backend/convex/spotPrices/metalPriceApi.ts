@@ -1,3 +1,4 @@
+import { withTimeout } from "../utils/timeout";
 import { type PerDollar, rateCodes } from "./rates";
 
 /**
@@ -6,6 +7,8 @@ import { type PerDollar, rateCodes } from "./rates";
  * replaces just this file.
  */
 const LATEST_URL = "https://api.metalpriceapi.com/v1/latest";
+/** How long a request may take, answer included, before it counts as failed. */
+const REQUEST_TIMEOUT_MS = 15_000;
 
 /** The latest prices from the provider. */
 export type Quote = {
@@ -16,12 +19,26 @@ export type Quote = {
   requestsPerMonth?: number;
 };
 
-/** Fetches gold, silver and the Home currencies, priced per US dollar. Throws when anything is missing. */
+/**
+ * Fetches gold, silver and the Home currencies, priced per US dollar. Throws
+ * when anything is missing, or when the provider takes longer than
+ * REQUEST_TIMEOUT_MS to answer.
+ */
 export async function fetchQuote(apiKey: string): Promise<Quote> {
   const currencies = rateCodes.filter((code) => code !== "USD");
   const url = `${LATEST_URL}?base=USD&currencies=${currencies.join(",")}`;
-  const response = await fetch(url, { headers: { "X-API-KEY": apiKey } });
-  const body: unknown = await response.json().catch(() => null);
+  const { response, body } = await withTimeout(
+    async (signal) => {
+      const response = await fetch(url, {
+        headers: { "X-API-KEY": apiKey },
+        signal,
+      });
+      const body: unknown = await response.json().catch(() => null);
+      return { response, body };
+    },
+    REQUEST_TIMEOUT_MS,
+    `MetalpriceAPI didn't answer within ${REQUEST_TIMEOUT_MS / 1000} seconds`,
+  );
   if (!response.ok || !isObject(body) || body.success !== true) {
     const error = isObject(body) && isObject(body.error) ? body.error : {};
     throw new Error(
