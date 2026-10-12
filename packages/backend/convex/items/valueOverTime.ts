@@ -12,10 +12,15 @@ export { monthOf };
  */
 
 /**
- * How many Items "Value over time" reads per page: each brings its history,
- * up to a point a month, so far fewer than the totals' pages.
+ * The most Items one page of "Value over time" reads. Each takes two lookups,
+ * its history and its Catalog entry, and its history is at most a point a
+ * month (items/valueHistory.ts): a page keeps to a quarter of the lookups
+ * one query may make (4,096), and inside half the documents (32,000) even if
+ * every Item's Market value changed every month for over two years. The
+ * bytes its Items take are capped apart (collectionTotals.ts). A Collection
+ * of 2,000 Items is four or five pages.
  */
-export const VALUE_OVER_TIME_PAGE_SIZE = 100;
+export const VALUE_OVER_TIME_PAGE_SIZE = 500;
 
 /** An Item's Market value from a moment on (marketValueHistory in schema.ts). */
 export type ValuePoint = {

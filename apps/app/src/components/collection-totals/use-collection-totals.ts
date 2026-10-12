@@ -32,18 +32,26 @@ function useUtcOffsetMinutes() {
   );
 }
 
+/** Totals as the app shows them. */
+export type ShownTotals = CollectionTotals & {
+  /**
+   * Only some pages are in yet: the figures are what those add up to, and
+   * grow as the rest arrive.
+   */
+  counting: boolean;
+};
+
 /**
  * Totals over the Items the signed-in person owns, or with `status` "sold"
- * over the ones they sold, live, or undefined while they first load. The
- * server sums a page of Items at a time; this reads every page and adds them
- * up (collectionTotals.ts explains why). When the Collection grows past a
- * page, the previous totals stay on screen until the next page is in. The
+ * over the ones they sold, live, or undefined while the first page loads.
+ * The server sums a page of Items at a time; this reads every page and adds
+ * them up (collectionTotals.ts explains why), showing what the pages so far
+ * add up to, `counting`, until the last is in. Once complete totals have
+ * been shown, they stay on screen while a change is counted again. The
  * Metal values are worked out here, at the latest Spot prices, so a Spot
  * price refresh re-reads no page.
  */
-export function useCollectionTotals(
-  sold?: "sold",
-): CollectionTotals | undefined {
+export function useCollectionTotals(sold?: "sold"): ShownTotals | undefined {
   const utcOffsetMinutes = useUtcOffsetMinutes();
   const { results, status, loadMore } = usePaginatedQuery(
     api.collectionTotals.unpricedPage,
@@ -61,13 +69,11 @@ export function useCollectionTotals(
     if (status === "CanLoadMore") loadMore(TOTALS_PAGE_SIZE);
   }, [status, loadMore]);
 
-  const complete = useMemo(
-    () =>
-      status === "Exhausted" && results.length > 0
-        ? results.reduce(combineTotals)
-        : undefined,
-    [results, status],
+  const sum = useMemo(
+    () => (results.length > 0 ? results.reduce(combineTotals) : undefined),
+    [results],
   );
+  const complete = status === "Exhausted" ? sum : undefined;
   // Kept per status: owned totals never stand in for sold ones.
   const previous = useRef<{ sold?: "sold"; totals: PageTotals }>(undefined);
   useEffect(() => {
@@ -75,17 +81,21 @@ export function useCollectionTotals(
   }, [complete, sold]);
 
   const prior = previous.current;
-  const shown =
-    complete ?? (prior && prior.sold === sold ? prior.totals : undefined);
+  const kept = prior && prior.sold === sold ? prior.totals : undefined;
+  const shown = complete ?? kept ?? sum;
+  const counting = complete === undefined && kept === undefined;
   return useMemo(
     () =>
       shown === undefined || perDollar === undefined
         ? undefined
-        : withMetalValues(
-            shown,
-            perDollar && spotPricesPerGram(perDollar, shown.currency),
-          ),
-    [shown, perDollar],
+        : {
+            ...withMetalValues(
+              shown,
+              perDollar && spotPricesPerGram(perDollar, shown.currency),
+            ),
+            counting,
+          },
+    [shown, perDollar, counting],
   );
 }
 

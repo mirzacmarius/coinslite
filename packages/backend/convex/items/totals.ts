@@ -13,11 +13,14 @@ import { type MetalContent, roundedMetalValue } from "./preciousMetal";
  */
 
 /**
- * How many Items the Collection totals read per page: few enough to stay far
- * inside a query's read limits even with long notes on every Item, and a Free
- * plan Collection (at most 50 Items) in one page.
+ * The most Items one page of the Collection totals reads. Each is a document
+ * of a few kilobytes and at most one lookup of its Catalog entry, so a page
+ * keeps to a quarter of the lookups and a sixteenth of the documents one
+ * query may read (4,096 and 32,000); the bytes its Items take are capped
+ * apart (collectionTotals.ts). A Collection of 2,000 Items is two or three
+ * pages, a Free plan one (at most 50 Items) one.
  */
-export const TOTALS_PAGE_SIZE = 500;
+export const TOTALS_PAGE_SIZE = 1_000;
 
 const itemTypes = ["coin", "banknote", "stamp"] as const satisfies ItemType[];
 

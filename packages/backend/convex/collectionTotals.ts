@@ -7,7 +7,7 @@ import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { type QueryCtx, query } from "./_generated/server";
 import { resolveItems } from "./items/resolve";
-import { collectionTotals, pageTotals } from "./items/totals";
+import { TOTALS_PAGE_SIZE, collectionTotals, pageTotals } from "./items/totals";
 import { historyOf } from "./items/valueHistory";
 import {
   VALUE_OVER_TIME_PAGE_SIZE,
@@ -28,10 +28,10 @@ import { homeCurrency, perDollar } from "./utils/validators";
  * one query may read. A stored running total would need every way of adding,
  * editing, deleting and converting Items to keep it in step. Instead each
  * page of Items is summed here with the pure `pageTotals`, and the app reads
- * page after page (TOTALS_PAGE_SIZE Items each) and adds them up with
- * `combineTotals`. Every page stays well inside the read limits however
- * large the Collection, stays live, and a Free plan Collection (at most 50
- * Items) is one page.
+ * page after page (up to TOTALS_PAGE_SIZE Items each) and adds them up with
+ * `combineTotals`, showing what it has while the rest arrive. Every page
+ * stays inside the read limits however large the Collection, stays live, and
+ * a Free plan Collection (at most 50 Items) is one page.
  *
  * Why no Metal values in the pages: they move with every Spot price refresh.
  * Each page says how much of each metal its Items hold instead, and the app
@@ -113,8 +113,33 @@ function requireUtcOffset(utcOffsetMinutes: number) {
 }
 
 /**
- * A page of the person's Items: the ones they own, or with `status` "sold"
- * the ones they sold.
+ * The most bytes of Items one page reads: a quarter of the 16 MiB a query may
+ * read, leaving the rest for the Catalog entries they link to and, for "Value
+ * over time", their history. Items with long notes make a page shorter
+ * rather than the query fail: Convex ends the page early, or has the app
+ * split it in two.
+ */
+const PAGE_BYTES = 4 * 1024 * 1024;
+
+/**
+ * `paginationOpts` held to at most `numItems` Items and PAGE_BYTES of them,
+ * however many the app asks for.
+ */
+const capped = (
+  paginationOpts: PaginationOptions,
+  numItems: number,
+): PaginationOptions => ({
+  ...paginationOpts,
+  numItems: Math.min(paginationOpts.numItems, numItems),
+  maximumBytesRead: Math.min(
+    paginationOpts.maximumBytesRead ?? PAGE_BYTES,
+    PAGE_BYTES,
+  ),
+});
+
+/**
+ * A page of the person's Items, up to TOTALS_PAGE_SIZE: the ones they own,
+ * or with `status` "sold" the ones they sold.
  */
 const itemsPage = (
   ctx: QueryCtx,
@@ -132,7 +157,7 @@ const itemsPage = (
             .gt("soldOn", "")
         : q.eq("ownerId", ownerId).eq("soldOn", undefined),
     )
-    .paginate(paginationOpts);
+    .paginate(capped(paginationOpts, TOTALS_PAGE_SIZE));
 
 const pageArgs = {
   paginationOpts: paginationOptsValidator,
@@ -233,10 +258,7 @@ export const valueOverTimePage = query({
     const items = await ctx.db
       .query("items")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", owner._id))
-      .paginate({
-        ...paginationOpts,
-        numItems: Math.min(paginationOpts.numItems, VALUE_OVER_TIME_PAGE_SIZE),
-      });
+      .paginate(capped(paginationOpts, VALUE_OVER_TIME_PAGE_SIZE));
     if (items.page.length === 0) return { ...items, page: [[]] };
     // Linked Items' metal facts come from their Catalog entries.
     const resolved = await resolveItems(ctx, items.page);

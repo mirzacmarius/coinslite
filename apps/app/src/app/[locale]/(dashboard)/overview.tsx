@@ -40,6 +40,7 @@ export function Overview() {
   const soldTotals = useCollectionTotals("sold");
   const firstRun = isFirstRun(latest?.length, soldTotals?.items);
   const deciding = firstRun === undefined;
+  const counting = totals?.counting === true || soldTotals?.counting === true;
 
   return (
     <>
@@ -54,7 +55,7 @@ export function Overview() {
         {!firstRun && (
           <section
             aria-labelledby={totalsId}
-            aria-busy={totals === undefined || deciding}
+            aria-busy={totals === undefined || deciding || counting}
           >
             <h2 id={totalsId} className="sr-only">
               {t("collectionTotals.title")}
@@ -66,6 +67,7 @@ export function Overview() {
                 totals={totals}
                 sold={soldTotals}
                 variant="overview"
+                counting={counting}
               />
             )}
           </section>
