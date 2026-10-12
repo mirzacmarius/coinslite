@@ -12,13 +12,9 @@ import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { CodeStep } from "./code-step";
 import { OtherSignInMethods } from "./other-methods";
-import {
-  AcceptTermsField,
-  HomeCurrencyField,
-  useAcceptTermsRule,
-} from "./sign-up-fields";
+import { AcceptTermsField, HomeCurrencyField } from "./sign-up-fields";
 import { TextField } from "./text-field";
-import { useAuthSchemas, useSubmitState } from "./use-auth-form";
+import { useAuthRules, useSubmitState } from "./use-auth-form";
 import { useAuthStep } from "./use-auth-step";
 
 export function SignUpFlow({
@@ -31,8 +27,7 @@ export function SignUpFlow({
   const t = useI18n();
   const locale = useCurrentLocale();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
-  const acceptTermsRule = useAcceptTermsRule();
+  const rules = useAuthRules();
   const [pendingEmail, setPendingEmail] = useState<string>();
   const [failed, setFailed] = useState(false);
 
@@ -87,7 +82,7 @@ export function SignUpFlow({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="email" validators={{ onChange: schemas.email }}>
+        <form.Field name="email" validators={{ onChange: rules.email }}>
           {(field) => (
             <TextField
               field={field}
@@ -100,7 +95,7 @@ export function SignUpFlow({
         </form.Field>
         <form.Field
           name="password"
-          validators={{ onChange: schemas.newPassword }}
+          validators={{ onChange: rules.newPassword }}
         >
           {(field) => (
             <TextField
@@ -118,7 +113,7 @@ export function SignUpFlow({
         </form.Field>
         <form.Field
           name="acceptTerms"
-          validators={{ onChange: acceptTermsRule }}
+          validators={{ onChange: rules.acceptTerms }}
         >
           {(field) => <AcceptTermsField field={field} showErrors={submitted} />}
         </form.Field>

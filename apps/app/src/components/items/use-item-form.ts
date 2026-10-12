@@ -27,13 +27,17 @@ import { isCatalogType } from "./item-fields";
 import {
   type ItemFormValues,
   blankItem,
-  detailFields,
   factValues,
   fillForm,
   hasDetails,
   valuesFromItem,
 } from "./item-form";
-import { type LinkedEntry, itemSave } from "./item-form-submit";
+import {
+  type LinkedEntry,
+  itemFormRules,
+  itemSave,
+  refusedDetails,
+} from "./item-form-submit";
 
 /** An Item as its page reads it: facts resolved, with the Catalog entry it's linked to. */
 type EditedItem = Doc<"items"> & { catalogEntry?: LinkedEntry | null };
@@ -117,15 +121,15 @@ export function useItemForm({
   // The scan this new Item comes from, until it's added or the form closes.
   const [scanned, setScanned] = useState<ScanPreset>();
   const itemLimitMessage = useItemLimitMessage();
+  const rules = useMemo(
+    () => itemFormRules((key) => t(key), locale),
+    [t, locale],
+  );
+  // Where a submit came from that waits for "More details" to open.
+  const [submitWhenOpen, setSubmitWhenOpen] = useState<Element>();
 
   const form = useForm({
     defaultValues: defaults,
-    onSubmitInvalid: ({ formApi }) => {
-      if (
-        detailFields.some((name) => formApi.getFieldMeta(name)?.errors.length)
-      )
-        setDetailsOpen(true);
-    },
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       const { save, wanted } = itemSave({
@@ -195,6 +199,7 @@ export function useItemForm({
         // A preselected Album stays preselected for the next Item.
         form.setFieldValue("albumId", value.albumId, {
           dontUpdateMeta: preselected,
+          dontValidate: preselected,
         });
         if (catalogVisible && isCatalogType(value.type)) openPicker(true);
         else titleRef.current?.focus();
@@ -213,12 +218,18 @@ export function useItemForm({
       form.getFieldValue("albumId") === undefined &&
       !form.getFieldMeta("albumId")?.isTouched
     )
-      form.setFieldValue("albumId", onlyAlbum, { dontUpdateMeta: true });
+      form.setFieldValue("albumId", onlyAlbum, {
+        dontUpdateMeta: true,
+        dontValidate: true,
+      });
   }, [open, onlyAlbum, form]);
   // Before the first paint, so the type pill never shows the previous type.
   useLayoutEffect(() => {
     if (open && newItemType && !item)
-      form.setFieldValue("type", newItemType, { dontUpdateMeta: true });
+      form.setFieldValue("type", newItemType, {
+        dontUpdateMeta: true,
+        dontValidate: true,
+      });
   }, [open, newItemType, item, form]);
   // Each opening for a coin or banknote starts on the Catalog picker, unless
   // the form already holds something.
@@ -337,6 +348,25 @@ export function useItemForm({
       toast.error(t("scanner.photosFailed"));
     }
   };
+  /**
+   * Validates and saves. A closed "More details" has no fields to check:
+   * when one of them holds what its rule refuses, it opens first, and the
+   * submit runs once its fields show, so they say what's wrong.
+   */
+  const submit = (from: Element) => {
+    if (!detailsOpen && refusedDetails(form.state.values, rules).length > 0) {
+      setDetailsOpen(true);
+      setSubmitWhenOpen(from);
+      return;
+    }
+    void submitForm(form, t("common.saveFailed"), from);
+  };
+  // After the render that opened "More details": its fields have mounted.
+  useEffect(() => {
+    if (!submitWhenOpen) return;
+    setSubmitWhenOpen(undefined);
+    void submitForm(form, t("common.saveFailed"), submitWhenOpen);
+  }, [submitWhenOpen, form, t]);
   const submitting = useSelector(form.store, (state) => state.isSubmitting);
   // A scan's photos are input too: closing the form drops them.
   const changed =
@@ -365,9 +395,10 @@ export function useItemForm({
     /** A new Item's form stays as it was for next time, unless it holds a scan. */
     keepsDraft: !item && !copyOf && scanned === undefined,
     submitting,
+    /** The rules the fields check what they hold with (item-form-submit.ts). */
+    rules,
     /** Validates and saves; `from` is where the submit came from (lib/submit-form.ts). */
-    submit: (from: Element) =>
-      void submitForm(form, t("common.saveFailed"), from),
+    submit,
     /** Opens the Catalog picker from the form, to link another entry. */
     pickAnother: () => openPicker(false),
     /** The Catalog picker's props (catalog-picker.tsx). */

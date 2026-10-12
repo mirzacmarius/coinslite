@@ -12,13 +12,13 @@ import { AuthPanel, FormMessage, authLink } from "./auth-panel";
 import { CodeStep } from "./code-step";
 import { OtherSignInMethods } from "./other-methods";
 import { TextField } from "./text-field";
-import { useAuthSchemas, useSubmitState } from "./use-auth-form";
+import { useAuthRules, useSubmitState } from "./use-auth-form";
 import { useAuthStep } from "./use-auth-step";
 
 export function SignInFlow({ next }: { next: string }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   // An account whose email isn't verified yet gets a code instead of a session.
   const [unverifiedEmail, setUnverifiedEmail] = useState<string>();
   const [failed, setFailed] = useState(false);
@@ -65,7 +65,7 @@ export function SignInFlow({ next }: { next: string }) {
       }
     >
       <AuthForm form={form}>
-        <form.Field name="email" validators={{ onChange: schemas.email }}>
+        <form.Field name="email" validators={{ onChange: rules.email }}>
           {(field) => (
             <TextField
               field={field}
@@ -76,7 +76,7 @@ export function SignInFlow({ next }: { next: string }) {
             />
           )}
         </form.Field>
-        <form.Field name="password" validators={{ onChange: schemas.password }}>
+        <form.Field name="password" validators={{ onChange: rules.password }}>
           {(field) => (
             <TextField
               field={field}

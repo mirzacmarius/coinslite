@@ -117,7 +117,6 @@ export function PreciousMetalSection() {
       <TextField
         name="weight"
         label={t("preciousMetal.weight")}
-        rule="weight"
         hint={
           metal
             ? t("preciousMetal.weightHint")
@@ -129,7 +128,6 @@ export function PreciousMetalSection() {
       <TextField
         name="purity"
         label={t("preciousMetal.purity")}
-        rule="purity"
         hint={
           metal
             ? t("preciousMetal.purityHint")

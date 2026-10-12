@@ -16,11 +16,7 @@ import {
 import { ResendCodeButton } from "./code-step";
 import { takeLinkFragment } from "./link-fragment";
 import { TextField } from "./text-field";
-import {
-  codeInputProps,
-  useAuthSchemas,
-  useSubmitState,
-} from "./use-auth-form";
+import { codeInputProps, useAuthRules, useSubmitState } from "./use-auth-form";
 import { useAuthStep } from "./use-auth-step";
 
 /** Forgot password: email a code, then choose a new password with it. */
@@ -61,7 +57,7 @@ function RequestStep({
 }: { next: string; onSent: (email: string) => void }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const form = useForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {
@@ -83,7 +79,7 @@ function RequestStep({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="email" validators={{ onChange: schemas.email }}>
+        <form.Field name="email" validators={{ onChange: rules.email }}>
           {(field) => (
             <TextField
               field={field}
@@ -109,7 +105,7 @@ function NewPasswordStep({
 }: { email: string; code: string; next: string }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const [message, setMessage] = useState<FormMessageState | undefined>(
     code
       ? undefined
@@ -141,7 +137,7 @@ function NewPasswordStep({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="code" validators={{ onChange: schemas.code }}>
+        <form.Field name="code" validators={{ onChange: rules.code }}>
           {(field) => (
             <TextField
               field={field}
@@ -153,7 +149,7 @@ function NewPasswordStep({
         </form.Field>
         <form.Field
           name="newPassword"
-          validators={{ onChange: schemas.newPassword }}
+          validators={{ onChange: rules.newPassword }}
         >
           {(field) => (
             <TextField

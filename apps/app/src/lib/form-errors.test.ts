@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { z } from "zod";
 import { errorText } from "./form-errors";
 
-describe("errorText", () => {
+describe("what a field's errors say", () => {
   test("a schema rule's issue shows its message", () => {
     expect(errorText([{ message: "Enter a title" }])).toBe("Enter a title");
   });

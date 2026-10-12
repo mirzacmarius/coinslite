@@ -84,12 +84,7 @@ function DescriptionGroup() {
   const { type } = useItemKind();
   return (
     <DetailGroup title={t("items.description")}>
-      <TextField
-        name="year"
-        label={t("items.year")}
-        rule="year"
-        inputMode="numeric"
-      />
+      <TextField name="year" label={t("items.year")} inputMode="numeric" />
       <TextField
         name="denomination"
         label={t("items.denomination")}
@@ -123,7 +118,6 @@ function DescriptionGroup() {
         <TextField
           name="mintage"
           label={t("items.mintage")}
-          rule="whole"
           inputMode="numeric"
         />
       )}
@@ -131,7 +125,6 @@ function DescriptionGroup() {
         <TextField
           name="numistaNumber"
           label={t("items.numistaNumber")}
-          rule="whole"
           inputMode="numeric"
         />
       )}
@@ -182,14 +175,12 @@ function PhysicalGroup() {
       <TextField
         name="diameter"
         label={t("items.diameter")}
-        rule="size"
         hint={t("items.millimetres")}
         inputMode="decimal"
       />
       <TextField
         name="thickness"
         label={t("items.thickness")}
-        rule="size"
         hint={t("items.millimetres")}
         inputMode="decimal"
       />

@@ -8,11 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, FormMessage, type FormMessageState } from "./auth-panel";
 import { TextField } from "./text-field";
-import {
-  codeInputProps,
-  useAuthSchemas,
-  useSubmitState,
-} from "./use-auth-form";
+import { codeInputProps, useAuthRules, useSubmitState } from "./use-auth-form";
 import { type AuthStepResult, useAuthStep } from "./use-auth-step";
 
 /**
@@ -32,7 +28,7 @@ export function CodeStep({
 }) {
   const t = useI18n();
   const attempt = useAuthStep("password");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const [message, setMessage] = useState<FormMessageState>();
   const codeInput = useRef<HTMLInputElement>(null);
   useEffect(() => codeInput.current?.focus(), []);
@@ -72,7 +68,7 @@ export function CodeStep({
       }
     >
       <AuthForm form={form}>
-        <form.Field name="code" validators={{ onChange: schemas.code }}>
+        <form.Field name="code" validators={{ onChange: rules.code }}>
           {(field) => (
             <TextField
               inputRef={codeInput}

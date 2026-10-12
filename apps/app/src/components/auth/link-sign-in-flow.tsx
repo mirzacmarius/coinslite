@@ -15,7 +15,7 @@ import {
 } from "./auth-panel";
 import { ResendCodeButton } from "./code-step";
 import { TextField } from "./text-field";
-import { useAuthSchemas, useSubmitState } from "./use-auth-form";
+import { useAuthRules, useSubmitState } from "./use-auth-form";
 import { type AuthStepResult, useAuthStep } from "./use-auth-step";
 
 /**
@@ -26,7 +26,7 @@ export function LinkSignInFlow({ next }: { next: string }) {
   const t = useI18n();
   const locale = useCurrentLocale();
   const attempt = useAuthStep("magic-link");
-  const schemas = useAuthSchemas();
+  const rules = useAuthRules();
   const [sentTo, setSentTo] = useState<string>();
   const [message, setMessage] = useState<FormMessageState>();
 
@@ -81,7 +81,7 @@ export function LinkSignInFlow({ next }: { next: string }) {
       footer={footer}
     >
       <AuthForm form={form}>
-        <form.Field name="email" validators={{ onChange: schemas.email }}>
+        <form.Field name="email" validators={{ onChange: rules.email }}>
           {(field) => (
             <TextField
               field={field}

@@ -36,7 +36,6 @@ export function PurchaseSection({
       <TextField
         name="purchaseDate"
         label={t("items.purchaseDate")}
-        rule="purchaseDate"
         type="date"
         max={localToday()}
       />

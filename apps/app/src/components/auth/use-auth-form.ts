@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { authRules } from "./auth-rules";
 
 /** Field rules shared by the auth forms, in the current language (auth-rules.ts). */
-export function useAuthSchemas() {
+export function useAuthRules() {
   const t = useI18n();
   return useMemo(() => authRules((key) => t(key)), [t]);
 }

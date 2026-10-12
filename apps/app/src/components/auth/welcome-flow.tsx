@@ -9,12 +9,8 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { AuthForm, SubmitButton } from "./auth-form";
 import { AuthPanel, AuthPanelSkeleton, FormMessage } from "./auth-panel";
-import {
-  AcceptTermsField,
-  HomeCurrencyField,
-  useAcceptTermsRule,
-} from "./sign-up-fields";
-import { useSubmitState } from "./use-auth-form";
+import { AcceptTermsField, HomeCurrencyField } from "./sign-up-fields";
+import { useAuthRules, useSubmitState } from "./use-auth-form";
 
 /**
  * The last step of signing up with Google or a sign-in link: the Home currency
@@ -58,9 +54,9 @@ function WelcomeForm({
   homeCurrency: HomeCurrency;
 }) {
   const t = useI18n();
+  const rules = useAuthRules();
   const locale = useCurrentLocale();
   const completeSignUp = useMutation(api.accounts.profile.completeSignUp);
-  const acceptTermsRule = useAcceptTermsRule();
   const [failed, setFailed] = useState(false);
 
   const form = useForm({
@@ -92,7 +88,7 @@ function WelcomeForm({
         </form.Field>
         <form.Field
           name="acceptTerms"
-          validators={{ onChange: acceptTermsRule }}
+          validators={{ onChange: rules.acceptTerms }}
         >
           {(field) => <AcceptTermsField field={field} showErrors={submitted} />}
         </form.Field>
