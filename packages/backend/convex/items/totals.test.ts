@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { marketRates } from "../spotPrices/rates";
+import { spotPricesPerGram } from "../spotPrices/rates";
 import {
   type CollectionTotals,
   type TotalsItem,
@@ -66,11 +66,8 @@ describe("the month an Item was acquired", () => {
 
 // Gold at $2,000 and silver at $25 a troy ounce (31.1034768 g), 10 NOK to
 // the dollar: a troy ounce of gold is 20,000 kr and one of silver 250 kr.
-const rates = marketRates({
-  quotedAt: 0,
-  fetchedAt: 0,
-  checkedAt: 0,
-  perDollar: {
+const spotPrices = spotPricesPerGram(
+  {
     USD: 1,
     NOK: 10,
     SEK: 10.5,
@@ -82,7 +79,8 @@ const rates = marketRates({
     XAU: 1 / 2000,
     XAG: 1 / 25,
   },
-});
+  "NOK",
+);
 
 // Amounts in øre.
 const krugerrand: TotalsItem = {
@@ -120,7 +118,11 @@ const soldStamps: TotalsItem = {
   salePrice: 20_00,
 };
 
-const context = { currency: "NOK", rates, utcOffsetMinutes: OSLO } as const;
+const context = {
+  currency: "NOK",
+  spotPrices,
+  utcOffsetMinutes: OSLO,
+} as const;
 
 const expectedTotals: CollectionTotals = {
   currency: "NOK",
@@ -158,10 +160,6 @@ describe("Collection totals", () => {
   });
 
   test("combining any split of the same Items into pages gives the same totals as one page", () => {
-    const spotPrices = {
-      gold: rates.spotPricePerGram("gold", "NOK"),
-      silver: rates.spotPricePerGram("silver", "NOK"),
-    };
     const splits: TotalsItem[][][] = [
       [
         [krugerrand, inheritedBanknote],

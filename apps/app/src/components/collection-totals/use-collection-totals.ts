@@ -61,7 +61,7 @@ export function useCollectionTotals(sold?: "sold"): ShownTotals | undefined {
     { initialNumItems: TOTALS_PAGE_SIZE },
   );
   const perDollar = useQuery(
-    api.collectionTotals.spotPrices,
+    api.collectionTotals.perDollar,
     utcOffsetMinutes === null ? "skip" : {},
   );
 

@@ -37,13 +37,13 @@ async function lastCheckedAt(
   ctx: QueryCtx,
   snapshot: Doc<"spotPriceSnapshots">,
 ) {
-  const check = await ctx.db.query("spotPriceChecks").first();
+  const check = await ctx.db.query("spotPriceChecks").unique();
   return check?.checkedAt ?? snapshot.checkedAt ?? snapshot.fetchedAt;
 }
 
 /** Notes a refresh attempt, successful or not. */
 async function recordCheck(ctx: MutationCtx, checkedAt: number) {
-  const check = await ctx.db.query("spotPriceChecks").first();
+  const check = await ctx.db.query("spotPriceChecks").unique();
   if (check) {
     await ctx.db.patch("spotPriceChecks", check._id, { checkedAt });
   } else {

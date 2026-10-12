@@ -35,14 +35,19 @@ const perGram = (perDollar: PerDollar, metal: Metal, currency: HomeCurrency) =>
   TROY_OUNCE_GRAMS;
 
 /**
- * Gold's and silver's Spot price per gram in minor units of `currency`, not
- * rounded: the same as MarketRates.spotPricePerGram, for the app to work
- * Metal values out from the stored table.
+ * Gold's and silver's Spot price: a gram of each in minor units of one Home
+ * currency, not rounded, so Metal values can multiply them and round once.
+ */
+export type SpotPrices = Record<Metal, number>;
+
+/**
+ * The Spot prices in `currency` from a stored table: the same as
+ * MarketRates.spotPricePerGram gives.
  */
 export const spotPricesPerGram = (
   perDollar: PerDollar,
   currency: HomeCurrency,
-): Record<Metal, number> => ({
+): SpotPrices => ({
   gold: perGram(perDollar, "gold", currency),
   silver: perGram(perDollar, "silver", currency),
 });
