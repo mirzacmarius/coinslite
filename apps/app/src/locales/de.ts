@@ -1197,6 +1197,37 @@ export default {
     removeBody:
       "Seine Dateien und der Bildnachweis werden gelöscht. Der Eintrag zeigt einen Platzhalter, bis ein anderes Bild hinzugefügt wird.",
     removed: "Bild entfernt",
+    commons: {
+      title: "Aus Wikimedia Commons",
+      address: "Dateiseite",
+      hint: "Füge die Adresse einer Dateiseite auf Commons ein. Angenommen werden gemeinfreie Dateien und solche unter CC0, CC BY und CC BY-SA. Das Bild wird in CoinsLite kopiert, nicht verlinkt.",
+      fetch: "Abrufen",
+      reading: "Dateiseite wird gelesen…",
+      downloading: "Bild wird heruntergeladen…",
+      read: "Ausgefüllt aus {title} unter {licence}. Prüfe den Bildnachweis vor dem Speichern.",
+      noAuthor: "Die Dateiseite nennt keinen Urheber. Gib den Urheber an.",
+      designReminder:
+        "Ein freies Foto macht das Motiv nicht frei. Verwende es nur, wenn auch das Motiv frei ist: gemeinfrei, vom Urheberrecht ausgenommen, abgelaufen oder mit Erlaubnis verwendet.",
+      errors: {
+        notCommonsFile:
+          "Füge die Adresse einer Dateiseite auf Wikimedia Commons ein, etwa https://commons.wikimedia.org/wiki/File:….",
+        notFound: "Diese Datei gibt es auf Wikimedia Commons nicht.",
+        notPicture: "Diese Datei ist kein Bild.",
+        nonCommercial:
+          "Diese Datei darf nur nicht kommerziell genutzt werden (NC) und kann daher nicht hinzugefügt werden.",
+        noDerivatives:
+          "Diese Datei darf nicht verändert werden (ND). Die Umwandlung in WebP ist eine Veränderung, daher kann sie nicht hinzugefügt werden.",
+        nonFree:
+          "Diese Datei ist nicht frei oder wird als Fair Use genutzt und kann daher nicht hinzugefügt werden.",
+        disputed:
+          "Diese Datei ist als ohne Lizenz, Quelle oder Erlaubnis, als Urheberrechtsverletzung oder zur Löschung markiert und kann daher nicht hinzugefügt werden.",
+        otherLicence:
+          "Diese Datei trägt eine andere Lizenz oder einen anderen Urheberrechtshinweis als gemeinfrei, CC0, CC BY oder CC BY-SA und kann daher nicht hinzugefügt werden.",
+        none: "Auf dieser Dateiseite wurde keine Lizenz gefunden, daher kann sie nicht hinzugefügt werden.",
+        failed:
+          "Die Datei konnte nicht von Wikimedia Commons gelesen werden. Versuche es noch einmal.",
+      },
+    },
     errors: {
       imageRequired: "Wähle ein Bild aus.",
       sourceRequired: "Gib die Quelle an.",

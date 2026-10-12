@@ -1,0 +1,16 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "pages": [
+      {
+        "ns": 6,
+        "title": "File:No such CoinsLite test file.jpg",
+        "missing": true,
+        "imagerepository": ""
+      }
+    ]
+  },
+  "limits": {
+    "categories": 500
+  }
+}

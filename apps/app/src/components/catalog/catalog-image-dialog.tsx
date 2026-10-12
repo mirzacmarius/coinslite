@@ -1,6 +1,7 @@
 "use client";
 
 import { FormDialog } from "@/components/form-dialog";
+import type { CommonsFile } from "@/lib/commons-image";
 import { formChanged } from "@/lib/discard-changes";
 import { errorText } from "@/lib/form-errors";
 import {
@@ -46,6 +47,7 @@ import { ChevronRight, ImageIcon, ImagePlus, Loader2, X } from "lucide-react";
 import type * as React from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { z } from "zod";
+import { CatalogImageCommons } from "./catalog-image-commons";
 
 /** A picture an admin chose, converted to WebP at full size and as a thumbnail. */
 type PickedImage = { full: ShrunkImage; thumbnail: ShrunkImage };
@@ -76,6 +78,14 @@ export type CatalogImageEntry = {
 };
 
 const accept = "image/jpeg,image/png,image/webp,image/gif";
+
+/** The credit's fields, each with its placeholder. */
+const fields = [
+  ["source", "sourcePlaceholder"],
+  ["author", "authorPlaceholder"],
+  ["licence", "licencePlaceholder"],
+  ["link", "linkPlaceholder"],
+] as const;
 
 /** The codes an image function can fail with, each with its message. */
 const failureCodes = new Set<string>([
@@ -135,6 +145,9 @@ export function CatalogImageDialog({
   const updateCredit = useMutation(api.catalog.images.updateCredit);
   const [picked, setPicked] = useState<PickedImage>();
   const [converting, setConverting] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [commonsFile, setCommonsFile] = useState<CommonsFile>();
+  const busy = converting || fetching;
   const [imageError, setImageError] = useState<string>();
   const [failed, setFailed] = useState<string>();
   const [defaults] = useState<ImageCredit>(() => ({
@@ -220,21 +233,23 @@ export function CatalogImageDialog({
     submitted ? errorText(errors) : undefined;
 
   const submit = (from: Element) => {
-    if (converting) return;
+    if (busy) return;
     if (!picked && !hasImage)
       setImageError(t("catalogImages.errors.imageRequired"));
     void submitForm(form, t("common.saveFailed"), from);
   };
 
-  const choose = async (file: File) => {
+  /** Converts a picture to the sizes stored; whether it could be. */
+  const convertPicture = async (file: Blob) => {
     setImageError(undefined);
     if (file.size > catalogImageLimits.originalBytes) {
       setImageError(t("catalogImages.errors.ORIGINAL_TOO_LARGE"));
-      return;
+      return false;
     }
     setConverting(true);
     try {
       setPicked(await shrinkImage(file, catalogImageSizes));
+      return true;
     } catch (failure) {
       const unwritable =
         failure instanceof ShrinkError && failure.reason === "unwritable";
@@ -243,17 +258,31 @@ export function CatalogImageDialog({
           ? t("catalogImages.errors.WEBP_UNSUPPORTED")
           : t("catalogImages.errors.IMAGE_UNREADABLE"),
       );
+      return false;
     } finally {
       setConverting(false);
     }
   };
 
-  const fields = [
-    ["source", "sourcePlaceholder"],
-    ["author", "authorPlaceholder"],
-    ["licence", "licencePlaceholder"],
-    ["link", "linkPlaceholder"],
-  ] as const;
+  /** Takes a Commons file's picture, and its credit in place of the one shown. */
+  const chooseFromCommons = async (file: CommonsFile, picture: Blob) => {
+    if (!(await convertPicture(picture))) return;
+    setCommonsFile(file);
+    for (const [name] of fields) form.setFieldValue(name, file.credit[name]);
+  };
+
+  /**
+   * Takes a picture the admin chose. A credit filled in from Commons and
+   * left as it was goes back to the entry's, as it doesn't fit another
+   * picture.
+   */
+  const chooseFile = async (file: File) => {
+    if (!(await convertPicture(file)) || !commonsFile) return;
+    const values = form.state.values;
+    if (fields.every(([name]) => values[name] === commonsFile.credit[name]))
+      for (const [name] of fields) form.setFieldValue(name, defaults[name]);
+    setCommonsFile(undefined);
+  };
 
   return (
     <FormDialog
@@ -311,8 +340,15 @@ export function CatalogImageDialog({
               currentUrl={entry.imageUrl}
               picked={picked}
               converting={converting}
+              disabled={fetching}
               error={imageError}
-              onFile={(file) => void choose(file)}
+              onFile={(file) => void chooseFile(file)}
+            />
+            <CatalogImageCommons
+              disabled={converting || submitting}
+              filledFrom={commonsFile}
+              onBusyChange={setFetching}
+              onPicture={chooseFromCommons}
             />
             <fieldset className="flex flex-col gap-3">
               <legend className="mb-1 text-xs font-medium">
@@ -383,7 +419,7 @@ export function CatalogImageDialog({
                   {t("catalogImages.cancel")}
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={submitting || converting}>
+              <Button type="submit" disabled={submitting || busy}>
                 {submitting && (
                   <Loader2 className="animate-spin" aria-hidden="true" />
                 )}
@@ -410,12 +446,15 @@ function ImagePicker({
   currentUrl,
   picked,
   converting,
+  disabled = false,
   error,
   onFile,
 }: {
   currentUrl?: string;
   picked?: PickedImage;
   converting: boolean;
+  /** While a picture comes from elsewhere (Wikimedia Commons). */
+  disabled?: boolean;
   error?: string;
   onFile: (file: File) => void;
 }) {
@@ -425,9 +464,10 @@ function ImagePicker({
   const [dropping, setDropping] = useState(false);
   const previewUrl = usePreviewUrl(picked?.full.blob);
   const shown = previewUrl ?? currentUrl;
+  const busy = converting || disabled;
   const pick = () => input.current?.click();
   const onDragOver = (event: React.DragEvent) => {
-    if (converting || !event.dataTransfer.types.includes("Files")) return;
+    if (busy || !event.dataTransfer.types.includes("Files")) return;
     event.preventDefault();
     setDropping(true);
   };
@@ -435,7 +475,7 @@ function ImagePicker({
     event.preventDefault();
     setDropping(false);
     const file = event.dataTransfer.files[0];
-    if (file && !converting) onFile(file);
+    if (file && !busy) onFile(file);
   };
   const size = (value: { width: number; height: number }) =>
     `${value.width} × ${value.height}`;
@@ -456,7 +496,7 @@ function ImagePicker({
         <button
           type="button"
           onClick={pick}
-          disabled={converting}
+          disabled={busy}
           aria-label={
             shown ? t("catalogImages.chooseAnother") : t("catalogImages.choose")
           }
@@ -509,7 +549,7 @@ function ImagePicker({
           variant="outline"
           size="xs"
           onClick={pick}
-          disabled={converting}
+          disabled={busy}
         >
           {shown ? t("catalogImages.chooseAnother") : t("catalogImages.choose")}
         </Button>

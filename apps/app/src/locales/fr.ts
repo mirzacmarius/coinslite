@@ -1179,6 +1179,37 @@ export default {
     removeBody:
       "Ses fichiers et son crédit sont supprimés. L’entrée affiche un espace réservé jusqu’à l’ajout d’une autre image.",
     removed: "Image retirée",
+    commons: {
+      title: "Depuis Wikimedia Commons",
+      address: "Page du fichier",
+      hint: "Collez l’adresse d’une page de fichier sur Commons. Les fichiers dans le domaine public ou sous CC0, CC BY et CC BY-SA sont acceptés. L’image est copiée dans CoinsLite, pas liée.",
+      fetch: "Récupérer",
+      reading: "Lecture de la page du fichier…",
+      downloading: "Téléchargement de l’image…",
+      read: "Rempli depuis {title} sous {licence}. Vérifiez le crédit avant d’enregistrer.",
+      noAuthor: "La page du fichier ne nomme aucun auteur. Indiquez l’auteur.",
+      designReminder:
+        "Une photo libre ne libère pas le motif. Ne l’utilisez que si le motif est libre lui aussi\u00a0: dans le domaine public, exclu du droit d’auteur, expiré ou utilisé avec autorisation.",
+      errors: {
+        notCommonsFile:
+          "Collez l’adresse d’une page de fichier sur Wikimedia Commons, comme https://commons.wikimedia.org/wiki/File:….",
+        notFound: "Ce fichier n’existe pas sur Wikimedia Commons.",
+        notPicture: "Ce fichier n’est pas une image.",
+        nonCommercial:
+          "Ce fichier n’est utilisable qu’à des fins non commerciales (NC)\u00a0: il ne peut pas être ajouté.",
+        noDerivatives:
+          "Ce fichier ne peut pas être modifié (ND). Le convertir en WebP est une modification\u00a0: il ne peut pas être ajouté.",
+        nonFree:
+          "Ce fichier n’est pas libre ou relève du «\u00a0fair use\u00a0»\u00a0: il ne peut pas être ajouté.",
+        disputed:
+          "Ce fichier est signalé comme sans licence, source ou autorisation, comme violation du droit d’auteur ou à supprimer\u00a0: il ne peut pas être ajouté.",
+        otherLicence:
+          "Ce fichier porte une licence ou une mention de droit d’auteur autre que le domaine public, CC0, CC BY ou CC BY-SA\u00a0: il ne peut pas être ajouté.",
+        none: "Aucune licence n’a été trouvée sur cette page de fichier\u00a0: le fichier ne peut pas être ajouté.",
+        failed:
+          "Impossible de lire le fichier depuis Wikimedia Commons. Réessayez.",
+      },
+    },
     errors: {
       imageRequired: "Choisissez une image.",
       sourceRequired: "Indiquez la source.",

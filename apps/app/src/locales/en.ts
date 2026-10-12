@@ -1148,6 +1148,36 @@ export default {
     removeBody:
       "Its files and credit are deleted. The entry shows a placeholder until another image is added.",
     removed: "Image removed",
+    commons: {
+      title: "From Wikimedia Commons",
+      address: "File page",
+      hint: "Paste the address of a Commons file page. Public domain, CC0, CC BY and CC BY-SA files are accepted. The picture is copied into CoinsLite, not linked.",
+      fetch: "Fetch",
+      reading: "Reading the file page…",
+      downloading: "Downloading the picture…",
+      read: "Filled in from {title} under {licence}. Check the credit before saving.",
+      noAuthor: "The file page names no creator. Enter the author.",
+      designReminder:
+        "A free photo doesn’t free the design. Use it only if the design is free too: in the public domain, excluded from copyright, expired, or used with permission.",
+      errors: {
+        notCommonsFile:
+          "Paste the address of a file page on Wikimedia Commons, such as https://commons.wikimedia.org/wiki/File:….",
+        notFound: "Wikimedia Commons has no such file.",
+        notPicture: "This file isn’t a picture.",
+        nonCommercial:
+          "This file may only be used non-commercially (NC), so it can’t be added.",
+        noDerivatives:
+          "This file may not be changed (ND). Converting it to WebP is a change, so it can’t be added.",
+        nonFree:
+          "This file is non-free or used under fair use, so it can’t be added.",
+        disputed:
+          "This file is tagged as missing a licence, source or permission, as a copyright violation, or for deletion, so it can’t be added.",
+        otherLicence:
+          "This file carries a licence or copyright notice other than public domain, CC0, CC BY or CC BY-SA, so it can’t be added.",
+        none: "No licence was found on this file page, so it can’t be added.",
+        failed: "Couldn’t read the file from Wikimedia Commons. Try again.",
+      },
+    },
     errors: {
       imageRequired: "Choose an image.",
       sourceRequired: "Enter the source.",

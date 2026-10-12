@@ -1,0 +1,102 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "pages": [
+      {
+        "pageid": 965353,
+        "ns": 6,
+        "title": "File:Morgan silver dollar.jpg",
+        "imagerepository": "local",
+        "imageinfo": [
+          {
+            "size": 28054,
+            "width": 312,
+            "height": 300,
+            "thumburl": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Morgan_silver_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+            "thumbwidth": 1280,
+            "thumbheight": 1231,
+            "thumbattribs": {
+              "src": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Morgan_silver_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "decoding": "async",
+              "loading": "lazy",
+              "width": 1280,
+              "height": 1231
+            },
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Morgan_silver_dollar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+            "descriptionurl": "https://commons.wikimedia.org/wiki/File:Morgan_silver_dollar.jpg",
+            "descriptionshorturl": "https://commons.wikimedia.org/w/index.php?curid=965353",
+            "extmetadata": {
+              "DateTime": {
+                "value": "2006-07-19 23:06:26",
+                "source": "mediawiki-metadata",
+                "hidden": ""
+              },
+              "ObjectName": {
+                "value": "Morgan silver dollar",
+                "source": "mediawiki-metadata"
+              },
+              "CommonsMetadataExtension": {
+                "value": 1.2,
+                "source": "extension",
+                "hidden": ""
+              },
+              "Categories": {
+                "value": "Morgan dollar|Files with no machine-readable author|Files with no machine-readable source|Media missing infobox template|Coins of the United States, 1884",
+                "source": "commons-categories",
+                "hidden": ""
+              },
+              "Assessments": {
+                "value": "",
+                "source": "commons-categories",
+                "hidden": ""
+              },
+              "Restrictions": {
+                "value": "",
+                "source": "commons-desc-page",
+                "hidden": ""
+              }
+            },
+            "mime": "image/jpeg"
+          }
+        ],
+        "categories": [
+          {
+            "ns": 14,
+            "title": "Category:Coins of the United States, 1884"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Files with no machine-readable author"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Files with no machine-readable source"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Media missing infobox template"
+          },
+          {
+            "ns": 14,
+            "title": "Category:Morgan dollar"
+          }
+        ],
+        "revisions": [
+          {
+            "slots": {
+              "main": {
+                "contentmodel": "wikitext",
+                "contentformat": "text/x-wiki",
+                "content": "== {{int:filedesc}} ==\n{{en|Picture of the Morgan Silver Dollar}}\nSource: uploaded at [[w:Image:Morgan dollar.jpg]]\n\n== {{int:license-header}} ==\n\n[[Category:Morgan dollar|1884]]\n[[Category:Coins of the United States, 1884]]\n[[Category:Media missing infobox template]]"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "categories": 500
+  },
+  "_note": "Edited from commons-morgan-silver-dollar.json: its licence template, licence categories and extmetadata licence fields are removed."
+}

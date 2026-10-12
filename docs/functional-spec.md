@@ -332,6 +332,13 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - A collapsible tree of every node. Add a root (country or Theme), add a child, edit, delete. Deletion states how many nodes below will go with it.
   - **Editable fields:** every Catalog field, including Item type (coin or banknote), country, metal, weight, fineness, diameter, Strike, the addable flag, sort order, and the image with its attribution.
   - **Images** are converted to WebP: full size (longest side ≤ 800 px) and a thumbnail (≤ 128 px), never upscaled.
+  - **An image from Wikimedia Commons:** the admin pastes a Commons file page's address instead of choosing a file.
+    - CoinsLite reads the file page's licence templates and categories, not only the API's summary, which often names only the design's licence. It also reads the creator named on the page (not the uploader).
+    - **Accepted:** public domain (PD templates, the Public Domain Mark), CC0, CC BY and CC BY-SA. **Refused with a message:** non-commercial (NC), no-derivatives (ND), non-free or fair use, files tagged as missing a licence, source or permission or nominated for deletion, any other licence or copyright notice, or no licence found.
+    - **Two licences:** where a file has a CC photo licence and a PD template for its design, the photo's licence governs the credit.
+    - **The credit is filled in and stays editable:** source "Wikimedia Commons"; the creator; the licence's name and deed, for example "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/); resized and converted to WebP"; and the file page as the link.
+    - The browser downloads the picture and converts it like a chosen file, so it's stored in CoinsLite, never linked to Wikimedia's servers.
+    - The dialog reminds the admin that the design must be free too: a free photo doesn't free the design.
 - **Catalog CSV export/import:**
   - **Columns:** `id, parent_id, item_type, title, country, denomination, series, material, strike, metal, weight_g, fineness, diameter_mm, year_from, year_to, technical_details, historical_notes, image_url, image_source, image_author, image_licence, sort_order, is_addable`.
   - **Further columns**, all optional: `numista_id`, `image_link`, the source, author, licence and link of the facts and notes (`facts_source` … `notes_link`), the technical facts (`mint, mint_mark, composition, edge, edge_lettering, thickness_mm, width_mm, height_mm, designers, mintage, issue_date, withdrawal_date`), `notes_language` (English when empty), and per app language `technical_details_<lang>, historical_notes_<lang>` with `notes_source_<lang>, notes_author_<lang>, notes_licence_<lang>, notes_link_<lang>`. A file without a column leaves that value as it is.
