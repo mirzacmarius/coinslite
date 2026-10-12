@@ -1,11 +1,19 @@
 import { brand } from "@/lib/brand";
+import { loaders } from "@/locales/loaders";
+import { defaultLocale } from "@coinslite/i18n";
 import type { MetadataRoute } from "next";
 
-export default function manifest(): MetadataRoute.Manifest {
+/**
+ * The install manifest. Its address carries no language, so it describes the
+ * app in the default language, in that dictionary's own words.
+ */
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const { common } = (await loaders[defaultLocale]()).default;
   return {
     name: "CoinsLite",
     short_name: "CoinsLite",
-    description: "Record the coins, banknotes and stamps you own.",
+    description: common.appDescription,
+    lang: defaultLocale,
     start_url: "/",
     display: "standalone",
     background_color: brand.lightBackground,
