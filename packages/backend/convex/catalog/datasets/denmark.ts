@@ -166,6 +166,8 @@ type Coin = {
   title?: string;
   yearFrom: number;
   yearTo?: number;
+  /** Replaced by a newer coin, though the bank gives no last year: titled by its first year alone. */
+  superseded?: boolean;
   /** YYYY, YYYY-MM or YYYY-MM-DD: the day the bank gives it went into circulation or was issued. */
   issueDate?: string;
   designers?: string[];
@@ -256,7 +258,7 @@ const frederikPortrait = (value: 20 | 10): Coin => ({
   spec: value === 20 ? twentyKroner : tenKroner,
   details:
     "Obverse: portrait of King Frederik X by Eva Hjorth, first used on the coin for the change of throne of 2024, with the inscriptions “Frederik X” and “Danmarks konge” divided by a heart, the traditional Danish mint mark. Reverse: the royal coat of arms, redrawn in 2024 by Ronny Skov Andersen, under Christian V's crown.",
-  link: coinSeries,
+  link: newDesign,
 });
 const frederikMonogram = (spec: Spec): Coin => ({
   key: "2025",
@@ -266,7 +268,7 @@ const frederikMonogram = (spec: Spec): Coin => ({
   spec,
   details:
     "Obverse: King Frederik X's monogram, drawn by Ronny Skov Andersen and adapted by Jeanette Skov Jensen around the hole, with the year the coin was made. Reverse: the value, the word “Danmark” and a new icon of four joined octagons for Amalienborg's four palaces, designed by Jeanette Skov Jensen.",
-  link: coinSeries,
+  link: newDesign,
 });
 const margretheMonogram = (
   yearFrom: number,
@@ -275,6 +277,7 @@ const margretheMonogram = (
 ): Coin => ({
   key: String(yearFrom),
   yearFrom,
+  superseded: true,
   issueDate,
   spec,
   details:
@@ -896,9 +899,11 @@ const yearsOf = (coins: Coin[]) => {
   };
 };
 
-const coinYears = ({ yearFrom, yearTo }: Coin) =>
+const coinYears = ({ yearFrom, yearTo, superseded }: Coin) =>
   yearTo === undefined
-    ? `${yearFrom}–`
+    ? superseded
+      ? `${yearFrom}`
+      : `${yearFrom}–`
     : yearFrom === yearTo
       ? `${yearFrom}`
       : `${yearFrom}–${yearTo}`;

@@ -117,6 +117,9 @@ describe("the Denmark dataset", () => {
     });
     expect(frederik?.yearTo).toBeUndefined();
     expect(frederik?.designers).toStartWith("Eva Hjorth");
+    const margrethe = byKey.get("dk-5-kroner-margrethe-ii-1990")?.values;
+    expect(margrethe).toMatchObject({ title: "5 kroner 1990", yearFrom: 1990 });
+    expect(margrethe?.yearTo).toBeUndefined();
     expect(byKey.get("dk-50-ore-crown-1989")?.values).toMatchObject({
       material: "bronze",
       weight: 4.3,
