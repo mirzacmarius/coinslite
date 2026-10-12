@@ -812,8 +812,8 @@ export default {
         "De această intrare de catalog sunt legate obiecte, deci rămâne intrare. Păstrează is_addable pe true.",
       TOO_MANY_NODES_BELOW:
         "Sub nodurile pe care le mută acest fișier se află peste 2.000 de noduri. Mută mai puține odată.",
-      TOO_MANY_LINKED_ITEMS:
-        "Peste 1.000 de obiecte sunt legate de intrările al căror tip de obiect se schimbă. Modifică mai puține odată.",
+      CHANGE_IN_PROGRESS:
+        "Pe acest nod încă rulează o ștergere sau o schimbare a tipului de obiect. Importă fișierul din nou după ce se termină.",
     },
   },
   collection: {
@@ -1666,7 +1666,7 @@ export default {
     deleteTitle: "Ștergi „{title}”?",
     deleteCounting: "Se numără ce se șterge odată cu el…",
     deleteTooLarge:
-      "Odată cu el s-ar șterge peste {nodes} de noduri sau {items} de obiecte legate. Șterge mai întâi nodurile de dedesubt.",
+      "Odată cu el s-ar șterge peste {nodes} de noduri. Șterge mai întâi nodurile de dedesubt.",
     "deleteBelow#zero": "Nimic de dedesubt nu se șterge odată cu el.",
     "deleteBelow#one": "1 nod de dedesubt se șterge odată cu el.",
     "deleteBelow#few": "{count} noduri de dedesubt se șterg odată cu el.",
@@ -1678,8 +1678,23 @@ export default {
       "{count} obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
     "deleteItems#other":
       "{count} de obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
+    deleteItemsMore:
+      "Peste {items} de obiecte sunt legate de intrări de catalog de aici și le păstrează datele ca fiind ale lor.",
+    deleteInProgress:
+      "Aici încă rulează o ștergere sau o schimbare a tipului de obiect. Șterge-l după ce se termină.",
     deleted: "„{title}” a fost șters",
     deleteFailed: "Nu s-a putut șterge. Încearcă din nou.",
+    deleting: "Se șterge „{title}”. Restul se termină în fundal.",
+    changes: {
+      delete: "Se șterge",
+      retype: "Obiectele primesc noul tip de obiect",
+    },
+    changeNotice: {
+      delete:
+        "Acest nod se șterge. Obiectele legate de el îi păstrează datele ca fiind ale lor. Între timp nu poate fi modificat.",
+      retype:
+        "Obiectele legate de această intrare de catalog primesc noul ei tip de obiect. Nu poate fi modificată până nu îl primesc toate.",
+    },
     errors: {
       TITLE_REQUIRED: "Dă-i un titlu.",
       TOO_LONG: "Este prea lung.",
@@ -1712,8 +1727,8 @@ export default {
         "De această intrare de catalog sunt legate obiecte, deci rămâne intrare.",
       TOO_MANY_NODES_BELOW:
         "Sub acest nod se află peste 2.000 de noduri, prea multe pentru a fi mutate deodată.",
-      TOO_MANY_LINKED_ITEMS:
-        "Peste 1.000 de obiecte sunt legate de această intrare, prea multe ca să le schimbi tipul de obiect deodată.",
+      CHANGE_IN_PROGRESS:
+        "Aici încă rulează o ștergere sau o schimbare a tipului de obiect. Încearcă din nou după ce se termină.",
       ID_REQUIRED: "Dă-i un ID.",
       INVALID_ID:
         "Folosește până la 64 de litere mici, cifre, puncte, cratime și liniuțe de subliniere.",

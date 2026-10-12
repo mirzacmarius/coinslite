@@ -420,7 +420,8 @@ export default defineSchema({
    * sources, so resolving every Item in a Collection reads little
    * (items/resolve.ts). A read model of the entry, never edited on its own
    * (ADR 0008): catalog/tree.ts writes it with every entry it writes, and
-   * deletes it when the node stops being an entry or leaves the Catalog.
+   * deletes it when the node stops being an entry, or catalog/changes.ts
+   * when the node leaves the Catalog.
    * Entries from before it existed have none until
    * `catalog/slimEntries:backfill` has run; readers then read the entry.
    */
@@ -465,6 +466,22 @@ export default defineSchema({
     "denomination",
     "series",
   ]),
+
+  /**
+   * A Catalog change running in the background, a batch per transaction
+   * (catalog/changes.ts): a node being deleted with everything below it, or
+   * an entry whose linked Items are taking its new Item type. Gone once the
+   * change is done. Meanwhile the editor shows it, and no write may touch
+   * the node, anything below it, or move a node above it.
+   */
+  catalogChanges: defineTable({
+    nodeId: v.id("catalogNodes"),
+    /** The node's path, which can't change while the change runs. */
+    path: v.string(),
+    kind: v.union(v.literal("delete"), v.literal("retype")),
+    /** For "retype": the Item type the entry's Items take. */
+    itemType: v.optional(catalogItemType),
+  }).index("by_path", ["path"]),
 
   /**
    * Market value history (items/valueHistory.ts): an Item's Market value per

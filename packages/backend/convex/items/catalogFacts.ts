@@ -255,3 +255,25 @@ export function entryDetails(entry: {
   });
 }
 export type EntryDetails = ReturnType<typeof entryDetails>;
+
+/**
+ * What an Item linked to a Catalog entry becomes as the entry leaves the
+ * Catalog: it takes the entry's facts as its own, keeping those the person
+ * changed, keeps a copy of the facts it has no field for (shown where the
+ * Item page showed them from the entry), and stops linking to it. Nobody's
+ * Item loses a fact.
+ */
+export function detachedFields<T extends CatalogFacts>(
+  item: T,
+  entry: CatalogEntryFacts & Parameters<typeof entryDetails>[0],
+): Omit<T, "catalogDetails" | "catalogEntryId"> & {
+  catalogDetails: EntryDetails | undefined;
+  catalogEntryId: undefined;
+} {
+  const details = entryDetails(entry);
+  return {
+    ...withCatalogFacts(item, entryFacts(entry)),
+    catalogDetails: Object.keys(details).length > 0 ? details : undefined,
+    catalogEntryId: undefined,
+  };
+}

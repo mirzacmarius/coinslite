@@ -18,6 +18,14 @@ import {
 } from "../utils/validators";
 import { ancestorNodesOf, nodeByKey } from "./browse";
 import {
+  changeAround,
+  changeAt,
+  changeOver,
+  deletionTooLarge,
+  planDeletion,
+  startDeletion,
+} from "./changes";
+import {
   type CatalogError,
   type EditorValues,
   type FileRow,
@@ -29,14 +37,17 @@ import {
   translationValuesOf,
   valuesFromFields,
 } from "./fields";
-import { applyPlan, deleteSubtree, planDeletion, planRows } from "./tree";
+import { applyPlan, planRows } from "./tree";
 
 /**
  * The admins' Catalog editor: the whole tree, node by node, where they add
  * countries, Themes, groupings and Catalog entries, correct any of their
  * values and delete them. A save goes through the same plan as a CSV import
  * (catalog/tree.ts), so paths, entry counts, countries and search words stay
- * right, and the same rules apply.
+ * right, and the same rules apply. Deleting a node, and giving the Items
+ * linked to an entry its new Item type, run in the background when they
+ * reach many Items (catalog/changes.ts); the tree shows each such change
+ * while it runs, and nothing it runs on can be edited meanwhile.
  */
 
 const optionalText = v.optional(v.string());
@@ -93,7 +104,7 @@ const editorRow = 2;
 export const catalogEditorErrors = {
   /** No Catalog node has the key. */
   nodeNotFound: "CATALOG_NODE_NOT_FOUND",
-  /** The node takes more nodes or Items with it than one delete may. */
+  /** The node takes more nodes with it than one delete may. */
   deleteTooLarge: "DELETE_TOO_LARGE",
 } as const;
 
@@ -163,6 +174,9 @@ export const create = mutation({
   },
 });
 
+/** A change running in the background on a node: being deleted, or its Items taking its new Item type. */
+const runningChange = v.union(v.literal("delete"), v.literal("retype"));
+
 const treeRow = v.object({
   key: v.string(),
   kind: catalogKind,
@@ -174,9 +188,14 @@ const treeRow = v.object({
   yearTo: v.optional(v.number()),
   /** Roots and groupings: the Catalog entries anywhere below. */
   entryCount: v.optional(v.number()),
+  /** A change running on the node itself, if any. */
+  change: v.optional(runningChange),
 });
 
-const treeRowOf = (node: Doc<"catalogNodes">) => ({
+const treeRowOf = (
+  node: Doc<"catalogNodes">,
+  change: Doc<"catalogChanges"> | null,
+) => ({
   key: node.key,
   kind: node.kind,
   title: node.title,
@@ -186,6 +205,7 @@ const treeRowOf = (node: Doc<"catalogNodes">) => ({
   ...(node.yearFrom !== undefined && { yearFrom: node.yearFrom }),
   ...(node.yearTo !== undefined && { yearTo: node.yearTo }),
   ...(node.kind !== "entry" && { entryCount: node.entryCount ?? 0 }),
+  ...(change && { change: change.kind }),
 });
 
 /** The nodes right below one, or the roots when `parentKey` is null, in sort order. */
@@ -206,7 +226,14 @@ export const children = query({
         q.eq("parentId", parent?._id),
       )
       .paginate(paginationOpts);
-    return { ...page, page: page.page.map(treeRowOf) };
+    return {
+      ...page,
+      page: await Promise.all(
+        page.page.map(async (node) =>
+          treeRowOf(node, await changeAt(ctx, node.path)),
+        ),
+      ),
+    };
   },
 });
 
@@ -241,6 +268,8 @@ export const node = query({
       /** The image at full size, if it has one: uploaded, or linked from a CSV file. */
       imageUrl: v.optional(v.string()),
       imageProvenance: v.optional(provenance),
+      /** A change running on the node or above it: it can't be saved until that's done. */
+      change: v.optional(runningChange),
     }),
   ),
   handler: async (ctx, { key }) => {
@@ -248,6 +277,7 @@ export const node = query({
     const node = await nodeByKey(ctx, key);
     if (!node) return null;
     const ancestors = await ancestorsOf(ctx, node);
+    const change = await changeOver(ctx, node.path);
     const imageUrl = node.imageFiles
       ? await ctx.storage.getUrl(node.imageFiles.full)
       : node.imageUrl;
@@ -259,6 +289,7 @@ export const node = query({
       values: editorValuesOf(node),
       ...(imageUrl && { imageUrl }),
       ...(node.imageProvenance && { imageProvenance: node.imageProvenance }),
+      ...(change && { change: change.kind }),
     };
   },
 });
@@ -275,34 +306,41 @@ export const deletion = query({
     v.null(),
     v.object({
       nodesBelow: v.number(),
+      /** Counted up to `catalogLimits.linkedItems`. */
       linkedItems: v.number(),
+      /** More Items link there than were counted. */
+      moreLinkedItems: v.boolean(),
       /** More than one delete may take: delete what's below first. */
       tooLarge: v.boolean(),
+      /** A deletion or Item type change is running on it, above or below it: wait until it's done. */
+      inProgress: v.boolean(),
     }),
   ),
   handler: async (ctx, { key }) => {
     await requireAdmin(ctx);
     const node = await nodeByKey(ctx, key);
     if (!node) return null;
-    const { below, linkedItems, tooLarge } = await planDeletion(ctx, node);
-    return { nodesBelow: below.length, linkedItems, tooLarge };
+    const inProgress = (await changeAround(ctx, node.path)) !== null;
+    return { ...(await planDeletion(ctx, node)), inProgress };
   },
 });
 
 /**
  * Deletes a node and everything below it. Items linked to entries there
  * keep those entries' facts as their own, so nobody's Item loses a fact.
+ * True once it's gone; false while the rest goes in the background, when
+ * it reaches many Items.
  */
 export const remove = mutation({
   args: { key: v.string() },
-  returns: v.null(),
+  returns: v.boolean(),
   handler: async (ctx, { key }) => {
     await requireAdmin(ctx);
     const node = await requireNode(ctx, key);
-    const planned = await planDeletion(ctx, node);
-    if (planned.tooLarge)
+    if (await changeAround(ctx, node.path))
+      throw new ConvexError(catalogErrors.changeInProgress);
+    if (await deletionTooLarge(ctx, node))
       throw new ConvexError(catalogEditorErrors.deleteTooLarge);
-    await deleteSubtree(ctx, node, planned);
-    return null;
+    return await startDeletion(ctx, node);
   },
 });

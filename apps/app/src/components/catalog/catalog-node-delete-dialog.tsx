@@ -3,16 +3,21 @@
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
-import { catalogLimits } from "@coinslite/backend/convex/catalog/fields";
+import {
+  catalogErrors,
+  catalogLimits,
+} from "@coinslite/backend/convex/catalog/fields";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { toast } from "@coinslite/ui/toaster";
 import { useMutation, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { useState } from "react";
 
 /**
  * Confirms deleting a Catalog node, stating what goes with it: the nodes
  * below it, and the Items linked to Catalog entries there, which keep those
- * entries' facts as their own.
+ * entries' facts as their own. When they're many, the deletion finishes in
+ * the background, and the tree shows the node as being deleted meanwhile.
  */
 export function CatalogNodeDeleteDialog({
   open,
@@ -36,15 +41,22 @@ export function CatalogNodeDeleteDialog({
   if (deletion === undefined) description = t("catalogEditor.deleteCounting");
   else if (deletion === null)
     description = t("catalogEditor.errors.CATALOG_NODE_NOT_FOUND");
+  else if (deletion.inProgress)
+    description = t("catalogEditor.deleteInProgress");
   else if (deletion.tooLarge)
     description = t("catalogEditor.deleteTooLarge", {
       nodes: number(catalogLimits.deleteNodes),
-      items: number(catalogLimits.linkedItems),
     });
   else
     description = `${t("catalogEditor.deleteBelow", {
       count: deletion.nodesBelow,
-    })} ${t("catalogEditor.deleteItems", { count: deletion.linkedItems })}`;
+    })} ${
+      deletion.moreLinkedItems
+        ? t("catalogEditor.deleteItemsMore", {
+            items: number(catalogLimits.linkedItems),
+          })
+        : t("catalogEditor.deleteItems", { count: deletion.linkedItems })
+    }`;
 
   return (
     <ConfirmDialog
@@ -58,16 +70,27 @@ export function CatalogNodeDeleteDialog({
       confirmLabel={t("catalogEditor.delete")}
       cancelLabel={t("items.cancel")}
       destructive
-      confirmDisabled={!deletion || deletion.tooLarge}
+      confirmDisabled={!deletion || deletion.tooLarge || deletion.inProgress}
       onConfirm={async () => {
         setFailed(undefined);
+        let gone: boolean;
         try {
-          await remove({ key: node.key });
+          gone = await remove({ key: node.key });
         } catch (failure) {
-          setFailed(t("catalogEditor.deleteFailed"));
+          const code =
+            failure instanceof ConvexError ? String(failure.data) : "";
+          setFailed(
+            code === catalogErrors.changeInProgress
+              ? t("catalogEditor.errors.CHANGE_IN_PROGRESS")
+              : t("catalogEditor.deleteFailed"),
+          );
           throw failure;
         }
-        toast.success(t("catalogEditor.deleted", { title: node.title }));
+        toast.success(
+          t(gone ? "catalogEditor.deleted" : "catalogEditor.deleting", {
+            title: node.title,
+          }),
+        );
       }}
     >
       {failed && (

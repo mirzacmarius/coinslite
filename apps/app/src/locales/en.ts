@@ -792,8 +792,8 @@ export default {
         "Items link to this Catalog entry, so it stays one. Keep is_addable true.",
       TOO_MANY_NODES_BELOW:
         "More than 2,000 nodes are below the ones this file moves. Move fewer at a time.",
-      TOO_MANY_LINKED_ITEMS:
-        "More than 1,000 Items link to the entries whose Item type changes. Change fewer at a time.",
+      CHANGE_IN_PROGRESS:
+        "A deletion or Item type change is still running on this node. Import the file again once it's done.",
     },
   },
   collection: {
@@ -1629,7 +1629,7 @@ export default {
     deleteTitle: "Delete “{title}”?",
     deleteCounting: "Counting what goes with it…",
     deleteTooLarge:
-      "This would take more than {nodes} nodes or {items} linked Items with it. Delete the nodes below it first.",
+      "This would take more than {nodes} nodes with it. Delete the nodes below it first.",
     "deleteBelow#zero": "Nothing below it goes with it.",
     "deleteBelow#one": "1 node below it goes with it.",
     "deleteBelow#few": "{count} nodes below it go with it.",
@@ -1641,8 +1641,23 @@ export default {
       "{count} Items link to Catalog entries here and keep their facts as their own.",
     "deleteItems#other":
       "{count} Items link to Catalog entries here and keep their facts as their own.",
+    deleteItemsMore:
+      "More than {items} Items link to Catalog entries here and keep their facts as their own.",
+    deleteInProgress:
+      "A deletion or Item type change is still running here. Delete it once that's done.",
     deleted: "“{title}” deleted",
     deleteFailed: "Couldn't delete it. Try again.",
+    deleting: "Deleting “{title}”. The rest finishes in the background.",
+    changes: {
+      delete: "Being deleted",
+      retype: "Items taking the new Item type",
+    },
+    changeNotice: {
+      delete:
+        "This node is being deleted. The Items linked to it keep their facts as their own. It can't be changed meanwhile.",
+      retype:
+        "The Items linked to this Catalog entry are taking its new Item type. It can't be changed until they all have.",
+    },
     errors: {
       TITLE_REQUIRED: "Give it a title.",
       TOO_LONG: "This is too long.",
@@ -1671,8 +1686,8 @@ export default {
       ENTRY_HAS_ITEMS: "Items link to this Catalog entry, so it stays one.",
       TOO_MANY_NODES_BELOW:
         "More than 2,000 nodes are below this one, too many to move at once.",
-      TOO_MANY_LINKED_ITEMS:
-        "More than 1,000 Items link to this entry, too many to change their Item type at once.",
+      CHANGE_IN_PROGRESS:
+        "A deletion or Item type change is still running here. Try again once it's done.",
       ID_REQUIRED: "Give it an ID.",
       INVALID_ID:
         "Use up to 64 lowercase letters, digits, dots, dashes and underscores.",

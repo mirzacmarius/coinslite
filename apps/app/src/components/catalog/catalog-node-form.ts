@@ -338,7 +338,6 @@ export const fieldOfProblem = (code: string): NodeFormField | undefined =>
       [catalogErrors.entryHasChildren]: "kind",
       [catalogErrors.entryHasItems]: "kind",
       [catalogErrors.rootNotAddable]: "kind",
-      [catalogErrors.tooManyLinkedItems]: "itemType",
       [catalogErrors.titleRequired]: "title",
       [catalogErrors.itemTypeRequired]: "itemType",
     }) as Record<string, NodeFormField>

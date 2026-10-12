@@ -101,8 +101,8 @@ export const catalogErrors = {
   entryHasChildren: "ENTRY_HAS_CHILDREN",
   /** Items link to this entry, so it stays a Catalog entry. */
   entryHasItems: "ENTRY_HAS_ITEMS",
-  /** More Items link to the entries changed than one save can update. */
-  tooManyLinkedItems: "TOO_MANY_LINKED_ITEMS",
+  /** A deletion or Item type change is running there (catalog/changes.ts); try again once it's done. */
+  changeInProgress: "CHANGE_IN_PROGRESS",
   /** A move takes more nodes below along than one save can update. */
   tooManyNodesBelow: "TOO_MANY_NODES_BELOW",
 } as const;
@@ -134,7 +134,7 @@ export const catalogLimits = {
   diameter: 500,
   mintage: 1e12,
   sortOrder: 1_000_000_000,
-  /** Items one save or delete updates: those linked to the entries it changes. */
+  /** Linked Items the delete confirmation counts; past that it says there are more. */
   linkedItems: 1000,
   /** Nodes one delete removes, the node and everything below it. */
   deleteNodes: 2000,

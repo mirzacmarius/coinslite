@@ -108,7 +108,7 @@ const knownProblemCodes = [
   "TOO_DEEP",
   "ENTRY_HAS_CHILDREN",
   "ENTRY_HAS_ITEMS",
-  "TOO_MANY_LINKED_ITEMS",
+  "CHANGE_IN_PROGRESS",
   "TOO_MANY_NODES_BELOW",
   "ID_REQUIRED",
   "INVALID_ID",
@@ -383,8 +383,11 @@ function NodeForm({
     return problem ? problemText(problem) : undefined;
   };
 
+  /** A deletion or Item type change running on the node or above it: nothing can be saved meanwhile. */
+  const changeRunning = node?.change !== undefined;
+
   const submit = () => {
-    if (submitting) return;
+    if (submitting || changeRunning) return;
     setSubmitted(true);
     const first = fieldOrder.find((field) => problems[field]);
     if (first) {
@@ -669,6 +672,18 @@ function NodeForm({
       </DialogDescription>
 
       <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
+        {node?.change && (
+          <p
+            role="status"
+            className="flex items-start gap-2 rounded-md border bg-muted px-3 py-2 text-xs"
+          >
+            <Loader2
+              className="mt-0.5 size-3.5 shrink-0 animate-spin text-muted-foreground"
+              aria-hidden="true"
+            />
+            {t(`catalogEditor.changeNotice.${node.change}`)}
+          </p>
+        )}
         <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
           <form.Field name="kind">
             {(field) => (
@@ -995,7 +1010,11 @@ function NodeForm({
           </DialogClose>
           {/* Not a submit button: Enter in a field or picker never saves the
               sheet; the button and Cmd/Ctrl+Enter do. */}
-          <Button type="button" disabled={submitting} onClick={submit}>
+          <Button
+            type="button"
+            disabled={submitting || changeRunning}
+            onClick={submit}
+          >
             {submitting && (
               <Loader2 className="animate-spin" aria-hidden="true" />
             )}

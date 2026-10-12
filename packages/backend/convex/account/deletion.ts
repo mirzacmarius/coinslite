@@ -91,6 +91,8 @@ export const accountDataByTable = {
     "kept: the Catalog's entry counts, which name no one",
   catalogSlimEntries:
     "kept: the Catalog entries' slim copies, part of the Catalog",
+  catalogChanges:
+    "kept: Catalog deletions and Item type changes running in the background, which name no one",
   photoLinkKeys:
     "kept: when photo links are issued and the deployment's own signing secret, which name no one",
   spotPriceSnapshots: "kept: the Spot prices everyone shares",

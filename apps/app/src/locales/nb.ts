@@ -807,8 +807,8 @@ export default {
         "Objekter er knyttet til denne katalogoppføringen, så den forblir én. Behold is_addable som true.",
       TOO_MANY_NODES_BELOW:
         "Mer enn 2 000 noder ligger under dem denne filen flytter. Flytt færre om gangen.",
-      TOO_MANY_LINKED_ITEMS:
-        "Over 1 000 objekter er knyttet til oppføringene som får ny objekttype. Endre færre om gangen.",
+      CHANGE_IN_PROGRESS:
+        "En sletting eller endring av objekttype pågår fortsatt på denne noden. Importer filen igjen når den er ferdig.",
     },
   },
   collection: {
@@ -1650,7 +1650,7 @@ export default {
     deleteTitle: "Slette «{title}»?",
     deleteCounting: "Teller hva som følger med…",
     deleteTooLarge:
-      "Dette ville tatt med seg over {nodes} noder eller {items} tilknyttede objekter. Slett nodene under den først.",
+      "Dette ville tatt med seg over {nodes} noder. Slett nodene under den først.",
     "deleteBelow#zero": "Ingenting under den følger med.",
     "deleteBelow#one": "1 node under den følger med.",
     "deleteBelow#few": "{count} noder under den følger med.",
@@ -1662,8 +1662,23 @@ export default {
       "{count} objekter er knyttet til katalogoppføringer her og beholder faktaene som sine egne.",
     "deleteItems#other":
       "{count} objekter er knyttet til katalogoppføringer her og beholder faktaene som sine egne.",
+    deleteItemsMore:
+      "Over {items} objekter er knyttet til katalogoppføringer her og beholder faktaene som sine egne.",
+    deleteInProgress:
+      "En sletting eller endring av objekttype pågår fortsatt her. Slett den når den er ferdig.",
     deleted: "«{title}» er slettet",
     deleteFailed: "Kunne ikke slette. Prøv igjen.",
+    deleting: "Sletter «{title}». Resten fullføres i bakgrunnen.",
+    changes: {
+      delete: "Slettes",
+      retype: "Objektene får ny objekttype",
+    },
+    changeNotice: {
+      delete:
+        "Denne noden slettes. Objektene som er knyttet til den, beholder faktaene som sine egne. Den kan ikke endres i mellomtiden.",
+      retype:
+        "Objektene som er knyttet til denne katalogoppføringen, får den nye objekttypen. Den kan ikke endres før alle har fått den.",
+    },
     errors: {
       TITLE_REQUIRED: "Gi den en tittel.",
       TOO_LONG: "Dette er for langt.",
@@ -1697,8 +1712,8 @@ export default {
         "Objekter er knyttet til denne katalogoppføringen, så den forblir én.",
       TOO_MANY_NODES_BELOW:
         "Mer enn 2 000 noder ligger under denne, for mange til å flyttes på én gang.",
-      TOO_MANY_LINKED_ITEMS:
-        "Over 1 000 objekter er knyttet til denne oppføringen, for mange til å endre objekttypen deres på én gang.",
+      CHANGE_IN_PROGRESS:
+        "En sletting eller endring av objekttype pågår fortsatt her. Prøv igjen når den er ferdig.",
       ID_REQUIRED: "Gi den en ID.",
       INVALID_ID:
         "Bruk opptil 64 små bokstaver, sifre, punktum, bindestreker og understreker.",

@@ -33,6 +33,8 @@ import type * as billing_polar from "../billing/polar.js";
 import type * as billing_rules from "../billing/rules.js";
 import type * as billing_webhook from "../billing/webhook.js";
 import type * as catalog_browse from "../catalog/browse.js";
+import type * as catalog_changeRules from "../catalog/changeRules.js";
+import type * as catalog_changes from "../catalog/changes.js";
 import type * as catalog_csv from "../catalog/csv.js";
 import type * as catalog_csvText from "../catalog/csvText.js";
 import type * as catalog_datasets_euroCommemorativeCoins from "../catalog/datasets/euroCommemorativeCoins.js";
@@ -164,6 +166,8 @@ declare const fullApi: ApiFromModules<{
   "billing/rules": typeof billing_rules;
   "billing/webhook": typeof billing_webhook;
   "catalog/browse": typeof catalog_browse;
+  "catalog/changeRules": typeof catalog_changeRules;
+  "catalog/changes": typeof catalog_changes;
   "catalog/csv": typeof catalog_csv;
   "catalog/csvText": typeof catalog_csvText;
   "catalog/datasets/euroCommemorativeCoins": typeof catalog_datasets_euroCommemorativeCoins;

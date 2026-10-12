@@ -834,8 +834,8 @@ export default {
         "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer. Lass is_addable auf true.",
       TOO_MANY_NODES_BELOW:
         "Unter den Knoten, die diese Datei verschiebt, liegen mehr als 2.000 Knoten. Verschiebe weniger auf einmal.",
-      TOO_MANY_LINKED_ITEMS:
-        "Mit den Einträgen, deren Objektart sich ändert, sind über 1.000 Objekte verknüpft. Ändere weniger auf einmal.",
+      CHANGE_IN_PROGRESS:
+        "Auf diesem Knoten läuft noch eine Löschung oder Änderung der Objektart. Importiere die Datei noch einmal, wenn sie fertig ist.",
     },
   },
   collection: {
@@ -1714,7 +1714,7 @@ export default {
     deleteTitle: "„{title}“ löschen?",
     deleteCounting: "Zählt, was mitgelöscht wird…",
     deleteTooLarge:
-      "Damit würden mehr als {nodes} Knoten oder {items} verknüpfte Objekte mitgelöscht. Lösche zuerst die Knoten darunter.",
+      "Damit würden mehr als {nodes} Knoten mitgelöscht. Lösche zuerst die Knoten darunter.",
     "deleteBelow#zero": "Darunter wird nichts mitgelöscht.",
     "deleteBelow#one": "1 Knoten darunter wird mitgelöscht.",
     "deleteBelow#few": "{count} Knoten darunter werden mitgelöscht.",
@@ -1726,8 +1726,23 @@ export default {
       "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
     "deleteItems#other":
       "{count} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    deleteItemsMore:
+      "Mehr als {items} Objekte sind mit Katalogeinträgen hier verknüpft und behalten deren Fakten als eigene.",
+    deleteInProgress:
+      "Hier läuft noch eine Löschung oder Änderung der Objektart. Lösche den Knoten, wenn sie fertig ist.",
     deleted: "„{title}“ gelöscht",
     deleteFailed: "Konnte nicht gelöscht werden. Versuche es noch einmal.",
+    deleting: "„{title}“ wird gelöscht. Der Rest geschieht im Hintergrund.",
+    changes: {
+      delete: "Wird gelöscht",
+      retype: "Objekte erhalten die neue Objektart",
+    },
+    changeNotice: {
+      delete:
+        "Dieser Knoten wird gelöscht. Die mit ihm verknüpften Objekte behalten seine Fakten als eigene. Bis dahin kann er nicht geändert werden.",
+      retype:
+        "Die mit diesem Katalogeintrag verknüpften Objekte erhalten seine neue Objektart. Bis alle sie haben, kann er nicht geändert werden.",
+    },
     errors: {
       TITLE_REQUIRED: "Gib einen Titel ein.",
       TOO_LONG: "Das ist zu lang.",
@@ -1761,8 +1776,8 @@ export default {
         "Mit diesem Katalogeintrag sind Objekte verknüpft, deshalb bleibt er einer.",
       TOO_MANY_NODES_BELOW:
         "Unter diesem Knoten liegen mehr als 2.000 Knoten, zu viele, um sie auf einmal zu verschieben.",
-      TOO_MANY_LINKED_ITEMS:
-        "Mit diesem Eintrag sind über 1.000 Objekte verknüpft, zu viele, um ihre Objektart auf einmal zu ändern.",
+      CHANGE_IN_PROGRESS:
+        "Hier läuft noch eine Löschung oder Änderung der Objektart. Versuche es noch einmal, wenn sie fertig ist.",
       ID_REQUIRED: "Gib eine ID ein.",
       INVALID_ID:
         "Verwende bis zu 64 Kleinbuchstaben, Ziffern, Punkte, Bindestriche und Unterstriche.",
