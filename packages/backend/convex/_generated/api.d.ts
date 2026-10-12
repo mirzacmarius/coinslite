@@ -122,6 +122,7 @@ import type * as uploads from "../uploads.js";
 import type * as users from "../users.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_files from "../utils/files.js";
+import type * as utils_pagination from "../utils/pagination.js";
 import type * as utils_validators from "../utils/validators.js";
 import type * as wants from "../wants.js";
 import type * as wants_rules from "../wants/rules.js";
@@ -247,6 +248,7 @@ declare const fullApi: ApiFromModules<{
   users: typeof users;
   "utils/auth": typeof utils_auth;
   "utils/files": typeof utils_files;
+  "utils/pagination": typeof utils_pagination;
   "utils/validators": typeof utils_validators;
   wants: typeof wants;
   "wants/rules": typeof wants_rules;
