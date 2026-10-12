@@ -1043,8 +1043,8 @@ export default {
       "What your Collection was worth at the end of each month, metal at that month’s Spot prices",
     valueMode: "Show",
     overTime: "Over time",
-    byDateAcquired: "By date acquired",
-    valueByDateAcquired: "Value by date acquired",
+    byDateAcquired: "By Date acquired",
+    valueByDateAcquired: "Value by Date acquired",
     valueByDateAcquiredDescription:
       "Purchase price and Market value of everything acquired by the end of each month: bought or added, whichever came first",
     month: "Month",

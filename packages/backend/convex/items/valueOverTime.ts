@@ -67,6 +67,10 @@ export const lastDayOf = (month: string) =>
     .toISOString()
     .slice(0, 10);
 
+/** When an Item's pieces were first recorded in CoinsLite. */
+const recordedAt = (item: Pick<SeriesItem, "addedAt" | "_creationTime">) =>
+  item.addedAt ?? item._creationTime;
+
 /**
  * When an Item enters the series: when it was acquired (acquiredAt), on its
  * purchase date or when its pieces were first recorded, whichever is
@@ -75,12 +79,7 @@ export const lastDayOf = (month: string) =>
 export const startOf = (
   item: Pick<SeriesItem, "addedAt" | "_creationTime" | "purchaseDate">,
   utcOffsetMinutes: number,
-) =>
-  acquiredAt(
-    item.addedAt ?? item._creationTime,
-    item.purchaseDate,
-    utcOffsetMinutes,
-  );
+) => acquiredAt(recordedAt(item), item.purchaseDate, utcOffsetMinutes);
 
 /**
  * The months a series over `items` covers: from the month the earliest of
@@ -128,9 +127,7 @@ function standingAt(item: SeriesItem, end: number) {
  */
 function firstValuedAt(item: SeriesItem) {
   if (item.history.length === 0)
-    return item.marketValue === undefined
-      ? undefined
-      : item.addedAt ?? item._creationTime;
+    return item.marketValue === undefined ? undefined : recordedAt(item);
   return item.history.find((point) => point.marketValue !== undefined)?.at;
 }
 
@@ -168,7 +165,10 @@ export function valueOverTime(
   }));
   for (const item of items) {
     const start = startOf(item, utcOffsetMinutes);
-    const firstValued =
+    const purchasePrice = item.purchasePrice ?? 0;
+    // Months ending by its first recorded Market value count it at its
+    // Purchase price; undefined when none do.
+    const atPurchasePriceUntil =
       item.purchaseDate === undefined ? undefined : firstValuedAt(item);
     for (const point of series) {
       if (start >= point.end) continue;
@@ -176,10 +176,10 @@ export function valueOverTime(
       const standing = standingAt(item, point.end);
       const { quantity } = standing;
       const marketValue =
-        firstValued !== undefined && firstValued >= point.end
-          ? item.purchasePrice ?? 0
+        atPurchasePriceUntil !== undefined && point.end <= atPurchasePriceUntil
+          ? purchasePrice
           : standing.marketValue;
-      point.purchasePrice += (item.purchasePrice ?? 0) * quantity;
+      point.purchasePrice += purchasePrice * quantity;
       point.marketValue += marketValue * quantity;
       if (point.rates)
         point.metalValue +=
