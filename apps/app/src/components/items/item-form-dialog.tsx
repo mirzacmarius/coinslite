@@ -19,14 +19,11 @@ import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Switch } from "@coinslite/ui/switch";
 import { ChevronRight, Library, Loader2, X } from "lucide-react";
+import { isCatalogType } from "./item-fields";
 import { ItemFieldsProvider, useItemFields } from "./item-form-fields";
 import { MoreDetails } from "./item-more-details";
 import { ItemPills } from "./item-pills";
-import {
-  type ItemFormProps,
-  isCatalogType,
-  useItemForm,
-} from "./use-item-form";
+import { type ItemFormProps, useItemForm } from "./use-item-form";
 
 const titleInput =
   "w-full bg-transparent px-0 text-base font-medium placeholder:text-muted-foreground focus:outline-none";

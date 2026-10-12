@@ -5,10 +5,9 @@ import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { BookOpen } from "lucide-react";
-import { itemTypeIcons, itemTypes } from "./item-fields";
+import { isCatalogType, itemTypeIcons, itemTypes } from "./item-fields";
 import { useItemFields } from "./item-form-fields";
 import type { LinkedEntry } from "./item-form-submit";
-import { isCatalogType } from "./use-item-form";
 
 /**
  * The Item form's first pills: the Catalog entry it's linked to, else the

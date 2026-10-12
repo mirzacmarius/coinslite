@@ -15,7 +15,6 @@ import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
-import type { CatalogItemType } from "@coinslite/backend/convex/catalog/fields";
 import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { photoSides } from "@coinslite/backend/convex/photos/rules";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
@@ -25,6 +24,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { isCatalogType } from "./item-fields";
 import {
   type ItemFormValues,
   blankItem,
@@ -43,10 +43,6 @@ type ItemFormValidator = ReturnType<typeof zodValidator>;
 /** The Item form's TanStack form. */
 export type ItemForm = FormApi<ItemFormValues, ItemFormValidator> &
   ReactFormApi<ItemFormValues, ItemFormValidator>;
-
-/** The Item types the Catalog holds, so the ones a Catalog picker is offered for. */
-export const isCatalogType = (type: ItemType): type is CatalogItemType =>
-  type === "coin" || type === "banknote";
 
 /** What the Item form dialog is given (item-form-dialog.tsx). */
 export type ItemFormProps = {

@@ -22,6 +22,7 @@ import {
   scaleOf,
 } from "./item-form";
 
+/** What adding an Item sends (items.ts). */
 export type ItemArgs = FunctionArgs<typeof api.items.add>;
 
 /** The Catalog entry an Item is (or is about to be) linked to. */

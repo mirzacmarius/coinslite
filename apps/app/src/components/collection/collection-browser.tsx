@@ -113,7 +113,7 @@ export function CollectionBrowser() {
 
   const narrowed =
     view.search !== undefined || filters.some((filter) => filter.active);
-  // No toolbar while the Collection loads or is empty (below).
+  // No toolbar while the Collection loads, or while it holds nothing yet.
   const toolbar =
     result !== undefined && (result.collectionSize > 0 || narrowed);
   // "/" finds, "F" filters.
@@ -144,7 +144,7 @@ export function CollectionBrowser() {
   const allSold = !narrowsView(view) && result.soldCount > 0;
 
   // A Collection with nothing in it yet: no toolbar, just the ways to start.
-  if (result.collectionSize === 0 && !narrowed) {
+  if (!toolbar) {
     return (
       <>
         {importDialog}
