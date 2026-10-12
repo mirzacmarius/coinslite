@@ -14,6 +14,20 @@ import Link from "next/link";
 
 const PAGE_SIZE = 25;
 
+/** Rows in the list's rhythm while the first Items load. */
+export function AlbumItemsSkeleton() {
+  return (
+    <ul className="divide-y border-b" aria-hidden="true">
+      {[0, 1, 2].map((row) => (
+        <li key={row} className="flex min-h-11 items-center gap-3 px-4 py-1.5">
+          <span className="size-8 animate-pulse rounded-md bg-muted" />
+          <span className="h-3.5 w-48 animate-pulse rounded bg-muted" />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** The Items in one Album, newest first, each opening its Item detail. */
 export function AlbumItems({ albumId }: { albumId: Id<"albums"> }) {
   const t = useI18n();
@@ -25,21 +39,7 @@ export function AlbumItems({ albumId }: { albumId: Id<"albums"> }) {
     { initialNumItems: PAGE_SIZE },
   );
 
-  if (status === "LoadingFirstPage") {
-    return (
-      <ul className="divide-y border-b" aria-hidden="true">
-        {[0, 1, 2].map((row) => (
-          <li
-            key={row}
-            className="flex min-h-11 items-center gap-3 px-4 py-1.5"
-          >
-            <span className="size-8 animate-pulse rounded-md bg-muted" />
-            <span className="h-3.5 w-48 animate-pulse rounded bg-muted" />
-          </li>
-        ))}
-      </ul>
-    );
-  }
+  if (status === "LoadingFirstPage") return <AlbumItemsSkeleton />;
   if (results.length === 0) {
     return (
       <div className="p-4">

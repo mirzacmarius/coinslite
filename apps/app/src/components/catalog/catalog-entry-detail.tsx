@@ -3,6 +3,7 @@
 import { entryItemsHref } from "@/components/collection/collection-url";
 import { useGradeLabels } from "@/components/items/grade-labels";
 import { WantButton } from "@/components/wantlist/wantlist";
+import { usePageTitle } from "@/lib/use-page-title";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import type { api } from "@coinslite/backend/convex/_generated/api";
@@ -55,6 +56,7 @@ export function CatalogEntryDetail({
   const labels = useGradeLabels();
   const catalogFormat = useCatalogFormat();
   const banknote = entry.itemType === "banknote";
+  usePageTitle(entry.title, t("nav.catalog"));
 
   const filled = (rows: Array<[string, React.ReactNode]>) =>
     rows.filter(([, value]) => value !== undefined && value !== false);

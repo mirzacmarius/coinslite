@@ -1,5 +1,6 @@
 "use client";
 
+import { usePageTitle } from "@/lib/use-page-title";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
@@ -12,8 +13,36 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { AlbumDot } from "./album-colours";
 import { AlbumFormDialog } from "./album-form-dialog";
-import { AlbumItems } from "./album-items";
+import { AlbumItems, AlbumItemsSkeleton } from "./album-items";
 import { DeleteAlbumDialog } from "./delete-album-dialog";
+
+/** The way back to the Albums, before the Album's name in the header bar. */
+function AlbumsLink() {
+  const t = useI18n();
+  return (
+    <Link href="/albums" className="hover:text-foreground">
+      {t("nav.albums")}
+    </Link>
+  );
+}
+
+/** The Album page while the Album loads: its header bar, a name, then rows of Items. */
+export function AlbumDetailSkeleton() {
+  return (
+    <>
+      <HeaderBar parent={<AlbumsLink />} title="" />
+      <div className="flex items-start gap-3 border-b p-4" aria-hidden="true">
+        <span className="flex h-6 shrink-0 items-center">
+          <span className="size-2.5 animate-pulse rounded-full bg-muted" />
+        </span>
+        <span className="flex h-6 items-center">
+          <span className="h-4 w-40 animate-pulse rounded bg-muted" />
+        </span>
+      </div>
+      <AlbumItemsSkeleton />
+    </>
+  );
+}
 
 /** One Album: its name, colour and description, then the Items in it. */
 export function AlbumDetail() {
@@ -26,19 +55,15 @@ export function AlbumDetail() {
   const [deleting, setDeleting] = useState({ open: false, key: 0 });
   // Once deleted, the Album is gone before the page has moved on.
   const [leaving, setLeaving] = useState(false);
-  const parent = (
-    <Link href="/albums" className="hover:text-foreground">
-      {t("nav.albums")}
-    </Link>
-  );
+  usePageTitle(album?.name, t("nav.albums"));
 
   if (album === undefined || (album === null && leaving)) {
-    return <HeaderBar parent={parent} title="" />;
+    return <AlbumDetailSkeleton />;
   }
   if (album === null) {
     return (
       <>
-        <HeaderBar parent={parent} title={t("albums.notFoundTitle")} />
+        <HeaderBar parent={<AlbumsLink />} title={t("albums.notFoundTitle")} />
         <div className="p-4">
           <EmptyState
             icon={
@@ -67,7 +92,7 @@ export function AlbumDetail() {
   return (
     <>
       <HeaderBar
-        parent={parent}
+        parent={<AlbumsLink />}
         title={album.name}
         actions={
           <>
