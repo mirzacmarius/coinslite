@@ -7,7 +7,6 @@ import { isDraft, type OperatorDetail, operator } from "@/legal/operator";
 import { freePlan } from "@coinslite/backend/convex/plans/rules";
 import { formatCountry, formatDate, type Locale } from "@coinslite/i18n";
 import { TriangleAlert } from "lucide-react";
-import Link from "next/link";
 
 /** The privacy policy or the terms, in one language. */
 export function LegalPage({
@@ -73,13 +72,15 @@ export function LegalPage({
                 <p className="text-muted-foreground">
                   {fill(t.governs, {
                     english: (
-                      <Link
+                      // Another language is another root layout: load it in full.
+                      <a
                         href={localePath("en", path)}
                         hrefLang="en"
+                        data-no-transition
                         className="text-link underline underline-offset-4"
                       >
                         {t.englishVersion}
-                      </Link>
+                      </a>
                     ),
                   })}
                 </p>

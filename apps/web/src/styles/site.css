@@ -425,6 +425,10 @@ html.lenis body {
 html.frame-away .site-header:not([data-static]) {
   translate: 0 -110%;
 }
+/* Unless keyboard focus is in it. */
+html.frame-away .site-header:not([data-static]):focus-within {
+  translate: 0 0;
+}
 .site-header__bar {
   display: flex;
   align-items: center;

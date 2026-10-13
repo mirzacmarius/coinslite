@@ -48,7 +48,7 @@ export function onPage(fn: PageFn) {
 
 function syncFlags() {
   const classes = document.documentElement.classList;
-  classes.add("js", "is-booted");
+  classes.add("js");
   classes.toggle("motion", !prefersReducedMotion());
 }
 
@@ -74,6 +74,8 @@ export function boot(setup?: () => void) {
   setup?.();
   initPage();
   intro?.play();
+  // Read by the layout's flags script, which shows the page if this never runs.
+  document.documentElement.classList.add("is-booted");
 }
 
 /** Covers the page before the route changes. */

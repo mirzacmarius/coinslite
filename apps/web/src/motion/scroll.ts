@@ -64,8 +64,13 @@ export function resetScroll() {
   state.velocity = 0;
 }
 
+/**
+ * Glides to a section. The visitor asked for it, so a page that was held
+ * still (the phone menu stops it while open) starts scrolling again first.
+ */
 export function scrollToTarget(target: string | HTMLElement) {
   if (lenis) {
+    lenis.start();
     lenis.scrollTo(target, { offset: -96, duration: 1.2 });
     return;
   }

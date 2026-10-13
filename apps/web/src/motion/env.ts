@@ -1,5 +1,10 @@
+/**
+ * No motion: the visitor asked for none, or the page had to show itself
+ * before the scripts booted (`.still`, set by the layout's flags script).
+ */
 export const prefersReducedMotion = () =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches;
+  matchMedia("(prefers-reduced-motion: reduce)").matches ||
+  document.documentElement.classList.contains("still");
 export const isTouch = () =>
   matchMedia("(hover: none), (pointer: coarse)").matches;
 

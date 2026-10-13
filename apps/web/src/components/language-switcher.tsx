@@ -47,6 +47,8 @@ export function LanguageSwitcher({
               lang={value}
               hrefLang={value}
               aria-current={value === locale ? "page" : undefined}
+              // Another language is another root layout: load it in full.
+              data-no-transition
               onClick={() => rememberLanguage(value)}
             >
               {localeNames[value]}

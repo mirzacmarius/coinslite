@@ -28,9 +28,11 @@ const body = Schibsted_Grotesk({
 /**
  * Runs before the first paint: content waiting for its reveal is hidden only
  * when scripts run and motion is welcome (`.motion`, see styles/site.css).
+ * If the engine still hasn't booted 3 s after the page has loaded (a script
+ * failed, or the browser is too old), the page shows itself and stays still.
  */
 const flags =
-  "document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion')";
+  "var c=document.documentElement.classList;c.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)c.add('motion');addEventListener('load',function(){setTimeout(function(){if(!c.contains('is-booted')){c.add('still');c.remove('motion')}},3000)})";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

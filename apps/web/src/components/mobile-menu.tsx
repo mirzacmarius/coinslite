@@ -106,6 +106,8 @@ export function MobileMenu({
                     lang={item.locale}
                     hrefLang={item.locale}
                     aria-current={item.current ? "page" : undefined}
+                    // Another language is another root layout: load it in full.
+                    data-no-transition
                     className="tap"
                     onClick={() => {
                       rememberLanguage(item.locale);

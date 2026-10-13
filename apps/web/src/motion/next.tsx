@@ -82,9 +82,19 @@ export function Engine({ setup }: { setup?: () => void }) {
       cleanup();
       router.push(href, { scroll: false });
     };
+    // When Next falls back to a full page load (a redirect to another site,
+    // a deploy in between), Back can bring this page out of the browser's
+    // back/forward cache still covered: uncover it.
+    const onShow = (event: PageTransitionEvent) => {
+      if (!event.persisted || mode.current !== "push") return;
+      mode.current = "idle";
+      void enter({ scrollTop: false });
+    };
     document.addEventListener("click", onClick, true);
+    addEventListener("pageshow", onShow);
     return () => {
       document.removeEventListener("click", onClick, true);
+      removeEventListener("pageshow", onShow);
     };
   }, [router]);
 
