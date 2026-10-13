@@ -48,11 +48,14 @@
   --border: 60 3% 83%;
   --link: 235 51% 47%;
   --ring: 235 51% 47%;
-  /* One shape rule, the app's: buttons and chips round 6 to 8px, cards 12px,
-     coins fully. */
+  /* One shape rule, in the app's soft line: buttons 14px, chips 10px,
+     sheets 16px, cards 24px, coins fully round. The shared components keep
+     the app's own --radius. */
   --radius: 0.5rem;
-  --r-control: calc(var(--radius) - 2px);
-  --r-card: 0.75rem;
+  --r-control: 0.625rem;
+  --r-button: 0.875rem;
+  --r-sheet: 1rem;
+  --r-card: 1.5rem;
 }
 
 html {
@@ -241,7 +244,7 @@ html.lenis body {
   gap: 0.9rem;
   min-height: 3.25rem;
   padding: 0 1.4rem 0 1.6rem;
-  border-radius: var(--radius);
+  border-radius: var(--r-button);
   background: var(--c-fg);
   color: var(--c-paper);
   font-family: var(--f-body);
@@ -345,7 +348,7 @@ html.lenis body {
   min-height: 3.25rem;
   padding: 0 1.4rem;
   border: 1px solid var(--c-fg);
-  border-radius: var(--radius);
+  border-radius: var(--r-button);
   color: var(--c-fg);
   font-size: 0.95rem;
   font-weight: 600;
@@ -1154,7 +1157,7 @@ html.frame-away .site-header:not([data-static]) {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: var(--radius);
+  border-radius: var(--r-sheet);
   background: #fff;
   box-shadow: 0 0 0 1px var(--c-line);
 }
@@ -1167,7 +1170,7 @@ html.frame-away .site-header:not([data-static]) {
 .sheet {
   position: relative;
   z-index: 1;
-  border-radius: var(--radius);
+  border-radius: var(--r-sheet);
   background: #fff;
   box-shadow:
     0 0 0 1px var(--c-line),
@@ -1274,7 +1277,10 @@ html.frame-away .site-header:not([data-static]) {
   content: "";
   position: absolute;
   bottom: calc(100% - 1px);
-  left: calc(1rem + var(--tab, 0) * 22%);
+  /* Four tab positions along the straight part of the top edge. */
+  left: calc(
+    var(--r-card) + var(--tab, 0) * (100% - 2 * var(--r-card) - 22%) / 3
+  );
   width: 22%;
   height: calc(0.85rem + 1px);
   border-radius: var(--r-control) var(--r-control) 0 0;

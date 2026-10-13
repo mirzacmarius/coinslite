@@ -57,7 +57,7 @@ No gradients, no glass, no blur. The figure uses the anatomy light theme mapped 
 
 **Grid and rhythm.** 12 columns, gutter `clamp(1rem, 0.6rem + 1.6vw, 2.5rem)`, outer margin equals the gutter, content capped at 1440 px. Text hangs from three lines: column 1, column 5 and column 7. Section padding moods: tight (`8u`), normal (`16u`), airy (`28u`), full viewport (hero only).
 
-**Shape.** The app's radii, so the site and the product read as one line: buttons 8px (6px for the small ones and chips, like the app's `rounded-md`), cards, trays and the plan cards 12px (the app's `rounded-xl`), report sheets 8px. Coins and recesses are fully round.
+**Shape.** Soft corners in the app's line, a little rounder on the site's larger scale: buttons 14px, small buttons and chips 10px, report sheets 16px, cards, trays and the plan cards 24px. Coins and recesses are fully round. The shared components keep the app's `--radius` (0.5rem).
 
 **Motion.** One ease family: `expo.out` for entrances and drawers, `expo.inOut` for the page curtain, `power3.out` for hovers. Hover 0.3 to 0.45 s, reveals 1.0 to 1.2 s with 60 ms staggers, the curtain 0.75 s each way. Sections slide in from the left by 32 px while their clip opens, like a drawer coming out. Under reduced motion: native scroll, no reveals, the figure jumps to its targets, the curtain fades.
 

@@ -48,7 +48,7 @@ export function LegalPage({
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  className="flex min-h-7 items-center rounded-md px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  className="flex min-h-7 items-center rounded-lg px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
                   {section.heading}
                 </a>
@@ -58,7 +58,7 @@ export function LegalPage({
         </nav>
         <article className="legal__body flex min-w-0 flex-col gap-6">
           {(isDraft || locale !== "en") && (
-            <div className="flex flex-col gap-2 rounded-xl border bg-card p-4 text-sm">
+            <div className="flex flex-col gap-2 rounded-2xl border bg-card p-4 text-sm">
               {isDraft && (
                 <p className="flex gap-2">
                   <TriangleAlert
