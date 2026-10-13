@@ -251,14 +251,6 @@ export default {
       ],
       cta: "Start free, upgrade later",
     },
-    pricesTitle: "Premium prices",
-    currency: "Currency",
-    month: "Monthly",
-    year: "Yearly",
-    pricesNote:
-      "You pay in your local currency when Premium has a price in it, otherwise in euros. Payments are handled by Polar.",
-    cancelNote:
-      "Cancel whenever you like: Premium lasts until the end of the period you paid for. Back on the Free plan, every Item stays and stays editable; you just can’t add more while you have over {limit}.",
   },
   questions: {
     title: "Questions collectors ask",

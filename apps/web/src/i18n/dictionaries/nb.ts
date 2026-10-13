@@ -252,14 +252,6 @@ export default {
       ],
       cta: "Start gratis, oppgrader senere",
     },
-    pricesTitle: "Priser for Premium",
-    currency: "Valuta",
-    month: "Månedlig",
-    year: "Årlig",
-    pricesNote:
-      "Du betaler i din lokale valuta når Premium har en pris i den, ellers i euro. Betalingen håndteres av Polar.",
-    cancelNote:
-      "Si opp når du vil: Premium varer til slutten av perioden du har betalt for. Tilbake på gratisplanen beholder du alle objektene og kan fortsatt redigere dem; du kan bare ikke legge til flere så lenge du har over {limit}.",
   },
   questions: {
     title: "Det samlere spør om",

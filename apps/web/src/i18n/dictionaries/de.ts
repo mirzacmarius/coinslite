@@ -252,14 +252,6 @@ export default {
       ],
       cta: "Gratis starten, später umsteigen",
     },
-    pricesTitle: "Preise für Premium",
-    currency: "Währung",
-    month: "Monatlich",
-    year: "Jährlich",
-    pricesNote:
-      "Du zahlst in deiner Landeswährung, wenn Premium einen Preis darin hat, sonst in Euro. Die Zahlung wickelt Polar ab.",
-    cancelNote:
-      "Kündige, wann du willst: Premium läuft bis zum Ende des bezahlten Zeitraums. Zurück im Gratis-Tarif bleiben alle Objekte erhalten und bearbeitbar; du kannst nur keine weiteren hinzufügen, solange du mehr als {limit} hast.",
   },
   questions: {
     title: "Was Sammler fragen",

@@ -253,14 +253,6 @@ export default {
       ],
       cta: "Începe gratuit, apoi Premium",
     },
-    pricesTitle: "Prețurile Premium",
-    currency: "Moneda",
-    month: "Lunar",
-    year: "Anual",
-    pricesNote:
-      "Plătești în moneda locală când Premium are un preț în ea, altfel în euro. Plata este gestionată de Polar.",
-    cancelNote:
-      "Anulează oricând: Premium rămâne activ până la sfârșitul perioadei plătite. Înapoi pe planul gratuit, toate obiectele rămân și pot fi editate în continuare; doar nu mai poți adăuga altele cât timp ai peste {limit}.",
   },
   questions: {
     title: "Ce întreabă colecționarii",

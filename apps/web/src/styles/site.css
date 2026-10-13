@@ -1388,17 +1388,9 @@ html.frame-away .site-header:not([data-static]):focus-within {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.plans__aside {
-  grid-column: 1 / -1;
-  margin-top: 2.5rem;
-}
 @media (min-width: 64rem) {
   .plans__cards {
-    grid-column: 1 / span 8;
-  }
-  .plans__aside {
-    grid-column: 9 / -1;
-    margin-top: 0;
+    grid-column: 1 / span 10;
   }
 }
 .plan {
@@ -1464,42 +1456,6 @@ html.frame-away .site-header:not([data-static]):focus-within {
   flex: none;
   translate: 0 -0.08em;
 }
-.prices {
-  width: 100%;
-  font-size: var(--t-s);
-  font-variant-numeric: tabular-nums;
-  border-collapse: collapse;
-}
-.prices caption {
-  text-align: left;
-  padding-bottom: 0.75rem;
-}
-.prices th,
-.prices td {
-  padding: 0.55rem 0;
-  border-bottom: 1px solid var(--c-line);
-  text-align: right;
-}
-.prices th:first-child {
-  text-align: left;
-}
-.prices thead th {
-  font-family: var(--f-mono);
-  font-weight: 400;
-  font-size: var(--t-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--c-muted);
-  border-bottom-color: var(--c-fg);
-}
-.plans__notes {
-  display: grid;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  font-size: var(--t-s);
-  color: var(--c-muted);
-}
-
 /* ------------------------------------------------------------ questions */
 
 .questions {

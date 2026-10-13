@@ -3,16 +3,13 @@ import { likelyCurrency } from "@/i18n/currency";
 import type { Dictionary } from "@/i18n/dictionary";
 import { format } from "@/i18n/format";
 import { appLink } from "@/i18n/links";
-import {
-  premiumCurrencies,
-  premiumPrices,
-} from "@coinslite/backend/convex/billing/rules";
+import { premiumPrices } from "@coinslite/backend/convex/billing/rules";
 import { freePlan } from "@coinslite/backend/convex/plans/rules";
 import { formatMoney, type Locale } from "@coinslite/i18n";
 
 const limit = { limit: freePlan.itemLimit };
 
-/** The two plans side by side, then every Premium price. */
+/** The two plans side by side. */
 export function Plans({
   locale,
   t,
@@ -21,8 +18,7 @@ export function Plans({
   t: Dictionary["plans"];
 }) {
   const currency = likelyCurrency[locale];
-  const price = (minor: number, priced = currency) =>
-    formatMoney(minor, priced, locale);
+  const price = (minor: number) => formatMoney(minor, currency, locale);
   const signup = appLink(locale, "/signup");
   return (
     <section id="plans" className="plans" aria-labelledby="plans-title">
@@ -83,33 +79,6 @@ export function Plans({
               {t.premium.cta}
             </PrimaryAction>
           </article>
-        </div>
-        <div className="plans__aside" data-reveal>
-          <table className="prices">
-            <caption className="label">{t.pricesTitle}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t.currency}</th>
-                <th scope="col">{t.month}</th>
-                <th scope="col">{t.year}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {premiumCurrencies.map((code) => (
-                <tr key={code}>
-                  <th scope="row" className="font-medium">
-                    {code}
-                  </th>
-                  <td>{price(premiumPrices[code].month, code)}</td>
-                  <td>{price(premiumPrices[code].year, code)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="plans__notes">
-            <p>{t.pricesNote}</p>
-            <p>{format(t.cancelNote, limit)}</p>
-          </div>
         </div>
       </div>
     </section>

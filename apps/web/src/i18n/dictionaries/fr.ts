@@ -253,14 +253,6 @@ export default {
       ],
       cta: "Gratuit d’abord, Premium ensuite",
     },
-    pricesTitle: "Tarifs de Premium",
-    currency: "Devise",
-    month: "Mensuel",
-    year: "Annuel",
-    pricesNote:
-      "Vous payez dans votre devise locale quand Premium y a un prix, sinon en euros. Le paiement est géré par Polar.",
-    cancelNote:
-      "Résiliez quand vous voulez : Premium reste actif jusqu’à la fin de la période payée. De retour à la formule gratuite, tous vos objets restent et restent modifiables ; vous ne pouvez simplement plus en ajouter tant que vous en avez plus de {limit}.",
   },
   questions: {
     title: "Les questions des collectionneurs",
