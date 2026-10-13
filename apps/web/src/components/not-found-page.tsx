@@ -1,34 +1,57 @@
-import { SiteHeader } from "@/components/site-header";
 import { getDictionary } from "@/i18n/dictionary";
 import { localePath } from "@/i18n/routing";
 import type { Locale } from "@coinslite/i18n";
-import { SearchX } from "lucide-react";
-import Link from "next/link";
+import { PrimaryAction } from "./actions";
+import { SiteHeader } from "./site-header";
 
-/** An address nothing answers: one calm column, as in the app. */
+const SECTIONS = ["record", "sets", "plans"] as const;
+
+/**
+ * An address nothing answers: three empty places cut into the board, the
+ * error engraved in them, and the way home or into a drawer of the home page.
+ * Its entrance is CSS (`.intro`), so the headline paints with the page.
+ */
 export function NotFoundPage({ locale }: { locale: Locale }) {
-  const t = getDictionary(locale).notFound;
+  const dictionary = getDictionary(locale);
+  const t = dictionary.notFound;
+  const home = localePath(locale);
   return (
     <>
       <SiteHeader locale={locale} path="/" />
-      <main
-        id="main"
-        className="flex flex-1 justify-center px-4 pb-24 pt-[14dvh]"
-      >
-        <div className="flex max-w-sm flex-col items-center gap-3 text-center">
-          <div className="flex size-9 items-center justify-center rounded-lg border bg-card text-muted-foreground">
-            <SearchX className="size-4" strokeWidth={1.75} aria-hidden="true" />
+      <main id="main" tabIndex={-1} className="lost flex-1">
+        <div className="wrap grid-12 items-start gap-y-12">
+          <div className="lost__text">
+            <h1 className="heading intro max-w-[14ch]" data-step="1">
+              {t.title}
+            </h1>
+            <p className="lead muted intro mt-6 max-w-[36ch]" data-step="2">
+              {t.description}
+            </p>
+            <div className="intro mt-10" data-step="3">
+              <PrimaryAction href={home}>{t.home}</PrimaryAction>
+            </div>
+            <nav aria-label={t.or} className="intro mt-12" data-step="3">
+              <p className="label">{t.or}</p>
+              <ul className="mt-3 flex flex-wrap gap-x-6">
+                {SECTIONS.map((id) => (
+                  <li key={id}>
+                    <a
+                      href={`${home}#${id}`}
+                      className="tap draw font-semibold"
+                    >
+                      {dictionary.header.nav[id]}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
-          <div className="flex flex-col gap-1">
-            <h1 className="text-[15px] font-medium">{t.title}</h1>
-            <p className="text-[13px] text-muted-foreground">{t.description}</p>
+          <div className="lost__tray" aria-hidden="true">
+            {/* Three empty places, the error engraved at the bottom of each. */}
+            <span className="lost__recess">4</span>
+            <span className="lost__recess">0</span>
+            <span className="lost__recess">4</span>
           </div>
-          <Link
-            href={localePath(locale)}
-            className="rounded-md text-[13px] font-medium text-link hover:underline"
-          >
-            {t.home}
-          </Link>
         </div>
       </main>
     </>

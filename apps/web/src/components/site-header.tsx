@@ -1,16 +1,19 @@
+import { localeNames, locales } from "@coinslite/i18n";
+import { LanguageSwitcher } from "./language-switcher";
+import { MobileMenu } from "./mobile-menu";
 import { getDictionary } from "@/i18n/dictionary";
 import { appLink } from "@/i18n/links";
 import { localePath } from "@/i18n/routing";
 import type { Locale } from "@coinslite/i18n";
 import { Logo } from "@coinslite/ui/logo";
-import { cn } from "@coinslite/ui/utils";
-import { outlinedAction, smallCapsLink } from "./actions";
-import { LanguageSwitcher } from "./language-switcher";
+
+const SECTIONS = ["record", "sets", "insurance", "plans", "questions"] as const;
 
 /**
- * The bar on every page, floating clear of the edges: home, the sections,
- * the language and the way into the app. On the home page it lies over the
- * opening screen (`overlay`); elsewhere it keeps its place above the page.
+ * The bar on every page: home, the index of the home page's sections (a
+ * marker slides to the one you're reading), the language and the way in.
+ * On the home page it floats over the opening screen and steps aside while
+ * you read down (`overlay`); elsewhere it keeps its place.
  */
 export function SiteHeader({
   locale,
@@ -24,47 +27,81 @@ export function SiteHeader({
 }) {
   const t = getDictionary(locale).header;
   const home = localePath(locale);
+  const links = SECTIONS.map((id) => ({
+    href: `${home}#${id}`,
+    label: t.nav[id],
+  }));
+  const signIn = appLink(locale, "/login");
+  const signUp = appLink(locale, "/signup");
   return (
-    <header
-      className={cn(
-        "inset-x-0 top-0 z-30 p-3 sm:p-4",
-        overlay ? "fixed" : "sticky",
-      )}
-    >
-      <div className="flex h-16 items-center gap-2 border border-foreground/10 bg-background/70 px-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/55 sm:px-6">
-        <a
-          href={home}
-          aria-label={t.home}
-          className="mr-auto focus-visible:outline-none md:mr-6 focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <Logo className="text-[15px] font-medium tracking-[-0.02em]" />
-        </a>
-        <nav className="hidden items-center gap-6 md:flex">
-          <a href={`${home}#features`} className={smallCapsLink}>
-            {t.features}
-          </a>
-          <a href={`${home}#plans`} className={smallCapsLink}>
-            {t.plans}
-          </a>
-        </nav>
-        <div className="flex items-center gap-1 sm:ml-auto sm:gap-5">
-          <LanguageSwitcher locale={locale} path={path} label={t.language} />
+    <header className="site-header" data-static={overlay ? undefined : ""}>
+      <div className="site-header__bar">
+        <div className="wrap flex h-full items-center gap-4 lg:gap-8">
           <a
-            href={appLink(locale, "/login")}
-            className={cn(smallCapsLink, "hidden sm:inline-flex")}
+            href={home}
+            aria-label={t.home}
+            className="logo-link mr-auto shrink-0 lg:mr-2"
           >
-            {t.signIn}
+            <Logo className="text-[17px] font-semibold tracking-[-0.02em]" />
           </a>
-          <a
-            href={appLink(locale, "/signup")}
-            className={cn(
-              outlinedAction,
-              // The narrowest phones reach it from the page's own buttons.
-              "h-10 whitespace-nowrap px-3 tracking-[0.08em] max-[359px]:hidden sm:px-6 sm:tracking-[0.16em]",
-            )}
-          >
-            {t.createAccount}
-          </a>
+          <nav aria-label={t.sections} className="site-index" data-index>
+            {links.map((link) => (
+              <a key={link.href} href={link.href} className="tap draw">
+                {link.label}
+              </a>
+            ))}
+            <span
+              className="site-index__marker"
+              data-marker
+              aria-hidden="true"
+            />
+          </nav>
+          <div className="flex items-center gap-2 sm:gap-5 lg:ml-auto">
+            <span className="max-[479px]:hidden">
+              <LanguageSwitcher
+                locale={locale}
+                path={path}
+                label={t.language}
+              />
+            </span>
+            <a
+              href={signIn}
+              className="tap draw hidden text-sm font-semibold md:inline-flex"
+            >
+              {t.signIn}
+            </a>
+            <a href={signUp} className="btn btn--compact" aria-label={t.start}>
+              {/* A phone's bar has room for the short label only. */}
+              <span
+                className="btn__label max-[479px]:hidden"
+                data-label={t.start}
+              >
+                <span>{t.start}</span>
+              </span>
+              <span
+                className="btn__label min-[480px]:hidden"
+                data-label={t.startShort}
+              >
+                <span>{t.startShort}</span>
+              </span>
+            </a>
+            <MobileMenu
+              label={t.menu}
+              close={t.close}
+              links={links}
+              actions={[
+                { href: signIn, label: t.signIn },
+                { href: signUp, label: t.start },
+              ]}
+              language={t.language}
+              languages={locales.map((value) => ({
+                locale: value,
+                href: localePath(value, path),
+                label: localeNames[value],
+                current: value === locale,
+              }))}
+            />
+          </div>
         </div>
       </div>
     </header>

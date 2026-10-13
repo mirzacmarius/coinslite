@@ -40,5 +40,7 @@ export function proxy(request: NextRequest) {
 export const config = {
   // Every page, including mistyped ones, so they get a translated 404. Next's
   // own files and the icons are left alone.
-  matcher: ["/((?!_next/|icon|apple-icon|favicon\\.ico|robots\\.txt).*)"],
+  matcher: [
+    "/((?!_next/|icon|apple-icon|favicon\\.ico|robots\\.txt|sitemap\\.xml).*)",
+  ],
 };

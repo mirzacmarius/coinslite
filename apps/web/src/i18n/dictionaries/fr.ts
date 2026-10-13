@@ -2,124 +2,297 @@ import type { Dictionary } from "../dictionary";
 
 export default {
   meta: {
-    title: "CoinsLite : un inventaire clair de vos pièces, billets et timbres",
+    title: "CoinsLite : chaque pièce, billet et timbre, bien répertorié",
     description:
-      "Enregistrez les pièces, billets et timbres que vous possédez, gardez leur état et leurs photos, et voyez ce que vaut votre collection dans votre propre devise. Gratuit jusqu’à {limit} objets.",
+      "Enregistrez vos pièces, billets et timbres avec leur état, leur prix d’achat et ce qu’ils valent aujourd’hui, dans votre propre devise. Gratuit jusqu’à {limit} objets.",
     imageAlt:
-      "CoinsLite, pour les collectionneurs de pièces, billets et timbres",
+      "CoinsLite : un médaillier dont un tiroir est ouvert, et les mots « Sachez exactement ce que vous avez »",
   },
   header: {
     home: "Page d’accueil de CoinsLite",
+    skip: "Aller au contenu",
     signIn: "Se connecter",
-    createAccount: "Créer un compte",
+    start: "Commencer gratuitement",
+    startShort: "Commencer",
     language: "Langue",
-    features: "Fonctionnalités",
-    plans: "Formules",
+    sections: "Rubriques",
+    menu: "Sommaire",
+    close: "Fermer",
+    nav: {
+      record: "Comment ça marche",
+      sets: "Ensembles",
+      insurance: "Assurance",
+      plans: "Formules",
+      questions: "Vos questions",
+    },
   },
   hero: {
-    eyebrow: "Pour les collectionneurs de pièces, billets et timbres",
-    titleLead: "Votre collection,",
-    titleRest: "bien répertoriée et estimée dans votre devise",
-    lead: "CoinsLite tient un inventaire clair de ce que vous possédez : ce qu’est chaque objet, son état, ce que vous l’avez payé et ce qu’il vaut aujourd’hui. Choisissez vos objets dans le catalogue en quelques clics, ou saisissez-les vous-même.",
-    primary: "Créer un compte gratuit",
+    kicker: "Pour les collectionneurs de pièces, billets et timbres",
+    title: "Sachez exactement ce que vous avez.",
+    lead: "CoinsLite tient le registre de chaque pièce, billet et timbre que vous possédez : ce que c’est, son état, ce que vous l’avez payé et ce qu’il vaut aujourd’hui, dans votre propre devise.",
+    primary: "Commencer gratuitement",
     secondary: "Se connecter",
-    note: "Gratuit jusqu’à {limit} objets. Aucune carte bancaire requise.",
+    note: "Gratuit pour vos {limit} premiers objets. Aucune carte bancaire requise.",
   },
-  preview: {
-    label: "Un exemple de collection",
-    title: "Collection",
-    items: "{count} objets",
-    marketValue: "Valeur de marché",
-    gainLoss: "Gain/perte",
-    types: { coin: "Pièce", banknote: "Billet", stamp: "Timbre" },
+  figure: {
+    fig: "Figure 1",
+    title: "Médaillier",
+    hint: "Ouvrez un tiroir, puis complétez son ensemble",
+    label:
+      "Un médaillier posé sur un établi, dessiné comme une illustration technique. Chacun de ses quatre tiroirs contient un ensemble : pièces de 2 euros, dollars Peace, billets et timbres. Une pièce occupe chaque alvéole que vous possédez ; les alvéoles vides sont ce qui manque encore. Un fichier posé dessus range une nouvelle fiche pour chaque objet ajouté.",
+    caption:
+      "Chaque tiroir est un ensemble du catalogue. Le plateau des dollars Peace a une alvéole pour chacun de ses 24 millésimes et ateliers, de 1921 à 1935.",
+    open: "{name} · {held} sur {total}",
+    closed: "{held} sur {total} dans le médaillier",
+    names: {
+      euro: "2 euros",
+      notes: "Billets",
+      stamps: "Timbres",
+    },
+    drawers: "Tiroirs",
+    pause: "Mettre en pause",
+    play: "Reprendre",
+    add: {
+      coin: "Ajouter une pièce",
+      note: "Ajouter un billet",
+      stamp: "Ajouter un timbre",
+    },
+    status: {
+      opened: "Tiroir {name} ouvert : {held} sur {total}.",
+      added: "Ajouté à {name} : {held} sur {total}.",
+      closed:
+        "Tous les tiroirs fermés : {held} sur {total} dans le médaillier.",
+    },
   },
-  features: {
-    title: "Ce que fait CoinsLite",
-    lead: "Tout ce qui suit existe déjà dans l’application, dans chaque langue.",
-    catalog: {
-      title: "Depuis le catalogue ou à la main",
-      text: "Choisissez une entrée du catalogue et ses informations se remplissent : pays, années, valeur faciale, série et métal. Ou saisissez l’objet vous-même ; les timbres se saisissent toujours à la main.",
+  statement: {
+    lead: "La plupart des collections vivent à trois endroits à la fois : dans le médaillier, dans un tableur ouvert pour la dernière fois en 2019, et dans la mémoire du collectionneur.",
+    turn: "Les pièces sont en sécurité. Ce que vous savez d’elles, non.",
+    rest: "CoinsLite le consigne, objet par objet, pour que vous, votre assureur et votre famille puissiez le lire.",
+  },
+  record: {
+    title: "Une pièce, enregistrée comme il faut",
+    lead: "Voici ce que CoinsLite garde pour une seule pièce. Chaque champ est facultatif, et la plupart se remplissent tout seuls.",
+    example: "Exemple de fiche",
+    chapters: {
+      catalog: {
+        title: "Choisissez-la dans le catalogue",
+        text: "Cherchez « Morgan 1921 » et choisissez l’entrée. Pays, série, valeur faciale, métal, poids et titre viennent avec. Absente du catalogue ? Saisissez-la vous-même ; les timbres le sont toujours.",
+      },
+      grade: {
+        title: "Notez son état sur la bonne échelle",
+        text: "Sheldon de 1 à 70 pour une pièce américaine, de 0 à 3 pour une norvégienne, de UNC à G pour la plupart des autres, et des échelles propres aux billets et aux timbres. La frappe est notée à part, et le numéro PCGS ou NGC d’une pièce sous coque l’accompagne.",
+      },
+      purchase: {
+        title: "Notez ce que vous avez payé, et où",
+        text: "Prix d’achat, date et provenance, pour chaque exemplaire. Un lot acheté d’un coup ? Renseignez l’achat sur tous les objets en une fois.",
+      },
+      photos: {
+        title: "Photographiez les deux faces",
+        text: "Avers et revers, plus six autres. Les photos sont stockées en privé et ne s’ouvrent que par des liens qui expirent dans l’heure.",
+      },
+      value: {
+        title: "Sachez ce qu’elle vaut aujourd’hui",
+        text: "Votre propre valeur de marché, estimée d’après les ventes que vous avez vues. Pour l’or et l’argent, la valeur du métal suit le cours spot d’elle-même.",
+      },
     },
-    grades: {
-      title: "L’état, distinct de la frappe",
-      text: "Notez l’état de chaque objet sur l’échelle qui lui convient : Sheldon 1–70, l’échelle norvégienne 0–3, les états européens et internationaux ou ceux des timbres. La frappe (circulation, brillant universel ou belle épreuve) est enregistrée à part.",
+    card: {
+      fields: {
+        catalog: "Catalogue",
+        grade: "État",
+        strike: "Frappe",
+        purchase: "Prix d’achat",
+        source: "Achetée",
+        photos: "Photos",
+        market: "Valeur de marché",
+        metal: "Valeur du métal",
+        gain: "Gain/perte",
+      },
+      values: {
+        catalog: "Argent, 26,73 g, 0,900",
+        grade: "MS-63 sur l’échelle Sheldon",
+        strike: "Circulation",
+        source: "{date} · Salon numismatique, Oslo",
+        photos: "Avers et revers",
+        metal: "24,06 g d’argent fin × cours spot",
+      },
     },
-    albums: {
-      title: "Albums",
-      text: "Regroupez vos objets en albums, par exemple une série que vous suivez ou un voyage. Chaque objet appartient à un album au plus.",
+  },
+  value: {
+    title: "Ce qu’elle vaut, dans votre propre devise",
+    text: "Les totaux de toute votre collection : ce que vous avez payé, ce qu’elle vaut aujourd’hui et le gain ou la perte entre les deux, le tout dans une seule devise de référence. Des graphiques montrent comment la valeur a évolué et où elle se trouve.",
+    facts: {
+      spot: {
+        value: "15",
+        text: "minutes entre deux mises à jour du cours spot de l’or et de l’argent, et chaque valeur du métal suit",
+      },
+      currencies: {
+        value: "8",
+        text: "devises de référence : NOK, SEK, DKK, EUR, RON, GBP, USD et CHF",
+      },
+      presets: {
+        value: "16",
+        text: "modèles de lingots qui renseignent poids et titre, du Krugerrand au Panda",
+      },
+      scales: {
+        value: "5",
+        text: "échelles de notation, des 70 points de Sheldon aux timbres, la frappe à part",
+      },
     },
-    photos: {
-      title: "Des photos des deux faces",
-      text: "Ajoutez une photo de l’avers et du revers. Les photos sont stockées en privé et vous seul pouvez les voir.",
+  },
+  sets: {
+    title: "Voyez ce qui manque",
+    text: "Toute série du catalogue s’ouvre comme un ensemble : les millésimes que vous avez, ceux qui vous manquent, et où vous en êtes. Marquez les manques comme souhaités, ou ajoutez en une fois tout ce que vous possédez déjà d’un ensemble.",
+    tray: {
+      title: "{series}, de 1921 à 1935",
+      count: "{held} sur {total} · {percent} %",
+      held: "Possédé",
+      missing: "Manquant",
+      wanted: "Sur votre liste de souhaits",
     },
-    totals: {
-      title: "Des totaux dans votre devise de référence",
-      text: "Prix d’achat, valeur de marché et gain/perte sur toute votre collection, le tout dans la devise que vous choisissez.",
-    },
-    spot: {
-      title: "Les cours spot de l’or et de l’argent",
-      text: "Les cours spot sont actualisés régulièrement, avec l’heure de chaque mise à jour, et la valeur du métal de vos pièces les suit.",
-    },
-    sets: {
-      title: "Ensembles et complétion",
-      text: "Affichez une série du catalogue comme un ensemble : ce que vous en possédez et les entrées qui vous manquent encore.",
-    },
-    insurance: {
+    note: "À titre d’exemple : le dollar Peace est l’un des ensembles du catalogue, avec chaque millésime et chaque atelier.",
+  },
+  insurance: {
+    title: "Si le pire arrive, remettez la liste",
+    text: "Le rapport d’assurance est un PDF exploitable par votre assureur : les objets de votre choix avec leur prix d’achat, leur valeur de marché et leur valeur du métal, la plus élevée comme valeur assurée, vos coordonnées et les totaux.",
+    premium: "Premium",
+    sheet: {
       title: "Rapport d’assurance",
-      text: "Un PDF pour votre assureur avec les objets de votre choix, leurs valeurs et vos coordonnées. Premium.",
+      owner: "Vos nom et adresse",
+      example: "Exemple",
+      columns: {
+        item: "Objet",
+        grade: "État",
+        quantity: "Qté",
+        market: "Valeur de marché",
+        metal: "Valeur du métal",
+        insured: "Valeur assurée",
+      },
+      total: "Total",
+      used: "oblitéré",
+      note: "Valeurs déclarées par le propriétaire. La valeur du métal est poids × titre × cours spot. La valeur assurée est la plus élevée des valeurs retenues pour chaque objet.",
     },
-    exports: {
-      title: "Export PDF et CSV",
-      text: "Votre collection, ou toute partie filtrée, en PDF à imprimer ou en CSV pour un tableur. Premium.",
+  },
+  also: {
+    title: "Et tout le reste",
+    items: {
+      albums: {
+        title: "Albums",
+        text: "Regroupez vos objets par série, par voyage ou comme bon vous semble.",
+      },
+      wantlist: {
+        title: "Liste de souhaits",
+        text: "Marquez ce que vous cherchez. Ajouter la pièce la raye de la liste.",
+      },
+      certification: {
+        title: "Pièces certifiées",
+        text: "PCGS, NGC, ANACS, ICG ou PMG, avec le numéro de certificat.",
+      },
+      stamps: {
+        title: "Catalogues de timbres",
+        text: "Numéros Michel, Scott, Stanley Gibbons, Yvert et Tellier, AFA et Norgeskatalogen.",
+      },
+      import: {
+        title: "Import de tableur",
+        text: "Jusqu’à 2 000 lignes depuis un fichier CSV, vérifiées avant tout enregistrement.",
+      },
+      export: {
+        title: "Export PDF et CSV",
+        text: "N’importe quelle vue de votre collection, à imprimer ou à garder. Premium.",
+      },
+      charts: {
+        title: "Graphiques",
+        text: "La valeur dans le temps, par date d’acquisition et par type d’objet.",
+      },
+      sales: {
+        title: "Objets vendus",
+        text: "Notez ce que vous avez vendu et à quel prix. L’objet quitte vos totaux et garde son historique.",
+      },
+      languages: {
+        title: "Cinq langues",
+        text: "English, Norsk bokmål, Deutsch, Français et Română, avec les nombres et les dates écrits à votre façon.",
+      },
+      phone: {
+        title: "Sur votre téléphone",
+        text: "Fonctionne dans le navigateur sur téléphone, tablette et ordinateur, et s’ajoute à votre écran d’accueil.",
+      },
     },
-    languages: {
-      title: "Cinq langues",
-      text: "Anglais, norvégien (bokmål), allemand, français et roumain, avec les nombres et les dates écrits comme votre langue les écrit.",
-    },
-    noAds: {
-      title: "Sans publicité",
-      text: "Aucune publicité, quelle que soit la formule, et aucun cookie de suivi : les pages vues sont comptées sans que nous sachions qui vous êtes.",
-    },
+  },
+  privacy: {
+    title: "Personne d’autre ne voit ce que vous possédez.",
+    points: [
+      "Vos photos ne sont que pour vous : un lien vers l’une d’elles cesse de fonctionner dans l’heure, même s’il est partagé.",
+      "Aucune publicité, quelle que soit la formule, et aucun cookie de suivi. Les pages vues sont comptées sans savoir qui vous êtes.",
+      "Supprimez votre compte, et vos objets, photos et albums partent avec lui.",
+    ],
   },
   plans: {
-    title: "Formules",
-    lead: "Commencez gratuitement. Passez à Premium quand votre collection grandit.",
+    title: "Gratuit pour vos {limit} premiers objets",
+    lead: "Premium est là quand votre collection dépasse la formule gratuite, ou quand vous voulez les rapports.",
     free: {
       name: "Formule gratuite",
       price: "Gratuit",
       summary: "Jusqu’à {limit} objets, quelle que soit leur quantité.",
       features: [
-        "Le catalogue, les albums et les photos",
-        "L’état, la frappe et les ensembles",
-        "Les totaux et les cours spot",
+        "Le catalogue, les ensembles et la liste de souhaits",
+        "États, frappe, photos et albums",
+        "Totaux, graphiques et cours spot",
+        "Import de tableur",
       ],
-      cta: "Créer un compte gratuit",
+      cta: "Commencer gratuitement",
     },
     premium: {
       name: "Premium",
       monthly: "{price} par mois",
       yearly: "ou {price} par an",
-      summary: "Des objets en nombre illimité, et les rapports en plus.",
+      summary: "Objets illimités, et les rapports en plus.",
       features: [
-        "Objets en nombre illimité",
+        "Objets illimités",
         "Le rapport d’assurance",
         "Export PDF et CSV",
-        "Tout ce que propose la formule gratuite",
+        "Tout ce qu’offre la formule gratuite",
       ],
-      cta: "Commencer avec un compte gratuit",
+      cta: "Gratuit d’abord, Premium ensuite",
     },
-    pricesTitle: "Tarifs de Premium",
-    currency: "Devise",
-    month: "Mensuel",
-    year: "Annuel",
-    pricesNote:
-      "Vous payez dans votre devise locale quand Premium y a un prix, sinon en euros. Le paiement est géré par Polar.",
-    cancelNote:
-      "Résiliez quand vous voulez : Premium reste actif jusqu’à la fin de la période payée. De retour à la formule gratuite, tous vos objets restent et restent modifiables ; vous ne pouvez simplement plus en ajouter tant que vous en avez plus de {limit}.",
+  },
+  questions: {
+    title: "Les questions des collectionneurs",
+    items: [
+      {
+        question: "Mes pièces doivent-elles être dans le catalogue ?",
+        answer:
+          "Non. Tout peut être saisi à la main, et les timbres le sont toujours. Quand le catalogue a l’émission, il vous évite la saisie et ouvre son ensemble.",
+      },
+      {
+        question: "Puis-je importer mon tableur ?",
+        answer:
+          "Oui. Importez un CSV jusqu’à 2 000 lignes, avec des en-têtes dans l’une des cinq langues. Vous voyez quelles lignes seront ajoutées, et pourquoi d’autres ne le seront pas, avant tout enregistrement. Les {limit} objets de la formule gratuite s’appliquent toujours.",
+      },
+      {
+        question: "Que se passe-t-il si j’arrête de payer Premium ?",
+        answer:
+          "Chaque objet reste, et reste modifiable. Vous ne pouvez simplement plus en ajouter tant que vous en avez plus de {limit}.",
+      },
+      {
+        question: "Qui peut voir ma collection ?",
+        answer:
+          "Vous seul. Vos photos sont stockées en privé, et ce site compte les pages vues sans cookies et sans savoir qui vous êtes.",
+      },
+      {
+        question: "Quelles devises puis-je utiliser ?",
+        answer:
+          "Votre devise de référence peut être NOK, SEK, DKK, EUR, RON, GBP, USD ou CHF. Changez-la plus tard et chaque montant est converti une fois, au taux que vous confirmez. Premium est facturé en NOK, RON, USD ou EUR, selon l’endroit où vous êtes.",
+      },
+      {
+        question: "Est-ce que ça marche sur mon téléphone ?",
+        answer:
+          "Oui. Ça fonctionne dans tout navigateur récent, sur téléphone, tablette ou ordinateur, et vous pouvez l’ajouter à votre écran d’accueil.",
+      },
+    ],
   },
   closing: {
-    title: "Commencez votre collection dès aujourd’hui",
+    title: "Commencez par la pièce posée sur votre bureau.",
     text: "Créer un compte prend une minute, et vos {limit} premiers objets sont gratuits.",
+    cta: "Commencer gratuitement",
   },
   footer: {
     product: "Produit",
@@ -127,12 +300,16 @@ export default {
     legal: "Mentions légales",
     privacy: "Politique de confidentialité",
     terms: "Conditions d’utilisation",
+    tagline:
+      "Un médaillier pour tout ce que vous collectionnez, avec la fiche de chaque pièce.",
+    colophon:
+      "Composé en Familjen Grotesk et Schibsted Grotesk. Chaque pièce de ce site est dessinée, pas photographiée.",
   },
   notFound: {
-    title: "Page introuvable",
-    description:
-      "Il n’y a rien à cette adresse. La page a peut-être été déplacée, ou le lien est erroné.",
+    title: "Rien n’est rangé à cette adresse",
+    description: "La page a peut-être été déplacée, ou le lien est erroné.",
     home: "Aller à l’accueil",
+    or: "Ou ouvrez un tiroir",
   },
   legal: {
     updated: "Dernière mise à jour le {date}",

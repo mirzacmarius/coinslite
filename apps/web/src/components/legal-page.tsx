@@ -3,11 +3,10 @@ import { getDictionary } from "@/i18n/dictionary";
 import { fill } from "@/i18n/format";
 import { localePath } from "@/i18n/routing";
 import { type LegalDocument, lastUpdated, legalTexts } from "@/legal";
-import { type OperatorDetail, isDraft, operator } from "@/legal/operator";
+import { isDraft, type OperatorDetail, operator } from "@/legal/operator";
 import { freePlan } from "@coinslite/backend/convex/plans/rules";
-import { type Locale, formatCountry, formatDate } from "@coinslite/i18n";
+import { formatCountry, formatDate, type Locale } from "@coinslite/i18n";
 import { TriangleAlert } from "lucide-react";
-import Link from "next/link";
 
 /** The privacy policy or the terms, in one language. */
 export function LegalPage({
@@ -29,21 +28,26 @@ export function LegalPage({
       <SiteHeader locale={locale} path={path} />
       <main
         id="main"
-        className="mx-auto flex w-full max-w-6xl flex-1 gap-12 px-4 pb-20 pt-10 sm:px-6 md:pt-14"
+        className="legal mx-auto w-full max-w-6xl flex-1 px-4 pb-20 pt-10 sm:px-6 md:pt-14"
       >
-        <nav
-          aria-labelledby="contents"
-          className="sticky top-28 hidden w-52 shrink-0 self-start lg:block"
-        >
+        {/* The title comes first on a phone; on a wide screen the contents
+            stand beside it as a sticky sidebar. */}
+        <header className="legal__head flex flex-col gap-2">
+          <h1 className="legal-title">{text.title}</h1>
+          <p className="text-[13px] text-muted-foreground">
+            {fill(t.updated, { date: formatDate(lastUpdated, locale) })}
+          </p>
+        </header>
+        <nav aria-labelledby="contents" data-toc className="legal__toc">
           <p id="contents" className="px-2 pb-2 text-xs text-muted-foreground">
             {t.contents}
           </p>
-          <ul className="flex flex-col text-[13px]">
+          <ul className="text-[13px]">
             {text.sections.map((section) => (
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  className="flex min-h-7 items-center rounded-md px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  className="flex min-h-7 items-center rounded-lg px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
                   {section.heading}
                 </a>
@@ -51,17 +55,9 @@ export function LegalPage({
             ))}
           </ul>
         </nav>
-        <article className="flex min-w-0 max-w-2xl flex-1 flex-col gap-6">
-          <header className="flex flex-col gap-2">
-            <h1 className="text-3xl font-semibold tracking-tight">
-              {text.title}
-            </h1>
-            <p className="text-[13px] text-muted-foreground">
-              {fill(t.updated, { date: formatDate(lastUpdated, locale) })}
-            </p>
-          </header>
+        <article className="legal__body flex min-w-0 flex-col gap-6">
           {(isDraft || locale !== "en") && (
-            <div className="flex flex-col gap-2 rounded-lg border bg-card p-4 text-sm">
+            <div className="flex flex-col gap-2 rounded-2xl border bg-card p-4 text-sm">
               {isDraft && (
                 <p className="flex gap-2">
                   <TriangleAlert
@@ -76,13 +72,15 @@ export function LegalPage({
                 <p className="text-muted-foreground">
                   {fill(t.governs, {
                     english: (
-                      <Link
+                      // Another language is another root layout: load it in full.
+                      <a
                         href={localePath("en", path)}
                         hrefLang="en"
+                        data-no-transition
                         className="text-link underline underline-offset-4"
                       >
                         {t.englishVersion}
-                      </Link>
+                      </a>
                     ),
                   })}
                 </p>
@@ -96,9 +94,7 @@ export function LegalPage({
               id={section.id}
               className="flex scroll-mt-28 flex-col gap-3"
             >
-              <h2 className="pt-2 text-lg font-semibold tracking-tight">
-                {section.heading}
-              </h2>
+              <h2 className="legal-heading pt-2">{section.heading}</h2>
               {section.blocks.map((block) =>
                 typeof block === "string" ? (
                   <p key={block} className="text-sm leading-6">
