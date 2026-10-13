@@ -35,27 +35,12 @@ export default {
     note: "Deine ersten {limit} Objekte sind gratis. Keine Kreditkarte nötig.",
   },
   figure: {
-    fig: "Abb. 1",
-    title: "Münzschrank",
-    hint: "Öffne eine Schublade und ergänze ihr Set",
     label:
-      "Ein Münzschrank auf einer Werkbank, gezeichnet wie eine technische Illustration. Jede seiner vier Schubladen enthält ein Set: 2-Euro-Münzen, Peace-Dollars, Banknoten und Briefmarken. In jeder Mulde, die du besitzt, liegt eine Münze; die leeren Mulden sind das, was noch fehlt. Ein Karteikasten obenauf legt für jedes neue Stück eine neue Karteikarte ab.",
-    caption:
-      "Jede Schublade ist ein Set aus dem Katalog. Das Tableau mit den Peace-Dollars hat für jeden seiner 24 Jahrgänge und Prägestätten von 1921 bis 1935 eine Mulde.",
-    open: "{name} · {held} von {total}",
-    closed: "{held} von {total} im Schrank",
+      "Ein Münzschrank, gezeichnet wie eine technische Illustration. Jede seiner vier Schubladen enthält ein Set: 2-Euro-Münzen, Peace-Dollars, Banknoten und Briefmarken. In jeder Mulde, die du besitzt, liegt eine Münze; die leeren Mulden sind das, was noch fehlt. Ein Karteikasten obenauf legt für jedes neue Stück eine neue Karteikarte ab.",
     names: {
       euro: "2 Euro",
       notes: "Banknoten",
       stamps: "Briefmarken",
-    },
-    drawers: "Schubladen",
-    pause: "Anhalten",
-    play: "Abspielen",
-    add: {
-      coin: "Münze hinzufügen",
-      note: "Banknote hinzufügen",
-      stamp: "Briefmarke hinzufügen",
     },
     status: {
       opened: "Schublade {name} offen: {held} von {total}.",

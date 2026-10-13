@@ -36,27 +36,12 @@ export default {
     note: "Primele {limit} de obiecte sunt gratuite. Nu ai nevoie de card.",
   },
   figure: {
-    fig: "Figura 1",
-    title: "Dulap pentru monede",
-    hint: "Deschide un sertar și completează-i setul",
     label:
-      "Un dulap pentru monede pe un banc de lucru, desenat ca o ilustrație tehnică. Fiecare dintre cele patru sertare conține un set: monede de 2 euro, dolari Peace, bancnote și timbre. În fiecare locaș pe care îl ai stă o monedă, locașurile goale sunt ce lipsește încă, iar un fișier de pe dulap adaugă câte o fișă nouă pentru fiecare obiect adăugat.",
-    caption:
-      "Fiecare sertar este un set din catalog. Tava cu dolari Peace are câte un locaș pentru fiecare dintre cei 24 de ani și monetării, din 1921 până în 1935.",
-    open: "{name} · {held} din {total}",
-    closed: "{held} din {total} în dulap",
+      "Un dulap pentru monede, desenat ca o ilustrație tehnică. Fiecare dintre cele patru sertare conține un set: monede de 2 euro, dolari Peace, bancnote și timbre. În fiecare locaș pe care îl ai stă o monedă, locașurile goale sunt ce lipsește încă, iar un fișier de pe dulap adaugă câte o fișă nouă pentru fiecare obiect adăugat.",
     names: {
       euro: "Monede de 2 euro",
       notes: "Bancnote",
       stamps: "Timbre",
-    },
-    drawers: "Sertare",
-    pause: "Pauză",
-    play: "Redă",
-    add: {
-      coin: "Adaugă o monedă",
-      note: "Adaugă o bancnotă",
-      stamp: "Adaugă un timbru",
     },
     status: {
       opened: "Sertarul {name} e deschis: {held} din {total}.",

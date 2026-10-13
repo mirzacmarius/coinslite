@@ -6,7 +6,6 @@ import {
   DRAWER_LIST,
   FIRST,
   heldAtStart,
-  readoutOf,
 } from "./model";
 import {
   CARD_DROP,
@@ -24,7 +23,6 @@ import {
   spring,
   useInView,
   useLoop,
-  useReadout,
 } from "@/components/iso/react/live";
 import * as React from "react";
 
@@ -43,7 +41,6 @@ interface Props {
   text: CabinetText;
   status: { opened: string; added: string; closed: string };
   defs: React.ReactNode;
-  bench: React.ReactNode;
   cabinetBack: React.ReactNode;
   cabinetFront: React.ReactNode;
   cardBox: {
@@ -110,14 +107,13 @@ export function CabinetLive({
   text,
   status,
   defs,
-  bench,
   cabinetBack,
   cabinetFront,
   cardBox,
   drawers,
   units,
 }: Props) {
-  const { anchor, say } = useReadout<HTMLDivElement>();
+  const anchor = React.useRef<HTMLDivElement>(null);
   const visible = useInView(anchor);
   const slides = React.useRef<(SVGGElement | null)[][]>(drawers.map(() => []));
   const hits = React.useRef<(SVGGElement | null)[]>([]);
@@ -144,10 +140,8 @@ export function CabinetLive({
     clock: 0,
     touring: true,
     quietFor: TOUR_BACK,
-    /** The pointer or the focus is in the figure: the tour waits. */
+    /** The pointer is in the figure: the tour waits. */
     inside: false,
-    /** Paused with the figure's own button: the tour waits until played. */
-    paused: false,
     hover: null as number | null,
     /** An add asked for before its drawer was out. */
     pending: null as "spoken" | "quiet" | null,
@@ -156,8 +150,6 @@ export function CabinetLive({
   });
 
   const [openShown, setOpenShown] = React.useState<number | null>(FIRST);
-  /** Bumped when a count changes, so the add button knows a full Set. */
-  const [, setCounted] = React.useState(0);
 
   const announce = React.useCallback((message: string) => {
     if (live.current) live.current.textContent = message;
@@ -214,7 +206,6 @@ export function CabinetLive({
         s.cards += 1;
       }
       if (speak) announce(fill(status.added, valuesOf(index)));
-      setCounted((value) => value + 1);
     },
     [announce, status, valuesOf],
   );
@@ -226,7 +217,6 @@ export function CabinetLive({
     s.cards = CARDS_AT_START;
     s.filing = null;
     s.pending = null;
-    setCounted((value) => value + 1);
     cardsRef.current
       ?.querySelectorAll<SVGGElement>(":scope > g")
       .forEach((node, at) => {
@@ -267,7 +257,7 @@ export function CabinetLive({
             }
           }
           moving = true;
-        } else if (!s.inside && !s.paused) {
+        } else if (!s.inside) {
           s.quietFor += dt;
           if (s.quietFor >= TOUR_BACK) {
             s.touring = true;
@@ -376,12 +366,9 @@ export function CabinetLive({
         } else moving = true;
       }
 
-      const opened =
-        s.open !== null && s.pulls[s.open]!.at > TRAVEL * 0.6 ? s.open : null;
-      say(readoutOf(text, opened, s.held));
       return moving;
     },
-    [add, drawers, openDrawer, reset, say, text, units],
+    [add, drawers, openDrawer, reset, units],
   );
 
   const kick = useLoop(tick, visible);
@@ -428,19 +415,6 @@ export function CabinetLive({
     s.hover = null;
     s.quietFor = 0;
   };
-  const [paused, setPaused] = React.useState(false);
-  const togglePause = () => {
-    const s = state.current;
-    s.paused = !s.paused;
-    setPaused(s.paused);
-    if (s.paused) s.touring = false;
-    else {
-      s.touring = true;
-      s.inside = false;
-    }
-    kick();
-  };
-
   const onClick = (event: React.MouseEvent) => {
     const s = state.current;
     const index = drawerAt(event.target);
@@ -454,22 +428,15 @@ export function CabinetLive({
     shift(units.y, index === FIRST ? TRAVEL : 0),
   );
 
-  const shown = openShown === null ? null : DRAWER_LIST[openShown]!;
   return (
-    // The tour waits while the pointer or the focus is in the figure.
-    // biome-ignore lint/a11y/noStaticElementInteractions: see above
+    // The tour waits while the pointer is in the figure.
     <div
       ref={anchor}
       className="cab-live"
       onPointerEnter={enterFigure}
       onPointerLeave={leaveFigure}
-      onFocus={enterFigure}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) leaveFigure();
-      }}
     >
-      {/* Pointing at a drawer opens it and tapping it adds a piece: shortcuts
-          for the buttons below, which do the same from the keyboard. */}
+      {/* Pointing at a drawer opens it and tapping it adds a piece. */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: see above */}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: see above */}
       <div
@@ -480,7 +447,6 @@ export function CabinetLive({
       >
         <IsoFigure width={WIDTH} height={HEIGHT} label={label}>
           {defs}
-          {bench}
           {cabinetBack}
           {drawers.map((parts, index) => {
             const key = DRAWER_LIST[index]!.key;
@@ -547,45 +513,6 @@ export function CabinetLive({
             ))}
           </g>
         </IsoFigure>
-      </div>
-      <div className="cab-controls">
-        <fieldset className="cab-drawers">
-          <legend className="sr-only">{text.drawers}</legend>
-          {[...DRAWER_LIST.keys()].reverse().map((index) => (
-            <button
-              key={DRAWER_LIST[index]!.key}
-              type="button"
-              aria-pressed={openShown === index}
-              onClick={() => {
-                interrupt();
-                openDrawer(openShown === index ? null : index, true);
-              }}
-            >
-              {text.names[DRAWER_LIST[index]!.key]}
-            </button>
-          ))}
-        </fieldset>
-        <button
-          type="button"
-          className="cab-add"
-          disabled={
-            shown === null || state.current.held[openShown!]!.every(Boolean)
-          }
-          onClick={() => {
-            interrupt();
-            add(true);
-          }}
-        >
-          {text.add[shown?.kind ?? "coin"]}
-        </button>
-        <button
-          type="button"
-          className="cab-pause"
-          aria-pressed={paused}
-          onClick={togglePause}
-        >
-          {paused ? text.play : text.pause}
-        </button>
       </div>
       <p ref={live} className="sr-only" aria-live="polite" />
     </div>

@@ -34,27 +34,12 @@ export default {
     note: "Free for your first {limit} Items. No card needed.",
   },
   figure: {
-    fig: "Fig. 1",
-    title: "Coin cabinet",
-    hint: "Open a drawer, then add to its Set",
     label:
-      "A coin cabinet on a workbench, drawn like a technical illustration. Each of its four drawers holds one Set: 2 euro coins, Peace dollars, banknotes and stamps. A coin sits in every recess you hold, the empty recesses are what’s still missing, and a card index on top files a new record card for every piece you add.",
-    caption:
-      "Every drawer is a Set from the Catalog. The Peace dollar tray has a recess for each of its 24 dates and mints, from 1921 to 1935.",
-    open: "{name} · {held} of {total}",
-    closed: "{held} of {total} in the cabinet",
+      "A coin cabinet, drawn like a technical illustration. Each of its four drawers holds one Set: 2 euro coins, Peace dollars, banknotes and stamps. A coin sits in every recess you hold, the empty recesses are what’s still missing, and a card index on top files a new record card for every piece you add.",
     names: {
       euro: "2 euro",
       notes: "Banknotes",
       stamps: "Stamps",
-    },
-    drawers: "Drawers",
-    pause: "Pause",
-    play: "Play",
-    add: {
-      coin: "Add a coin",
-      note: "Add a banknote",
-      stamp: "Add a stamp",
     },
     status: {
       opened: "{name} drawer open: {held} of {total}.",

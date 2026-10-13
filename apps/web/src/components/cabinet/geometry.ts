@@ -2,9 +2,6 @@ import { DRAWER_LIST, type Drawer } from "./model";
 import {
   AZIMUTH,
   at,
-  BENCH,
-  BENCH_FOOT_H,
-  BENCH_H,
   BODY,
   BODY_TOP,
   BODY_Z,
@@ -60,8 +57,6 @@ import {
   sideArc,
   sideSeam,
   slabOf,
-  topMatrix,
-  topTicks,
 } from "@/components/iso/iso-kit";
 
 const solid = (plan: Plan, z: number, h: number, steps = 4, bevel = 0) =>
@@ -108,70 +103,6 @@ function roundRectX(
   corner(y0 + r, z0 + r, 180);
   return pathOf(points, true);
 }
-
-/* ------------------------------------------------------------------ bench */
-
-const BENCH_FEET: Plane[] = [
-  [BENCH.x + 20, BENCH.y + 18],
-  [BENCH.x + BENCH.w - 20, BENCH.y + 18],
-  [BENCH.x + 20, BENCH.y + BENCH.d - 18],
-  [BENCH.x + BENCH.w - 20, BENCH.y + BENCH.d - 18],
-];
-const BENCH_SCREWS: Plane[] = [
-  [BENCH.x + 8, BENCH.y + 8],
-  [BENCH.x + BENCH.w - 8, BENCH.y + 8],
-  [BENCH.x + 8, BENCH.y + BENCH.d - 8],
-  [BENCH.x + BENCH.w - 8, BENCH.y + BENCH.d - 8],
-];
-/** A ruler strip along the bench's right edge, read along y. */
-const STRIP: Plan = {
-  x: BENCH.x + BENCH.w - 19,
-  y: BENCH.y + 26,
-  w: 7,
-  d: BENCH.d - 52,
-  r: 1,
-};
-const RULE = topTicks(
-  STRIP.y + 4,
-  STRIP.y + STRIP.d - 4,
-  4,
-  5,
-  STRIP.x + 0.8,
-  0.6,
-  [2, 3.8],
-  P,
-  "y",
-);
-/** The maker's plate, front right, with the one engraved word. */
-const LABEL: Plan = {
-  x: BENCH.x + BENCH.w - 66,
-  y: BENCH.y + BENCH.d - 22,
-  w: 40,
-  d: 12,
-  r: 1.6,
-};
-
-export const BENCH_ART = {
-  halo: haloOf(BENCH, -BENCH_H - BENCH_FOOT_H, BENCH_H, P),
-  feet: BENCH_FEET.map(([x, y]) => [
-    cyl(x, y, 7, -BENCH_H - BENCH_FOOT_H, 1.6, 28),
-    cyl(x, y, 5.4, -BENCH_H - BENCH_FOOT_H + 1.6, BENCH_FOOT_H - 1.6, 28),
-  ]),
-  slab: solid(BENCH, -BENCH_H, BENCH_H, 8, 1.6),
-  groove: planOutline(insetPlan(BENCH, 5), 0, P),
-  screwRings: join(BENCH_SCREWS.map(([x, y]) => ring(x, y, 2.2, 0, P, 16))),
-  screws: BENCH_SCREWS.map(([x, y]) => at([x, y, 0])),
-  strip: solid(STRIP, 0, 0.6, 3),
-  ruleMinor: RULE.minor,
-  ruleMajor: RULE.major,
-  label: solid(LABEL, 0, 0.8, 4),
-  labelLine: planOutline(insetPlan(LABEL, 1.6), 0.8, P),
-  labelScrews: [
-    at([LABEL.x + 3.4, LABEL.y + LABEL.d / 2, 0.8]),
-    at([LABEL.x + LABEL.w - 3.4, LABEL.y + LABEL.d / 2, 0.8]),
-  ],
-  labelText: topMatrix([LABEL.x + 8, LABEL.y + 7.6], 0.8, P, "x"),
-};
 
 /* ---------------------------------------------------------------- cabinet */
 

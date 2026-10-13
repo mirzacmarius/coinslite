@@ -7,7 +7,7 @@ import { freePlan } from "@coinslite/backend/convex/plans/rules";
 import type { Locale } from "@coinslite/i18n";
 
 /**
- * The opening screen: the promise in large type beside Fig 1, the cabinet.
+ * The opening screen: the promise in large type beside the coin cabinet.
  * Its entrance is CSS (`.intro`), so the headline paints with the page.
  */
 export function Hero({ locale, t }: { locale: Locale; t: Dictionary }) {
