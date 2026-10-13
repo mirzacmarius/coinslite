@@ -198,6 +198,12 @@
       "sourceType": "github",
       "skillPath": "skills/convex-verify/SKILL.md",
       "computedHash": "dbe65a37ca2e9a5afa55669b8928ce1dc3ac765151452008f9105bde049228f7"
+    },
+    "github-actions-parallelize": {
+      "source": "stablyai/skills",
+      "sourceType": "github",
+      "skillPath": "github-actions-parallelize/SKILL.md",
+      "computedHash": "4ebb75edf03ba2976533e68d63a29c84dcee9bb1468ac14551cc63e21db2ef99"
     }
   }
 }
