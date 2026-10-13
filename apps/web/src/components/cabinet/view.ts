@@ -12,7 +12,7 @@ import {
  * from the floor it stands on.
  */
 
-export const WIDTH = 600;
+export const WIDTH = 560;
 export const HEIGHT = 440;
 const PAD = 18;
 export const AZIMUTH = 55;
@@ -98,8 +98,13 @@ function corners({ x, y, w, d }: Plan, z0: number, z1: number): Point3[] {
 
 export const P = fitProjection(
   [
-    // The cabinet from its feet up, with a drawer all the way out.
-    ...corners({ ...PLINTH, d: FRONT + TRAVEL - PLINTH.y }, 0, TOP_Z),
+    // The cabinet from its feet up, then its drawers all the way out.
+    ...corners(PLINTH, 0, TOP_Z),
+    ...corners(
+      { ...PLINTH, y: FRONT, d: TRAVEL },
+      slotBottom(0),
+      slotTop(DRAWERS - 1),
+    ),
     ...corners(TOP, TOP_Z, TOP_Z + TOP_H),
     ...corners(CARD_BOX, TOP_Z + TOP_H, TOP_Z + TOP_H + CARD.h + 4),
   ],

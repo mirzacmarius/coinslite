@@ -1,9 +1,7 @@
 import { PrimaryAction } from "@/components/actions";
 import { CabinetFigure } from "@/components/cabinet/figure";
 import type { Dictionary } from "@/i18n/dictionary";
-import { format } from "@/i18n/format";
 import { appLink } from "@/i18n/links";
-import { freePlan } from "@coinslite/backend/convex/plans/rules";
 import type { Locale } from "@coinslite/i18n";
 
 /**
@@ -36,9 +34,6 @@ export function Hero({ locale, t }: { locale: Locale; t: Dictionary }) {
               {t.hero.secondary}
             </a>
           </div>
-          <p className="intro muted mt-5 text-sm" data-step="3">
-            {format(t.hero.note, { limit: freePlan.itemLimit })}
-          </p>
         </div>
         <div className="hero__figure intro" data-step="figure">
           <CabinetFigure t={t.figure} />

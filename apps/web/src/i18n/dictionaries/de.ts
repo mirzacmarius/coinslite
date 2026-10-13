@@ -32,7 +32,6 @@ export default {
     lead: "CoinsLite führt Buch über jede Münze, Banknote und Briefmarke, die du besitzt: was sie ist, ihre Erhaltung, was du bezahlt hast und was sie heute wert ist, in deiner eigenen Währung.",
     primary: "Gratis starten",
     secondary: "Anmelden",
-    note: "Deine ersten {limit} Objekte sind gratis. Keine Kreditkarte nötig.",
   },
   figure: {
     label:

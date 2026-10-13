@@ -32,7 +32,6 @@ export default {
     lead: "CoinsLite tient le registre de chaque pièce, billet et timbre que vous possédez : ce que c’est, son état, ce que vous l’avez payé et ce qu’il vaut aujourd’hui, dans votre propre devise.",
     primary: "Commencer gratuitement",
     secondary: "Se connecter",
-    note: "Gratuit pour vos {limit} premiers objets. Aucune carte bancaire requise.",
   },
   figure: {
     label:

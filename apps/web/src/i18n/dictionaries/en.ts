@@ -31,7 +31,6 @@ export default {
     lead: "CoinsLite keeps the record behind every coin, banknote and stamp you own: what it is, its Grade, what you paid and what it’s worth today, in your own currency.",
     primary: "Start free",
     secondary: "Sign in",
-    note: "Free for your first {limit} Items. No card needed.",
   },
   figure: {
     label:

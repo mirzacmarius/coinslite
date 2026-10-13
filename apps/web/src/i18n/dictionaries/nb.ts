@@ -32,7 +32,6 @@ export default {
     lead: "CoinsLite fører oversikten bak hver mynt, seddel og frimerke du eier: hva det er, kvaliteten, hva du betalte og hva det er verdt i dag, i din egen valuta.",
     primary: "Kom i gang gratis",
     secondary: "Logg inn",
-    note: "De første {limit} objektene er gratis. Du trenger ikke kort.",
   },
   figure: {
     label:

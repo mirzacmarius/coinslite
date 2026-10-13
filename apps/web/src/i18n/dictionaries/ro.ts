@@ -33,7 +33,6 @@ export default {
     lead: "CoinsLite ține evidența fiecărei monede, bancnote și a fiecărui timbru pe care le ai: ce este, în ce stare e, cât ai plătit și cât valorează azi, în moneda ta de bază.",
     primary: "Începe gratuit",
     secondary: "Conectează-te",
-    note: "Primele {limit} de obiecte sunt gratuite. Nu ai nevoie de card.",
   },
   figure: {
     label:
