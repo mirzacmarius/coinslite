@@ -1020,16 +1020,22 @@ html.frame-away .site-header:not([data-static]):focus-within {
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+/* Scrolls sideways only when the table can't fit (a phone). The padding
+   holds the sheets underneath and the report's slide up and left on hover,
+   so neither is clipped or makes it scroll. */
 .sheet-frame {
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
-  padding: 0 1.25rem 1.25rem 0;
+  padding: 0.75rem 1.25rem 1.25rem 0.75rem;
+  margin: -0.75rem 0 0 -0.75rem;
 }
 /* The report lies on the sheets before it; pointing at it slides it out. */
 .sheet-stack {
   position: relative;
-  min-width: 38rem;
+  width: min-content;
+  min-width: 100%;
 }
 .sheet-stack::before,
 .sheet-stack::after {
