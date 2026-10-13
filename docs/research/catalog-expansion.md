@@ -380,6 +380,8 @@ That page lists the data it covers: the archive, the diary, publications and rep
   - Every coin issued under the Coinage Act 1971 s.3 has one.
   - Notices are served as HTML, PDF and `data.xml`, with a [linked-data API](https://www.thegazette.co.uk/data).
   - Commemorative and proof notices have to be filtered out.
+  - Before 1998 the notices are only scanned page PDFs (`/London/issue/<issue>/page/<page>`), with an OCR text layer that has errors; the site search indexes it only in part. COIN-147 found them by script and transcribed them by hand (`unitedKingdomScannedCoins.ts`).
+- **The Decimal Currency Act 1967, Schedule 1** on legislation.gov.uk (as enacted, a scanned PDF): the standard weight, diameter and composition of the first 10p, 5p, 2p, 1p and ½p, which their 1968 proclamation doesn't repeat. OGL v3.0. It gives bronze as "copper, tin and zinc" with no shares.
 - **The Coinage Act 1971, Schedule 1** on legislation.gov.uk: its specification table is an image, and later proclamations aren't consolidated into it. Low value.
 - **The Royal Mint's [mintage figures](https://www.royalmint.com/collect/collector-resources/uk-coin-mintage-figures/)** are the best UK dataset: 538 records, 1968–2025, ½p to £2, served as JSON. Their licence blocks reuse (below).
 - **The Bank of England's [withdrawn](https://www.bankofengland.co.uk/banknotes/withdrawn-banknotes) and current banknotes:** first issued and last legal tender dates, colour, size and design. Their licence blocks reuse (below).
