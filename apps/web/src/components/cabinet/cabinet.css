@@ -1,0 +1,56 @@
+/* Fig 1, the coin cabinet: its own tones on top of the kit's (iso.css). */
+.cab-live {
+  --cab-void: #c9c9c5;
+  --cab-velvet: #e2e3ea;
+  --cab-hole: #b9bbca;
+  --cab-floor: #cfd1dc;
+  --cab-strip: #d9d9d5;
+  position: relative;
+  outline: none;
+  touch-action: pan-y;
+}
+.cab-live:focus-visible {
+  outline: 2px solid var(--c-accent, #3b45b5);
+  outline-offset: 6px;
+}
+.cab-void {
+  fill: var(--cab-void);
+}
+.cab-hole {
+  fill: var(--cab-hole);
+}
+.cab-card {
+  fill: var(--anatomy-face);
+}
+.cab-tray > .iso-top {
+  fill: var(--cab-velvet);
+}
+.cab-strip > .iso-top {
+  fill: var(--cab-strip);
+}
+.cab-pieces > g:not([data-held]) {
+  display: none;
+}
+.cab-fall:not([data-on]) {
+  display: none;
+}
+.cab-hits path {
+  fill: transparent;
+  cursor: pointer;
+}
+.cab-hits g:not([data-out]) .cab-hit-tray {
+  pointer-events: none;
+}
+.cab-floor {
+  fill: var(--cab-floor);
+}
+.cab-cards > g:not([data-held]) {
+  display: none;
+}
+.cab-cards > g[data-lit] .iso-edge {
+  stroke: var(--anatomy-lit);
+}
+.cab-cards > g[data-lit] .iso-top,
+.cab-cards > g[data-lit] .iso-shade {
+  fill: var(--anatomy-lit-top);
+}
