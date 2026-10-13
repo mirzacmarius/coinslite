@@ -32,30 +32,14 @@ export default {
     lead: "CoinsLite tient le registre de chaque pièce, billet et timbre que vous possédez : ce que c’est, son état, ce que vous l’avez payé et ce qu’il vaut aujourd’hui, dans votre propre devise.",
     primary: "Commencer gratuitement",
     secondary: "Se connecter",
-    note: "Gratuit pour vos {limit} premiers objets. Aucune carte bancaire requise.",
   },
   figure: {
-    fig: "Figure 1",
-    title: "Médaillier",
-    hint: "Ouvrez un tiroir, puis complétez son ensemble",
     label:
-      "Un médaillier posé sur un établi, dessiné comme une illustration technique. Chacun de ses quatre tiroirs contient un ensemble : pièces de 2 euros, dollars Peace, billets et timbres. Une pièce occupe chaque alvéole que vous possédez ; les alvéoles vides sont ce qui manque encore. Un fichier posé dessus range une nouvelle fiche pour chaque objet ajouté.",
-    caption:
-      "Chaque tiroir est un ensemble du catalogue. Le plateau des dollars Peace a une alvéole pour chacun de ses 24 millésimes et ateliers, de 1921 à 1935.",
-    open: "{name} · {held} sur {total}",
-    closed: "{held} sur {total} dans le médaillier",
+      "Un médaillier, dessiné comme une illustration technique. Chacun de ses quatre tiroirs contient un ensemble : pièces de 2 euros, dollars Peace, billets et timbres. Une pièce occupe chaque alvéole que vous possédez ; les alvéoles vides sont ce qui manque encore. Un fichier posé dessus range une nouvelle fiche pour chaque objet ajouté.",
     names: {
       euro: "2 euros",
       notes: "Billets",
       stamps: "Timbres",
-    },
-    drawers: "Tiroirs",
-    pause: "Mettre en pause",
-    play: "Reprendre",
-    add: {
-      coin: "Ajouter une pièce",
-      note: "Ajouter un billet",
-      stamp: "Ajouter un timbre",
     },
     status: {
       opened: "Tiroir {name} ouvert : {held} sur {total}.",

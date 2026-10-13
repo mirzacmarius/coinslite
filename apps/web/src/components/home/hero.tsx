@@ -1,13 +1,11 @@
 import { PrimaryAction } from "@/components/actions";
 import { CabinetFigure } from "@/components/cabinet/figure";
 import type { Dictionary } from "@/i18n/dictionary";
-import { format } from "@/i18n/format";
 import { appLink } from "@/i18n/links";
-import { freePlan } from "@coinslite/backend/convex/plans/rules";
 import type { Locale } from "@coinslite/i18n";
 
 /**
- * The opening screen: the promise in large type beside Fig 1, the cabinet.
+ * The opening screen: the promise in large type beside the coin cabinet.
  * Its entrance is CSS (`.intro`), so the headline paints with the page.
  */
 export function Hero({ locale, t }: { locale: Locale; t: Dictionary }) {
@@ -36,9 +34,6 @@ export function Hero({ locale, t }: { locale: Locale; t: Dictionary }) {
               {t.hero.secondary}
             </a>
           </div>
-          <p className="intro muted mt-5 text-sm" data-step="3">
-            {format(t.hero.note, { limit: freePlan.itemLimit })}
-          </p>
         </div>
         <div className="hero__figure intro" data-step="figure">
           <CabinetFigure t={t.figure} />

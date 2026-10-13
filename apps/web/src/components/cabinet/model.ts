@@ -91,41 +91,6 @@ export const countHeld = (held: readonly boolean[]) =>
   held.filter(Boolean).length;
 
 export interface CabinetText {
-  /** "{name} · {held} of {total}" */
-  open: string;
-  /** "{held} of {total} held" */
-  closed: string;
   /** Each drawer's Set: the Peace dollar by its Catalog name, the rest described. */
   names: Record<DrawerKey, string>;
-  /** The drawer buttons' group name. */
-  drawers: string;
-  /** The add button, by what the open drawer holds. */
-  add: Record<Kind, string>;
-  /** The button that pauses and plays the idle tour. */
-  pause: string;
-  play: string;
-}
-
-const fill = (text: string, values: Record<string, string | number>) =>
-  text.replace(/\{(\w+)\}/g, (match, name: string) =>
-    name in values ? String(values[name]) : match,
-  );
-
-/** The readout: the open drawer's Set, or the whole cabinet. */
-export function readoutOf(
-  text: CabinetText,
-  open: number | null,
-  held: readonly (readonly boolean[])[],
-) {
-  if (open === null) {
-    const total = DRAWER_LIST.reduce((sum, drawer) => sum + drawer.size, 0);
-    const count = held.reduce((sum, list) => sum + countHeld(list), 0);
-    return fill(text.closed, { held: count, total });
-  }
-  const drawer = DRAWER_LIST[open]!;
-  return fill(text.open, {
-    name: text.names[drawer.key],
-    held: countHeld(held[open]!),
-    total: drawer.size,
-  });
 }

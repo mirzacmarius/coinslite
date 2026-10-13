@@ -9,19 +9,14 @@ import {
 /**
  * The world of Fig 1, the coin cabinet: about one unit to 2 mm, x across the
  * cabinet, y from its back to its front (the drawers slide out along +y), z up
- * from the top of the bench.
+ * from the floor it stands on.
  */
 
-export const WIDTH = 600;
+export const WIDTH = 560;
 export const HEIGHT = 440;
 const PAD = 18;
 export const AZIMUTH = 55;
 export const ELEVATION = 33;
-
-/** The bench the cabinet stands on, with its feet below z = 0. */
-export const BENCH: Plan = { x: -116, y: -70, w: 258, d: 226, r: 9 };
-export const BENCH_H = 8;
-export const BENCH_FOOT_H = 5;
 
 /** The cabinet: plinth on four bun feet, the body, then a top board. */
 export const FOOT_H = 4;
@@ -103,7 +98,13 @@ function corners({ x, y, w, d }: Plan, z0: number, z1: number): Point3[] {
 
 export const P = fitProjection(
   [
-    ...corners(BENCH, -BENCH_H - BENCH_FOOT_H, 0),
+    // The cabinet from its feet up, then its drawers all the way out.
+    ...corners(PLINTH, 0, TOP_Z),
+    ...corners(
+      { ...PLINTH, y: FRONT, d: TRAVEL },
+      slotBottom(0),
+      slotTop(DRAWERS - 1),
+    ),
     ...corners(TOP, TOP_Z, TOP_Z + TOP_H),
     ...corners(CARD_BOX, TOP_Z + TOP_H, TOP_Z + TOP_H + CARD.h + 4),
   ],

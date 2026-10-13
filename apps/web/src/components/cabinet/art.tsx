@@ -1,5 +1,4 @@
 import {
-  BENCH_ART,
   BOX_ART,
   CABINET_ART,
   DRAWER_ART,
@@ -11,38 +10,13 @@ import { CabinetLive, type DrawerParts } from "./live";
 import { type CabinetText, DRAWER_LIST, heldAtStart } from "./model";
 import { CARDS_AT_START } from "./view";
 import type { Flat } from "@/components/iso/iso-kit";
-import { Dots, FaceText, Line, Solid } from "@/components/iso/react/draw";
+import { Dots, Line, Solid } from "@/components/iso/react/draw";
 
 /*
  * Fig 1's static drawing, built on the server. Every part is a constant; the
  * live component only places them in painter's order and moves the drawers.
  * The root of every element prop carries a key (references/react.md).
  */
-
-const BENCH = (
-  <g key="bench">
-    <path className="iso-halo" d={BENCH_ART.halo} />
-    {BENCH_ART.feet.map((parts, foot) => (
-      <g key={`foot-${BENCH_ART.screws[foot]?.join()}`}>
-        <Solid paths={parts[0]!} tone="lo" />
-        <Solid paths={parts[1]!} tone="mid" />
-      </g>
-    ))}
-    <Solid paths={BENCH_ART.slab} tone="mid" />
-    <Line d={BENCH_ART.groove} tone="lo" />
-    <Line d={BENCH_ART.screwRings} tone="lo" />
-    <Dots points={BENCH_ART.screws} size={0.5} tone="mid" />
-    <Solid paths={BENCH_ART.strip} tone="lo" crease="none" />
-    <Line d={BENCH_ART.ruleMinor} tone="lo" />
-    <Line d={BENCH_ART.ruleMajor} tone="mid" />
-    <Solid paths={BENCH_ART.label} tone="lo" crease="none" />
-    <Line d={BENCH_ART.labelLine} tone="faint" />
-    <Dots points={BENCH_ART.labelScrews} size={0.45} tone="mid" />
-    <FaceText transform={BENCH_ART.labelText} size={3.4} tone="lo">
-      CoinsLite
-    </FaceText>
-  </g>
-);
 
 const CABINET_BACK = (
   <g key="cabinet-back">
@@ -353,7 +327,6 @@ export function CabinetArt({
       text={text}
       status={status}
       defs={DEFS}
-      bench={BENCH}
       cabinetBack={CABINET_BACK}
       cabinetFront={CABINET_FRONT}
       cardBox={CARD_BOX}

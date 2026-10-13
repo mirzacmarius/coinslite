@@ -199,14 +199,6 @@ html.lenis body {
   text-wrap: balance;
   margin-left: -0.04em;
 }
-.statement {
-  font-family: var(--f-display);
-  font-weight: 500;
-  font-size: var(--t-l);
-  line-height: 1.12;
-  letter-spacing: -0.025em;
-  text-wrap: pretty;
-}
 .lead {
   font-size: var(--t-m);
   line-height: 1.45;
@@ -527,13 +519,10 @@ html.frame-away .site-header:not([data-static]):focus-within {
 
 .hero {
   padding-top: calc(4.25rem + clamp(1.5rem, 1rem + 3vw, 4rem));
-  padding-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
+  padding-bottom: clamp(1rem, 0.5rem + 2vw, 3rem);
 }
 .hero__grid {
-  row-gap: clamp(2rem, 1rem + 3vw, 3rem);
+  row-gap: clamp(1rem, 0.5rem + 2vw, 3rem);
   align-items: center;
 }
 .hero__text {
@@ -548,172 +537,59 @@ html.frame-away .site-header:not([data-static]):focus-within {
   }
   .hero__figure {
     grid-column: 7 / -1;
-    margin-right: calc(-1 * var(--gutter));
   }
 }
 
-/* The plate around Fig 1, in the site's paper and line. */
-.plate.iso[data-theme="light"] {
+/* The coin cabinet, drawn straight on the page in the site's paper and line. */
+.cabinet.iso[data-theme="light"] {
   --anatomy-page: var(--c-bg);
   --anatomy-card: var(--c-bg);
+  --anatomy-paper: var(--c-bg);
   --anatomy-text: var(--c-muted);
   --anatomy-strong: var(--c-fg);
   --anatomy-muted: #77777d;
   --anatomy-mono: var(--f-mono);
 }
-.plate .iso-figure {
-  margin: 0;
-}
-/* No card: the cabinet stands on the page itself, labelled like a plate. */
-.plate .iso-plate {
-  padding: 2.25rem 0 2.6rem;
-  box-shadow: none;
-  background: transparent;
-}
-.plate .iso-plate-corners {
-  inset: 0 0 0.25rem;
-}
-/* On a wide screen the drawing bleeds off the right edge; its labels and
-   buttons stay inside the margin. */
-@media (min-width: 64rem) {
-  .plate .iso-plate-corners {
-    right: var(--gutter);
-  }
-  .plate .cab-controls {
-    margin-right: var(--gutter);
-  }
-  .plate .iso-legend {
-    padding-right: var(--gutter);
-  }
-}
-.plate .iso-plate-corner {
-  font-size: 0.6875rem;
-  color: var(--c-muted);
-}
-.plate .iso-plate-corner[data-corner="fig"],
-.plate .iso-plate-corner[data-corner="readout"] {
-  color: var(--c-fg);
-}
-.plate .iso-legend {
-  text-wrap: pretty;
-  margin-top: 0.9rem;
-  font-size: var(--t-s);
-  color: var(--c-muted);
-  max-width: 46ch;
-}
-
-/* The drawer buttons under the drawing. */
-.cab-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem 1rem;
-  padding: 0.6rem 0.75rem 0;
-  border-top: 1px solid var(--c-line);
-  margin: 0.25rem 0.5rem 0;
-}
-.cab-drawers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-.cab-drawers button,
-.cab-add,
-.cab-pause {
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  min-height: 2rem;
-  padding: 0 0.7rem;
-  border-radius: var(--r-control);
-  font-family: var(--f-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border: 1px solid var(--c-line-strong);
-  color: var(--c-fg);
-  background: transparent;
-  transition:
-    background-color 0.3s var(--ease-soft),
-    color 0.3s var(--ease-soft),
-    border-color 0.3s var(--ease-soft);
-}
-.cab-drawers button[aria-pressed="true"] {
-  background: var(--c-fg);
-  border-color: var(--c-fg);
-  color: var(--c-paper);
-}
-/* Like the outlined button: ink slides in from the left. */
-.cab-drawers button::before,
-.cab-add::before,
-.cab-pause::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--c-fg);
-  translate: -101% 0;
-  transition: translate 0.45s var(--ease-out);
-}
-@media (hover: hover) {
-  .cab-drawers button:hover,
-  .cab-add:hover:not(:disabled),
-  .cab-pause:hover {
-    border-color: var(--c-fg);
-    color: var(--c-paper);
-  }
-  .cab-drawers button:hover::before,
-  .cab-add:hover:not(:disabled)::before,
-  .cab-pause:hover::before {
-    translate: 0 0;
-  }
-}
-.cab-drawers button:focus-visible,
-.cab-add:focus-visible,
-.cab-pause:focus-visible {
-  color: var(--c-paper);
-}
-.cab-drawers button:focus-visible::before,
-.cab-add:focus-visible::before,
-.cab-pause:focus-visible::before {
-  translate: 0 0;
-}
-/* Add and pause sit together at the right end. */
-.cab-add {
-  margin-left: auto;
-  border-color: var(--c-fg);
-}
-.cab-pause[aria-pressed="true"] {
-  background: var(--c-fg);
-  color: var(--c-paper);
-}
-.cab-add:disabled {
-  opacity: 0.45;
-}
 
 /* ------------------------------------------------------------ statement */
 
 .statement-section {
-  padding-block: clamp(5rem, 3rem + 8vw, 11rem);
+  padding-block: clamp(2.5rem, 1rem + 5vw, 7rem) clamp(3.5rem, 2rem + 6vw, 8rem);
 }
-.statement-section__text {
+/* Read in a zigzag: the setup on the left, the turn across the page, the
+   answer on the right. */
+.statement-section__grid {
+  row-gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+.statement-section__lead,
+.statement-section__turn,
+.statement-section__rest {
   grid-column: 1 / -1;
-  max-width: 34em;
 }
-@media (min-width: 64rem) {
-  .statement-section__text {
-    grid-column: 5 / -1;
-  }
+.statement-section__lead {
+  max-width: 34ch;
 }
 .statement-section__turn {
-  color: var(--c-fg);
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: var(--t-xl);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
-.statement-section__text .muted-run {
-  color: var(--c-muted);
+.statement-section__turn > span {
+  display: block;
+}
+.statement-section__rest {
+  max-width: 36ch;
+}
+@media (min-width: 64rem) {
+  .statement-section__lead {
+    grid-column: 1 / span 6;
+  }
+  .statement-section__rest {
+    grid-column: 7 / -1;
+  }
 }
 
 /* --------------------------------------------------------------- record */
@@ -922,7 +798,6 @@ html.frame-away .site-header:not([data-static]):focus-within {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--c-fg);
 }
 @media (min-width: 64rem) {
   .value__text {
@@ -1145,16 +1020,22 @@ html.frame-away .site-header:not([data-static]):focus-within {
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+/* Scrolls sideways only when the table can't fit (a phone). The padding
+   holds the sheets underneath and the report's slide up and left on hover,
+   so neither is clipped or makes it scroll. */
 .sheet-frame {
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
-  padding: 0 1.25rem 1.25rem 0;
+  padding: 0.75rem 1.25rem 1.25rem 0.75rem;
+  margin: -0.75rem 0 0 -0.75rem;
 }
 /* The report lies on the sheets before it; pointing at it slides it out. */
 .sheet-stack {
   position: relative;
-  min-width: 38rem;
+  width: min-content;
+  min-width: 100%;
 }
 .sheet-stack::before,
 .sheet-stack::after {
@@ -1576,7 +1457,8 @@ html.frame-away .site-header:not([data-static]):focus-within {
   width: clamp(11rem, 6rem + 9vw, 16rem);
   aspect-ratio: 1;
   border-radius: 50%;
-  margin-top: 3rem;
+  /* Room for the rings drawn outside it, so they end on the margin. */
+  margin: 11px;
   background: #11143a;
   box-shadow:
     inset 0 8px 18px rgb(0 0 0 / 0.55),

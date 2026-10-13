@@ -32,30 +32,14 @@ export default {
     lead: "CoinsLite fører oversikten bak hver mynt, seddel og frimerke du eier: hva det er, kvaliteten, hva du betalte og hva det er verdt i dag, i din egen valuta.",
     primary: "Kom i gang gratis",
     secondary: "Logg inn",
-    note: "De første {limit} objektene er gratis. Du trenger ikke kort.",
   },
   figure: {
-    fig: "Figur 1",
-    title: "Myntskap",
-    hint: "Åpne en skuff og fyll på settet",
     label:
-      "Et myntskap på en arbeidsbenk, tegnet som en teknisk illustrasjon. Hver av de fire skuffene rommer ett sett: 2-euromynter, Peace-dollar, sedler og frimerker. En mynt ligger i hver fordypning du har, de tomme fordypningene er det som mangler, og en kortkasse på toppen arkiverer et nytt kort for hvert objekt du legger til.",
-    caption:
-      "Hver skuff er et sett fra katalogen. Brettet med Peace-dollar har en fordypning for hver av sine 24 årganger og myntsteder, fra 1921 til 1935.",
-    open: "{name} · {held} av {total}",
-    closed: "{held} av {total} i skapet",
+      "Et myntskap, tegnet som en teknisk illustrasjon. Hver av de fire skuffene rommer ett sett: 2-euromynter, Peace-dollar, sedler og frimerker. En mynt ligger i hver fordypning du har, de tomme fordypningene er det som mangler, og en kortkasse på toppen arkiverer et nytt kort for hvert objekt du legger til.",
     names: {
       euro: "2-euromynter",
       notes: "Sedler",
       stamps: "Frimerker",
-    },
-    drawers: "Skuffer",
-    pause: "Sett på pause",
-    play: "Spill av",
-    add: {
-      coin: "Legg til en mynt",
-      note: "Legg til en seddel",
-      stamp: "Legg til et frimerke",
     },
     status: {
       opened: "Skuffen {name} er åpen: {held} av {total}.",
