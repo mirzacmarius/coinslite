@@ -1,22 +1,31 @@
 import { formatCsvRecord } from "../csvText";
 import { catalogCsvColumns, catalogLimits } from "../fields";
+import { type ProclaimedPart, ukCoinDesigns } from "./unitedKingdomCoins";
 import {
-  type ProclaimedPart,
-  type UkCoinDesign,
-  ukCoinDesigns,
-} from "./unitedKingdomCoins";
+  type UkCoinSpecification,
+  type UkScannedCoinDesign,
+  ukScannedCoinDesigns,
+} from "./unitedKingdomScannedCoins";
 
 /**
  * The United Kingdom's circulating coins, as a Catalog CSV file: country,
- * then each decimal denomination from 1 penny to 2 pounds, then its
+ * then each decimal denomination from ½ penny to 2 pounds, then its
  * definitive designs (one grouping per proclamation year) and its
  * commemorative designs, then one entry per design.
  *
- * Facts: the royal proclamations under the Coinage Act 1971 in The Gazette
- * (unitedKingdomCoins.ts, rebuilt by scripts/fetch-uk-coins.ts), each
- * giving its coins' metal, standard weight, diameter, composition, shape,
- * edge and design in words. Every coin made in base metal is included, as
- * the coin made to circulate; the proclamations don't say whether the Royal
+ * Facts: the royal proclamations in The Gazette, each giving its coins'
+ * metal, standard weight, diameter, composition, shape, edge and design in
+ * words. Those since 1998 are read from The Gazette's data
+ * (unitedKingdomCoins.ts, rebuilt by scripts/fetch-uk-coins.ts); those of
+ * 1968 to 1997, printed only as scanned pages, are transcribed by hand
+ * (unitedKingdomScannedCoins.ts). The first decimal coins' standard weight,
+ * diameter and composition are in Schedule 1 to the Decimal Currency Act
+ * 1967, not their proclamation; their facts are credited to that Act on
+ * legislation.gov.uk, their notes to the proclamation. A coin whose design
+ * and specification are on different Gazette pages has its facts credited
+ * to the page with its specification, its notes to the page with its
+ * design. Every coin made in base metal is included, as the coin made to
+ * circulate; the proclamations don't say whether the Royal
  * Mint then released a design into circulation or only in collectors' packs,
  * nor how many it struck. Gold, silver and platinum coins and the five-pound
  * crowns and up are left out.
@@ -29,9 +38,6 @@ import {
  * proclamations altering a design's words are applied (fetch-uk-coins.ts).
  * Its issue date is the day the proclamation was given.
  *
- * Not yet: coins proclaimed before 1998, when The Gazette began publishing
- * notices as data; their proclamations are only scanned pages.
- *
  * No images: the designs of UK coins are Crown copyright and the Royal Mint
  * doesn't license them, and the Open Government Licence excludes design
  * rights (docs/research/catalog-expansion.md §3.9).
@@ -41,11 +47,12 @@ const root = "gb";
 const proclamations =
   "https://www.thegazette.co.uk/all-notices/notice?noticetypes=1101&text=coins&edition=London";
 
+const licence =
+  "Contains public sector information licensed under the Open Government Licence v3.0.";
 const gazette = (link: string) => ({
   source: "The Gazette (royal proclamation)",
   author: "The Crown",
-  licence:
-    "Contains public sector information licensed under the Open Government Licence v3.0.",
+  licence,
   link,
 });
 type Provenance = ReturnType<typeof gazette>;
@@ -55,6 +62,13 @@ const credit = (group: "facts" | "notes", from: Provenance) => ({
   [`${group}_licence`]: from.licence,
   [`${group}_link`]: from.link,
 });
+/** Where a coin's weight, diameter and composition are given, when not on its design's page. */
+const specifiedIn = (specification: UkCoinSpecification) => ({
+  source: specification.source,
+  author: "The Crown",
+  licence,
+  link: specification.link,
+});
 /** Facts and notes alike come from the proclamation. */
 const proclaimedIn = (link: string) => ({
   ...credit("facts", gazette(link)),
@@ -63,7 +77,14 @@ const proclaimedIn = (link: string) => ({
 
 type Row = Record<string, string>;
 
-const denominations: UkCoinDesign["denomination"][] = [
+/** Every design: those transcribed from scanned pages, then those read as data. */
+const ukDesigns: UkScannedCoinDesign[] = [
+  ...ukScannedCoinDesigns,
+  ...ukCoinDesigns,
+];
+
+const denominations: UkScannedCoinDesign["denomination"][] = [
+  "½ penny",
   "1 penny",
   "2 pence",
   "5 pence",
@@ -91,7 +112,7 @@ const alloyMetals = new Set(["copper", "nickel", "zinc", "tin", "aluminium"]);
 const partsText = (parts: ProclaimedPart[], separator = ", ") =>
   parts.map(({ metal, percent }) => `${metal} ${percent}%`).join(separator);
 
-function metalOf(design: UkCoinDesign) {
+function metalOf(design: UkScannedCoinDesign) {
   if (design.sections)
     return `${design.metal}; inner section ${partsText(design.sections.inner)}; outer section ${partsText(design.sections.outer)}`;
   if (design.composition && !compositionOf(design))
@@ -100,7 +121,7 @@ function metalOf(design: UkCoinDesign) {
 }
 
 /** The composition in the Catalog's words, where every metal is one it knows. */
-function compositionOf(design: UkCoinDesign) {
+function compositionOf(design: UkScannedCoinDesign) {
   const parts = design.composition;
   if (!parts?.every(({ metal }) => alloyMetals.has(metal))) return undefined;
   return partsText(parts, "; ");
@@ -108,12 +129,14 @@ function compositionOf(design: UkCoinDesign) {
 
 const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
 
-function detailsOf(design: UkCoinDesign) {
+function detailsOf(design: UkScannedCoinDesign) {
   return [
     design.obverse && `Obverse: ${sentence(design.obverse)}`,
     `Reverse: ${sentence(design.reverse)}`,
     `Metal: ${sentence(metalOf(design))}`,
     design.shape && `Shape: ${sentence(design.shape)}`,
+    design.specification &&
+      `Standard weight, diameter and composition: ${sentence(design.specification.words)}`,
   ]
     .filter(Boolean)
     .join(" ");
@@ -170,6 +193,7 @@ function subjectOf(reverse: string) {
 
 const slug = (text: string) =>
   text
+    .replace("½", "half")
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
     .toLowerCase()
@@ -212,7 +236,10 @@ const shared = (denomination: string) => ({
  * the first part of its reverse that differs, "with the badge of Edinburgh
  * being the principal focus" reading "badge of Edinburgh".
  */
-function differenceOf(design: UkCoinDesign, alike: UkCoinDesign[]) {
+function differenceOf(
+  design: UkScannedCoinDesign,
+  alike: UkScannedCoinDesign[],
+) {
   const parts = (reverse: string) => reverse.split(/,\s*/);
   const index = parts(design.reverse).findIndex((part, at) =>
     alike.some(
@@ -225,10 +252,14 @@ function differenceOf(design: UkCoinDesign, alike: UkCoinDesign[]) {
     .trim();
 }
 
-function titlesOf(designs: UkCoinDesign[]) {
+/** What a design shows: its own subject where its proclamation's opening words don't say. */
+const subjectOfDesign = (design: UkScannedCoinDesign) =>
+  design.subject ?? subjectOf(design.reverse);
+
+function titlesOf(designs: UkScannedCoinDesign[]) {
   const plain = designs.map(
     (design) =>
-      `${design.denomination}${design.coinDate ? ` ${design.coinDate}` : ""} – ${subjectOf(design.reverse)}`,
+      `${design.denomination}${design.coinDate ? ` ${design.coinDate}` : ""} – ${subjectOfDesign(design)}`,
   );
   return designs.map((design, index) => {
     const title = plain[index] as string;
@@ -246,7 +277,7 @@ function titlesOf(designs: UkCoinDesign[]) {
 }
 
 function entries(
-  designs: UkCoinDesign[],
+  designs: UkScannedCoinDesign[],
   parent: string,
   series: string,
 ): Row[] {
@@ -258,7 +289,7 @@ function entries(
     return {
       id: uniqueKey(
         `${root}-${slug(design.denomination)}-${design.year}-`,
-        subjectOf(design.reverse),
+        subjectOfDesign(design),
       ),
       parent_id: parent,
       title: titles[index] as string,
@@ -279,21 +310,29 @@ function entries(
       ...(design.purpose && {
         historical_notes: `Made ${sentence(design.purpose)}`,
       }),
-      ...proclaimedIn(design.link),
+      ...(design.specification
+        ? {
+            ...credit("facts", specifiedIn(design.specification)),
+            ...credit("notes", gazette(design.link)),
+          }
+        : proclaimedIn(design.link)),
     };
   });
 }
 
 function denominationRows(
-  denomination: UkCoinDesign["denomination"],
+  denomination: UkScannedCoinDesign["denomination"],
   sortOrder: number,
 ): Row[] {
-  const designs = ukCoinDesigns.filter(
+  const designs = ukDesigns.filter(
     (design) => design.denomination === denomination,
   );
   const key = `${root}-${slug(denomination)}`;
   const years = designs.map((design) => design.year);
-  const groups = new Map<string, { title: string; designs: UkCoinDesign[] }>();
+  const groups = new Map<
+    string,
+    { title: string; designs: UkScannedCoinDesign[] }
+  >();
   for (const design of designs) {
     const from = design.inForce.slice(0, 4);
     const [id, title] =

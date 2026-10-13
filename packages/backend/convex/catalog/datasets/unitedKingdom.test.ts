@@ -13,6 +13,17 @@ const kindOfRow = (row: (typeof file.rows)[number]) =>
   });
 const below = (key: string) => file.rows.filter((row) => row.parentKey === key);
 const entries = file.rows.filter((row) => row.addable);
+const ogl =
+  "Contains public sector information licensed under the Open Government Licence v3.0.";
+/** A page of The Gazette, as data since 1998 or as a scanned page before. */
+const gazetteLink =
+  /^https:\/\/www\.thegazette\.co\.uk\/(?:notice\/[\w-]+|London\/issue\/\d+\/page\/\d+)$/;
+const scannedPage =
+  /^https:\/\/www\.thegazette\.co\.uk\/London\/issue\/\d+\/page\/\d+$/;
+const decimalCurrencyAct =
+  "https://www.legislation.gov.uk/ukpga/1967/47/enacted";
+const byTitle = (title: string) =>
+  entries.find((row) => row.values.title === title);
 
 describe("the United Kingdom circulating coins dataset", () => {
   test("reads as a Catalog CSV file with no problems", () => {
@@ -38,6 +49,7 @@ describe("the United Kingdom circulating coins dataset", () => {
 
   test("has each circulating decimal denomination, its definitive and commemorative designs", () => {
     expect(below("gb").map((row) => row.values.denomination)).toEqual([
+      "½ penny",
       "1 penny",
       "2 pence",
       "5 pence",
@@ -76,13 +88,16 @@ describe("the United Kingdom circulating coins dataset", () => {
       expect(entry.values.mintage).toBeUndefined();
       // Every metal the proclamations name has its Catalog material.
       expect(entry.values.material).toBeDefined();
-      // The first notice published as data, in 1998, came into force in December 1997.
-      expect(entry.values.yearFrom).toBeGreaterThanOrEqual(1997);
+      // The first decimal coins were proclaimed in February 1968.
+      expect(entry.values.yearFrom).toBeGreaterThanOrEqual(1968);
       expect(entry.values.issueDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(entry.values.technicalDetails).toContain("Reverse: ");
-      expect(entry.values.factsLink).toMatch(
-        /^https:\/\/www\.thegazette\.co\.uk\/notice\/[\w-]+$/,
-      );
+      expect(entry.values.notesLink).toMatch(gazetteLink);
+      if (entry.values.factsLink !== decimalCurrencyAct)
+        expect(entry.values.factsLink).toMatch(gazetteLink);
+      // Every coin has the weight and diameter its sources give.
+      expect(entry.values.weight).toBeGreaterThan(0);
+      expect(entry.values.diameter).toBeGreaterThan(0);
     }
   });
 
@@ -138,7 +153,7 @@ describe("the United Kingdom circulating coins dataset", () => {
     expect(newton?.values.title).toStartWith("50 pence – ");
     expect(newton?.values.technicalDetails).not.toContain("2018");
     for (const title of titles)
-      expect(title).toMatch(/^\d+ (?:penny|pence|pounds?)(?: \d{4})? – /);
+      expect(title).toMatch(/^(?:\d+|½) (?:penny|pence|pounds?)(?: \d{4})? – /);
   });
 
   test("gives the bimetallic two pounds and plated steel coins the metals the Catalog knows", () => {
@@ -167,19 +182,125 @@ describe("the United Kingdom circulating coins dataset", () => {
     );
   });
 
-  test("credits every row's facts and notes to The Gazette in full", () => {
+  test("credits every row's facts and notes in full: to The Gazette, or the first coins' facts to the Decimal Currency Act 1967", () => {
     for (const row of file.rows) {
-      for (const group of ["facts", "notes"] as const) {
-        expect(row.values).toMatchObject({
-          [`${group}Source`]: "The Gazette (royal proclamation)",
-          [`${group}Author`]: "The Crown",
-          [`${group}Licence`]:
-            "Contains public sector information licensed under the Open Government Licence v3.0.",
-        });
-        expect(row.values[`${group}Link`]).toStartWith(
+      const act = row.values.factsLink === decimalCurrencyAct;
+      expect(row.values).toMatchObject({
+        factsSource: act
+          ? "legislation.gov.uk (Decimal Currency Act 1967, Schedule 1)"
+          : "The Gazette (royal proclamation)",
+        factsAuthor: "The Crown",
+        factsLicence: ogl,
+        notesSource: "The Gazette (royal proclamation)",
+        notesAuthor: "The Crown",
+        notesLicence: ogl,
+      });
+      if (!act)
+        expect(row.values.factsLink).toStartWith(
           "https://www.thegazette.co.uk/",
         );
-      }
+      expect(row.values.notesLink).toStartWith("https://www.thegazette.co.uk/");
     }
+  });
+
+  test("has a row for every design transcribed from the scanned proclamations of 1968 to 1997, credited to its page", () => {
+    const scanned = entries.filter((row) =>
+      scannedPage.test(String(row.values.notesLink)),
+    );
+    const perDenomination: Record<string, number> = {};
+    for (const row of scanned) {
+      const denomination = String(row.values.denomination);
+      perDenomination[denomination] = (perDenomination[denomination] ?? 0) + 1;
+    }
+    expect(perDenomination).toEqual({
+      "½ penny": 1,
+      "1 penny": 2,
+      "2 pence": 2,
+      "5 pence": 2,
+      "10 pence": 1,
+      "20 pence": 1,
+      "50 pence": 3,
+      "1 pound": 10,
+      "2 pounds": 7,
+    });
+    expect(
+      byTitle(
+        "50 pence 1994 – The Allied invasion force heading for Normandy and filling the sea and sky",
+      )?.values.yearFrom,
+    ).toBe(1994);
+    for (const row of scanned) {
+      expect(row.values.yearFrom).toBeLessThanOrEqual(1997);
+      expect(String(row.values.issueDate) < "1997-12-17").toBe(true);
+    }
+    // The first decimal coins: designs from the proclamation of 14 February
+    // 1968, weights, diameters and compositions from the Act.
+    const tenNewPence = byTitle(
+      "10 pence – Lion passant guardant royally crowned",
+    );
+    expect(tenNewPence?.parentKey).toBe("gb-10-pence-definitive-1968");
+    expect(tenNewPence?.values).toMatchObject({
+      yearFrom: 1968,
+      material: "cupronickel",
+      composition: "copper 75%; nickel 25%",
+      weight: 11.31036,
+      diameter: 28.5,
+      edge: "reeded",
+      issueDate: "1968-02-14",
+      factsLink: decimalCurrencyAct,
+      notesLink: "https://www.thegazette.co.uk/London/issue/44527/page/1947",
+    });
+    expect(tenNewPence?.values.technicalDetails).toContain(
+      "Reverse: a lion passant guardant royally crowned, being part of the crest of England, and the inscription “10 NEW PENCE”.",
+    );
+    // The bronze coins bear "the date 1971, or of a succeeding year".
+    const halfpenny = below("gb-half-penny-definitive-1968")[0];
+    expect(halfpenny?.values).toMatchObject({
+      title: "½ penny – The Royal Crown",
+      denomination: "½ penny",
+      yearFrom: 1971,
+      material: "bronze",
+      weight: 1.782,
+      diameter: 17.145,
+      edge: "plain",
+      factsLink: decimalCurrencyAct,
+    });
+    // The Act gives bronze no shares of its metals, so none is given.
+    expect(halfpenny?.values.composition).toBeUndefined();
+    // A design on one page whose specification is on the page before.
+    expect(byTitle("50 pence – Figure of Britannia")?.values).toMatchObject({
+      weight: 13.5,
+      diameter: 30,
+      factsLink: "https://www.thegazette.co.uk/London/issue/44749/page/13765",
+      notesLink: "https://www.thegazette.co.uk/London/issue/44749/page/13766",
+    });
+    // An altering proclamation's new reverse: the coin of 20 April 1983.
+    expect(
+      byTitle(
+        "1 pound – Thistle eradicated enfiling a representation of Our Royal Diadem",
+      )?.values,
+    ).toMatchObject({
+      yearFrom: 1983,
+      material: "nickelBrass",
+      composition: "copper 70%; nickel 5.5%; zinc 24.5%",
+      weight: 9.5,
+      diameter: 22.5,
+      edge: "lettered",
+      edgeLettering: "NEMO ME IMPUNE LACESSIT",
+      issueDate: "1983-06-22",
+      factsLink: "https://www.thegazette.co.uk/London/issue/49328/page/5509",
+      notesLink: "https://www.thegazette.co.uk/London/issue/49397/page/8379",
+    });
+    // A commemorative whose proclamation fixes the date on the coin.
+    expect(
+      byTitle("2 pounds 1986 – St. Andrew’s cross and a Thistle of Scotland")
+        ?.values,
+    ).toMatchObject({
+      yearFrom: 1986,
+      weight: 15.976,
+      diameter: 28.4,
+      edgeLettering: "XIII COMMONWEALTH GAMES SCOTLAND 1986",
+      historicalNotes:
+        "Made to commemorate the XIII Commonwealth Games, to be held in Scotland in the year One thousand nine hundred and eighty-six.",
+    });
   });
 });
