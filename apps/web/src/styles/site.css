@@ -519,9 +519,7 @@ html.frame-away .site-header:not([data-static]):focus-within {
 
 .hero {
   padding-top: calc(4.25rem + clamp(1.5rem, 1rem + 3vw, 4rem));
-  padding-bottom: clamp(1rem, 0.5rem + 3vw, 5rem);
-  display: flex;
-  align-items: center;
+  padding-bottom: clamp(1rem, 0.5rem + 2vw, 3rem);
 }
 .hero__grid {
   row-gap: clamp(1rem, 0.5rem + 2vw, 3rem);
@@ -533,12 +531,7 @@ html.frame-away .site-header:not([data-static]):focus-within {
 .hero__figure {
   grid-column: 1 / -1;
 }
-/* On a phone the hero is as tall as its content; on a wide screen it fills
-   the first screen. */
 @media (min-width: 64rem) {
-  .hero {
-    min-height: 100svh;
-  }
   .hero__text {
     grid-column: 1 / span 6;
   }
@@ -561,34 +554,42 @@ html.frame-away .site-header:not([data-static]):focus-within {
 /* ------------------------------------------------------------ statement */
 
 .statement-section {
-  padding-block: clamp(2.5rem, 0.5rem + 9vw, 11rem);
+  padding-block: clamp(2.5rem, 1rem + 5vw, 7rem) clamp(3.5rem, 2rem + 6vw, 8rem);
 }
-.statement-section__text {
+/* Read in a zigzag: the setup on the left, the turn across the page, the
+   answer on the right. */
+.statement-section__grid {
+  row-gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+.statement-section__lead,
+.statement-section__turn,
+.statement-section__rest {
   grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1.25rem, 1rem + 1vw, 2rem);
-}
-@media (min-width: 64rem) {
-  .statement-section__text {
-    grid-column: 5 / -1;
-  }
 }
 .statement-section__lead {
   max-width: 34ch;
 }
-/* The turn, said large in ink between the two quieter lines. */
 .statement-section__turn {
   font-family: var(--f-display);
   font-weight: 500;
   font-size: var(--t-xl);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
+  line-height: 1;
+  letter-spacing: -0.04em;
   text-wrap: balance;
-  max-width: 16ch;
+}
+.statement-section__turn > span {
+  display: block;
 }
 .statement-section__rest {
-  max-width: 40ch;
+  max-width: 36ch;
+}
+@media (min-width: 64rem) {
+  .statement-section__lead {
+    grid-column: 1 / span 6;
+  }
+  .statement-section__rest {
+    grid-column: 7 / -1;
+  }
 }
 
 /* --------------------------------------------------------------- record */
