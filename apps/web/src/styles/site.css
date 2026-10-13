@@ -798,7 +798,6 @@ html.frame-away .site-header:not([data-static]):focus-within {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--c-fg);
 }
 @media (min-width: 64rem) {
   .value__text {
@@ -1452,7 +1451,8 @@ html.frame-away .site-header:not([data-static]):focus-within {
   width: clamp(11rem, 6rem + 9vw, 16rem);
   aspect-ratio: 1;
   border-radius: 50%;
-  margin-top: 3rem;
+  /* Room for the rings drawn outside it, so they end on the margin. */
+  margin: 11px;
   background: #11143a;
   box-shadow:
     inset 0 8px 18px rgb(0 0 0 / 0.55),
