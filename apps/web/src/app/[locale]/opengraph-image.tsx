@@ -120,6 +120,7 @@ export default async function Image({
             width: 438,
             gap: 18,
             padding: 24,
+            borderRadius: 18,
             background: colours.velvetDeep,
           }}
         >

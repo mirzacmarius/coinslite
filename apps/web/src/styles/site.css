@@ -48,8 +48,11 @@
   --border: 60 3% 83%;
   --link: 235 51% 47%;
   --ring: 235 51% 47%;
-  /* One shape rule: square corners, round coins. */
-  --radius: 0rem;
+  /* One shape rule, the app's: buttons and chips round 6 to 8px, cards 12px,
+     coins fully. */
+  --radius: 0.5rem;
+  --r-control: calc(var(--radius) - 2px);
+  --r-card: 0.75rem;
 }
 
 html {
@@ -85,6 +88,7 @@ body {
   top: var(--gutter);
   z-index: 120;
   padding: 0.7em 1.1em;
+  border-radius: var(--r-control);
   background: var(--c-fg);
   color: var(--c-bg);
   font-size: var(--t-s);
@@ -224,7 +228,7 @@ html.lenis body {
 }
 
 /*
- * The primary button: ink, square. On hover an indigo fill slides across it
+ * The primary button: ink, rounded like the app's. On hover an indigo fill slides across it
  * from the left, like a drawer front; its label slides out on its runner while
  * a copy slides in, and the arrow travels on. On velvet (`--light`) the fill
  * is ink. Touch gets the fill on press.
@@ -237,6 +241,7 @@ html.lenis body {
   gap: 0.9rem;
   min-height: 3.25rem;
   padding: 0 1.4rem 0 1.6rem;
+  border-radius: var(--radius);
   background: var(--c-fg);
   color: var(--c-paper);
   font-family: var(--f-body);
@@ -340,6 +345,7 @@ html.lenis body {
   min-height: 3.25rem;
   padding: 0 1.4rem;
   border: 1px solid var(--c-fg);
+  border-radius: var(--radius);
   color: var(--c-fg);
   font-size: 0.95rem;
   font-weight: 600;
@@ -616,6 +622,7 @@ html.frame-away .site-header:not([data-static]) {
   overflow: clip;
   min-height: 2rem;
   padding: 0 0.7rem;
+  border-radius: var(--r-control);
   font-family: var(--f-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
@@ -797,6 +804,7 @@ html.frame-away .site-header:not([data-static]) {
 
 /* The record card, set like the card under a coin in a cabinet tray. */
 .record-card {
+  border-radius: var(--r-card);
   background: var(--c-paper);
   box-shadow: 0 0 0 1px var(--c-line-strong);
   padding: clamp(1.25rem, 1rem + 1vw, 2rem);
@@ -993,6 +1001,7 @@ html.frame-away .site-header:not([data-static]) {
   }
 }
 .tray {
+  border-radius: var(--r-card);
   background: var(--c-velvet-deep);
   padding: clamp(1rem, 0.6rem + 1.6vw, 2rem);
   box-shadow:
@@ -1123,6 +1132,7 @@ html.frame-away .site-header:not([data-static]) {
   gap: 0.5rem;
   padding: 0.3rem 0.6rem;
   border: 1px solid var(--c-fg);
+  border-radius: var(--r-control);
   font-family: var(--f-mono);
   font-size: var(--t-xs);
   text-transform: uppercase;
@@ -1144,6 +1154,7 @@ html.frame-away .site-header:not([data-static]) {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: var(--radius);
   background: #fff;
   box-shadow: 0 0 0 1px var(--c-line);
 }
@@ -1156,6 +1167,7 @@ html.frame-away .site-header:not([data-static]) {
 .sheet {
   position: relative;
   z-index: 1;
+  border-radius: var(--radius);
   background: #fff;
   box-shadow:
     0 0 0 1px var(--c-line),
@@ -1248,6 +1260,7 @@ html.frame-away .site-header:not([data-static]) {
   --rule: 1.6rem;
   position: relative;
   padding: 1.1rem 1.25rem 1.25rem;
+  border-radius: var(--r-card);
   background: var(--c-paper);
   box-shadow:
     0 0 0 1px var(--c-line-strong),
@@ -1264,6 +1277,7 @@ html.frame-away .site-header:not([data-static]) {
   left: calc(1rem + var(--tab, 0) * 22%);
   width: 22%;
   height: calc(0.85rem + 1px);
+  border-radius: var(--r-control) var(--r-control) 0 0;
   background: var(--c-paper);
   box-shadow:
     -1px -1px 0 0 var(--c-line-strong),
@@ -1382,6 +1396,7 @@ html.frame-away .site-header:not([data-static]) {
   flex-direction: column;
   gap: 1.5rem;
   padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+  border-radius: var(--r-card);
   box-shadow: 0 0 0 1px var(--c-line-strong);
   background: var(--c-bg);
 }
@@ -1717,6 +1732,7 @@ html.frame-away .site-header:not([data-static]) {
 }
 .btn--compact {
   min-height: 2.5rem;
+  border-radius: var(--r-control);
   padding: 0 1rem;
   font-size: 0.875rem;
 }
@@ -1771,6 +1787,7 @@ html.menu-open {
 .lost__tray {
   align-self: start;
   padding: clamp(0.9rem, 0.5rem + 1.5vw, 1.75rem);
+  border-radius: var(--r-card);
   background: var(--c-velvet-deep);
   box-shadow:
     inset 0 0 0 1px rgb(236 236 244 / 0.08),

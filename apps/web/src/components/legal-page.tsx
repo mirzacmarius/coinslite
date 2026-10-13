@@ -58,7 +58,7 @@ export function LegalPage({
         </nav>
         <article className="legal__body flex min-w-0 flex-col gap-6">
           {(isDraft || locale !== "en") && (
-            <div className="flex flex-col gap-2 rounded-lg border bg-card p-4 text-sm">
+            <div className="flex flex-col gap-2 rounded-xl border bg-card p-4 text-sm">
               {isDraft && (
                 <p className="flex gap-2">
                   <TriangleAlert
