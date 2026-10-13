@@ -23,8 +23,9 @@ import {
  * 1967, not their proclamation; their facts are credited to that Act on
  * legislation.gov.uk, their notes to the proclamation. A coin whose design
  * and specification are on different Gazette pages has its facts credited
- * to the page with its specification, its notes to the page with its design. Every coin made in base metal is included, as
- * the coin made to circulate; the proclamations don't say whether the Royal
+ * to the page with its specification, its notes to the page with its
+ * design. Every coin made in base metal is included, as the coin made to
+ * circulate; the proclamations don't say whether the Royal
  * Mint then released a design into circulation or only in collectors' packs,
  * nor how many it struck. Gold, silver and platinum coins and the five-pound
  * crowns and up are left out.
@@ -75,12 +76,14 @@ const proclaimedIn = (link: string) => ({
 });
 
 type Row = Record<string, string>;
-type UkCoinDesign = UkScannedCoinDesign;
 
 /** Every design: those transcribed from scanned pages, then those read as data. */
-const ukDesigns: UkCoinDesign[] = [...ukScannedCoinDesigns, ...ukCoinDesigns];
+const ukDesigns: UkScannedCoinDesign[] = [
+  ...ukScannedCoinDesigns,
+  ...ukCoinDesigns,
+];
 
-const denominations: UkCoinDesign["denomination"][] = [
+const denominations: UkScannedCoinDesign["denomination"][] = [
   "½ penny",
   "1 penny",
   "2 pence",
@@ -109,7 +112,7 @@ const alloyMetals = new Set(["copper", "nickel", "zinc", "tin", "aluminium"]);
 const partsText = (parts: ProclaimedPart[], separator = ", ") =>
   parts.map(({ metal, percent }) => `${metal} ${percent}%`).join(separator);
 
-function metalOf(design: UkCoinDesign) {
+function metalOf(design: UkScannedCoinDesign) {
   if (design.sections)
     return `${design.metal}; inner section ${partsText(design.sections.inner)}; outer section ${partsText(design.sections.outer)}`;
   if (design.composition && !compositionOf(design))
@@ -118,7 +121,7 @@ function metalOf(design: UkCoinDesign) {
 }
 
 /** The composition in the Catalog's words, where every metal is one it knows. */
-function compositionOf(design: UkCoinDesign) {
+function compositionOf(design: UkScannedCoinDesign) {
   const parts = design.composition;
   if (!parts?.every(({ metal }) => alloyMetals.has(metal))) return undefined;
   return partsText(parts, "; ");
@@ -126,7 +129,7 @@ function compositionOf(design: UkCoinDesign) {
 
 const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
 
-function detailsOf(design: UkCoinDesign) {
+function detailsOf(design: UkScannedCoinDesign) {
   return [
     design.obverse && `Obverse: ${sentence(design.obverse)}`,
     `Reverse: ${sentence(design.reverse)}`,
@@ -233,7 +236,10 @@ const shared = (denomination: string) => ({
  * the first part of its reverse that differs, "with the badge of Edinburgh
  * being the principal focus" reading "badge of Edinburgh".
  */
-function differenceOf(design: UkCoinDesign, alike: UkCoinDesign[]) {
+function differenceOf(
+  design: UkScannedCoinDesign,
+  alike: UkScannedCoinDesign[],
+) {
   const parts = (reverse: string) => reverse.split(/,\s*/);
   const index = parts(design.reverse).findIndex((part, at) =>
     alike.some(
@@ -247,10 +253,10 @@ function differenceOf(design: UkCoinDesign, alike: UkCoinDesign[]) {
 }
 
 /** What a design shows: its own subject where its proclamation's opening words don't say. */
-const subjectOfDesign = (design: UkCoinDesign) =>
+const subjectOfDesign = (design: UkScannedCoinDesign) =>
   design.subject ?? subjectOf(design.reverse);
 
-function titlesOf(designs: UkCoinDesign[]) {
+function titlesOf(designs: UkScannedCoinDesign[]) {
   const plain = designs.map(
     (design) =>
       `${design.denomination}${design.coinDate ? ` ${design.coinDate}` : ""} – ${subjectOfDesign(design)}`,
@@ -271,7 +277,7 @@ function titlesOf(designs: UkCoinDesign[]) {
 }
 
 function entries(
-  designs: UkCoinDesign[],
+  designs: UkScannedCoinDesign[],
   parent: string,
   series: string,
 ): Row[] {
@@ -315,7 +321,7 @@ function entries(
 }
 
 function denominationRows(
-  denomination: UkCoinDesign["denomination"],
+  denomination: UkScannedCoinDesign["denomination"],
   sortOrder: number,
 ): Row[] {
   const designs = ukDesigns.filter(
@@ -323,7 +329,10 @@ function denominationRows(
   );
   const key = `${root}-${slug(denomination)}`;
   const years = designs.map((design) => design.year);
-  const groups = new Map<string, { title: string; designs: UkCoinDesign[] }>();
+  const groups = new Map<
+    string,
+    { title: string; designs: UkScannedCoinDesign[] }
+  >();
   for (const design of designs) {
     const from = design.inForce.slice(0, 4);
     const [id, title] =

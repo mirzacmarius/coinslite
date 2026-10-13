@@ -24,6 +24,13 @@
 // revoked by the proclamation of 20 April 1983 before any was issued; the
 // twenty-five pence crowns; coins of gold and silver; and the proclamations
 // for Gibraltar and the Falkland Islands that the Gazette also printed.
+//
+// Not found: the proclamations for the smaller 10 pence of 1992 and the 1992
+// EC presidency 50 pence (no issue from July 1991 to September 1992 has
+// them), the smaller 50 pence and the bimetallic 2 pounds of 1997 (none from
+// December 1996 to December 1997), and any for the 1982 change from "NEW
+// PENCE" to "PENCE" on the reverses. Those designs are missing until their
+// proclamations are found.
 
 import type { UkCoinDesign } from "./unitedKingdomCoins";
 
@@ -350,7 +357,8 @@ export const ukScannedCoinDesigns: UkScannedCoinDesign[] = [
       "to commemorate in the year One thousand nine hundred and ninety-four the fiftieth anniversary of the D-Day landings",
     series: "commemorative",
     denomination: "50 pence",
-    year: 1993,
+    year: 1994,
+    coinDate: 1994,
     metal: "cupro-nickel",
     weight: 13.5,
     diameter: 30,
@@ -496,11 +504,11 @@ export const ukScannedCoinDesigns: UkScannedCoinDesign[] = [
     [
       [
         "a Cypher of the letters W and M interlaced and surmounting a Parliamentary Mace horizontally placed and having a representation of the Royal Crown above and the dates 1689 and 1989 below, all within the inscription “TERCENTENARY OF THE BILL OF RIGHTS”",
-        "“TERCENTENARY OF THE BILL OF RIGHTS”",
+        "Tercentenary of the Bill of Rights",
       ],
       [
         "a Cypher of the letters W and M interlaced and surmounting a Parliamentary Mace horizontally placed and having a representation of the Crown of Scotland above and the dates 1689 and 1989 below, all within the inscription “TERCENTENARY OF THE CLAIM OF RIGHT”",
-        "“TERCENTENARY OF THE CLAIM OF RIGHT”",
+        "Tercentenary of the Claim of Right",
       ],
     ] as const
   ).map(

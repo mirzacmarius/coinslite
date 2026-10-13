@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { checkNode, kindOf, readCatalogFile } from "../fields";
 import { unitedKingdom } from "./unitedKingdom";
-import { ukScannedCoinDesigns } from "./unitedKingdomScannedCoins";
 
 const file = readCatalogFile(unitedKingdom);
 const byKey = new Map(file.rows.map((row) => [row.key, row]));
@@ -208,7 +207,27 @@ describe("the United Kingdom circulating coins dataset", () => {
     const scanned = entries.filter((row) =>
       scannedPage.test(String(row.values.notesLink)),
     );
-    expect(scanned).toHaveLength(ukScannedCoinDesigns.length);
+    const perDenomination: Record<string, number> = {};
+    for (const row of scanned) {
+      const denomination = String(row.values.denomination);
+      perDenomination[denomination] = (perDenomination[denomination] ?? 0) + 1;
+    }
+    expect(perDenomination).toEqual({
+      "½ penny": 1,
+      "1 penny": 2,
+      "2 pence": 2,
+      "5 pence": 2,
+      "10 pence": 1,
+      "20 pence": 1,
+      "50 pence": 3,
+      "1 pound": 10,
+      "2 pounds": 7,
+    });
+    expect(
+      byTitle(
+        "50 pence 1994 – The Allied invasion force heading for Normandy and filling the sea and sky",
+      )?.values.yearFrom,
+    ).toBe(1994);
     for (const row of scanned) {
       expect(row.values.yearFrom).toBeLessThanOrEqual(1997);
       expect(String(row.values.issueDate) < "1997-12-17").toBe(true);
