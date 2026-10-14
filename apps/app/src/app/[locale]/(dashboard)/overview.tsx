@@ -32,19 +32,18 @@ import { Plus } from "lucide-react";
 import { useId, useState } from "react";
 
 /**
- * Where the Collection stands (spec 9): a large Add Item button, easy to
- * tap on a phone (the dialog asks for the Item type), the totals, the value
- * over time, the latest Items, the Sets closest to complete, what needs
- * attention, how many entries are on the Wantlist, and on phones the Spot
- * prices and how much of the Free plan is used (wider screens have them in
- * the sidebar). The value chart, Set progress and Needs attention are each
- * left out when they would be empty.
+ * Where the Collection stands (spec 9): the totals, the value over time,
+ * the latest Items, the Sets closest to complete, what needs attention, how
+ * many entries are on the Wantlist, and on phones a large Add Item button,
+ * the Spot prices and how much of the Free plan is used (wider screens have
+ * them in the sidebar). The value chart, Set progress and Needs attention
+ * are each left out when they would be empty.
  * An empty Collection shows the start card instead (StartCard): its first
  * way in adds an Item, and there are no totals or Items yet.
  * The header appears the moment a link is clicked. Until it's known whether
- * the Collection is empty, the button's place is held blank and the totals
- * and Items show skeletons, so neither the button nor the start card
- * appear and then vanish.
+ * the Collection is empty, the button's place on phones is held blank and
+ * the totals and Items show skeletons, so neither the button nor the start
+ * card appear and then vanish.
  */
 export function Overview() {
   const t = useI18n();
@@ -69,10 +68,7 @@ export function Overview() {
         {!firstRun && (
           <Button
             size="lg"
-            className={cn(
-              "w-full sm:w-auto sm:self-start",
-              deciding && "invisible",
-            )}
+            className={cn("w-full md:hidden", deciding && "invisible")}
             onClick={() => addItem()}
           >
             <Plus aria-hidden="true" />

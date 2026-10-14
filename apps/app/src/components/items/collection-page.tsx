@@ -15,7 +15,8 @@ import { useAddItem } from "./add-item";
 /**
  * The Collection: every Item the person owns, searched, filtered, sorted
  * and paged as the URL says, under the totals. The URL is request data, so
- * everything that reads it streams in below the header (ADR 0004).
+ * everything that reads it streams in below the header (ADR 0004). Its Add
+ * Item shows on phones only: wider screens have it in the sidebar.
  */
 export function CollectionPage() {
   const t = useI18n();
@@ -27,7 +28,7 @@ export function CollectionPage() {
         actions={
           <>
             <ScanCoinButton />
-            <Button size="xs" onClick={() => addItem()}>
+            <Button size="xs" className="md:hidden" onClick={() => addItem()}>
               <Plus aria-hidden="true" />
               {t("items.add")}
             </Button>
