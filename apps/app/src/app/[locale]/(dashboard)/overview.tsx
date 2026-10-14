@@ -41,9 +41,9 @@ import { useId, useState } from "react";
  * An empty Collection shows the start card instead (StartCard): its first
  * way in adds an Item, and there are no totals or Items yet.
  * The header appears the moment a link is clicked. Until it's known whether
- * the Collection is empty, the button's place is held blank and the totals
- * and Items show skeletons, so neither the button nor the start card
- * appear and then vanish.
+ * the Collection is empty, the button's place on phones is held blank and
+ * the totals and Items show skeletons, so neither the button nor the start
+ * card appear and then vanish.
  */
 export function Overview() {
   const t = useI18n();

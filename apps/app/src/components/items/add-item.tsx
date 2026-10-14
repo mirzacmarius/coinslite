@@ -51,9 +51,10 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The sidebar's first quick action, in the accent colour and taller than
- * the rows below it: from tablet width up the one Add Item button, as pages
- * show theirs on phones only, where there's no sidebar.
+ * The sidebar's first quick action, in the accent colour and, while the
+ * sidebar is expanded, taller than the rows below it: from tablet width up
+ * the Add Item button, as pages show theirs on phones only, where there's
+ * no sidebar. Its focus ring stands off it, which is the same colour.
  */
 export function AddItemQuickAction() {
   const t = useI18n();
@@ -62,7 +63,7 @@ export function AddItemQuickAction() {
     <SidebarMenuItem>
       <SidebarMenuButton
         tooltip={t("items.add")}
-        className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+        className="h-9 bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90 hover:text-sidebar-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar active:bg-sidebar-primary/90 active:text-sidebar-primary-foreground"
         onClick={() => addItem()}
       >
         <Plus aria-hidden="true" />
