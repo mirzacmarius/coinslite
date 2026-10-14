@@ -1247,12 +1247,6 @@ export default {
       "It's switched off for now. Your Items aren't affected.",
   },
   overview: {
-    addShortcuts: "Add to your Collection",
-    add: {
-      coin: "Add coin",
-      banknote: "Add banknote",
-      stamp: "Add stamp",
-    },
     latestItems: "Latest Items",
     viewCollection: "View Collection",
     firstRunTitle: "Start your Collection",
@@ -1459,6 +1453,9 @@ export default {
     },
     pickHint: "to pick",
     manual: "Add manually",
+    noStamps:
+      "The Catalog has no stamps, so type in your stamp’s details yourself.",
+    addStamp: "Add stamp",
     recent: "Recently picked",
     browse: "Browse the Catalog",
     back: "Back",

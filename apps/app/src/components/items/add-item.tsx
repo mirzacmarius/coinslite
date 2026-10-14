@@ -12,7 +12,7 @@ import { ItemFormDialog } from "./item-form-dialog";
 
 /** What the "New Item" dialog opens with. */
 export type NewItemPreset = {
-  /** The Item type already chosen, as the Overview's "Add banknote" does. */
+  /** The Item type already chosen, as the coin scanner does. */
   type?: ItemType;
   /** A coin scan's photos and suggestion, for the person to review (scanner/scan-coin.tsx). */
   scan?: ScanPreset;
@@ -23,8 +23,8 @@ const AddItemContext = createContext<(preset?: NewItemPreset) => void>(
 );
 
 /**
- * Opens the "New Item" dialog from anywhere in the app, optionally with its
- * Item type already chosen: `addItem()` or `addItem({ type: "stamp" })`.
+ * Opens the "New Item" dialog from anywhere in the app: `addItem()`, or with
+ * a coin scan to review, `addItem({ type: "coin", scan })`.
  */
 export const useAddItem = () => useContext(AddItemContext);
 

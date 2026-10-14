@@ -1275,12 +1275,6 @@ export default {
       "Este dezactivat deocamdată. Obiectele tale nu sunt afectate.",
   },
   overview: {
-    addShortcuts: "Adaugă în colecție",
-    add: {
-      coin: "Adaugă monedă",
-      banknote: "Adaugă bancnotă",
-      stamp: "Adaugă timbru",
-    },
     latestItems: "Cele mai noi obiecte",
     viewCollection: "Vezi colecția",
     firstRunTitle: "Începe-ți colecția",
@@ -1492,6 +1486,9 @@ export default {
     },
     pickHint: "pentru a alege",
     manual: "Adaugă manual",
+    noStamps:
+      "Catalogul nu conține timbre. Completează singur detaliile timbrului.",
+    addStamp: "Adaugă timbru",
     recent: "Alese recent",
     browse: "Răsfoiește catalogul",
     back: "Înapoi",

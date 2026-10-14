@@ -1284,12 +1284,6 @@ export default {
       "Il est désactivé pour le moment. Vos objets ne sont pas concernés.",
   },
   overview: {
-    addShortcuts: "Ajouter à votre collection",
-    add: {
-      coin: "Ajouter une pièce",
-      banknote: "Ajouter un billet",
-      stamp: "Ajouter un timbre",
-    },
     latestItems: "Derniers objets ajoutés",
     viewCollection: "Voir la collection",
     firstRunTitle: "Commencez votre collection",
@@ -1509,6 +1503,9 @@ export default {
     },
     pickHint: "pour choisir",
     manual: "Ajouter manuellement",
+    noStamps:
+      "Le catalogue ne contient pas de timbres. Saisissez vous-même les informations de votre timbre.",
+    addStamp: "Ajouter un timbre",
     recent: "Choisis récemment",
     browse: "Parcourir le catalogue",
     back: "Retour",

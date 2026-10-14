@@ -20,7 +20,6 @@ import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Switch } from "@coinslite/ui/switch";
 import { useSelector } from "@tanstack/react-form";
 import { ChevronRight, History, Library, Loader2, X } from "lucide-react";
-import { isCatalogType } from "./item-fields";
 import { ItemFieldsProvider, useItemFields } from "./item-form-fields";
 import { MoreDetails } from "./item-more-details";
 import { ItemPills } from "./item-pills";
@@ -200,7 +199,7 @@ export function ItemFormDialog(props: ItemFormProps) {
       {!item && (
         <CatalogPickerDialog
           {...itemForm.picker}
-          itemType={isCatalogType(type) ? type : "coin"}
+          itemType={type}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             titleRef.current?.focus();

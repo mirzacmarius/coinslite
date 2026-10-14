@@ -1264,12 +1264,6 @@ export default {
       "Den er slått av foreløpig. Objektene dine påvirkes ikke.",
   },
   overview: {
-    addShortcuts: "Legg til i samlingen",
-    add: {
-      coin: "Legg til mynt",
-      banknote: "Legg til seddel",
-      stamp: "Legg til frimerke",
-    },
     latestItems: "Nyeste objekter",
     viewCollection: "Vis samlingen",
     firstRunTitle: "Start samlingen din",
@@ -1480,6 +1474,9 @@ export default {
     },
     pickHint: "for å velge",
     manual: "Legg til manuelt",
+    noStamps:
+      "Katalogen har ingen frimerker. Skriv inn opplysningene om frimerket selv.",
+    addStamp: "Legg til frimerke",
     recent: "Nylig valgt",
     browse: "Bla i katalogen",
     back: "Tilbake",

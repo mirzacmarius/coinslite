@@ -1308,12 +1308,6 @@ export default {
       "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
   },
   overview: {
-    addShortcuts: "Zur Sammlung hinzufügen",
-    add: {
-      coin: "Münze hinzufügen",
-      banknote: "Banknote hinzufügen",
-      stamp: "Briefmarke hinzufügen",
-    },
     latestItems: "Neueste Objekte",
     viewCollection: "Sammlung ansehen",
     firstRunTitle: "Beginne deine Sammlung",
@@ -1532,6 +1526,9 @@ export default {
     },
     pickHint: "zum Auswählen",
     manual: "Manuell hinzufügen",
+    noStamps:
+      "Der Katalog enthält keine Briefmarken. Gib die Angaben zu deiner Briefmarke selbst ein.",
+    addStamp: "Briefmarke hinzufügen",
     recent: "Zuletzt gewählt",
     browse: "Katalog durchsuchen",
     back: "Zurück",
