@@ -32,31 +32,36 @@ export function CatalogSourceCredit({
 }) {
   const t = useI18n();
   const catalogFormat = useCatalogFormat();
-  const credit = catalogFormat.credit(provenance);
   const source = (
     <SourceLink provenance={provenance}>{provenance.source}</SourceLink>
   );
-  if (credit === provenance.source) return source;
+  const moreToCredit =
+    provenance.licence !== undefined ||
+    (provenance.author !== undefined &&
+      provenance.author !== provenance.source);
+  if (!moreToCredit) return source;
   return (
     <>
       {source}
       <Popover>
         <PopoverTrigger asChild>
           <IconButton
-            label={t("catalog.creditTerms")}
+            type="button"
+            label={t("catalog.sourceAndLicence")}
             className="-my-1 ml-0.5 size-6 align-middle [&_svg]:size-3.5"
           >
             <Info strokeWidth={1.75} />
           </IconButton>
         </PopoverTrigger>
         <PopoverContent className="w-[280px] p-3 text-xs leading-relaxed">
-          {credit}
+          {catalogFormat.credit(provenance)}
         </PopoverContent>
       </Popover>
     </>
   );
 }
 
+/** The source's link around `children`, or `children` alone when it has none. */
 function SourceLink({
   provenance,
   children,
