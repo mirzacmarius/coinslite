@@ -50,7 +50,11 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** The sidebar's first quick action. */
+/**
+ * The sidebar's first quick action, in the accent colour and taller than
+ * the rows below it: from tablet width up the one Add Item button, as pages
+ * show theirs on phones only, where there's no sidebar.
+ */
 export function AddItemQuickAction() {
   const t = useI18n();
   const addItem = useAddItem();
@@ -58,12 +62,14 @@ export function AddItemQuickAction() {
     <SidebarMenuItem>
       <SidebarMenuButton
         tooltip={t("items.add")}
-        className="border bg-card text-foreground hover:bg-card hover:text-foreground hover:shadow-sm group-data-[collapsible=icon]:border-0"
+        className="h-9 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
         onClick={() => addItem()}
       >
         <Plus aria-hidden="true" />
         <span>{t("items.add")}</span>
-        <Kbd className="ml-auto group-data-[collapsible=icon]:hidden">C</Kbd>
+        <Kbd className="ml-auto border-primary-foreground/40 bg-transparent text-primary-foreground group-data-[collapsible=icon]:hidden">
+          C
+        </Kbd>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
