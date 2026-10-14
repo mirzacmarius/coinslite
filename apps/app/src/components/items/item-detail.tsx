@@ -9,6 +9,7 @@ import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
 import {
   collectionHref,
   entryItemsHref,
+  itemPageHref,
   viewOfItemUrl,
 } from "@/components/collection/collection-url";
 import { useShortcut } from "@/lib/use-shortcut";
@@ -75,8 +76,9 @@ export function ItemDetail() {
   const catalogFormat = useCatalogFormat();
   const albums = useAlbums();
   const router = useRouter();
+  // The Item's edit page, which comes back to this view of the Collection.
+  const editHref = itemPageHref(itemId, params.toString(), true);
   // Each opening starts the form afresh from the Item as it is now.
-  const [editing, setEditing] = useState({ open: false, key: 0 });
   const [duplicating, setDuplicating] = useState({ open: false, key: 0 });
   const [deleting, setDeleting] = useState(false);
   const [selling, setSelling] = useState({ open: false, key: 0 });
@@ -85,9 +87,7 @@ export function ItemDetail() {
   const itemLimitMessage = useItemLimitMessage();
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
-  const openEdit = () =>
-    setEditing(({ key }) => ({ open: true, key: key + 1 }));
-  useShortcut("e", openEdit, Boolean(item));
+  useShortcut("e", () => router.push(editHref), Boolean(item));
   const parent = (
     <Link
       href={view ? collectionHref(view) : "/collection"}
@@ -100,34 +100,7 @@ export function ItemDetail() {
   if (item === undefined || (item === null && leaving)) {
     return <ItemDetailSkeleton parent={parent} />;
   }
-  if (item === null) {
-    return (
-      <>
-        <HeaderBar parent={parent} title={t("items.notFoundTitle")} />
-        <div className="p-4">
-          <EmptyState
-            icon={
-              <SearchX
-                className="size-4"
-                strokeWidth={1.75}
-                aria-hidden="true"
-              />
-            }
-            title={t("items.notFoundTitle")}
-            description={t("items.notFound")}
-            action={
-              <Link
-                href="/collection"
-                className="text-[13px] font-medium text-link hover:underline"
-              >
-                {t("items.backToCollection")}
-              </Link>
-            }
-          />
-        </div>
-      </>
-    );
-  }
+  if (item === null) return <ItemNotFound parent={parent} />;
 
   const album = albums?.find(({ _id }) => _id === item.albumId);
   // "Converting to …" while a Home currency change converts the amounts.
@@ -335,14 +308,11 @@ export function ItemDetail() {
             </Button>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={openEdit}
-                  aria-keyshortcuts="E"
-                >
-                  <Pencil aria-hidden="true" />
-                  <ActionLabel>{t("items.edit")}</ActionLabel>
+                <Button variant="ghost" size="xs" asChild>
+                  <Link href={editHref} aria-keyshortcuts="E">
+                    <Pencil aria-hidden="true" />
+                    <ActionLabel>{t("items.edit")}</ActionLabel>
+                  </Link>
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="flex items-center gap-2">
@@ -358,12 +328,6 @@ export function ItemDetail() {
             </Button>
           </>
         }
-      />
-      <ItemFormDialog
-        key={editing.key}
-        item={item}
-        open={editing.open}
-        onOpenChange={(open) => setEditing(({ key }) => ({ open, key }))}
       />
       <ItemFormDialog
         key={`copy-${duplicating.key}`}
@@ -602,6 +566,33 @@ export function ItemDetail() {
             <PropertyRow label={t("items.source")}>{item.source}</PropertyRow>
           </PanelSection>
         </aside>
+      </div>
+    </>
+  );
+}
+
+/** An Item that doesn't exist, or isn't the person's, with the way back to the Collection. */
+export function ItemNotFound({ parent }: { parent: React.ReactNode }) {
+  const t = useI18n();
+  return (
+    <>
+      <HeaderBar parent={parent} title={t("items.notFoundTitle")} />
+      <div className="p-4">
+        <EmptyState
+          icon={
+            <SearchX className="size-4" strokeWidth={1.75} aria-hidden="true" />
+          }
+          title={t("items.notFoundTitle")}
+          description={t("items.notFound")}
+          action={
+            <Link
+              href="/collection"
+              className="text-[13px] font-medium text-link hover:underline"
+            >
+              {t("items.backToCollection")}
+            </Link>
+          }
+        />
       </div>
     </>
   );

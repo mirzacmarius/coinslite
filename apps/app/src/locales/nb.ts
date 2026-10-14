@@ -134,7 +134,6 @@ export default {
       "Et nytt objekt fylt ut fra «{title}». Endre det som er annerledes; bilder kopieres ikke.",
     newDescription:
       "Registrer en mynt, en seddel eller et frimerke i samlingen din.",
-    editDescription: "Endre hvilke som helst av objektets detaljer.",
     materials: {
       gold: "Gull",
       silver: "Sølv",

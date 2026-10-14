@@ -136,7 +136,6 @@ export default {
       "Un obiect nou completat după „{title}”. Schimbă ce diferă; fotografiile nu se copiază.",
     newDescription:
       "Înregistrează o monedă, o bancnotă sau un timbru în colecția ta.",
-    editDescription: "Schimbă oricare dintre detaliile acestui obiect.",
     materials: {
       gold: "Aur",
       silver: "Argint",

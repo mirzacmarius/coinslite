@@ -258,16 +258,20 @@ export type ItemSave =
  *   the facts changed from it (`formArgs`). A copy of a linked Item, made
  *   while the Catalog is hidden (`catalogVisible` false), becomes the
  *   person's own: only an existing link stays.
+ * - `storedLinkKey`: the entry an edited Item is linked to now, if any. An
+ *   edit that links it to another entry, or to one for the first time,
+ *   sends that entry's key.
  * - `albumIds`: the person's Albums, once loaded. An Album deleted since the
  *   form opened can't take the Item.
- * - `wantedKeys`: the wanted Catalog entries. Adding from one clears the want
- *   (wants.ts), which `wanted` says.
+ * - `wantedKeys`: the wanted Catalog entries. Adding from one, or linking an
+ *   edited Item to one, clears the want (wants.ts), which `wanted` says.
  * - `amountsIn`: the Home currency the amounts were typed in (COIN-125).
  */
 export function itemSave({
   values,
   itemId,
   linked,
+  storedLinkKey,
   catalogVisible,
   albumIds,
   wantedKeys,
@@ -277,6 +281,7 @@ export function itemSave({
   values: ItemFormValues;
   itemId?: Id<"items">;
   linked: LinkedEntry | undefined;
+  storedLinkKey?: string;
   catalogVisible: boolean | undefined;
   albumIds: readonly string[] | undefined;
   wantedKeys: ReadonlySet<string> | undefined;
@@ -287,11 +292,21 @@ export function itemSave({
   const args = formArgs(values, link && factValues(link.facts, locale), locale);
   if (albumIds && !albumIds.some((albumId) => albumId === args.albumId))
     args.albumId = undefined;
-  if (itemId)
+  if (itemId) {
+    const linking = link && link.key !== storedLinkKey ? link : undefined;
     return {
-      save: { mutation: "update", args: { itemId, ...args, amountsIn } },
-      wanted: false,
+      save: {
+        mutation: "update",
+        args: {
+          itemId,
+          ...args,
+          ...(linking && { catalogEntryKey: linking.key }),
+          amountsIn,
+        },
+      },
+      wanted: linking !== undefined && wantedKeys?.has(linking.key) === true,
     };
+  }
   return {
     save: {
       mutation: "add",

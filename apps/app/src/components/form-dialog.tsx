@@ -4,8 +4,8 @@ import { type CloseRequest, asksBeforeClosing } from "@/lib/discard-changes";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
-import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { Dialog } from "@coinslite/ui/dialog";
+import { DiscardChangesDialog } from "./discard-changes-dialog";
 import type * as React from "react";
 import { createContext, useContext, useRef, useState } from "react";
 
@@ -71,7 +71,7 @@ export function FormDialog({
       >
         {children}
       </Dialog>
-      <ConfirmDialog
+      <DiscardChangesDialog
         open={asking !== undefined}
         onOpenChange={(next) => {
           if (next) return;
@@ -84,12 +84,7 @@ export function FormDialog({
             if (target?.isConnected) target.focus();
           });
         }}
-        title={t("discardChanges.title")}
-        description={t("discardChanges.description")}
-        confirmLabel={t("discardChanges.discard")}
-        cancelLabel={t("discardChanges.keepEditing")}
-        destructive
-        onConfirm={() => {
+        onDiscard={() => {
           focusedBefore.current = null;
           if (asking?.discarding) onDiscard?.();
           onOpenChange?.(false);

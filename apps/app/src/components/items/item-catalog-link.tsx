@@ -13,17 +13,15 @@ import { useItemTypeOptions } from "./item-type-options";
 
 /**
  * The Item form's first pills: the Catalog entry it's linked to, else the
- * Item type, and for a new coin or banknote not linked yet, a way to pick
- * one from the Catalog (`onPick` opens the picker).
+ * Item type, and for a coin or banknote not linked yet, a way to pick one
+ * from the Catalog (`onPick` opens the picker). An edited Item can be
+ * linked to another entry, or to one for the first time, the same way.
  */
 export function CatalogLink({
   linked,
-  editing,
   onPick,
 }: {
   linked: LinkedEntry | undefined;
-  /** Editing an existing Item, whose link stays. */
-  editing: boolean;
   onPick: () => void;
 }) {
   const t = useI18n();
@@ -37,7 +35,7 @@ export function CatalogLink({
         <CatalogEntryPill
           title={linked.title}
           label={t("catalogPicker.entry")}
-          onClick={editing ? undefined : onPick}
+          onClick={catalogVisible ? onPick : undefined}
         />
       ) : (
         <form.Field name="type">
@@ -53,7 +51,7 @@ export function CatalogLink({
           )}
         </form.Field>
       )}
-      {!editing && !linked && catalogVisible && isCatalogType(type) && (
+      {!linked && catalogVisible && isCatalogType(type) && (
         <Button
           type="button"
           variant="ghost"
@@ -70,9 +68,9 @@ export function CatalogLink({
 }
 
 /**
- * The Catalog entry a new Item is linked to, in place of the Item type pill
- * (the entry decides the type); clicking it picks another. Not a button on
- * an existing Item, whose link stays.
+ * The Catalog entry the Item is linked to, in place of the Item type pill
+ * (the entry decides the type); clicking it picks another. Not a button
+ * while the Catalog is hidden.
  */
 function CatalogEntryPill({
   title,

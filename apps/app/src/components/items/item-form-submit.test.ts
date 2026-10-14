@@ -109,6 +109,7 @@ describe("saving an Item being edited", () => {
       values: typed,
       itemId: "items-1" as Id<"items">,
       linked: morganEntry,
+      storedLinkKey: morganEntry.key,
       catalogVisible: false,
       albumIds: undefined,
       wantedKeys: new Set(["us-morgan-dollar-1881-s"]),
@@ -125,6 +126,42 @@ describe("saving an Item being edited", () => {
     expect(save.args).not.toHaveProperty("catalogEntryKey");
     expect(save.args.country).toBeUndefined();
     expect(wanted).toBe(false);
+  });
+
+  test("links it to the entry picked while editing, in place of its own", () => {
+    const { save } = itemSave({
+      values: typed,
+      itemId: "items-1" as Id<"items">,
+      linked: morganEntry,
+      storedLinkKey: "us-peace-dollar-1922",
+      catalogVisible: true,
+      albumIds: undefined,
+      wantedKeys: undefined,
+      amountsIn: "EUR",
+      locale: "nb",
+    });
+
+    expect(save.args).toMatchObject({
+      catalogEntryKey: "us-morgan-dollar-1881-s",
+    });
+  });
+
+  test("links an Item added by hand to the entry picked while editing, clearing its want", () => {
+    const { save, wanted } = itemSave({
+      values: typed,
+      itemId: "items-1" as Id<"items">,
+      linked: morganEntry,
+      catalogVisible: true,
+      albumIds: undefined,
+      wantedKeys: new Set(["us-morgan-dollar-1881-s"]),
+      amountsIn: "EUR",
+      locale: "nb",
+    });
+
+    expect(save.args).toMatchObject({
+      catalogEntryKey: "us-morgan-dollar-1881-s",
+    });
+    expect(wanted).toBe(true);
   });
 });
 

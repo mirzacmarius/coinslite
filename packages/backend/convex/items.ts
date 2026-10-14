@@ -346,15 +346,39 @@ export const addCatalogEntries = mutation({
  * Saves the whole Item form: a field left empty is cleared. On an Item
  * linked to a Catalog entry, a fact left empty or set to the entry's follows
  * the entry again; only the facts that differ are kept as the person's.
+ *
+ * With `catalogEntryKey`, the Item is linked to that entry instead, or for
+ * the first time (ADR 0001): the form holds the facts it filled in from it,
+ * and only those the person changed are kept. An owned Item takes the entry
+ * off the Wantlist, as adding one from it does.
  */
 export const update = mutation({
-  args: { itemId: v.id("items"), ...itemFields, amountsIn },
+  args: {
+    itemId: v.id("items"),
+    ...itemFields,
+    catalogEntryKey: v.optional(v.string()),
+    amountsIn,
+  },
   returns: v.null(),
-  handler: async (ctx, { itemId, albumId, amountsIn, ...fields }) => {
+  handler: async (
+    ctx,
+    { itemId, albumId, catalogEntryKey, amountsIn, ...fields },
+  ) => {
     const item = await requireOwnItem(ctx, itemId);
     const album = await ownAlbumId(ctx, item.ownerId, albumId);
-    const entry = await itemResolver(ctx).entryOf(item);
-    const checked = checkFields(fields, entry, item);
+    const linking =
+      catalogEntryKey === undefined
+        ? undefined
+        : await requireCatalogEntry(
+            ctx,
+            await requireSetUpUser(ctx),
+            catalogEntryKey,
+          );
+    const relinked =
+      linking !== undefined && linking._id !== item.catalogEntryId;
+    const entry = linking ?? (await itemResolver(ctx).entryOf(item));
+    // Facts stored against another entry say nothing about this one's.
+    const checked = checkFields(fields, entry, relinked ? undefined : item);
     // The form sends its amounts each time; only amounts that differ from
     // the stored ones are written.
     if (
@@ -365,11 +389,18 @@ export const update = mutation({
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
-    await ctx.db.patch(itemId, {
+    await ctx.db.patch("items", itemId, {
       ...cleared,
       ...checked,
       albumId: album,
+      ...(relinked && {
+        catalogEntryId: linking._id,
+        // Facts frozen from an entry that left the Catalog; the new one's are read live.
+        catalogDetails: undefined,
+      }),
     });
+    if (relinked && item.soldOn === undefined)
+      await clearWant(ctx, item.ownerId, linking._id);
     await recordIfChanged(ctx, item, checked);
     await moveBetweenAlbums(
       ctx,
