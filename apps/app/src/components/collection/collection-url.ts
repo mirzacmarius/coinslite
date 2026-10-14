@@ -85,6 +85,16 @@ export function itemInViewHref(itemId: string, view: CollectionView) {
   return `/collection/${itemId}?${params}`;
 }
 
+/**
+ * An Item's page, or with `edit` its Edit Item page, keeping what the URL
+ * it's opened from carries (`query`, an Item URL's own): the Collection view
+ * it came from, if any.
+ */
+export function itemPageHref(itemId: string, query: string, edit = false) {
+  const path = `/collection/${itemId}${edit ? "/edit" : ""}`;
+  return query ? `${path}?${query}` : path;
+}
+
 /** The Collection view an Item's URL carries; undefined when it was opened from elsewhere. */
 export function viewOfItemUrl(params: URLSearchParams) {
   return params.get(fromView) === "1"

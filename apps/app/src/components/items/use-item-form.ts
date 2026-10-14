@@ -65,7 +65,8 @@ export type ItemFormProps = {
 };
 
 /**
- * The Item form's state and saving, for item-form-dialog.tsx to lay out:
+ * The Item form's state and saving, for item-form-dialog.tsx and the Edit
+ * Item page (item-edit.tsx) to lay out:
  * its values and the Catalog entry they're linked to, the Catalog picker
  * (where adding a coin or banknote starts), a coin scan's suggestion and
  * photos, the Album a new Item goes into, and what happens after saving
@@ -417,7 +418,7 @@ export function useItemForm({
     form,
     /** Editing an existing Item, on its page, rather than adding one. */
     editing: item !== undefined,
-    /** The title field, which has the focus whenever the form starts. */
+    /** The title field, which has the focus whenever a new Item's form starts. */
     titleRef,
     linked,
     /** The linked entry's facts as the form writes them. */

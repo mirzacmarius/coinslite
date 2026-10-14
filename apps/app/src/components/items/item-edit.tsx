@@ -1,5 +1,6 @@
 "use client";
 
+import { itemPageHref } from "@/components/collection/collection-url";
 import { useLeaveGuard } from "@/components/leave-guard";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
@@ -19,7 +20,8 @@ import { ItemNotFound } from "./item-detail";
 import { ItemFormBody } from "./item-form-body";
 import { useItemForm } from "./use-item-form";
 
-type EditedItem = NonNullable<FunctionReturnType<typeof api.items.get>>;
+/** The Item as its pages read it. */
+type PageItem = NonNullable<FunctionReturnType<typeof api.items.get>>;
 
 const collectionLink = (label: string) => (
   <Link href="/collection" className="hover:text-foreground">
@@ -39,8 +41,7 @@ export function ItemEdit() {
   const t = useI18n();
   const { itemId } = useParams<{ itemId: string }>();
   const item = useQuery(api.items.get, { itemId });
-  const query = useSearchParams().toString();
-  const itemHref = `/collection/${itemId}${query ? `?${query}` : ""}`;
+  const itemHref = itemPageHref(itemId, useSearchParams().toString());
   // Each visit starts afresh from the Item as it is now: a page left behind
   // stays mounted, hidden, and its layout effects run again when it shows
   // (docs/adr/0004), so a visit given up on isn't there the next time.
@@ -56,20 +57,22 @@ export function ItemEdit() {
   return <EditForm key={visit} item={item} itemHref={itemHref} />;
 }
 
-function EditForm({ item, itemHref }: { item: EditedItem; itemHref: string }) {
+function EditForm({ item, itemHref }: { item: PageItem; itemHref: string }) {
   const t = useI18n();
   const mod = useModifierKey();
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const itemForm = useItemForm({
     open: true,
-    // Saved: back to the Item's page.
+    // The form closes once saved: back to the Item's page, in place of this
+    // one, so Back doesn't return to the form.
     onOpenChange: (open) => {
-      if (!open) router.push(itemHref);
+      if (!open) router.replace(itemHref);
     },
     item,
   });
   const { submit } = itemForm;
-  const { leave, question } = useLeaveGuard(itemForm.changed);
+  const { leave, question } = useLeaveGuard(itemForm.changed, formRef);
   useUnsavedInput(itemForm.changed);
   return (
     <>
@@ -110,6 +113,7 @@ function EditForm({ item, itemHref }: { item: EditedItem; itemHref: string }) {
         }
       />
       <form
+        ref={formRef}
         method="post"
         noValidate
         onSubmit={(event) => {

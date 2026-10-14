@@ -13,7 +13,7 @@ export async function generateMetadata() {
 export default function Page() {
   return (
     <Suspense fallback={<ItemEditSkeleton />}>
-      <ItemPageTitle />
+      <ItemPageTitle editing />
       <ItemEdit />
     </Suspense>
   );

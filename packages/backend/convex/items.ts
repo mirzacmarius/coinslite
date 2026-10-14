@@ -389,7 +389,7 @@ export const update = mutation({
     const cleared = Object.fromEntries(
       fieldNames.map((name) => [name, undefined]),
     );
-    await ctx.db.patch(itemId, {
+    await ctx.db.patch("items", itemId, {
       ...cleared,
       ...checked,
       albumId: album,

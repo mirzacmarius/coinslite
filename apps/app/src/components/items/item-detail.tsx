@@ -9,6 +9,7 @@ import { useCatalogFormat } from "@/components/catalog/use-catalog-format";
 import {
   collectionHref,
   entryItemsHref,
+  itemPageHref,
   viewOfItemUrl,
 } from "@/components/collection/collection-url";
 import { useShortcut } from "@/lib/use-shortcut";
@@ -76,8 +77,7 @@ export function ItemDetail() {
   const albums = useAlbums();
   const router = useRouter();
   // The Item's edit page, which comes back to this view of the Collection.
-  const query = params.toString();
-  const editHref = `/collection/${itemId}/edit${query ? `?${query}` : ""}`;
+  const editHref = itemPageHref(itemId, params.toString(), true);
   // Each opening starts the form afresh from the Item as it is now.
   const [duplicating, setDuplicating] = useState({ open: false, key: 0 });
   const [deleting, setDeleting] = useState(false);
