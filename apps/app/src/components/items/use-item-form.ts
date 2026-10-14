@@ -10,7 +10,7 @@ import {
 } from "@/components/plans/plan-usage";
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useWantedKeys } from "@/components/wantlist/wantlist";
-import { formChanged } from "@/lib/discard-changes";
+import { formChanged, heldInput } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -29,6 +29,7 @@ import {
   factValues,
   fillForm,
   hasDetails,
+  prefillForm,
   valuesFromItem,
 } from "./item-form";
 import {
@@ -94,6 +95,8 @@ export function useItemForm({
     const from = item ?? copyOf;
     return from ? valuesFromItem(from, locale) : blankItem();
   });
+  // Adding an Item from scratch, not editing one or starting from a copy.
+  const isNew = !item && !copyOf;
   const catalogVisible = useCatalogVisible();
   const [linked, setLinked] = useState<LinkedEntry | undefined>(
     (item ?? copyOf)?.catalogEntry ?? undefined,
@@ -119,6 +122,8 @@ export function useItemForm({
   const [failed, setFailed] = useState<string>();
   // The scan this new Item comes from, until it's added or the form closes.
   const [scanned, setScanned] = useState<ScanPreset>();
+  // Whether this opening found the input left from an earlier one.
+  const [draftKept, setDraftKept] = useState(false);
   const itemLimitMessage = useItemLimitMessage();
   const rules = useMemo(
     () => itemFormRules((key) => t(key), locale),
@@ -161,8 +166,7 @@ export function useItemForm({
       // The only Album, filed into without being picked: say so, so the
       // Item doesn't land there unnoticed.
       const preselected =
-        !item &&
-        !copyOf &&
+        isNew &&
         onlyAlbum !== undefined &&
         value.albumId === onlyAlbum &&
         // Submitting marks every field touched; only a pick makes it dirty.
@@ -188,28 +192,38 @@ export function useItemForm({
         onOpenChange(false);
         return;
       }
-      form.reset();
-      setDetailsOpen(false);
-      setLinked(undefined);
+      clearForm();
       if (createMore) {
-        // "Create more" keeps the pills for the next Item, and starts it
-        // on the Catalog picker like the first.
-        fillForm(form, { type: value.type, country: value.country });
-        // A preselected Album stays preselected for the next Item.
-        form.setFieldValue("albumId", value.albumId, {
-          dontUpdateMeta: preselected,
-          dontValidate: preselected,
+        // "Create more" keeps the pills for the next Item, filled in for the
+        // person, and starts it where the first started.
+        prefillForm(form, {
+          type: value.type,
+          country: value.country,
+          albumId: value.albumId,
         });
-        if (catalogVisible && isCatalogType(value.type)) openPicker(true);
-        else titleRef.current?.focus();
+        beginItem();
       } else {
         onOpenChange(false);
       }
     },
   });
   // With exactly one Album, a new Item goes into it unless the person picks otherwise.
-  const onlyAlbum =
-    !item && !copyOf && albums?.length === 1 ? albums[0]?._id : undefined;
+  const onlyAlbum = isNew && albums?.length === 1 ? albums[0]?._id : undefined;
+  /** Empties a new Item's form: what was typed and picked, a scan, an error. */
+  const clearForm = () => {
+    form.reset();
+    setLinked(undefined);
+    setScanned(undefined);
+    setFailed(undefined);
+    setDetailsOpen(false);
+    setDraftKept(false);
+  };
+  /** Starts a new Item where adding starts: a coin or banknote on the Catalog picker, else its title. */
+  const beginItem = () => {
+    if (catalogVisible && isCatalogType(form.getFieldValue("type")))
+      openPicker(true);
+    else titleRef.current?.focus();
+  };
   useEffect(() => {
     if (
       open &&
@@ -217,18 +231,25 @@ export function useItemForm({
       form.getFieldValue("albumId") === undefined &&
       !form.getFieldMeta("albumId")?.isTouched
     )
-      form.setFieldValue("albumId", onlyAlbum, {
-        dontUpdateMeta: true,
-        dontValidate: true,
-      });
+      prefillForm(form, { albumId: onlyAlbum });
   }, [open, onlyAlbum, form]);
+  // Before the first paint: a New Item form that opens holding what the
+  // person typed or picked last time says so, with a way to start over.
+  const wasOpen = useRef(false);
+  useLayoutEffect(() => {
+    if (open && !wasOpen.current && isNew)
+      setDraftKept(
+        heldInput(
+          form.state.values,
+          defaults,
+          (name) => form.getFieldMeta(name)?.isDirty === true,
+        ),
+      );
+    wasOpen.current = open;
+  });
   // Before the first paint, so the type pill never shows the previous type.
   useLayoutEffect(() => {
-    if (open && newItemType && !item)
-      form.setFieldValue("type", newItemType, {
-        dontUpdateMeta: true,
-        dontValidate: true,
-      });
+    if (open && newItemType && !item) prefillForm(form, { type: newItemType });
   }, [open, newItemType, item, form]);
   // Each opening for a coin or banknote starts on the Catalog picker, unless
   // the form already holds something.
@@ -313,19 +334,14 @@ export function useItemForm({
   useLayoutEffect(() => {
     if (!open || item || !scan || appliedScan.current === scan) return;
     appliedScan.current = scan;
-    form.reset();
-    setLinked(undefined);
-    setFailed(undefined);
-    setDetailsOpen(false);
+    clearForm();
     setScanned(scan);
     if (scan.suggestion) void applySuggestion(scan.suggestion);
   });
   // A scan the person closes the form on isn't kept for the next Item.
   useEffect(() => {
     if (open || !scanned) return;
-    setScanned(undefined);
-    setLinked(undefined);
-    form.reset();
+    clearForm();
   }, [open, scanned, form]);
   /** Puts a scan's photos on the Item it became; tells the person if that fails. */
   const attachScanPhotos = async (
@@ -346,6 +362,16 @@ export function useItemForm({
     } catch {
       toast.error(t("scanner.photosFailed"));
     }
+  };
+  /**
+   * Starts the new Item afresh, as if the dialog had just opened: emptied,
+   * with its preset type and only Album, on the Catalog picker or the title.
+   */
+  const startOver = () => {
+    clearForm();
+    if (newItemType) prefillForm(form, { type: newItemType });
+    if (onlyAlbum) prefillForm(form, { albumId: onlyAlbum });
+    beginItem();
   };
   /**
    * Validates and saves. A closed "More details" has no fields to check:
@@ -389,10 +415,16 @@ export function useItemForm({
     createMore,
     setCreateMore,
     scanned,
+    /** Whether the form opened holding the input left from an earlier opening. */
+    draftKept,
+    /** For a new Item: drops its input, for Cancel. */
+    discardDraft: isNew ? clearForm : undefined,
+    /** Drops a new Item's input and starts it again (`startOver` above). */
+    startOver,
     /** Unsaved input, for the "Discard changes?" prompt. */
     changed,
     /** A new Item's form stays as it was for next time, unless it holds a scan. */
-    keepsDraft: !item && !copyOf && scanned === undefined,
+    keepsDraft: isNew && scanned === undefined,
     submitting,
     /** The rules the fields check what they hold with (item-form-submit.ts). */
     rules,

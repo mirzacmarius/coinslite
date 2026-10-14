@@ -64,6 +64,8 @@ export default {
     moreDetails: "More details",
     createMore: "Create more",
     cancel: "Cancel",
+    draftKept: "You started this Item earlier and didn’t add it.",
+    startOver: "Start over",
     close: "Close",
     added: "Item added to your Collection",
     addedToAlbum: "Item added to {album}",
