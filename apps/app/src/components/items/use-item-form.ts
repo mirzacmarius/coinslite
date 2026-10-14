@@ -23,7 +23,6 @@ import { useForm, useSelector } from "@tanstack/react-form";
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { isCatalogType } from "./item-fields";
 import {
   blankItem,
   factValues,
@@ -66,11 +65,11 @@ export type ItemFormProps = {
 
 /**
  * The Item form's state and saving, for item-form-dialog.tsx and the Edit
- * Item page (item-edit.tsx) to lay out:
- * its values and the Catalog entry they're linked to, the Catalog picker
- * (where adding a coin or banknote starts), a coin scan's suggestion and
- * photos, the Album a new Item goes into, and what happens after saving
- * ("Create more" starts the next Item).
+ * Item page (item-edit.tsx) to lay out: its values and the Catalog entry
+ * they're linked to, the Catalog picker (the form's "Pick from the Catalog"
+ * and Catalog pill open it), a coin scan's suggestion and photos, the Album
+ * a new Item goes into, and what happens after saving ("Create more" starts
+ * the next Item).
  */
 export function useItemForm({
   open,
@@ -111,15 +110,6 @@ export function useItemForm({
     [linked, locale],
   );
   const [pickerOpen, setPickerOpen] = useState(false);
-  // Whether the picker is where adding started, so closing it closes the
-  // dialog and the Item type is picked on it, rather than one opened from
-  // the form's Catalog pill, where the entry decides the type.
-  const [pickerFirst, setPickerFirst] = useState(false);
-  /** Opens the Catalog picker; `first` when adding starts on it. */
-  const openPicker = (first: boolean) => {
-    setPickerFirst(first);
-    setPickerOpen(true);
-  };
   const [createMore, setCreateMore] = useState(false);
   // The Edit Item page shows every field.
   const [detailsOpen, setDetailsOpen] = useState(
@@ -203,13 +193,13 @@ export function useItemForm({
       clearForm();
       if (createMore) {
         // "Create more" keeps the pills for the next Item, filled in for the
-        // person, and starts it where the first started.
+        // person, and starts it on its title, like the first.
         prefillForm(form, {
           type: value.type,
           country: value.country,
           albumId: value.albumId,
         });
-        beginItem();
+        titleRef.current?.focus();
       } else {
         onOpenChange(false);
       }
@@ -225,12 +215,6 @@ export function useItemForm({
     setFailed(undefined);
     setDetailsOpen(false);
     setDraftKept(false);
-  };
-  /** Starts a new Item where adding starts: a coin or banknote on the Catalog picker, else its title. */
-  const beginItem = () => {
-    if (catalogVisible && isCatalogType(form.getFieldValue("type")))
-      openPicker(true);
-    else titleRef.current?.focus();
   };
   useEffect(() => {
     if (
@@ -262,28 +246,11 @@ export function useItemForm({
   useLayoutEffect(() => {
     if (open && newItemType && !item) prefillForm(form, { type: newItemType });
   }, [open, newItemType, item, form]);
-  // Each opening for a coin or banknote starts on the Catalog picker, unless
-  // the form already holds something.
-  const pickerOffered = useRef(false);
+  // Closing the dialog closes the Catalog picker too: each opening starts
+  // on the form, and the picker opens from it.
   useEffect(() => {
-    if (!open) {
-      pickerOffered.current = false;
-      setPickerOpen(false);
-      return;
-    }
-    if (pickerOffered.current || item || catalogVisible === undefined) return;
-    pickerOffered.current = true;
-    if (copyOf) return;
-    if (
-      !scan &&
-      catalogVisible &&
-      !linked &&
-      !form.state.isDirty &&
-      isCatalogType(newItemType ?? form.getFieldValue("type"))
-    ) {
-      openPicker(true);
-    }
-  }, [open, item, copyOf, catalogVisible, linked, newItemType, form, scan]);
+    if (!open) setPickerOpen(false);
+  }, [open]);
   /** Links the form to a picked Catalog entry and fills the facts from it. */
   const pickEntry = async (picked: PickedCatalogEntry) => {
     setPickerOpen(false);
@@ -381,13 +348,13 @@ export function useItemForm({
   };
   /**
    * Starts the new Item afresh, as if the dialog had just opened: emptied,
-   * with its preset type and only Album, on the Catalog picker or the title.
+   * with its preset type and only Album, on its title.
    */
   const startOver = () => {
     clearForm();
     if (newItemType) prefillForm(form, { type: newItemType });
     if (onlyAlbum) prefillForm(form, { albumId: onlyAlbum });
-    beginItem();
+    titleRef.current?.focus();
   };
   /**
    * Validates and saves. A closed "More details" has no fields to check:
@@ -448,23 +415,13 @@ export function useItemForm({
     rules,
     /** Validates and saves; `from` is where the submit came from (lib/submit-form.ts). */
     submit,
-    /** Opens the Catalog picker from the form, to link another entry. */
-    pickAnother: () => openPicker(false),
+    /** Opens the Catalog picker from the form, to link an entry or another one. */
+    openPicker: () => setPickerOpen(true),
 
     /** The Catalog picker's props (catalog-picker.tsx). */
     picker: {
       open: pickerOpen,
-      // The Item type is picked where adding starts, filled in for the person
-      // like a preset; from the form's Catalog pill, the entry decides it.
-      onItemTypeChange: pickerFirst
-        ? (type: ItemType) => prefillForm(form, { type })
-        : undefined,
-      // Esc closes the picker, as its hint says: when adding started on it,
-      // that's the whole dialog, not a way into the form.
-      onOpenChange: (next: boolean) => {
-        setPickerOpen(next);
-        if (!next && pickerFirst) onOpenChange(false);
-      },
+      onOpenChange: setPickerOpen,
       onPick: (entry: PickedCatalogEntry) => void pickEntry(entry),
       // An edited Item can be linked to another entry, not unlinked, and
       // its picker adds nothing.
