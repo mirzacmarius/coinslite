@@ -48,6 +48,28 @@ describe("asksBeforeClosing", () => {
     ).toBe(false);
   });
 
+  test("Cancel in a form that keeps its draft asks, since it drops the draft", () => {
+    expect(
+      asksBeforeClosing({
+        open: false,
+        changed: true,
+        keepsDraft: true,
+        discarding: true,
+      }),
+    ).toBe(true);
+  });
+
+  test("Cancel in an unchanged form closes straight away", () => {
+    expect(
+      asksBeforeClosing({
+        open: false,
+        changed: false,
+        keepsDraft: true,
+        discarding: true,
+      }),
+    ).toBe(false);
+  });
+
   test("opening never asks", () => {
     expect(asksBeforeClosing({ open: true, changed: true })).toBe(false);
   });

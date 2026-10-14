@@ -1,7 +1,7 @@
 "use client";
 
 import { CatalogPickerDialog } from "@/components/catalog/catalog-picker";
-import { FormDialog } from "@/components/form-dialog";
+import { FormDialog, FormDialogCancel } from "@/components/form-dialog";
 import { ItemLimitNotice } from "@/components/plans/plan-usage";
 import { ScanNotice } from "@/components/scanner/scan-notice";
 import { useI18n } from "@/locales/client";
@@ -19,7 +19,7 @@ import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
 import { Switch } from "@coinslite/ui/switch";
 import { useSelector } from "@tanstack/react-form";
-import { ChevronRight, Library, Loader2, X } from "lucide-react";
+import { ChevronRight, History, Library, Loader2, X } from "lucide-react";
 import { isCatalogType } from "./item-fields";
 import { ItemFieldsProvider, useItemFields } from "./item-form-fields";
 import { MoreDetails } from "./item-more-details";
@@ -66,6 +66,7 @@ export function ItemFormDialog(props: ItemFormProps) {
       onOpenChange={onOpenChange}
       changed={itemForm.changed}
       keepsDraft={itemForm.keepsDraft}
+      onDiscard={item || copyOf ? undefined : itemForm.discardDraft}
     >
       <DialogContent
         className="sm:max-w-[600px]"
@@ -134,6 +135,9 @@ export function ItemFormDialog(props: ItemFormProps) {
               {!item && itemForm.scanned && (
                 <ScanNotice scan={itemForm.scanned} />
               )}
+              {itemForm.draftKept && (
+                <DraftNotice onStartOver={itemForm.startOver} />
+              )}
               <TitleAndNotes titleRef={titleRef} />
               <ItemPills
                 linked={linked}
@@ -169,11 +173,7 @@ export function ItemFormDialog(props: ItemFormProps) {
               </label>
             )}
             <div className="flex items-center gap-2">
-              <DialogClose asChild>
-                <Button type="button" variant="ghost">
-                  {t("items.cancel")}
-                </Button>
-              </DialogClose>
+              <FormDialogCancel>{t("items.cancel")}</FormDialogCancel>
               {/* Not a submit button: Enter in a field or picker never saves the
                   dialog; the button and Cmd/Ctrl+Enter do (linear-style-ui keyboard rules). */}
               <Button
@@ -264,5 +264,28 @@ function TitleAndNotes({
         )}
       </form.Field>
     </>
+  );
+}
+
+/**
+ * Atop a New Item form that opened holding what was typed last time: says
+ * so, with a way to start a new Item instead.
+ */
+function DraftNotice({ onStartOver }: { onStartOver: () => void }) {
+  const t = useI18n();
+  return (
+    <div className="flex items-center gap-2 rounded-md border bg-muted/40 py-1 pl-2 pr-1">
+      <History
+        className="size-4 shrink-0 text-muted-foreground"
+        strokeWidth={1.75}
+        aria-hidden="true"
+      />
+      <p className="min-w-0 flex-1 text-[13px] text-muted-foreground">
+        {t("items.draftKept")}
+      </p>
+      <Button type="button" variant="ghost" size="xs" onClick={onStartOver}>
+        {t("items.startOver")}
+      </Button>
+    </div>
   );
 }

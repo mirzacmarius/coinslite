@@ -27,6 +27,8 @@ export type CloseRequest = {
   changed: boolean;
   /** Whether closing keeps the input for next time, as the New Item dialog does. */
   keepsDraft?: boolean;
+  /** Cancel: closing drops the input, even where closing otherwise keeps it as a draft. */
+  discarding?: boolean;
 };
 
 /**
@@ -37,6 +39,7 @@ export function asksBeforeClosing({
   open,
   changed,
   keepsDraft = false,
+  discarding = false,
 }: CloseRequest) {
-  return !open && changed && !keepsDraft;
+  return !open && changed && (!keepsDraft || discarding);
 }

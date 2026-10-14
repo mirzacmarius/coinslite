@@ -119,6 +119,8 @@ export function useItemForm({
   const [failed, setFailed] = useState<string>();
   // The scan this new Item comes from, until it's added or the form closes.
   const [scanned, setScanned] = useState<ScanPreset>();
+  // Whether this opening found the input left from an earlier one.
+  const [draftKept, setDraftKept] = useState(false);
   const itemLimitMessage = useItemLimitMessage();
   const rules = useMemo(
     () => itemFormRules((key) => t(key), locale),
@@ -222,6 +224,13 @@ export function useItemForm({
         dontValidate: true,
       });
   }, [open, onlyAlbum, form]);
+  // Before the first paint: a New Item form that opens holding what was typed
+  // last time says so, with a way to start over.
+  useLayoutEffect(() => {
+    if (open && !item && !copyOf)
+      setDraftKept(formChanged(form.state, defaults));
+    if (!open) setDraftKept(false);
+  }, [open, item, copyOf, form, defaults]);
   // Before the first paint, so the type pill never shows the previous type.
   useLayoutEffect(() => {
     if (open && newItemType && !item)
@@ -318,6 +327,7 @@ export function useItemForm({
     setFailed(undefined);
     setDetailsOpen(false);
     setScanned(scan);
+    setDraftKept(false);
     if (scan.suggestion) void applySuggestion(scan.suggestion);
   });
   // A scan the person closes the form on isn't kept for the next Item.
@@ -346,6 +356,30 @@ export function useItemForm({
     } catch {
       toast.error(t("scanner.photosFailed"));
     }
+  };
+  /** Empties a new Item's form: what was typed, the linked entry and a scan. */
+  const discardDraft = () => {
+    form.reset();
+    if (newItemType)
+      form.setFieldValue("type", newItemType, {
+        dontUpdateMeta: true,
+        dontValidate: true,
+      });
+    setLinked(undefined);
+    setScanned(undefined);
+    setFailed(undefined);
+    setDetailsOpen(false);
+    setDraftKept(false);
+  };
+  /**
+   * Starts the new Item afresh, as if the dialog had just opened: a coin or
+   * banknote on the Catalog picker, a stamp on its title.
+   */
+  const startOver = () => {
+    discardDraft();
+    if (catalogVisible && isCatalogType(form.getFieldValue("type")))
+      openPicker(true);
+    else titleRef.current?.focus();
   };
   /**
    * Validates and saves. A closed "More details" has no fields to check:
@@ -389,6 +423,12 @@ export function useItemForm({
     createMore,
     setCreateMore,
     scanned,
+    /** Whether the form opened holding the input left from an earlier opening. */
+    draftKept,
+    /** Drops a new Item's input, for Cancel. */
+    discardDraft,
+    /** Drops a new Item's input and starts again from the Catalog picker. */
+    startOver,
     /** Unsaved input, for the "Discard changes?" prompt. */
     changed,
     /** A new Item's form stays as it was for next time, unless it holds a scan. */
