@@ -1063,6 +1063,7 @@ export default {
     numistaLink: "N# {id} on Numista",
     noImage: "No image yet",
     imageCredit: "Image",
+    sourceAndLicence: "Source and licence",
   },
   collectionTotals: {
     title: "Collection totals",

@@ -1114,6 +1114,7 @@ export default {
     numistaLink: "N# {id} bei Numista",
     noImage: "Noch kein Bild",
     imageCredit: "Bild",
+    sourceAndLicence: "Quelle und Lizenz",
   },
   collectionTotals: {
     title: "Summen der Sammlung",
