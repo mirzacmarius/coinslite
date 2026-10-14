@@ -34,7 +34,8 @@ import { PurchaseSection } from "./item-purchase";
  * The Item form's fields beyond the basics, in a group that opens by itself
  * when it holds values or errors (use-item-form.ts): description, a coin's
  * physical facts and precious metal, Grade, references, and purchase. Only
- * the fields the Item type has show.
+ * the fields the Item type has show. Without `onOpenChange` (the Edit Item
+ * page) they show without the group's toggle.
  */
 export function MoreDetails({
   open,
@@ -44,7 +45,7 @@ export function MoreDetails({
   locked,
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
   /** Whether the form is linked to a Catalog entry, whose facts it shows. */
   linked: boolean;
   /** The currency amounts are typed in, and why they can't be, if so. */
@@ -53,6 +54,23 @@ export function MoreDetails({
 }) {
   const t = useI18n();
   const isCoin = useItemKind().type === "coin";
+  const groups = (
+    <>
+      {linked && (
+        <p className="text-xs text-muted-foreground">
+          {t("catalogPicker.factsHint")}
+        </p>
+      )}
+      <DescriptionGroup />
+      {isCoin && <PhysicalGroup />}
+      {isCoin && <PreciousMetalSection />}
+      <GradeGroup />
+      <ReferencesGroup />
+      <PurchaseSection currency={currency} locked={locked} />
+    </>
+  );
+  if (!onOpenChange)
+    return <div className="flex flex-col gap-5 pb-1 pt-3">{groups}</div>;
   return (
     <Collapsible open={open} onOpenChange={onOpenChange}>
       <CollapsibleTrigger className="group flex h-7 items-center gap-1 rounded-md text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
@@ -63,17 +81,7 @@ export function MoreDetails({
         {t("items.moreDetails")}
       </CollapsibleTrigger>
       <CollapsibleContent className="flex flex-col gap-5 pb-1 pt-3">
-        {linked && (
-          <p className="text-xs text-muted-foreground">
-            {t("catalogPicker.factsHint")}
-          </p>
-        )}
-        <DescriptionGroup />
-        {isCoin && <PhysicalGroup />}
-        {isCoin && <PreciousMetalSection />}
-        <GradeGroup />
-        <ReferencesGroup />
-        <PurchaseSection currency={currency} locked={locked} />
+        {groups}
       </CollapsibleContent>
     </Collapsible>
   );

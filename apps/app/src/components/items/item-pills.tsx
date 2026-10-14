@@ -20,13 +20,10 @@ import type { LinkedEntry } from "./item-form-submit";
  */
 export function ItemPills({
   linked,
-  editing,
   onPickEntry,
   onAlbumCreateFailed,
 }: {
   linked: LinkedEntry | undefined;
-  /** Editing an existing Item, whose Catalog link stays. */
-  editing: boolean;
   /** Opens the Catalog picker. */
   onPickEntry: () => void;
   /** Says an Album made from the Album pill couldn't be created. */
@@ -47,7 +44,7 @@ export function ItemPills({
   return (
     <>
       <div className="flex flex-wrap items-center gap-1.5 pt-1">
-        <CatalogLink linked={linked} editing={editing} onPick={onPickEntry} />
+        <CatalogLink linked={linked} onPick={onPickEntry} />
         <form.Field name="albumId">
           {(field) => (
             <AlbumPicker

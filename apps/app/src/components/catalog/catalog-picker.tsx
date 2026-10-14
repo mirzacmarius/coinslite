@@ -82,8 +82,8 @@ export function CatalogPickerDialog({
   /** Picks another Item type, at the top. */
   onItemTypeChange?: (type: ItemType) => void;
   onPick: (entry: PickedCatalogEntry) => void;
-  /** "Add manually": the person types the facts in instead. */
-  onManual: () => void;
+  /** "Add manually": the person types the facts in instead; without it, no such button. */
+  onManual?: () => void;
   /** After adding several entries at once; without it, the picker picks one. */
   onAdded?: (count: number) => void;
   onCloseAutoFocus?: (event: Event) => void;
@@ -140,16 +140,18 @@ export function CatalogPickerDialog({
 }
 
 /** In place of the search for a stamp: the Catalog holds none, so on to typing its details in. */
-function NoStamps({ onManual }: { onManual: () => void }) {
+function NoStamps({ onManual }: { onManual?: () => void }) {
   const t = useI18n();
   return (
     <div className="flex flex-col items-start gap-3 px-4 py-5">
       <p className="text-[13px] text-muted-foreground">
         {t("catalogPicker.noStamps")}
       </p>
-      <Button type="button" onClick={onManual}>
-        {t("catalogPicker.addStamp")}
-      </Button>
+      {onManual && (
+        <Button type="button" onClick={onManual}>
+          {t("catalogPicker.addStamp")}
+        </Button>
+      )}
     </div>
   );
 }
@@ -179,7 +181,7 @@ function PickerBody({
 }: {
   itemType: CatalogItemType;
   onPick: (entry: PickedCatalogEntry) => void;
-  onManual: () => void;
+  onManual?: () => void;
   onAdded?: (count: number) => void;
 }) {
   const t = useI18n();
@@ -243,15 +245,17 @@ function PickerBody({
                   {t(selecting ? "sets.pickOne" : "sets.selectSeveral")}
                 </Button>
               )}
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                className={onAdded ? "shrink-0" : "ml-auto shrink-0"}
-                onClick={onManual}
-              >
-                {t("catalogPicker.manual")}
-              </Button>
+              {onManual && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  className={onAdded ? "shrink-0" : "ml-auto shrink-0"}
+                  onClick={onManual}
+                >
+                  {t("catalogPicker.manual")}
+                </Button>
+              )}
             </>
           }
           idle={

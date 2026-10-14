@@ -42,14 +42,17 @@ import {
 /** An Item as its page reads it: facts resolved, with the Catalog entry it's linked to. */
 type EditedItem = Doc<"items"> & { catalogEntry?: LinkedEntry | null };
 
-/** The Item form's TanStack form. */
-export type ItemForm = ReturnType<typeof useItemForm>["form"];
+/** The Item form's state and saving, as `useItemForm` gives them. */
+export type ItemFormState = ReturnType<typeof useItemForm>;
 
-/** What the Item form dialog is given (item-form-dialog.tsx). */
+/** The Item form's TanStack form. */
+export type ItemForm = ItemFormState["form"];
+
+/** What the Item form is given: the dialog (item-form-dialog.tsx), or the Edit Item page (item-edit.tsx). */
 export type ItemFormProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** The Item being edited; without one the dialog adds a new Item. */
+  /** The Item being edited, on its page; without one a new Item is added. */
   item?: EditedItem;
   /** For a new Item: an existing Item it starts as a copy of. */
   copyOf?: EditedItem;
@@ -117,8 +120,9 @@ export function useItemForm({
     setPickerOpen(true);
   };
   const [createMore, setCreateMore] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(() =>
-    hasDetails(defaults, fromEntry),
+  // The Edit Item page shows every field.
+  const [detailsOpen, setDetailsOpen] = useState(
+    () => item !== undefined || hasDetails(defaults, fromEntry),
   );
   const [failed, setFailed] = useState<string>();
   // The scan this new Item comes from, until it's added or the form closes.
@@ -141,6 +145,7 @@ export function useItemForm({
         values: value,
         itemId: item?._id,
         linked,
+        storedLinkKey: item?.catalogEntry?.key,
         catalogVisible,
         albumIds: albums?.map((album) => album._id),
         wantedKeys,
@@ -403,6 +408,8 @@ export function useItemForm({
 
   return {
     form,
+    /** Editing an existing Item, on its page, rather than adding one. */
+    editing: item !== undefined,
     /** The title field, which has the focus whenever the form starts. */
     titleRef,
     linked,
@@ -451,16 +458,22 @@ export function useItemForm({
         if (!next && pickerFirst) onOpenChange(false);
       },
       onPick: (entry: PickedCatalogEntry) => void pickEntry(entry),
-      onManual: () => {
-        // The facts stay, as the person's own.
-        setLinked(undefined);
-        setPickerOpen(false);
-      },
+      // An edited Item can be linked to another entry, not unlinked, and
+      // its picker adds nothing.
+      onManual: item
+        ? undefined
+        : () => {
+            // The facts stay, as the person's own.
+            setLinked(undefined);
+            setPickerOpen(false);
+          },
       // Several entries added at once: nothing is left to fill in here.
-      onAdded: () => {
-        setPickerOpen(false);
-        onOpenChange(false);
-      },
+      onAdded: item
+        ? undefined
+        : () => {
+            setPickerOpen(false);
+            onOpenChange(false);
+          },
     },
   };
 }

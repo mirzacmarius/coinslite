@@ -130,7 +130,6 @@ export default {
     duplicateDescription:
       "A new Item filled in from “{title}”. Change what differs; photos aren't copied.",
     newDescription: "Record a coin, banknote or stamp in your Collection.",
-    editDescription: "Change any of this Item's details.",
     materials: {
       gold: "Gold",
       silver: "Silver",

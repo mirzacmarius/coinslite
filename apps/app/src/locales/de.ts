@@ -138,7 +138,6 @@ export default {
       "Ein neues Objekt, ausgefüllt nach „{title}“. Ändere, was abweicht; Fotos werden nicht kopiert.",
     newDescription:
       "Erfasse eine Münze, Banknote oder Briefmarke in deiner Sammlung.",
-    editDescription: "Ändere beliebige Angaben zu diesem Objekt.",
     materials: {
       gold: "Gold",
       silver: "Silber",

@@ -258,6 +258,9 @@ export type ItemSave =
  *   the facts changed from it (`formArgs`). A copy of a linked Item, made
  *   while the Catalog is hidden (`catalogVisible` false), becomes the
  *   person's own: only an existing link stays.
+ * - `storedLinkKey`: the entry an edited Item is linked to now, if any. An
+ *   edit that links it to another entry, or to one for the first time,
+ *   sends that entry's key.
  * - `albumIds`: the person's Albums, once loaded. An Album deleted since the
  *   form opened can't take the Item.
  * - `wantedKeys`: the wanted Catalog entries. Adding from one clears the want
@@ -268,6 +271,7 @@ export function itemSave({
   values,
   itemId,
   linked,
+  storedLinkKey,
   catalogVisible,
   albumIds,
   wantedKeys,
@@ -277,6 +281,7 @@ export function itemSave({
   values: ItemFormValues;
   itemId?: Id<"items">;
   linked: LinkedEntry | undefined;
+  storedLinkKey?: string;
   catalogVisible: boolean | undefined;
   albumIds: readonly string[] | undefined;
   wantedKeys: ReadonlySet<string> | undefined;
@@ -289,7 +294,16 @@ export function itemSave({
     args.albumId = undefined;
   if (itemId)
     return {
-      save: { mutation: "update", args: { itemId, ...args, amountsIn } },
+      save: {
+        mutation: "update",
+        args: {
+          itemId,
+          ...args,
+          ...(link &&
+            link.key !== storedLinkKey && { catalogEntryKey: link.key }),
+          amountsIn,
+        },
+      },
       wanted: false,
     };
   return {
