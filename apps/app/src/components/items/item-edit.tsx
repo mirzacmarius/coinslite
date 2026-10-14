@@ -13,7 +13,7 @@ import type { FunctionReturnType } from "convex/server";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { ItemCatalogPicker } from "./item-catalog-picker";
 import { ItemNotFound } from "./item-detail";
 import { ItemFormBody } from "./item-form-body";
@@ -45,7 +45,11 @@ export function ItemEdit() {
   // stays mounted, hidden, and its layout effects run again when it shows
   // (docs/adr/0004), so a visit given up on isn't there the next time.
   const [visit, setVisit] = useState(0);
-  useLayoutEffect(() => setVisit((current) => current + 1), []);
+  const shown = useRef(false);
+  useLayoutEffect(() => {
+    if (shown.current) setVisit((current) => current + 1);
+    shown.current = true;
+  }, []);
   if (item === undefined) return <ItemEditSkeleton />;
   if (item === null)
     return <ItemNotFound parent={collectionLink(t("nav.collection"))} />;

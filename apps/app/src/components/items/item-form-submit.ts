@@ -263,8 +263,8 @@ export type ItemSave =
  *   sends that entry's key.
  * - `albumIds`: the person's Albums, once loaded. An Album deleted since the
  *   form opened can't take the Item.
- * - `wantedKeys`: the wanted Catalog entries. Adding from one clears the want
- *   (wants.ts), which `wanted` says.
+ * - `wantedKeys`: the wanted Catalog entries. Adding from one, or linking an
+ *   edited Item to one, clears the want (wants.ts), which `wanted` says.
  * - `amountsIn`: the Home currency the amounts were typed in (COIN-125).
  */
 export function itemSave({
@@ -292,20 +292,21 @@ export function itemSave({
   const args = formArgs(values, link && factValues(link.facts, locale), locale);
   if (albumIds && !albumIds.some((albumId) => albumId === args.albumId))
     args.albumId = undefined;
-  if (itemId)
+  if (itemId) {
+    const linking = link && link.key !== storedLinkKey ? link : undefined;
     return {
       save: {
         mutation: "update",
         args: {
           itemId,
           ...args,
-          ...(link &&
-            link.key !== storedLinkKey && { catalogEntryKey: link.key }),
+          ...(linking && { catalogEntryKey: linking.key }),
           amountsIn,
         },
       },
-      wanted: false,
+      wanted: linking !== undefined && wantedKeys?.has(linking.key) === true,
     };
+  }
   return {
     save: {
       mutation: "add",

@@ -146,14 +146,14 @@ describe("saving an Item being edited", () => {
     });
   });
 
-  test("links an Item added by hand to the entry picked while editing", () => {
-    const { save } = itemSave({
+  test("links an Item added by hand to the entry picked while editing, clearing its want", () => {
+    const { save, wanted } = itemSave({
       values: typed,
       itemId: "items-1" as Id<"items">,
       linked: morganEntry,
       catalogVisible: true,
       albumIds: undefined,
-      wantedKeys: undefined,
+      wantedKeys: new Set(["us-morgan-dollar-1881-s"]),
       amountsIn: "EUR",
       locale: "nb",
     });
@@ -161,6 +161,7 @@ describe("saving an Item being edited", () => {
     expect(save.args).toMatchObject({
       catalogEntryKey: "us-morgan-dollar-1881-s",
     });
+    expect(wanted).toBe(true);
   });
 });
 

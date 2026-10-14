@@ -148,7 +148,8 @@ export function useItemForm({
         storedLinkKey: item?.catalogEntry?.key,
         catalogVisible,
         albumIds: albums?.map((album) => album._id),
-        wantedKeys,
+        // A sold Item linked to a wanted entry leaves it on the Wantlist.
+        wantedKeys: item?.soldOn === undefined ? wantedKeys : undefined,
         amountsIn: amounts.amountsIn,
         locale,
       });
@@ -305,10 +306,16 @@ export function useItemForm({
       entry.facts,
       locale,
     );
-    // Facts few entries hold: what the person already typed stays, as their
-    // own, when the entry has nothing to put there.
-    for (const name of ["mintMark", "mintage", "thickness"] as const)
-      if (entry.facts[name] === undefined) delete values[name];
+    // Facts few entries hold, and the year an entry for several years leaves
+    // to the person: when the entry has nothing to put there, what the
+    // person typed stays, as their own. What the entry linked before held
+    // goes with it.
+    for (const name of ["year", "mintMark", "mintage", "thickness"] as const)
+      if (
+        entry.facts[name] === undefined &&
+        form.getFieldValue(name) !== fromEntry?.[name]
+      )
+        delete values[name];
     fillForm(form, { type: entry.itemType, ...values });
     return true;
   };
