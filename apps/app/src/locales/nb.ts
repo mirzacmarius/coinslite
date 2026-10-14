@@ -1474,6 +1474,9 @@ export default {
     },
     pickHint: "for å velge",
     manual: "Legg til manuelt",
+    noStamps:
+      "Katalogen har ingen frimerker. Skriv inn opplysningene om frimerket selv.",
+    addStamp: "Legg til frimerke",
     recent: "Nylig valgt",
     browse: "Bla i katalogen",
     back: "Tilbake",

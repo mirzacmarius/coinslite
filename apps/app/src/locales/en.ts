@@ -1453,6 +1453,9 @@ export default {
     },
     pickHint: "to pick",
     manual: "Add manually",
+    noStamps:
+      "The Catalog has no stamps, so type in your stamp’s details yourself.",
+    addStamp: "Add stamp",
     recent: "Recently picked",
     browse: "Browse the Catalog",
     back: "Back",

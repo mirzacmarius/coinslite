@@ -23,8 +23,8 @@ const AddItemContext = createContext<(preset?: NewItemPreset) => void>(
 );
 
 /**
- * Opens the "New Item" dialog from anywhere in the app, optionally with its
- * Item type already chosen: `addItem()` or `addItem({ type: "stamp" })`.
+ * Opens the "New Item" dialog from anywhere in the app: `addItem()`, or with
+ * a coin scan to review, `addItem({ type: "coin", scan })`.
  */
 export const useAddItem = () => useContext(AddItemContext);
 

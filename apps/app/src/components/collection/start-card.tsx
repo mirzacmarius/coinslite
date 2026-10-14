@@ -39,10 +39,10 @@ const chevron = (
 
 /**
  * The ways into an empty Collection (spec 9), on the Overview and the
- * Collection page: add an Item (the dialog asks for its type), add a whole Set from the
- * Catalog (not while the Catalog is hidden), or import a spreadsheet. The
- * page holds the import dialog, so it stays open as the first rows fill the
- * Collection and this card gives way.
+ * Collection page: add an Item (the dialog asks for its type), add a whole
+ * Set from the Catalog (not while the Catalog is hidden), or import a
+ * spreadsheet. The page holds the import dialog, so it stays open as the
+ * first rows fill the Collection and this card gives way.
  */
 export function StartCard({
   title,

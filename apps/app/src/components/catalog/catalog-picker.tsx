@@ -1,6 +1,7 @@
 "use client";
 
-import { itemTypeIcons, itemTypes } from "@/components/items/item-fields";
+import { isCatalogType } from "@/components/items/item-fields";
+import { useItemTypeOptions } from "@/components/items/item-type-options";
 import { WantedMark, useWantedKeys } from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
@@ -30,7 +31,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type * as React from "react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import {
   BulkAddBar,
   DuplicatesSwitch,
@@ -60,8 +61,9 @@ const SelectingContext = createContext<EntrySelection | null>(null);
  * `onAdded` it can also select several entries (or all that are missing
  * below a grouping) and add one Item of each at once.
  *
- * With `onItemTypeChange`, the Item type is picked at its top first (spec
- * 5.4): coin, banknote, or stamp, which the Catalog doesn't hold.
+ * With `onItemTypeChange`, where adding starts, the Item type is picked at
+ * its top first (spec 5.4): coin, banknote or stamp. The Catalog holds no
+ * stamps, so for a stamp it leads on to typing the details in.
  */
 export function CatalogPickerDialog({
   open,
@@ -75,8 +77,9 @@ export function CatalogPickerDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  itemType: CatalogItemType;
-  /** Picks another Item type; a stamp is then added manually. */
+  /** A stamp only with `onItemTypeChange`, which can pick one. */
+  itemType: ItemType;
+  /** Picks another Item type, at the top. */
   onItemTypeChange?: (type: ItemType) => void;
   onPick: (entry: PickedCatalogEntry) => void;
   /** "Add manually": the person types the facts in instead. */
@@ -86,11 +89,22 @@ export function CatalogPickerDialog({
   onCloseAutoFocus?: (event: Event) => void;
 }) {
   const t = useI18n();
+  const typeOptions = useItemTypeOptions();
+  const content = useRef<HTMLDivElement>(null);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        ref={content}
         aria-describedby={undefined}
         className="sm:top-[12%] sm:max-w-[640px] sm:translate-y-0"
+        onOpenAutoFocus={(event) => {
+          // The search, not the Item type above it, so typing searches at once.
+          const search =
+            content.current?.querySelector<HTMLElement>("[cmdk-input]");
+          if (!search) return;
+          event.preventDefault();
+          search.focus();
+        }}
         onCloseAutoFocus={onCloseAutoFocus}
       >
         <DialogTitle className="sr-only">
@@ -100,30 +114,43 @@ export function CatalogPickerDialog({
           <div className="border-b px-3 py-2">
             <SegmentedControl
               label={t("items.type")}
-              options={itemTypes.map((type) => {
-                const Icon = itemTypeIcons[type];
-                return {
-                  value: type,
-                  label: t(`items.types.${type}`),
-                  icon: <Icon strokeWidth={1.75} aria-hidden="true" />,
-                };
-              })}
+              options={typeOptions}
               value={itemType}
               onChange={onItemTypeChange}
+              size="lg"
             />
           </div>
         )}
-        <PickerBody
-          itemType={itemType}
-          onPick={(entry) => {
-            rememberPicked(entry);
-            onPick(entry);
-          }}
-          onManual={onManual}
-          onAdded={onAdded}
-        />
+        {isCatalogType(itemType) ? (
+          <PickerBody
+            itemType={itemType}
+            onPick={(entry) => {
+              rememberPicked(entry);
+              onPick(entry);
+            }}
+            onManual={onManual}
+            onAdded={onAdded}
+          />
+        ) : (
+          <NoStamps onManual={onManual} />
+        )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** In place of the search for a stamp: the Catalog holds none, so on to typing its details in. */
+function NoStamps({ onManual }: { onManual: () => void }) {
+  const t = useI18n();
+  return (
+    <div className="flex flex-col items-start gap-3 px-4 py-5">
+      <p className="text-[13px] text-muted-foreground">
+        {t("catalogPicker.noStamps")}
+      </p>
+      <Button type="button" onClick={onManual}>
+        {t("catalogPicker.addStamp")}
+      </Button>
+    </div>
   );
 }
 

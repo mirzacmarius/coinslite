@@ -6,9 +6,10 @@ import { Button } from "@coinslite/ui/button";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { useSelector } from "@tanstack/react-form";
 import { BookOpen } from "lucide-react";
-import { isCatalogType, itemTypeIcons, itemTypes } from "./item-fields";
+import { isCatalogType, itemTypeIcons } from "./item-fields";
 import { useItemFields } from "./item-form-fields";
 import type { LinkedEntry } from "./item-form-submit";
+import { useItemTypeOptions } from "./item-type-options";
 
 /**
  * The Item form's first pills: the Catalog entry it's linked to, else the
@@ -29,14 +30,7 @@ export function CatalogLink({
   const { form } = useItemFields();
   const type = useSelector(form.store, (state) => state.values.type);
   const catalogVisible = useCatalogVisible();
-  const typeOptions = itemTypes.map((type) => {
-    const Icon = itemTypeIcons[type];
-    return {
-      value: type,
-      label: t(`items.types.${type}`),
-      icon: <Icon strokeWidth={1.75} />,
-    };
-  });
+  const typeOptions = useItemTypeOptions();
   return (
     <>
       {linked ? (

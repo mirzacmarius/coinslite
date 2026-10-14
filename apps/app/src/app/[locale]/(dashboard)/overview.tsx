@@ -33,11 +33,12 @@ import { useId, useState } from "react";
 
 /**
  * Where the Collection stands (spec 9): a large Add Item button, easy to
- * tap on a phone (the dialog asks for the Item type), the totals, the value over time, the latest Items, the Sets closest to
- * complete, what needs attention, how many entries are on the Wantlist, and
- * on phones the Spot prices and how much of the Free plan is used (wider
- * screens have them in the sidebar). The value chart, Set progress and Needs
- * attention are each left out when they would be empty.
+ * tap on a phone (the dialog asks for the Item type), the totals, the value
+ * over time, the latest Items, the Sets closest to complete, what needs
+ * attention, how many entries are on the Wantlist, and on phones the Spot
+ * prices and how much of the Free plan is used (wider screens have them in
+ * the sidebar). The value chart, Set progress and Needs attention are each
+ * left out when they would be empty.
  * An empty Collection shows the start card instead (StartCard): its first
  * way in adds an Item, and there are no totals or Items yet.
  * The header appears the moment a link is clicked. Until it's known whether

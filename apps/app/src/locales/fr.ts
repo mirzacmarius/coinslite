@@ -1503,6 +1503,9 @@ export default {
     },
     pickHint: "pour choisir",
     manual: "Ajouter manuellement",
+    noStamps:
+      "Le catalogue ne contient pas de timbres. Saisissez vous-même les informations de votre timbre.",
+    addStamp: "Ajouter un timbre",
     recent: "Choisis récemment",
     browse: "Parcourir le catalogue",
     back: "Retour",
