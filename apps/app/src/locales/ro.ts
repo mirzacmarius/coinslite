@@ -1485,9 +1485,6 @@ export default {
     },
     pickHint: "pentru a alege",
     manual: "Adaugă manual",
-    noStamps:
-      "Catalogul nu conține timbre. Completează singur detaliile timbrului.",
-    addStamp: "Adaugă timbru",
     recent: "Alese recent",
     browse: "Răsfoiește catalogul",
     back: "Înapoi",

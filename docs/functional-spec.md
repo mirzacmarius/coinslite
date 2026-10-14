@@ -84,10 +84,10 @@ Grades within a scale are ordered, so Items can be sorted and filtered by Grade.
 Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grade, both on Catalog entries and on Items.
 
 ### 5.4 Adding an Item
-- Pick the Item type first: coin, banknote or stamp, at the top of the Catalog picker, where adding starts. The Catalog holds no stamps, so for a stamp the picker leads on to the form. While the Catalog is hidden, adding starts on the form, where the type is the first pill. Each new Item starts as a coin; the coin scanner opens the form with a coin already chosen.
+- Adding opens the form, its title in focus. Its first pill picks the Item type: coin, banknote or stamp. Each new Item starts as a coin; the coin scanner opens the form with a coin already chosen.
 - **Two ways to add:**
-  - **From the Catalog** (default for coins and banknotes): pick a Catalog entry with the picker (§6.2). The descriptive facts come from the entry.
-  - **Manually:** the user types the descriptive facts. Stamps are always added manually.
+  - **From the Catalog** (coins and banknotes): the form's **Pick from the Catalog** opens the picker (§6.2) for the chosen type. The descriptive facts come from the picked entry. Not while the Catalog is hidden.
+  - **Manually:** the user types the descriptive facts. Stamps are always added manually; the Catalog holds none.
 - **Bullion presets** fill metal, weight, purity, country and title (title only if it's empty):
 
 | Preset | Metal | Weight g | Purity | Country |
@@ -250,7 +250,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 - **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
-- **Add Item:** one large button, full width on phones, opening the form, where the Item type is picked first (§5.4). While the Collection is empty, the first-run prompt has it instead.
+- **Add Item:** one large button, full width on phones, opening the form (§5.4). While the Collection is empty, the first-run prompt has it instead.
 - **Value over time:** the Collection's "over time" chart (§7), compact: the same figures, without the switch to Value by Date acquired. Absent while nothing is owned.
 - **Latest Items:** the three most recently added, each with thumbnail, year and denomination, and its Market value (× Quantity when more than one) on the right.
 - **Set progress:** up to three Sets the user is closest to completing, among the Sets their held Catalog entries open with "View as Set" (§6.4), each with held / total and % as its Set view shows them, and opening it. Closest means the largest share held, then the fewest entries missing. A complete Set isn't listed. Absent when there are none, and while the Catalog is hidden.

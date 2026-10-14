@@ -25,11 +25,11 @@ import { type ItemFormProps, useItemForm } from "./use-item-form";
  * Basic fields stay in view; the rest sit under "More details", which opens
  * by itself when it holds values or errors.
  *
- * Coins and banknotes are added from the Catalog by default (spec 5.4): each
- * opening starts on the Catalog picker; "Add manually" leads to typing the
- * facts in, and Esc closes the dialog. A picked entry fills the facts; the
+ * Each opening starts on the form (spec 5.4), its title in focus: its first
+ * pill picks the Item type, and for a coin or banknote "Pick from the
+ * Catalog" opens the Catalog picker. A picked entry fills the facts; the
  * Item stays linked to it and stores only the facts the person changes
- * (ADR 0001).
+ * (ADR 0001). Without one, the person types the facts in.
  *
  * After a coin scan the form opens filled with the scanner's suggestion,
  * marked as such, and the scan's photos become the new Item's when it's added.

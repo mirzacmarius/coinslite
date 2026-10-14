@@ -44,7 +44,7 @@ export function ItemFormBody({
         <TitleAndNotes titleRef={itemForm.titleRef} />
         <ItemPills
           linked={itemForm.linked}
-          onPickEntry={itemForm.pickAnother}
+          onPickEntry={itemForm.openPicker}
           onAlbumCreateFailed={itemForm.setFailed}
         />
         <MoreDetails
