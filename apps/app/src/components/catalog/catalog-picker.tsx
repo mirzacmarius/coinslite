@@ -1,5 +1,6 @@
 "use client";
 
+import { itemTypeIcons, itemTypes } from "@/components/items/item-fields";
 import { WantedMark, useWantedKeys } from "@/components/wantlist/wantlist";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
@@ -12,6 +13,8 @@ import { isSet, setLimits } from "@coinslite/backend/convex/catalog/setRules";
 import { Button } from "@coinslite/ui/button";
 import { CommandGroup, CommandItem } from "@coinslite/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@coinslite/ui/dialog";
+import type { ItemType } from "@coinslite/ui/item-type-icon";
+import { SegmentedControl } from "@coinslite/ui/segmented-control";
 import { toast } from "@coinslite/ui/toaster";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import {
@@ -56,11 +59,15 @@ const SelectingContext = createContext<EntrySelection | null>(null);
  * this device, or browse countries and Themes down to their entries. With
  * `onAdded` it can also select several entries (or all that are missing
  * below a grouping) and add one Item of each at once.
+ *
+ * With `onItemTypeChange`, the Item type is picked at its top first (spec
+ * 5.4): coin, banknote, or stamp, which the Catalog doesn't hold.
  */
 export function CatalogPickerDialog({
   open,
   onOpenChange,
   itemType,
+  onItemTypeChange,
   onPick,
   onManual,
   onAdded,
@@ -69,6 +76,8 @@ export function CatalogPickerDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   itemType: CatalogItemType;
+  /** Picks another Item type; a stamp is then added manually. */
+  onItemTypeChange?: (type: ItemType) => void;
   onPick: (entry: PickedCatalogEntry) => void;
   /** "Add manually": the person types the facts in instead. */
   onManual: () => void;
@@ -87,6 +96,23 @@ export function CatalogPickerDialog({
         <DialogTitle className="sr-only">
           {t("catalogPicker.title")}
         </DialogTitle>
+        {onItemTypeChange && (
+          <div className="border-b px-3 py-2">
+            <SegmentedControl
+              label={t("items.type")}
+              options={itemTypes.map((type) => {
+                const Icon = itemTypeIcons[type];
+                return {
+                  value: type,
+                  label: t(`items.types.${type}`),
+                  icon: <Icon strokeWidth={1.75} aria-hidden="true" />,
+                };
+              })}
+              value={itemType}
+              onChange={onItemTypeChange}
+            />
+          </div>
+        )}
         <PickerBody
           itemType={itemType}
           onPick={(entry) => {

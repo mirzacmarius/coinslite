@@ -84,7 +84,7 @@ Grades within a scale are ordered, so Items can be sorted and filtered by Grade.
 Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grade, both on Catalog entries and on Items.
 
 ### 5.4 Adding an Item
-- Pick the Item type first. Shortcuts elsewhere in the app can open the form with a type already chosen.
+- Pick the Item type first: coin, banknote or stamp, at the top of the Catalog picker, where adding starts. A stamp goes straight on to the form, since the Catalog holds no stamps. Each new Item starts as a coin; the coin scanner opens the form with a coin already chosen.
 - **Two ways to add:**
   - **From the Catalog** (default for coins and banknotes): pick a Catalog entry with the picker (§6.2). The descriptive facts come from the entry.
   - **Manually:** the user types the descriptive facts. Stamps are always added manually.
@@ -249,14 +249,14 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 - **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
-- **Shortcuts:** add a coin, a banknote or a stamp, each opening the form with that type chosen. While the Collection is empty they sit in the first-run prompt instead.
+- **Add Item:** one large button, full width on phones, opening the form, where the Item type is picked first (§5.4). While the Collection is empty, the first-run prompt has it instead.
 - **Value over time:** the Collection's "over time" chart (§7), compact: the same figures, without the switch to Value by Date acquired. Absent while nothing is owned.
 - **Latest Items:** the three most recently added, each with thumbnail, year and denomination, and its Market value (× Quantity when more than one) on the right.
 - **Set progress:** up to three Sets the user is closest to completing, among the Sets their held Catalog entries open with "View as Set" (§6.4), each with held / total and % as its Set view shows them, and opening it. Closest means the largest share held, then the fewest entries missing. A complete Set isn't listed. Absent when there are none, and while the Catalog is hidden.
 - **Needs attention:** how many owned Items have no Market value, how many have no photo (no side photo and no more photos), and how many coins and banknotes have no Grade, each opening the Collection filtered to exactly those Items (§7). A count of none isn't listed; absent when all are none.
 - Like the totals, Set progress and Needs attention are worked out a page of Items at a time, so a Collection of any size stays within what one request may read.
 - **First-run prompt:** while the Collection is empty, one start card takes the place of the totals and Latest Items, with three ways to start:
-  - **Add an Item:** the three shortcuts.
+  - **Add an Item:** opens the form (§5.4).
   - **Add a whole Set:** opens the Catalog to pick a Set and add what the user owns from it (§6.4). Absent while the Catalog is hidden.
   - **Import a spreadsheet:** opens the CSV import.
   - The empty Collection page offers the same three ways.

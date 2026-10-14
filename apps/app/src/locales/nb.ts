@@ -1264,12 +1264,6 @@ export default {
       "Den er slått av foreløpig. Objektene dine påvirkes ikke.",
   },
   overview: {
-    addShortcuts: "Legg til i samlingen",
-    add: {
-      coin: "Legg til mynt",
-      banknote: "Legg til seddel",
-      stamp: "Legg til frimerke",
-    },
     latestItems: "Nyeste objekter",
     viewCollection: "Vis samlingen",
     firstRunTitle: "Start samlingen din",

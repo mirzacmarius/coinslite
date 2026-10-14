@@ -201,6 +201,7 @@ export function ItemFormDialog(props: ItemFormProps) {
         <CatalogPickerDialog
           {...itemForm.picker}
           itemType={isCatalogType(type) ? type : "coin"}
+          onItemTypeChange={itemForm.chooseType}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             titleRef.current?.focus();

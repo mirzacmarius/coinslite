@@ -12,7 +12,7 @@ import { ItemFormDialog } from "./item-form-dialog";
 
 /** What the "New Item" dialog opens with. */
 export type NewItemPreset = {
-  /** The Item type already chosen, as the Overview's "Add banknote" does. */
+  /** The Item type already chosen, as the coin scanner does. */
   type?: ItemType;
   /** A coin scan's photos and suggestion, for the person to review (scanner/scan-coin.tsx). */
   scan?: ScanPreset;

@@ -1284,12 +1284,6 @@ export default {
       "Il est désactivé pour le moment. Vos objets ne sont pas concernés.",
   },
   overview: {
-    addShortcuts: "Ajouter à votre collection",
-    add: {
-      coin: "Ajouter une pièce",
-      banknote: "Ajouter un billet",
-      stamp: "Ajouter un timbre",
-    },
     latestItems: "Derniers objets ajoutés",
     viewCollection: "Voir la collection",
     firstRunTitle: "Commencez votre collection",

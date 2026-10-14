@@ -1308,12 +1308,6 @@ export default {
       "Er ist vorerst ausgeschaltet. Deine Objekte sind davon nicht betroffen.",
   },
   overview: {
-    addShortcuts: "Zur Sammlung hinzufügen",
-    add: {
-      coin: "Münze hinzufügen",
-      banknote: "Banknote hinzufügen",
-      stamp: "Briefmarke hinzufügen",
-    },
     latestItems: "Neueste Objekte",
     viewCollection: "Sammlung ansehen",
     firstRunTitle: "Beginne deine Sammlung",

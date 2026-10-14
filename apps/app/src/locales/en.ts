@@ -1247,12 +1247,6 @@ export default {
       "It's switched off for now. Your Items aren't affected.",
   },
   overview: {
-    addShortcuts: "Add to your Collection",
-    add: {
-      coin: "Add coin",
-      banknote: "Add banknote",
-      stamp: "Add stamp",
-    },
     latestItems: "Latest Items",
     viewCollection: "View Collection",
     firstRunTitle: "Start your Collection",

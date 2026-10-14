@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { useId } from "react";
 import { cn } from "../utils";
 
@@ -15,7 +16,8 @@ export function SegmentedControl<T extends string>({
   className,
 }: {
   label: string;
-  options: { value: T; label: string }[];
+  /** Each option's `icon`, if any, shows before its label. */
+  options: { value: T; label: string; icon?: React.ReactNode }[];
   value: T;
   onChange: (value: T) => void;
   className?: string;
@@ -32,7 +34,7 @@ export function SegmentedControl<T extends string>({
       {options.map((option) => (
         <label
           key={option.value}
-          className="relative cursor-pointer rounded-[calc(var(--radius)-3px)] flex h-6 items-center px-2.5 font-medium text-muted-foreground has-[:checked]:bg-card has-[:checked]:text-foreground has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+          className="relative cursor-pointer rounded-[calc(var(--radius)-3px)] flex h-6 items-center gap-1.5 px-2.5 font-medium text-muted-foreground has-[:checked]:bg-card has-[:checked]:text-foreground has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring [&_svg]:size-3.5 [&_svg]:shrink-0"
         >
           <input
             type="radio"
@@ -42,6 +44,7 @@ export function SegmentedControl<T extends string>({
             onChange={() => onChange(option.value)}
             className="sr-only"
           />
+          {option.icon}
           {option.label}
         </label>
       ))}

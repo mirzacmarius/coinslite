@@ -235,16 +235,19 @@ export function useItemForm({
   }, [open, onlyAlbum, form]);
   // Before the first paint: a New Item form that opens holding what the
   // person typed or picked last time says so, with a way to start over.
+  // A fresh start is a coin, unless a shortcut chose the type (below), not
+  // the type last picked in the Catalog picker.
   const wasOpen = useRef(false);
   useLayoutEffect(() => {
-    if (open && !wasOpen.current && isNew)
-      setDraftKept(
-        heldInput(
-          form.state.values,
-          defaults,
-          (name) => form.getFieldMeta(name)?.isDirty === true,
-        ),
+    if (open && !wasOpen.current && isNew) {
+      const kept = heldInput(
+        form.state.values,
+        defaults,
+        (name) => form.getFieldMeta(name)?.isDirty === true,
       );
+      setDraftKept(kept);
+      if (!kept) prefillForm(form, { type: defaults.type });
+    }
     wasOpen.current = open;
   });
   // Before the first paint, so the type pill never shows the previous type.
@@ -432,6 +435,15 @@ export function useItemForm({
     submit,
     /** Opens the Catalog picker from the form, to link another entry. */
     pickAnother: () => openPicker(false),
+    /**
+     * Picks the Item type at the top of the Catalog picker, filled in for the
+     * person like a preset: a stamp, which the Catalog doesn't hold, leaves
+     * the picker for its title.
+     */
+    chooseType: (type: ItemType) => {
+      prefillForm(form, { type });
+      if (!isCatalogType(type)) setPickerOpen(false);
+    },
     /** The Catalog picker's props (catalog-picker.tsx). */
     picker: {
       open: pickerOpen,
