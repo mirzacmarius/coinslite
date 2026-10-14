@@ -1085,6 +1085,7 @@ export default {
     numistaLink: "N# {id} pe Numista",
     noImage: "Încă nu există imagine",
     imageCredit: "Imagine",
+    creditTerms: "Sursă și licență",
   },
   collectionTotals: {
     title: "Totalurile colecției",

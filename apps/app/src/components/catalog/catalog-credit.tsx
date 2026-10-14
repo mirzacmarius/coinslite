@@ -1,13 +1,70 @@
 "use client";
 
+import { useI18n } from "@/locales/client";
 import type { Provenance } from "@coinslite/backend/convex/catalog/fields";
+import { IconButton } from "@coinslite/ui/icon-button";
+import { Popover, PopoverContent, PopoverTrigger } from "@coinslite/ui/popover";
+import { Info } from "lucide-react";
+import type * as React from "react";
 import { useCatalogFormat } from "./use-catalog-format";
 
 /** Who to credit for some facts, notes or an image, linked to the source when it has a link. */
 export function CatalogCredit({ provenance }: { provenance: Provenance }) {
   const catalogFormat = useCatalogFormat();
-  const text = catalogFormat.credit(provenance);
-  if (!provenance.link) return <>{text}</>;
+  return (
+    <SourceLink provenance={provenance}>
+      {catalogFormat.credit(provenance)}
+    </SourceLink>
+  );
+}
+
+/**
+ * The short credit for facts shown away from their Catalog entry, as on the
+ * Item page: the source's name alone, linked, with the whole credit behind
+ * an info button. Some sources' terms (the ECB's, the BNR's, the Open
+ * Government Licence) ask for their credit wherever their facts appear, so
+ * the whole of it stays one click away, also on phones.
+ */
+export function CatalogSourceCredit({
+  provenance,
+}: {
+  provenance: Provenance;
+}) {
+  const t = useI18n();
+  const catalogFormat = useCatalogFormat();
+  const credit = catalogFormat.credit(provenance);
+  const source = (
+    <SourceLink provenance={provenance}>{provenance.source}</SourceLink>
+  );
+  if (credit === provenance.source) return source;
+  return (
+    <>
+      {source}
+      <Popover>
+        <PopoverTrigger asChild>
+          <IconButton
+            label={t("catalog.creditTerms")}
+            className="-my-1 ml-0.5 size-6 align-middle [&_svg]:size-3.5"
+          >
+            <Info strokeWidth={1.75} />
+          </IconButton>
+        </PopoverTrigger>
+        <PopoverContent className="w-[280px] p-3 text-xs leading-relaxed">
+          {credit}
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
+
+function SourceLink({
+  provenance,
+  children,
+}: {
+  provenance: Provenance;
+  children: React.ReactNode;
+}) {
+  if (!provenance.link) return <>{children}</>;
   return (
     <a
       href={provenance.link}
@@ -15,7 +72,7 @@ export function CatalogCredit({ provenance }: { provenance: Provenance }) {
       rel="noreferrer"
       className="underline-offset-2 hover:underline"
     >
-      {text}
+      {children}
     </a>
   );
 }

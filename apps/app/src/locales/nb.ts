@@ -1076,6 +1076,7 @@ export default {
     numistaLink: "N# {id} på Numista",
     noImage: "Ikke noe bilde ennå",
     imageCredit: "Bilde",
+    creditTerms: "Kilde og lisens",
   },
   collectionTotals: {
     title: "Totaler for samlingen",
