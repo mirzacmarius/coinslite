@@ -68,7 +68,8 @@ export default {
     moreDetails: "Weitere Angaben",
     createMore: "Weitere hinzufügen",
     cancel: "Abbrechen",
-    draftKept: "Dieses Objekt hast du vorhin begonnen, aber nicht hinzugefügt.",
+    draftKept:
+      "Du hast vorhin mit diesem Objekt angefangen, es aber nicht hinzugefügt.",
     startOver: "Neu beginnen",
     close: "Schließen",
     added: "Objekt zur Sammlung hinzugefügt",

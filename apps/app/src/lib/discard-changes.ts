@@ -19,6 +19,22 @@ export function formChanged<Values extends object>(
   );
 }
 
+/**
+ * Whether someone typed or picked something in a form: a field they edited
+ * (`edited`) now holds something other than its default. Values filled in for
+ * the person without marking the field edited, such as a preselected Album or
+ * the pills "Create more" carries over, don't count.
+ */
+export function heldInput<Values extends object>(
+  values: Values,
+  defaults: Values,
+  edited: (name: keyof Values) => boolean,
+) {
+  return (Object.keys(values) as (keyof Values)[]).some(
+    (name) => edited(name) && !Object.is(values[name], defaults[name]),
+  );
+}
+
 /** A dialog asked to open or close, and what closing would do to its form. */
 export type CloseRequest = {
   /** What the dialog is asked to become: false when it's asked to close. */

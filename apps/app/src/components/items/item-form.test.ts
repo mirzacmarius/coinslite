@@ -1,7 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { FieldApi, FormApi } from "@tanstack/react-form";
-import { blankItem, factValues, fillForm, valuesFromItem } from "./item-form";
+import {
+  blankItem,
+  factValues,
+  fillForm,
+  prefillForm,
+  valuesFromItem,
+} from "./item-form";
 import { formArgs } from "./item-form-submit";
 
 /** A stored Item, as the Item page reads it. */
@@ -119,5 +125,17 @@ describe("filling the form from a Catalog entry (MUS-734)", () => {
     const form = formWithTitleMounted();
     fillForm(form, { title: "Morgan dollar 1881-S", year: "1881" });
     expect(form.state.isDirty).toBe(true);
+  });
+});
+
+describe("filling pills in for the person", () => {
+  test("a prefilled pill holds its value but isn't input to keep or discard", () => {
+    const form = new FormApi({ defaultValues: blankItem() });
+    form.mount();
+    new FieldApi({ form, name: "country" }).mount();
+    prefillForm(form, { type: "banknote", country: "NO" });
+    expect(form.getFieldValue("country")).toBe("NO");
+    expect(form.getFieldValue("type")).toBe("banknote");
+    expect(form.state.isDirty).toBe(false);
   });
 });

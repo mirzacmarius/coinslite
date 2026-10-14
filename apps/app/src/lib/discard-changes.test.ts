@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { asksBeforeClosing, formChanged } from "./discard-changes";
+import { asksBeforeClosing, formChanged, heldInput } from "./discard-changes";
 
 describe("formChanged", () => {
   const album = { name: "Norway", description: "", colour: "blue" };
@@ -72,5 +72,29 @@ describe("asksBeforeClosing", () => {
 
   test("opening never asks", () => {
     expect(asksBeforeClosing({ open: true, changed: true })).toBe(false);
+  });
+});
+
+describe("heldInput", () => {
+  const defaults = { title: "", country: undefined as string | undefined };
+  const edited =
+    (...names: string[]) =>
+    (name: string) =>
+      names.includes(name);
+
+  test("a field the person edited to something new is input", () => {
+    expect(
+      heldInput({ ...defaults, title: "1 krone" }, defaults, edited("title")),
+    ).toBe(true);
+  });
+
+  test("typing something and deleting it again isn't", () => {
+    expect(heldInput(defaults, defaults, edited("title"))).toBe(false);
+  });
+
+  test("a value filled in for the person isn't", () => {
+    expect(heldInput({ ...defaults, country: "NO" }, defaults, edited())).toBe(
+      false,
+    );
   });
 });

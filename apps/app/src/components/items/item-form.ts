@@ -355,3 +355,21 @@ export function fillForm(form: FillableForm, values: Partial<ItemFormValues>) {
     });
   }
 }
+
+/**
+ * Writes values filled in for the person into the Item form: a preset Item
+ * type, the only Album, the pills "Create more" carries over. Only their
+ * values: they count neither as a change nor as a draft to keep.
+ */
+export function prefillForm(
+  form: FillableForm,
+  values: Partial<ItemFormValues>,
+) {
+  for (const name of Object.keys(values) as (keyof ItemFormValues)[]) {
+    const value = values[name] as ItemFormValues[typeof name];
+    form.setFieldValue(name, value, {
+      dontUpdateMeta: true,
+      dontValidate: true,
+    });
+  }
+}

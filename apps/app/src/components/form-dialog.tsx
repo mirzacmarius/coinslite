@@ -10,7 +10,7 @@ import type * as React from "react";
 import { createContext, useContext, useRef, useState } from "react";
 
 /** Closes the dialog dropping its input, as Cancel does (FormDialogCancel). */
-const CancelContext = createContext<() => void>(() => {});
+const CancelContext = createContext<(() => void) | null>(null);
 
 /**
  * The dialog around a form. While the form has changes, closing it (Esc, the
@@ -100,12 +100,13 @@ export function FormDialog({
 }
 
 /**
- * A form dialog's Cancel button: closes it and drops what was typed, asking
- * first when there is something to drop, also in a form that otherwise keeps
- * its draft.
+ * A FormDialog's Cancel: closes it and drops what was typed, asking first
+ * when there is something to drop, also where the form otherwise keeps its
+ * draft (New Item). Where it doesn't, a `DialogClose` Cancel does the same.
  */
 export function FormDialogCancel({ children }: { children: React.ReactNode }) {
   const cancel = useContext(CancelContext);
+  if (!cancel) throw new Error("FormDialogCancel belongs inside a FormDialog.");
   return (
     <Button type="button" variant="ghost" onClick={cancel}>
       {children}

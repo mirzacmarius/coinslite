@@ -67,8 +67,9 @@ export default {
     moreDetails: "Mai multe detalii",
     createMore: "Adaugă mai multe",
     cancel: "Anulează",
-    draftKept: "Ai început acest obiect mai devreme și nu l-ai adăugat.",
-    startOver: "Ia-o de la capăt",
+    draftKept:
+      "Ai început să completezi acest obiect mai devreme și nu l-ai adăugat.",
+    startOver: "Începe din nou",
     close: "Închide",
     added: "Obiect adăugat în colecție",
     addedToAlbum: "Obiect adăugat în {album}",
