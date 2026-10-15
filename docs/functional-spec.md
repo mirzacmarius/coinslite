@@ -325,8 +325,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 14. Spot prices and exchange rates
 
-- One provider supplies gold and silver spot prices and currency exchange rates, under a licence that allows commercial use.
-- A scheduled job stores the latest values every 15 minutes, so the cost doesn't grow with the number of users. All conversions use the stored values.
+- gold-api.com supplies live gold and silver spot prices. MetalpriceAPI supplies currency exchange rates, and backup gold and silver prices at the previous day's close. Both are used under licences that allow commercial use.
+- A scheduled job stores the latest spot prices every 15 minutes, and the exchange rates as often as the MetalpriceAPI plan allows, so the cost doesn't grow with the number of users. All conversions use the stored values.
 
 ## 15. Administration
 
@@ -372,7 +372,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 17. Open items
 
-- Spot price and exchange-rate provider: MetalpriceAPI paid plan preferred, metalcharts.org fallback. The licence must be confirmed before launch.
+- Spot price and exchange-rate providers: gold-api.com supplies live gold and silver, and MetalpriceAPI supplies exchange rates and the backup metal prices. MetalpriceAPI's licence must be confirmed before launch.
 - Legal operator for privacy policy, terms and billing: before launch.
 - AI provider for the scanner: when that milestone starts.
 - Marketing site and guides: written after the app reaches feature completeness.
