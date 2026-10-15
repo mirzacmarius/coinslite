@@ -26,6 +26,7 @@ const coin = (fields: Partial<SeriesItem>): SeriesItem => ({
 /** Spot prices with gold at `perGram` minor units a gram. */
 const goldAt = (perGram: number): MarketRates => ({
   quotedAt: 0,
+  ratesQuotedAt: 0,
   stale: false,
   rate: () => 1,
   convert: (amount) => amount,

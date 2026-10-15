@@ -101,7 +101,7 @@ export const preview = query({
       inBackground,
       rate: rates && {
         value: rates.rate(from, to),
-        quotedAt: rates.quotedAt,
+        quotedAt: rates.ratesQuotedAt,
         stale: rates.stale,
       },
     };

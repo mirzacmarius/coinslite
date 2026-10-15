@@ -56,9 +56,11 @@ export const spotPricesPerGram = (
 export const STALE_AFTER_MS = 60 * 60 * 1000;
 
 export type Snapshot = {
-  /** When the provider quoted these prices. */
+  /** When the Spot prices were quoted. */
   quotedAt: number;
-  /** When CoinsLite last stored good prices. */
+  /** When the exchange rates were quoted. */
+  ratesQuotedAt: number;
+  /** When CoinsLite last stored fresh Spot prices. */
   fetchedAt: number;
   /** The latest refresh attempt, whether or not it succeeded. */
   checkedAt: number;
@@ -77,7 +79,8 @@ export function marketRates(snapshot: Snapshot) {
     perDollar[to] / perDollar[from];
   return {
     quotedAt: snapshot.quotedAt,
-    /** True when refreshes have been failing for a while (STALE_AFTER_MS). */
+    ratesQuotedAt: snapshot.ratesQuotedAt,
+    /** True when fresh Spot prices haven't arrived for a while (STALE_AFTER_MS). */
     stale: snapshot.checkedAt - snapshot.fetchedAt > STALE_AFTER_MS,
     /** How much one unit of `from` is worth in `to`, e.g. 11.5 for EUR → NOK. */
     rate: (from: HomeCurrency, to: HomeCurrency) => rate(from, to),

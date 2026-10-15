@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import {
+  type ActionCtx,
   type MutationCtx,
   type QueryCtx,
   env,
@@ -10,23 +11,34 @@ import {
   internalQuery,
   query,
 } from "./_generated/server";
-import { type Quote, fetchQuote } from "./spotPrices/metalPriceApi";
+import { fetchMetals } from "./spotPrices/goldApi";
+import { fetchQuote } from "./spotPrices/metalPriceApi";
 import {
   type MarketRates,
   type Metal,
   marketRates,
   spotPriceOf,
 } from "./spotPrices/rates";
+import { nextSnapshot } from "./spotPrices/snapshot";
 import { setUpUserOrNull } from "./utils/auth";
 import { homeCurrency, perDollar } from "./utils/validators";
 
 /**
- * The one stored snapshot, or null before the first successful refresh. Only
- * a successful refresh changes it, so a query that reads the prices this way
- * isn't re-run by a failed one.
+ * The one stored snapshot, or null before the first refresh with exchange
+ * rates. Only a refresh that brings prices changes it, so a query that reads
+ * the prices this way isn't re-run by one that brings none.
  */
 export async function latestSnapshot(ctx: QueryCtx) {
-  return await ctx.db.query("spotPriceSnapshots").order("desc").first();
+  const snapshot = await ctx.db
+    .query("spotPriceSnapshots")
+    .order("desc")
+    .first();
+  return (
+    snapshot && {
+      ...snapshot,
+      ratesQuotedAt: snapshot.ratesQuotedAt ?? snapshot.quotedAt,
+    }
+  );
 }
 
 /**
@@ -41,19 +53,31 @@ async function lastCheckedAt(
   return check?.checkedAt ?? snapshot.checkedAt ?? snapshot.fetchedAt;
 }
 
+/** When MetalpriceAPI was last asked. */
+async function lastRatesCheckedAt(
+  ctx: QueryCtx,
+  snapshot: Doc<"spotPriceSnapshots">,
+) {
+  const check = await ctx.db.query("spotPriceChecks").unique();
+  return check?.ratesCheckedAt ?? (await lastCheckedAt(ctx, snapshot));
+}
+
 /** Notes a refresh attempt, successful or not. */
-async function recordCheck(ctx: MutationCtx, checkedAt: number) {
+async function recordCheck(
+  ctx: MutationCtx,
+  times: { checkedAt: number; ratesCheckedAt?: number },
+) {
   const check = await ctx.db.query("spotPriceChecks").unique();
   if (check) {
-    await ctx.db.patch("spotPriceChecks", check._id, { checkedAt });
+    await ctx.db.patch("spotPriceChecks", check._id, times);
   } else {
-    await ctx.db.insert("spotPriceChecks", { checkedAt });
+    await ctx.db.insert("spotPriceChecks", times);
   }
 }
 
 /**
- * The latest Spot prices and exchange rates, or null before the first
- * successful refresh. Every conversion uses these stored values: Metal values
+ * The latest Spot prices and exchange rates, or null before the first refresh
+ * with exchange rates. Every conversion uses these stored values: Metal values
  * (`spotPricePerGram`) and Home currency changes (`rate`, `convert`). Knowing
  * whether they're out of date (`stale`) means reading when a refresh was
  * last attempted, so every attempt re-runs a query that calls this.
@@ -70,6 +94,7 @@ export async function latestRates(ctx: QueryCtx): Promise<MarketRates | null> {
 const ratesOfDay = (day: Doc<"spotPriceDays">) =>
   marketRates({
     quotedAt: day.quotedAt,
+    ratesQuotedAt: day.quotedAt,
     fetchedAt: day.quotedAt,
     checkedAt: day.quotedAt,
     perDollar: day.perDollar,
@@ -150,41 +175,51 @@ const MONTH_MS = 31 * 24 * 60 * 60 * 1000;
 const SCHEDULE_SLACK_MS = 7.5 * 60 * 1000;
 
 /**
- * How long to wait after a provider request before the next one, so a plan's
- * monthly quota lasts the month with a tenth to spare. Without a known quota,
- * every scheduled run asks.
+ * How long to wait after a MetalpriceAPI request before the next one, so its
+ * plan's monthly quota lasts the month with a tenth to spare. Without a known
+ * quota, every scheduled run asks.
  */
 function waitBetweenRequests(requestsPerMonth: number | undefined) {
   if (!requestsPerMonth) return 0;
   return MONTH_MS / (requestsPerMonth * 0.9) - SCHEDULE_SLACK_MS;
 }
 
-/** When the provider was last asked, and the plan's quota it stated. */
+/** When MetalpriceAPI was last asked, and the plan's quota it stated. */
 export const lastRequest = internalQuery({
   args: {},
   returns: v.union(
     v.null(),
     v.object({
-      checkedAt: v.number(),
+      ratesCheckedAt: v.number(),
       requestsPerMonth: v.optional(v.number()),
     }),
   ),
   handler: async (ctx) => {
     const snapshot = await latestSnapshot(ctx);
-    return (
-      snapshot && {
-        checkedAt: await lastCheckedAt(ctx, snapshot),
-        requestsPerMonth: snapshot.requestsPerMonth,
-      }
-    );
+    if (!snapshot) return null;
+    return {
+      ratesCheckedAt: await lastRatesCheckedAt(ctx, snapshot),
+      requestsPerMonth: snapshot.requestsPerMonth,
+    };
   },
 });
 
+/** Whether MetalpriceAPI's quota allows asking it now. */
+async function ratesDue(ctx: ActionCtx) {
+  const last = await ctx.runQuery(internal.spotPrices.lastRequest, {});
+  return (
+    !last ||
+    Date.now() - last.ratesCheckedAt >=
+      waitBetweenRequests(last.requestsPerMonth)
+  );
+}
+
 /**
  * Fetches the latest prices and stores them. Runs every 15 minutes (crons.ts)
- * and makes one provider request however many people use CoinsLite, fewer
- * when the provider's plan allows fewer a month. When the provider fails, or
- * no key is set, the last good snapshot stays in place.
+ * and makes the same requests however many people use CoinsLite: gold and
+ * silver from gold-api.com every run, and exchange rates from MetalpriceAPI
+ * as often as its plan allows. Whatever a provider fails to bring, or isn't
+ * asked for, stays as last stored.
  */
 export const refresh = internalAction({
   args: {},
@@ -193,55 +228,79 @@ export const refresh = internalAction({
     const apiKey = env.METALPRICE_API_KEY;
     if (!apiKey) {
       console.warn(
-        "Spot prices not refreshed: METALPRICE_API_KEY isn't set. Keeping the last stored prices.",
+        "Exchange rates not refreshed: METALPRICE_API_KEY isn't set. Keeping the last stored rates.",
       );
-      await ctx.runMutation(internal.spotPrices.recordFailedRefresh, {});
-      return null;
     }
-    const last = await ctx.runQuery(internal.spotPrices.lastRequest, {});
-    if (
-      last &&
-      Date.now() - last.checkedAt < waitBetweenRequests(last.requestsPerMonth)
-    ) {
-      return null;
-    }
-    let quote: Quote;
-    try {
-      quote = await fetchQuote(apiKey);
-    } catch (error) {
-      console.error(
-        "Spot prices not refreshed; keeping the last stored prices.",
-        error,
-      );
-      await ctx.runMutation(internal.spotPrices.recordFailedRefresh, {});
-      return null;
-    }
-    await ctx.runMutation(internal.spotPrices.record, quote);
+    const ratesKey = apiKey && (await ratesDue(ctx)) ? apiKey : null;
+    const [metals, rates] = await Promise.all([
+      fetchMetals().catch((error: unknown) => {
+        console.error(
+          "Spot prices not refreshed from gold-api.com; keeping the last stored prices.",
+          error,
+        );
+        return undefined;
+      }),
+      ratesKey
+        ? fetchQuote(ratesKey).catch((error: unknown) => {
+            console.error(
+              "Exchange rates not refreshed from MetalpriceAPI; keeping the last stored rates.",
+              error,
+            );
+            return undefined;
+          })
+        : undefined,
+    ]);
+    await ctx.runMutation(internal.spotPrices.record, {
+      metals,
+      rates,
+      askedForRates: ratesKey !== null,
+    });
     return null;
   },
 });
 
 /**
- * Replaces the stored snapshot with freshly fetched prices, and keeps the
- * day's first good prices for good (spotPriceDays) for "Value over time".
+ * Notes a refresh attempt and stores what it brought (spotPrices/snapshot.ts),
+ * and keeps the day's first good prices for good (spotPriceDays) for "Value
+ * over time".
  */
 export const record = internalMutation({
   args: {
-    quotedAt: v.number(),
-    perDollar,
-    requestsPerMonth: v.optional(v.number()),
+    metals: v.optional(
+      v.object({
+        quotedAt: v.number(),
+        perDollar: v.object({ XAU: v.number(), XAG: v.number() }),
+      }),
+    ),
+    rates: v.optional(
+      v.object({
+        quotedAt: v.number(),
+        perDollar,
+        requestsPerMonth: v.optional(v.number()),
+      }),
+    ),
+    askedForRates: v.boolean(),
   },
   returns: v.null(),
-  handler: async (ctx, quote) => {
+  handler: async (ctx, { metals, rates, askedForRates }) => {
     const now = Date.now();
-    const snapshot = { ...quote, fetchedAt: now };
     const latest = await latestSnapshot(ctx);
+    // Until ratesCheckedAt is first written, its fallback (checkedAt) moves on
+    // every run, so the fallback is written once.
+    const ratesCheckedAt = askedForRates
+      ? now
+      : latest && (await lastRatesCheckedAt(ctx, latest));
+    await recordCheck(ctx, {
+      checkedAt: now,
+      ...(ratesCheckedAt && { ratesCheckedAt }),
+    });
+    const snapshot = nextSnapshot(latest, { metals, rates }, now);
+    if (!snapshot) return null;
     if (latest) {
       await ctx.db.replace("spotPriceSnapshots", latest._id, snapshot);
     } else {
       await ctx.db.insert("spotPriceSnapshots", snapshot);
     }
-    await recordCheck(ctx, now);
     const day = new Date(now).toISOString().slice(0, 10);
     const kept = await ctx.db
       .query("spotPriceDays")
@@ -250,23 +309,10 @@ export const record = internalMutation({
     if (!kept) {
       await ctx.db.insert("spotPriceDays", {
         day,
-        quotedAt: quote.quotedAt,
-        perDollar: quote.perDollar,
+        quotedAt: snapshot.quotedAt,
+        perDollar: snapshot.perDollar,
       });
     }
-    return null;
-  },
-});
-
-/**
- * Notes a failed refresh; the stored prices stay untouched, and age into
- * being out of date.
- */
-export const recordFailedRefresh = internalMutation({
-  args: {},
-  returns: v.null(),
-  handler: async (ctx) => {
-    await recordCheck(ctx, Date.now());
     return null;
   },
 });

@@ -3,7 +3,10 @@ import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-/** One provider request every 15 minutes, however many people use CoinsLite. */
+/**
+ * Live gold and silver every 15 minutes, and exchange rates as often as
+ * MetalpriceAPI's plan allows (spotPrices.ts), however many people use CoinsLite.
+ */
 crons.interval(
   "refresh spot prices and exchange rates",
   { minutes: 15 },
