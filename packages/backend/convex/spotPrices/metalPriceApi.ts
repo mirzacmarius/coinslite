@@ -2,9 +2,9 @@ import { withTimeout } from "../utils/timeout";
 import { type PerDollar, rateCodes } from "./rates";
 
 /**
- * The price provider: MetalpriceAPI (https://metalpriceapi.com). This is the
- * only module that knows its address and answer format, so another provider
- * replaces just this file.
+ * The exchange-rate provider, whose gold and silver are the backup for
+ * gold-api.com's: MetalpriceAPI (https://metalpriceapi.com). This is the only
+ * module that knows its address and answer format.
  */
 const LATEST_URL = "https://api.metalpriceapi.com/v1/latest";
 /** How long a request may take, answer included, before it counts as failed. */

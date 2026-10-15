@@ -552,8 +552,8 @@ export default defineSchema({
     /** When the Spot prices were quoted. */
     quotedAt: v.number(),
     /**
-     * When the exchange rates were quoted; documents from before the metals
-     * had their own source lack it, and read `quotedAt` (latestSnapshot).
+     * When the exchange rates were quoted. Missing on documents from before
+     * gold-api.com; latestSnapshot falls back to `quotedAt`.
      */
     ratesQuotedAt: v.optional(v.number()),
     /** When CoinsLite last stored fresh Spot prices. */
@@ -578,7 +578,7 @@ export default defineSchema({
     /**
      * When MetalpriceAPI was last asked, whether or not it answered: every
      * request counts against its monthly quota. Before it was first written,
-     * `checkedAt`.
+     * every refresh asked it, so `checkedAt`.
      */
     ratesCheckedAt: v.optional(v.number()),
   }),

@@ -53,10 +53,7 @@ async function lastCheckedAt(
   return check?.checkedAt ?? snapshot.checkedAt ?? snapshot.fetchedAt;
 }
 
-/**
- * When MetalpriceAPI was last asked. Until ratesCheckedAt was first written,
- * every refresh asked it.
- */
+/** When MetalpriceAPI was last asked. */
 async function lastRatesCheckedAt(
   ctx: QueryCtx,
   snapshot: Doc<"spotPriceSnapshots">,
@@ -221,8 +218,8 @@ async function ratesDue(ctx: ActionCtx) {
  * Fetches the latest prices and stores them. Runs every 15 minutes (crons.ts)
  * and makes the same requests however many people use CoinsLite: gold and
  * silver from gold-api.com every run, and exchange rates from MetalpriceAPI
- * as often as its plan allows. Whatever a provider fails to bring, or
- * MetalpriceAPI without a key, stays as last stored.
+ * as often as its plan allows. Whatever a provider fails to bring, or isn't
+ * asked for, stays as last stored.
  */
 export const refresh = internalAction({
   args: {},
@@ -288,8 +285,8 @@ export const record = internalMutation({
   handler: async (ctx, { metals, rates, askedForRates }) => {
     const now = Date.now();
     const latest = await latestSnapshot(ctx);
-    // Carried forward when MetalpriceAPI isn't asked: the time it falls back
-    // to, checkedAt, moves on every run.
+    // Until ratesCheckedAt is first written, its fallback (checkedAt) moves on
+    // every run, so the fallback is written once.
     const ratesCheckedAt = askedForRates
       ? now
       : latest && (await lastRatesCheckedAt(ctx, latest));

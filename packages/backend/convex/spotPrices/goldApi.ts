@@ -4,7 +4,7 @@ import type { PerDollar } from "./rates";
 /**
  * The live metal price provider: gold-api.com (https://gold-api.com). This is
  * the only module that knows its address and answer format. It needs no key;
- * its terms only ask for no more than a few requests a second.
+ * its terms forbid several requests a second.
  */
 const PRICE_URL = "https://api.gold-api.com/price";
 /** How long a request may take, answer included, before it counts as failed. */

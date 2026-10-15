@@ -13,7 +13,7 @@ export type StoredPrices = {
 
 /**
  * The prices to store after a refresh at `now`, or null when there's nothing
- * to store. The exchange rates come from MetalpriceAPI when it was asked; the
+ * to store. The exchange rates come from MetalpriceAPI when it answered; the
  * metals are the most recently quoted of the stored ones, gold-api.com's and
  * MetalpriceAPI's. `fetchedAt` moves only when this refresh brought the
  * metals, so the prices go out of date when live ones stop arriving, however
