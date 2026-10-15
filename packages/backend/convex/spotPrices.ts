@@ -26,7 +26,16 @@ import { homeCurrency, perDollar } from "./utils/validators";
  * isn't re-run by a failed one.
  */
 export async function latestSnapshot(ctx: QueryCtx) {
-  return await ctx.db.query("spotPriceSnapshots").order("desc").first();
+  const snapshot = await ctx.db
+    .query("spotPriceSnapshots")
+    .order("desc")
+    .first();
+  return (
+    snapshot && {
+      ...snapshot,
+      ratesQuotedAt: snapshot.ratesQuotedAt ?? snapshot.quotedAt,
+    }
+  );
 }
 
 /**
@@ -70,6 +79,7 @@ export async function latestRates(ctx: QueryCtx): Promise<MarketRates | null> {
 const ratesOfDay = (day: Doc<"spotPriceDays">) =>
   marketRates({
     quotedAt: day.quotedAt,
+    ratesQuotedAt: day.quotedAt,
     fetchedAt: day.quotedAt,
     checkedAt: day.quotedAt,
     perDollar: day.perDollar,
@@ -234,7 +244,11 @@ export const record = internalMutation({
   returns: v.null(),
   handler: async (ctx, quote) => {
     const now = Date.now();
-    const snapshot = { ...quote, fetchedAt: now };
+    const snapshot = {
+      ...quote,
+      ratesQuotedAt: quote.quotedAt,
+      fetchedAt: now,
+    };
     const latest = await latestSnapshot(ctx);
     if (latest) {
       await ctx.db.replace("spotPriceSnapshots", latest._id, snapshot);

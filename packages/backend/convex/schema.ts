@@ -549,9 +549,14 @@ export default defineSchema({
    * replaced by each successful refresh and kept when a refresh fails.
    */
   spotPriceSnapshots: defineTable({
-    /** When the provider quoted the prices. */
+    /** When the Spot prices were quoted. */
     quotedAt: v.number(),
-    /** When CoinsLite stored them. */
+    /**
+     * When the exchange rates were quoted; documents from before the metals
+     * had their own source lack it, and read `quotedAt` (latestSnapshot).
+     */
+    ratesQuotedAt: v.optional(v.number()),
+    /** When CoinsLite last stored fresh Spot prices. */
     fetchedAt: v.number(),
     /**
      * Where the latest refresh attempt was kept before spotPriceChecks; read
