@@ -546,7 +546,7 @@ export default defineSchema({
 
   /**
    * The latest Spot prices and exchange rates (spotPrices.ts): one document,
-   * replaced by each successful refresh and kept when a refresh fails.
+   * replaced by each refresh that brings prices and kept when none does.
    */
   spotPriceSnapshots: defineTable({
     /** When the Spot prices were quoted. */
@@ -560,11 +560,11 @@ export default defineSchema({
     fetchedAt: v.number(),
     /**
      * Where the latest refresh attempt was kept before spotPriceChecks; read
-     * only until that table has its document. A successful refresh drops it.
+     * only until that table has its document. Replacing the document drops it.
      */
     checkedAt: v.optional(v.number()),
     perDollar,
-    /** The provider plan's monthly request quota, when it states one; refreshes are spaced to fit it. */
+    /** MetalpriceAPI's monthly request quota, when it states one; its requests are spaced to fit it. */
     requestsPerMonth: v.optional(v.number()),
   }),
 
@@ -575,6 +575,12 @@ export default defineSchema({
    */
   spotPriceChecks: defineTable({
     checkedAt: v.number(),
+    /**
+     * When MetalpriceAPI was last asked, whether or not it answered: every
+     * request counts against its monthly quota. Before it was first written,
+     * `checkedAt`.
+     */
+    ratesCheckedAt: v.optional(v.number()),
   }),
 
   /**
