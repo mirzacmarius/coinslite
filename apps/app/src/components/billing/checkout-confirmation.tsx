@@ -43,7 +43,7 @@ export function CheckoutConfirmation() {
         <h2 className="text-sm font-medium">
           {t(premium ? "billing.welcomeTitle" : "billing.confirmingTitle")}
         </h2>
-        <p className="text-[13px] text-muted-foreground">
+        <p className="text-ui text-muted-foreground">
           {t(
             premium
               ? "billing.welcomeDescription"

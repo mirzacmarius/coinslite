@@ -5,6 +5,7 @@ import { errorScreenLocale } from "@/lib/error-screen-locale";
 import { globalErrorTexts } from "@/locales/global-error";
 import { Button } from "@coinslite/ui/button";
 import { Logo } from "@coinslite/ui/logo";
+import { cn } from "@coinslite/ui/utils";
 import * as Sentry from "@sentry/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
@@ -50,12 +51,16 @@ export default function GlobalError({
     Sentry.captureException(error);
   }, [error]);
   return (
-    <html lang={locale} className={dark ? "dark" : undefined}>
+    <html
+      lang={locale}
+      // The app's larger root size, as in the locale layout.
+      className={cn("text-[112.5%]", dark && "dark")}
+    >
       <body className="bg-background text-foreground antialiased [font-family:ui-sans-serif,system-ui,sans-serif]">
         <title>{t.title}</title>
         <div className="flex min-h-dvh flex-col pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
           <div className="flex h-12 items-center px-4 pt-[env(safe-area-inset-top)]">
-            <Logo className="text-[13px]" />
+            <Logo className="text-ui" />
           </div>
           <main
             id="main"
@@ -63,10 +68,8 @@ export default function GlobalError({
           >
             <div className="flex max-w-sm flex-col items-center gap-3 text-center">
               <div className="flex flex-col gap-1">
-                <h1 className="text-[15px] font-medium">{t.title}</h1>
-                <p className="text-[13px] text-muted-foreground">
-                  {t.description}
-                </p>
+                <h1 className="text-ui-lg font-medium">{t.title}</h1>
+                <p className="text-ui text-muted-foreground">{t.description}</p>
               </div>
               <Button
                 variant="outline"

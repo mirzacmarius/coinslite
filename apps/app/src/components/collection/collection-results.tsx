@@ -176,7 +176,7 @@ function ItemList({
                 )}
                 <ItemThumbnail type={item.type} url={item.thumbnailUrl} />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] font-medium">
+                  <span className="truncate text-ui font-medium">
                     {item.title}
                     {about.strike && (
                       <span className="font-normal text-muted-foreground">
@@ -245,7 +245,7 @@ function PhoneFigures({
   return (
     <span className="flex shrink-0 flex-col items-end text-right md:hidden">
       {(marketValue || quantity > 1) && (
-        <span className="whitespace-nowrap text-[13px] tabular-nums">
+        <span className="whitespace-nowrap text-ui tabular-nums">
           {marketValue && (
             <>
               <span className="sr-only">{t("items.marketValue")} </span>
@@ -272,7 +272,7 @@ function PhoneFigures({
 
 function Amount({ label, children }: { label: string; children?: string }) {
   return (
-    <span className="hidden w-28 truncate text-right text-[13px] tabular-nums lg:block">
+    <span className="hidden w-28 truncate text-right text-ui tabular-nums lg:block">
       {children && (
         <>
           <span className="sr-only">{label} </span>
@@ -328,7 +328,7 @@ function ItemGrid({
                 </span>
               )}
               <span className="flex min-w-0 flex-col gap-0.5 p-2.5">
-                <span className="truncate text-[13px] font-medium">
+                <span className="truncate text-ui font-medium">
                   {item.title}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">

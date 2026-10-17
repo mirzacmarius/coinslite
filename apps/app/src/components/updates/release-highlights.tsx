@@ -54,7 +54,7 @@ export function ReleaseHighlights() {
   return (
     <Dialog open={open} onOpenChange={(next) => !next && close()}>
       <DialogContent
-        className="sm:max-w-[480px]"
+        className="sm:max-w-[30rem]"
         onOpenAutoFocus={(event) => {
           event.preventDefault();
           gotIt.current?.focus();

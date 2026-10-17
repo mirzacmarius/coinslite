@@ -25,8 +25,8 @@ export function WantlistCard() {
         strokeWidth={1.75}
         aria-hidden="true"
       />
-      <span className="text-[13px] font-medium">{t("wantlist.title")}</span>
-      <span className="flex-1 text-[13px] tabular-nums text-muted-foreground">
+      <span className="text-ui font-medium">{t("wantlist.title")}</span>
+      <span className="flex-1 text-ui tabular-nums text-muted-foreground">
         {t("wantlist.count", { count })}
       </span>
       <ChevronRight

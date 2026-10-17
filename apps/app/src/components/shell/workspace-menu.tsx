@@ -41,14 +41,14 @@ export function WorkspaceMenu({ className }: { className?: string }) {
             className,
           )}
         >
-          <Logo className="text-[13px] font-medium" />
+          <Logo className="text-ui font-medium" />
           <ChevronDown
             className="!size-3.5 text-muted-foreground"
             aria-hidden="true"
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-[220px]">
+      <DropdownMenuContent align="start" className="w-[13.75rem]">
         {links.map(({ href, label, icon: Icon, unseen: linkUnseen }) => (
           <DropdownMenuItem key={href} asChild>
             <Link href={href}>

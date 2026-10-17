@@ -100,7 +100,7 @@ export function CatalogSetPage({ actions }: { actions?: React.ReactNode }) {
             action={
               <Link
                 href={set ? catalogNodeHref(set.key) : catalogHref}
-                className="text-[13px] font-medium text-link hover:underline"
+                className="text-ui font-medium text-link hover:underline"
               >
                 {set
                   ? t("sets.browse", { title: nodeTitle(set) })
@@ -346,7 +346,7 @@ function Completion({
   const t = useI18n();
   const format = useFormatters();
   return (
-    <div className="flex items-center gap-2 text-[13px]">
+    <div className="flex items-center gap-2 text-ui">
       <span className="font-medium tabular-nums">
         {t("sets.completion", {
           held: format.number(held),
@@ -427,7 +427,7 @@ function SetEntryRow({
       >
         <EntryTile entry={entry} />
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-[13px] font-medium">
+          <span className="truncate text-ui font-medium">
             {entry.title}
             {suffix && (
               <span className="font-normal text-muted-foreground">

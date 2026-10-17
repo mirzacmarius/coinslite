@@ -53,7 +53,7 @@ export function CatalogSourceCredit({
             <Info strokeWidth={1.75} />
           </IconButton>
         </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-3 text-xs leading-relaxed">
+        <PopoverContent className="w-[17.5rem] p-3 text-xs leading-relaxed">
           {catalogFormat.credit(provenance)}
         </PopoverContent>
       </Popover>

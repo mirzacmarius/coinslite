@@ -33,7 +33,7 @@ import {
 import { useId, useRef, useState } from "react";
 
 const messageInput =
-  "w-full resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
+  "w-full resize-none bg-transparent px-0 text-base placeholder:text-muted-foreground focus:outline-none md:text-sm";
 
 /**
  * Account's "Send feedback" button and the compact dialog it opens. The draft
@@ -119,7 +119,7 @@ export function SendFeedback() {
           }}
         >
           <DialogHeader>
-            <div className="flex items-center gap-1 text-[13px] text-muted-foreground">
+            <div className="flex items-center gap-1 text-ui text-muted-foreground">
               <UserRound
                 className="size-4"
                 strokeWidth={1.75}

@@ -22,7 +22,7 @@ function ItemFigures({ item }: { item: LatestItem }) {
   const { marketValue, quantity } = item;
   if (marketValue === undefined && quantity === 1) return null;
   return (
-    <span className="shrink-0 whitespace-nowrap text-right text-[13px] tabular-nums">
+    <span className="shrink-0 whitespace-nowrap text-right text-ui tabular-nums">
       {marketValue !== undefined && (
         <>
           <span className="sr-only">{t("items.marketValue")} </span>
@@ -53,7 +53,7 @@ export function LatestItems({ items }: { items: LatestItem[] | undefined }) {
       className="overflow-hidden rounded-xl bg-card"
     >
       <div className="flex h-10 items-center justify-between gap-3 border-b pl-4 pr-2">
-        <h2 id={titleId} className="text-[13px] font-medium">
+        <h2 id={titleId} className="text-ui font-medium">
           {t("overview.latestItems")}
         </h2>
         <Button asChild variant="ghost" size="xs">
@@ -91,7 +91,7 @@ export function LatestItems({ items }: { items: LatestItem[] | undefined }) {
                     className="size-10"
                   />
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-[13px] font-medium">
+                    <span className="truncate text-ui font-medium">
                       {item.title}
                     </span>
                     {facts.length > 0 && (

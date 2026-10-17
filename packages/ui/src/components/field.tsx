@@ -95,7 +95,7 @@ export function CheckboxField({
           aria-describedby={errorId}
           className="mt-0.5"
         />
-        <label htmlFor={id} className="text-[13px] leading-5">
+        <label htmlFor={id} className="text-ui leading-5">
           {label}
         </label>
       </div>

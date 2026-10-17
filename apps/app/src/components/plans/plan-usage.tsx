@@ -135,7 +135,7 @@ export function OverviewPlanUsage() {
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">
           <h2 className="text-sm font-medium">{t("plans.freePlan")}</h2>
-          <p className="text-[13px] text-muted-foreground">
+          <p className="text-ui text-muted-foreground">
             {used > limit
               ? t("plans.overLimit", { limit })
               : t("plans.usedOf", { used, limit })}
@@ -146,7 +146,7 @@ export function OverviewPlanUsage() {
             <Link href={upgradeHref}>{t("plans.upgradeToPremium")}</Link>
           </Button>
         ) : (
-          <UpgradeLink className="text-[13px]">
+          <UpgradeLink className="text-ui">
             {t("plans.upgradeToPremium")}
           </UpgradeLink>
         )}

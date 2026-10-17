@@ -181,7 +181,7 @@ export function SellItemDialog({
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>
       <DialogContent
-        className="sm:max-w-[480px]"
+        className="sm:max-w-[30rem]"
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
@@ -199,7 +199,7 @@ export function SellItemDialog({
           className="flex min-h-0 flex-col"
         >
           <DialogHeader>
-            <div className="flex min-w-0 items-center gap-1.5 text-[13px]">
+            <div className="flex min-w-0 items-center gap-1.5 text-ui">
               <HandCoins
                 className="size-4 shrink-0 text-muted-foreground"
                 strokeWidth={1.75}

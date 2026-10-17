@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col bg-background pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
       <div className="flex h-12 items-center px-4 pt-[env(safe-area-inset-top)]">
-        <Logo className="text-[13px]" />
+        <Logo className="text-ui" />
       </div>
       <main
         id="main"
@@ -22,14 +22,14 @@ export default function NotFound() {
             <SearchX className="size-4" strokeWidth={1.75} aria-hidden="true" />
           </div>
           <div className="flex flex-col gap-1">
-            <h1 className="text-[15px] font-medium">{t("notFound.title")}</h1>
-            <p className="text-[13px] text-muted-foreground">
+            <h1 className="text-ui-lg font-medium">{t("notFound.title")}</h1>
+            <p className="text-ui text-muted-foreground">
               {t("notFound.description")}
             </p>
           </div>
           <Link
             href="/"
-            className="text-[13px] font-medium text-link hover:underline"
+            className="text-ui font-medium text-link hover:underline"
           >
             {t("notFound.home")}
           </Link>

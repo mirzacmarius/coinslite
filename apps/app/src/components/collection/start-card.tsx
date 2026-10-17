@@ -23,7 +23,7 @@ function WayText({
 }) {
   return (
     <span className="flex min-w-0 flex-1 flex-col">
-      <span className="text-[13px] font-medium">{title}</span>
+      <span className="text-ui font-medium">{title}</span>
       <span className="text-xs text-muted-foreground">{description}</span>
     </span>
   );
@@ -66,7 +66,7 @@ export function StartCard({
         <h2 id={titleId} className="text-sm font-medium">
           {title}
         </h2>
-        <p className="text-[13px] text-muted-foreground">{description}</p>
+        <p className="text-ui text-muted-foreground">{description}</p>
       </div>
       <ul className="divide-y">
         <li>

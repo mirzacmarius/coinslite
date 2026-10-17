@@ -73,7 +73,7 @@ export function MoreDetails({
     return <div className="flex flex-col gap-5 pb-1 pt-3">{groups}</div>;
   return (
     <Collapsible open={open} onOpenChange={onOpenChange}>
-      <CollapsibleTrigger className="group flex h-7 items-center gap-1 rounded-md text-[13px] text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+      <CollapsibleTrigger className="group flex h-7 items-center gap-1 rounded-md text-ui text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
         <ChevronRight
           className="size-3.5 transition-transform duration-150 group-data-[state=open]:rotate-90"
           aria-hidden="true"

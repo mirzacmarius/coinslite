@@ -234,7 +234,7 @@ function PropertyRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid h-7 grid-cols-[96px_1fr] items-center gap-2">
+    <div className="grid h-7 grid-cols-[6rem_1fr] items-center gap-2">
       <span className="truncate text-xs text-muted-foreground">{label}</span>
       <div className="min-w-0 justify-self-start">{children}</div>
     </div>
@@ -262,13 +262,13 @@ function NewItemDialog() {
         <Button variant="outline">New Item dialog</Button>
       </DialogTrigger>
       <DialogContent
-        className="sm:max-w-[600px]"
+        className="sm:max-w-[37.5rem]"
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") add();
         }}
       >
         <DialogHeader>
-          <div className="flex items-center gap-1 text-[13px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-ui text-muted-foreground">
             <Coins className="size-4" strokeWidth={1.75} aria-hidden="true" />
             <span>Collection</span>
             <ChevronRight className="size-3.5" aria-hidden="true" />
@@ -325,7 +325,7 @@ function NewItemDialog() {
           </div>
         </div>
         <DialogFooter>
-          <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
+          <label className="flex items-center gap-2 text-ui text-muted-foreground">
             <Switch /> Create more
           </label>
           <div className="flex items-center gap-2">
@@ -353,7 +353,7 @@ function DeleteAlbumDialog() {
       <DialogTrigger asChild>
         <Button variant="outline">Confirm dialog</Button>
       </DialogTrigger>
-      <DialogContent className="gap-3 p-4 sm:max-w-[400px]">
+      <DialogContent className="gap-3 p-4 sm:max-w-[25rem]">
         <DialogTitle>Delete “Morgans”?</DialogTitle>
         <DialogDescription>
           The 4 Items in it stay in your Collection, without an Album.
@@ -520,7 +520,7 @@ export function DesignGallery() {
               {tokens.map((token) => (
                 <div
                   key={token}
-                  className="flex h-9 items-center gap-2 rounded-md border bg-card px-2 text-[13px]"
+                  className="flex h-9 items-center gap-2 rounded-md border bg-card px-2 text-ui"
                 >
                   <span
                     className="size-5 rounded border"
@@ -582,7 +582,7 @@ export function DesignGallery() {
                 noResults="No matches"
               />
             </div>
-            <Card className="flex w-full max-w-[280px] flex-col gap-1 p-4">
+            <Card className="flex w-full max-w-[17.5rem] flex-col gap-1 p-4">
               <h3 className="mb-1 text-xs font-medium text-muted-foreground">
                 Properties
               </h3>
@@ -624,7 +624,7 @@ export function DesignGallery() {
                 />
               </PropertyRow>
               <PropertyRow label="Metal value">
-                <span className="text-[13px]">{money(249559, "EUR")}</span>
+                <span className="text-ui">{money(249559, "EUR")}</span>
               </PropertyRow>
             </Card>
           </Section>
@@ -839,8 +839,8 @@ export function DesignGallery() {
           </Section>
 
           <Section title="Unseen marker">
-            <div className="flex w-[220px] flex-col rounded-lg border bg-popover p-1">
-              <div className="flex h-7 items-center gap-2 rounded-md px-2 text-[13px]">
+            <div className="flex w-[13.75rem] flex-col rounded-lg border bg-popover p-1">
+              <div className="flex h-7 items-center gap-2 rounded-md px-2 text-ui">
                 <Sparkles
                   className="size-4 text-muted-foreground"
                   strokeWidth={1.75}
@@ -891,7 +891,7 @@ function FiltersSample() {
           <Input
             aria-label="Search the Collection"
             placeholder="Search title, denomination, country"
-            className="h-7 w-[220px] text-[13px]"
+            className="h-7 w-[13.75rem] text-ui"
           />
         </div>
         <Button variant="ghost" size="xs">

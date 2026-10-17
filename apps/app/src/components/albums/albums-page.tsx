@@ -67,7 +67,7 @@ export function AlbumsPage() {
                   <AlbumDot colour={album.colour} className="size-2.5" />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] font-medium">
+                  <span className="truncate text-ui font-medium">
                     {album.name}
                   </span>
                   {album.description && (

@@ -78,7 +78,7 @@ export function AlbumDetail() {
             action={
               <Link
                 href="/albums"
-                className="text-[13px] font-medium text-link hover:underline"
+                className="text-ui font-medium text-link hover:underline"
               >
                 {t("albums.backToAlbums")}
               </Link>

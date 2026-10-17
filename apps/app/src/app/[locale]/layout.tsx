@@ -68,7 +68,10 @@ export default async function RootLayout({
   const locale = isLocale(requested) ? requested : defaultLocale;
   const dictionary = (await loaders[locale]()).default;
   return (
-    <html lang={locale} suppressHydrationWarning>
+    // A larger root size (18px by default) scales the app's text and controls
+    // together, for collectors who read small type with difficulty. As a
+    // percentage it still follows the browser's own text-size setting.
+    <html lang={locale} className="text-[112.5%]" suppressHydrationWarning>
       <body
         className={cn(
           `${inter.variable} ${GeistMono.variable}`,

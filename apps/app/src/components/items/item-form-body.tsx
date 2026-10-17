@@ -15,7 +15,7 @@ import type { ItemFormState } from "./use-item-form";
 const titleInput =
   "w-full bg-transparent px-0 text-base font-medium placeholder:text-muted-foreground focus:outline-none";
 const notesInput =
-  "w-full shrink-0 resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
+  "w-full shrink-0 resize-none bg-transparent px-0 text-base placeholder:text-muted-foreground focus:outline-none md:text-sm";
 
 /**
  * The Item form's fields, in the New Item dialog (item-form-dialog.tsx) and
@@ -133,7 +133,7 @@ function DraftNotice({ onStartOver }: { onStartOver: () => void }) {
         strokeWidth={1.75}
         aria-hidden="true"
       />
-      <p className="min-w-0 flex-1 text-[13px] text-muted-foreground">
+      <p className="min-w-0 flex-1 text-ui text-muted-foreground">
         {t("items.draftKept")}
       </p>
       <Button type="button" variant="ghost" size="xs" onClick={onStartOver}>

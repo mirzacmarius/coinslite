@@ -142,7 +142,7 @@ export function ExportMenu({
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[240px]">
+      <DropdownMenuContent align="end" className="w-[15rem]">
         {plan === "free" ? (
           <>
             <p className="px-2 py-1.5 text-xs text-muted-foreground">

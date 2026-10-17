@@ -53,7 +53,7 @@ export function HomeCurrencySetting({
       <p
         role="status"
         aria-describedby={hintId}
-        className="text-[13px] text-muted-foreground"
+        className="text-ui text-muted-foreground"
       >
         {t("homeCurrency.converting", { currency: change.to })}
       </p>
@@ -61,7 +61,7 @@ export function HomeCurrencySetting({
   if (change?.state === "stalled")
     return (
       <div role="status" className="flex flex-col items-start gap-1.5">
-        <p className="text-[13px] text-muted-foreground">
+        <p className="text-ui text-muted-foreground">
           {t("homeCurrency.stalled", { currency: change.to })}
         </p>
         <Button
@@ -212,7 +212,7 @@ function ConversionFacts({ preview }: { preview: Preview }) {
   const { rate } = preview;
   return (
     <div className="flex flex-col gap-2">
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md border px-3 py-2 text-[13px]">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md border px-3 py-2 text-ui">
         <dt className="text-muted-foreground">{t("homeCurrency.amounts")}</dt>
         <dd className="text-right">
           {preview.countedAll

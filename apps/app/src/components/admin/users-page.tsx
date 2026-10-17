@@ -287,7 +287,7 @@ function UsersTable({
                 router.push(href);
               }}
             >
-              <TableCell className="max-w-[280px] pl-4">
+              <TableCell className="max-w-[17.5rem] pl-4">
                 <span className="flex min-w-0 items-center gap-2">
                   <Link
                     href={href}
@@ -306,7 +306,7 @@ function UsersTable({
                   )}
                 </span>
               </TableCell>
-              <TableCell className="max-w-[280px] truncate text-muted-foreground">
+              <TableCell className="max-w-[17.5rem] truncate text-muted-foreground">
                 {user.email ?? "–"}
               </TableCell>
               <TableCell>{date(user.createdAt)}</TableCell>

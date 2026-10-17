@@ -81,7 +81,7 @@ export function CatalogPickerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         aria-describedby={undefined}
-        className="sm:top-[12%] sm:max-w-[640px] sm:translate-y-0"
+        className="sm:top-[12%] sm:max-w-[40rem] sm:translate-y-0"
         onCloseAutoFocus={onCloseAutoFocus}
       >
         <DialogTitle className="sr-only">

@@ -51,7 +51,7 @@ export function DisplayMenu({
           <span className="sr-only sm:hidden">{t("collection.display")}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="flex w-[280px] flex-col p-1">
+      <PopoverContent align="end" className="flex w-[17.5rem] flex-col p-1">
         <Row label={t("collection.layout")}>
           <SegmentedControl<CollectionLayout>
             label={t("collection.layout")}
@@ -71,7 +71,7 @@ export function DisplayMenu({
           >
             <SelectTrigger
               aria-labelledby={sortLabel}
-              className="h-7 w-[160px] text-[13px]"
+              className="h-7 w-[10rem] text-ui"
             >
               <SelectValue />
             </SelectTrigger>
@@ -113,7 +113,7 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-9 items-center justify-between gap-2 px-2 text-[13px]">
+    <div className="flex min-h-9 items-center justify-between gap-2 px-2 text-ui">
       <span id={labelId} className="text-muted-foreground">
         {label}
       </span>

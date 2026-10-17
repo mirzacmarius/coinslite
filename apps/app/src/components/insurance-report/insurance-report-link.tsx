@@ -11,7 +11,7 @@ export function InsuranceReportLink({ premium }: { premium: boolean }) {
   return (
     <Link
       href="/settings/insurance-report"
-      className="flex h-9 items-center gap-2 rounded-md px-2 text-[13px] font-medium hover:bg-muted"
+      className="flex h-9 items-center gap-2 rounded-md px-2 text-ui font-medium hover:bg-muted"
     >
       <ShieldCheck
         className="size-4 text-muted-foreground"

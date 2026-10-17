@@ -71,7 +71,7 @@ export function DeleteAccountDialog({
         await signOut();
       }}
     >
-      <dl className="divide-y overflow-hidden rounded-md border text-[13px]">
+      <dl className="divide-y overflow-hidden rounded-md border text-ui">
         {rows.map(({ label, value }) => (
           <div
             key={label}

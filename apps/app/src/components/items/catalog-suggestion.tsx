@@ -47,7 +47,7 @@ export function CatalogSuggestion({ itemId }: { itemId: Id<"items"> }) {
   return (
     <section
       aria-label={t("catalogSuggestion.label")}
-      className="flex max-w-xl flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-card px-3 py-2 text-[13px]"
+      className="flex max-w-xl flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-card px-3 py-2 text-ui"
     >
       <BookOpen
         className="size-4 shrink-0 text-muted-foreground"

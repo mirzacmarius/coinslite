@@ -237,7 +237,7 @@ function FigureSection({
       className="overflow-hidden rounded-xl bg-card"
     >
       <div className="flex flex-col gap-0.5 border-b px-4 py-2.5">
-        <h2 id={id} className="text-[13px] font-medium">
+        <h2 id={id} className="text-ui font-medium">
           {title}
         </h2>
         <p className="text-xs text-muted-foreground">{description}</p>

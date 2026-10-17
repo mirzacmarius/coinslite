@@ -37,7 +37,7 @@ export function ScanNotice({ scan }: { scan: ScanPreset }) {
         </div>
       )}
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className="flex items-center gap-1.5 text-[13px] font-medium">
+        <p className="flex items-center gap-1.5 text-ui font-medium">
           <ScanLine className="size-4" strokeWidth={1.75} aria-hidden="true" />
           {t(scan.suggestion ? "scanner.suggested" : "scanner.photosFromScan")}
         </p>

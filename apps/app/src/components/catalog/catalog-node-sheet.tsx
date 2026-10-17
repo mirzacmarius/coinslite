@@ -124,10 +124,10 @@ type KnownProblem = (typeof knownProblemCodes)[number];
 
 /** On wider screens the dialog sits at the right edge, full height, like a sheet. */
 const sheetClass =
-  "sm:inset-y-0 sm:bottom-0 sm:left-auto sm:right-0 sm:top-0 sm:h-dvh sm:max-h-dvh sm:max-w-[480px] sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:border-y-0 sm:border-r-0";
+  "sm:inset-y-0 sm:bottom-0 sm:left-auto sm:right-0 sm:top-0 sm:h-dvh sm:max-h-dvh sm:max-w-[30rem] sm:translate-x-0 sm:translate-y-0 sm:rounded-none sm:border-y-0 sm:border-r-0";
 
 const textareaClass =
-  "flex min-h-20 w-full rounded-md border border-input bg-card px-2.5 py-1.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 aria-[invalid=true]:border-destructive";
+  "flex min-h-20 w-full rounded-md border border-input bg-card px-2.5 py-1.5 text-base placeholder:text-muted-foreground md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 aria-[invalid=true]:border-destructive";
 
 /**
  * The admins' sheet for one Catalog node: add a country, Theme, grouping or
@@ -645,7 +645,7 @@ function NodeForm({
       className="flex min-h-0 flex-1 flex-col"
     >
       <DialogHeader className="border-b">
-        <div className="flex min-w-0 items-center gap-1 text-[13px] text-muted-foreground">
+        <div className="flex min-w-0 items-center gap-1 text-ui text-muted-foreground">
           <BookOpen
             className="size-4 shrink-0"
             strokeWidth={1.75}

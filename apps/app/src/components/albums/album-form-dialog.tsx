@@ -35,7 +35,7 @@ import { useAlbumError } from "./use-albums";
 const nameInput =
   "w-full bg-transparent px-0 text-base font-medium placeholder:text-muted-foreground focus:outline-none";
 const descriptionInput =
-  "w-full resize-none bg-transparent px-0 text-sm placeholder:text-muted-foreground focus:outline-none";
+  "w-full resize-none bg-transparent px-0 text-base placeholder:text-muted-foreground focus:outline-none md:text-sm";
 
 type AlbumFormValues = {
   name: string;
@@ -138,7 +138,7 @@ export function AlbumFormDialog({
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>
       <DialogContent
-        className="sm:max-w-[560px]"
+        className="sm:max-w-[35rem]"
         onOpenAutoFocus={(event) => {
           event.preventDefault();
           nameRef.current?.focus();
@@ -160,7 +160,7 @@ export function AlbumFormDialog({
           className="flex min-h-0 flex-col"
         >
           <DialogHeader>
-            <div className="flex items-center gap-1 text-[13px] text-muted-foreground">
+            <div className="flex items-center gap-1 text-ui text-muted-foreground">
               <FolderOpen
                 className="size-4"
                 strokeWidth={1.75}

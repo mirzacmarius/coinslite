@@ -38,7 +38,7 @@ const DialogContent = React.forwardRef<
       className={cn(
         // Under sm the dialog sits at the bottom of the screen like a sheet.
         "fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] w-full flex-col overflow-y-auto rounded-t-lg border bg-popover p-0 text-popover-foreground shadow-lg outline-none duration-150 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-[0.98] data-[state=open]:zoom-in-[0.98]",
-        "sm:inset-x-auto sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-[560px] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg",
+        "sm:inset-x-auto sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-[35rem] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg",
         className,
       )}
       {...props}

@@ -81,7 +81,7 @@ export function ValueDistributionChart({
                 key={entry.kind}
                 className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-x-3"
               >
-                <span className="truncate text-[13px]">{labelOf(entry)}</span>
+                <span className="truncate text-ui">{labelOf(entry)}</span>
                 <div className="flex flex-col gap-0.5">
                   {barsOf(entry).map(([series, amount]) => (
                     <div key={series} className="flex h-4 items-center gap-2">

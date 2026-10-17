@@ -57,7 +57,7 @@ export function ItemFormDialog(props: Omit<ItemFormProps, "item">) {
       onDiscard={itemForm.discardDraft}
     >
       <DialogContent
-        className="sm:max-w-[600px]"
+        className="sm:max-w-[37.5rem]"
         onOpenAutoFocus={(event) => {
           event.preventDefault();
           titleRef.current?.focus();
@@ -79,7 +79,7 @@ export function ItemFormDialog(props: Omit<ItemFormProps, "item">) {
           className="flex min-h-0 flex-col"
         >
           <DialogHeader>
-            <div className="flex items-center gap-1 text-[13px] text-muted-foreground">
+            <div className="flex items-center gap-1 text-ui text-muted-foreground">
               <Library
                 className="size-4"
                 strokeWidth={1.75}
@@ -116,7 +116,7 @@ export function ItemFormDialog(props: Omit<ItemFormProps, "item">) {
             {copyOf ? (
               <span />
             ) : (
-              <label className="flex items-center gap-2 text-[13px] text-muted-foreground">
+              <label className="flex items-center gap-2 text-ui text-muted-foreground">
                 <Switch
                   checked={itemForm.createMore}
                   onCheckedChange={itemForm.setCreateMore}

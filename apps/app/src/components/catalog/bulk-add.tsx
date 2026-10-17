@@ -225,7 +225,7 @@ export function DuplicatesSwitch({
   const t = useI18n();
   const id = useId();
   return (
-    <span className="flex h-7 items-center gap-2 text-[13px] text-muted-foreground">
+    <span className="flex h-7 items-center gap-2 text-ui text-muted-foreground">
       <Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
       <label htmlFor={id}>{t("sets.allowDuplicates")}</label>
     </span>

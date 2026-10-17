@@ -278,9 +278,9 @@ export function ImportDialog({
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="sm:max-w-[560px]">
+      <DialogContent className="sm:max-w-[35rem]">
         <DialogHeader>
-          <div className="flex min-w-0 items-center gap-1.5 text-[13px]">
+          <div className="flex min-w-0 items-center gap-1.5 text-ui">
             <FileUp
               className="size-4 shrink-0 text-muted-foreground"
               strokeWidth={1.75}
@@ -322,7 +322,7 @@ export function ImportDialog({
           }}
         />
 
-        <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-3 text-[13px]">
+        <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto px-4 py-3 text-ui">
           {state.stage === "pick" && (
             <>
               <Button

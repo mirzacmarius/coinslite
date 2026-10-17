@@ -234,7 +234,7 @@ function TreeLevel({
     }
     return (
       <p
-        className="flex h-9 items-center pr-4 text-[13px] text-muted-foreground"
+        className="flex h-9 items-center pr-4 text-ui text-muted-foreground"
         style={indent(level + 1)}
       >
         {t("catalogEditor.nothingBelow")}
@@ -318,7 +318,7 @@ function TreeRow({
   return (
     <li>
       <div
-        className="group flex h-9 items-center gap-1.5 pr-2 text-[13px] hover:bg-muted/60"
+        className="group flex h-9 items-center gap-1.5 pr-2 text-ui hover:bg-muted/60"
         style={indent(level)}
       >
         {isEntry ? (
@@ -395,7 +395,7 @@ function TreeRow({
             </TooltipTrigger>
             <TooltipContent>{t("catalogEditor.moreActions")}</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end" className="w-[200px]">
+          <DropdownMenuContent align="end" className="w-[12.5rem]">
             <DropdownMenuItem onSelect={() => actions.edit(node.key)}>
               <Pencil strokeWidth={1.75} />
               {t("catalogEditor.edit")}

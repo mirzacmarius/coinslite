@@ -114,7 +114,7 @@ export function ItemPills({
         )}
         <form.Field name="quantity" validators={{ onChange: rules.quantity }}>
           {(field) => (
-            <label className="flex h-7 items-center gap-1.5 rounded-md px-2 text-[13px] text-muted-foreground">
+            <label className="flex h-7 items-center gap-1.5 rounded-md px-2 text-ui text-muted-foreground">
               {t("items.quantity")}
               <Input
                 type="number"
@@ -124,7 +124,7 @@ export function ItemPills({
                 aria-invalid={
                   errorOf(field.state.meta.errors) ? true : undefined
                 }
-                className="h-7 w-16 px-2 text-right text-[13px]"
+                className="h-7 w-16 px-2 text-right text-ui"
                 value={field.state.value}
                 onChange={(event) => field.handleChange(event.target.value)}
                 onBlur={field.handleBlur}
