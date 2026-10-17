@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@coinslite/ui/dropdown-menu";
+import { ItemTypeIcon } from "@coinslite/ui/item-type-icon";
 import { PhotoViewer } from "@coinslite/ui/photo-viewer";
 import { toast } from "@coinslite/ui/toaster";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
@@ -33,6 +34,7 @@ import {
   ImagePlus,
   ImageUp,
   Loader2,
+  Maximize2,
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
@@ -46,6 +48,19 @@ const sideNames = {
   coin: { front: "obverse", back: "reverse" },
   banknote: { front: "front", back: "back" },
   stamp: { front: "stamp", back: "back" },
+} as const;
+
+/**
+ * How each Item type's two sides sit: a coin's round faces side by side as
+ * squares, a banknote's wide sides one above the other, and a stamp's upright
+ * ones side by side. A banknote's side without a photo is a low strip rather
+ * than a wide empty frame. The more photos below always sit four to a row,
+ * on the page's gutter, so two of them span a side exactly.
+ */
+const stages = {
+  coin: { sides: "grid-cols-2", tile: "aspect-square", empty: "aspect-square" },
+  banknote: { sides: "grid-cols-1", tile: "aspect-[2/1]", empty: "h-28" },
+  stamp: { sides: "grid-cols-2", tile: "aspect-[4/5]", empty: "aspect-[4/5]" },
 } as const;
 
 /** A photo to remove: one side, or one of the more photos by its id. */
@@ -101,9 +116,10 @@ function usePhotoUpload(itemId: Id<"items">) {
 }
 
 /**
- * An Item's photos: its two sides, then up to `photoLimits.more` more. Each
- * can be added, replaced (sides) or removed, and viewed full screen. An Item
- * without any shows one compact row to add them instead.
+ * An Item's photos on the page's grid: its two sides large, shaped for the
+ * Item type, then up to `photoLimits.more` more as small tiles. Each can be
+ * added, replaced (sides) or removed, and viewed full screen. An Item without
+ * any shows one place to add them instead.
  */
 export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   const t = useI18n();
@@ -123,6 +139,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
     target: "front",
   });
   const names = sideNames[item.type];
+  const stage = stages[item.type];
   const more = photos?.more ?? [];
   // Until the photos load, the Item's sides tell whether it has any.
   const hasPhotos =
@@ -202,17 +219,18 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
     <section
       ref={section}
       aria-label={t("photos.title")}
-      className={cn("flex flex-col gap-4", hasPhotos ? "max-w-sm" : "max-w-xl")}
+      className="flex min-w-0 flex-col"
     >
       {hasPhotos ? (
-        <>
-          <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-4">
+          <div className={cn("grid gap-4", stage.sides)}>
             {photoSides.map((side) => (
               <PhotoSlot
                 key={side}
                 label={t(`photos.sides.${names[side]}`)}
                 url={urlOf(side)}
                 busy={busy[side]}
+                tile={urlOf(side) === null ? stage.empty : stage.tile}
                 onFile={(file) => void add(side, file)}
                 onView={() => view(side)}
                 onRemove={() => setRemoval({ open: true, target: side })}
@@ -220,11 +238,8 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
             ))}
           </div>
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-0.5">
-              <h2
-                id={moreId}
-                className="text-xs font-medium text-muted-foreground"
-              >
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+              <h2 id={moreId} className="text-ui font-medium">
                 {t("photos.more.title")}
               </h2>
               {photos !== undefined && more.length === 0 && (
@@ -234,7 +249,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
               )}
             </div>
             {photos !== undefined && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-4">
                 {more.map((photo, at) => (
                   <PhotoSlot
                     key={photo.id}
@@ -261,34 +276,39 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
               </div>
             )}
           </div>
-        </>
+        </div>
       ) : (
         <fieldset
           aria-labelledby={addId}
-          className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2"
+          className="flex min-h-56 min-w-0 flex-col items-center justify-center gap-4 rounded-xl border border-dashed bg-card/50 px-4 py-8 text-center"
         >
-          <span
-            id={addId}
-            className="mr-1 text-ui font-medium text-muted-foreground"
-          >
-            {t("photos.addPhotos")}
-          </span>
-          {photoSides.map((side) => (
-            <AddPhotoButton
-              key={side}
-              label={t(`photos.sides.${names[side]}`)}
-              busy={busy[side]}
-              onFile={(file) => addFromRow(side, file)}
-            />
-          ))}
-          <AddPhotoButton
-            label={t("photos.more.title")}
-            busy={busy.more}
-            onFile={(file) => addFromRow(undefined, file)}
+          <ItemTypeIcon
+            type={item.type}
+            className="size-12 rounded-xl bg-card [&_svg]:size-6"
           />
-          <span className="ml-auto hidden text-xs text-muted-foreground sm:inline">
-            {t("photos.formats")}
-          </span>
+          <div className="flex flex-col gap-1">
+            <span id={addId} className="text-ui-lg font-medium">
+              {t("photos.addPhotos")}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {t("photos.formats")}
+            </span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {photoSides.map((side) => (
+              <AddPhotoButton
+                key={side}
+                label={t(`photos.sides.${names[side]}`)}
+                busy={busy[side]}
+                onFile={(file) => addFromRow(side, file)}
+              />
+            ))}
+            <AddPhotoButton
+              label={t("photos.more.title")}
+              busy={busy.more}
+              onFile={(file) => addFromRow(undefined, file)}
+            />
+          </div>
         </fieldset>
       )}
       <PhotoViewer
@@ -415,8 +435,10 @@ function AddPhotoButton({
  * tile to add one. A file can also be dropped on the tile. `url` is undefined
  * while loading. Without `onFile` the photo can only be viewed or removed;
  * without `onView` and `onRemove` the slot only adds. `small` tiles (the more
- * photos) show the add tile without its hint, and `labelId` names an element
- * that already labels them.
+ * photos) are bare squares: their label is for screen readers, their menu sits
+ * on the tile (shown on hover or focus where there's a pointer), and the add
+ * tile has no hint; `labelId` names an element that already labels them.
+ * `tile` shapes a side's tile (stages).
  */
 function PhotoSlot({
   label,
@@ -424,6 +446,7 @@ function PhotoSlot({
   url,
   busy,
   small = false,
+  tile = "aspect-square",
   onFile,
   onView,
   onRemove,
@@ -433,6 +456,7 @@ function PhotoSlot({
   url: string | null | undefined;
   busy: boolean;
   small?: boolean;
+  tile?: string;
   onFile?: (file: File) => void;
   onView?: () => void;
   onRemove?: () => void;
@@ -443,6 +467,48 @@ function PhotoSlot({
   const labelledBy = labelId ?? `${id}-label`;
   const tileFocus =
     "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
+  const menu = url && (
+    // Not modal, so the confirmation it opens gets focus cleanly.
+    <DropdownMenu modal={false}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              disabled={busy}
+              aria-labelledby={`${labelledBy} ${id}-actions`}
+              className={cn(
+                small &&
+                  "absolute right-1 top-1 bg-popover/90 text-popover-foreground shadow-sm hover:bg-popover aria-expanded:opacity-100 group-focus-within/tile:opacity-100 group-hover/tile:opacity-100 [@media(hover:hover)]:opacity-0",
+              )}
+            >
+              <MoreHorizontal strokeWidth={1.75} aria-hidden="true" />
+              <span id={`${id}-actions`} className="sr-only">
+                {t("photos.actions")}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent>{t("photos.actions")}</TooltipContent>
+      </Tooltip>
+      <DropdownMenuContent align="end">
+        {onFile && (
+          <DropdownMenuItem onSelect={pick}>
+            <ImageUp strokeWidth={1.75} aria-hidden="true" />
+            {t("photos.replace")}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem
+          onSelect={onRemove}
+          className="text-destructive focus:text-destructive [&_svg]:text-destructive"
+        >
+          <Trash2 strokeWidth={1.75} aria-hidden="true" />
+          {t("photos.remove")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div className="flex min-w-0 flex-col gap-1">
@@ -450,8 +516,9 @@ function PhotoSlot({
         aria-busy={busy}
         {...dropTarget}
         className={cn(
-          "relative aspect-square overflow-hidden rounded-lg border bg-muted",
-          url === null && "border-dashed",
+          "group/tile relative overflow-hidden",
+          small ? "aspect-square rounded-lg" : cn(tile, "rounded-xl"),
+          url === null ? "border border-dashed" : "bg-card",
           url === undefined && "animate-pulse",
           dropping && "ring-2 ring-ring",
         )}
@@ -461,9 +528,27 @@ function PhotoSlot({
             type="button"
             onClick={onView}
             aria-labelledby={`${labelledBy} ${id}-view`}
-            className={cn("size-full", tileFocus)}
+            className={cn("group/photo size-full cursor-zoom-in", tileFocus)}
           >
-            <img src={url} alt="" className="size-full object-contain" />
+            <img
+              src={url}
+              alt=""
+              decoding="async"
+              loading={small ? "lazy" : undefined}
+              className={cn(
+                "size-full object-contain",
+                small ? "p-1" : "p-2 sm:p-3",
+              )}
+            />
+            {!small && (
+              <span className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-md bg-popover/90 text-popover-foreground opacity-0 shadow-sm transition-opacity duration-100 group-hover/photo:opacity-100 group-focus-visible/photo:opacity-100 motion-reduce:transition-none">
+                <Maximize2
+                  className="size-3.5"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+              </span>
+            )}
             <span id={`${id}-view`} className="sr-only">
               {t("photos.view")}
             </span>
@@ -477,7 +562,7 @@ function PhotoSlot({
               disabled={busy}
               aria-labelledby={`${labelledBy} ${id}-add`}
               className={cn(
-                "flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-muted-foreground transition-colors duration-100 hover:bg-muted/60 hover:text-foreground",
+                "flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-muted-foreground transition-colors duration-100 hover:bg-muted hover:text-foreground",
                 tileFocus,
               )}
             >
@@ -506,53 +591,24 @@ function PhotoSlot({
             />
           </div>
         )}
+        {small && url && (
+          <>
+            <span id={`${id}-label`} className="sr-only">
+              {label}
+            </span>
+            {menu}
+          </>
+        )}
       </div>
-      {!(small && url === null) && (
+      {!small && (
         <div className="flex h-7 items-center justify-between gap-2">
           <span
             id={`${id}-label`}
-            className="truncate text-xs text-muted-foreground"
+            className="truncate text-ui text-muted-foreground"
           >
             {label}
           </span>
-          {url && (
-            // Not modal, so the confirmation it opens gets focus cleanly.
-            <DropdownMenu modal={false}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      disabled={busy}
-                      aria-labelledby={`${labelledBy} ${id}-actions`}
-                    >
-                      <MoreHorizontal strokeWidth={1.75} aria-hidden="true" />
-                      <span id={`${id}-actions`} className="sr-only">
-                        {t("photos.actions")}
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t("photos.actions")}</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="end">
-                {onFile && (
-                  <DropdownMenuItem onSelect={pick}>
-                    <ImageUp strokeWidth={1.75} aria-hidden="true" />
-                    {t("photos.replace")}
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  onSelect={onRemove}
-                  className="text-destructive focus:text-destructive [&_svg]:text-destructive"
-                >
-                  <Trash2 strokeWidth={1.75} aria-hidden="true" />
-                  {t("photos.remove")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {menu}
         </div>
       )}
       {fileInput}

@@ -33,11 +33,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
 import {
+  Award,
   Copy,
   HandCoins,
   ListChecks,
   Pencil,
   SearchX,
+  ShieldCheck,
   Trash2,
   Undo2,
 } from "lucide-react";
@@ -50,15 +52,23 @@ import { CatalogSuggestion } from "./catalog-suggestion";
 import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
-import { ItemHeader, ItemHeaderSkeleton, type ItemMoney } from "./item-header";
+import {
+  ItemHeader,
+  ItemHeaderSkeleton,
+  type ItemMoney,
+  ItemTag,
+} from "./item-header";
 import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
 import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
 
 /**
- * One Item, every recorded fact: its title, value and Gain/loss first, then
- * the photos and descriptive facts beside the properties panel.
+ * One Item, every recorded fact: its photos first, beside its title, Grade,
+ * Album and figures (value, Gain/loss, what was paid, Metal value) and notes;
+ * then the rest in titled cards that flow down two columns where there's room.
+ * Everything sits on those two columns and their one gutter: the photos and
+ * the title take one each on a wide screen, and the sides split a column.
  */
 export function ItemDetail() {
   const t = useI18n();
@@ -87,6 +97,7 @@ export function ItemDetail() {
   const itemLimitMessage = useItemLimitMessage();
   // Once deleted, the Item reads as missing while the page goes back.
   const [leaving, setLeaving] = useState(false);
+  const notesId = useId();
   useShortcut("e", () => router.push(editHref), Boolean(item));
   const parent = (
     <Link
@@ -133,7 +144,7 @@ export function ItemDetail() {
           rel="noreferrer"
           className="text-link hover:underline"
         >
-          N# {item.numistaNumber}
+          <span translate="no">N# {item.numistaNumber}</span>
         </a>
       ),
     ],
@@ -180,16 +191,25 @@ export function ItemDetail() {
     ) : (
       text
     );
-  const certificate =
-    item.certificateNumber &&
-    verifyLink([grader, item.certificateNumber].filter(Boolean).join(" "));
-  const graded = item.grade && item.gradingScale;
-  const references: Array<[string, React.ReactNode]> = [
+  // Grading services' and catalogues' own codes, kept as they're written.
+  const code = (text: string | undefined) =>
+    text && <span translate="no">{text}</span>;
+  const certification: Array<[string, React.ReactNode]> = [
     [t("items.grader"), grader],
     [
       t("items.certificateNumber"),
       item.certificateNumber && verifyLink(item.certificateNumber),
     ],
+  ];
+  const gradeLabel =
+    item.grade &&
+    item.gradingScale &&
+    labels.grade(item.gradingScale, item.grade, item.strike);
+  const gradeMeaning =
+    item.grade &&
+    item.gradingScale &&
+    labels.meaning(item.gradingScale, item.grade);
+  const references: Array<[string, React.ReactNode]> = [
     [
       t("items.stampCatalogue"),
       item.stampCatalogue &&
@@ -200,11 +220,11 @@ export function ItemDetail() {
           otherReference,
         ),
     ],
-    [t("items.stampCatalogueNumber"), item.stampCatalogueNumber],
+    [t("items.stampCatalogueNumber"), code(item.stampCatalogueNumber)],
     [t("items.perforation"), item.perforation],
     [t("items.watermark"), item.watermark],
     [t("items.colour"), item.colour],
-    [t("items.serialNumber"), item.serialNumber],
+    [t("items.serialNumber"), code(item.serialNumber)],
     [t("items.signatures"), item.signatures],
     [t("items.printer"), item.printer],
   ];
@@ -271,8 +291,48 @@ export function ItemDetail() {
   const shownPhysical = filled(physical);
   const shownFromCatalog = filled(fromCatalog);
   const shownReferences = filled(references);
+  const shownCertification = filled(certification);
+  // The Grade section shows once anything about the Item's condition is set.
+  const graded = Boolean(
+    gradeLabel || item.strike || item.gradeNote || shownCertification.length,
+  );
   // Whose facts the Item shows from its entry, credited as the entry page does.
   const factsCredit = item.catalogEntry?.factsCredit;
+  // What sums the Item up under its title: its Grade, Certification and Album.
+  const tags = [
+    gradeLabel && (
+      <ItemTag
+        key="grade"
+        icon={<Award strokeWidth={1.75} aria-hidden="true" />}
+      >
+        {gradeLabel}
+        {gradeMeaning && (
+          <span className="text-muted-foreground"> · {gradeMeaning}</span>
+        )}
+      </ItemTag>
+    ),
+    item.certificateNumber && (
+      <ItemTag
+        key="certificate"
+        icon={<ShieldCheck strokeWidth={1.75} aria-hidden="true" />}
+        href={verifyHref || undefined}
+        external
+      >
+        <span translate="no">
+          {[grader, item.certificateNumber].filter(Boolean).join(" ")}
+        </span>
+      </ItemTag>
+    ),
+    album && (
+      <ItemTag
+        key="album"
+        icon={<AlbumDot colour={album.colour} />}
+        href={`/albums/${album._id}`}
+      >
+        {album.name}
+      </ItemTag>
+    ),
+  ].filter(Boolean);
   return (
     <>
       <HeaderBar
@@ -357,35 +417,42 @@ export function ItemDetail() {
         onOpenChange={setDeleting}
         onLeaving={setLeaving}
       />
-      <ItemHeader item={item} money={money} />
-      <div className="flex flex-1 flex-col lg:flex-row">
-        <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
-          {!item.catalogEntryId && item.type !== "stamp" && (
-            <CatalogSuggestion itemId={item._id} />
-          )}
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4 sm:p-6">
+        {!item.catalogEntryId && item.type !== "stamp" && (
+          <CatalogSuggestion itemId={item._id} />
+        )}
+        <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
           <ItemPhotos item={item} />
-          {shownFacts.length > 0 && (
-            <dl className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3 text-sm">
-              {shownFacts.map(([label, value]) => (
-                <div key={label} className="flex flex-col gap-0.5">
-                  <dt className="text-xs text-muted-foreground">{label}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-          {item.notes && (
-            <section className="flex max-w-xl flex-col gap-1">
-              <h2 className="text-xs font-medium text-muted-foreground">
-                {t("items.notes")}
-              </h2>
-              <p className="whitespace-pre-line text-sm">{item.notes}</p>
-            </section>
-          )}
+          <ItemHeader
+            item={item}
+            money={money}
+            tags={
+              tags.length > 0 && (
+                <ul className="flex flex-wrap gap-1.5">{tags}</ul>
+              )
+            }
+          >
+            {item.notes && (
+              <section
+                aria-labelledby={notesId}
+                className="flex flex-col gap-1"
+              >
+                <h2
+                  id={notesId}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  {t("items.notes")}
+                </h2>
+                <p className="whitespace-pre-line break-words text-sm">
+                  {item.notes}
+                </p>
+              </section>
+            )}
+          </ItemHeader>
         </div>
-        <aside className="flex w-full shrink-0 flex-col divide-y border-t bg-card lg:w-[17.5rem] lg:border-l lg:border-t-0 xl:w-[18.75rem]">
+        <div className="gap-x-4 [columns:18rem_2]">
           {item.soldOn !== undefined && (
-            <PanelSection
+            <FactSection
               title={t("sale.section")}
               action={
                 <Button variant="ghost" size="xs" onClick={openSale}>
@@ -393,25 +460,22 @@ export function ItemDetail() {
                 </Button>
               }
             >
-              <PropertyRow label={t("sale.soldOn")}>
-                {format.date(item.soldOn)}
-              </PropertyRow>
-              <PropertyRow label={t("sale.salePrice")}>
-                {money(item.salePrice)}
-              </PropertyRow>
+              <Fact label={t("sale.soldOn")}>{format.date(item.soldOn)}</Fact>
+              <Fact label={t("sale.salePrice")}>{money(item.salePrice)}</Fact>
               {item.saleNote && (
-                <PropertyRow label={t("sale.note")} wrap>
-                  {item.saleNote}
-                </PropertyRow>
+                <Fact label={t("sale.note")}>{item.saleNote}</Fact>
               )}
-            </PanelSection>
+            </FactSection>
           )}
-          <PanelSection title={t("items.details")}>
-            <PropertyRow label={t("items.type")}>
-              {t(`items.types.${item.type}`)}
-            </PropertyRow>
+          <FactSection title={t("items.details")}>
+            <Fact label={t("items.type")}>{t(`items.types.${item.type}`)}</Fact>
+            {shownFacts.map(([label, value]) => (
+              <Fact key={label} label={label}>
+                {value}
+              </Fact>
+            ))}
             {item.catalogEntry && (
-              <PropertyRow label={t("catalogPicker.entry")} wrap>
+              <Fact label={t("catalogPicker.entry")}>
                 <Link
                   href={catalogNodeHref(item.catalogEntry.key)}
                   className="hover:underline"
@@ -431,10 +495,10 @@ export function ItemDetail() {
                     </Link>
                   </>
                 )}
-              </PropertyRow>
+              </Fact>
             )}
             {item.catalogEntry?.set && (
-              <PropertyRow label={t("sets.title")}>
+              <Fact label={t("sets.title")}>
                 <Link
                   href={setHref(item.catalogEntry.set)}
                   className="inline-flex items-center gap-1.5 hover:underline"
@@ -446,9 +510,9 @@ export function ItemDetail() {
                   />
                   {t("sets.viewAsSet")}
                 </Link>
-              </PropertyRow>
+              </Fact>
             )}
-            <PropertyRow label={t("albums.album")}>
+            <Fact label={t("albums.album")}>
               {album && (
                 <Link
                   href={`/albums/${album._id}`}
@@ -458,114 +522,115 @@ export function ItemDetail() {
                   <span className="truncate">{album.name}</span>
                 </Link>
               )}
-            </PropertyRow>
-            <PropertyRow label={t("items.grade")} wrap={Boolean(certificate)}>
-              {item.grade && item.gradingScale && (
-                <>
-                  {labels.grade(item.gradingScale, item.grade, item.strike)}
-                  {!certificate &&
-                    labels.meaning(item.gradingScale, item.grade) && (
+            </Fact>
+            <Fact label={t("items.quantity")}>
+              {format.number(item.quantity)}
+            </Fact>
+          </FactSection>
+          {graded && (
+            <FactSection title={t("items.grade")}>
+              <Fact label={t("items.grade")}>
+                {gradeLabel && (
+                  <>
+                    {gradeLabel}
+                    {gradeMeaning && (
                       <span className="text-muted-foreground">
                         {" · "}
-                        {labels.meaning(item.gradingScale, item.grade)}
+                        {gradeMeaning}
                       </span>
                     )}
-                </>
+                  </>
+                )}
+              </Fact>
+              {item.gradingScale && (
+                <Fact label={t("items.gradingScale")}>
+                  {labels.scale(item.gradingScale)}
+                </Fact>
               )}
-              {certificate && (
-                <>
-                  {graded && " · "}
-                  {certificate}
-                </>
+              {item.type !== "stamp" && (
+                <Fact label={t("items.strike")}>
+                  {item.strike && labels.strike(item.strike)}
+                </Fact>
               )}
-            </PropertyRow>
-            {item.gradingScale && (
-              <PropertyRow label={t("items.gradingScale")}>
-                {labels.scale(item.gradingScale)}
-              </PropertyRow>
-            )}
-            {item.gradeNote && (
-              <PropertyRow label={t("items.gradeNote")} wrap>
-                {item.gradeNote}
-              </PropertyRow>
-            )}
-            {item.type !== "stamp" && (
-              <PropertyRow label={t("items.strike")}>
-                {item.strike && labels.strike(item.strike)}
-              </PropertyRow>
-            )}
-            <PropertyRow label={t("items.quantity")}>
-              {format.number(item.quantity)}
-            </PropertyRow>
-          </PanelSection>
-          {shownPhysical.length > 0 && (
-            <PanelSection title={t("items.physical")}>
-              {shownPhysical.map(([label, value]) => (
-                <PropertyRow key={label} label={label}>
-                  {value}
-                </PropertyRow>
-              ))}
-            </PanelSection>
-          )}
-          {shownReferences.length > 0 && (
-            <PanelSection title={t("items.references")}>
-              {shownReferences.map(([label, value]) => (
-                <PropertyRow key={label} label={label}>
-                  {value}
-                </PropertyRow>
-              ))}
-            </PanelSection>
-          )}
-          {(shownFromCatalog.length > 0 || factsCredit) && (
-            <PanelSection title={t("items.fromCatalog")}>
-              {shownFromCatalog.map(([label, value]) => (
-                <PropertyRow key={label} label={label} wrap>
-                  {value}
-                </PropertyRow>
-              ))}
-              {factsCredit && (
-                <PropertyRow label={t("items.factsSource")} wrap>
-                  <CatalogSourceCredit provenance={factsCredit} />
-                </PropertyRow>
+              {item.gradeNote && (
+                <Fact label={t("items.gradeNote")}>{item.gradeNote}</Fact>
               )}
-            </PanelSection>
+              {shownCertification.map(([label, value]) => (
+                <Fact key={label} label={label}>
+                  {value}
+                </Fact>
+              ))}
+            </FactSection>
           )}
+          <FactSection title={t("items.purchase")}>
+            <Fact label={t("items.purchasePrice")}>
+              {money(item.purchasePrice)}
+            </Fact>
+            <Fact label={t("items.marketValue")}>
+              {money(item.marketValue)}
+            </Fact>
+            <Fact label={t("items.purchaseDate")}>
+              {item.purchaseDate && format.date(item.purchaseDate)}
+            </Fact>
+            <Fact label={t("items.source")}>{item.source}</Fact>
+          </FactSection>
           {item.type === "coin" && (item.metal || item.bullion) && (
-            <PanelSection title={t("preciousMetal.title")}>
-              <PropertyRow label={t("preciousMetal.metal")}>
+            <FactSection title={t("preciousMetal.title")}>
+              <Fact label={t("preciousMetal.metal")}>
                 {item.metal && t(`items.materials.${item.metal}`)}
-              </PropertyRow>
-              <PropertyRow label={t("preciousMetal.weight")}>
+              </Fact>
+              <Fact label={t("preciousMetal.weight")}>
                 {item.weight !== undefined &&
                   `${format.number(item.weight)} ${t("preciousMetal.grams")}`}
-              </PropertyRow>
-              <PropertyRow label={t("preciousMetal.purity")}>
+              </Fact>
+              <Fact label={t("preciousMetal.purity")}>
                 {item.purity !== undefined &&
                   format.number(item.purity, { maximumFractionDigits: 5 })}
-              </PropertyRow>
-              <PropertyRow label={t("preciousMetal.bullion")}>
+              </Fact>
+              <Fact label={t("preciousMetal.bullion")}>
                 {t(item.bullion ? "preciousMetal.yes" : "preciousMetal.no")}
-              </PropertyRow>
-              {item.metal && (
-                <PropertyRow label={t("preciousMetal.metalValue")} wrap>
+              </Fact>
+              {/* An owned Item's is among the figures at the top. */}
+              {item.metal && sold && (
+                <Fact label={t("preciousMetal.metalValue")}>
                   <MetalValue item={item} />
-                </PropertyRow>
+                </Fact>
               )}
-            </PanelSection>
+            </FactSection>
           )}
-          <PanelSection title={t("items.purchase")}>
-            <PropertyRow label={t("items.purchasePrice")}>
-              {money(item.purchasePrice)}
-            </PropertyRow>
-            <PropertyRow label={t("items.marketValue")}>
-              {money(item.marketValue)}
-            </PropertyRow>
-            <PropertyRow label={t("items.purchaseDate")}>
-              {item.purchaseDate && format.date(item.purchaseDate)}
-            </PropertyRow>
-            <PropertyRow label={t("items.source")}>{item.source}</PropertyRow>
-          </PanelSection>
-        </aside>
+          {shownPhysical.length > 0 && (
+            <FactSection title={t("items.physical")}>
+              {shownPhysical.map(([label, value]) => (
+                <Fact key={label} label={label}>
+                  {value}
+                </Fact>
+              ))}
+            </FactSection>
+          )}
+          {shownReferences.length > 0 && (
+            <FactSection title={t("items.references")}>
+              {shownReferences.map(([label, value]) => (
+                <Fact key={label} label={label}>
+                  {value}
+                </Fact>
+              ))}
+            </FactSection>
+          )}
+          {(shownFromCatalog.length > 0 || factsCredit) && (
+            <FactSection title={t("items.fromCatalog")}>
+              {shownFromCatalog.map(([label, value]) => (
+                <Fact key={label} label={label}>
+                  {value}
+                </Fact>
+              ))}
+              {factsCredit && (
+                <Fact label={t("items.factsSource")}>
+                  <CatalogSourceCredit provenance={factsCredit} />
+                </Fact>
+              )}
+            </FactSection>
+          )}
+        </div>
       </div>
     </>
   );
@@ -600,12 +665,12 @@ export function ItemNotFound({ parent }: { parent: React.ReactNode }) {
 
 /**
  * The Item page while the Item loads (and once it's deleted, while the page
- * goes back): its bar, header, facts and properties panel as placeholders.
+ * goes back): its bar, photos, header and fact sections as placeholders.
  */
 export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
   const t = useI18n();
   const placeholder = (size: string) => (
-    <span className={cn("animate-pulse rounded bg-muted", size)} />
+    <span className={cn("block animate-pulse rounded bg-muted", size)} />
   );
   return (
     <>
@@ -627,36 +692,49 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
           </>
         }
       />
-      <div aria-busy="true" className="flex flex-1 flex-col">
-        <ItemHeaderSkeleton />
-        <div className="flex flex-1 flex-col lg:flex-row" aria-hidden="true">
-          <div className="flex min-w-0 flex-1 flex-col gap-6 p-4">
-            {placeholder("h-11 w-full max-w-xl rounded-lg")}
-            <div className="grid max-w-xl grid-cols-2 gap-x-6 gap-y-3">
-              {[0, 1, 2, 3].map((fact) => (
-                <div key={fact} className="flex flex-col gap-1.5">
-                  {placeholder("h-3 w-16")}
-                  {placeholder("h-4 w-24")}
+      <div
+        aria-busy="true"
+        className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4 sm:p-6"
+      >
+        <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+          <div className="grid grid-cols-2 gap-4" aria-hidden="true">
+            {placeholder("aspect-square rounded-xl")}
+            {placeholder("aspect-square rounded-xl")}
+          </div>
+          <ItemHeaderSkeleton />
+        </div>
+        <div className="gap-x-4 [columns:18rem_2]" aria-hidden="true">
+          {[
+            [0, 1, 2, 3],
+            [0, 1, 2],
+          ].map((rows) => (
+            <div
+              key={rows.length}
+              className="mb-4 flex break-inside-avoid flex-col gap-3 rounded-xl bg-card p-4"
+            >
+              {placeholder("h-4 w-24")}
+              {rows.map((row) => (
+                <div
+                  key={row}
+                  className="grid grid-cols-[min(9rem,40%)_minmax(0,1fr)] gap-4"
+                >
+                  {placeholder("h-3.5 w-20")}
+                  {placeholder("h-3.5 w-28")}
                 </div>
               ))}
             </div>
-          </div>
-          <div className="flex w-full shrink-0 flex-col gap-3 border-t bg-card p-4 lg:w-[17.5rem] lg:border-l lg:border-t-0 xl:w-[18.75rem]">
-            {placeholder("h-3 w-20")}
-            {[0, 1, 2, 3, 4].map((row) => (
-              <div key={row} className="grid grid-cols-[7rem_1fr] gap-2">
-                {placeholder("h-3 w-16")}
-                {placeholder("h-3.5 w-24")}
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </>
   );
 }
 
-function PanelSection({
+/**
+ * One titled card of the Item's facts. The cards flow down two columns where
+ * there's room, each kept whole.
+ */
+function FactSection({
   title,
   action,
   children,
@@ -667,56 +745,45 @@ function PanelSection({
 }) {
   const titleId = useId();
   return (
-    <section aria-labelledby={titleId} className="flex flex-col gap-1 p-4">
-      {action ? (
-        <div className="-my-1 mb-0 flex items-center justify-between gap-2">
-          <h2
-            id={titleId}
-            className="text-xs font-medium text-muted-foreground"
-          >
-            {title}
-          </h2>
-          {action}
-        </div>
-      ) : (
-        <h2
-          id={titleId}
-          className="mb-1 text-xs font-medium text-muted-foreground"
-        >
+    <section
+      aria-labelledby={titleId}
+      className="mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3"
+    >
+      <div className="flex min-h-7 items-center justify-between gap-2">
+        <h2 id={titleId} className="text-ui font-medium">
           {title}
         </h2>
-      )}
-      {children}
+        {action}
+      </div>
+      <dl className="mt-1 divide-y">{children}</dl>
     </section>
   );
 }
 
-/** A label and its value; a missing value shows as a dash. Long text can `wrap`. */
-function PropertyRow({
+/** A fact's label and value; a missing value shows as a dash. Long values wrap. */
+function Fact({
   label,
-  wrap = false,
   children,
 }: {
   label: string;
-  wrap?: boolean;
   children: React.ReactNode;
 }) {
+  const missing =
+    children === undefined ||
+    children === null ||
+    children === false ||
+    children === "";
   return (
-    <div
-      className={cn(
-        "grid min-h-7 grid-cols-[7rem_1fr] gap-2",
-        wrap ? "items-start py-1" : "items-center",
-      )}
-    >
-      <span className="truncate text-xs text-muted-foreground">{label}</span>
-      <span
+    <div className="grid grid-cols-[min(9rem,40%)_minmax(0,1fr)] gap-x-4 py-2">
+      <dt className="break-words text-ui text-muted-foreground">{label}</dt>
+      <dd
         className={cn(
-          "min-w-0 text-ui",
-          wrap ? "whitespace-pre-line break-words" : "truncate",
+          "min-w-0 whitespace-pre-line break-words text-ui",
+          missing && "text-muted-foreground",
         )}
       >
-        {children || "–"}
-      </span>
+        {missing ? "–" : children}
+      </dd>
     </div>
   );
 }
