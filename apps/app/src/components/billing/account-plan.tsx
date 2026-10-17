@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useCustomerPortal } from "./customer-portal";
 
 const rowClass =
-  "flex h-9 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium transition-colors duration-100 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "flex h-9 w-full items-center gap-2 rounded-md px-2 text-left text-ui font-medium transition-colors duration-100 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const iconClass = "size-4 shrink-0 text-muted-foreground";
 
 /** The subscription behind Premium; undefined while loading or on the Free plan. */
@@ -33,9 +33,7 @@ export function SubscriptionSummary() {
       }),
   ].filter((part): part is string => typeof part === "string");
   if (parts.length === 0) return null;
-  return (
-    <p className="text-[13px] text-muted-foreground">{parts.join(" · ")}</p>
-  );
+  return <p className="text-ui text-muted-foreground">{parts.join(" · ")}</p>;
 }
 
 /**

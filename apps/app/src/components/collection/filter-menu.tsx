@@ -227,7 +227,7 @@ export function FilterButton({
           </Kbd>
         </TooltipContent>
       </Tooltip>
-      <PopoverContent className="w-[280px]">
+      <PopoverContent className="w-[17.5rem]">
         {/* Each opening starts at the list of filters. */}
         {open && (
           <FilterCommand

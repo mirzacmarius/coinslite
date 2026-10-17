@@ -89,7 +89,7 @@ function CatalogEntryPill({
   );
   if (!onClick) {
     return (
-      <span className="inline-flex h-7 max-w-full items-center gap-1.5 rounded-md bg-muted px-2 text-[13px] font-medium [&_svg]:size-4 [&_svg]:shrink-0">
+      <span className="inline-flex h-7 max-w-full items-center gap-1.5 rounded-md bg-muted px-2 text-ui font-medium [&_svg]:size-4 [&_svg]:shrink-0">
         <span className="sr-only">{label}: </span>
         {content}
       </span>

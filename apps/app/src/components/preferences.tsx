@@ -107,7 +107,7 @@ function AppearanceSwatch({ appearance }: { appearance: Appearance }) {
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex h-5 shrink-0 items-center gap-1 rounded-[5px] border px-1.5 text-[11px] font-medium leading-none",
+        "inline-flex h-5 shrink-0 items-center gap-1 rounded-[5px] border px-1.5 text-xs font-medium leading-none",
         appearance === "light" && "border-[#e6e6e8] bg-white text-[#1b1b1f]",
         appearance === "dark" && "border-[#2e2e33] bg-[#151517] text-[#e4e4e7]",
         appearance === "system" &&
@@ -152,7 +152,7 @@ export function AppearancePicker({ describedBy }: { describedBy?: string }) {
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[220px]">
+      <DropdownMenuContent align="end" className="w-[13.75rem]">
         <DropdownMenuRadioGroup value={current} onValueChange={setTheme}>
           {appearances.map((value) => (
             // The check goes on the right, after the sample, so the

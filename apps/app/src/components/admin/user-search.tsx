@@ -59,7 +59,7 @@ export const UserSearch = forwardRef<
         }}
         placeholder={t("adminUsers.searchPlaceholder")}
         aria-label={t("adminUsers.search")}
-        className="h-7 w-full pl-7 pr-7 text-[13px] transition-[width] duration-150 ease-out sm:w-[240px] sm:focus:w-[300px] [&::-webkit-search-cancel-button]:hidden"
+        className="h-7 w-full pl-7 pr-7 text-ui transition-[width] duration-150 ease-out sm:w-[15rem] sm:focus:w-[18.75rem] [&::-webkit-search-cancel-button]:hidden"
       />
       {text !== "" && (
         <button

@@ -97,7 +97,7 @@ function FlagSettings({ flags }: { flags: FeatureFlags }) {
       <div className="divide-y rounded-xl bg-card">
         <FlagRow
           label={
-            <label htmlFor={switchId} className="text-[13px] font-medium">
+            <label htmlFor={switchId} className="text-ui font-medium">
               {t("featureFlags.catalog")}
             </label>
           }
@@ -115,9 +115,7 @@ function FlagSettings({ flags }: { flags: FeatureFlags }) {
         </FlagRow>
         <FlagRow
           label={
-            <p className="text-[13px] font-medium">
-              {t("featureFlags.scanner")}
-            </p>
+            <p className="text-ui font-medium">{t("featureFlags.scanner")}</p>
           }
           description={t("featureFlags.scannerDescription")}
         >

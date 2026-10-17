@@ -383,7 +383,7 @@ export function ItemDetail() {
             </section>
           )}
         </div>
-        <aside className="flex w-full shrink-0 flex-col divide-y border-t bg-card lg:w-[280px] lg:border-l lg:border-t-0 xl:w-[300px]">
+        <aside className="flex w-full shrink-0 flex-col divide-y border-t bg-card lg:w-[17.5rem] lg:border-l lg:border-t-0 xl:w-[18.75rem]">
           {item.soldOn !== undefined && (
             <PanelSection
               title={t("sale.section")}
@@ -587,7 +587,7 @@ export function ItemNotFound({ parent }: { parent: React.ReactNode }) {
           action={
             <Link
               href="/collection"
-              className="text-[13px] font-medium text-link hover:underline"
+              className="text-ui font-medium text-link hover:underline"
             >
               {t("items.backToCollection")}
             </Link>
@@ -641,10 +641,10 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
               ))}
             </div>
           </div>
-          <div className="flex w-full shrink-0 flex-col gap-3 border-t bg-card p-4 lg:w-[280px] lg:border-l lg:border-t-0 xl:w-[300px]">
+          <div className="flex w-full shrink-0 flex-col gap-3 border-t bg-card p-4 lg:w-[17.5rem] lg:border-l lg:border-t-0 xl:w-[18.75rem]">
             {placeholder("h-3 w-20")}
             {[0, 1, 2, 3, 4].map((row) => (
-              <div key={row} className="grid grid-cols-[112px_1fr] gap-2">
+              <div key={row} className="grid grid-cols-[7rem_1fr] gap-2">
                 {placeholder("h-3 w-16")}
                 {placeholder("h-3.5 w-24")}
               </div>
@@ -704,14 +704,14 @@ function PropertyRow({
   return (
     <div
       className={cn(
-        "grid min-h-7 grid-cols-[112px_1fr] gap-2",
+        "grid min-h-7 grid-cols-[7rem_1fr] gap-2",
         wrap ? "items-start py-1" : "items-center",
       )}
     >
       <span className="truncate text-xs text-muted-foreground">{label}</span>
       <span
         className={cn(
-          "min-w-0 text-[13px]",
+          "min-w-0 text-ui",
           wrap ? "whitespace-pre-line break-words" : "truncate",
         )}
       >

@@ -49,7 +49,7 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={pending ? undefined : onOpenChange}>
-      <DialogContent role="alertdialog" className="gap-3 p-4 sm:max-w-[400px]">
+      <DialogContent role="alertdialog" className="gap-3 p-4 sm:max-w-[25rem]">
         <DialogTitle className="text-sm font-medium">{title}</DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground">
           {description}

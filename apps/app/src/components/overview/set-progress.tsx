@@ -32,7 +32,7 @@ export function SetProgressCard({ progress }: { progress: SetProgress }) {
       className="overflow-hidden rounded-xl bg-card"
     >
       <div className="flex h-10 items-center border-b px-4">
-        <h2 id={titleId} className="text-[13px] font-medium">
+        <h2 id={titleId} className="text-ui font-medium">
           {t("overview.setProgress")}
         </h2>
       </div>
@@ -57,7 +57,7 @@ export function SetProgressCard({ progress }: { progress: SetProgress }) {
               >
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span className="flex items-baseline gap-3">
-                    <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
+                    <span className="min-w-0 flex-1 truncate text-ui font-medium">
                       {name}
                     </span>
                     <span className="shrink-0 text-xs tabular-nums text-muted-foreground">

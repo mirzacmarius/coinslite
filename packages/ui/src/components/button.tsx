@@ -21,7 +21,7 @@ const buttonVariants = cva(
       },
       size: {
         /** App chrome: toolbars, pills, menus. */
-        xs: "h-7 px-2 text-[13px]",
+        xs: "h-7 px-2 text-ui",
         /** Forms and dialogs; the default. */
         sm: "h-8 px-2.5 text-sm",
         /** The marketing site. */

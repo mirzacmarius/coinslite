@@ -13,7 +13,7 @@ export function PropertyPanel({
   return (
     <aside
       className={cn(
-        "flex w-full shrink-0 flex-col divide-y border-t bg-card lg:w-[280px] lg:border-l lg:border-t-0 xl:w-[300px]",
+        "flex w-full shrink-0 flex-col divide-y border-t bg-card lg:w-[17.5rem] lg:border-l lg:border-t-0 xl:w-[18.75rem]",
         className,
       )}
       {...props}
@@ -52,14 +52,14 @@ export function PropertyRow({
   return (
     <div
       className={cn(
-        "grid min-h-7 grid-cols-[112px_1fr] gap-2",
+        "grid min-h-7 grid-cols-[7rem_1fr] gap-2",
         wrap ? "items-start py-1" : "items-center",
       )}
     >
       <span className="truncate text-xs text-muted-foreground">{label}</span>
       <span
         className={cn(
-          "min-w-0 text-[13px]",
+          "min-w-0 text-ui",
           wrap ? "whitespace-pre-line break-words" : "truncate",
         )}
       >

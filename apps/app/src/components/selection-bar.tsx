@@ -33,9 +33,9 @@ export function SelectionBar({
     <section
       aria-label={label}
       className={cn(
-        "flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px]",
+        "flex flex-wrap items-center gap-x-3 gap-y-1.5 text-ui",
         variant === "floating"
-          ? "sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 mx-2 mt-4 rounded-lg border bg-popover px-3 py-2 shadow-lg md:bottom-4 md:mx-auto md:w-full md:max-w-[760px] xl:max-w-[1000px]"
+          ? "sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 mx-2 mt-4 rounded-lg border bg-popover px-3 py-2 shadow-lg md:bottom-4 md:mx-auto md:w-full md:max-w-[47.5rem] xl:max-w-[62.5rem]"
           : "border-t px-3 py-2",
       )}
     >

@@ -87,7 +87,7 @@ export function UserDetail() {
             action={
               <Link
                 href="/admin/users"
-                className="text-[13px] font-medium text-link hover:underline"
+                className="text-ui font-medium text-link hover:underline"
               >
                 {t("adminUsers.backToUsers")}
               </Link>
@@ -143,7 +143,7 @@ function Section({
       aria-labelledby={id}
       className="overflow-hidden rounded-xl bg-card"
     >
-      <h3 id={id} className="border-b px-4 py-2.5 text-[13px] font-medium">
+      <h3 id={id} className="border-b px-4 py-2.5 text-ui font-medium">
         {title}
       </h3>
       <div className="flex flex-col px-4 py-2">{children}</div>

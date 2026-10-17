@@ -68,7 +68,7 @@ export function AccountPage() {
           </Badge>
         </div>
         {account.displayName && (
-          <p className="text-[13px] text-muted-foreground">{account.email}</p>
+          <p className="text-ui text-muted-foreground">{account.email}</p>
         )}
         <SubscriptionSummary />
       </header>
@@ -402,7 +402,7 @@ function EmailSection({ account }: { account: Account }) {
             type="submit"
             variant="outline"
             disabled={submitting}
-            className="sm:mt-[22px]"
+            className="sm:mt-[1.375rem]"
           >
             {submitting && (
               <Loader2 className="animate-spin" aria-hidden="true" />

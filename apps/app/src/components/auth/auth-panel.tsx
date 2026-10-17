@@ -13,16 +13,16 @@ export function AuthPanel({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="flex w-full max-w-[360px] flex-col gap-6">
+    <div className="flex w-full max-w-[22.5rem] flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-base font-medium">{title}</h1>
         {description && (
-          <p className="text-[13px] text-muted-foreground">{description}</p>
+          <p className="text-ui text-muted-foreground">{description}</p>
         )}
       </div>
       {children}
       {footer && (
-        <div className="flex flex-col gap-1 text-[13px] text-muted-foreground">
+        <div className="flex flex-col gap-1 text-ui text-muted-foreground">
           {footer}
         </div>
       )}
@@ -62,7 +62,7 @@ export const authLink =
 export function AuthPanelSkeleton() {
   return (
     <div
-      className="flex w-full max-w-[360px] flex-col gap-6"
+      className="flex w-full max-w-[22.5rem] flex-col gap-6"
       aria-busy="true"
       aria-hidden="true"
     >

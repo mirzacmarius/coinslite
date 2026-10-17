@@ -44,7 +44,7 @@ export function CatalogRow({
       >
         {tile}
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-[13px] font-medium">
+          <span className="truncate text-ui font-medium">
             {title}
             {suffix && (
               <span className="font-normal text-muted-foreground">

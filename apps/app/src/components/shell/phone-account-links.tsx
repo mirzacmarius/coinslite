@@ -13,7 +13,7 @@ export function PhoneAccountLinks() {
     <nav aria-label={t("shell.more")} className="md:hidden">
       <Link
         href={albums.href}
-        className="flex h-9 items-center gap-2 rounded-md px-2 text-[13px] font-medium hover:bg-muted"
+        className="flex h-9 items-center gap-2 rounded-md px-2 text-ui font-medium hover:bg-muted"
       >
         <albums.icon
           className="size-4 text-muted-foreground"

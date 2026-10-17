@@ -125,7 +125,7 @@ function CheckRow({
     <li>
       <label
         className={cn(
-          "flex h-9 items-center gap-2 px-3 text-[13px] transition-colors duration-100",
+          "flex h-9 items-center gap-2 px-3 text-ui transition-colors duration-100",
           disabled ? "cursor-not-allowed" : "cursor-pointer hover:bg-muted",
         )}
       >
@@ -358,7 +358,7 @@ function ReportBuilder({ account }: { account: Account }) {
               aria-live="polite"
               aria-busy={refreshing}
               className={cn(
-                "flex flex-col divide-y rounded-md border text-[13px] transition-opacity duration-150",
+                "flex flex-col divide-y rounded-md border text-ui transition-opacity duration-150",
                 refreshing && "opacity-60",
               )}
             >
@@ -404,7 +404,7 @@ function ReportBuilder({ account }: { account: Account }) {
         title={t("insuranceReport.ownerTitle")}
         description={t("insuranceReport.ownerDescription")}
       >
-        <dl className="grid grid-cols-[96px_1fr] gap-x-3 gap-y-1.5 text-[13px]">
+        <dl className="grid grid-cols-[6rem_1fr] gap-x-3 gap-y-1.5 text-ui">
           {(
             [
               [

@@ -22,6 +22,14 @@ const config = {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },
+      // In rem, so text follows the root size (the app's is larger, for
+      // readability) and the browser's own text-size setting.
+      fontSize: {
+        /** App chrome: rows, toolbars, pills, menus. 13px at a 16px root. */
+        ui: "0.8125rem",
+        /** Section and dialog headings in the app. 15px at a 16px root. */
+        "ui-lg": "0.9375rem",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

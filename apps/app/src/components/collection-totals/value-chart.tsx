@@ -346,7 +346,7 @@ function LineChart({
                 y={y(tick)}
                 textAnchor="end"
                 dominantBaseline="middle"
-                className="fill-muted-foreground text-[11px]"
+                className="fill-muted-foreground text-xs"
               >
                 {tickLabels[index]}
               </text>
@@ -358,7 +358,7 @@ function LineChart({
                 x={lastIndex === 0 ? x(0) : left}
                 y={height - 6}
                 textAnchor={lastIndex === 0 ? "middle" : "start"}
-                className="fill-muted-foreground text-[11px]"
+                className="fill-muted-foreground text-xs"
               >
                 {monthLabel(series[0]?.month ?? "")}
               </text>
@@ -367,7 +367,7 @@ function LineChart({
                   x={width}
                   y={height - 6}
                   textAnchor="end"
-                  className="fill-muted-foreground text-[11px]"
+                  className="fill-muted-foreground text-xs"
                 >
                   {monthLabel(series[lastIndex]?.month ?? "")}
                 </text>

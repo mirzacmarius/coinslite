@@ -315,7 +315,7 @@ export function CatalogImageDialog({
       changed={changed || picked !== undefined}
     >
       <DialogContent
-        className="sm:max-w-[600px]"
+        className="sm:max-w-[37.5rem]"
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
@@ -333,7 +333,7 @@ export function CatalogImageDialog({
           className="flex min-h-0 flex-col"
         >
           <DialogHeader>
-            <div className="flex min-w-0 items-center gap-1 text-[13px] text-muted-foreground">
+            <div className="flex min-w-0 items-center gap-1 text-ui text-muted-foreground">
               <ImageIcon
                 className="size-4 shrink-0"
                 strokeWidth={1.75}
@@ -554,7 +554,7 @@ function ImagePicker({
         )}
       </div>
       <div className="flex min-w-0 flex-col items-start gap-1.5">
-        <p id={`${id}-status`} className="text-[13px]" aria-live="polite">
+        <p id={`${id}-status`} className="text-ui" aria-live="polite">
           {converting
             ? t("catalogImages.converting")
             : picked

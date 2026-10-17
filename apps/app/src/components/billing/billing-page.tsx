@@ -156,7 +156,7 @@ function UpgradeToPremium({ status }: { status: Status }) {
                     <Badge>{t("billing.save", { percent: saving })}</Badge>
                   )}
                 </span>
-                <span className="text-[13px] text-muted-foreground">
+                <span className="text-ui text-muted-foreground">
                   {t(
                     option === "month" ? "billing.perMonth" : "billing.perYear",
                     {
@@ -209,7 +209,7 @@ function PremiumPlan({ status }: { status: Status }) {
       badge={<Badge variant="outline">{t("billing.premium")}</Badge>}
     >
       {subscription && (
-        <dl className="flex flex-col divide-y rounded-md border text-[13px]">
+        <dl className="flex flex-col divide-y rounded-md border text-ui">
           {subscription.interval && (
             <PlanRow label={t("billing.billingPeriod")}>
               {t(

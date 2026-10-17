@@ -20,11 +20,11 @@ export function SettingsGroup({
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
       <div className="flex flex-col gap-0.5 px-1">
-        <h2 id={id} className="text-[15px] font-medium">
+        <h2 id={id} className="text-ui-lg font-medium">
           {title}
         </h2>
         {description && (
-          <p className="text-[13px] text-muted-foreground">{description}</p>
+          <p className="text-ui text-muted-foreground">{description}</p>
         )}
       </div>
       <div
@@ -56,9 +56,9 @@ export function SettingsRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-[60px] flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+    <div className="flex min-h-[3.75rem] flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div className="flex min-w-0 flex-col gap-0.5">
-        <span className="text-[13px] font-medium">{label}</span>
+        <span className="text-ui font-medium">{label}</span>
         {description && (
           <span id={descriptionId} className="text-xs text-muted-foreground">
             {description}

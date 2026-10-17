@@ -24,7 +24,7 @@ export function SegmentedControl<T extends string>({
   return (
     <fieldset
       className={cn(
-        "inline-flex self-start rounded-md border bg-muted p-0.5 text-[13px]",
+        "inline-flex self-start rounded-md border bg-muted p-0.5 text-ui",
         className,
       )}
     >

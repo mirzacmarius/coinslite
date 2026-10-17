@@ -35,7 +35,7 @@ export function SpotPrices({ className }: { className?: string }) {
       className={cn("rounded-xl bg-card", className)}
     >
       <div className="flex min-h-10 flex-wrap items-center justify-between gap-x-3 border-b px-4 py-2">
-        <h2 id={titleId} className="text-[13px] font-medium">
+        <h2 id={titleId} className="text-ui font-medium">
           {t("spotPrices.title")}
         </h2>
         {prices && (
@@ -57,9 +57,7 @@ export function SpotPrices({ className }: { className?: string }) {
         </div>
       ) : prices === null ? (
         <div className="flex flex-col gap-1 px-4 py-6 text-center">
-          <p className="text-[13px] font-medium">
-            {t("spotPrices.emptyTitle")}
-          </p>
+          <p className="text-ui font-medium">{t("spotPrices.emptyTitle")}</p>
           <p className="text-xs text-muted-foreground">
             {t("spotPrices.emptyDescription")}
           </p>
@@ -131,10 +129,10 @@ export function SidebarSpotPrices() {
       </h2>
       <table
         aria-labelledby={titleId}
-        className="w-full whitespace-nowrap text-[11px] tabular-nums"
+        className="w-full whitespace-nowrap text-xs tabular-nums"
       >
         <thead>
-          <tr className="text-[10px] text-muted-foreground">
+          <tr className="text-xs text-muted-foreground">
             <th scope="col" className="sr-only">
               {t("spotPrices.metal")}
             </th>
@@ -166,7 +164,7 @@ export function SidebarSpotPrices() {
         </tbody>
       </table>
       {prices.stale && (
-        <p className="flex items-start gap-1.5 text-[11px] leading-4 text-muted-foreground">
+        <p className="flex items-start gap-1.5 text-xs leading-4 text-muted-foreground">
           <Clock
             className="mt-px size-3 shrink-0"
             strokeWidth={1.75}

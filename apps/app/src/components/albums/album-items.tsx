@@ -80,7 +80,7 @@ export function AlbumItems({ albumId }: { albumId: Id<"albums"> }) {
               >
                 <ItemThumbnail type={item.type} url={item.thumbnailUrl} />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] font-medium">
+                  <span className="truncate text-ui font-medium">
                     {item.title}
                   </span>
                   {facts.length > 0 && (

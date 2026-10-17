@@ -222,7 +222,7 @@ function ImportSection() {
           <dt className="text-xs text-muted-foreground">
             {t(`catalogAdmin.${key}`)}
           </dt>
-          <dd className="text-[15px] font-medium tabular-nums">
+          <dd className="text-ui-lg font-medium tabular-nums">
             {number(count)}
           </dd>
         </div>
@@ -243,7 +243,7 @@ function ImportSection() {
         onChange={(event) => void choose(event.target.files?.[0])}
       />
       {file ? (
-        <div className="flex h-9 items-center gap-2 rounded-md border px-3 text-[13px]">
+        <div className="flex h-9 items-center gap-2 rounded-md border px-3 text-ui">
           <FileSpreadsheet
             className="size-4 shrink-0 text-muted-foreground"
             strokeWidth={1.75}
@@ -269,7 +269,7 @@ function ImportSection() {
       ) : null}
 
       {file && report === undefined && (
-        <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
+        <p className="flex items-center gap-2 text-ui text-muted-foreground">
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
           {t("catalogAdmin.checking")}
         </p>
@@ -280,7 +280,7 @@ function ImportSection() {
       {report && report.errorCount > 0 && (
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-0.5">
-            <h3 className="text-[13px] font-medium text-destructive">
+            <h3 className="text-ui font-medium text-destructive">
               {t("catalogAdmin.problemsTitle")}
             </h3>
             <p className="text-xs text-muted-foreground">
@@ -332,7 +332,7 @@ function ImportSection() {
       )}
 
       {report && report.errorCount === 0 && changes === 0 && (
-        <p className="text-[13px] text-muted-foreground">
+        <p className="text-ui text-muted-foreground">
           {t("catalogAdmin.upToDate")}
         </p>
       )}

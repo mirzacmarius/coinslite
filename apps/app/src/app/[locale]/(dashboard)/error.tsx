@@ -46,7 +46,7 @@ export default function DashboardError({
               </Button>
               <Link
                 href="/"
-                className="text-[13px] font-medium text-link hover:underline"
+                className="text-ui font-medium text-link hover:underline"
               >
                 {t("error.home")}
               </Link>

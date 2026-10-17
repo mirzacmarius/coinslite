@@ -311,7 +311,7 @@ function ScanCoinDialog({
         }}
       >
         <DialogHeader>
-          <div className="flex items-center gap-1 text-[13px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-ui text-muted-foreground">
             <Library className="size-4" strokeWidth={1.75} aria-hidden="true" />
             <span>{t("nav.collection")}</span>
             <ChevronRight className="size-3.5" aria-hidden="true" />
@@ -350,7 +350,7 @@ function ScanCoinDialog({
           <p
             aria-live="polite"
             className={cn(
-              "flex min-h-5 items-center gap-1.5 text-[13px]",
+              "flex min-h-5 items-center gap-1.5 text-ui",
               status.state === "failed"
                 ? "text-destructive"
                 : "text-muted-foreground",
@@ -477,7 +477,7 @@ function PhotoStep({
       <h3
         id={`${id}-title`}
         className={cn(
-          "flex items-center gap-1.5 text-[13px] font-medium",
+          "flex items-center gap-1.5 text-ui font-medium",
           !current && !photo && "text-muted-foreground",
         )}
       >
@@ -536,7 +536,7 @@ function PhotoStep({
                 aria-hidden="true"
               />
             )}
-            <span className="text-[13px] font-medium">
+            <span className="text-ui font-medium">
               {t(touch ? "scanner.takePhoto" : "scanner.choosePhoto")}
             </span>
           </span>

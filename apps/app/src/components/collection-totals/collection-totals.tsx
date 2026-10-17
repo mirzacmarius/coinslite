@@ -93,7 +93,7 @@ export function CollectionTotalsSection({
         className={cn("border-b", seriesColorVariables)}
       >
         <h2 className="flex h-10 items-center px-2">
-          <CollapsibleTrigger className="flex h-7 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-left text-[13px] outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
+          <CollapsibleTrigger className="flex h-7 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-left text-ui outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
             <ChevronRight
               className={cn(
                 "size-3.5 shrink-0 text-muted-foreground transition-transform duration-150",
@@ -509,7 +509,7 @@ function ConvertingNotice({ currency }: { currency: HomeCurrency }) {
   return (
     <p
       role="status"
-      className="rounded-xl bg-card px-4 py-3 text-[13px] text-muted-foreground"
+      className="rounded-xl bg-card px-4 py-3 text-ui text-muted-foreground"
     >
       {t("homeCurrency.convertingTotals", { currency })}
     </p>

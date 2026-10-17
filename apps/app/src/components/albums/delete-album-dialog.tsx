@@ -87,7 +87,7 @@ export function DeleteAlbumDialog({
       {hasItems && (
         <div className="flex flex-col gap-2">
           <div className="overflow-hidden rounded-md border">
-            <label className="flex h-9 cursor-pointer items-center gap-2 border-b bg-muted/40 px-3 text-[13px] text-muted-foreground">
+            <label className="flex h-9 cursor-pointer items-center gap-2 border-b bg-muted/40 px-3 text-ui text-muted-foreground">
               <Checkbox
                 checked={
                   results.length > 0 && tickedShown === results.length
@@ -120,7 +120,7 @@ export function DeleteAlbumDialog({
                 ))}
               {results.map((item) => (
                 <li key={item._id}>
-                  <label className="flex h-9 cursor-pointer items-center gap-2 px-3 text-[13px] transition-colors duration-100 hover:bg-muted">
+                  <label className="flex h-9 cursor-pointer items-center gap-2 px-3 text-ui transition-colors duration-100 hover:bg-muted">
                     <Checkbox
                       checked={ticked.has(item._id)}
                       onCheckedChange={(checked) =>

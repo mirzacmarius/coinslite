@@ -89,7 +89,7 @@ export function CatalogNodePage({ actions }: { actions?: React.ReactNode }) {
             action={
               <Link
                 href={catalogHref}
-                className="text-[13px] font-medium text-link hover:underline"
+                className="text-ui font-medium text-link hover:underline"
               >
                 {t("catalog.backToCatalog")}
               </Link>
@@ -226,7 +226,7 @@ function BrowseBy({
     <div className="flex h-10 items-center border-b px-4">
       <nav
         aria-label={t("catalog.browseBy")}
-        className="inline-flex rounded-md border bg-muted p-0.5 text-[13px]"
+        className="inline-flex rounded-md border bg-muted p-0.5 text-ui"
       >
         {views.map(({ view, label }) => (
           <Link

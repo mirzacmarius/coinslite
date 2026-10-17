@@ -96,7 +96,7 @@ export function AppSidebar({
             className="flex min-w-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
           >
             <Logo
-              className="text-[13px] font-medium"
+              className="text-ui font-medium"
               nameClassName="group-data-[collapsible=icon]:sr-only"
             />
           </Link>
@@ -249,7 +249,7 @@ function SidebarUser() {
   const avatar = (
     <Avatar className="size-7 rounded-md">
       {user?.image && <AvatarImage src={user.image} alt="" />}
-      <AvatarFallback className="rounded-md bg-sidebar-accent text-[11px] font-medium">
+      <AvatarFallback className="rounded-md bg-sidebar-accent text-xs font-medium">
         {initialsOf(name)}
       </AvatarFallback>
     </Avatar>
@@ -258,7 +258,7 @@ function SidebarUser() {
     // Collapsed to icons, only the picture shows (the name stays for screen
     // readers); the menu, outside the sidebar, always shows name and email.
     <span className="grid min-w-0 flex-1 text-left leading-tight group-data-[collapsible=icon]:sr-only">
-      <span className="truncate text-[13px] font-medium text-foreground">
+      <span className="truncate text-ui font-medium text-foreground">
         {name}
       </span>
       {user?.email && user.email !== name && (

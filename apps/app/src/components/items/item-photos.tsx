@@ -269,7 +269,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
         >
           <span
             id={addId}
-            className="mr-1 text-[13px] font-medium text-muted-foreground"
+            className="mr-1 text-ui font-medium text-muted-foreground"
           >
             {t("photos.addPhotos")}
           </span>
@@ -488,7 +488,7 @@ function PhotoSlot({
               />
               <span
                 id={`${id}-add`}
-                className={cn("text-[13px] font-medium", small && "sr-only")}
+                className={cn("text-ui font-medium", small && "sr-only")}
               >
                 {t("photos.add")}
               </span>

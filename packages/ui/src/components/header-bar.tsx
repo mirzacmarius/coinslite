@@ -40,7 +40,7 @@ export function HeaderBar({
         className,
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-1 text-[13px]">
+      <div className="flex min-w-0 flex-1 items-center gap-1 text-ui">
         {leading && (
           <span className="-ml-2 mr-1 hidden shrink-0 items-center gap-2 md:flex">
             {leading}

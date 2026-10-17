@@ -194,7 +194,7 @@ function QuickAddDialog({
       changed={quantity !== "1" || grade !== undefined || album !== undefined}
     >
       <DialogContent
-        className="sm:max-w-[480px]"
+        className="sm:max-w-[30rem]"
         onKeyDown={(event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
             event.preventDefault();
@@ -203,7 +203,7 @@ function QuickAddDialog({
         }}
       >
         <DialogHeader>
-          <div className="flex min-w-0 items-center gap-1 text-[13px] text-muted-foreground">
+          <div className="flex min-w-0 items-center gap-1 text-ui text-muted-foreground">
             <Library className="size-4" strokeWidth={1.75} aria-hidden="true" />
             <span>{t("nav.collection")}</span>
             <ChevronRight className="size-3.5" aria-hidden="true" />
@@ -267,7 +267,7 @@ function QuickAddDialog({
             />
             <label
               htmlFor={quantityId}
-              className="flex h-7 items-center gap-1.5 rounded-md px-2 text-[13px] text-muted-foreground"
+              className="flex h-7 items-center gap-1.5 rounded-md px-2 text-ui text-muted-foreground"
             >
               {t("items.quantity")}
               <Input
@@ -277,7 +277,7 @@ function QuickAddDialog({
                 min={1}
                 max={itemLimits.quantity}
                 aria-invalid={quantityError ? true : undefined}
-                className="h-7 w-16 px-2 text-right text-[13px]"
+                className="h-7 w-16 px-2 text-right text-ui"
                 value={quantity}
                 onChange={(event) => setQuantity(event.target.value)}
               />

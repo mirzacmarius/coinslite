@@ -45,7 +45,7 @@ function PhoneTabs({ items }: { items: NavItem[] }) {
               aria-current={current ? "page" : undefined}
               className={cn(
                 // The current tab gets a bar and bold text, not just a colour.
-                "relative flex flex-col items-center gap-1 px-1 py-2 text-[11px] font-medium text-muted-foreground",
+                "relative flex flex-col items-center gap-1 px-1 py-2 text-xs font-medium text-muted-foreground",
                 current &&
                   "font-semibold text-foreground before:absolute before:inset-x-5 before:top-0 before:h-0.5 before:rounded-full before:bg-foreground",
               )}

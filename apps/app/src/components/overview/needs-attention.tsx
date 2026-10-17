@@ -30,7 +30,7 @@ export function NeedsAttentionCard({ counts }: { counts: NeedsAttention }) {
       className="overflow-hidden rounded-xl bg-card"
     >
       <div className="flex h-10 items-center border-b px-4">
-        <h2 id={titleId} className="text-[13px] font-medium">
+        <h2 id={titleId} className="text-ui font-medium">
           {t("overview.needsAttention")}
         </h2>
       </div>
@@ -41,10 +41,10 @@ export function NeedsAttentionCard({ counts }: { counts: NeedsAttention }) {
               href={collectionHref({ without: kind })}
               className="flex min-h-12 items-center gap-3 px-4 py-2 outline-none transition-colors duration-100 hover:bg-muted/60 focus-visible:bg-muted"
             >
-              <span className="min-w-0 flex-1 text-[13px]">
+              <span className="min-w-0 flex-1 text-ui">
                 {t(`overview.attention.${kind}`)}
               </span>
-              <span className="shrink-0 text-[13px] font-medium tabular-nums">
+              <span className="shrink-0 text-ui font-medium tabular-nums">
                 {format.number(counts[kind])}
               </span>
               <ChevronRight
