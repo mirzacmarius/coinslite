@@ -5,7 +5,7 @@ import {
   SubscriptionSummary,
 } from "@/components/billing/account-plan";
 import { InsuranceReportLink } from "@/components/insurance-report/insurance-report-link";
-import { AppearancePicker } from "@/components/preferences";
+import { AppearancePicker, PalettePicker } from "@/components/preferences";
 import { PhoneAccountLinks } from "@/components/shell/phone-account-links";
 import { useSignOut } from "@/components/sign-out";
 import { UpdatesLink } from "@/components/updates/updates-link";
@@ -269,6 +269,7 @@ function PreferencesSection({ account }: { account: Account }) {
   const t = useI18n();
   const currencyHintId = useId();
   const appearanceHintId = useId();
+  const coloursHintId = useId();
   return (
     <SettingsGroup title={t("account.preferences.title")}>
       <SettingsRow
@@ -293,6 +294,13 @@ function PreferencesSection({ account }: { account: Account }) {
         descriptionId={appearanceHintId}
       >
         <AppearancePicker describedBy={appearanceHintId} />
+      </SettingsRow>
+      <SettingsRow
+        label={t("shell.colours")}
+        description={t("account.preferences.coloursHint")}
+        descriptionId={coloursHintId}
+      >
+        <PalettePicker describedBy={coloursHintId} />
       </SettingsRow>
     </SettingsGroup>
   );

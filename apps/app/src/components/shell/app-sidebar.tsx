@@ -3,6 +3,7 @@
 import {
   AppearanceRadioItems,
   LanguageRadioItems,
+  PaletteRadioItems,
 } from "@/components/preferences";
 import { useSignOut } from "@/components/sign-out";
 import { UnseenMarker } from "@/components/updates/unseen-marker";
@@ -48,6 +49,7 @@ import {
   Languages,
   LogOut,
   Settings,
+  Palette,
   SunMoon,
 } from "lucide-react";
 import Link from "next/link";
@@ -313,6 +315,15 @@ function SidebarUser() {
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <AppearanceRadioItems />
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Palette strokeWidth={1.75} />
+                {t("shell.colours")}
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <PaletteRadioItems />
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSeparator />

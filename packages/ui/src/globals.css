@@ -3,15 +3,96 @@
 @tailwind utilities;
 
 /*
- * CoinsLite design tokens: quiet neutrals (blue-grey in the dark theme) and
- * one indigo accent. The app sits on the chrome colour (--sidebar) and its
- * pages on an inset panel (--background). Cards are a raised shade of the
+ * CoinsLite design tokens. The app sits on the chrome colour (--sidebar) and
+ * its pages on an inset panel (--background). Cards are a raised shade of the
  * panel with no border; popovers step one shade further. Every
  * text/background pairing meets WCAG AA (4.5:1), and control borders
  * (--input) reach 3:1 against their surface.
+ *
+ * The colours come in palettes (Colours, in the app), each light and dark,
+ * chosen by `data-palette` on the html element: apps/app/src/lib/palettes.ts
+ * lists them, and palettes.test.ts beside it checks each against the rules
+ * above. Obsidian, the default, is `:root` and `.dark`.
  */
 @layer base {
+  /*
+   * Obsidian, the default: graphite neutrals with ivory text and one
+   * champagne-gold accent. Dark keeps the moodboard's swatches (chrome
+   * #0b0b0c, Secondary Surface #242326 for hovers, champagne #c6a76a); light
+   * is warm ivory with the champagne deepened to an antique gold that
+   * carries white text.
+   */
   :root {
+    --background: 48 33.3% 97.1%; /* #faf9f5 ivory panel */
+    --foreground: 36 9.8% 10%; /* #1c1a17 warm ink */
+    --card: 42 31.3% 93.7%; /* #f4f1ea raised, no border */
+    --card-foreground: 36 9.8% 10%;
+    --popover: 45 100% 99.2%; /* #fffefb near-white */
+    --popover-foreground: 36 9.8% 10%;
+    --primary: 38 55.6% 35.4%; /* #8c6828 antique gold (champagne deepened) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 42 24.5% 89.6%;
+    --secondary-foreground: 36 9.8% 10%;
+    --muted: 42 24.5% 89.6%; /* #ebe7de hover, bands */
+    --muted-foreground: 32 6.9% 37.1%; /* #655f58 */
+    --accent: 40 55.3% 85.1%; /* #eee0c4 champagne tint */
+    --accent-foreground: 40 56.4% 19.8%;
+    --link: 38 58.4% 30.2%; /* #7a5920 */
+    --destructive: 3 71.2% 41%; /* #b3261e */
+    --destructive-foreground: 0 0% 100%;
+    --success: 147 57.4% 26.7%; /* #1d6b40 */
+    --success-foreground: 0 0% 100%;
+    --border: 42 20% 87.3%; /* #e5e1d8 */
+    --input: 38 7.6% 51.2%; /* #8c8579 */
+    --ring: 38 55.6% 35.4%;
+    --sidebar: 42 25% 92.2%; /* #f0ede6 chrome */
+    --sidebar-accent: 40 22.4% 86.9%; /* #e5e0d6 hover and current on the chrome */
+    --radius: 0.5rem;
+    --chart-1: 38 55.6% 35.4%;
+    --chart-2: 206 56.9% 32.7%;
+    --chart-3: 173 56.2% 26.9%;
+    --chart-4: 21 68.8% 39%;
+    --chart-5: 147 57.4% 26.7%;
+  }
+
+  .dark {
+    --background: 240 5.6% 7.1%; /* #111113 panel */
+    --foreground: 42 39.4% 93.5%; /* #f5f1e8 ivory */
+    --card: 240 5.7% 10.4%; /* #19191c raised, no border */
+    --card-foreground: 42 39.4% 93.5%;
+    --popover: 240 4.8% 12.4%; /* #1e1e21 */
+    --popover-foreground: 42 39.4% 93.5%;
+    --primary: 40 44.7% 59.6%; /* #c6a76a champagne gold */
+    --primary-foreground: 38 33.3% 6.5%; /* #16120b warm near-black */
+    --secondary: 260 4.1% 14.3%;
+    --secondary-foreground: 42 39.4% 93.5%;
+    --muted: 260 4.1% 14.3%; /* #242326 secondary surface */
+    --muted-foreground: 32 6.9% 62.9%; /* #a7a19a */
+    --accent: 39 22.1% 15.1%; /* #2f291e champagne tint */
+    --accent-foreground: 41 54.6% 81%;
+    --link: 40 50% 67.1%; /* #d5b981 */
+    --destructive: 1 72.7% 64.2%; /* #e66461 */
+    --destructive-foreground: 0 60.9% 9%;
+    --success: 145 52% 55.9%; /* #54c985 */
+    --success-foreground: 141 68.4% 7.5%;
+    --border: 240 4.4% 17.6%; /* #2b2b2f */
+    --input: 250 2.6% 44.7%; /* #706f75 */
+    --ring: 40 44.7% 59.6%;
+    --sidebar: 240 4.3% 4.5%; /* #0b0b0c chrome */
+    --sidebar-accent: 24 8.2% 12%; /* #211e1c warm hover and current on the chrome */
+    --chart-1: 40 44.7% 59.6%;
+    --chart-2: 207 56.8% 62.8%;
+    --chart-3: 169 40.8% 52.9%;
+    --chart-4: 21 68% 62%;
+    --chart-5: 145 52% 55.9%;
+  }
+
+  /*
+   * Indigo, the app's colours before the palettes: quiet neutrals (blue-grey
+   * in the dark) and one indigo accent. The marketing site's shared
+   * components use it, under its own site.css.
+   */
+  [data-palette="indigo"] {
     --background: 240 9.1% 97.8%; /* #f9f9fa panel */
     --foreground: 240 6.9% 11.4%; /* #1b1b1f */
     --card: 240 8.3% 95.3%; /* #f2f2f4 raised, no border */
@@ -23,7 +104,7 @@
     --secondary: 240 8.1% 92.7%;
     --secondary-foreground: 240 6.9% 11.4%;
     --muted: 240 8.1% 92.7%; /* #ebebee hover, bands */
-    --muted-foreground: 222 4.8% 40.8%; /* #63666d */
+    --muted-foreground: 222 4.8% 40.5%; /* #62656c */
     --accent: 231 70% 96.1%; /* #eef0fc */
     --accent-foreground: 240 6.9% 11.4%;
     --link: 234 53.8% 56.7%; /* #5560cc */
@@ -36,7 +117,6 @@
     --ring: 234 56.3% 59.6%;
     --sidebar: 240 3.4% 94.3%; /* #f0f0f1 chrome */
     --sidebar-accent: 240 5.7% 89.6%; /* #e3e3e6 hover and current on the chrome */
-    --radius: 0.5rem;
     --chart-1: 234 56.3% 59.6%;
     --chart-2: 199 89% 32%;
     --chart-3: 175 77% 26%;
@@ -44,7 +124,7 @@
     --chart-5: 142 72% 29%;
   }
 
-  .dark {
+  .dark[data-palette="indigo"] {
     --background: 233 15.3% 11.6%; /* #191a22 panel */
     --foreground: 231 14.3% 90.4%; /* #e3e4ea */
     --card: 235 14.3% 15.1%; /* #21222c raised, no border */
@@ -56,7 +136,7 @@
     --secondary: 235 13.3% 17.6%;
     --secondary-foreground: 231 14.3% 90.4%;
     --muted: 235 13.3% 17.6%; /* #272833 */
-    --muted-foreground: 231 6.2% 58.6%; /* #8f919c */
+    --muted-foreground: 231 6.2% 60%; /* #93959f */
     --accent: 237 34.3% 26.9%; /* #2d2f5c */
     --accent-foreground: 231 14.3% 90.4%;
     --link: 234 100% 75.5%; /* #828fff */
@@ -65,7 +145,7 @@
     --success: 142 69% 58%; /* #4ade80 */
     --success-foreground: 142 80% 8%;
     --border: 235 11.5% 20.4%; /* #2e2f3a */
-    --input: 233 7% 44.7%; /* #6a6c7a */
+    --input: 233 7% 47%; /* #6f7180 */
     --ring: 234 56.3% 59.6%;
     --sidebar: 234 21.7% 9%; /* #12131c chrome */
     --sidebar-accent: 235 11.1% 19.4%; /* #2c2d37 */
@@ -74,6 +154,217 @@
     --chart-3: 173 66% 50%;
     --chart-4: 38 92% 60%;
     --chart-5: 142 69% 58%;
+  }
+
+  /*
+   * Midnight: deep navy surfaces and one ice-blue accent. Dark keeps the
+   * moodboard's swatches (chrome #080d18, panel #111a2a, ice #8dbbff); light
+   * is icy blue-white with navy ink and the ice deepened to cobalt. Hues stay
+   * at 214-221, clear of Indigo's 234.
+   */
+  [data-palette="midnight"] {
+    --background: 214 45% 97.6%; /* #f6f9fc panel */
+    --foreground: 218.4 42.4% 11.6%; /* #111a2a navy ink */
+    --card: 214 38% 94.6%; /* #ecf1f6 raised, no border */
+    --card-foreground: 218.4 42.4% 11.6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218.4 42.4% 11.6%;
+    --primary: 215 58% 43%; /* #2e63ad ice blue, deepened */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 34% 91.8%;
+    --secondary-foreground: 218.4 42.4% 11.6%;
+    --muted: 214 34% 91.8%; /* #e3e9f1 hover, bands */
+    --muted-foreground: 217 20% 38%; /* #4e5c74 */
+    --accent: 214 80% 92%; /* #dae8fb */
+    --accent-foreground: 216 58% 27%;
+    --link: 216 62% 37%; /* #245399 */
+    --destructive: 357 68% 42%; /* #b4222a */
+    --destructive-foreground: 0 0% 100%;
+    --success: 148 70% 25%; /* #136c3d */
+    --success-foreground: 0 0% 100%;
+    --border: 214 30% 88.5%; /* #d9e1ea */
+    --input: 216 16% 53%; /* #74839a */
+    --ring: 215 58% 43%;
+    --sidebar: 215 34% 93%; /* #e7ecf3 chrome */
+    --sidebar-accent: 215 32% 88%; /* #d7dfea hover and current on the chrome */
+    --chart-1: 215 58% 43%;
+    --chart-2: 199 89% 32%;
+    --chart-3: 175 77% 26%;
+    --chart-4: 32 95% 40%;
+    --chart-5: 148 70% 25%;
+  }
+
+  .dark[data-palette="midnight"] {
+    --background: 218.4 42.4% 11.6%; /* #111a2a panel (source Surface) */
+    --foreground: 216 55.6% 96.5%; /* #f1f5fb */
+    --card: 217 42% 14.2%; /* #152133 raised, no border */
+    --card-foreground: 216 55.6% 96.5%;
+    --popover: 217 42% 15.7%; /* #172439 */
+    --popover-foreground: 216 55.6% 96.5%;
+    --primary: 215.8 100% 77.6%; /* #8dbbff ice blue */
+    --primary-foreground: 217 72% 10%; /* #07152c */
+    --secondary: 216.3 42.2% 17.6%;
+    --secondary-foreground: 216 55.6% 96.5%;
+    --muted: 216.3 42.2% 17.6%; /* #1a2940 source Secondary Surface */
+    --muted-foreground: 214.7 23.2% 67.8%; /* #9aaac0 */
+    --accent: 214 52% 25%; /* #1f3b61 */
+    --accent-foreground: 215 100% 91%;
+    --link: 215.8 100% 77.6%; /* #8dbbff */
+    --destructive: 0 90% 71%; /* #f87272 */
+    --destructive-foreground: 0 65% 10%;
+    --success: 148 55% 60%; /* #61d195 */
+    --success-foreground: 150 80% 8%;
+    --border: 217 30% 20.5%; /* #253144 */
+    --input: 217 22% 48%; /* #5f7495 */
+    --ring: 215.8 100% 77.6%;
+    --sidebar: 221.2 50% 6.3%; /* #080d18 chrome (source Background) */
+    --sidebar-accent: 216.3 42.2% 17.6%; /* #1a2940 */
+    --chart-1: 215.8 100% 77.6%;
+    --chart-2: 199 85% 60%;
+    --chart-3: 173 60% 50%;
+    --chart-4: 38 90% 62%;
+    --chart-5: 148 55% 60%;
+  }
+
+  /*
+   * Forest: green-tinted neutrals and one brass accent. Dark keeps the
+   * moodboard's swatches (chrome #0a100d, card #141e18, brass #bda66a);
+   * light is soft sage paper with forest ink and the brass deepened, its hue
+   * moved a touch toward gold so it doesn't turn olive. Success is an
+   * emerald, clear of the green neutrals.
+   */
+  [data-palette="forest"] {
+    --background: 92 24% 96.4%; /* #f6f8f4 panel, soft sage */
+    --foreground: 150 28% 13%; /* #182a21 forest ink */
+    --card: 92 18% 93.4%; /* #eef1eb raised, no border */
+    --card-foreground: 150 28% 13%;
+    --popover: 92 25% 99.4%; /* #fdfefd */
+    --popover-foreground: 150 28% 13%;
+    --primary: 41 66% 30.8%; /* #82621b deep brass */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 92 15% 90.2%;
+    --secondary-foreground: 150 28% 13%;
+    --muted: 92 15% 90.2%; /* #e6eae2 hover, bands */
+    --muted-foreground: 125 8% 36%; /* #546356 */
+    --accent: 42 55% 90%; /* #f4ebd7 brass tint */
+    --accent-foreground: 40 62% 22%;
+    --link: 41 68% 29.5%; /* #7e5e18 */
+    --destructive: 357 68% 42%; /* #b4222a */
+    --destructive-foreground: 0 0% 100%;
+    --success: 153 74% 25%; /* #116f44 emerald */
+    --success-foreground: 0 0% 100%;
+    --border: 92 13% 87%; /* #dee2da */
+    --input: 96 6% 50%; /* #7e8778 */
+    --ring: 41 66% 30.8%;
+    --sidebar: 92 16% 91.6%; /* #e9ede6 chrome */
+    --sidebar-accent: 92 14% 86.8%; /* #dde2d9 hover and current on the chrome */
+    --chart-1: 41 66% 30.8%;
+    --chart-2: 196 60% 32%;
+    --chart-3: 152 40% 30%;
+    --chart-4: 22 65% 42%;
+    --chart-5: 85 25% 38%;
+  }
+
+  .dark[data-palette="forest"] {
+    --background: 147 21% 7.4%; /* #0f1712 panel */
+    --foreground: 77.1 22.6% 93.9%; /* #f1f3ec */
+    --card: 144 20% 9.8%; /* #141e18 surface, raised, no border */
+    --card-foreground: 77.1 22.6% 93.9%;
+    --popover: 144 19% 12.2%; /* #19251e */
+    --popover-foreground: 77.1 22.6% 93.9%;
+    --primary: 43.4 38.6% 57.8%; /* #bda66a brass */
+    --primary-foreground: 150 25% 6%; /* #0b130f */
+    --secondary: 143.1 16.9% 15.1%;
+    --secondary-foreground: 77.1 22.6% 93.9%;
+    --muted: 143.1 16.9% 15.1%; /* #202d25 secondary surface */
+    --muted-foreground: 125.5 6.3% 65.7%; /* #a2ada3 */
+    --accent: 43.4 30% 18.5%; /* #3d3521 brass tint */
+    --accent-foreground: 43.4 50% 82%;
+    --link: 43.4 46% 64%; /* #cdb679 */
+    --destructive: 1 85% 70%; /* #f47471 */
+    --destructive-foreground: 0 62% 10%;
+    --success: 152 60% 58%; /* #54d498 emerald */
+    --success-foreground: 152 80% 8%;
+    --border: 143 15% 17.5%; /* #26332b */
+    --input: 128 6% 45%; /* #6c7a6e */
+    --ring: 43.4 38.6% 57.8%;
+    --sidebar: 150 23.1% 5.1%; /* #0a100d chrome */
+    --sidebar-accent: 143.1 16.9% 15.1%; /* #202d25 */
+    --chart-1: 43.4 38.6% 57.8%;
+    --chart-2: 196 50% 60%;
+    --chart-3: 150 35% 55%;
+    --chart-4: 22 60% 62%;
+    --chart-5: 85 25% 60%;
+  }
+
+  /*
+   * Plum: aubergine-tinted neutrals and one dusty rose-gold accent. Dark
+   * keeps the moodboard's swatches (chrome #130d16, panel #211623, rose
+   * #d6a0a0); light is blush paper with plum ink and the rose deepened. The
+   * red is a vivid, warmer true red, so Delete never reads as the accent.
+   */
+  [data-palette="plum"] {
+    --background: 324 45.5% 97.8%; /* #fcf7fa panel, blush paper */
+    --foreground: 286 32.3% 12.7%; /* #26162b plum ink */
+    --card: 317 28% 95.1%; /* #f6eff4 raised, no border */
+    --card-foreground: 286 32.3% 12.7%;
+    --popover: 330 60% 99.4%; /* #fefdfd */
+    --popover-foreground: 286 32.3% 12.7%;
+    --primary: 353 32.2% 45.7%; /* #9a4f58 rose gold, deepened */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 307 23.1% 92.4%;
+    --secondary-foreground: 286 32.3% 12.7%;
+    --muted: 307 23.1% 92.4%; /* #f0e7ef hover, bands */
+    --muted-foreground: 287 9.3% 40.2%; /* #6c5d70 */
+    --accent: 354 76% 95.1%; /* #fce9eb */
+    --accent-foreground: 286 32.3% 12.7%;
+    --link: 351 33.6% 43.1%; /* #934954 */
+    --destructive: 0 77.2% 42.9%; /* #c21919 */
+    --destructive-foreground: 0 0% 100%;
+    --success: 146 68.2% 26.1%; /* #15703d */
+    --success-foreground: 0 0% 100%;
+    --border: 308 13.3% 88.2%; /* #e5dde4 */
+    --input: 286 7.1% 52.7%; /* #8b7e8f */
+    --ring: 353 32.2% 45.7%;
+    --sidebar: 317 24.1% 94.3%; /* #f4edf2 chrome */
+    --sidebar-accent: 300 17.2% 88.6%; /* #e7dde7 hover and current on the chrome */
+    --chart-1: 353 32.2% 45.7%;
+    --chart-2: 289 25.8% 41.8%;
+    --chart-3: 179 43% 32.4%;
+    --chart-4: 35 65.9% 42.5%;
+    --chart-5: 146 68.2% 26.1%;
+  }
+
+  .dark[data-palette="plum"] {
+    --background: 291 22.8% 11.2%; /* #211623 panel (Surface) */
+    --foreground: 317 30.4% 95.5%; /* #f7f0f5 */
+    --card: 292 21.1% 13.9%; /* #291c2b raised, no border */
+    --card-foreground: 317 30.4% 95.5%;
+    --popover: 296 21% 15.9%; /* #302031 Secondary Surface */
+    --popover-foreground: 317 30.4% 95.5%;
+    --primary: 0 39.7% 73.3%; /* #d6a0a0 rose gold */
+    --primary-foreground: 318 39.5% 8.4%; /* #1e0d19 */
+    --secondary: 297 19.6% 18%;
+    --secondary-foreground: 317 30.4% 95.5%;
+    --muted: 297 19.6% 18%; /* #362537 */
+    --muted-foreground: 307 11.2% 68.6%; /* #b8a6b6 */
+    --accent: 345 30.1% 24.1%; /* #502b34 */
+    --accent-foreground: 317 30.4% 95.5%;
+    --link: 359 60% 79.4%; /* #eaabac */
+    --destructive: 2 90% 66.5%; /* #f6625d */
+    --destructive-foreground: 2 60.8% 10%;
+    --success: 145 51.9% 63.3%; /* #71d299 */
+    --success-foreground: 145 68.8% 6.3%;
+    --border: 296 15.1% 20.8%; /* #3c2d3d */
+    --input: 289 6.8% 46.3%; /* #7b6e7e */
+    --ring: 0 39.7% 73.3%;
+    --sidebar: 280 25.7% 6.9%; /* #130d16 chrome */
+    --sidebar-accent: 296 21% 15.9%; /* #302031 */
+    --chart-1: 0 39.7% 73.3%;
+    --chart-2: 281 40.1% 69.2%;
+    --chart-3: 176 42.7% 56.9%;
+    --chart-4: 38 68.9% 64.7%;
+    --chart-5: 145 51.9% 63.3%;
   }
 }
 

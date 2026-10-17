@@ -3,6 +3,7 @@
 import {
   AppearanceRadioItems,
   LanguageRadioItems,
+  PaletteRadioItems,
 } from "@/components/preferences";
 import { useSignOut } from "@/components/sign-out";
 import { UnseenMarker } from "@/components/updates/unseen-marker";
@@ -20,11 +21,11 @@ import {
 } from "@coinslite/ui/dropdown-menu";
 import { Logo } from "@coinslite/ui/logo";
 import { cn } from "@coinslite/ui/utils";
-import { ChevronDown, Languages, LogOut, SunMoon } from "lucide-react";
+import { ChevronDown, Languages, LogOut, Palette, SunMoon } from "lucide-react";
 import Link from "next/link";
 import { useSettingsLinks } from "./settings-links";
 
-/** The phone top bar's menu: Settings' links, language and appearance, and signing out. */
+/** The phone top bar's menu: Settings' links, language, appearance and colours, and signing out. */
 export function WorkspaceMenu({ className }: { className?: string }) {
   const t = useI18n();
   const signOut = useSignOut();
@@ -80,6 +81,15 @@ export function WorkspaceMenu({ className }: { className?: string }) {
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <AppearanceRadioItems />
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Palette strokeWidth={1.75} />
+            {t("shell.colours")}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <PaletteRadioItems />
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSeparator />

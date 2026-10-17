@@ -53,6 +53,9 @@ export default async function RootLayout({
     <html
       lang={locale}
       className={cn(display.variable, body.variable, GeistMono.variable)}
+      // The shared components keep the app's former Indigo colours here,
+      // under site.css's own; the app itself defaults to Obsidian.
+      data-palette="indigo"
       suppressHydrationWarning
     >
       <head>
