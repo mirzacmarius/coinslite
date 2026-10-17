@@ -2,6 +2,7 @@ import "@coinslite/ui/globals.css";
 import { Analytics } from "@/components/analytics";
 import { LeavePageGuard } from "@/components/leave-page-guard";
 import { NewDeploymentReload } from "@/components/new-deployment-reload";
+import { PaletteScript } from "@/components/palette";
 import { ThemeProvider } from "@/components/theme-provider";
 import { brand } from "@/lib/brand";
 import { I18nProvider } from "@/locales/client";
@@ -78,6 +79,7 @@ export default async function RootLayout({
           "font-sans antialiased",
         )}
       >
+        <PaletteScript />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

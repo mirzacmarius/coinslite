@@ -1,10 +1,19 @@
 "use client";
 
+import { setPalette, usePalette } from "@/components/palette";
 import {
   noteLanguageChange,
   noteSavingLanguage,
   rememberLanguage,
 } from "@/lib/language-cookie";
+import {
+  type Palette,
+  type PaletteSample,
+  defaultPalette,
+  isPalette,
+  paletteSamples,
+  palettes,
+} from "@/lib/palettes";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useChangeLocale, useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -22,7 +31,7 @@ import { cn } from "@coinslite/ui/utils";
 import { useConvexAuth, useMutation } from "convex/react";
 import { Check, ChevronDown, Languages } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useCallback } from "react";
+import { type ReactNode, useCallback } from "react";
 
 /**
  * Switches the interface language: stored in this browser and, when signed
@@ -99,52 +108,84 @@ export function AppearanceRadioItems() {
 }
 
 /**
- * A small "Aa" sample of an appearance: the page colour, its text and the
- * accent dot. Fixed colours, as it previews a theme other than the current.
+ * A small "Aa" sample: a page colour, its text and the accent dot, or two
+ * split corner to corner. Fixed colours, as it previews a palette or an
+ * appearance other than the current one.
  */
-function AppearanceSwatch({ appearance }: { appearance: Appearance }) {
+function Swatch({
+  sample,
+  split,
+}: {
+  sample: PaletteSample;
+  split?: PaletteSample;
+}) {
   return (
     <span
       aria-hidden="true"
-      className={cn(
-        "inline-flex h-5 shrink-0 items-center gap-1 rounded-[5px] border px-1.5 text-xs font-medium leading-none",
-        appearance === "light" && "border-[#e6e6e8] bg-white text-[#1b1b1f]",
-        appearance === "dark" && "border-[#2e2e33] bg-[#151517] text-[#e4e4e7]",
-        appearance === "system" &&
-          "border-[#8c8c95] bg-[linear-gradient(135deg,#ffffff_50%,#151517_50%)]",
-      )}
+      className="inline-flex h-5 shrink-0 items-center gap-1 rounded-[5px] border px-1.5 text-xs font-medium leading-none"
+      style={{
+        color: sample.foreground,
+        background: split
+          ? `linear-gradient(135deg, ${sample.background} 50%, ${split.background} 50%)`
+          : sample.background,
+      }}
     >
-      <span className="size-1 rounded-full bg-primary" />
-      {/* Over the split sample, the text inverts whatever is beneath it. */}
       <span
-        className={cn(
-          appearance === "system" && "text-white mix-blend-difference",
-        )}
-      >
-        Aa
-      </span>
+        className="size-1.5 rounded-full"
+        style={{ background: sample.primary }}
+      />
+      {/* Over the split sample, the text inverts whatever is beneath it. */}
+      <span className={cn(split && "text-white mix-blend-difference")}>Aa</span>
     </span>
   );
 }
 
-/** The Account page's appearance setting: a menu of samples, Linear-style. */
-export function AppearancePicker({ describedBy }: { describedBy?: string }) {
-  const t = useI18n();
-  const { theme, setTheme } = useTheme();
-  const labels = useAppearanceLabels();
-  // The stored choice is only known in the browser.
-  const hydrated = useHydrated();
-  const current: Appearance =
-    hydrated && (theme === "light" || theme === "dark") ? theme : "system";
+/** A palette in both its versions, light and dark. */
+function PaletteSwatch({ palette }: { palette: Palette }) {
+  const samples = paletteSamples[palette];
+  return <Swatch sample={samples.light} split={samples.dark} />;
+}
+
+/** An appearance in the palette in use. */
+function AppearanceSwatch({ appearance }: { appearance: Appearance }) {
+  const samples = paletteSamples[usePalette() ?? defaultPalette];
+  return appearance === "system" ? (
+    <Swatch sample={samples.light} split={samples.dark} />
+  ) : (
+    <Swatch sample={samples[appearance]} />
+  );
+}
+
+/**
+ * An Account page setting as a menu of samples, Linear-style: the trigger
+ * shows the current choice, and the check goes after each sample.
+ */
+function SampleMenu<T extends string>({
+  name,
+  describedBy,
+  options,
+  current,
+  labels,
+  sample,
+  onChange,
+}: {
+  name: string;
+  describedBy?: string;
+  options: readonly T[];
+  current: T;
+  labels: Record<T, string>;
+  sample: (option: T) => ReactNode;
+  onChange: (value: string) => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          aria-label={`${t("shell.appearance")}: ${labels[current]}`}
+          aria-label={`${name}: ${labels[current]}`}
           aria-describedby={describedBy}
         >
-          <AppearanceSwatch appearance={current} />
+          {sample(current)}
           {labels[current]}
           <ChevronDown
             className="!size-3.5 text-muted-foreground"
@@ -153,8 +194,8 @@ export function AppearancePicker({ describedBy }: { describedBy?: string }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[13.75rem]">
-        <DropdownMenuRadioGroup value={current} onValueChange={setTheme}>
-          {appearances.map((value) => (
+        <DropdownMenuRadioGroup value={current} onValueChange={onChange}>
+          {options.map((value) => (
             // The check goes on the right, after the sample, so the
             // radio item's own indicator on the left is hidden.
             <DropdownMenuRadioItem
@@ -162,7 +203,7 @@ export function AppearancePicker({ describedBy }: { describedBy?: string }) {
               value={value}
               className="h-8 pl-2 [&>span:first-child]:hidden"
             >
-              <AppearanceSwatch appearance={value} />
+              {sample(value)}
               {labels[value]}
               {value === current && (
                 <Check className="ml-auto !text-link" aria-hidden="true" />
@@ -172,6 +213,76 @@ export function AppearancePicker({ describedBy }: { describedBy?: string }) {
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+/** The Account page's appearance setting. */
+export function AppearancePicker({ describedBy }: { describedBy?: string }) {
+  const t = useI18n();
+  const { theme, setTheme } = useTheme();
+  const labels = useAppearanceLabels();
+  // The stored choice is only known in the browser.
+  const hydrated = useHydrated();
+  const current: Appearance =
+    hydrated && (theme === "light" || theme === "dark") ? theme : "system";
+  return (
+    <SampleMenu
+      name={t("shell.appearance")}
+      describedBy={describedBy}
+      options={appearances}
+      current={current}
+      labels={labels}
+      sample={(appearance) => <AppearanceSwatch appearance={appearance} />}
+      onChange={setTheme}
+    />
+  );
+}
+
+function usePaletteLabels(): Record<Palette, string> {
+  const t = useI18n();
+  return {
+    obsidian: t("shell.coloursObsidian"),
+    midnight: t("shell.coloursMidnight"),
+    forest: t("shell.coloursForest"),
+    plum: t("shell.coloursPlum"),
+    indigo: t("shell.coloursIndigo"),
+  };
+}
+
+function choosePalette(value: string) {
+  if (isPalette(value)) setPalette(value);
+}
+
+/** The Colours, as radio items for a menu, each with its sample. */
+export function PaletteRadioItems() {
+  const palette = usePalette() ?? defaultPalette;
+  const labels = usePaletteLabels();
+  return (
+    <DropdownMenuRadioGroup value={palette} onValueChange={choosePalette}>
+      {palettes.map((value) => (
+        <DropdownMenuRadioItem key={value} value={value}>
+          <PaletteSwatch palette={value} />
+          {labels[value]}
+        </DropdownMenuRadioItem>
+      ))}
+    </DropdownMenuRadioGroup>
+  );
+}
+
+/** The Account page's Colours setting. */
+export function PalettePicker({ describedBy }: { describedBy?: string }) {
+  const t = useI18n();
+  const labels = usePaletteLabels();
+  return (
+    <SampleMenu
+      name={t("shell.colours")}
+      describedBy={describedBy}
+      options={palettes}
+      current={usePalette() ?? defaultPalette}
+      labels={labels}
+      sample={(palette) => <PaletteSwatch palette={palette} />}
+      onChange={choosePalette}
+    />
   );
 }
 

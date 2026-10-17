@@ -4,7 +4,7 @@ import { seriesColorVariables } from "@/components/collection-totals/chart-card"
 import { TotalsFigures } from "@/components/collection-totals/collection-totals";
 import { ValueChart } from "@/components/collection-totals/value-chart";
 import { ValueDistributionChart } from "@/components/collection-totals/value-distribution-chart";
-import { AppearancePicker } from "@/components/preferences";
+import { AppearancePicker, PalettePicker } from "@/components/preferences";
 import { AppShell } from "@/components/shell/app-shell";
 import { UnseenMarker } from "@/components/updates/unseen-marker";
 import { useFormatters } from "@/locales/use-formatters";
@@ -834,6 +834,12 @@ export function DesignGallery() {
                 description="Light, dark, or the same as your device."
               >
                 <AppearancePicker />
+              </SettingsRow>
+              <SettingsRow
+                label="Colours"
+                description="Each has a light and a dark version."
+              >
+                <PalettePicker />
               </SettingsRow>
             </SettingsGroup>
           </Section>

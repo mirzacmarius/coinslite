@@ -2,6 +2,7 @@
 
 import "@coinslite/ui/globals.css";
 import { errorScreenLocale } from "@/lib/error-screen-locale";
+import { storedPalette } from "@/lib/palettes";
 import { globalErrorTexts } from "@/locales/global-error";
 import { Button } from "@coinslite/ui/button";
 import { Logo } from "@coinslite/ui/logo";
@@ -10,8 +11,8 @@ import * as Sentry from "@sentry/nextjs";
 import { useParams } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
 
-/** Cookies announce no changes; they're read again on each render. */
-const cookiesNeverAnnounce = () => () => {};
+/** Cookies and stored choices announce no changes; each render reads them. */
+const neverAnnounces = () => () => {};
 
 const darkScheme = "(prefers-color-scheme: dark)";
 
@@ -26,7 +27,7 @@ function onSchemeChange(change: () => void) {
  * layout, or the frame around the pages), in the language the page was in.
  * It reports the error and offers a reload, laid out like the not-found
  * screen. It brings its own styles, as the root layout is gone, and follows
- * the system's light or dark scheme.
+ * the system's light or dark scheme, in the Colours chosen in this browser.
  */
 export default function GlobalError({
   error,
@@ -36,8 +37,13 @@ export default function GlobalError({
   const urlLocale = useParams()?.locale;
   // Only the browser has these; until hydration, render as the server did.
   const cookies = useSyncExternalStore(
-    cookiesNeverAnnounce,
+    neverAnnounces,
     () => document.cookie,
+    () => undefined,
+  );
+  const palette = useSyncExternalStore(
+    neverAnnounces,
+    storedPalette,
     () => undefined,
   );
   const dark = useSyncExternalStore(
@@ -55,6 +61,7 @@ export default function GlobalError({
       lang={locale}
       // The app's larger root size, as in the locale layout.
       className={cn("text-[112.5%]", dark && "dark")}
+      data-palette={palette}
     >
       <body className="bg-background text-foreground antialiased [font-family:ui-sans-serif,system-ui,sans-serif]">
         <title>{t.title}</title>
