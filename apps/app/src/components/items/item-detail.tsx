@@ -67,6 +67,8 @@ import { SellItemDialog } from "./sell-item-dialog";
  * One Item, every recorded fact: its photos first, beside its title, Grade,
  * Album and figures (value, Gain/loss, what was paid, Metal value) and notes;
  * then the rest in titled cards that flow down two columns where there's room.
+ * Everything sits on those two columns and their one gutter: the photos and
+ * the title take one each on a wide screen, and the sides split a column.
  */
 export function ItemDetail() {
   const t = useI18n();
@@ -415,11 +417,11 @@ export function ItemDetail() {
         onOpenChange={setDeleting}
         onLeaving={setLeaving}
       />
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4 sm:p-6">
         {!item.catalogEntryId && item.type !== "stamp" && (
           <CatalogSuggestion itemId={item._id} />
         )}
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:items-start xl:gap-8">
+        <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
           <ItemPhotos item={item} />
           <ItemHeader
             item={item}
@@ -692,15 +694,12 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
       />
       <div
         aria-busy="true"
-        className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6"
+        className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4 sm:p-6"
       >
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] xl:items-start xl:gap-8">
-          <div
-            className="grid grid-cols-2 gap-3 rounded-xl bg-card p-3 sm:gap-4 sm:p-4"
-            aria-hidden="true"
-          >
-            {placeholder("aspect-square rounded-lg")}
-            {placeholder("aspect-square rounded-lg")}
+        <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+          <div className="grid grid-cols-2 gap-4" aria-hidden="true">
+            {placeholder("aspect-square rounded-xl")}
+            {placeholder("aspect-square rounded-xl")}
           </div>
           <ItemHeaderSkeleton />
         </div>

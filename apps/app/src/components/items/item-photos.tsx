@@ -54,7 +54,8 @@ const sideNames = {
  * How each Item type's two sides sit: a coin's round faces side by side as
  * squares, a banknote's wide sides one above the other, and a stamp's upright
  * ones side by side. A banknote's side without a photo is a low strip rather
- * than a wide empty frame.
+ * than a wide empty frame. The more photos below always sit four to a row,
+ * on the page's gutter, so two of them span a side exactly.
  */
 const stages = {
   coin: { sides: "grid-cols-2", tile: "aspect-square", empty: "aspect-square" },
@@ -115,10 +116,10 @@ function usePhotoUpload(itemId: Id<"items">) {
 }
 
 /**
- * An Item's photos on one panel: its two sides large, shaped for the Item
- * type, then up to `photoLimits.more` more as small tiles. Each can be added,
- * replaced (sides) or removed, and viewed full screen. An Item without any
- * shows one place to add them instead.
+ * An Item's photos on the page's grid: its two sides large, shaped for the
+ * Item type, then up to `photoLimits.more` more as small tiles. Each can be
+ * added, replaced (sides) or removed, and viewed full screen. An Item without
+ * any shows one place to add them instead.
  */
 export function ItemPhotos({ item }: { item: Doc<"items"> }) {
   const t = useI18n();
@@ -221,8 +222,8 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
       className="flex min-w-0 flex-col"
     >
       {hasPhotos ? (
-        <div className="flex flex-col gap-4 rounded-xl bg-card p-3 sm:p-4">
-          <div className={cn("grid gap-3 sm:gap-4", stage.sides)}>
+        <div className="flex flex-col gap-4">
+          <div className={cn("grid gap-4", stage.sides)}>
             {photoSides.map((side) => (
               <PhotoSlot
                 key={side}
@@ -236,7 +237,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
               />
             ))}
           </div>
-          <div className="flex flex-col gap-2 border-t pt-3">
+          <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
               <h2 id={moreId} className="text-ui font-medium">
                 {t("photos.more.title")}
@@ -248,7 +249,7 @@ export function ItemPhotos({ item }: { item: Doc<"items"> }) {
               )}
             </div>
             {photos !== undefined && (
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+              <div className="grid grid-cols-4 gap-4">
                 {more.map((photo, at) => (
                   <PhotoSlot
                     key={photo.id}
@@ -434,9 +435,10 @@ function AddPhotoButton({
  * tile to add one. A file can also be dropped on the tile. `url` is undefined
  * while loading. Without `onFile` the photo can only be viewed or removed;
  * without `onView` and `onRemove` the slot only adds. `small` tiles (the more
- * photos) show the add tile without its hint, and `labelId` names an element
- * that already labels them. `tile` shapes a side's tile (stages); small ones
- * are square.
+ * photos) are bare squares: their label is for screen readers, their menu sits
+ * on the tile (shown on hover or focus where there's a pointer), and the add
+ * tile has no hint; `labelId` names an element that already labels them.
+ * `tile` shapes a side's tile (stages).
  */
 function PhotoSlot({
   label,
@@ -465,6 +467,48 @@ function PhotoSlot({
   const labelledBy = labelId ?? `${id}-label`;
   const tileFocus =
     "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
+  const menu = url && (
+    // Not modal, so the confirmation it opens gets focus cleanly.
+    <DropdownMenu modal={false}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              disabled={busy}
+              aria-labelledby={`${labelledBy} ${id}-actions`}
+              className={cn(
+                small &&
+                  "absolute right-1 top-1 bg-popover/90 text-popover-foreground shadow-sm hover:bg-popover aria-expanded:opacity-100 group-focus-within/tile:opacity-100 group-hover/tile:opacity-100 [@media(hover:hover)]:opacity-0",
+              )}
+            >
+              <MoreHorizontal strokeWidth={1.75} aria-hidden="true" />
+              <span id={`${id}-actions`} className="sr-only">
+                {t("photos.actions")}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent>{t("photos.actions")}</TooltipContent>
+      </Tooltip>
+      <DropdownMenuContent align="end">
+        {onFile && (
+          <DropdownMenuItem onSelect={pick}>
+            <ImageUp strokeWidth={1.75} aria-hidden="true" />
+            {t("photos.replace")}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem
+          onSelect={onRemove}
+          className="text-destructive focus:text-destructive [&_svg]:text-destructive"
+        >
+          <Trash2 strokeWidth={1.75} aria-hidden="true" />
+          {t("photos.remove")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div className="flex min-w-0 flex-col gap-1">
@@ -472,9 +516,9 @@ function PhotoSlot({
         aria-busy={busy}
         {...dropTarget}
         className={cn(
-          "relative overflow-hidden",
-          small ? "aspect-square rounded-md" : cn(tile, "rounded-lg"),
-          url === null ? "border border-dashed" : "bg-background",
+          "group/tile relative overflow-hidden",
+          small ? "aspect-square rounded-lg" : cn(tile, "rounded-xl"),
+          url === null ? "border border-dashed" : "bg-card",
           url === undefined && "animate-pulse",
           dropping && "ring-2 ring-ring",
         )}
@@ -547,56 +591,24 @@ function PhotoSlot({
             />
           </div>
         )}
+        {small && url && (
+          <>
+            <span id={`${id}-label`} className="sr-only">
+              {label}
+            </span>
+            {menu}
+          </>
+        )}
       </div>
-      {!(small && url === null) && (
+      {!small && (
         <div className="flex h-7 items-center justify-between gap-2">
           <span
             id={`${id}-label`}
-            className={cn(
-              "truncate text-muted-foreground",
-              small ? "text-xs" : "text-ui",
-            )}
+            className="truncate text-ui text-muted-foreground"
           >
             {label}
           </span>
-          {url && (
-            // Not modal, so the confirmation it opens gets focus cleanly.
-            <DropdownMenu modal={false}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      disabled={busy}
-                      aria-labelledby={`${labelledBy} ${id}-actions`}
-                    >
-                      <MoreHorizontal strokeWidth={1.75} aria-hidden="true" />
-                      <span id={`${id}-actions`} className="sr-only">
-                        {t("photos.actions")}
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{t("photos.actions")}</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="end">
-                {onFile && (
-                  <DropdownMenuItem onSelect={pick}>
-                    <ImageUp strokeWidth={1.75} aria-hidden="true" />
-                    {t("photos.replace")}
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  onSelect={onRemove}
-                  className="text-destructive focus:text-destructive [&_svg]:text-destructive"
-                >
-                  <Trash2 strokeWidth={1.75} aria-hidden="true" />
-                  {t("photos.remove")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {menu}
         </div>
       )}
       {fileInput}

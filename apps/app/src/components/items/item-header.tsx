@@ -134,13 +134,13 @@ export function ItemHeader({
 }
 
 /**
- * The figures share out each row they fill, two to a row on a phone, and a
- * figure too wide for its share takes the whole row, as the Collection
- * totals' do. Amounts never wrap.
+ * The figures sit two to a row, on the page's two columns, and a figure too
+ * wide for its half takes the whole row, as does an odd one out. Amounts
+ * never wrap.
  */
 const figuresLayout = "-mb-px -mr-px flex flex-wrap";
 const figureLayout =
-  "flex min-w-min flex-[1_1_8.5rem] flex-col gap-0.5 border-b border-r px-4 py-3";
+  "flex min-w-min flex-[1_1_40%] flex-col gap-0.5 border-b border-r px-4 py-3";
 
 function Figure({
   label,
