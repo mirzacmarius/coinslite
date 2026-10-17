@@ -21,6 +21,12 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 
 /**
+ * Links into the dashboard prefetch static output only, so the sidebar's links
+ * cost no server render. Whatever reads the request waits for the click.
+ */
+export const ensureStatic = "prefetch";
+
+/**
  * Checks the account behind the session. One deleted since is ended, then
  * sign-in opens (a plain redirect would loop: the proxy still sees a valid
  * token). One not set up yet (a first Google or sign-in-link visit) finishes
