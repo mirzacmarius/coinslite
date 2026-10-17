@@ -18,6 +18,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${t.title} · CoinsLite`, robots: { index: false } };
 }
 
+/**
+ * The site must stay static (ensureStatic), which needs one address to
+ * prerender; any other is rendered once, on its first visit, then kept.
+ */
+export function generateStaticParams() {
+  return [{ missing: ["not-found"] }];
+}
+
 /** Any other address in a language: the not-found page, in that language. */
 export default async function Missing() {
   return <NotFoundPage locale={await currentLocale()} />;
