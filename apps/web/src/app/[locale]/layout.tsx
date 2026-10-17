@@ -34,6 +34,9 @@ const body = Schibsted_Grotesk({
 const flags =
   "var c=document.documentElement.classList;c.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)c.add('motion');addEventListener('load',function(){setTimeout(function(){if(!c.contains('is-booted')){c.add('still');c.remove('motion')}},3000)})";
 
+/** The whole site is prerendered: the build fails if a page reads the request. */
+export const ensureStatic = "navigation";
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
