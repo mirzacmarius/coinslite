@@ -417,22 +417,22 @@ function ItemPhotosSample() {
   const [index, setIndex] = useState<number | null>(null);
   return (
     <>
-      <div className="grid max-w-sm grid-cols-2 gap-3">
+      <div className="grid max-w-md grid-cols-2 gap-3 rounded-xl bg-card p-3">
         {samplePhotos.map((photo, at) => (
           <div key={photo.caption} className="flex flex-col gap-1">
             <button
               type="button"
               onClick={() => setIndex(at)}
               aria-label={`${photo.caption}, view full screen`}
-              className="aspect-square overflow-hidden rounded-lg border bg-muted"
+              className="aspect-square cursor-zoom-in overflow-hidden rounded-lg bg-background"
             >
               <img
                 src={photo.src}
                 alt=""
-                className="size-full object-contain"
+                className="size-full object-contain p-2"
               />
             </button>
-            <span className="flex h-7 items-center text-xs text-muted-foreground">
+            <span className="flex h-7 items-center text-ui text-muted-foreground">
               {photo.caption}
             </span>
           </div>
