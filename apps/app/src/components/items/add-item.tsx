@@ -3,6 +3,7 @@
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
+import { Button } from "@coinslite/ui/button";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd } from "@coinslite/ui/kbd";
 import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
@@ -53,8 +54,9 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
 /**
  * The sidebar's first quick action, in the accent colour and, while the
  * sidebar is expanded, taller than the rows below it: from tablet width up
- * the Add Item button, as pages show theirs on phones only, where there's
- * no sidebar. Its focus ring stands off it, which is the same colour.
+ * the Add Item button, as phones, where there's no sidebar, have theirs in
+ * the tabs (AddItemTabButton). Its focus ring stands off it, which is the
+ * same colour.
  */
 export function AddItemQuickAction() {
   const t = useI18n();
@@ -73,5 +75,25 @@ export function AddItemQuickAction() {
         </Kbd>
       </SidebarMenuButton>
     </SidebarMenuItem>
+  );
+}
+
+/**
+ * The phones' Add Item button: round, in the accent colour, in the middle of
+ * the tabs along the bottom, where a thumb reaches it on every page. Its
+ * focus ring stands off it, which is the same colour.
+ */
+export function AddItemTabButton() {
+  const t = useI18n();
+  const addItem = useAddItem();
+  return (
+    <Button
+      size="icon"
+      aria-label={t("items.add")}
+      className="size-11 rounded-full shadow-md ring-offset-card transition-[color,background-color,transform] focus-visible:ring-offset-2 active:scale-95 [&_svg]:size-6"
+      onClick={() => addItem()}
+    >
+      <Plus aria-hidden="true" />
+    </Button>
   );
 }

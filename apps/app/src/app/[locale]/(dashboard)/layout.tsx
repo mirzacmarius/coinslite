@@ -4,6 +4,7 @@ import { EndSession, UntilSessionEnds } from "@/components/end-session";
 import {
   AddItemProvider,
   AddItemQuickAction,
+  AddItemTabButton,
 } from "@/components/items/add-item";
 import { SidebarPlanUsage } from "@/components/plans/plan-usage";
 import {
@@ -57,6 +58,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <ScanCoinQuickAction />
             </>
           }
+          phoneAction={<AddItemTabButton />}
           sidebarFooter={
             <>
               <SidebarSpotPrices />
