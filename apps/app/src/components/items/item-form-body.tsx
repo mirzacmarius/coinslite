@@ -9,6 +9,7 @@ import { cn } from "@coinslite/ui/utils";
 import { History } from "lucide-react";
 import { ItemFieldsProvider, useItemFields } from "./item-form-fields";
 import { MoreDetails } from "./item-more-details";
+import { TitleCatalogMatches } from "./item-title-matches";
 import { ItemPills } from "./item-pills";
 import type { ItemFormState } from "./use-item-form";
 
@@ -41,7 +42,18 @@ export function ItemFormBody({
         {!editing && <ItemLimitNotice />}
         {!editing && itemForm.scanned && <ScanNotice scan={itemForm.scanned} />}
         {itemForm.draftKept && <DraftNotice onStartOver={itemForm.startOver} />}
-        <TitleAndNotes titleRef={itemForm.titleRef} />
+        <TitleAndNotes
+          titleRef={itemForm.titleRef}
+          matches={
+            !editing &&
+            !itemForm.linked && (
+              <TitleCatalogMatches
+                form={itemForm.form}
+                onPick={itemForm.pickTitleMatch}
+              />
+            )
+          }
+        />
         <ItemPills
           linked={itemForm.linked}
           onPickEntry={itemForm.openPicker}
@@ -64,11 +76,16 @@ export function ItemFormBody({
   );
 }
 
-/** The title, which a new Item can't be without, and notes, at the top of the form. */
+/**
+ * The title, which a new Item can't be without, and notes, at the top of
+ * the form; between them, a new Item's Catalog entries matching the title.
+ */
 function TitleAndNotes({
   titleRef,
+  matches,
 }: {
   titleRef: React.RefObject<HTMLInputElement | null>;
+  matches?: React.ReactNode;
 }) {
   const t = useI18n();
   const { form, baseId, rules, errorOf } = useItemFields();
@@ -103,6 +120,7 @@ function TitleAndNotes({
           );
         }}
       </form.Field>
+      {matches}
       <form.Field name="notes">
         {(field) => (
           <textarea

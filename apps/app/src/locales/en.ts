@@ -48,6 +48,8 @@ export default {
     new: "New Item",
     title: "Title",
     titlePlaceholder: "Title, e.g. Morgan dollar 1881-S",
+    titleMatches: "Found in the Catalog",
+    titleMatchUse: "Use",
     notesPlaceholder: "Add notes…",
     type: "Item type",
     types: {

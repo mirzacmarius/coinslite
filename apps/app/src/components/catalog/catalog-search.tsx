@@ -243,7 +243,7 @@ const kindIcons: Record<CatalogSearchHit["kind"], LucideIcon> = {
 };
 
 /** A hit's years, denomination and metal. */
-function useHitFacts(hit: CatalogSearchHit) {
+export function useHitFacts(hit: CatalogSearchHit) {
   const t = useI18n();
   const years =
     hit.yearFrom === undefined

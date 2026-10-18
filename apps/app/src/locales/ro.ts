@@ -51,6 +51,8 @@ export default {
     new: "Obiect nou",
     title: "Titlu",
     titlePlaceholder: "Titlu, de ex. 10 lei 2008",
+    titleMatches: "Găsit în catalog",
+    titleMatchUse: "Folosește",
     notesPlaceholder: "Adaugă note…",
     type: "Tip de obiect",
     types: {
