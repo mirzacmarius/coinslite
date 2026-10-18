@@ -1,6 +1,6 @@
 "use client";
 
-import { useAddItem } from "@/components/items/add-item";
+import { StartAddItemProvider, useAddItem } from "@/components/items/add-item";
 import { useStorePhotoFile } from "@/components/items/use-store-photo-file";
 import {
   ShrinkError,
@@ -9,6 +9,7 @@ import {
   shrinkImage,
 } from "@/lib/shrink-image";
 import { useHydrated } from "@/lib/use-hydrated";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -94,8 +95,14 @@ export function useScanner() {
   return useHydrated() ? status : undefined;
 }
 
-/** Holds the one scanner dialog, beside the "New Item" form it hands over to. */
+/**
+ * Holds the one scanner dialog, beside the "New Item" form it hands over to.
+ * For those who may scan, adding an Item starts with it (the Add Item
+ * buttons, and C; lib/use-shortcut.ts); for everyone else, with the form.
+ */
 export function ScanCoinProvider({ children }: { children: React.ReactNode }) {
+  const scanner = useScanner();
+  const addItem = useAddItem();
   const [open, setOpen] = useState(false);
   // A fresh dialog for each scan, so nothing of the last one lingers.
   const [scan, setScan] = useState(0);
@@ -103,9 +110,17 @@ export function ScanCoinProvider({ children }: { children: React.ReactNode }) {
     setScan((count) => count + 1);
     setOpen(true);
   }, []);
+  const available = scanner?.available === true;
+  const startAddItem = useCallback(
+    () => (available ? openScanner() : addItem()),
+    [available, openScanner, addItem],
+  );
+  useShortcut("c", startAddItem);
   return (
     <ScanCoinContext.Provider value={openScanner}>
-      {children}
+      <StartAddItemProvider value={startAddItem}>
+        {children}
+      </StartAddItemProvider>
       <ScanCoinDialog key={scan} open={open} onOpenChange={setOpen} />
     </ScanCoinContext.Provider>
   );
@@ -288,9 +303,23 @@ function ScanCoinDialog({
     }
   };
 
-  /** The add form without suggestions, with whichever photos were taken. */
+  // No match: adding by hand is the way on, so it becomes the main button.
+  const byHandFirst =
+    !configured ||
+    status.state === "unidentified" ||
+    status.state === "notConfigured";
+
+  /**
+   * The add form without suggestions, with whichever photos were taken;
+   * without any, the plain form, for any Item type.
+   */
   const addByHand = async () => {
     if (working) return;
+    if (!photos.front && !photos.back) {
+      onOpenChange(false);
+      addItem();
+      return;
+    }
     setStatus({ state: "working" });
     try {
       handOver({ photos: await uploaded() });
@@ -380,21 +409,23 @@ function ScanCoinDialog({
         <DialogFooter>
           <Button
             type="button"
-            variant="ghost"
+            variant={byHandFirst ? "default" : "ghost"}
             disabled={working}
             onClick={() => void addByHand()}
           >
             {t("scanner.addByHand")}
           </Button>
           <div className="flex items-center gap-2">
+            {/* Phones close it with the X: the footer has no room for three. */}
             <DialogClose asChild>
-              <Button type="button" variant="ghost">
+              <Button type="button" variant="ghost" className="max-sm:hidden">
                 {t("scanner.cancel")}
               </Button>
             </DialogClose>
             {configured && (
               <Button
                 type="button"
+                variant={byHandFirst ? "outline" : "default"}
                 disabled={working || nextSide !== undefined}
                 onClick={() => void scan()}
               >
@@ -403,7 +434,14 @@ function ScanCoinDialog({
                 )}
                 {t("scanner.identify")}
                 {mod && (
-                  <Kbd className="ml-1 border-primary-foreground/40 bg-transparent text-primary-foreground">
+                  <Kbd
+                    className={cn(
+                      // Phones have no keyboard to press it on, nor the room.
+                      "ml-1 max-sm:hidden",
+                      !byHandFirst &&
+                        "border-primary-foreground/40 bg-transparent text-primary-foreground",
+                    )}
+                  >
                     {mod}↵
                   </Kbd>
                 )}
@@ -542,7 +580,7 @@ function PhotoStep({
           </span>
         )}
       </button>
-      <div className="flex h-7 items-center gap-1">
+      <div className="flex min-h-7 flex-wrap items-center gap-1">
         {photo && (
           <Button
             type="button"

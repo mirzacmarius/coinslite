@@ -3,7 +3,7 @@
 import { catalogHref } from "@/components/catalog/catalog-levels";
 import { IconTile } from "@/components/catalog/catalog-rows";
 import { useCatalogVisible } from "@/components/catalog/use-catalog-visible";
-import { useAddItem } from "@/components/items/add-item";
+import { useStartAddItem } from "@/components/items/add-item";
 import { useI18n } from "@/locales/client";
 import { ChevronRight, FileUp, ListChecks, Plus } from "lucide-react";
 import Link from "next/link";
@@ -56,7 +56,7 @@ export function StartCard({
   const t = useI18n();
   const titleId = useId();
   const catalogVisible = useCatalogVisible();
-  const addItem = useAddItem();
+  const startAddItem = useStartAddItem();
   return (
     <section
       aria-labelledby={titleId}
@@ -70,7 +70,7 @@ export function StartCard({
       </div>
       <ul className="divide-y">
         <li>
-          <button type="button" className={wayRow} onClick={() => addItem()}>
+          <button type="button" className={wayRow} onClick={startAddItem}>
             <IconTile icon={Plus} />
             <WayText
               title={t("startCard.addItem")}

@@ -52,6 +52,8 @@ export default {
     new: "Nouvel objet",
     title: "Titre",
     titlePlaceholder: "Titre, par ex. 5 francs Semeuse 1960",
+    titleMatches: "Trouvé dans le catalogue",
+    titleMatchUse: "Utiliser",
     notesPlaceholder: "Ajouter des notes…",
     type: "Type d’objet",
     types: {

@@ -257,8 +257,12 @@ export function useItemForm({
     setFailed(undefined);
     await linkEntry(picked.key);
   };
-  /** Links the form to the Catalog entry with this key and fills the facts from it; false when it can't. */
-  const linkEntry = async (key: string) => {
+  /**
+   * Links the form to the Catalog entry with this key and fills the facts
+   * from it; false when it can't. The entry's title replaces the person's
+   * own only with `takeTitle`, as when picked for what they were typing.
+   */
+  const linkEntry = async (key: string, takeTitle = false) => {
     const entry = await convex
       .query(api.items.catalogEntry, { key })
       .catch(() => null);
@@ -267,7 +271,7 @@ export function useItemForm({
       return false;
     }
     const title = form.getFieldValue("title").trim();
-    if (!title || title === linked?.title)
+    if (takeTitle || !title || title === linked?.title)
       fillForm(form, { title: entry.title });
     setLinked({ key: entry.key, title: entry.title, facts: entry.facts });
     const values: Partial<ReturnType<typeof factValues>> = factValues(
@@ -415,6 +419,11 @@ export function useItemForm({
     rules,
     /** Validates and saves; `from` is where the submit came from (lib/submit-form.ts). */
     submit,
+    /** Links a Catalog entry found for the title being typed, title and all. */
+    pickTitleMatch: (key: string) => {
+      setFailed(undefined);
+      void linkEntry(key, true);
+    },
     /** Opens the Catalog picker from the form, to link an entry or another one. */
     openPicker: () => setPickerOpen(true),
 

@@ -50,6 +50,8 @@ export default {
     new: "Nytt objekt",
     title: "Tittel",
     titlePlaceholder: "Tittel, f.eks. 10 kroner 1964",
+    titleMatches: "Funnet i katalogen",
+    titleMatchUse: "Bruk",
     notesPlaceholder: "Legg til notater…",
     type: "Objekttype",
     types: {

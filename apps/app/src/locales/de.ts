@@ -52,6 +52,8 @@ export default {
     new: "Neues Objekt",
     title: "Titel",
     titlePlaceholder: "Titel, z. B. 5 Mark 1951",
+    titleMatches: "Im Katalog gefunden",
+    titleMatchUse: "Übernehmen",
     notesPlaceholder: "Notizen hinzufügen…",
     type: "Objektart",
     types: {
