@@ -135,7 +135,6 @@ export default {
     duplicateTitle: "Duplicate Item",
     duplicateDescription:
       "A new Item filled in from “{title}”. Change what differs; photos aren't copied.",
-    newDescription: "Record a coin, banknote or stamp in your Collection.",
     materials: {
       gold: "Gold",
       silver: "Silver",

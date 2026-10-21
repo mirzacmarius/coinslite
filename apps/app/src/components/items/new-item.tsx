@@ -23,7 +23,7 @@ import { ItemFormBody } from "./item-form-body";
 import { useItemTypeOptions } from "./item-type-options";
 import { useItemForm } from "./use-item-form";
 
-const collectionHref = "/collection";
+const collectionPath = "/collection";
 
 /**
  * New Item (spec 5.4): adding an Item on a page of its own rather than in a
@@ -66,11 +66,12 @@ function NewItemForm() {
     onOpenChange: (open) => {
       if (!open)
         router.replace(
-          added.current ? itemPageHref(added.current, "") : collectionHref,
+          added.current ? itemPageHref(added.current, "") : collectionPath,
         );
     },
+    // With Create more on, the form stays for the next Item.
     onAdded: (itemId) => {
-      added.current = itemId;
+      added.current = itemForm.createMore ? undefined : itemId;
     },
     newItemType: scan ? "coin" : undefined,
     scan,
@@ -89,16 +90,20 @@ function NewItemForm() {
       : scanFirst && type === "coin"
         ? "scan"
         : "form";
-  // The form starts on its title, as it did in the dialog.
+  // The form starts on its title, as it did in the dialog: the first time it
+  // shows, not each time the Item type moves to it.
+  const titleFocused = useRef(false);
   useEffect(() => {
-    if (step === "form") titleRef.current?.focus({ preventScroll: true });
+    if (step !== "form" || titleFocused.current) return;
+    titleFocused.current = true;
+    titleRef.current?.focus({ preventScroll: true });
   }, [step, titleRef]);
 
   return (
     <>
       <HeaderBar
         parent={
-          <Link href={collectionHref} className="hover:text-foreground">
+          <Link href={collectionPath} className="hover:text-foreground">
             {t("nav.collection")}
           </Link>
         }
@@ -108,7 +113,8 @@ function NewItemForm() {
             <Button
               variant="ghost"
               size="xs"
-              onClick={() => leave(collectionHref)}
+              disabled={itemForm.submitting}
+              onClick={() => leave(collectionPath)}
             >
               {t("items.cancel")}
             </Button>

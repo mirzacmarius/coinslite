@@ -305,11 +305,6 @@ export function useItemForm({
     setScanned(scan);
     if (scan.suggestion) void applySuggestion(scan.suggestion);
   });
-  // A scan the person closes the form on isn't kept for the next Item.
-  useEffect(() => {
-    if (open || !scanned) return;
-    clearForm();
-  }, [open, scanned, form]);
   /** Puts a scan's photos on the Item it became; tells the person if that fails. */
   const attachScanPhotos = async (
     itemId: Id<"items">,

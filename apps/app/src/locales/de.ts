@@ -141,8 +141,6 @@ export default {
     duplicateTitle: "Objekt duplizieren",
     duplicateDescription:
       "Ein neues Objekt, ausgefüllt nach „{title}“. Ändere, was abweicht; Fotos werden nicht kopiert.",
-    newDescription:
-      "Erfasse eine Münze, Banknote oder Briefmarke in deiner Sammlung.",
     materials: {
       gold: "Gold",
       silver: "Silber",

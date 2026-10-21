@@ -141,8 +141,6 @@ export default {
     duplicateTitle: "Dupliquer l’objet",
     duplicateDescription:
       "Un nouvel objet rempli à partir de «\u00a0{title}\u00a0». Modifiez ce qui diffère\u00a0; les photos ne sont pas copiées.",
-    newDescription:
-      "Enregistrez une pièce, un billet ou un timbre dans votre collection.",
     materials: {
       gold: "Or",
       silver: "Argent",

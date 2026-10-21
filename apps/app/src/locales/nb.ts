@@ -138,8 +138,6 @@ export default {
     duplicateTitle: "Dupliser objekt",
     duplicateDescription:
       "Et nytt objekt fylt ut fra «{title}». Endre det som er annerledes; bilder kopieres ikke.",
-    newDescription:
-      "Registrer en mynt, en seddel eller et frimerke i samlingen din.",
     materials: {
       gold: "Gull",
       silver: "Sølv",

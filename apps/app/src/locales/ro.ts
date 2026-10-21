@@ -139,8 +139,6 @@ export default {
     duplicateTitle: "Duplică obiectul",
     duplicateDescription:
       "Un obiect nou completat după „{title}”. Schimbă ce diferă; fotografiile nu se copiază.",
-    newDescription:
-      "Înregistrează o monedă, o bancnotă sau un timbru în colecția ta.",
     materials: {
       gold: "Aur",
       silver: "Argint",

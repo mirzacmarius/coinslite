@@ -8,7 +8,6 @@ import {
   shrinkImage,
 } from "@/lib/shrink-image";
 import { useHydrated } from "@/lib/use-hydrated";
-import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -224,7 +223,20 @@ export function ScanCoin({
     }
   };
 
-  useShortcut("mod+Enter", () => void scan(), active);
+  // Cmd/Ctrl+Enter identifies the coin wherever the focus is on the page,
+  // the Item type's radios too, as it did in the dialog.
+  const latestScan = useRef(scan);
+  latestScan.current = scan;
+  useEffect(() => {
+    if (!active) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key !== "Enter") return;
+      event.preventDefault();
+      void latestScan.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active]);
 
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-3">
