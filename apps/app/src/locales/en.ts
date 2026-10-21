@@ -132,6 +132,7 @@ export default {
     save: "Save",
     saved: "Item saved",
     duplicate: "Duplicate",
+    moreActions: "More actions",
     duplicateTitle: "Duplicate Item",
     duplicateDescription:
       "A new Item filled in from “{title}”. Change what differs; photos aren't copied.",
@@ -352,6 +353,8 @@ export default {
     },
     email: {
       title: "Email",
+      change: "Change email",
+      linkSent: "Link sent to {email}",
       current: "You sign in as {email}.",
       newEmail: "New email",
       send: "Send confirmation link",

@@ -191,11 +191,7 @@ function ItemList({
                     </span>
                   )}
                 </span>
-                <PhoneFigures
-                  marketValue={about.marketValue}
-                  quantity={item.quantity}
-                  grade={about.grade}
-                />
+                <PhoneFigures quantity={item.quantity} grade={about.grade} />
                 <span className="hidden w-24 truncate text-right text-xs text-muted-foreground md:block">
                   {about.grade && (
                     <>
@@ -228,36 +224,24 @@ function ItemList({
 }
 
 /**
- * A row's figures on a phone, where there's no room for columns: the Market
- * value of one piece (× Quantity when there's more than one) on the right,
- * the Grade under it. The value never truncates; the title gives way instead.
+ * A row's figures on a phone, where there's no room for columns: × Quantity
+ * when there's more than one, the Grade under it. No amounts: the totals and
+ * the Item page have those, and the title gets the room.
  */
 function PhoneFigures({
-  marketValue,
   quantity,
   grade,
 }: {
-  marketValue: string | undefined;
   quantity: number;
   grade: string | undefined;
 }) {
   const t = useI18n();
+  if (quantity <= 1 && !grade) return null;
   return (
     <span className="flex shrink-0 flex-col items-end text-right md:hidden">
-      {(marketValue || quantity > 1) && (
-        <span className="whitespace-nowrap text-ui tabular-nums">
-          {marketValue && (
-            <>
-              <span className="sr-only">{t("items.marketValue")} </span>
-              {marketValue}
-            </>
-          )}
-          {quantity > 1 && (
-            <span className="text-xs text-muted-foreground">
-              {marketValue && " "}
-              <span className="sr-only">{t("items.quantity")} </span>×{quantity}
-            </span>
-          )}
+      {quantity > 1 && (
+        <span className="whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+          <span className="sr-only">{t("items.quantity")} </span>×{quantity}
         </span>
       )}
       {grade && (

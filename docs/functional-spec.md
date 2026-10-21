@@ -120,7 +120,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Sets, the Wantlist and "You hold" counts follow the new links. No suggestions while the Catalog is hidden.
 
 ### 5.5 Editing, duplicating, deleting
-- **Edit** changes any field, photos included. It opens a page of its own, with every field open, Cancel and Save in the bar, and Cmd/Ctrl+Enter to save; on the Item page, **E** opens it, except while typing or with a dialog open. Leaving it with unsaved changes asks first.
+- **Edit** changes any field, photos included. It opens a page of its own, with every field open, Cancel and Save in the bar (a size up on phones, where the bar leaves out the Item's name to give them room), and Cmd/Ctrl+Enter to save; on the Item page, **E** opens it, except while typing or with a dialog open. Leaving it with unsaved changes asks first.
   - Its Catalog pill searches the Catalog as when adding (§6.2): picking an entry fills its facts in, and saving links the Item to it, in place of its own entry or for the first time. The facts the person changed are kept, as on a new Item. An owned Item takes the entry off the Wantlist.
 - **Set purchase** records a bought lot's purchase on many Items at once, from the Collection's select mode (§7).
 - **Duplicate** opens the form prefilled from an existing Item and saves it as a new Item. Photos are not copied unless the user adds them.
@@ -136,7 +136,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 ### 5.7 Item detail
 - Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Purchase price, Market value, purchase date and source, notes and Album.
 - For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity**.
-- Actions: edit, duplicate, delete.
+- **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album tags, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
+- Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
 
 ## 6. Catalog
 
@@ -232,7 +233,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in.
   - delete them, with a confirmation
   - A move, a Grade or a purchase can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
-- **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device.
+- **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
 - **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts open only on a screen at least 1024 px wide and 1000 px tall, where the list still starts in view below it, and collapsed on anything smaller, such as a phone or a 1280 × 800 laptop; it is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.
 - **Export (Premium), covering the current filtered view:**
   - **PDF, A4 landscape:**
@@ -253,7 +254,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 9. Overview (home)
 
-- **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss.
+- **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss. The pieces card opens the Collection.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
 - **Add Item:** on phones, a round button in the accent colour in the middle of the tabs along the bottom, on every page, opening the form (§5.4). From tablet width up, the sidebar's Add Item, in the accent colour, is the button for it. While the Collection is empty, the first-run prompt also has a way to add, on every screen size.
 - **Value over time:** the Collection's "over time" chart (§7), compact: the same figures, without the switch to Value by Date acquired. Absent while nothing is owned.
@@ -313,7 +314,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Settings and links:**
   - Home currency (§4)
   - language
-  - change email
+  - change email, folded like Contact and address to the current email (and a confirmation link waiting, if one is) until opened
   - manage subscription, or upgrade
   - Albums
   - Updates, marked when there's an unseen release

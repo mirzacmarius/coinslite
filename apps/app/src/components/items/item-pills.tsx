@@ -3,7 +3,6 @@
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
-import { itemLimits } from "@coinslite/backend/convex/items/rules";
 import { countryCodes, formatCountry } from "@coinslite/i18n";
 import { Input } from "@coinslite/ui/input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
@@ -124,16 +123,24 @@ export function ItemPills({
             <label className="flex h-7 items-center gap-1.5 rounded-md px-2 text-ui text-muted-foreground">
               {t("items.quantity")}
               <Input
-                type="number"
+                // Text, not a number field: Safari won't select a number
+                // field's contents. The rule checks the whole number.
+                type="text"
                 inputMode="numeric"
-                min={1}
-                max={itemLimits.quantity}
+                pattern="[0-9]*"
+                autoComplete="off"
                 aria-invalid={
                   errorOf(field.state.meta.errors) ? true : undefined
                 }
                 className="h-7 w-16 px-2 text-right text-ui"
                 value={field.state.value}
                 onChange={(event) => field.handleChange(event.target.value)}
+                // Typing replaces the number rather than going in front of
+                // it; a frame later, so a tap's own caret doesn't undo it.
+                onFocus={(event) => {
+                  const input = event.currentTarget;
+                  requestAnimationFrame(() => input.select());
+                }}
                 onBlur={field.handleBlur}
               />
             </label>

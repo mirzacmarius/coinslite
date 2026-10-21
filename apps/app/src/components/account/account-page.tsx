@@ -38,7 +38,7 @@ import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { ChevronRight, Globe, Loader2, Trash2 } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import { type ReactNode, useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { DeleteAccountDialog } from "./delete-account-dialog";
 import { HomeCurrencySetting } from "./home-currency-setting";
@@ -98,8 +98,6 @@ function ContactSection({ account }: { account: Account }) {
   const locale = useCurrentLocale();
   const updateContact = useMutation(api.account.updateContact);
   const [failed, setFailed] = useState(false);
-  // Folded to a summary until opened: most visits are for other settings.
-  const [open, setOpen] = useState(false);
   const countryOptions = useMemo(
     () =>
       countryCodes
@@ -204,108 +202,90 @@ function ContactSection({ account }: { account: Account }) {
       title={t("account.contact.title")}
       description={t("account.contact.description")}
     >
-      <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger className="group flex w-full items-center gap-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="truncate text-ui font-medium">
-              {name || t("account.contact.empty")}
-            </span>
-            {place && (
-              <span className="truncate text-xs text-muted-foreground">
-                {place}
-              </span>
-            )}
-          </span>
-          <ChevronRight
-            className="size-4 shrink-0 text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-90"
-            aria-hidden="true"
-          />
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <SettingsBlock className="pt-1">
-            <form
-              method="post"
-              noValidate
-              className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void submitForm(
-                  form,
-                  t("common.saveFailed"),
-                  event.currentTarget,
-                );
-              }}
-            >
-              {text("displayName", t("account.contact.displayName"), {
-                rule: z
-                  .string()
-                  .trim()
-                  .min(1, t("account.contact.displayNameRequired")),
-                autoComplete: "nickname",
-              })}
-              {text("fullName", t("account.contact.fullName"), {
-                autoComplete: "name",
-              })}
-              {text("streetAddress", t("account.contact.streetAddress"), {
-                className: "sm:col-span-2",
-                autoComplete: "street-address",
-              })}
-              {text("postalCode", t("account.contact.postalCode"), {
-                autoComplete: "postal-code",
-              })}
-              {text("city", t("account.contact.city"), {
-                autoComplete: "address-level2",
-              })}
-              <form.Field name="country">
-                {(field) => (
-                  <Field
-                    id="account-country"
-                    label={t("account.contact.country")}
-                  >
-                    {(control) => (
-                      <PropertyPicker
-                        id={control.id}
-                        icon={Globe}
-                        label={t("account.contact.country")}
-                        placeholder={t("account.contact.setCountry")}
-                        value={field.state.value}
-                        options={countryOptions}
-                        onChange={field.handleChange}
-                        onClear={() => field.handleChange(undefined)}
-                        clearLabel={t("account.contact.noCountry")}
-                        noResults={t("items.noMatches")}
-                      />
-                    )}
-                  </Field>
-                )}
-              </form.Field>
-              {text("contactPhone", t("account.contact.phone"), {
-                rule: z
-                  .string()
-                  .refine(
-                    (phone) =>
-                      !phone.trim() ||
-                      /^\+?[0-9][0-9 ()./-]*$/.test(phone.trim()),
-                    t("account.contact.invalidPhone"),
-                  ),
-                autoComplete: "tel",
-                type: "tel",
-              })}
-              <div className="flex items-center justify-between gap-3 sm:col-span-2">
-                <p role="alert" className="text-xs text-destructive">
-                  {failed && t("account.contact.failed")}
-                </p>
-                <Button type="submit" disabled={submitting}>
-                  {submitting && (
-                    <Loader2 className="animate-spin" aria-hidden="true" />
+      <FoldedCard summary={name || t("account.contact.empty")} detail={place}>
+        <SettingsBlock className="pt-1">
+          <form
+            method="post"
+            noValidate
+            className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void submitForm(
+                form,
+                t("common.saveFailed"),
+                event.currentTarget,
+              );
+            }}
+          >
+            {text("displayName", t("account.contact.displayName"), {
+              rule: z
+                .string()
+                .trim()
+                .min(1, t("account.contact.displayNameRequired")),
+              autoComplete: "nickname",
+            })}
+            {text("fullName", t("account.contact.fullName"), {
+              autoComplete: "name",
+            })}
+            {text("streetAddress", t("account.contact.streetAddress"), {
+              className: "sm:col-span-2",
+              autoComplete: "street-address",
+            })}
+            {text("postalCode", t("account.contact.postalCode"), {
+              autoComplete: "postal-code",
+            })}
+            {text("city", t("account.contact.city"), {
+              autoComplete: "address-level2",
+            })}
+            <form.Field name="country">
+              {(field) => (
+                <Field
+                  id="account-country"
+                  label={t("account.contact.country")}
+                >
+                  {(control) => (
+                    <PropertyPicker
+                      id={control.id}
+                      icon={Globe}
+                      label={t("account.contact.country")}
+                      placeholder={t("account.contact.setCountry")}
+                      value={field.state.value}
+                      options={countryOptions}
+                      onChange={field.handleChange}
+                      onClear={() => field.handleChange(undefined)}
+                      clearLabel={t("account.contact.noCountry")}
+                      noResults={t("items.noMatches")}
+                    />
                   )}
-                  {t("account.contact.save")}
-                </Button>
-              </div>
-            </form>
-          </SettingsBlock>
-        </CollapsibleContent>
-      </Collapsible>
+                </Field>
+              )}
+            </form.Field>
+            {text("contactPhone", t("account.contact.phone"), {
+              rule: z
+                .string()
+                .refine(
+                  (phone) =>
+                    !phone.trim() ||
+                    /^\+?[0-9][0-9 ()./-]*$/.test(phone.trim()),
+                  t("account.contact.invalidPhone"),
+                ),
+              autoComplete: "tel",
+              type: "tel",
+            })}
+            <div className="flex items-center justify-between gap-3 sm:col-span-2">
+              <p role="alert" className="text-xs text-destructive">
+                {failed && t("account.contact.failed")}
+              </p>
+              <Button type="submit" disabled={submitting}>
+                {submitting && (
+                  <Loader2 className="animate-spin" aria-hidden="true" />
+                )}
+                {t("account.contact.save")}
+              </Button>
+            </div>
+          </form>
+        </SettingsBlock>
+      </FoldedCard>
     </SettingsGroup>
   );
 }
@@ -402,79 +382,127 @@ function EmailSection({ account }: { account: Account }) {
       title={t("account.email.title")}
       description={t("account.email.current", { email: account.email ?? "" })}
     >
-      <SettingsBlock className="flex flex-col gap-3">
-        {account.pendingEmail && (
-          <p
-            role="status"
-            className="rounded-md border bg-muted px-3 py-2 text-xs"
-          >
-            {t("account.email.sent", { email: account.pendingEmail })}
-          </p>
-        )}
-        <form
-          method="post"
-          noValidate
-          className="flex flex-col gap-3 sm:flex-row sm:items-start"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void submitForm(form, t("common.saveFailed"), event.currentTarget);
-          }}
-        >
-          <form.Field
-            name="newEmail"
-            validators={{
-              onChange: z
-                .string()
-                .trim()
-                .pipe(z.email(t("account.email.invalid"))),
+      <FoldedCard
+        summary={t("account.email.change")}
+        detail={
+          account.pendingEmail &&
+          t("account.email.linkSent", { email: account.pendingEmail })
+        }
+      >
+        <SettingsBlock className="flex flex-col gap-3 pt-1">
+          {account.pendingEmail && (
+            <p
+              role="status"
+              className="rounded-md border bg-muted px-3 py-2 text-xs"
+            >
+              {t("account.email.sent", { email: account.pendingEmail })}
+            </p>
+          )}
+          <form
+            method="post"
+            noValidate
+            className="flex flex-col gap-3 sm:flex-row sm:items-start"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void submitForm(
+                form,
+                t("common.saveFailed"),
+                event.currentTarget,
+              );
             }}
           >
-            {(field) => (
-              <Field
-                id="account-new-email"
-                label={t("account.email.newEmail")}
-                error={
-                  (submitted && errorText(field.state.meta.errors)) || error
-                }
-                className="flex-1"
-              >
-                {(control) => (
-                  <Input
-                    {...control}
-                    type="email"
-                    autoComplete="email"
-                    value={field.state.value}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                )}
-              </Field>
-            )}
-          </form.Field>
-          <Button
-            type="submit"
-            variant="outline"
-            disabled={submitting}
-            className="sm:mt-[1.375rem]"
-          >
-            {submitting && (
-              <Loader2 className="animate-spin" aria-hidden="true" />
-            )}
-            {t("account.email.send")}
-          </Button>
-        </form>
-        {needsSignIn && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="self-start"
-            onClick={() => void signOut("/settings")}
-          >
-            {t("account.email.signInAgainAction")}
-          </Button>
-        )}
-      </SettingsBlock>
+            <form.Field
+              name="newEmail"
+              validators={{
+                onChange: z
+                  .string()
+                  .trim()
+                  .pipe(z.email(t("account.email.invalid"))),
+              }}
+            >
+              {(field) => (
+                <Field
+                  id="account-new-email"
+                  label={t("account.email.newEmail")}
+                  error={
+                    (submitted && errorText(field.state.meta.errors)) || error
+                  }
+                  className="flex-1"
+                >
+                  {(control) => (
+                    <Input
+                      {...control}
+                      type="email"
+                      autoComplete="email"
+                      value={field.state.value}
+                      onChange={(event) =>
+                        field.handleChange(event.target.value)
+                      }
+                      onBlur={field.handleBlur}
+                    />
+                  )}
+                </Field>
+              )}
+            </form.Field>
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={submitting}
+              className="sm:mt-[1.375rem]"
+            >
+              {submitting && (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              )}
+              {t("account.email.send")}
+            </Button>
+          </form>
+          {needsSignIn && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="self-start"
+              onClick={() => void signOut("/settings")}
+            >
+              {t("account.email.signInAgainAction")}
+            </Button>
+          )}
+        </SettingsBlock>
+      </FoldedCard>
     </SettingsGroup>
+  );
+}
+
+/**
+ * A settings card folded to a summary, a line and an optional second one,
+ * until its arrow opens it: most visits to the page are for other settings.
+ */
+function FoldedCard({
+  summary,
+  detail,
+  children,
+}: {
+  summary: ReactNode;
+  detail?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <Collapsible>
+      <CollapsibleTrigger className="group flex w-full items-center gap-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="truncate text-ui font-medium">{summary}</span>
+          {detail && (
+            <span className="truncate text-xs text-muted-foreground">
+              {detail}
+            </span>
+          )}
+        </span>
+        <ChevronRight
+          className="size-4 shrink-0 text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-90"
+          aria-hidden="true"
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent>{children}</CollapsibleContent>
+    </Collapsible>
   );
 }
 

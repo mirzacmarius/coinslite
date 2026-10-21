@@ -22,6 +22,7 @@ export const HeaderBarLeading = HeaderBarLeadingContext.Provider;
 export function HeaderBar({
   title,
   parent,
+  parentOnPhones = true,
   actions,
   className,
 }: {
@@ -29,6 +30,8 @@ export function HeaderBar({
   title: React.ReactNode;
   /** A link to the parent page, e.g. the Album an Item belongs to. */
   parent?: React.ReactNode;
+  /** False leaves the parent out on phones, so the actions get the room. */
+  parentOnPhones?: boolean;
   actions?: React.ReactNode;
   className?: string;
 }) {
@@ -48,7 +51,12 @@ export function HeaderBar({
           </span>
         )}
         {parent && (
-          <span className="flex shrink-0 items-center gap-1 text-muted-foreground">
+          <span
+            className={cn(
+              "flex shrink-0 items-center gap-1 text-muted-foreground",
+              !parentOnPhones && "max-md:hidden",
+            )}
+          >
             {parent}
             <ChevronRight className="size-3.5" aria-hidden="true" />
           </span>

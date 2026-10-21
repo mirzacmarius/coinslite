@@ -28,6 +28,7 @@ import {
 } from "@coinslite/ui/collapsible";
 import { cn } from "@coinslite/ui/utils";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { type ReactNode, useId, useState } from "react";
 import { seriesColorVariables } from "./chart-card";
 import {
@@ -395,6 +396,8 @@ export function TotalsFigures({
         )}
         <Figure
           label={t("collectionTotals.pieces")}
+          // On the Overview, the way into what they add up to.
+          href={variant === "overview" ? "/collection" : undefined}
           value={format.number(totalPieces(totals))}
           hint={itemTypes
             .filter((type) => totals.pieces[type] > 0)
@@ -479,19 +482,35 @@ function Figure({
   label,
   value,
   hint,
+  href,
 }: {
   label: string;
   value: ReactNode;
   hint?: string;
+  /** Makes the whole card a link, named by its label. */
+  href?: string;
 }) {
   return (
     <div
       className={cn(
         figureLayout,
         "flex flex-col gap-0.5 border-b border-r px-4 py-3",
+        href &&
+          "relative transition-colors hover:bg-accent/50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-inset has-[:focus-visible]:ring-ring",
       )}
     >
-      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dt className="text-xs text-muted-foreground">
+        {href ? (
+          <Link
+            href={href}
+            className="outline-none after:absolute after:inset-0"
+          >
+            {label}
+          </Link>
+        ) : (
+          label
+        )}
+      </dt>
       <dd className="whitespace-nowrap text-lg font-semibold proportional-nums sm:text-xl">
         {value}
       </dd>

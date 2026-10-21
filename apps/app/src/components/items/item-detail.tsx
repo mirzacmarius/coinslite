@@ -26,7 +26,14 @@ import {
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { EmptyState } from "@coinslite/ui/empty-state";
-import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@coinslite/ui/dropdown-menu";
+import { HeaderBar } from "@coinslite/ui/header-bar";
 import { Kbd } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
@@ -37,6 +44,7 @@ import {
   Copy,
   HandCoins,
   ListChecks,
+  MoreHorizontal,
   Pencil,
   SearchX,
   ShieldCheck,
@@ -53,10 +61,11 @@ import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
 import {
-  ItemHeader,
-  ItemHeaderSkeleton,
+  ItemFigures,
   type ItemMoney,
   ItemTag,
+  ItemTitle,
+  ItemTitleSkeleton,
 } from "./item-header";
 import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
@@ -64,9 +73,10 @@ import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
 
 /**
- * One Item, every recorded fact: its photos first, beside its title, Grade,
- * Album and figures (value, Gain/loss, what was paid, Metal value) and notes;
- * then the rest in titled cards that flow down two columns where there's room.
+ * One Item, every recorded fact: its photos beside its title, Grade, Album,
+ * Details and notes (on one column the title comes first, above the photos);
+ * then its figures (value, Gain/loss, what was paid, Metal value) and the
+ * rest in titled cards that flow down two columns where there's room.
  * Everything sits on those two columns and their one gutter: the photos and
  * the title take one each on a wide screen, and the sides split a column.
  */
@@ -341,37 +351,12 @@ export function ItemDetail() {
         actions={
           <>
             {view && <ItemNeighbours itemId={item._id} view={view} />}
-            {sold ? (
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={() => setTakingBack(true)}
-              >
-                <Undo2 aria-hidden="true" />
-                <ActionLabel>{t("sale.markOwned")}</ActionLabel>
-              </Button>
-            ) : (
-              <Button variant="ghost" size="xs" onClick={openSale}>
-                <HandCoins aria-hidden="true" />
-                <ActionLabel>{t("sale.sell")}</ActionLabel>
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() =>
-                setDuplicating(({ key }) => ({ open: true, key: key + 1 }))
-              }
-            >
-              <Copy aria-hidden="true" />
-              <ActionLabel>{t("items.duplicate")}</ActionLabel>
-            </Button>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="xs" asChild>
                   <Link href={editHref} aria-keyshortcuts="E">
                     <Pencil aria-hidden="true" />
-                    <ActionLabel>{t("items.edit")}</ActionLabel>
+                    {t("items.edit")}
                   </Link>
                 </Button>
               </TooltipTrigger>
@@ -382,10 +367,45 @@ export function ItemDetail() {
                 </Kbd>
               </TooltipContent>
             </Tooltip>
-            <Button variant="ghost" size="xs" onClick={() => setDeleting(true)}>
-              <Trash2 aria-hidden="true" />
-              <ActionLabel>{t("deleteItem.delete")}</ActionLabel>
-            </Button>
+            {/* Edit is the one button; the rest, Delete last, wait in a
+                menu so a tap can't delete the Item by mistake. */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon-xs">
+                  <MoreHorizontal aria-hidden="true" />
+                  <span className="sr-only">{t("items.moreActions")}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {sold ? (
+                  <DropdownMenuItem onSelect={() => setTakingBack(true)}>
+                    <Undo2 strokeWidth={1.75} aria-hidden="true" />
+                    {t("sale.markOwned")}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onSelect={openSale}>
+                    <HandCoins strokeWidth={1.75} aria-hidden="true" />
+                    {t("sale.sell")}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onSelect={() =>
+                    setDuplicating(({ key }) => ({ open: true, key: key + 1 }))
+                  }
+                >
+                  <Copy strokeWidth={1.75} aria-hidden="true" />
+                  {t("items.duplicate")}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => setDeleting(true)}
+                  className="text-destructive focus:text-destructive [&_svg]:text-destructive"
+                >
+                  <Trash2 strokeWidth={1.75} aria-hidden="true" />
+                  {t("deleteItem.delete")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         }
       />
@@ -422,16 +442,77 @@ export function ItemDetail() {
           <CatalogSuggestion itemId={item._id} />
         )}
         <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+          {/* On one column the title leads, above the photos; on two it
+              heads the column beside them. */}
+          <ItemTitle item={item} className="xl:hidden" />
           <ItemPhotos item={item} />
-          <ItemHeader
-            item={item}
-            money={money}
-            tags={
-              tags.length > 0 && (
-                <ul className="flex flex-wrap gap-1.5">{tags}</ul>
-              )
-            }
-          >
+          <div className="flex min-w-0 flex-col gap-5">
+            <ItemTitle item={item} className="max-xl:hidden" />
+            {tags.length > 0 && (
+              <ul className="flex flex-wrap gap-1.5">{tags}</ul>
+            )}
+            <FactSection title={t("items.details")} className="mb-0">
+              <Fact label={t("items.type")}>
+                {t(`items.types.${item.type}`)}
+              </Fact>
+              {shownFacts.map(([label, value]) => (
+                <Fact key={label} label={label}>
+                  {value}
+                </Fact>
+              ))}
+              {item.catalogEntry && (
+                <Fact label={t("catalogPicker.entry")}>
+                  <Link
+                    href={catalogNodeHref(item.catalogEntry.key)}
+                    className="hover:underline"
+                  >
+                    {item.catalogEntry.title}
+                  </Link>
+                  {item.catalogEntry.otherItems > 0 && (
+                    <>
+                      {" "}
+                      <Link
+                        href={entryItemsHref(item.catalogEntry.key)}
+                        className="text-muted-foreground hover:text-foreground hover:underline"
+                      >
+                        {t("items.moreYouHold", {
+                          count: format.number(item.catalogEntry.otherItems),
+                        })}
+                      </Link>
+                    </>
+                  )}
+                </Fact>
+              )}
+              {item.catalogEntry?.set && (
+                <Fact label={t("sets.title")}>
+                  <Link
+                    href={setHref(item.catalogEntry.set)}
+                    className="inline-flex items-center gap-1.5 hover:underline"
+                  >
+                    <ListChecks
+                      className="size-3.5 text-muted-foreground"
+                      strokeWidth={1.75}
+                      aria-hidden="true"
+                    />
+                    {t("sets.viewAsSet")}
+                  </Link>
+                </Fact>
+              )}
+              <Fact label={t("albums.album")}>
+                {album && (
+                  <Link
+                    href={`/albums/${album._id}`}
+                    className="inline-flex max-w-full items-center gap-1.5 hover:underline"
+                  >
+                    <AlbumDot colour={album.colour} />
+                    <span className="truncate">{album.name}</span>
+                  </Link>
+                )}
+              </Fact>
+              <Fact label={t("items.quantity")}>
+                {format.number(item.quantity)}
+              </Fact>
+            </FactSection>
             {item.notes && (
               <section
                 aria-labelledby={notesId}
@@ -448,9 +529,14 @@ export function ItemDetail() {
                 </p>
               </section>
             )}
-          </ItemHeader>
+          </div>
         </div>
         <div className="gap-x-4 [columns:18rem_2]">
+          <ItemFigures
+            item={item}
+            money={money}
+            className="mb-4 break-inside-avoid"
+          />
           {item.soldOn !== undefined && (
             <FactSection
               title={t("sale.section")}
@@ -467,66 +553,6 @@ export function ItemDetail() {
               )}
             </FactSection>
           )}
-          <FactSection title={t("items.details")}>
-            <Fact label={t("items.type")}>{t(`items.types.${item.type}`)}</Fact>
-            {shownFacts.map(([label, value]) => (
-              <Fact key={label} label={label}>
-                {value}
-              </Fact>
-            ))}
-            {item.catalogEntry && (
-              <Fact label={t("catalogPicker.entry")}>
-                <Link
-                  href={catalogNodeHref(item.catalogEntry.key)}
-                  className="hover:underline"
-                >
-                  {item.catalogEntry.title}
-                </Link>
-                {item.catalogEntry.otherItems > 0 && (
-                  <>
-                    {" "}
-                    <Link
-                      href={entryItemsHref(item.catalogEntry.key)}
-                      className="text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      {t("items.moreYouHold", {
-                        count: format.number(item.catalogEntry.otherItems),
-                      })}
-                    </Link>
-                  </>
-                )}
-              </Fact>
-            )}
-            {item.catalogEntry?.set && (
-              <Fact label={t("sets.title")}>
-                <Link
-                  href={setHref(item.catalogEntry.set)}
-                  className="inline-flex items-center gap-1.5 hover:underline"
-                >
-                  <ListChecks
-                    className="size-3.5 text-muted-foreground"
-                    strokeWidth={1.75}
-                    aria-hidden="true"
-                  />
-                  {t("sets.viewAsSet")}
-                </Link>
-              </Fact>
-            )}
-            <Fact label={t("albums.album")}>
-              {album && (
-                <Link
-                  href={`/albums/${album._id}`}
-                  className="inline-flex max-w-full items-center gap-1.5 hover:underline"
-                >
-                  <AlbumDot colour={album.colour} />
-                  <span className="truncate">{album.name}</span>
-                </Link>
-              )}
-            </Fact>
-            <Fact label={t("items.quantity")}>
-              {format.number(item.quantity)}
-            </Fact>
-          </FactSection>
           {graded && (
             <FactSection title={t("items.grade")}>
               <Fact label={t("items.grade")}>
@@ -697,11 +723,12 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
         className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4 sm:p-6"
       >
         <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+          <ItemTitleSkeleton className="xl:hidden" />
           <div className="grid grid-cols-2 gap-4" aria-hidden="true">
             {placeholder("aspect-square rounded-xl")}
             {placeholder("aspect-square rounded-xl")}
           </div>
-          <ItemHeaderSkeleton />
+          <ItemTitleSkeleton className="max-xl:hidden" />
         </div>
         <div className="gap-x-4 [columns:18rem_2]" aria-hidden="true">
           {[
@@ -737,17 +764,22 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
 function FactSection({
   title,
   action,
+  className,
   children,
 }: {
   title: string;
   action?: React.ReactNode;
+  className?: string;
   children: React.ReactNode;
 }) {
   const titleId = useId();
   return (
     <section
       aria-labelledby={titleId}
-      className="mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3"
+      className={cn(
+        "mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3",
+        className,
+      )}
     >
       <div className="flex min-h-7 items-center justify-between gap-2">
         <h2 id={titleId} className="text-ui font-medium">
