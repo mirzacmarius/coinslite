@@ -136,6 +136,7 @@ export default {
     save: "Salvează",
     saved: "Obiect salvat",
     duplicate: "Duplică",
+    moreActions: "Mai multe acțiuni",
     duplicateTitle: "Duplică obiectul",
     duplicateDescription:
       "Un obiect nou completat după „{title}”. Schimbă ce diferă; fotografiile nu se copiază.",
@@ -360,6 +361,8 @@ export default {
     },
     email: {
       title: "E-mail",
+      change: "Schimbă adresa de e-mail",
+      linkSent: "Link trimis la {email}",
       current: "Te conectezi cu {email}.",
       newEmail: "Adresă de e-mail nouă",
       send: "Trimite linkul de confirmare",

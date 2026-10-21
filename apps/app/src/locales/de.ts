@@ -138,6 +138,7 @@ export default {
     save: "Speichern",
     saved: "Objekt gespeichert",
     duplicate: "Duplizieren",
+    moreActions: "Weitere Aktionen",
     duplicateTitle: "Objekt duplizieren",
     duplicateDescription:
       "Ein neues Objekt, ausgefüllt nach „{title}“. Ändere, was abweicht; Fotos werden nicht kopiert.",
@@ -368,6 +369,8 @@ export default {
     },
     email: {
       title: "E-Mail",
+      change: "E-Mail ändern",
+      linkSent: "Link an {email} gesendet",
       current: "Du meldest dich mit {email} an.",
       newEmail: "Neue E-Mail-Adresse",
       send: "Bestätigungslink senden",

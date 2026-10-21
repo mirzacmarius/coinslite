@@ -135,6 +135,7 @@ export default {
     save: "Lagre",
     saved: "Objektet er lagret",
     duplicate: "Dupliser",
+    moreActions: "Flere handlinger",
     duplicateTitle: "Dupliser objekt",
     duplicateDescription:
       "Et nytt objekt fylt ut fra «{title}». Endre det som er annerledes; bilder kopieres ikke.",
@@ -357,6 +358,8 @@ export default {
     },
     email: {
       title: "E-post",
+      change: "Endre e-post",
+      linkSent: "Lenke sendt til {email}",
       current: "Du logger inn som {email}.",
       newEmail: "Ny e-postadresse",
       send: "Send bekreftelseslenke",

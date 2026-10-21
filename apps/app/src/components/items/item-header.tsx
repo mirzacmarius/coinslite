@@ -266,25 +266,13 @@ export function ItemTag({
   );
 }
 
-/** ItemHeader while the Item loads. */
-export function ItemHeaderSkeleton() {
+/** ItemTitle while the Item loads. */
+export function ItemTitleSkeleton({ className }: { className?: string }) {
   return (
-    <div className="flex flex-col gap-5" aria-hidden="true">
-      <div className="flex flex-col gap-2.5">
-        <span className="h-6 w-24 animate-pulse rounded bg-muted" />
-        <span className="h-7 w-72 max-w-[85%] animate-pulse rounded bg-muted" />
-        <span className="h-5 w-48 animate-pulse rounded bg-muted" />
-      </div>
-      <div className="overflow-hidden rounded-xl bg-card">
-        <div className={figuresLayout}>
-          {[0, 1, 2].map((figure) => (
-            <div key={figure} className={cn(figureLayout, "gap-2")}>
-              <span className="h-3 w-20 animate-pulse rounded bg-muted" />
-              <span className="h-6 w-28 animate-pulse rounded bg-muted" />
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className={cn("flex flex-col gap-2.5", className)} aria-hidden="true">
+      <span className="h-6 w-24 animate-pulse rounded bg-muted" />
+      <span className="h-7 w-72 max-w-[85%] animate-pulse rounded bg-muted" />
+      <span className="h-5 w-48 animate-pulse rounded bg-muted" />
     </div>
   );
 }

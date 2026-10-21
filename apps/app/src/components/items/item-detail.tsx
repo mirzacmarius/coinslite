@@ -62,10 +62,10 @@ import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
 import {
   ItemFigures,
-  ItemHeaderSkeleton,
   type ItemMoney,
   ItemTag,
   ItemTitle,
+  ItemTitleSkeleton,
 } from "./item-header";
 import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
@@ -373,7 +373,7 @@ export function ItemDetail() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon-xs">
                   <MoreHorizontal aria-hidden="true" />
-                  <span className="sr-only">{t("shell.more")}</span>
+                  <span className="sr-only">{t("items.moreActions")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -723,11 +723,12 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
         className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-4 sm:p-6"
       >
         <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+          <ItemTitleSkeleton className="xl:hidden" />
           <div className="grid grid-cols-2 gap-4" aria-hidden="true">
             {placeholder("aspect-square rounded-xl")}
             {placeholder("aspect-square rounded-xl")}
           </div>
-          <ItemHeaderSkeleton />
+          <ItemTitleSkeleton className="max-xl:hidden" />
         </div>
         <div className="gap-x-4 [columns:18rem_2]" aria-hidden="true">
           {[

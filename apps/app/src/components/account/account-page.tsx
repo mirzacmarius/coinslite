@@ -383,10 +383,10 @@ function EmailSection({ account }: { account: Account }) {
       description={t("account.email.current", { email: account.email ?? "" })}
     >
       <FoldedCard
-        summary={account.email ?? ""}
+        summary={t("account.email.change")}
         detail={
           account.pendingEmail &&
-          t("account.email.sent", { email: account.pendingEmail })
+          t("account.email.linkSent", { email: account.pendingEmail })
         }
       >
         <SettingsBlock className="flex flex-col gap-3 pt-1">
