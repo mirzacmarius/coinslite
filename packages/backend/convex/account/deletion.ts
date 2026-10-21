@@ -26,7 +26,12 @@ import { rateLimiter as feedbackLimits } from "../feedback";
 import { deleteHomeCurrencyChangeOf } from "../homeCurrency";
 import { deleteItem } from "../items/deletion";
 import { deleteUploadsOf, rateLimiter as uploadLimits } from "../uploads";
-import { NOT_SIGNED_IN, requireUserId } from "../utils/auth";
+import {
+  NOT_SIGNED_IN,
+  requireRecentSignIn,
+  requireUserId,
+} from "../utils/auth";
+import { type ClosingReason, closingReason, stillDue } from "./deletionRules";
 
 /**
  * Deleting an account (spec §2): the person, everything in their Collection,
@@ -100,6 +105,11 @@ export const accountDataByTable = {
   spotPriceChecks: "kept: when the shared Spot prices were last asked for",
   featureFlags: "kept: the feature flags that apply to everyone",
 } as const satisfies Record<TableNames, `${"deleted" | "kept"}${string}`>;
+
+export const deletionErrors = {
+  /** Deleting now is for a deactivated account only (account/closing.ts). */
+  notDeactivated: "NOT_DEACTIVATED",
+} as const;
 
 /** How many Items the confirmation counts before it says there are more. */
 export const summaryItemLimit = 1000;
@@ -354,45 +364,31 @@ async function deleteInBatches(ctx: MutationCtx, left: Remainder) {
 }
 
 /**
- * Deletes the signed-in person's account and everything in it, for good.
- * From the moment it returns, the account can't be used or signed in to; a
- * large Collection finishes disappearing in the background. Fails, deleting
- * nothing, while a subscription that would charge again can't be ended.
+ * Deletes the signed-in person's account and everything in it, for good:
+ * "Delete now" on a deactivated account. From the moment it returns, the
+ * account can't be used or signed in to; a large Collection finishes
+ * disappearing in the background. Refused for an account that isn't
+ * deactivated (NOT_DEACTIVATED, also when it's reactivated meanwhile) and
+ * without a sign-in in the last few minutes (SIGN_IN_AGAIN), so a session
+ * left open elsewhere, or taken, can't delete an account at once. Fails,
+ * deleting nothing, while a subscription that would charge again can't be
+ * ended.
  */
 export const deleteAccount = action({
   args: {},
   returns: v.null(),
   handler: async (ctx) => {
-    await deleteAccountOf(ctx, await requireUserId(ctx));
+    if (!(await deleteAccountOf(ctx, await requireUserId(ctx))))
+      throw new ConvexError(deletionErrors.notDeactivated);
     return null;
   },
 });
 
 /**
- * Why an account is deleted without the person there: deactivated and its
- * time up (account/closing.ts), or unused (account/inactivity.ts). Each
- * stage checks it still holds, so reactivating or signing in meanwhile
- * keeps the account.
- */
-const closingReason = v.union(v.literal("deactivated"), v.literal("unused"));
-export type ClosingReason = Infer<typeof closingReason>;
-
-/** Whether the account is still due to go for `reason`. */
-function stillDue(user: Doc<"users">, reason: ClosingReason | undefined) {
-  if (reason === undefined) return true;
-  if (reason === "deactivated") return user.deactivatedAt !== undefined;
-  return (
-    user.inactivityNotice === 12 &&
-    user.plan === undefined &&
-    user.deactivatedAt === undefined
-  );
-}
-
-/**
  * Deletes an account and everything in it, for good: the person's own
- * request, or, with `reason`, one whose time is up, if it still is. Returns
- * whether it was deleted. Fails, deleting nothing, while a subscription that
- * would charge again can't be ended.
+ * request (`deleteAccount`), or, with `reason`, one whose time is up, if it
+ * still is. Returns whether it was deleted. Fails, deleting nothing, while a
+ * subscription that would charge again can't be ended.
  */
 export async function deleteAccountOf(
   ctx: ActionCtx,
@@ -421,7 +417,9 @@ export async function deleteAccountOf(
 
 /**
  * Marks the account as being deleted, so no checkout opens while billing
- * stops; false, marking nothing, when it's no longer due for `reason`.
+ * stops; false, marking nothing, when it's no longer due for `reason`. The
+ * person's own request (no `reason`) is refused unless the account is
+ * deactivated and they signed in a moment ago.
  */
 export const beginClosingAccount = internalMutation({
   args: { userId: v.id("users"), reason: v.optional(closingReason) },
@@ -429,6 +427,11 @@ export const beginClosingAccount = internalMutation({
   handler: async (ctx, { userId, reason }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError(NOT_SIGNED_IN);
+    if (reason === undefined) {
+      if (user.deactivatedAt === undefined)
+        throw new ConvexError(deletionErrors.notDeactivated);
+      await requireRecentSignIn(ctx);
+    }
     if (!stillDue(user, reason)) return false;
     await beginClosing(ctx, userId);
     return true;

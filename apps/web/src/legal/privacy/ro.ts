@@ -119,7 +119,7 @@ export default {
       id: "security",
       heading: "Securitate",
       blocks: [
-        "Datele circulă criptat. Parolele sunt păstrate doar ca hash-uri. Fotografiile tale sunt private: sunt afișate doar ție, prin linkuri care nu mai funcționează după cel mult o oră. Doar câțiva administratori pot vedea date de cont precum nume, adrese de e-mail, planuri și câte obiecte are un cont, și doar pentru a administra serviciul.",
+        "Datele circulă criptat. Parolele sunt păstrate doar ca hash-uri. Fotografiile tale sunt private: sunt afișate doar ție, prin linkuri care nu mai funcționează după cel mult o zi. Doar câțiva administratori pot vedea date de cont precum nume, adrese de e-mail, planuri și câte obiecte are un cont, și doar pentru a administra serviciul.",
       ],
     },
     {

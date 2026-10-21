@@ -1045,6 +1045,9 @@ export default {
       "Kontoen og alt i samlingen din slettes for godt. Dette kan ikke angres.",
     cancel: "Avbryt",
     failed: "Det gikk ikke. Prøv igjen.",
+    signInAgain:
+      "Av hensyn til sikkerheten må du logge inn på nytt før du sletter kontoen.",
+    signInAgainAction: "Logg inn på nytt",
   },
   catalog: {
     emptyTitle: "Katalogen er tom",

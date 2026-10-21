@@ -119,7 +119,7 @@ export default {
       id: "security",
       heading: "Sikkerhet",
       blocks: [
-        "Data overføres kryptert. Passord lagres bare som hasher. Bildene dine er private: de vises bare for deg, gjennom lenker som slutter å virke innen en time. Bare noen få administratorer kan se kontoopplysninger som navn, e-postadresser, abonnement og hvor mange objekter en konto har, og bare for å drive tjenesten.",
+        "Data overføres kryptert. Passord lagres bare som hasher. Bildene dine er private: de vises bare for deg, gjennom lenker som slutter å virke innen et døgn. Bare noen få administratorer kan se kontoopplysninger som navn, e-postadresser, abonnement og hvor mange objekter en konto har, og bare for å drive tjenesten.",
       ],
     },
     {

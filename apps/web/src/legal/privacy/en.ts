@@ -119,7 +119,7 @@ export default {
       id: "security",
       heading: "Security",
       blocks: [
-        "Data travels encrypted. Passwords are stored only as hashes. Your photos are private: they are shown only to you, through links that stop working within an hour. Only a small number of administrators can see account details such as names, email addresses, plans and how many Items an account holds, and only to run the service.",
+        "Data travels encrypted. Passwords are stored only as hashes. Your photos are private: they are shown only to you, through links that stop working within a day. Only a small number of administrators can see account details such as names, email addresses, plans and how many Items an account holds, and only to run the service.",
       ],
     },
     {

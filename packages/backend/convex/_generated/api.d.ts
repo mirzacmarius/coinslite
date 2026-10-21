@@ -12,6 +12,7 @@ import type * as account from "../account.js";
 import type * as account_closing from "../account/closing.js";
 import type * as account_closingMessages from "../account/closingMessages.js";
 import type * as account_deletion from "../account/deletion.js";
+import type * as account_deletionRules from "../account/deletionRules.js";
 import type * as account_emailChangeMessages from "../account/emailChangeMessages.js";
 import type * as account_inactivity from "../account/inactivity.js";
 import type * as account_inactivityMessages from "../account/inactivityMessages.js";
@@ -184,6 +185,7 @@ declare const fullApi: ApiFromModules<{
   "account/closing": typeof account_closing;
   "account/closingMessages": typeof account_closingMessages;
   "account/deletion": typeof account_deletion;
+  "account/deletionRules": typeof account_deletionRules;
   "account/emailChangeMessages": typeof account_emailChangeMessages;
   "account/inactivity": typeof account_inactivity;
   "account/inactivityMessages": typeof account_inactivityMessages;

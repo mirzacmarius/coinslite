@@ -24,7 +24,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Change email:** a confirmation link goes to the new address. The change applies once it's confirmed.
 - **Sign out.**
 - **Delete account:** from Account, beside Manage subscription, with an explicit confirmation. A subscription that would renew must be cancelled first.
-  - Asking deactivates the account at once and emails the owner. A deactivated account can only be reactivated, deleted now, or signed out of; everything else is closed to it.
+  - Asking deactivates the account at once and emails the owner. A deactivated account can only be reactivated, deleted now, or signed out of; everything else is closed to it. Deleting it now needs a sign-in in the last 15 minutes, so a session left open elsewhere can't.
   - 14 days later a last email asks the owner to delete it now, or to reactivate it (and choose a plan again).
   - Without either, it stays deactivated for 7 more days and is then deleted without further warning.
   - Deleting permanently removes the user, their Items, Albums, photos and subscription link.

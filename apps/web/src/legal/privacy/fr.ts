@@ -119,7 +119,7 @@ export default {
       id: "security",
       heading: "Sécurité",
       blocks: [
-        "Les données circulent chiffrées. Les mots de passe ne sont enregistrés que sous forme d’empreintes. Vos photos sont privées : elles ne sont montrées qu’à vous, par des liens qui cessent de fonctionner en moins d’une heure. Seul un petit nombre d’administrateurs peut voir des informations de compte comme les noms, adresses e-mail, formules et le nombre d’objets d’un compte, et uniquement pour faire fonctionner le service.",
+        "Les données circulent chiffrées. Les mots de passe ne sont enregistrés que sous forme d’empreintes. Vos photos sont privées : elles ne sont montrées qu’à vous, par des liens qui cessent de fonctionner en moins d’une journée. Seul un petit nombre d’administrateurs peut voir des informations de compte comme les noms, adresses e-mail, formules et le nombre d’objets d’un compte, et uniquement pour faire fonctionner le service.",
       ],
     },
     {

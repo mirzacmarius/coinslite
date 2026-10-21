@@ -1061,6 +1061,9 @@ export default {
       "Votre compte et toute votre collection sont supprimés définitivement. Cette action est irréversible.",
     cancel: "Annuler",
     failed: "Cela n’a pas fonctionné. Réessayez.",
+    signInAgain:
+      "Par sécurité, reconnectez-vous avant de supprimer votre compte.",
+    signInAgainAction: "Se reconnecter",
   },
   catalog: {
     emptyTitle: "Le catalogue est vide",
