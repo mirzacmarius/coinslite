@@ -253,7 +253,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 9. Overview (home)
 
-- **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss.
+- **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss. The pieces card opens the Collection.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
 - **Add Item:** on phones, a round button in the accent colour in the middle of the tabs along the bottom, on every page, opening the form (§5.4). From tablet width up, the sidebar's Add Item, in the accent colour, is the button for it. While the Collection is empty, the first-run prompt also has a way to add, on every screen size.
 - **Value over time:** the Collection's "over time" chart (§7), compact: the same figures, without the switch to Value by Date acquired. Absent while nothing is owned.
