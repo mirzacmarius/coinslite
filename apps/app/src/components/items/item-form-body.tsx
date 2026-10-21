@@ -25,9 +25,12 @@ const notesInput =
  */
 export function ItemFormBody({
   itemForm,
+  typePicker,
   className,
 }: {
   itemForm: ItemFormState;
+  /** Whether the Item type pill shows: not where the page picks the type (new-item.tsx). */
+  typePicker?: boolean;
   className?: string;
 }) {
   const editing = itemForm.editing;
@@ -54,6 +57,7 @@ export function ItemFormBody({
         />
         <ItemPills
           linked={itemForm.linked}
+          typePicker={typePicker}
           onPickEntry={itemForm.openPicker}
           onAlbumCreateFailed={itemForm.setFailed}
         />

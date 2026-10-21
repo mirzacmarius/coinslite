@@ -107,8 +107,11 @@ function useScanUpload() {
  * any photo goes to the plain form.
  */
 export function ScanCoin({
+  active,
   onHandOver,
 }: {
+  /** Whether it's in view: Cmd/Ctrl+Enter identifies the coin only then. */
+  active: boolean;
   onHandOver: (scan?: ScanPreset) => void;
 }) {
   const t = useI18n();
@@ -221,7 +224,7 @@ export function ScanCoin({
     }
   };
 
-  useShortcut("mod+Enter", () => void scan());
+  useShortcut("mod+Enter", () => void scan(), active);
 
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-3">
