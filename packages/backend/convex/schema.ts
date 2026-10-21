@@ -88,6 +88,15 @@ export default defineSchema({
     /** When they last signed in, on any device (auth.ts). */
     lastSignInAt: v.optional(v.number()),
 
+    // Closing the account (account/closing.ts). Deleting it deactivates it
+    // first; it's deleted at `deletionAt` unless they reactivate it.
+    /** When they asked to delete it, deactivating it. */
+    deactivatedAt: v.optional(v.number()),
+    /** When a deactivated account is deleted for good. */
+    deletionAt: v.optional(v.number()),
+    /** The next step of closing it, called off when they reactivate it. */
+    closingStep: v.optional(v.id("_scheduled_functions")),
+
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),

@@ -369,11 +369,9 @@ export default {
       failed: "Kunne ikke sende lenken. Prøv igjen.",
     },
     danger: {
-      title: "Logg ut eller slett",
+      title: "Logg ut",
       signOut: "Logg ut",
       delete: "Slett kontoen",
-      deleteWarning:
-        "Når du sletter kontoen, fjernes den og alt i den. Dette kan ikke angres.",
     },
     confirmEmail: {
       pageTitle: "Bekreft e-post",
@@ -1025,16 +1023,28 @@ export default {
   deleteAccount: {
     title: "Slette kontoen?",
     description:
-      "Profilen, kontaktopplysningene og innloggingsmåtene dine slettes for godt, sammen med alt i samlingen din. Dette kan ikke angres.",
-    endsSubscription:
-      "Premium-abonnementet ditt avsluttes nå og blir ikke belastet igjen.",
+      "Kontoen din deaktiveres nå og slettes for godt om 21 dager, med alt i samlingen din. Vi sender deg en e-post nå og igjen etter 14 dager. Fram til da kan du logge inn og aktivere den igjen.",
+    subscriptionActive:
+      "Premium-abonnementet ditt fornyes fortsatt. Si det opp under Administrer abonnement først, og slett deretter kontoen.",
     items: "Objekter",
     photos: "Bilder",
     albums: "Album",
     atLeast: "{value}+",
     confirm: "Slett kontoen",
     cancel: "Avbryt",
-    failed: "Kontoen kunne ikke slettes, og ingenting ble fjernet. Prøv igjen.",
+    failed: "Kontoen kunne ikke deaktiveres. Prøv igjen.",
+  },
+  deactivated: {
+    title: "Kontoen din er deaktivert",
+    description:
+      "Du ba om å slette den, så den slettes for godt {date}, med alt i samlingen din. Aktiver den igjen for å fortsette å bruke CoinsLite, eller slett den nå.",
+    reactivate: "Aktiver kontoen igjen",
+    deleteNow: "Slett nå",
+    deleteNowTitle: "Slette kontoen nå?",
+    deleteNowDescription:
+      "Kontoen og alt i samlingen din slettes for godt. Dette kan ikke angres.",
+    cancel: "Avbryt",
+    failed: "Det gikk ikke. Prøv igjen.",
   },
   catalog: {
     emptyTitle: "Katalogen er tom",

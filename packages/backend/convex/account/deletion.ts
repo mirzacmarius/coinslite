@@ -3,9 +3,10 @@ import { ConvexError, type Infer, v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Doc, Id, TableNames } from "../_generated/dataModel";
 import {
-  type MutationCtx,
+  type ActionCtx,
   action,
   internalMutation,
+  type MutationCtx,
   query,
 } from "../_generated/server";
 import { rateLimiter as emailChangeLimits } from "../account";
@@ -362,23 +363,32 @@ export const deleteAccount = action({
   args: {},
   returns: v.null(),
   handler: async (ctx) => {
-    const userId = await requireUserId(ctx);
-    // First, so a deleted account is never charged again.
-    await ctx.runMutation(internal.account.deletion.beginClosingAccount, {
-      userId,
-    });
-    try {
-      await stopBilling(ctx, userId);
-    } catch (error) {
-      await ctx.runMutation(internal.account.deletion.cancelClosingAccount, {
-        userId,
-      });
-      throw error;
-    }
-    await ctx.runMutation(internal.account.deletion.closeAccount, { userId });
+    await deleteAccountOf(ctx, await requireUserId(ctx));
     return null;
   },
 });
+
+/**
+ * Deletes an account and everything in it, for good: the person's own
+ * request, or a deactivated or unused account whose time is up
+ * (account/closing.ts). Fails, deleting nothing, while a subscription that
+ * would charge again can't be ended.
+ */
+export async function deleteAccountOf(ctx: ActionCtx, userId: Id<"users">) {
+  // First, so a deleted account is never charged again.
+  await ctx.runMutation(internal.account.deletion.beginClosingAccount, {
+    userId,
+  });
+  try {
+    await stopBilling(ctx, userId);
+  } catch (error) {
+    await ctx.runMutation(internal.account.deletion.cancelClosingAccount, {
+      userId,
+    });
+    throw error;
+  }
+  await ctx.runMutation(internal.account.deletion.closeAccount, { userId });
+}
 
 /** Marks the account as being deleted, so no checkout opens while billing stops. */
 export const beginClosingAccount = internalMutation({

@@ -372,11 +372,9 @@ export default {
       failed: "Linkul nu a putut fi trimis. Încearcă din nou.",
     },
     danger: {
-      title: "Deconectare sau ștergere",
+      title: "Deconectare",
       signOut: "Deconectează-te",
       delete: "Șterge contul",
-      deleteWarning:
-        "Ștergerea contului îl elimină împreună cu tot conținutul. Acțiunea nu poate fi anulată.",
     },
     confirmEmail: {
       pageTitle: "Confirmă e-mailul",
@@ -1033,17 +1031,28 @@ export default {
   deleteAccount: {
     title: "Ștergi contul?",
     description:
-      "Profilul, datele de contact și metodele de conectare se șterg definitiv, împreună cu tot ce este în colecția ta. Acțiunea nu poate fi anulată.",
-    endsSubscription:
-      "Abonamentul Premium se încheie acum și nu va mai fi facturat.",
+      "Contul tău este dezactivat acum și șters definitiv peste 21 de zile, cu tot ce e în colecția ta. Îți scriem acum și din nou după 14 zile. Până atunci te poți conecta ca să-l reactivezi.",
+    subscriptionActive:
+      "Abonamentul tău Premium încă se reînnoiește. Anulează-l mai întâi din Gestionează abonamentul, apoi șterge contul.",
     items: "Obiecte",
     photos: "Fotografii",
     albums: "Albume",
     atLeast: "{value}+",
     confirm: "Șterge contul",
     cancel: "Anulează",
-    failed:
-      "Contul nu a putut fi șters și nu s-a eliminat nimic. Încearcă din nou.",
+    failed: "Contul nu a putut fi dezactivat. Încearcă din nou.",
+  },
+  deactivated: {
+    title: "Contul tău este dezactivat",
+    description:
+      "Ai cerut ștergerea lui, așa că va fi șters definitiv pe {date}, cu tot ce e în colecția ta. Reactivează-l ca să folosești în continuare CoinsLite sau șterge-l acum.",
+    reactivate: "Reactivează contul",
+    deleteNow: "Șterge acum",
+    deleteNowTitle: "Ștergi contul acum?",
+    deleteNowDescription:
+      "Contul tău și tot ce e în colecția ta sunt șterse definitiv. Acțiunea nu poate fi anulată.",
+    cancel: "Anulează",
+    failed: "Nu a funcționat. Încearcă din nou.",
   },
   catalog: {
     emptyTitle: "Catalogul este gol",

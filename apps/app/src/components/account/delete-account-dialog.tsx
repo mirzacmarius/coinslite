@@ -1,16 +1,18 @@
 "use client";
 
-import { useSignOut } from "@/components/sign-out";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
-import { useAction, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 
 /**
  * Confirms deleting the account, saying what goes with it and how much of
- * it, then signs out. Nothing is deleted when it fails, so it can be retried.
+ * it. It's deactivated at once and deleted in 21 days (account/closing.ts),
+ * and the app shows the deactivated account (DeactivatedAccount). Not while
+ * a subscription would renew: that's cancelled first, under Manage
+ * subscription.
  */
 export function DeleteAccountDialog({
   open,
@@ -21,8 +23,7 @@ export function DeleteAccountDialog({
 }) {
   const t = useI18n();
   const { number } = useFormatters();
-  const signOut = useSignOut();
-  const deleteAccount = useAction(api.account.deletion.deleteAccount);
+  const requestDeletion = useMutation(api.account.closing.requestDeletion);
   const summary = useQuery(api.account.deletion.summary, open ? {} : "skip");
   const [failed, setFailed] = useState(false);
 
@@ -52,23 +53,19 @@ export function DeleteAccountDialog({
         onOpenChange(next);
       }}
       title={t("deleteAccount.title")}
-      description={
-        summary?.endsSubscription
-          ? `${t("deleteAccount.description")} ${t("deleteAccount.endsSubscription")}`
-          : t("deleteAccount.description")
-      }
+      description={t("deleteAccount.description")}
       confirmLabel={t("deleteAccount.confirm")}
       cancelLabel={t("deleteAccount.cancel")}
       destructive
+      confirmDisabled={summary?.endsSubscription !== false}
       onConfirm={async () => {
         setFailed(false);
         try {
-          await deleteAccount({});
+          await requestDeletion({});
         } catch (failure) {
           setFailed(true);
           throw failure;
         }
-        await signOut();
       }}
     >
       <dl className="divide-y overflow-hidden rounded-md border text-ui">
@@ -89,6 +86,11 @@ export function DeleteAccountDialog({
           </div>
         ))}
       </dl>
+      {summary?.endsSubscription && (
+        <p role="alert" className="text-xs text-destructive">
+          {t("deleteAccount.subscriptionActive")}
+        </p>
+      )}
       {failed && (
         <p role="alert" className="text-xs text-destructive">
           {t("deleteAccount.failed")}

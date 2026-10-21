@@ -380,11 +380,9 @@ export default {
       failed: "Der Link konnte nicht gesendet werden. Versuche es noch einmal.",
     },
     danger: {
-      title: "Abmelden oder löschen",
+      title: "Abmelden",
       signOut: "Abmelden",
       delete: "Konto löschen",
-      deleteWarning:
-        "Beim Löschen deines Kontos wird es mit allem darin entfernt. Das lässt sich nicht rückgängig machen.",
     },
     confirmEmail: {
       pageTitle: "E-Mail bestätigen",
@@ -1061,9 +1059,9 @@ export default {
   deleteAccount: {
     title: "Konto löschen?",
     description:
-      "Dein Profil, deine Kontaktdaten und deine Anmeldemethoden werden endgültig gelöscht, zusammen mit allem in deiner Sammlung. Das lässt sich nicht rückgängig machen.",
-    endsSubscription:
-      "Dein Premium-Abo endet sofort und wird nicht mehr abgerechnet.",
+      "Dein Konto wird jetzt deaktiviert und in 21 Tagen endgültig gelöscht, mit allem in deiner Sammlung. Wir schreiben dir jetzt und nach 14 Tagen noch einmal. Bis dahin kannst du dich anmelden und es reaktivieren.",
+    subscriptionActive:
+      "Dein Premium-Abo verlängert sich noch. Kündige es zuerst unter Abo verwalten und lösche dann dein Konto.",
     items: "Objekte",
     photos: "Fotos",
     albums: "Alben",
@@ -1071,7 +1069,19 @@ export default {
     confirm: "Konto löschen",
     cancel: "Abbrechen",
     failed:
-      "Dein Konto konnte nicht gelöscht werden, und es wurde nichts entfernt. Versuche es noch einmal.",
+      "Dein Konto konnte nicht deaktiviert werden. Versuch es noch einmal.",
+  },
+  deactivated: {
+    title: "Dein Konto ist deaktiviert",
+    description:
+      "Du hast darum gebeten, es zu löschen, daher wird es am {date} endgültig gelöscht, mit allem in deiner Sammlung. Reaktiviere es, um CoinsLite weiter zu nutzen, oder lösche es jetzt.",
+    reactivate: "Konto reaktivieren",
+    deleteNow: "Jetzt löschen",
+    deleteNowTitle: "Konto jetzt löschen?",
+    deleteNowDescription:
+      "Dein Konto und alles in deiner Sammlung werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+    cancel: "Abbrechen",
+    failed: "Das hat nicht geklappt. Versuch es noch einmal.",
   },
   catalog: {
     emptyTitle: "Der Katalog ist leer",

@@ -9,6 +9,8 @@
  */
 
 import type * as account from "../account.js";
+import type * as account_closing from "../account/closing.js";
+import type * as account_closingMessages from "../account/closingMessages.js";
 import type * as account_deletion from "../account/deletion.js";
 import type * as account_emailChangeMessages from "../account/emailChangeMessages.js";
 import type * as account_rules from "../account/rules.js";
@@ -177,6 +179,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   account: typeof account;
+  "account/closing": typeof account_closing;
+  "account/closingMessages": typeof account_closingMessages;
   "account/deletion": typeof account_deletion;
   "account/emailChangeMessages": typeof account_emailChangeMessages;
   "account/rules": typeof account_rules;

@@ -363,11 +363,9 @@ export default {
       failed: "Couldn't send the link. Try again.",
     },
     danger: {
-      title: "Sign out or delete",
+      title: "Sign out",
       signOut: "Sign out",
       delete: "Delete account",
-      deleteWarning:
-        "Deleting your account removes it and everything in it. This can't be undone.",
     },
     confirmEmail: {
       pageTitle: "Confirm email",
@@ -1011,17 +1009,28 @@ export default {
   deleteAccount: {
     title: "Delete your account?",
     description:
-      "Your profile, contact details and sign-in methods are deleted for good, with everything in your Collection. This can't be undone.",
-    endsSubscription:
-      "Your Premium subscription ends now and won't be charged again.",
+      "Your account is deactivated now and deleted for good in 21 days, with everything in your Collection. We'll email you now and again after 14 days. Until then you can sign in and reactivate it.",
+    subscriptionActive:
+      "Your Premium subscription still renews. Cancel it under Manage subscription first, then delete your account.",
     items: "Items",
     photos: "Photos",
     albums: "Albums",
     atLeast: "{value}+",
     confirm: "Delete account",
     cancel: "Cancel",
-    failed:
-      "Your account couldn't be deleted, and nothing was removed. Try again.",
+    failed: "Your account couldn't be deactivated. Try again.",
+  },
+  deactivated: {
+    title: "Your account is deactivated",
+    description:
+      "You asked to delete it, so it's deleted for good on {date}, with everything in your Collection. Reactivate it to keep using CoinsLite, or delete it now.",
+    reactivate: "Reactivate account",
+    deleteNow: "Delete now",
+    deleteNowTitle: "Delete your account now?",
+    deleteNowDescription:
+      "Your account and everything in your Collection are deleted for good. This can't be undone.",
+    cancel: "Cancel",
+    failed: "That didn't work. Try again.",
   },
   catalog: {
     emptyTitle: "The Catalog is empty",

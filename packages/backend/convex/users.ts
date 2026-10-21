@@ -24,6 +24,8 @@ export const getUser = query({
         "country",
         "homeCurrency",
         "homeCurrencyChange",
+        "deactivatedAt",
+        "deletionAt",
       )
       .extend({
         /** The display name they chose, else their sign-in provider's. */
@@ -44,6 +46,8 @@ export const getUser = query({
       country: user.country,
       homeCurrency: user.homeCurrency,
       homeCurrencyChange: user.homeCurrencyChange,
+      deactivatedAt: user.deactivatedAt,
+      deletionAt: user.deletionAt,
     };
   },
 });
