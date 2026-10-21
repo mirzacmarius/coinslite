@@ -32,7 +32,7 @@ import { toast } from "@coinslite/ui/toaster";
 import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { Globe, Loader2 } from "lucide-react";
+import { Globe, Loader2, Trash2 } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { DeleteAccountDialog } from "./delete-account-dialog";
@@ -74,6 +74,7 @@ export function AccountPage() {
       </header>
       <div className="flex flex-col rounded-xl bg-card p-1">
         <PlanLink plan={account.plan} />
+        <DeleteAccountLink />
         <PhoneAccountLinks />
         <UpdatesLink />
         <InsuranceReportLink premium={account.plan === "premium"} />
@@ -450,21 +451,39 @@ function FeedbackSection() {
 function LeaveSection() {
   const t = useI18n();
   const signOut = useSignOut();
-  const [deleting, setDeleting] = useState(false);
   return (
-    <SettingsGroup
-      title={t("account.danger.title")}
-      description={t("account.danger.deleteWarning")}
-    >
+    <SettingsGroup title={t("account.danger.title")}>
       <SettingsBlock className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => void signOut()}>
           {t("account.danger.signOut")}
         </Button>
-        <Button variant="destructive" onClick={() => setDeleting(true)}>
-          {t("account.danger.delete")}
-        </Button>
       </SettingsBlock>
-      <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
     </SettingsGroup>
+  );
+}
+
+/**
+ * Deleting the account, beside Manage subscription: a subscription that
+ * would renew is cancelled there first (DeleteAccountDialog).
+ */
+function DeleteAccountLink() {
+  const t = useI18n();
+  const [deleting, setDeleting] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        className="flex h-9 w-full items-center gap-2 rounded-md px-2 text-left text-ui font-medium text-destructive transition-colors duration-100 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        onClick={() => setDeleting(true)}
+      >
+        <Trash2
+          className="size-4 shrink-0"
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
+        {t("account.danger.delete")}
+      </button>
+      <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
+    </>
   );
 }

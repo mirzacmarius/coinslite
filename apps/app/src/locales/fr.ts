@@ -376,11 +376,9 @@ export default {
       failed: "Impossible d’envoyer le lien. Réessayez.",
     },
     danger: {
-      title: "Se déconnecter ou supprimer",
+      title: "Se déconnecter",
       signOut: "Se déconnecter",
       delete: "Supprimer le compte",
-      deleteWarning:
-        "Supprimer votre compte l’efface avec tout son contenu. Cette action est irréversible.",
     },
     confirmEmail: {
       pageTitle: "Confirmer l’e-mail",
@@ -1041,17 +1039,28 @@ export default {
   deleteAccount: {
     title: "Supprimer votre compte\u00a0?",
     description:
-      "Votre profil, vos coordonnées et vos moyens de connexion sont supprimés définitivement, avec tout le contenu de votre collection. Cette action est irréversible.",
-    endsSubscription:
-      "Votre abonnement Premium prend fin maintenant et ne sera plus facturé.",
+      "Votre compte est désactivé dès maintenant et supprimé définitivement dans 21 jours, avec toute votre collection. Nous vous écrivons maintenant, puis de nouveau après 14 jours. D’ici là, vous pouvez vous connecter et le réactiver.",
+    subscriptionActive:
+      "Votre abonnement Premium se renouvelle encore. Résiliez-le d’abord dans Gérer l’abonnement, puis supprimez votre compte.",
     items: "Objets",
     photos: "Photos",
     albums: "Albums",
     atLeast: "{value}+",
     confirm: "Supprimer le compte",
     cancel: "Annuler",
-    failed:
-      "Votre compte n’a pas pu être supprimé, et rien n’a été effacé. Réessayez.",
+    failed: "Votre compte n’a pas pu être désactivé. Réessayez.",
+  },
+  deactivated: {
+    title: "Votre compte est désactivé",
+    description:
+      "Vous avez demandé sa suppression\u00a0: il sera supprimé définitivement le {date}, avec toute votre collection. Réactivez-le pour continuer à utiliser CoinsLite, ou supprimez-le maintenant.",
+    reactivate: "Réactiver le compte",
+    deleteNow: "Supprimer maintenant",
+    deleteNowTitle: "Supprimer votre compte maintenant\u00a0?",
+    deleteNowDescription:
+      "Votre compte et toute votre collection sont supprimés définitivement. Cette action est irréversible.",
+    cancel: "Annuler",
+    failed: "Cela n’a pas fonctionné. Réessayez.",
   },
   catalog: {
     emptyTitle: "Le catalogue est vide",

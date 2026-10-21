@@ -23,7 +23,12 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Password reset:** request a link by email, then set a new password.
 - **Change email:** a confirmation link goes to the new address. The change applies once it's confirmed.
 - **Sign out.**
-- **Delete account:** requires an explicit confirmation. It permanently removes the user, their Items, Albums, photos and subscription link.
+- **Delete account:** from Account, beside Manage subscription, with an explicit confirmation. A subscription that would renew must be cancelled first.
+  - Asking deactivates the account at once and emails the owner. A deactivated account can only be reactivated, deleted now, or signed out of; everything else is closed to it.
+  - 14 days later a last email asks the owner to delete it now, or to reactivate it (and choose a plan again).
+  - Without either, it stays deactivated for 7 more days and is then deleted without further warning.
+  - Deleting permanently removes the user, their Items, Albums, photos and subscription link.
+- **Unused Free accounts:** an account on the Free plan that nobody signs in to gets an email after 6 months, another after 8, and after 12 one saying it will be deleted 14 days later, which then happens. Signing in starts the count again.
 
 ## 3. Languages and regional settings
 
@@ -314,7 +319,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Updates, marked when there's an unseen release
   - Insurance report, locked with an upgrade path on the Free plan
 - **Send feedback:** a free-text message that reaches the team by email.
-- **Sign out, delete account.**
+- **Sign out.** Delete account sits with the plan, beside Manage subscription (§2).
 
 ## 13. Updates
 

@@ -88,6 +88,25 @@ export default defineSchema({
     /** When they last signed in, on any device (auth.ts). */
     lastSignInAt: v.optional(v.number()),
 
+    // Closing the account (account/closing.ts). Deleting it deactivates it
+    // first; it's deleted at `deletionAt` unless they reactivate it. An
+    // unused Free account is closed too (account/inactivity.ts).
+    /** When they asked to delete it, deactivating it. */
+    deactivatedAt: v.optional(v.number()),
+    /** When a deactivated account is deleted for good. */
+    deletionAt: v.optional(v.number()),
+    /** The next step of closing it, called off when they reactivate it. */
+    closingStep: v.optional(v.id("_scheduled_functions")),
+    /**
+     * On the Free plan, the last email about not using the account: after 6,
+     * 8 or 12 months without signing in. Signing in clears it.
+     */
+    inactivityNotice: v.optional(
+      v.union(v.literal(6), v.literal(8), v.literal(12)),
+    ),
+    /** When the step after `inactivityNotice` is due: the next email, or the deletion. */
+    inactivityDueAt: v.optional(v.number()),
+
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
@@ -102,6 +121,18 @@ export default defineSchema({
     .index("by_plan_and_planEnd", ["plan", "planEnd"])
     .index("by_lastSignInAt", ["lastSignInAt"])
     .index("by_plan_and_lastSignInAt", ["plan", "lastSignInAt"])
+    // Free accounts not in use: those not emailed yet by when they last
+    // signed in, the others by when their next step is due.
+    .index("by_plan_and_inactivityNotice_and_lastSignInAt", [
+      "plan",
+      "inactivityNotice",
+      "lastSignInAt",
+    ])
+    .index("by_plan_and_inactivityNotice_and_inactivityDueAt", [
+      "plan",
+      "inactivityNotice",
+      "inactivityDueAt",
+    ])
     .searchIndex("search_displayName", {
       searchField: "displayName",
       filterFields: ["plan"],

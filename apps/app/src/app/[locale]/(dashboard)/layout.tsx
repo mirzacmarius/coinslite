@@ -1,5 +1,6 @@
 import { HomeCurrencyChangeNotices } from "@/components/account/home-currency-change";
 import { ProfileLanguage } from "@/components/account/profile-language";
+import { DeactivatedGate } from "@/components/account/deactivated-account";
 import { EndSession, UntilSessionEnds } from "@/components/end-session";
 import {
   AddItemQuickAction,
@@ -64,7 +65,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <ProfileLanguage />
       <HomeCurrencyChangeNotices />
       <ReleaseHighlights />
-      <UntilSessionEnds>{children}</UntilSessionEnds>
+      <UntilSessionEnds>
+        <DeactivatedGate>{children}</DeactivatedGate>
+      </UntilSessionEnds>
     </AppShell>
   );
 }

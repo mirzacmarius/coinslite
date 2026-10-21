@@ -57,7 +57,12 @@ export const store = internalMutation({
       (args.type === "signIn" && args.sessionId === undefined);
     const userId = signedInUser(result);
     if (startedSession && userId) {
-      await ctx.db.patch(userId, { lastSignInAt: Date.now() });
+      // Signing in is using the account: the count of months unused starts again.
+      await ctx.db.patch(userId, {
+        lastSignInAt: Date.now(),
+        inactivityNotice: undefined,
+        inactivityDueAt: undefined,
+      });
     }
     return result;
   },
