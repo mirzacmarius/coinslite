@@ -120,7 +120,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Sets, the Wantlist and "You hold" counts follow the new links. No suggestions while the Catalog is hidden.
 
 ### 5.5 Editing, duplicating, deleting
-- **Edit** changes any field, photos included. It opens a page of its own, with every field open, Cancel and Save in the bar, and Cmd/Ctrl+Enter to save; on the Item page, **E** opens it, except while typing or with a dialog open. Leaving it with unsaved changes asks first.
+- **Edit** changes any field, photos included. It opens a page of its own, with every field open, Cancel and Save in the bar (a size up on phones, where the bar leaves out the Item's name to give them room), and Cmd/Ctrl+Enter to save; on the Item page, **E** opens it, except while typing or with a dialog open. Leaving it with unsaved changes asks first.
   - Its Catalog pill searches the Catalog as when adding (§6.2): picking an entry fills its facts in, and saving links the Item to it, in place of its own entry or for the first time. The facts the person changed are kept, as on a new Item. An owned Item takes the entry off the Wantlist.
 - **Set purchase** records a bought lot's purchase on many Items at once, from the Collection's select mode (§7).
 - **Duplicate** opens the form prefilled from an existing Item and saves it as a new Item. Photos are not copied unless the user adds them.

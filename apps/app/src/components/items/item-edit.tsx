@@ -20,6 +20,9 @@ import { ItemNotFound } from "./item-detail";
 import { ItemFormBody } from "./item-form-body";
 import { useItemForm } from "./use-item-form";
 
+/** Cancel and Save, a size up on phones for a thumb. */
+const phoneButton = "max-md:h-9 max-md:px-4 max-md:text-sm";
+
 /** The Item as its pages read it. */
 type PageItem = NonNullable<FunctionReturnType<typeof api.items.get>>;
 
@@ -85,10 +88,16 @@ function EditForm({ item, itemHref }: { item: PageItem; itemHref: string }) {
             {item.title}
           </Link>
         }
+        parentOnPhones={false}
         title={t("items.editItem")}
         actions={
           <>
-            <Button variant="ghost" size="xs" onClick={() => leave(itemHref)}>
+            <Button
+              variant="ghost"
+              size="xs"
+              className={phoneButton}
+              onClick={() => leave(itemHref)}
+            >
               {t("items.cancel")}
             </Button>
             {/* Not a submit button: Enter in a field never saves; the button
@@ -96,6 +105,7 @@ function EditForm({ item, itemHref }: { item: PageItem; itemHref: string }) {
             <Button
               type="button"
               size="xs"
+              className={phoneButton}
               disabled={itemForm.submitting}
               onClick={(event) => submit(event.currentTarget)}
             >
