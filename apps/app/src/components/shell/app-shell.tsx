@@ -19,7 +19,6 @@ import type * as React from "react";
 import { useEffect, useState } from "react";
 import { AppSidebar } from "./app-sidebar";
 import { type NavItem, isCurrent, navItems } from "./navigation";
-import { WorkspaceMenu } from "./workspace-menu";
 
 /**
  * The tabs along the bottom of phones, sharing the width equally, with
@@ -112,7 +111,7 @@ function useSidebarOpen() {
 /**
  * The frame around every signed-in screen: on tablets and desktops a sidebar
  * that collapses to icons (app-sidebar.tsx) beside the page's panel, and on
- * phones a compact top bar plus four tabs (three while the Catalog is
+ * phones four tabs (three while the Catalog is
  * hidden) around the phone action. Each page starts with its own HeaderBar,
  * which holds the title and the page's own actions.
  */
@@ -161,10 +160,11 @@ export function AppShell({
         }
       >
         <SidebarInset className="min-w-0 md:overflow-hidden">
-          {/* The phone top bar; a landmark (banner), as everything outside `main` is. */}
-          <header className="flex h-11 items-center border-b bg-card px-2 pt-[env(safe-area-inset-top)] md:hidden">
-            <WorkspaceMenu className="h-8" />
-          </header>
+          {/* On phones, a strip behind the status bar; each page's header bar sticks just below it. */}
+          <div
+            aria-hidden="true"
+            className="sticky top-0 z-30 h-[env(safe-area-inset-top)] shrink-0 bg-background md:hidden"
+          />
           <main
             id="main"
             tabIndex={-1}

@@ -28,7 +28,7 @@ export type SettingsLink = {
 /**
  * What "Settings" holds: the account, plans and updates, and for admins the
  * admin areas, which stay out of sight for everyone else. The sidebar lists
- * them under Settings; the phone top bar's menu lists them too.
+ * them under Settings; on phones, the Account page links to them.
  */
 export function useSettingsLinks(): SettingsLink[] {
   const t = useI18n();

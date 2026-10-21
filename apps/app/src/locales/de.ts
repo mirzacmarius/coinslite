@@ -27,7 +27,6 @@ export default {
     primaryNavigation: "Hauptmenü",
     sidebar: "Seitenleiste",
     signOut: "Abmelden",
-    workspaceMenu: "Konto und Einstellungen",
     plans: "Tarife",
     appearance: "Darstellung",
     appearanceLight: "Hell",

@@ -39,7 +39,7 @@ export function HeaderBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-10 shrink-0 items-center justify-between gap-2 border-b bg-background px-4",
+        "sticky top-0 z-30 flex max-md:top-[env(safe-area-inset-top)] h-10 shrink-0 items-center justify-between gap-2 border-b bg-background px-4",
         className,
       )}
     >
