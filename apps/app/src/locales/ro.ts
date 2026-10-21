@@ -1895,7 +1895,6 @@ export default {
     home: "Mergi la prezentare",
   },
   scanner: {
-    scan: "Scanează moneda",
     title: "Scanează moneda",
     beta: "Beta",
     description:

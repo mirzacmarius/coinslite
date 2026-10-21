@@ -1875,7 +1875,6 @@ export default {
     home: "Gå til oversikten",
   },
   scanner: {
-    scan: "Skann mynt",
     title: "Skann mynt",
     beta: "Beta",
     description:

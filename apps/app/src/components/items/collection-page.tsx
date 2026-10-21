@@ -4,7 +4,6 @@ import {
   BrowserSkeleton,
   CollectionBrowser,
 } from "@/components/collection/collection-browser";
-import { ScanCoinButton } from "@/components/scanner/scan-coin";
 import { useI18n } from "@/locales/client";
 import { HeaderBar } from "@coinslite/ui/header-bar";
 import { Suspense } from "react";
@@ -19,7 +18,7 @@ export function CollectionPage() {
   const t = useI18n();
   return (
     <>
-      <HeaderBar title={t("nav.collection")} actions={<ScanCoinButton />} />
+      <HeaderBar title={t("nav.collection")} />
       <Suspense fallback={<BrowserSkeleton />}>
         <CollectionBrowser />
       </Suspense>

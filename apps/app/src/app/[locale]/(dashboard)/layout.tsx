@@ -7,10 +7,7 @@ import {
   AddItemTabButton,
 } from "@/components/items/add-item";
 import { SidebarPlanUsage } from "@/components/plans/plan-usage";
-import {
-  ScanCoinProvider,
-  ScanCoinQuickAction,
-} from "@/components/scanner/scan-coin";
+import { ScanCoinProvider } from "@/components/scanner/scan-coin";
 import { AppShell } from "@/components/shell/app-shell";
 import { SidebarSpotPrices } from "@/components/spot-prices/spot-prices";
 import { ReleaseHighlights } from "@/components/updates/release-highlights";
@@ -52,12 +49,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <AddItemProvider>
       <ScanCoinProvider>
         <AppShell
-          quickActions={
-            <>
-              <AddItemQuickAction />
-              <ScanCoinQuickAction />
-            </>
-          }
+          quickActions={<AddItemQuickAction />}
           phoneAction={<AddItemTabButton />}
           sidebarFooter={
             <>

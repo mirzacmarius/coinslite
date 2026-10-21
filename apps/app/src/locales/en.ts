@@ -1850,7 +1850,6 @@ export default {
     home: "Go to the Overview",
   },
   scanner: {
-    scan: "Scan coin",
     title: "Scan coin",
     beta: "Beta",
     description:

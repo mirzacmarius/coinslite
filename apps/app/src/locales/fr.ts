@@ -1927,7 +1927,6 @@ export default {
     home: "Aller à l’aperçu",
   },
   scanner: {
-    scan: "Scanner une pièce",
     title: "Scanner une pièce",
     beta: "Bêta",
     description:

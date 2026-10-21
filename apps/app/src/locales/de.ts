@@ -1942,7 +1942,6 @@ export default {
     home: "Zur Übersicht",
   },
   scanner: {
-    scan: "Münze scannen",
     title: "Münze scannen",
     beta: "Beta",
     description:

@@ -36,7 +36,6 @@ import {
 } from "@coinslite/ui/dialog";
 import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
-import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { cn } from "@coinslite/ui/utils";
 import { useAction, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -46,13 +45,10 @@ import {
   ImagePlus,
   Library,
   Loader2,
-  ScanLine,
   X,
 } from "lucide-react";
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useId,
   useRef,
@@ -79,11 +75,6 @@ const scanPhoto: ShrinkTarget = {
  * for the person to review, with the photos; a coin that isn't identified
  * can be added by hand, photos and all.
  */
-
-const ScanCoinContext = createContext<() => void>(() => {});
-
-/** Opens the scanner. Only offer it where `useScanner().available` says so. */
-export const useScanCoin = () => useContext(ScanCoinContext);
 
 /**
  * Whether the signed-in person may scan (the scanner flag, and Premium
@@ -117,46 +108,12 @@ export function ScanCoinProvider({ children }: { children: React.ReactNode }) {
   );
   useShortcut("c", startAddItem);
   return (
-    <ScanCoinContext.Provider value={openScanner}>
+    <>
       <StartAddItemProvider value={startAddItem}>
         {children}
       </StartAddItemProvider>
       <ScanCoinDialog key={scan} open={open} onOpenChange={setOpen} />
-    </ScanCoinContext.Provider>
-  );
-}
-
-/** The sidebar's quick action, for those who may scan. */
-export function ScanCoinQuickAction() {
-  const t = useI18n();
-  const scanner = useScanner();
-  const scanCoin = useScanCoin();
-  if (!scanner?.available) return null;
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton tooltip={t("scanner.scan")} onClick={scanCoin}>
-        <ScanLine aria-hidden="true" />
-        {/* The badge comes last, so the button's own truncation misses it. */}
-        <span className="truncate">{t("scanner.scan")}</span>
-        <Badge className="ml-auto shrink-0 group-data-[collapsible=icon]:hidden">
-          {t("scanner.beta")}
-        </Badge>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  );
-}
-
-/** The page toolbar's button, for those who may scan. */
-export function ScanCoinButton() {
-  const t = useI18n();
-  const scanner = useScanner();
-  const scanCoin = useScanCoin();
-  if (!scanner?.available) return null;
-  return (
-    <Button variant="ghost" size="xs" onClick={scanCoin}>
-      <ScanLine aria-hidden="true" />
-      {t("scanner.scan")}
-    </Button>
+    </>
   );
 }
 
