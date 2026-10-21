@@ -313,7 +313,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Settings and links:**
   - Home currency (§4)
   - language
-  - change email
+  - change email, folded like Contact and address to the current email (and a confirmation link waiting, if one is) until opened
   - manage subscription, or upgrade
   - Albums
   - Updates, marked when there's an unseen release
