@@ -26,7 +26,14 @@ import {
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { EmptyState } from "@coinslite/ui/empty-state";
-import { ActionLabel, HeaderBar } from "@coinslite/ui/header-bar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@coinslite/ui/dropdown-menu";
+import { HeaderBar } from "@coinslite/ui/header-bar";
 import { Kbd } from "@coinslite/ui/kbd";
 import { toast } from "@coinslite/ui/toaster";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
@@ -37,6 +44,7 @@ import {
   Copy,
   HandCoins,
   ListChecks,
+  MoreHorizontal,
   Pencil,
   SearchX,
   ShieldCheck,
@@ -341,37 +349,12 @@ export function ItemDetail() {
         actions={
           <>
             {view && <ItemNeighbours itemId={item._id} view={view} />}
-            {sold ? (
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={() => setTakingBack(true)}
-              >
-                <Undo2 aria-hidden="true" />
-                <ActionLabel>{t("sale.markOwned")}</ActionLabel>
-              </Button>
-            ) : (
-              <Button variant="ghost" size="xs" onClick={openSale}>
-                <HandCoins aria-hidden="true" />
-                <ActionLabel>{t("sale.sell")}</ActionLabel>
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() =>
-                setDuplicating(({ key }) => ({ open: true, key: key + 1 }))
-              }
-            >
-              <Copy aria-hidden="true" />
-              <ActionLabel>{t("items.duplicate")}</ActionLabel>
-            </Button>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="xs" asChild>
                   <Link href={editHref} aria-keyshortcuts="E">
                     <Pencil aria-hidden="true" />
-                    <ActionLabel>{t("items.edit")}</ActionLabel>
+                    {t("items.edit")}
                   </Link>
                 </Button>
               </TooltipTrigger>
@@ -382,10 +365,45 @@ export function ItemDetail() {
                 </Kbd>
               </TooltipContent>
             </Tooltip>
-            <Button variant="ghost" size="xs" onClick={() => setDeleting(true)}>
-              <Trash2 aria-hidden="true" />
-              <ActionLabel>{t("deleteItem.delete")}</ActionLabel>
-            </Button>
+            {/* Edit is the one button; the rest, Delete last, wait in a
+                menu so a tap can't delete the Item by mistake. */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon-xs">
+                  <MoreHorizontal aria-hidden="true" />
+                  <span className="sr-only">{t("shell.more")}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {sold ? (
+                  <DropdownMenuItem onSelect={() => setTakingBack(true)}>
+                    <Undo2 strokeWidth={1.75} aria-hidden="true" />
+                    {t("sale.markOwned")}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem onSelect={openSale}>
+                    <HandCoins strokeWidth={1.75} aria-hidden="true" />
+                    {t("sale.sell")}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onSelect={() =>
+                    setDuplicating(({ key }) => ({ open: true, key: key + 1 }))
+                  }
+                >
+                  <Copy strokeWidth={1.75} aria-hidden="true" />
+                  {t("items.duplicate")}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => setDeleting(true)}
+                  className="text-destructive focus:text-destructive [&_svg]:text-destructive"
+                >
+                  <Trash2 strokeWidth={1.75} aria-hidden="true" />
+                  {t("deleteItem.delete")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         }
       />
