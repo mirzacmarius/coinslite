@@ -309,7 +309,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 ## 12. Account
 
 - **Header:** name or email, plan, and renewal or end date.
-- **Contact and address:** display name, full name, address, postal code, city, country, phone. Used on the Insurance report.
+- **Contact and address:** display name, full name, address, postal code, city, country, phone. Used on the Insurance report. Folded to a summary (the name, then the address) until its arrow opens the form.
 - **Settings and links:**
   - Home currency (§4)
   - language

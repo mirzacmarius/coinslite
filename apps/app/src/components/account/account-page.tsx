@@ -20,6 +20,11 @@ import { normalizeEmail } from "@coinslite/backend/convex/accounts/credentials";
 import { type CountryCode, countryCodes, formatCountry } from "@coinslite/i18n";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@coinslite/ui/collapsible";
 import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
@@ -32,7 +37,7 @@ import { toast } from "@coinslite/ui/toaster";
 import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { Globe, Loader2, Trash2 } from "lucide-react";
+import { ChevronRight, Globe, Loader2, Trash2 } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { DeleteAccountDialog } from "./delete-account-dialog";
@@ -93,6 +98,8 @@ function ContactSection({ account }: { account: Account }) {
   const locale = useCurrentLocale();
   const updateContact = useMutation(api.account.updateContact);
   const [failed, setFailed] = useState(false);
+  // Folded to a summary until opened: most visits are for other settings.
+  const [open, setOpen] = useState(false);
   const countryOptions = useMemo(
     () =>
       countryCodes
@@ -139,6 +146,15 @@ function ContactSection({ account }: { account: Account }) {
   );
   const errorOf = (errors: unknown[]) =>
     submitted ? errorText(errors) : undefined;
+  // The summary while folded: who, then where, as stored.
+  const name = stored.fullName.trim() || stored.displayName.trim();
+  const place = [
+    stored.streetAddress,
+    [stored.postalCode, stored.city].filter(Boolean).join(" "),
+    stored.country && formatCountry(stored.country, locale),
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   const text = (
     name:
@@ -188,80 +204,108 @@ function ContactSection({ account }: { account: Account }) {
       title={t("account.contact.title")}
       description={t("account.contact.description")}
     >
-      <SettingsBlock>
-        <form
-          method="post"
-          noValidate
-          className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void submitForm(form, t("common.saveFailed"), event.currentTarget);
-          }}
-        >
-          {text("displayName", t("account.contact.displayName"), {
-            rule: z
-              .string()
-              .trim()
-              .min(1, t("account.contact.displayNameRequired")),
-            autoComplete: "nickname",
-          })}
-          {text("fullName", t("account.contact.fullName"), {
-            autoComplete: "name",
-          })}
-          {text("streetAddress", t("account.contact.streetAddress"), {
-            className: "sm:col-span-2",
-            autoComplete: "street-address",
-          })}
-          {text("postalCode", t("account.contact.postalCode"), {
-            autoComplete: "postal-code",
-          })}
-          {text("city", t("account.contact.city"), {
-            autoComplete: "address-level2",
-          })}
-          <form.Field name="country">
-            {(field) => (
-              <Field id="account-country" label={t("account.contact.country")}>
-                {(control) => (
-                  <PropertyPicker
-                    id={control.id}
-                    icon={Globe}
-                    label={t("account.contact.country")}
-                    placeholder={t("account.contact.setCountry")}
-                    value={field.state.value}
-                    options={countryOptions}
-                    onChange={field.handleChange}
-                    onClear={() => field.handleChange(undefined)}
-                    clearLabel={t("account.contact.noCountry")}
-                    noResults={t("items.noMatches")}
-                  />
-                )}
-              </Field>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleTrigger className="group flex w-full items-center gap-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="truncate text-ui font-medium">
+              {name || t("account.contact.empty")}
+            </span>
+            {place && (
+              <span className="truncate text-xs text-muted-foreground">
+                {place}
+              </span>
             )}
-          </form.Field>
-          {text("contactPhone", t("account.contact.phone"), {
-            rule: z
-              .string()
-              .refine(
-                (phone) =>
-                  !phone.trim() || /^\+?[0-9][0-9 ()./-]*$/.test(phone.trim()),
-                t("account.contact.invalidPhone"),
-              ),
-            autoComplete: "tel",
-            type: "tel",
-          })}
-          <div className="flex items-center justify-between gap-3 sm:col-span-2">
-            <p role="alert" className="text-xs text-destructive">
-              {failed && t("account.contact.failed")}
-            </p>
-            <Button type="submit" disabled={submitting}>
-              {submitting && (
-                <Loader2 className="animate-spin" aria-hidden="true" />
-              )}
-              {t("account.contact.save")}
-            </Button>
-          </div>
-        </form>
-      </SettingsBlock>
+          </span>
+          <ChevronRight
+            className="size-4 shrink-0 text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-90"
+            aria-hidden="true"
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SettingsBlock className="pt-1">
+            <form
+              method="post"
+              noValidate
+              className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void submitForm(
+                  form,
+                  t("common.saveFailed"),
+                  event.currentTarget,
+                );
+              }}
+            >
+              {text("displayName", t("account.contact.displayName"), {
+                rule: z
+                  .string()
+                  .trim()
+                  .min(1, t("account.contact.displayNameRequired")),
+                autoComplete: "nickname",
+              })}
+              {text("fullName", t("account.contact.fullName"), {
+                autoComplete: "name",
+              })}
+              {text("streetAddress", t("account.contact.streetAddress"), {
+                className: "sm:col-span-2",
+                autoComplete: "street-address",
+              })}
+              {text("postalCode", t("account.contact.postalCode"), {
+                autoComplete: "postal-code",
+              })}
+              {text("city", t("account.contact.city"), {
+                autoComplete: "address-level2",
+              })}
+              <form.Field name="country">
+                {(field) => (
+                  <Field
+                    id="account-country"
+                    label={t("account.contact.country")}
+                  >
+                    {(control) => (
+                      <PropertyPicker
+                        id={control.id}
+                        icon={Globe}
+                        label={t("account.contact.country")}
+                        placeholder={t("account.contact.setCountry")}
+                        value={field.state.value}
+                        options={countryOptions}
+                        onChange={field.handleChange}
+                        onClear={() => field.handleChange(undefined)}
+                        clearLabel={t("account.contact.noCountry")}
+                        noResults={t("items.noMatches")}
+                      />
+                    )}
+                  </Field>
+                )}
+              </form.Field>
+              {text("contactPhone", t("account.contact.phone"), {
+                rule: z
+                  .string()
+                  .refine(
+                    (phone) =>
+                      !phone.trim() ||
+                      /^\+?[0-9][0-9 ()./-]*$/.test(phone.trim()),
+                    t("account.contact.invalidPhone"),
+                  ),
+                autoComplete: "tel",
+                type: "tel",
+              })}
+              <div className="flex items-center justify-between gap-3 sm:col-span-2">
+                <p role="alert" className="text-xs text-destructive">
+                  {failed && t("account.contact.failed")}
+                </p>
+                <Button type="submit" disabled={submitting}>
+                  {submitting && (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  )}
+                  {t("account.contact.save")}
+                </Button>
+              </div>
+            </form>
+          </SettingsBlock>
+        </CollapsibleContent>
+      </Collapsible>
     </SettingsGroup>
   );
 }

@@ -340,6 +340,7 @@ export default {
     contact: {
       title: "Kontakt und Adresse",
       description: "Erscheint in deinem Versicherungsbericht.",
+      empty: "Noch keine Kontaktdaten",
       displayName: "Anzeigename",
       fullName: "Vollständiger Name",
       streetAddress: "Adresse",
