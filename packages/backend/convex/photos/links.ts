@@ -16,18 +16,21 @@ import { photoSignatureLength, photoType } from "./rules";
  * Links to Item photos. A photo is never handed out as a plain storage
  * address, which anyone holding it could open for good: its owner's queries
  * give a link to GET /photos on this deployment, signed for that file and
- * owner with a server secret, that works for an hour at most. Queries can't
+ * owner with a server secret, that works for a day at most. Queries can't
  * read the clock, so the time a link is issued at is kept in one document
- * that a cron renews every half hour; queries rerun then and hand out fresh
- * links, each good for at least another half hour.
+ * that a cron renews every 12 hours; queries rerun then and hand out fresh
+ * links, each good for at least another 12 hours. Renewing reruns every
+ * query that hands out links, for everyone at once, and changes every link,
+ * so browsers download the photos again: twice a day keeps both rare, at the
+ * cost of a copied link working for up to a day.
  *
  * The secret is PHOTO_LINK_SECRET. A deployment without it (local
  * development, tests) signs with a random secret it keeps in that document
  * instead, which never leaves the backend either.
  */
 
-/** How long a link works after it's issued. */
-export const photoLinkLifetime = 60 * 60 * 1000;
+/** How long a link works after it's issued: twice the time between renewals (crons.ts). */
+export const photoLinkLifetime = 24 * 60 * 60 * 1000;
 /** How much later than this deployment's clock a link may claim to be issued. */
 const clockSkew = 60 * 1000;
 
@@ -55,7 +58,7 @@ export async function ensurePhotoLinks(ctx: MutationCtx) {
   if (!(await linkKeys(ctx))) await issueAsOfNow(ctx);
 }
 
-/** Every half hour (crons.ts): links are issued as of now from here on. */
+/** Every 12 hours (crons.ts): links are issued as of now from here on. */
 export const renew = internalMutation({
   args: {},
   returns: v.null(),

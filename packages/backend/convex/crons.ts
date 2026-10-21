@@ -22,10 +22,10 @@ crons.interval(
   {},
 );
 
-/** Photo links are issued afresh every half hour, so each works for an hour at most (photos/links.ts). */
+/** Photo links are issued afresh twice a day, so each works for a day at most (photos/links.ts). */
 crons.interval(
   "renew photo links",
-  { minutes: 30 },
+  { hours: 12 },
   internal.photos.links.renew,
   {},
 );

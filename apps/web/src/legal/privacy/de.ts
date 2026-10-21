@@ -119,7 +119,7 @@ export default {
       id: "security",
       heading: "Sicherheit",
       blocks: [
-        "Daten werden verschlüsselt übertragen. Passwörter werden nur als Hashes gespeichert. Deine Fotos sind privat: Sie werden nur dir gezeigt, über Links, die innerhalb einer Stunde ungültig werden. Nur wenige Administratoren können Kontodaten wie Namen, E-Mail-Adressen, Tarife und die Zahl der Objekte eines Kontos sehen, und nur, um den Dienst zu betreiben.",
+        "Daten werden verschlüsselt übertragen. Passwörter werden nur als Hashes gespeichert. Deine Fotos sind privat: Sie werden nur dir gezeigt, über Links, die innerhalb eines Tages ungültig werden. Nur wenige Administratoren können Kontodaten wie Namen, E-Mail-Adressen, Tarife und die Zahl der Objekte eines Kontos sehen, und nur, um den Dienst zu betreiben.",
       ],
     },
     {
