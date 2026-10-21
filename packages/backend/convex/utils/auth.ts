@@ -1,4 +1,4 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { getAuthSessionId, getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import type { ActionCtx, MutationCtx, QueryCtx } from "../_generated/server";
 
@@ -7,6 +7,23 @@ export const NOT_SET_UP = "NOT_SET_UP";
 export const NOT_ADMIN = "NOT_ADMIN";
 /** The account is deactivated, on its way to being deleted (account/closing.ts). */
 export const DEACTIVATED = "DEACTIVATED";
+/** The sign-in is too old for what was asked (`requireRecentSignIn`). */
+export const SIGN_IN_AGAIN = "SIGN_IN_AGAIN";
+
+/**
+ * How recent a sign-in has to be for changing the email or deleting the
+ * account now, so a session left open elsewhere (or taken) can't.
+ */
+const RECENT_SIGN_IN_MS = 15 * 60 * 1000;
+
+/** A sign-in within the last few minutes, by session start; refreshing a session doesn't count. */
+export async function requireRecentSignIn(ctx: MutationCtx) {
+  const sessionId = await getAuthSessionId(ctx);
+  const session = sessionId && (await ctx.db.get(sessionId));
+  if (!session || Date.now() - session._creationTime > RECENT_SIGN_IN_MS) {
+    throw new ConvexError(SIGN_IN_AGAIN);
+  }
+}
 
 /** The signed-in user's id; anyone else is turned away. */
 export async function requireUserId(ctx: QueryCtx | MutationCtx | ActionCtx) {

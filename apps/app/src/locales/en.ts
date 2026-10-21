@@ -1031,6 +1031,8 @@ export default {
       "Your account and everything in your Collection are deleted for good. This can't be undone.",
     cancel: "Cancel",
     failed: "That didn't work. Try again.",
+    signInAgain: "For your safety, sign in again before deleting your account.",
+    signInAgainAction: "Sign in again",
   },
   catalog: {
     emptyTitle: "The Catalog is empty",

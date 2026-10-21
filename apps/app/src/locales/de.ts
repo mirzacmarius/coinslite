@@ -1082,6 +1082,9 @@ export default {
       "Dein Konto und alles in deiner Sammlung werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
     cancel: "Abbrechen",
     failed: "Das hat nicht geklappt. Versuch es noch einmal.",
+    signInAgain:
+      "Melde dich zu deiner Sicherheit erneut an, bevor du dein Konto löschst.",
+    signInAgainAction: "Erneut anmelden",
   },
   catalog: {
     emptyTitle: "Der Katalog ist leer",

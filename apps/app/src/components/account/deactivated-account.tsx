@@ -6,6 +6,7 @@ import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { useAction, useMutation, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -34,6 +35,7 @@ function DeactivatedAccount({ deletionAt }: { deletionAt?: number }) {
   const [reactivating, setReactivating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [needsSignIn, setNeedsSignIn] = useState(false);
 
   return (
     <div className="flex w-full justify-center p-4 pt-16">
@@ -61,6 +63,7 @@ function DeactivatedAccount({ deletionAt }: { deletionAt?: number }) {
             disabled={reactivating}
             onClick={async () => {
               setFailed(false);
+              setNeedsSignIn(false);
               setReactivating(true);
               try {
                 await reactivate({});
@@ -88,6 +91,16 @@ function DeactivatedAccount({ deletionAt }: { deletionAt?: number }) {
             {t("deactivated.failed")}
           </p>
         )}
+        {needsSignIn && (
+          <div role="alert" className="flex flex-col items-start gap-2">
+            <p className="text-xs text-destructive">
+              {t("deactivated.signInAgain")}
+            </p>
+            <Button variant="outline" size="sm" onClick={() => void signOut()}>
+              {t("deactivated.signInAgainAction")}
+            </Button>
+          </div>
+        )}
       </section>
       <ConfirmDialog
         open={deleting}
@@ -99,9 +112,18 @@ function DeactivatedAccount({ deletionAt }: { deletionAt?: number }) {
         destructive
         onConfirm={async () => {
           setFailed(false);
+          setNeedsSignIn(false);
           try {
             await deleteAccount({});
           } catch (failure) {
+            // Deleting now needs a fresh sign-in: the dialog closes for it.
+            if (
+              failure instanceof ConvexError &&
+              String(failure.data) === "SIGN_IN_AGAIN"
+            ) {
+              setNeedsSignIn(true);
+              return;
+            }
             setFailed(true);
             throw failure;
           }

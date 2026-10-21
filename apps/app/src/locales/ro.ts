@@ -1053,6 +1053,9 @@ export default {
       "Contul tău și tot ce e în colecția ta sunt șterse definitiv. Acțiunea nu poate fi anulată.",
     cancel: "Anulează",
     failed: "Nu a funcționat. Încearcă din nou.",
+    signInAgain:
+      "Pentru siguranța ta, conectează-te din nou înainte de a șterge contul.",
+    signInAgainAction: "Conectează-te din nou",
   },
   catalog: {
     emptyTitle: "Catalogul este gol",

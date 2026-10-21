@@ -1,5 +1,4 @@
 import { defaultLocale } from "@coinslite/i18n";
-import { getAuthSessionId } from "@convex-dev/auth/server";
 import { HOUR, RateLimiter } from "@convex-dev/rate-limiter";
 import { ConvexError, v } from "convex/values";
 import { components, internal } from "./_generated/api";
@@ -18,7 +17,12 @@ import { deleteUserAndSignInMethods } from "./accounts/linking";
 import { nameKey } from "./admin/userList";
 import { planOf } from "./plans";
 import schema from "./schema";
-import { requireSetUpUser, requireUserId } from "./utils/auth";
+import {
+  SIGN_IN_AGAIN,
+  requireRecentSignIn,
+  requireSetUpUser,
+  requireUserId,
+} from "./utils/auth";
 import { hex } from "./utils/hex";
 import { homeCurrency, language, plan } from "./utils/validators";
 
@@ -27,13 +31,11 @@ export const emailChangeErrors = {
   emailInUse: "EMAIL_IN_USE",
   invalidLink: "INVALID_LINK",
   tooManyRequests: "TOO_MANY_REQUESTS",
-  signInAgain: "SIGN_IN_AGAIN",
+  signInAgain: SIGN_IN_AGAIN,
   otherAccount: "OTHER_ACCOUNT",
 } as const;
 
 const LINK_LIFETIME_MS = 60 * 60 * 1000;
-/** Changing the email needs a sign-in this recent, so a session left open elsewhere can't. */
-const RECENT_SIGN_IN_MS = 15 * 60 * 1000;
 
 /** No more than five email-change requests an hour per person. */
 export const rateLimiter = new RateLimiter(components.rateLimiter, {
@@ -281,15 +283,6 @@ async function othersWithEmail(
   ids.delete(userId);
   const others = await Promise.all([...ids].map((id) => ctx.db.get(id)));
   return others.filter((other): other is Doc<"users"> => other !== null);
-}
-
-/** A sign-in within the last few minutes, by session start; refreshing a session doesn't count. */
-async function requireRecentSignIn(ctx: MutationCtx) {
-  const sessionId = await getAuthSessionId(ctx);
-  const session = sessionId && (await ctx.db.get(sessionId));
-  if (!session || Date.now() - session._creationTime > RECENT_SIGN_IN_MS) {
-    throw new ConvexError(emailChangeErrors.signInAgain);
-  }
 }
 
 async function clearPendingChanges(ctx: MutationCtx, userId: Id<"users">) {
