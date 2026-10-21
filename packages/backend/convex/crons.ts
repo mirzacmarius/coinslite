@@ -46,4 +46,12 @@ crons.interval(
   {},
 );
 
+/** Free accounts nobody signs in to: their emails, and in the end their deletion (account/inactivity.ts). */
+crons.cron(
+  "email and delete unused Free accounts",
+  "17 9 * * *",
+  internal.account.inactivity.sweep,
+  {},
+);
+
 export default crons;

@@ -8,6 +8,7 @@ import {
 } from "@coinslite/i18n";
 import { closingMessages } from "./account/closingMessages";
 import { emailChangeMessages } from "./account/emailChangeMessages";
+import { inactivityMessages } from "./account/inactivityMessages";
 import { codeEmailMessages } from "./accounts/codeEmailMessages";
 import { exportLabels } from "./collection/exportLabels";
 import { collectionPdfMessages } from "./collection/pdfMessages";
@@ -24,6 +25,7 @@ import { releaseGroups, releases } from "./updates/releases";
 const localized: Record<string, Record<Locale, unknown>> = {
   "Email change emails": emailChangeMessages,
   "Account closing emails": closingMessages,
+  "Unused account emails": inactivityMessages,
   "Sign-in code emails": codeEmailMessages,
   "Collection CSV": exportLabels,
   "Collection PDF": collectionPdfMessages,

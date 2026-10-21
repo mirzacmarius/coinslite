@@ -28,6 +28,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
   - 14 days later a last email asks the owner to delete it now, or to reactivate it (and choose a plan again).
   - Without either, it stays deactivated for 7 more days and is then deleted without further warning.
   - Deleting permanently removes the user, their Items, Albums, photos and subscription link.
+- **Unused Free accounts:** an account on the Free plan that nobody signs in to gets an email after 6 months, another after 8, and after 12 one saying it will be deleted 14 days later, which then happens. Signing in starts the count again.
 
 ## 3. Languages and regional settings
 
