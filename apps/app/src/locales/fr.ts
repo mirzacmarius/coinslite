@@ -27,7 +27,6 @@ export default {
     primaryNavigation: "Menu principal",
     sidebar: "Barre latérale",
     signOut: "Se déconnecter",
-    workspaceMenu: "Compte et préférences",
     plans: "Formules",
     appearance: "Apparence",
     appearanceLight: "Clair",

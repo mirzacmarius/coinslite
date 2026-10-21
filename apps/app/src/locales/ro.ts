@@ -26,7 +26,6 @@ export default {
     primaryNavigation: "Meniu principal",
     sidebar: "Bară laterală",
     signOut: "Deconectare",
-    workspaceMenu: "Cont și preferințe",
     plans: "Planuri",
     appearance: "Aspect",
     appearanceLight: "Luminos",

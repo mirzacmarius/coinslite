@@ -23,7 +23,6 @@ export default {
     primaryNavigation: "Main",
     sidebar: "Sidebar",
     signOut: "Sign out",
-    workspaceMenu: "Account and preferences",
     plans: "Plans",
     appearance: "Appearance",
     appearanceLight: "Light",

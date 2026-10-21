@@ -256,6 +256,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 - **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss. The pieces card opens the Collection.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
+- **Phones** have no top bar: each page starts with its own header bar, and what the sidebar keeps under Settings is on the Account tab (Plans, Updates, preferences, signing out, Albums, and for admins the admin areas).
 - **Add Item:** on phones, a round button in the accent colour in the middle of the tabs along the bottom, on every page, opening the form (§5.4). From tablet width up, the sidebar's Add Item, in the accent colour, is the button for it. While the Collection is empty, the first-run prompt also has a way to add, on every screen size.
 - **Value over time:** the Collection's "over time" chart (§7), compact: the same figures, without the switch to Value by Date acquired. Absent while nothing is owned.
 - **Latest Items:** the three most recently added, each with thumbnail, year and denomination, and its Market value (× Quantity when more than one) on the right.
