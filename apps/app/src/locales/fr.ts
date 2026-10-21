@@ -76,8 +76,6 @@ export default {
     moreDetails: "Plus de détails",
     createMore: "En ajouter d’autres",
     cancel: "Annuler",
-    draftKept: "Vous avez commencé à saisir cet objet plus tôt sans l’ajouter.",
-    startOver: "Recommencer",
     close: "Fermer",
     added: "Objet ajouté à votre collection",
     addedToAlbum: "Objet ajouté à {album}",
@@ -143,8 +141,6 @@ export default {
     duplicateTitle: "Dupliquer l’objet",
     duplicateDescription:
       "Un nouvel objet rempli à partir de «\u00a0{title}\u00a0». Modifiez ce qui diffère\u00a0; les photos ne sont pas copiées.",
-    newDescription:
-      "Enregistrez une pièce, un billet ou un timbre dans votre collection.",
     materials: {
       gold: "Or",
       silver: "Argent",
@@ -1927,7 +1923,6 @@ export default {
     home: "Aller à l’aperçu",
   },
   scanner: {
-    scan: "Scanner une pièce",
     title: "Scanner une pièce",
     beta: "Bêta",
     description:
@@ -1949,8 +1944,6 @@ export default {
     identify: "Identifier la pièce",
     identifying: "Identification de la pièce…",
     addByHand: "Ajouter à la main",
-    cancel: "Annuler",
-    close: "Fermer",
     unidentified:
       "La pièce n’a pas pu être identifiée. Essayez de nouvelles photos avec une meilleure lumière, ou ajoutez-la à la main avec ces photos.",
     notConfigured:

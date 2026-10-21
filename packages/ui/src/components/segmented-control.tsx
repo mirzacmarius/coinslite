@@ -12,19 +12,22 @@ export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  disabled,
   className,
 }: {
   label: string;
   options: { value: T; label: string }[];
   value: T;
   onChange: (value: T) => void;
+  disabled?: boolean;
   className?: string;
 }) {
   const name = useId();
   return (
     <fieldset
+      disabled={disabled}
       className={cn(
-        "inline-flex self-start rounded-md border bg-muted p-0.5 text-ui",
+        "inline-flex self-start rounded-md border bg-muted p-0.5 text-ui disabled:opacity-50",
         className,
       )}
     >
@@ -32,7 +35,7 @@ export function SegmentedControl<T extends string>({
       {options.map((option) => (
         <label
           key={option.value}
-          className="relative cursor-pointer rounded-[calc(var(--radius)-3px)] flex h-6 items-center px-2.5 font-medium text-muted-foreground has-[:checked]:bg-card has-[:checked]:text-foreground has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+          className="relative cursor-pointer has-[:disabled]:cursor-default rounded-[calc(var(--radius)-3px)] flex h-6 items-center px-2.5 font-medium text-muted-foreground has-[:checked]:bg-card has-[:checked]:text-foreground has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
         >
           <input
             type="radio"

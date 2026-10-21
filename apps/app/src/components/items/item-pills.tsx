@@ -20,10 +20,13 @@ import type { LinkedEntry } from "./item-form-submit";
  */
 export function ItemPills({
   linked,
+  typePicker,
   onPickEntry,
   onAlbumCreateFailed,
 }: {
   linked: LinkedEntry | undefined;
+  /** Whether the Item type pill shows: not where the page picks the type (new-item.tsx). */
+  typePicker?: boolean;
   /** Opens the Catalog picker. */
   onPickEntry: () => void;
   /** Says an Album made from the Album pill couldn't be created. */
@@ -44,7 +47,11 @@ export function ItemPills({
   return (
     <>
       <div className="flex flex-wrap items-center gap-1.5 pt-1">
-        <CatalogLink linked={linked} onPick={onPickEntry} />
+        <CatalogLink
+          linked={linked}
+          typePicker={typePicker}
+          onPick={onPickEntry}
+        />
         <form.Field name="albumId">
           {(field) => (
             <AlbumPicker

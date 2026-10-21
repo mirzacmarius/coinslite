@@ -3,7 +3,7 @@
 import { catalogHref } from "@/components/catalog/catalog-levels";
 import { IconTile } from "@/components/catalog/catalog-rows";
 import { useCatalogVisible } from "@/components/catalog/use-catalog-visible";
-import { useStartAddItem } from "@/components/items/add-item";
+import { newItemHref } from "@/components/items/add-item";
 import { useI18n } from "@/locales/client";
 import { ChevronRight, FileUp, ListChecks, Plus } from "lucide-react";
 import Link from "next/link";
@@ -39,7 +39,7 @@ const chevron = (
 
 /**
  * The ways into an empty Collection (spec 9), on the Overview and the
- * Collection page: add an Item (the dialog asks for its type), add a whole
+ * Collection page: add an Item (its page asks for its type), add a whole
  * Set from the Catalog (not while the Catalog is hidden), or import a
  * spreadsheet. The page holds the import dialog, so it stays open as the
  * first rows fill the Collection and this card gives way.
@@ -56,7 +56,6 @@ export function StartCard({
   const t = useI18n();
   const titleId = useId();
   const catalogVisible = useCatalogVisible();
-  const startAddItem = useStartAddItem();
   return (
     <section
       aria-labelledby={titleId}
@@ -70,14 +69,14 @@ export function StartCard({
       </div>
       <ul className="divide-y">
         <li>
-          <button type="button" className={wayRow} onClick={startAddItem}>
+          <Link href={newItemHref} className={wayRow}>
             <IconTile icon={Plus} />
             <WayText
               title={t("startCard.addItem")}
               description={t("startCard.addItemDescription")}
             />
             {chevron}
-          </button>
+          </Link>
         </li>
         {catalogVisible !== false && (
           <li>

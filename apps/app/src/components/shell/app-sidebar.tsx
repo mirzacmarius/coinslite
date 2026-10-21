@@ -19,7 +19,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -66,10 +65,10 @@ const sectionPadding = "px-1 group-data-[collapsible=icon]:px-2";
 /**
  * The sidebar on tablets and desktops (shadcn/ui's sidebar-07): the logo and
  * the most used actions at the top, then the sections and Settings, and at
- * the bottom Spot prices, plan usage and the person, whose menu holds the
- * language, appearance and signing out. It collapses to icons (Cmd/Ctrl+B,
- * the toggle at the start of every page's header bar, or the rail along its
- * edge), keeping the logo's ring.
+ * the bottom Spot prices, plan usage and the person, whose menu opens their
+ * Account and holds the language, appearance and signing out. It collapses
+ * to icons (Cmd/Ctrl+B, the toggle at the start of every page's header bar,
+ * or the rail along its edge), keeping the logo's ring.
  */
 export function AppSidebar({
   items,
@@ -294,10 +293,13 @@ function SidebarUser() {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="flex items-center gap-2 font-normal">
-              {avatar}
-              {who}
-            </DropdownMenuLabel>
+            {/* The person themselves opens their Account. */}
+            <DropdownMenuItem asChild className="h-auto py-1.5 font-normal">
+              <Link href="/settings">
+                {avatar}
+                {who}
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>

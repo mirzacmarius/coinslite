@@ -72,8 +72,6 @@ export default {
     moreDetails: "More details",
     createMore: "Create more",
     cancel: "Cancel",
-    draftKept: "You started this Item earlier and didn’t add it.",
-    startOver: "Start over",
     close: "Close",
     added: "Item added to your Collection",
     addedToAlbum: "Item added to {album}",
@@ -137,7 +135,6 @@ export default {
     duplicateTitle: "Duplicate Item",
     duplicateDescription:
       "A new Item filled in from “{title}”. Change what differs; photos aren't copied.",
-    newDescription: "Record a coin, banknote or stamp in your Collection.",
     materials: {
       gold: "Gold",
       silver: "Silver",
@@ -1850,7 +1847,6 @@ export default {
     home: "Go to the Overview",
   },
   scanner: {
-    scan: "Scan coin",
     title: "Scan coin",
     beta: "Beta",
     description:
@@ -1872,8 +1868,6 @@ export default {
     identify: "Identify coin",
     identifying: "Identifying the coin…",
     addByHand: "Add by hand",
-    cancel: "Cancel",
-    close: "Close",
     unidentified:
       "The coin couldn't be identified. Try new photos in better light, or add it by hand with these photos.",
     notConfigured:

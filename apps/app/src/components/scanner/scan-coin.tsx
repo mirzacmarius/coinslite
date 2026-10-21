@@ -1,6 +1,5 @@
 "use client";
 
-import { StartAddItemProvider, useAddItem } from "@/components/items/add-item";
 import { useStorePhotoFile } from "@/components/items/use-store-photo-file";
 import {
   ShrinkError,
@@ -9,7 +8,6 @@ import {
   shrinkImage,
 } from "@/lib/shrink-image";
 import { useHydrated } from "@/lib/use-hydrated";
-import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
@@ -25,39 +23,12 @@ import {
 } from "@coinslite/backend/convex/scanner/rules";
 import { Badge } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@coinslite/ui/dialog";
-import { IconButton } from "@coinslite/ui/icon-button";
 import { Kbd, useModifierKey } from "@coinslite/ui/kbd";
-import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { cn } from "@coinslite/ui/utils";
 import { useAction, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import {
-  Camera,
-  ChevronRight,
-  ImagePlus,
-  Library,
-  Loader2,
-  ScanLine,
-  X,
-} from "lucide-react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { Camera, ImagePlus, Loader2 } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ScanPreset, ScannedPhoto } from "./scan-preset";
 
 /**
@@ -74,90 +45,13 @@ const scanPhoto: ShrinkTarget = {
 };
 
 /**
- * The coin scanner (spec §16): photograph a coin's front, then its back, and
- * CoinsLite suggests what it is. The suggestion opens in the "New Item" form
- * for the person to review, with the photos; a coin that isn't identified
- * can be added by hand, photos and all.
- */
-
-const ScanCoinContext = createContext<() => void>(() => {});
-
-/** Opens the scanner. Only offer it where `useScanner().available` says so. */
-export const useScanCoin = () => useContext(ScanCoinContext);
-
-/**
  * Whether the signed-in person may scan (the scanner flag, and Premium
  * during the beta), and whether this deployment can. Undefined while loading.
  */
 export function useScanner() {
   const status = useQuery(api.scanner.status);
-  // The app shell asks too; see useHydrated.
+  // See useHydrated.
   return useHydrated() ? status : undefined;
-}
-
-/**
- * Holds the one scanner dialog, beside the "New Item" form it hands over to.
- * For those who may scan, adding an Item starts with it (the Add Item
- * buttons, and C; lib/use-shortcut.ts); for everyone else, with the form.
- */
-export function ScanCoinProvider({ children }: { children: React.ReactNode }) {
-  const scanner = useScanner();
-  const addItem = useAddItem();
-  const [open, setOpen] = useState(false);
-  // A fresh dialog for each scan, so nothing of the last one lingers.
-  const [scan, setScan] = useState(0);
-  const openScanner = useCallback(() => {
-    setScan((count) => count + 1);
-    setOpen(true);
-  }, []);
-  const available = scanner?.available === true;
-  const startAddItem = useCallback(
-    () => (available ? openScanner() : addItem()),
-    [available, openScanner, addItem],
-  );
-  useShortcut("c", startAddItem);
-  return (
-    <ScanCoinContext.Provider value={openScanner}>
-      <StartAddItemProvider value={startAddItem}>
-        {children}
-      </StartAddItemProvider>
-      <ScanCoinDialog key={scan} open={open} onOpenChange={setOpen} />
-    </ScanCoinContext.Provider>
-  );
-}
-
-/** The sidebar's quick action, for those who may scan. */
-export function ScanCoinQuickAction() {
-  const t = useI18n();
-  const scanner = useScanner();
-  const scanCoin = useScanCoin();
-  if (!scanner?.available) return null;
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton tooltip={t("scanner.scan")} onClick={scanCoin}>
-        <ScanLine aria-hidden="true" />
-        {/* The badge comes last, so the button's own truncation misses it. */}
-        <span className="truncate">{t("scanner.scan")}</span>
-        <Badge className="ml-auto shrink-0 group-data-[collapsible=icon]:hidden">
-          {t("scanner.beta")}
-        </Badge>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  );
-}
-
-/** The page toolbar's button, for those who may scan. */
-export function ScanCoinButton() {
-  const t = useI18n();
-  const scanner = useScanner();
-  const scanCoin = useScanCoin();
-  if (!scanner?.available) return null;
-  return (
-    <Button variant="ghost" size="xs" onClick={scanCoin}>
-      <ScanLine aria-hidden="true" />
-      {t("scanner.scan")}
-    </Button>
-  );
 }
 
 /**
@@ -203,20 +97,26 @@ function useScanUpload() {
 }
 
 /**
- * The scanner: one step per side, front first, each taken with the camera
- * on a phone or picked from the computer's files, then "Identify coin".
+ * The coin scanner (spec §16), where the New Item page starts for those who
+ * may scan (new-item.tsx): photograph a coin's front, then its back, each
+ * with the camera on a phone or picked from the computer's files, and
+ * "Identify coin" suggests what it is. The suggestion goes to the form
+ * (`onHandOver`) for the person to review, with the photos; a coin that isn't
+ * identified can be added by hand, photos and all, and adding by hand before
+ * any photo goes to the plain form.
  */
-function ScanCoinDialog({
-  open,
-  onOpenChange,
+export function ScanCoin({
+  active,
+  onHandOver,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  /** Whether it's in view: Cmd/Ctrl+Enter identifies the coin only then. */
+  active: boolean;
+  onHandOver: (scan?: ScanPreset) => void;
 }) {
   const t = useI18n();
   const mod = useModifierKey();
   const scanner = useScanner();
-  const addItem = useAddItem();
+  const titleId = useId();
   const upload = useScanUpload();
   const identify = useAction(api.scan.identify);
   const [photos, setPhotos] = useState<Partial<Record<PhotoSide, TakenPhoto>>>(
@@ -277,11 +177,6 @@ function ScanCoinDialog({
     return done;
   };
 
-  const handOver = (preset: ScanPreset) => {
-    onOpenChange(false);
-    addItem({ type: "coin", scan: preset });
-  };
-
   const scan = async () => {
     if (working || nextSide || !configured) return;
     setStatus({ state: "working" });
@@ -296,7 +191,7 @@ function ScanCoinDialog({
         back: sent.back.storageId,
       });
       if (result.outcome === "suggested")
-        handOver({ photos: sent, suggestion: result });
+        onHandOver({ photos: sent, suggestion: result });
       else setStatus({ state: result.outcome });
     } catch (failure) {
       setStatus({ state: "failed", message: errorMessage(codeOf(failure)) });
@@ -316,141 +211,125 @@ function ScanCoinDialog({
   const addByHand = async () => {
     if (working) return;
     if (!photos.front && !photos.back) {
-      onOpenChange(false);
-      addItem();
+      onHandOver();
       return;
     }
     setStatus({ state: "working" });
     try {
-      handOver({ photos: await uploaded() });
+      onHandOver({ photos: await uploaded() });
     } catch {
       // The photos can be added on the Item's page later.
-      handOver({ photos: {} });
+      onHandOver({ photos: {} });
     }
   };
 
+  // Cmd/Ctrl+Enter identifies the coin wherever the focus is on the page,
+  // the Item type's radios too, as it did in the dialog.
+  const latestScan = useRef(scan);
+  latestScan.current = scan;
+  useEffect(() => {
+    if (!active) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key !== "Enter") return;
+      event.preventDefault();
+      void latestScan.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        onKeyDown={(event) => {
-          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-            event.preventDefault();
-            void scan();
-          }
-        }}
+    <section aria-labelledby={titleId} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <h2
+          id={titleId}
+          className="flex items-center gap-1.5 text-sm font-medium"
+        >
+          {t("scanner.title")}
+          <Badge>{t("scanner.beta")}</Badge>
+        </h2>
+        <p className="text-ui text-muted-foreground">
+          {configured ? t("scanner.description") : t("scanner.notConfigured")}
+        </p>
+        {configured && (
+          <p className="text-xs text-muted-foreground">{t("scanner.tips")}</p>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {photoSides.map((side, step) => (
+          <PhotoStep
+            key={side}
+            side={side}
+            step={step + 1}
+            photo={photos[side]}
+            current={side === nextSide}
+            disabled={working}
+            onFile={(file) => void take(side, file)}
+          />
+        ))}
+      </div>
+      <p
+        aria-live="polite"
+        className={cn(
+          "flex min-h-5 items-center gap-1.5 text-ui",
+          status.state === "failed"
+            ? "text-destructive"
+            : "text-muted-foreground",
+        )}
       >
-        <DialogHeader>
-          <div className="flex items-center gap-1 text-ui text-muted-foreground">
-            <Library className="size-4" strokeWidth={1.75} aria-hidden="true" />
-            <span>{t("nav.collection")}</span>
-            <ChevronRight className="size-3.5" aria-hidden="true" />
-            <DialogTitle className="text-foreground">
-              {t("scanner.title")}
-            </DialogTitle>
-            <Badge className="ml-1">{t("scanner.beta")}</Badge>
-          </div>
-          <DialogClose asChild>
-            <IconButton type="button" label={t("scanner.close")} shortcut="Esc">
-              <X />
-            </IconButton>
-          </DialogClose>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-3 px-4 pb-4 pt-1">
-          <DialogDescription>
-            {configured ? t("scanner.description") : t("scanner.notConfigured")}
-          </DialogDescription>
-          {configured && (
-            <p className="text-xs text-muted-foreground">{t("scanner.tips")}</p>
-          )}
-          <div className="grid grid-cols-2 gap-3">
-            {photoSides.map((side, step) => (
-              <PhotoStep
-                key={side}
-                side={side}
-                step={step + 1}
-                photo={photos[side]}
-                current={side === nextSide}
-                disabled={working}
-                onFile={(file) => void take(side, file)}
-              />
-            ))}
-          </div>
-          <p
-            aria-live="polite"
-            className={cn(
-              "flex min-h-5 items-center gap-1.5 text-ui",
-              status.state === "failed"
-                ? "text-destructive"
-                : "text-muted-foreground",
-            )}
-          >
-            {status.state === "working" ? (
-              <>
-                <Loader2
-                  className="size-4 animate-spin"
-                  strokeWidth={1.75}
-                  aria-hidden="true"
-                />
-                {t("scanner.identifying")}
-              </>
-            ) : status.state === "unidentified" ? (
-              t("scanner.unidentified")
-            ) : status.state === "notConfigured" ? (
-              t("scanner.notConfigured")
-            ) : status.state === "failed" ? (
-              status.message
-            ) : configured ? (
-              t(`scanner.next.${nextSide ?? "done"}`)
-            ) : null}
-          </p>
-        </div>
-
-        <DialogFooter>
+        {status.state === "working" ? (
+          <>
+            <Loader2
+              className="size-4 animate-spin"
+              strokeWidth={1.75}
+              aria-hidden="true"
+            />
+            {t("scanner.identifying")}
+          </>
+        ) : status.state === "unidentified" ? (
+          t("scanner.unidentified")
+        ) : status.state === "notConfigured" ? (
+          t("scanner.notConfigured")
+        ) : status.state === "failed" ? (
+          status.message
+        ) : configured ? (
+          t(`scanner.next.${nextSide ?? "done"}`)
+        ) : null}
+      </p>
+      <div className="flex items-center justify-between gap-2 border-t pt-3">
+        <Button
+          type="button"
+          variant={byHandFirst ? "default" : "ghost"}
+          disabled={working}
+          onClick={() => void addByHand()}
+        >
+          {t("scanner.addByHand")}
+        </Button>
+        {configured && (
           <Button
             type="button"
-            variant={byHandFirst ? "default" : "ghost"}
-            disabled={working}
-            onClick={() => void addByHand()}
+            variant={byHandFirst ? "outline" : "default"}
+            disabled={working || nextSide !== undefined}
+            onClick={() => void scan()}
           >
-            {t("scanner.addByHand")}
-          </Button>
-          <div className="flex items-center gap-2">
-            {/* Phones close it with the X: the footer has no room for three. */}
-            <DialogClose asChild>
-              <Button type="button" variant="ghost" className="max-sm:hidden">
-                {t("scanner.cancel")}
-              </Button>
-            </DialogClose>
-            {configured && (
-              <Button
-                type="button"
-                variant={byHandFirst ? "outline" : "default"}
-                disabled={working || nextSide !== undefined}
-                onClick={() => void scan()}
+            {working && <Loader2 className="animate-spin" aria-hidden="true" />}
+            {t("scanner.identify")}
+            {mod && (
+              <Kbd
+                className={cn(
+                  // Phones have no keyboard to press it on, nor the room.
+                  "ml-1 max-sm:hidden",
+                  !byHandFirst &&
+                    "border-primary-foreground/40 bg-transparent text-primary-foreground",
+                )}
               >
-                {working && (
-                  <Loader2 className="animate-spin" aria-hidden="true" />
-                )}
-                {t("scanner.identify")}
-                {mod && (
-                  <Kbd
-                    className={cn(
-                      // Phones have no keyboard to press it on, nor the room.
-                      "ml-1 max-sm:hidden",
-                      !byHandFirst &&
-                        "border-primary-foreground/40 bg-transparent text-primary-foreground",
-                    )}
-                  >
-                    {mod}↵
-                  </Kbd>
-                )}
-              </Button>
+                {mod}↵
+              </Kbd>
             )}
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </Button>
+        )}
+      </div>
+    </section>
   );
 }
 

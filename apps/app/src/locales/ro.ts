@@ -75,9 +75,6 @@ export default {
     moreDetails: "Mai multe detalii",
     createMore: "Adaugă mai multe",
     cancel: "Anulează",
-    draftKept:
-      "Ai început să completezi acest obiect mai devreme și nu l-ai adăugat.",
-    startOver: "Începe din nou",
     close: "Închide",
     added: "Obiect adăugat în colecție",
     addedToAlbum: "Obiect adăugat în {album}",
@@ -142,8 +139,6 @@ export default {
     duplicateTitle: "Duplică obiectul",
     duplicateDescription:
       "Un obiect nou completat după „{title}”. Schimbă ce diferă; fotografiile nu se copiază.",
-    newDescription:
-      "Înregistrează o monedă, o bancnotă sau un timbru în colecția ta.",
     materials: {
       gold: "Aur",
       silver: "Argint",
@@ -1895,7 +1890,6 @@ export default {
     home: "Mergi la prezentare",
   },
   scanner: {
-    scan: "Scanează moneda",
     title: "Scanează moneda",
     beta: "Beta",
     description:
@@ -1917,8 +1911,6 @@ export default {
     identify: "Identifică moneda",
     identifying: "Se identifică moneda…",
     addByHand: "Adaugă manual",
-    cancel: "Anulează",
-    close: "Închide",
     unidentified:
       "Moneda nu a putut fi identificată. Încearcă fotografii noi, cu lumină mai bună, sau adaug-o manual cu aceste fotografii.",
     notConfigured:

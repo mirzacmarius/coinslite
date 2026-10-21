@@ -76,9 +76,6 @@ export default {
     moreDetails: "Weitere Angaben",
     createMore: "Weitere hinzufügen",
     cancel: "Abbrechen",
-    draftKept:
-      "Du hast vorhin mit diesem Objekt angefangen, es aber nicht hinzugefügt.",
-    startOver: "Neu beginnen",
     close: "Schließen",
     added: "Objekt zur Sammlung hinzugefügt",
     addedToAlbum: "Objekt zu {album} hinzugefügt",
@@ -144,8 +141,6 @@ export default {
     duplicateTitle: "Objekt duplizieren",
     duplicateDescription:
       "Ein neues Objekt, ausgefüllt nach „{title}“. Ändere, was abweicht; Fotos werden nicht kopiert.",
-    newDescription:
-      "Erfasse eine Münze, Banknote oder Briefmarke in deiner Sammlung.",
     materials: {
       gold: "Gold",
       silver: "Silber",
@@ -1942,7 +1937,6 @@ export default {
     home: "Zur Übersicht",
   },
   scanner: {
-    scan: "Münze scannen",
     title: "Münze scannen",
     beta: "Beta",
     description:
@@ -1964,8 +1958,6 @@ export default {
     identify: "Münze bestimmen",
     identifying: "Münze wird bestimmt…",
     addByHand: "Von Hand hinzufügen",
-    cancel: "Abbrechen",
-    close: "Schließen",
     unidentified:
       "Die Münze konnte nicht bestimmt werden. Versuch es mit neuen Fotos bei besserem Licht, oder füge sie mit diesen Fotos von Hand hinzu.",
     notConfigured:

@@ -165,7 +165,7 @@ export function OverviewPlanUsage() {
 }
 
 /**
- * A banner row in the New Item dialog from 40 Items: how many are used, or
+ * A banner row in the New Item form from 40 Items: how many are used, or
  * that the plan is full, with the upgrade link. Saving stays possible; the
  * server has the last word.
  */

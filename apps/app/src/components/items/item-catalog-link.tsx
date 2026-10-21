@@ -16,13 +16,16 @@ import { useItemTypeOptions } from "./item-type-options";
  * Item type, and for a coin or banknote not linked yet, a way to pick one
  * from the Catalog (`onPick` opens the picker). An edited Item can be
  * linked to another entry, or to one for the first time, the same way.
+ * Without `typePicker`, the page picks the type above the form instead.
  */
 export function CatalogLink({
   linked,
   onPick,
+  typePicker = true,
 }: {
   linked: LinkedEntry | undefined;
   onPick: () => void;
+  typePicker?: boolean;
 }) {
   const t = useI18n();
   const { form } = useItemFields();
@@ -38,18 +41,20 @@ export function CatalogLink({
           onClick={catalogVisible ? onPick : undefined}
         />
       ) : (
-        <form.Field name="type">
-          {(field) => (
-            <PropertyPicker
-              icon={itemTypeIcons[field.state.value]}
-              label={t("items.type")}
-              value={field.state.value}
-              options={typeOptions}
-              onChange={field.handleChange}
-              noResults={t("items.noMatches")}
-            />
-          )}
-        </form.Field>
+        typePicker && (
+          <form.Field name="type">
+            {(field) => (
+              <PropertyPicker
+                icon={itemTypeIcons[field.state.value]}
+                label={t("items.type")}
+                value={field.state.value}
+                options={typeOptions}
+                onChange={field.handleChange}
+                noResults={t("items.noMatches")}
+              />
+            )}
+          </form.Field>
+        )
       )}
       {!linked && catalogVisible && isCatalogType(type) && (
         <Button

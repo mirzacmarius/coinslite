@@ -4,9 +4,7 @@ import { ItemLimitNotice } from "@/components/plans/plan-usage";
 import { ScanNotice } from "@/components/scanner/scan-notice";
 import { useI18n } from "@/locales/client";
 import { itemLimits } from "@coinslite/backend/convex/items/rules";
-import { Button } from "@coinslite/ui/button";
 import { cn } from "@coinslite/ui/utils";
-import { History } from "lucide-react";
 import { ItemFieldsProvider, useItemFields } from "./item-form-fields";
 import { MoreDetails } from "./item-more-details";
 import { TitleCatalogMatches } from "./item-title-matches";
@@ -19,16 +17,20 @@ const notesInput =
   "w-full shrink-0 resize-none bg-transparent px-0 text-base placeholder:text-muted-foreground focus:outline-none md:text-sm";
 
 /**
- * The Item form's fields, in the New Item dialog (item-form-dialog.tsx) and
+ * The Item form's fields, on the New Item page (new-item.tsx), in the
+ * Duplicate dialog (item-form-dialog.tsx) and
  * on the Edit Item page (item-edit.tsx): a new Item's notices, the title and
  * notes, the pills, then More details, which the Edit Item page shows open
  * without its toggle, and what went wrong saving.
  */
 export function ItemFormBody({
   itemForm,
+  typePicker,
   className,
 }: {
   itemForm: ItemFormState;
+  /** Whether the Item type pill shows: not where the page picks the type (new-item.tsx). */
+  typePicker?: boolean;
   className?: string;
 }) {
   const editing = itemForm.editing;
@@ -41,7 +43,6 @@ export function ItemFormBody({
       <div className={cn("flex flex-col gap-2", className)}>
         {!editing && <ItemLimitNotice />}
         {!editing && itemForm.scanned && <ScanNotice scan={itemForm.scanned} />}
-        {itemForm.draftKept && <DraftNotice onStartOver={itemForm.startOver} />}
         <TitleAndNotes
           titleRef={itemForm.titleRef}
           matches={
@@ -56,6 +57,7 @@ export function ItemFormBody({
         />
         <ItemPills
           linked={itemForm.linked}
+          typePicker={typePicker}
           onPickEntry={itemForm.openPicker}
           onAlbumCreateFailed={itemForm.setFailed}
         />
@@ -135,28 +137,5 @@ function TitleAndNotes({
         )}
       </form.Field>
     </>
-  );
-}
-
-/**
- * Atop a New Item form that opened holding what was typed last time: says
- * so, with a way to start a new Item instead.
- */
-function DraftNotice({ onStartOver }: { onStartOver: () => void }) {
-  const t = useI18n();
-  return (
-    <div className="flex items-center gap-2 rounded-md border bg-muted/40 py-1 pl-2 pr-1">
-      <History
-        className="size-4 shrink-0 text-muted-foreground"
-        strokeWidth={1.75}
-        aria-hidden="true"
-      />
-      <p className="min-w-0 flex-1 text-ui text-muted-foreground">
-        {t("items.draftKept")}
-      </p>
-      <Button type="button" variant="ghost" size="xs" onClick={onStartOver}>
-        {t("items.startOver")}
-      </Button>
-    </div>
   );
 }
