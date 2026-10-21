@@ -4,9 +4,9 @@ import { internal } from "../_generated/api";
 import type { Doc, Id, TableNames } from "../_generated/dataModel";
 import {
   type ActionCtx,
+  type MutationCtx,
   action,
   internalMutation,
-  type MutationCtx,
   query,
 } from "../_generated/server";
 import { rateLimiter as emailChangeLimits } from "../account";
@@ -369,16 +369,42 @@ export const deleteAccount = action({
 });
 
 /**
+ * Why an account is deleted without the person there: deactivated and its
+ * time up (account/closing.ts), or unused (account/inactivity.ts). Each
+ * stage checks it still holds, so reactivating or signing in meanwhile
+ * keeps the account.
+ */
+const closingReason = v.union(v.literal("deactivated"), v.literal("unused"));
+export type ClosingReason = Infer<typeof closingReason>;
+
+/** Whether the account is still due to go for `reason`. */
+function stillDue(user: Doc<"users">, reason: ClosingReason | undefined) {
+  if (reason === undefined) return true;
+  if (reason === "deactivated") return user.deactivatedAt !== undefined;
+  return (
+    user.inactivityNotice === 12 &&
+    user.plan === undefined &&
+    user.deactivatedAt === undefined
+  );
+}
+
+/**
  * Deletes an account and everything in it, for good: the person's own
- * request, or a deactivated or unused account whose time is up
- * (account/closing.ts). Fails, deleting nothing, while a subscription that
+ * request, or, with `reason`, one whose time is up, if it still is. Returns
+ * whether it was deleted. Fails, deleting nothing, while a subscription that
  * would charge again can't be ended.
  */
-export async function deleteAccountOf(ctx: ActionCtx, userId: Id<"users">) {
+export async function deleteAccountOf(
+  ctx: ActionCtx,
+  userId: Id<"users">,
+  reason?: ClosingReason,
+): Promise<boolean> {
   // First, so a deleted account is never charged again.
-  await ctx.runMutation(internal.account.deletion.beginClosingAccount, {
-    userId,
-  });
+  const due: boolean = await ctx.runMutation(
+    internal.account.deletion.beginClosingAccount,
+    { userId, reason },
+  );
+  if (!due) return false;
   try {
     await stopBilling(ctx, userId);
   } catch (error) {
@@ -387,17 +413,25 @@ export async function deleteAccountOf(ctx: ActionCtx, userId: Id<"users">) {
     });
     throw error;
   }
-  await ctx.runMutation(internal.account.deletion.closeAccount, { userId });
+  return await ctx.runMutation(internal.account.deletion.closeAccount, {
+    userId,
+    reason,
+  });
 }
 
-/** Marks the account as being deleted, so no checkout opens while billing stops. */
+/**
+ * Marks the account as being deleted, so no checkout opens while billing
+ * stops; false, marking nothing, when it's no longer due for `reason`.
+ */
 export const beginClosingAccount = internalMutation({
-  args: { userId: v.id("users") },
-  returns: v.null(),
-  handler: async (ctx, { userId }) => {
-    if (!(await ctx.db.get(userId))) throw new ConvexError(NOT_SIGNED_IN);
+  args: { userId: v.id("users"), reason: v.optional(closingReason) },
+  returns: v.boolean(),
+  handler: async (ctx, { userId, reason }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) throw new ConvexError(NOT_SIGNED_IN);
+    if (!stillDue(user, reason)) return false;
     await beginClosing(ctx, userId);
-    return null;
+    return true;
   },
 });
 
@@ -416,11 +450,16 @@ export const cancelClosingAccount = internalMutation({
  * deletes the first batch of the rest.
  */
 export const closeAccount = internalMutation({
-  args: { userId: v.id("users") },
-  returns: v.null(),
-  handler: async (ctx, { userId }) => {
+  args: { userId: v.id("users"), reason: v.optional(closingReason) },
+  returns: v.boolean(),
+  handler: async (ctx, { userId, reason }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError(NOT_SIGNED_IN);
+    // Reactivated or signed in to while billing stopped: it stays.
+    if (!stillDue(user, reason)) {
+      await cancelClosing(ctx, userId);
+      return false;
+    }
     await deleteSubscriptionsOf(ctx, userId);
     await markClosed(ctx, userId);
     await deleteCollectionCountsOf(ctx, userId);
@@ -436,7 +475,7 @@ export const closeAccount = internalMutation({
         outbox: { email: user.email, sentBefore: Date.now() },
       }),
     });
-    return null;
+    return true;
   },
 });
 

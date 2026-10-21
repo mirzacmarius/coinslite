@@ -1,13 +1,12 @@
-import { defaultLocale, type Locale } from "@coinslite/i18n";
+import { type Locale, defaultLocale } from "@coinslite/i18n";
 import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import {
+  type MutationCtx,
   env,
   internalAction,
   internalMutation,
-  internalQuery,
-  type MutationCtx,
   mutation,
 } from "../_generated/server";
 import { chargesAgain } from "../billing/rules";
@@ -23,7 +22,7 @@ import { deleteAccountOf } from "./deletion";
  * calls this off. The deletion itself is account/deletion.ts's.
  */
 
-const DAY = 24 * 60 * 60 * 1000;
+export const DAY = 24 * 60 * 60 * 1000;
 
 export const closingRules = {
   /** From asking to delete the account to the last email. */
@@ -159,23 +158,39 @@ export const sendLastNotice = internalMutation({
   },
 });
 
-/** Whether the account is still deactivated: not reactivated since. */
-export const stillDeactivated = internalQuery({
-  args: { userId: v.id("users") },
-  returns: v.boolean(),
-  handler: async (ctx, { userId }) =>
-    (await ctx.db.get(userId))?.deactivatedAt !== undefined,
-});
+/** How long a deletion that failed (billing couldn't be stopped) waits to try again. */
+const retryAfter = DAY;
 
 /** 21 days after asking: deletes the account, unless it was reactivated. */
 export const deleteDeactivated = internalAction({
   args: { userId: v.id("users") },
   returns: v.null(),
   handler: async (ctx, { userId }) => {
-    if (
-      await ctx.runQuery(internal.account.closing.stillDeactivated, { userId })
-    )
-      await deleteAccountOf(ctx, userId);
+    try {
+      await deleteAccountOf(ctx, userId, "deactivated");
+    } catch (error) {
+      await ctx.runMutation(internal.account.closing.retryDeletion, {
+        userId,
+      });
+      throw error;
+    }
+    return null;
+  },
+});
+
+/** Tries a failed deletion again a day later, unless it was reactivated. */
+export const retryDeletion = internalMutation({
+  args: { userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db.get(userId);
+    if (user?.deactivatedAt === undefined) return null;
+    const closingStep = await ctx.scheduler.runAfter(
+      retryAfter,
+      internal.account.closing.deleteDeactivated,
+      { userId },
+    );
+    await ctx.db.patch(userId, { closingStep });
     return null;
   },
 });

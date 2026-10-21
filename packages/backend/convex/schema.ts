@@ -104,6 +104,8 @@ export default defineSchema({
     inactivityNotice: v.optional(
       v.union(v.literal(6), v.literal(8), v.literal(12)),
     ),
+    /** When the step after `inactivityNotice` is due: the next email, or the deletion. */
+    inactivityDueAt: v.optional(v.number()),
 
     // Unused template fields, kept until existing documents are cleaned up
     username: v.optional(v.string()),
@@ -119,11 +121,17 @@ export default defineSchema({
     .index("by_plan_and_planEnd", ["plan", "planEnd"])
     .index("by_lastSignInAt", ["lastSignInAt"])
     .index("by_plan_and_lastSignInAt", ["plan", "lastSignInAt"])
-    // Free accounts not in use, by the last inactivity email they had.
+    // Free accounts not in use: those not emailed yet by when they last
+    // signed in, the others by when their next step is due.
     .index("by_plan_and_inactivityNotice_and_lastSignInAt", [
       "plan",
       "inactivityNotice",
       "lastSignInAt",
+    ])
+    .index("by_plan_and_inactivityNotice_and_inactivityDueAt", [
+      "plan",
+      "inactivityNotice",
+      "inactivityDueAt",
     ])
     .searchIndex("search_displayName", {
       searchField: "displayName",

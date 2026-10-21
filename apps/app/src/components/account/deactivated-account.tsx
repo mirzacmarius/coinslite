@@ -1,8 +1,7 @@
 "use client";
 
 import { useSignOut } from "@/components/sign-out";
-import { useI18n } from "@/locales/client";
-import { useFormatters } from "@/locales/use-formatters";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
@@ -28,7 +27,7 @@ export function DeactivatedGate({ children }: { children: ReactNode }) {
  */
 function DeactivatedAccount({ deletionAt }: { deletionAt?: number }) {
   const t = useI18n();
-  const { date } = useFormatters();
+  const locale = useCurrentLocale();
   const signOut = useSignOut();
   const reactivate = useMutation(api.account.closing.reactivate);
   const deleteAccount = useAction(api.account.deletion.deleteAccount);
@@ -47,7 +46,14 @@ function DeactivatedAccount({ deletionAt }: { deletionAt?: number }) {
         </h1>
         <p className="text-ui text-muted-foreground">
           {t("deactivated.description", {
-            date: deletionAt === undefined ? "" : date(deletionAt),
+            // In UTC, as the emails write it.
+            date:
+              deletionAt === undefined
+                ? ""
+                : new Intl.DateTimeFormat(locale, {
+                    dateStyle: "long",
+                    timeZone: "UTC",
+                  }).format(deletionAt),
           })}
         </p>
         <div className="flex flex-wrap gap-2 pt-1">

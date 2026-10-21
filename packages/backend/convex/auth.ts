@@ -61,6 +61,7 @@ export const store = internalMutation({
       await ctx.db.patch(userId, {
         lastSignInAt: Date.now(),
         inactivityNotice: undefined,
+        inactivityDueAt: undefined,
       });
     }
     return result;
