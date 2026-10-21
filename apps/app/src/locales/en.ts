@@ -72,8 +72,6 @@ export default {
     moreDetails: "More details",
     createMore: "Create more",
     cancel: "Cancel",
-    draftKept: "You started this Item earlier and didn’t add it.",
-    startOver: "Start over",
     close: "Close",
     added: "Item added to your Collection",
     addedToAlbum: "Item added to {album}",
@@ -1871,8 +1869,6 @@ export default {
     identify: "Identify coin",
     identifying: "Identifying the coin…",
     addByHand: "Add by hand",
-    cancel: "Cancel",
-    close: "Close",
     unidentified:
       "The coin couldn't be identified. Try new photos in better light, or add it by hand with these photos.",
     notConfigured:

@@ -84,7 +84,7 @@ Grades within a scale are ordered, so Items can be sorted and filtered by Grade.
 Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grade, both on Catalog entries and on Items.
 
 ### 5.4 Adding an Item
-- Adding opens the form, its title in focus. Its first pill picks the Item type: coin, banknote or stamp. Each new Item starts as a coin; the coin scanner opens the form with a coin already chosen.
+- Adding opens the New Item page (Add Item, or C), not a dialog, so it's easy to fill in on a phone. For those who may scan it starts with the coin scanner (§16), which hands over to the form; otherwise with the form, its title in focus. Its first pill picks the Item type: coin, banknote or stamp. Each new Item starts as a coin; the coin scanner opens the form with a coin already chosen. Leaving with unsaved input asks first; adding goes to the new Item's page, or with **Create more** on, starts the next one.
 - **Two ways to add:**
   - **From the Catalog** (coins and banknotes): the form's **Pick from the Catalog** opens the picker (§6.2) for the chosen type. The descriptive facts come from the picked entry. Not while the Catalog is hidden.
   - **Manually:** the user types the descriptive facts. Stamps are always added manually; the Catalog holds none.

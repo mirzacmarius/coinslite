@@ -74,8 +74,6 @@ export default {
     moreDetails: "Flere detaljer",
     createMore: "Legg til flere",
     cancel: "Avbryt",
-    draftKept: "Du begynte på dette objektet tidligere uten å legge det til.",
-    startOver: "Begynn på nytt",
     close: "Lukk",
     added: "Objektet er lagt til i samlingen",
     addedToAlbum: "Objekt lagt til i {album}",
@@ -1896,8 +1894,6 @@ export default {
     identify: "Identifiser mynt",
     identifying: "Identifiserer mynten…",
     addByHand: "Legg til manuelt",
-    cancel: "Avbryt",
-    close: "Lukk",
     unidentified:
       "Mynten kunne ikke identifiseres. Prøv nye bilder i bedre lys, eller legg den til manuelt med disse bildene.",
     notConfigured:

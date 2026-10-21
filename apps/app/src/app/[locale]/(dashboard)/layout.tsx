@@ -2,12 +2,11 @@ import { HomeCurrencyChangeNotices } from "@/components/account/home-currency-ch
 import { ProfileLanguage } from "@/components/account/profile-language";
 import { EndSession, UntilSessionEnds } from "@/components/end-session";
 import {
-  AddItemProvider,
   AddItemQuickAction,
+  AddItemShortcut,
   AddItemTabButton,
 } from "@/components/items/add-item";
 import { SidebarPlanUsage } from "@/components/plans/plan-usage";
-import { ScanCoinProvider } from "@/components/scanner/scan-coin";
 import { AppShell } from "@/components/shell/app-shell";
 import { SidebarSpotPrices } from "@/components/spot-prices/spot-prices";
 import { ReleaseHighlights } from "@/components/updates/release-highlights";
@@ -46,29 +45,26 @@ async function AccountCheck() {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <AddItemProvider>
-      <ScanCoinProvider>
-        <AppShell
-          quickActions={<AddItemQuickAction />}
-          phoneAction={<AddItemTabButton />}
-          sidebarFooter={
-            <>
-              <SidebarSpotPrices />
-              <SidebarPlanUsage />
-            </>
-          }
-        >
-          {/* Alongside the page, not before it: the shell and the page are on
-            screen without waiting for the backend. */}
-          <Suspense>
-            <AccountCheck />
-          </Suspense>
-          <ProfileLanguage />
-          <HomeCurrencyChangeNotices />
-          <ReleaseHighlights />
-          <UntilSessionEnds>{children}</UntilSessionEnds>
-        </AppShell>
-      </ScanCoinProvider>
-    </AddItemProvider>
+    <AppShell
+      quickActions={<AddItemQuickAction />}
+      phoneAction={<AddItemTabButton />}
+      sidebarFooter={
+        <>
+          <SidebarSpotPrices />
+          <SidebarPlanUsage />
+        </>
+      }
+    >
+      {/* Alongside the page, not before it: the shell and the page are on
+        screen without waiting for the backend. */}
+      <Suspense>
+        <AccountCheck />
+      </Suspense>
+      <AddItemShortcut />
+      <ProfileLanguage />
+      <HomeCurrencyChangeNotices />
+      <ReleaseHighlights />
+      <UntilSessionEnds>{children}</UntilSessionEnds>
+    </AppShell>
   );
 }

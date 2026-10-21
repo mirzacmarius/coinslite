@@ -10,7 +10,7 @@ import {
 } from "@/components/plans/plan-usage";
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useWantedKeys } from "@/components/wantlist/wantlist";
-import { formChanged, heldInput } from "@/lib/discard-changes";
+import { formChanged } from "@/lib/discard-changes";
 import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -47,7 +47,7 @@ export type ItemFormState = ReturnType<typeof useItemForm>;
 /** The Item form's TanStack form. */
 export type ItemForm = ItemFormState["form"];
 
-/** What the Item form is given: the dialog (item-form-dialog.tsx), or the Edit Item page (item-edit.tsx). */
+/** What the Item form is given: the New Item page (new-item.tsx), the Duplicate dialog (item-form-dialog.tsx), or the Edit Item page (item-edit.tsx). */
 export type ItemFormProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -64,7 +64,7 @@ export type ItemFormProps = {
 };
 
 /**
- * The Item form's state and saving, for item-form-dialog.tsx and the Edit
+ * The Item form's state and saving, for new-item.tsx, item-form-dialog.tsx and the Edit
  * Item page (item-edit.tsx) to lay out: its values and the Catalog entry
  * they're linked to, the Catalog picker (the form's "Pick from the Catalog"
  * and Catalog pill open it), a coin scan's suggestion and photos, the Album
@@ -89,8 +89,8 @@ export function useItemForm({
   const home = useQuery(api.users.getUser)?.homeCurrency;
   const amounts = useAmountsCurrency(open);
   const titleRef = useRef<HTMLInputElement>(null);
-  // Only while open: the "New Item" dialog is mounted on every page, also
-  // while the session ends, when these would fail signed out.
+  // Only while open: the Duplicate dialog is mounted with its Item's page,
+  // also while the session ends, when these would fail signed out.
   const albums = useAlbums(open);
   const wantedKeys = useWantedKeys(open);
   // One object for the dialog's life: the form resets when it sees new defaults.
@@ -118,8 +118,6 @@ export function useItemForm({
   const [failed, setFailed] = useState<string>();
   // The scan this new Item comes from, until it's added or the form closes.
   const [scanned, setScanned] = useState<ScanPreset>();
-  // Whether this opening found the input left from an earlier one.
-  const [draftKept, setDraftKept] = useState(false);
   const itemLimitMessage = useItemLimitMessage();
   const rules = useMemo(
     () => itemFormRules((key) => t(key), locale),
@@ -214,7 +212,6 @@ export function useItemForm({
     setScanned(undefined);
     setFailed(undefined);
     setDetailsOpen(false);
-    setDraftKept(false);
   };
   useEffect(() => {
     if (
@@ -225,23 +222,6 @@ export function useItemForm({
     )
       prefillForm(form, { albumId: onlyAlbum });
   }, [open, onlyAlbum, form]);
-  // Before the first paint: a New Item form that opens holding what the
-  // person typed or picked last time says so, with a way to start over.
-  // A fresh start is a coin, unless the coin scanner chose the type (below),
-  // not the type last picked in the Catalog picker.
-  const wasOpen = useRef(false);
-  useLayoutEffect(() => {
-    if (open && !wasOpen.current && isNew) {
-      const kept = heldInput(
-        form.state.values,
-        defaults,
-        (name) => form.getFieldMeta(name)?.isDirty === true,
-      );
-      setDraftKept(kept);
-      if (!kept) prefillForm(form, { type: defaults.type });
-    }
-    wasOpen.current = open;
-  });
   // Before the first paint, so the type pill never shows the previous type.
   useLayoutEffect(() => {
     if (open && newItemType && !item) prefillForm(form, { type: newItemType });
@@ -351,16 +331,6 @@ export function useItemForm({
     }
   };
   /**
-   * Starts the new Item afresh, as if the dialog had just opened: emptied,
-   * with its preset type and only Album, on its title.
-   */
-  const startOver = () => {
-    clearForm();
-    if (newItemType) prefillForm(form, { type: newItemType });
-    if (onlyAlbum) prefillForm(form, { albumId: onlyAlbum });
-    titleRef.current?.focus();
-  };
-  /**
    * Validates and saves. A closed "More details" has no fields to check:
    * when one of them holds what its rule refuses, it opens first, and the
    * submit runs once its fields show, so they say what's wrong.
@@ -404,16 +374,8 @@ export function useItemForm({
     createMore,
     setCreateMore,
     scanned,
-    /** Whether the form opened holding the input left from an earlier opening. */
-    draftKept,
-    /** For a new Item: drops its input, for Cancel. */
-    discardDraft: isNew ? clearForm : undefined,
-    /** Drops a new Item's input and starts it again (`startOver` above). */
-    startOver,
     /** Unsaved input, for the "Discard changes?" prompt. */
     changed,
-    /** A new Item's form stays as it was for next time, unless it holds a scan. */
-    keepsDraft: isNew && scanned === undefined,
     submitting,
     /** The rules the fields check what they hold with (item-form-submit.ts). */
     rules,

@@ -76,8 +76,6 @@ export default {
     moreDetails: "Plus de détails",
     createMore: "En ajouter d’autres",
     cancel: "Annuler",
-    draftKept: "Vous avez commencé à saisir cet objet plus tôt sans l’ajouter.",
-    startOver: "Recommencer",
     close: "Fermer",
     added: "Objet ajouté à votre collection",
     addedToAlbum: "Objet ajouté à {album}",
@@ -1948,8 +1946,6 @@ export default {
     identify: "Identifier la pièce",
     identifying: "Identification de la pièce…",
     addByHand: "Ajouter à la main",
-    cancel: "Annuler",
-    close: "Fermer",
     unidentified:
       "La pièce n’a pas pu être identifiée. Essayez de nouvelles photos avec une meilleure lumière, ou ajoutez-la à la main avec ces photos.",
     notConfigured:

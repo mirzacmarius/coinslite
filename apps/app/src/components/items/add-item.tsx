@@ -1,68 +1,25 @@
 "use client";
 
-import type { ScanPreset } from "@/components/scanner/scan-preset";
+import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { Button } from "@coinslite/ui/button";
-import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { Kbd } from "@coinslite/ui/kbd";
 import { SidebarMenuButton, SidebarMenuItem } from "@coinslite/ui/sidebar";
 import { Plus } from "lucide-react";
-import { createContext, useCallback, useContext, useState } from "react";
-import { ItemFormDialog } from "./item-form-dialog";
-
-/** What the "New Item" dialog opens with. */
-export type NewItemPreset = {
-  /** The Item type already chosen, as the coin scanner does. */
-  type?: ItemType;
-  /** A coin scan's photos and suggestion, for the person to review (scanner/scan-coin.tsx). */
-  scan?: ScanPreset;
-};
-
-const AddItemContext = createContext<(preset?: NewItemPreset) => void>(
-  () => {},
-);
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 /**
- * Opens the "New Item" dialog from anywhere in the app: `addItem()`, or with
- * a coin scan to review, `addItem({ type: "coin", scan })`.
+ * The New Item page (new-item.tsx), where adding an Item starts: the Add
+ * Item buttons link to it, and C opens it.
  */
-export const useAddItem = () => useContext(AddItemContext);
+export const newItemHref = "/collection/new";
 
-const StartAddItemContext = createContext<(() => void) | null>(null);
-
-/**
- * Where adding an Item starts: the coin scanner for those who may scan
- * (scanner/scan-coin.tsx provides it, and C runs it), else straight to the
- * "New Item" form. The Add Item buttons start here.
- */
-export const StartAddItemProvider = StartAddItemContext.Provider;
-
-/** Starts adding an Item; see StartAddItemProvider. */
-export function useStartAddItem() {
-  const addItem = useAddItem();
-  const start = useContext(StartAddItemContext);
-  return start ?? (() => addItem());
-}
-
-/** Holds the one "New Item" dialog. */
-export function AddItemProvider({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const [preset, setPreset] = useState<NewItemPreset>({});
-  const addItem = useCallback((next: NewItemPreset = {}) => {
-    setPreset(next);
-    setOpen(true);
-  }, []);
-  return (
-    <AddItemContext.Provider value={addItem}>
-      {children}
-      <ItemFormDialog
-        open={open}
-        onOpenChange={setOpen}
-        newItemType={preset.type}
-        scan={preset.scan}
-      />
-    </AddItemContext.Provider>
-  );
+/** C opens the New Item page from anywhere in the app (lib/use-shortcut.ts). */
+export function AddItemShortcut() {
+  const router = useRouter();
+  useShortcut("c", () => router.push(newItemHref));
+  return null;
 }
 
 /**
@@ -74,19 +31,20 @@ export function AddItemProvider({ children }: { children: React.ReactNode }) {
  */
 export function AddItemQuickAction() {
   const t = useI18n();
-  const startAddItem = useStartAddItem();
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
+        asChild
         tooltip={t("items.add")}
         className="h-9 bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90 hover:text-sidebar-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar active:bg-sidebar-primary/90 active:text-sidebar-primary-foreground"
-        onClick={startAddItem}
       >
-        <Plus aria-hidden="true" />
-        <span>{t("items.add")}</span>
-        <Kbd className="ml-auto border-primary-foreground/40 bg-transparent text-primary-foreground group-data-[collapsible=icon]:hidden">
-          C
-        </Kbd>
+        <Link href={newItemHref}>
+          <Plus aria-hidden="true" />
+          <span>{t("items.add")}</span>
+          <Kbd className="ml-auto border-primary-foreground/40 bg-transparent text-primary-foreground group-data-[collapsible=icon]:hidden">
+            C
+          </Kbd>
+        </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
@@ -99,15 +57,15 @@ export function AddItemQuickAction() {
  */
 export function AddItemTabButton() {
   const t = useI18n();
-  const startAddItem = useStartAddItem();
   return (
     <Button
+      asChild
       size="icon"
-      aria-label={t("items.add")}
       className="size-11 rounded-full shadow-md ring-offset-card transition-[color,background-color,transform] focus-visible:ring-offset-2 active:scale-95 [&_svg]:size-6"
-      onClick={startAddItem}
     >
-      <Plus aria-hidden="true" />
+      <Link href={newItemHref} aria-label={t("items.add")}>
+        <Plus aria-hidden="true" />
+      </Link>
     </Button>
   );
 }

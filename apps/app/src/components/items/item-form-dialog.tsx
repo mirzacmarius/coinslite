@@ -53,8 +53,6 @@ export function ItemFormDialog(props: Omit<ItemFormProps, "item">) {
       open={open}
       onOpenChange={onOpenChange}
       changed={itemForm.changed}
-      keepsDraft={itemForm.keepsDraft}
-      onDiscard={itemForm.discardDraft}
     >
       <DialogContent
         className="sm:max-w-[37.5rem]"

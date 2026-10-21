@@ -76,9 +76,6 @@ export default {
     moreDetails: "Weitere Angaben",
     createMore: "Weitere hinzufügen",
     cancel: "Abbrechen",
-    draftKept:
-      "Du hast vorhin mit diesem Objekt angefangen, es aber nicht hinzugefügt.",
-    startOver: "Neu beginnen",
     close: "Schließen",
     added: "Objekt zur Sammlung hinzugefügt",
     addedToAlbum: "Objekt zu {album} hinzugefügt",
@@ -1963,8 +1960,6 @@ export default {
     identify: "Münze bestimmen",
     identifying: "Münze wird bestimmt…",
     addByHand: "Von Hand hinzufügen",
-    cancel: "Abbrechen",
-    close: "Schließen",
     unidentified:
       "Die Münze konnte nicht bestimmt werden. Versuch es mit neuen Fotos bei besserem Licht, oder füge sie mit diesen Fotos von Hand hinzu.",
     notConfigured:
