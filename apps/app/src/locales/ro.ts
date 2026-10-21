@@ -332,6 +332,7 @@ export default {
     contact: {
       title: "Contact și adresă",
       description: "Apar în raportul de asigurare.",
+      empty: "Încă nu ai date de contact",
       displayName: "Nume afișat",
       fullName: "Nume complet",
       streetAddress: "Adresă",

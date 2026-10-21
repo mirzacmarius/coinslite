@@ -329,6 +329,7 @@ export default {
     contact: {
       title: "Kontakt og adresse",
       description: "Vises i forsikringsrapporten.",
+      empty: "Ingen kontaktopplysninger ennå",
       displayName: "Visningsnavn",
       fullName: "Fullt navn",
       streetAddress: "Adresse",

@@ -324,6 +324,7 @@ export default {
     contact: {
       title: "Contact and address",
       description: "Shown on your Insurance report.",
+      empty: "No contact details yet",
       displayName: "Display name",
       fullName: "Full name",
       streetAddress: "Address",

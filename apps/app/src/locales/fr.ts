@@ -336,6 +336,7 @@ export default {
     contact: {
       title: "Coordonnées et adresse",
       description: "Affichées sur votre rapport d’assurance.",
+      empty: "Aucune coordonnée pour l’instant",
       displayName: "Nom affiché",
       fullName: "Nom complet",
       streetAddress: "Adresse",
