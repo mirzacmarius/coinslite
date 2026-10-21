@@ -25,31 +25,19 @@ export type ItemMoney = (
 ) => string | undefined;
 
 /**
- * What the Item page leads with, beside its photos: the Item type, the title,
- * the key facts (year · denomination · country), `tags` such as its Grade and
- * Album, then its figures, by the Collection totals' rules (itemFigures): the
- * Market value (the total, with the value per piece, when there are several),
- * the Gain/loss, what was paid and, for an owned gold or silver coin, its
- * Metal value. A sold Item shows what it sold for and its realised Gain/loss.
- * `children` follow, such as the notes. The bar above already holds the
- * page's heading, so the title here isn't a second one.
+ * The Item type, the title and the key facts (year · denomination ·
+ * country). The bar above already holds the page's heading, so the title
+ * here isn't a second one.
  */
-export function ItemHeader({
+export function ItemTitle({
   item,
-  money,
-  tags,
-  children,
+  className,
 }: {
   item: Doc<"items">;
-  money: ItemMoney;
-  tags?: React.ReactNode;
-  children?: React.ReactNode;
+  className?: string;
 }) {
   const t = useI18n();
   const format = useFormatters();
-  const { value, gainLoss } = itemFigures(item);
-  const several = item.quantity > 1;
-  const sold = item.soldOn !== undefined;
   const keyFacts = [
     item.year,
     item.denomination,
@@ -57,6 +45,45 @@ export function ItemHeader({
   ]
     .filter((fact) => fact !== undefined && fact !== "")
     .join(" · ");
+  return (
+    <div className={cn("flex flex-col gap-2", className)}>
+      <p className="flex items-center gap-2 text-ui text-muted-foreground">
+        <ItemTypeIcon type={item.type} className="size-6 rounded" />
+        {t(`items.types.${item.type}`)}
+        {item.soldOn !== undefined && (
+          <Badge variant="outline">{t("sale.soldBadge")}</Badge>
+        )}
+      </p>
+      <p className="text-balance break-words text-2xl font-semibold leading-tight tracking-tight">
+        {item.title}
+      </p>
+      {keyFacts && (
+        <p className="text-base text-muted-foreground">{keyFacts}</p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The Item's figures, by the Collection totals' rules (itemFigures): the
+ * Market value (the total, with the value per piece, when there are several),
+ * the Gain/loss, what was paid and, for an owned gold or silver coin, its
+ * Metal value. A sold Item shows what it sold for and its realised Gain/loss.
+ */
+export function ItemFigures({
+  item,
+  money,
+  className,
+}: {
+  item: Doc<"items">;
+  money: ItemMoney;
+  className?: string;
+}) {
+  const t = useI18n();
+  const format = useFormatters();
+  const { value, gainLoss } = itemFigures(item);
+  const several = item.quantity > 1;
+  const sold = item.soldOn !== undefined;
   const missing = <span className="text-muted-foreground">–</span>;
   // "2 × €515.00" under a total of several pieces.
   const perPiece = (amount: number | undefined) =>
@@ -69,66 +96,47 @@ export function ItemHeader({
       : item.purchasePrice * item.quantity;
 
   return (
-    <div className="flex min-w-0 flex-col gap-5">
-      <div className="flex flex-col gap-2">
-        <p className="flex items-center gap-2 text-ui text-muted-foreground">
-          <ItemTypeIcon type={item.type} className="size-6 rounded" />
-          {t(`items.types.${item.type}`)}
-          {sold && <Badge variant="outline">{t("sale.soldBadge")}</Badge>}
-        </p>
-        <p className="text-balance break-words text-2xl font-semibold leading-tight tracking-tight">
-          {item.title}
-        </p>
-        {keyFacts && (
-          <p className="text-base text-muted-foreground">{keyFacts}</p>
-        )}
-      </div>
-      {tags}
-      <div className="overflow-hidden rounded-xl bg-card">
-        <dl className={figuresLayout}>
-          <Figure
-            label={t(
-              value.kind === "salePrice"
-                ? "collectionTotals.summarySalePrice"
-                : several
-                  ? "collectionTotals.marketValue"
-                  : "items.marketValue",
-            )}
-            value={money(value.total) ?? missing}
-            hint={perPiece(value.perPiece)}
-          />
-          <Figure
-            label={t(`collectionTotals.${gainLoss.kind}`)}
-            value={
-              gainLoss.amount === undefined ? (
-                missing
-              ) : (
-                <span className={gainLossColour(gainLoss.amount)}>
-                  {money(gainLoss.amount, { signed: true })}
-                </span>
-              )
-            }
-            hint={
-              gainLoss.amount === undefined
-                ? t(`items.${gainLoss.kind}None`)
-                : undefined
-            }
-          />
-          <Figure
-            label={t(
-              several
-                ? "collectionTotals.purchasePrice"
-                : "items.purchasePrice",
-            )}
-            value={money(paid) ?? missing}
-            hint={perPiece(item.purchasePrice)}
-          />
-          {!sold && item.type === "coin" && item.metal && (
-            <MetalValueFigure item={item} />
+    <div className={cn("overflow-hidden rounded-xl bg-card", className)}>
+      <dl className={figuresLayout}>
+        <Figure
+          label={t(
+            value.kind === "salePrice"
+              ? "collectionTotals.summarySalePrice"
+              : several
+                ? "collectionTotals.marketValue"
+                : "items.marketValue",
           )}
-        </dl>
-      </div>
-      {children}
+          value={money(value.total) ?? missing}
+          hint={perPiece(value.perPiece)}
+        />
+        <Figure
+          label={t(`collectionTotals.${gainLoss.kind}`)}
+          value={
+            gainLoss.amount === undefined ? (
+              missing
+            ) : (
+              <span className={gainLossColour(gainLoss.amount)}>
+                {money(gainLoss.amount, { signed: true })}
+              </span>
+            )
+          }
+          hint={
+            gainLoss.amount === undefined
+              ? t(`items.${gainLoss.kind}None`)
+              : undefined
+          }
+        />
+        <Figure
+          label={t(
+            several ? "collectionTotals.purchasePrice" : "items.purchasePrice",
+          )}
+          value={money(paid) ?? missing}
+          hint={perPiece(item.purchasePrice)}
+        />
+        {!sold && item.type === "coin" && item.metal && (
+          <MetalValueFigure item={item} />
+        )}
+      </dl>
     </div>
   );
 }

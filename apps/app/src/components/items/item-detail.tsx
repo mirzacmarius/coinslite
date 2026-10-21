@@ -61,10 +61,11 @@ import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
 import {
-  ItemHeader,
+  ItemFigures,
   ItemHeaderSkeleton,
   type ItemMoney,
   ItemTag,
+  ItemTitle,
 } from "./item-header";
 import { ItemNeighbours } from "./item-neighbours";
 import { ItemPhotos } from "./item-photos";
@@ -72,9 +73,10 @@ import { MetalValue } from "./metal-value";
 import { SellItemDialog } from "./sell-item-dialog";
 
 /**
- * One Item, every recorded fact: its photos first, beside its title, Grade,
- * Album and figures (value, Gain/loss, what was paid, Metal value) and notes;
- * then the rest in titled cards that flow down two columns where there's room.
+ * One Item, every recorded fact: its photos beside its title, Grade, Album,
+ * Details and notes (on one column the title comes first, above the photos);
+ * then its figures (value, Gain/loss, what was paid, Metal value) and the
+ * rest in titled cards that flow down two columns where there's room.
  * Everything sits on those two columns and their one gutter: the photos and
  * the title take one each on a wide screen, and the sides split a column.
  */
@@ -440,16 +442,77 @@ export function ItemDetail() {
           <CatalogSuggestion itemId={item._id} />
         )}
         <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+          {/* On one column the title leads, above the photos; on two it
+              heads the column beside them. */}
+          <ItemTitle item={item} className="xl:hidden" />
           <ItemPhotos item={item} />
-          <ItemHeader
-            item={item}
-            money={money}
-            tags={
-              tags.length > 0 && (
-                <ul className="flex flex-wrap gap-1.5">{tags}</ul>
-              )
-            }
-          >
+          <div className="flex min-w-0 flex-col gap-5">
+            <ItemTitle item={item} className="max-xl:hidden" />
+            {tags.length > 0 && (
+              <ul className="flex flex-wrap gap-1.5">{tags}</ul>
+            )}
+            <FactSection title={t("items.details")} className="mb-0">
+              <Fact label={t("items.type")}>
+                {t(`items.types.${item.type}`)}
+              </Fact>
+              {shownFacts.map(([label, value]) => (
+                <Fact key={label} label={label}>
+                  {value}
+                </Fact>
+              ))}
+              {item.catalogEntry && (
+                <Fact label={t("catalogPicker.entry")}>
+                  <Link
+                    href={catalogNodeHref(item.catalogEntry.key)}
+                    className="hover:underline"
+                  >
+                    {item.catalogEntry.title}
+                  </Link>
+                  {item.catalogEntry.otherItems > 0 && (
+                    <>
+                      {" "}
+                      <Link
+                        href={entryItemsHref(item.catalogEntry.key)}
+                        className="text-muted-foreground hover:text-foreground hover:underline"
+                      >
+                        {t("items.moreYouHold", {
+                          count: format.number(item.catalogEntry.otherItems),
+                        })}
+                      </Link>
+                    </>
+                  )}
+                </Fact>
+              )}
+              {item.catalogEntry?.set && (
+                <Fact label={t("sets.title")}>
+                  <Link
+                    href={setHref(item.catalogEntry.set)}
+                    className="inline-flex items-center gap-1.5 hover:underline"
+                  >
+                    <ListChecks
+                      className="size-3.5 text-muted-foreground"
+                      strokeWidth={1.75}
+                      aria-hidden="true"
+                    />
+                    {t("sets.viewAsSet")}
+                  </Link>
+                </Fact>
+              )}
+              <Fact label={t("albums.album")}>
+                {album && (
+                  <Link
+                    href={`/albums/${album._id}`}
+                    className="inline-flex max-w-full items-center gap-1.5 hover:underline"
+                  >
+                    <AlbumDot colour={album.colour} />
+                    <span className="truncate">{album.name}</span>
+                  </Link>
+                )}
+              </Fact>
+              <Fact label={t("items.quantity")}>
+                {format.number(item.quantity)}
+              </Fact>
+            </FactSection>
             {item.notes && (
               <section
                 aria-labelledby={notesId}
@@ -466,9 +529,14 @@ export function ItemDetail() {
                 </p>
               </section>
             )}
-          </ItemHeader>
+          </div>
         </div>
         <div className="gap-x-4 [columns:18rem_2]">
+          <ItemFigures
+            item={item}
+            money={money}
+            className="mb-4 break-inside-avoid"
+          />
           {item.soldOn !== undefined && (
             <FactSection
               title={t("sale.section")}
@@ -485,66 +553,6 @@ export function ItemDetail() {
               )}
             </FactSection>
           )}
-          <FactSection title={t("items.details")}>
-            <Fact label={t("items.type")}>{t(`items.types.${item.type}`)}</Fact>
-            {shownFacts.map(([label, value]) => (
-              <Fact key={label} label={label}>
-                {value}
-              </Fact>
-            ))}
-            {item.catalogEntry && (
-              <Fact label={t("catalogPicker.entry")}>
-                <Link
-                  href={catalogNodeHref(item.catalogEntry.key)}
-                  className="hover:underline"
-                >
-                  {item.catalogEntry.title}
-                </Link>
-                {item.catalogEntry.otherItems > 0 && (
-                  <>
-                    {" "}
-                    <Link
-                      href={entryItemsHref(item.catalogEntry.key)}
-                      className="text-muted-foreground hover:text-foreground hover:underline"
-                    >
-                      {t("items.moreYouHold", {
-                        count: format.number(item.catalogEntry.otherItems),
-                      })}
-                    </Link>
-                  </>
-                )}
-              </Fact>
-            )}
-            {item.catalogEntry?.set && (
-              <Fact label={t("sets.title")}>
-                <Link
-                  href={setHref(item.catalogEntry.set)}
-                  className="inline-flex items-center gap-1.5 hover:underline"
-                >
-                  <ListChecks
-                    className="size-3.5 text-muted-foreground"
-                    strokeWidth={1.75}
-                    aria-hidden="true"
-                  />
-                  {t("sets.viewAsSet")}
-                </Link>
-              </Fact>
-            )}
-            <Fact label={t("albums.album")}>
-              {album && (
-                <Link
-                  href={`/albums/${album._id}`}
-                  className="inline-flex max-w-full items-center gap-1.5 hover:underline"
-                >
-                  <AlbumDot colour={album.colour} />
-                  <span className="truncate">{album.name}</span>
-                </Link>
-              )}
-            </Fact>
-            <Fact label={t("items.quantity")}>
-              {format.number(item.quantity)}
-            </Fact>
-          </FactSection>
           {graded && (
             <FactSection title={t("items.grade")}>
               <Fact label={t("items.grade")}>
@@ -755,17 +763,22 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
 function FactSection({
   title,
   action,
+  className,
   children,
 }: {
   title: string;
   action?: React.ReactNode;
+  className?: string;
   children: React.ReactNode;
 }) {
   const titleId = useId();
   return (
     <section
       aria-labelledby={titleId}
-      className="mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3"
+      className={cn(
+        "mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3",
+        className,
+      )}
     >
       <div className="flex min-h-7 items-center justify-between gap-2">
         <h2 id={titleId} className="text-ui font-medium">
