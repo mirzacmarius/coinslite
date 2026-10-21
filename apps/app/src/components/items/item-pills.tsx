@@ -134,6 +134,12 @@ export function ItemPills({
                 className="h-7 w-16 px-2 text-right text-ui"
                 value={field.state.value}
                 onChange={(event) => field.handleChange(event.target.value)}
+                // Typing replaces the number rather than going in front of
+                // it; a frame later, so a tap's own caret doesn't undo it.
+                onFocus={(event) => {
+                  const input = event.currentTarget;
+                  requestAnimationFrame(() => input.select());
+                }}
                 onBlur={field.handleBlur}
               />
             </label>
