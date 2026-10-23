@@ -49,6 +49,17 @@ export function narrowsView(view: CollectionView) {
   );
 }
 
+/**
+ * Whether the view narrows the list beyond choosing owned or sold Items: a
+ * search or any other filter. The totals then lead with the view's figures,
+ * as the sold view alone has its own whole (the sold totals).
+ */
+export function narrowsBeyondStatus(view: CollectionView) {
+  return Object.entries(view).some(
+    ([key, value]) => key !== "sort" && key !== "status" && value !== undefined,
+  );
+}
+
 /** The browser window's viewport (`innerWidth` × `innerHeight`), in CSS pixels. */
 export type ViewportSize = { width: number; height: number };
 

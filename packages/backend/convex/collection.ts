@@ -10,6 +10,7 @@ import {
 } from "./collection/browse";
 import type { CollectionView } from "./collection/view";
 import { countFilterOptions } from "./collection/viewRules";
+import { unpricedTotals } from "./collectionTotals";
 import { bulkLimits } from "./items/bulkRules";
 import { itemWithThumbnail } from "./items/thumbnail";
 import { requireSetUpUser } from "./utils/auth";
@@ -43,6 +44,12 @@ const pageFields = {
   entry: v.union(v.null(), v.object({ key: v.string(), title: v.string() })),
   /** The country origin compares against; null when the person has none. */
   ownCountry: v.union(v.string(), v.null()),
+  /**
+   * The totals of every Item the view shows, over all its pages, before any
+   * Spot price (items/totals.ts PageTotals): the app prices them at the
+   * latest Spot prices, as it does the whole Collection's.
+   */
+  viewTotals: unpricedTotals,
 };
 
 /** How many Items each filter option would show (viewRules.ts filterCounts). */
@@ -98,8 +105,14 @@ export const page = query({
   returns: v.object(pageFields),
   handler: async (ctx, { view, page, pageSize, locale }) => {
     const { owner, read } = await readOwnCollection(ctx, view, locale);
-    const found = await browsePage(ctx, read, { view, page, pageSize });
-    return { ...found, currency: owner.homeCurrency };
+    const currency = owner.homeCurrency;
+    const found = await browsePage(ctx, read, {
+      view,
+      page,
+      pageSize,
+      currency,
+    });
+    return { ...found, currency };
   },
 });
 
@@ -137,10 +150,16 @@ export const browse = query({
   returns: v.object({ ...pageFields, options: filterCountsResult }),
   handler: async (ctx, { view, page, pageSize, locale }) => {
     const { owner, read } = await readOwnCollection(ctx, view, locale);
-    const found = await browsePage(ctx, read, { view, page, pageSize });
+    const currency = owner.homeCurrency;
+    const found = await browsePage(ctx, read, {
+      view,
+      page,
+      pageSize,
+      currency,
+    });
     return {
       ...found,
-      currency: owner.homeCurrency,
+      currency,
       options: countFilterOptions(read.items, view, read.context),
     };
   },

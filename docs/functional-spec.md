@@ -210,10 +210,11 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 ## 7. Collection
 
 - **Spot price:** gold and silver, per gram and per troy ounce (31.1034768 g), in the Home currency, with the time of the last update. Refreshes at least every 15 minutes.
-- **Totals over the whole Collection** (not the filtered view), each clearly labelled as counting Items or pieces:
+- **Totals over the whole Collection**, each clearly labelled as counting Items or pieces:
   - number of Items; number of pieces per Item type
   - total Purchase price, total Market value, Gain/loss
   - gold and silver Metal value with the total fine weight, shown only when non-zero
+  - With a search or filter on (the sold view alone doesn't count), the section leads with the same figures for **the current view**, headed "This view", and keeps the whole Collection's (on the sold view, all sold Items') beneath. The collapsed summary line shows the view's figures then. The charts stay the whole Collection's.
 - **Charts:**
   - An Item's **Date acquired** is its purchase date, or when it was recorded in CoinsLite if that is earlier or it has no purchase date. Purchase dates before 1900 count as 1900.
   - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month.

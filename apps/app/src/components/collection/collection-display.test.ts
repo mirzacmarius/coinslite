@@ -1,10 +1,21 @@
 import { describe, expect, test } from "bun:test";
 import {
   type CollectionDisplay,
+  narrowsBeyondStatus,
   narrowsView,
   readDisplay,
   totalsOpen,
 } from "./collection-display";
+
+describe("narrowsBeyondStatus", () => {
+  test("the sold view alone is a whole of its own, not a narrowing", () => {
+    expect(narrowsBeyondStatus({ status: "sold" })).toBe(false);
+    expect(narrowsBeyondStatus({ sort: "value" })).toBe(false);
+    expect(narrowsBeyondStatus({ status: "sold", country: "NO" })).toBe(true);
+    expect(narrowsBeyondStatus({ search: "krone" })).toBe(true);
+    expect(narrowsBeyondStatus({ storage: "none" })).toBe(true);
+  });
+});
 
 describe("readDisplay", () => {
   test("a device that remembers nothing gets the defaults", () => {

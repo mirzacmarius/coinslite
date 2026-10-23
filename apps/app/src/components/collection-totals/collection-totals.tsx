@@ -14,6 +14,7 @@ import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import {
   type CollectionTotals,
+  type PageTotals,
   totalPieces,
 } from "@coinslite/backend/convex/items/totals";
 import {
@@ -34,6 +35,7 @@ import { seriesColorVariables } from "./chart-card";
 import {
   type ShownTotals,
   useCollectionTotals,
+  usePricedTotals,
   useValueOverTime,
 } from "./use-collection-totals";
 import { ValueChart } from "./value-chart";
@@ -54,25 +56,35 @@ const firstPaint = {
 };
 
 /**
- * What the whole Collection holds and is worth (spec 7), whatever the list
- * is filtered to: totals, today's Spot prices and two charts, under a row
- * that opens and collapses them and sums them up while they're collapsed.
+ * What the whole Collection holds and is worth (spec 7): totals, today's
+ * Spot prices and two charts, under a row that opens and collapses them and
+ * sums them up while they're collapsed. With a search or filter on
+ * (`viewTotals`), the view's figures lead and the whole Collection's follow.
  * When they start open is `totalsOpen`'s call, which follows the window as it
  * resizes; a choice made here sticks for the rest of the visit and is
- * remembered on the device. An empty Collection
- * shows only the Spot prices.
+ * remembered on the device. An empty Collection shows only the Spot prices.
  */
 export function CollectionTotalsSection({
   narrowed,
   sold,
+  viewTotals,
 }: {
   narrowed: boolean;
   /** The sold view's: the sold Items' sale figures instead. */
   sold?: boolean;
+  /**
+   * The current view's totals, before any Spot price, while a search or
+   * filter narrows it; null while they load, undefined when nothing narrows
+   * the view beyond owned or sold.
+   */
+  viewTotals?: PageTotals | null;
 }) {
   const t = useI18n();
   const titleId = useId();
   const totals = useCollectionTotals(sold ? "sold" : undefined);
+  const priced = usePricedTotals(viewTotals ?? undefined);
+  // The view's figures: null while they load, undefined when there's no view.
+  const view = viewTotals === undefined ? undefined : (priced ?? null);
   const [display, changeDisplay] = useCollectionDisplay();
   const viewport = useViewportSize();
   const [chosen, setChosen] = useState<boolean>();
@@ -112,6 +124,7 @@ export function CollectionTotalsSection({
             </span>
             <TotalsSummary
               totals={totals}
+              view={view}
               sold={sold}
               className={cn(
                 open === true && "hidden",
@@ -125,7 +138,7 @@ export function CollectionTotalsSection({
           className={cn(open === undefined && firstPaint.details)}
         >
           <div className="flex flex-col gap-4 px-4 pb-4">
-            <TotalsDetails totals={totals} sold={sold} />
+            <TotalsDetails totals={totals} view={view} sold={sold} />
           </div>
         </CollapsibleContent>
       </section>
@@ -135,16 +148,20 @@ export function CollectionTotalsSection({
 
 /**
  * The collapsed totals in one line: Items, total Market value, Gain/loss and
- * any Metal value. The line holds as many whole figures as fit, in that
- * order; the rest wrap out of sight rather than being cut. It pulses while
- * the totals are still counting.
+ * any Metal value, of the view while one narrows the list (`view`, headed
+ * "This view"), else of the whole Collection. The line holds as many whole
+ * figures as fit, in that order; the rest wrap out of sight rather than
+ * being cut. It pulses while the totals are still counting.
  */
 function TotalsSummary({
   totals,
+  view,
   sold,
   className,
 }: {
   totals: ShownTotals | undefined;
+  /** The view's figures: null while they load, undefined without a view. */
+  view: CollectionTotals | null | undefined;
   sold?: boolean;
   className?: string;
 }) {
@@ -152,32 +169,34 @@ function TotalsSummary({
   const formatMoney = useMoney();
   // While a Home currency change converts the amounts, only that's said of them.
   const converting = useConvertingTo() !== undefined;
-  if (totals === undefined)
+  if (totals === undefined || view === null)
     return (
       <span
         className={cn("h-3.5 w-48 animate-pulse rounded bg-muted", className)}
         aria-hidden="true"
       />
     );
-  if (totals.items === 0) return null;
+  const shown = view ?? totals;
+  if (shown.items === 0) return null;
 
-  const money = (amount: number) => formatMoney(amount, totals.currency);
-  const gainLoss = sold ? totals.realised : totals.gainLoss;
+  const money = (amount: number) => formatMoney(amount, shown.currency);
+  const gainLoss = sold ? shown.realised : shown.gainLoss;
   const figures: { key: string; label?: string; value: ReactNode }[] = [
     {
       key: "items",
-      value: t("collectionTotals.summaryItems", { count: totals.items }),
+      ...(view && { label: `${t("collectionTotals.thisView")}:` }),
+      value: t("collectionTotals.summaryItems", { count: shown.items }),
     },
     sold
       ? {
           key: "salePrice",
           label: t("collectionTotals.summarySalePrice"),
-          value: money(totals.salePrice),
+          value: money(shown.salePrice),
         }
       : {
           key: "marketValue",
           label: t("collectionTotals.summaryMarketValue"),
-          value: money(totals.marketValue),
+          value: money(shown.marketValue),
         },
   ];
   if (gainLoss.items > 0 && !converting)
@@ -186,12 +205,10 @@ function TotalsSummary({
       label: t(
         sold ? "collectionTotals.realised" : "collectionTotals.gainLoss",
       ),
-      value: (
-        <SignedMoney amount={gainLoss.amount} currency={totals.currency} />
-      ),
+      value: <SignedMoney amount={gainLoss.amount} currency={shown.currency} />,
     });
   for (const metal of sold || converting ? [] : metals) {
-    const { value } = totals.metals[metal];
+    const { value } = shown.metals[metal];
     if (value)
       figures.push({
         key: metal,
@@ -204,7 +221,7 @@ function TotalsSummary({
     <span
       className={cn(
         "flex h-5 min-w-0 flex-1 flex-wrap gap-x-3 overflow-hidden text-muted-foreground",
-        totals.counting && "animate-pulse",
+        !view && totals.counting && "animate-pulse",
         className,
       )}
     >
@@ -219,32 +236,65 @@ function TotalsSummary({
 }
 
 /**
- * The totals, Spot prices and charts, with placeholders while they load. The
- * sold view's are its sale figures, with no charts: those show what's owned.
- * While a Home currency change converts the amounts, the charts wait too.
+ * The totals, Spot prices and charts, with placeholders while they load. With
+ * a view's figures (`view`), those come first under "This view" and the
+ * whole Collection's follow under their own heading; the charts stay the
+ * whole Collection's. The sold view's are its sale figures, with no charts:
+ * those show what's owned. While a Home currency change converts the
+ * amounts, the charts wait too.
  */
 function TotalsDetails({
   totals,
+  view,
   sold,
 }: {
   totals: ShownTotals | undefined;
+  /** The view's figures: null while they load, undefined without a view. */
+  view: CollectionTotals | null | undefined;
   sold?: boolean;
 }) {
+  const t = useI18n();
   const converting = useConvertingTo() !== undefined;
   const empty = totals?.items === 0;
+  const variant = sold ? "sold" : "collection";
+  const whole =
+    totals === undefined ? (
+      <FiguresSkeleton />
+    ) : (
+      !empty && (
+        <TotalsFigures
+          totals={totals}
+          variant={variant}
+          counting={totals.counting}
+        />
+      )
+    );
   return (
     <>
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
-        {totals === undefined ? (
-          <FiguresSkeleton />
+        {view === undefined ? (
+          whole
         ) : (
-          !empty && (
-            <TotalsFigures
-              totals={totals}
-              variant={sold ? "sold" : "collection"}
-              counting={totals.counting}
-            />
-          )
+          <div className="flex flex-col gap-4">
+            <Scoped title={t("collectionTotals.thisView")}>
+              {view === null ? (
+                <FiguresSkeleton />
+              ) : (
+                <TotalsFigures totals={view} variant={variant} />
+              )}
+            </Scoped>
+            {whole && (
+              <Scoped
+                title={t(
+                  sold
+                    ? "collectionTotals.wholeSold"
+                    : "collectionTotals.wholeCollection",
+                )}
+              >
+                {whole}
+              </Scoped>
+            )}
+          </div>
         )}
         <SpotPrices className={cn(empty && "max-w-xl xl:col-span-2")} />
       </div>
@@ -272,6 +322,18 @@ function Charts({ totals }: { totals: ShownTotals }) {
     >
       <ValueChart totals={totals} overTime={overTime?.sum} />
       <ValueDistributionChart totals={totals} />
+    </div>
+  );
+}
+
+/** A card of figures under the heading that says what they cover. */
+function Scoped({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <h3 className="px-1 text-xs font-medium text-muted-foreground">
+        {title}
+      </h3>
+      {children}
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { api } from "@coinslite/backend/convex/_generated/api";
 import {
   type CollectionTotals,
+  type PageTotals,
   TOTALS_PAGE_SIZE,
   combineTotals,
   withMetalValues,
@@ -124,6 +125,31 @@ export function useCollectionTotals(sold?: "sold"): ShownTotals | undefined {
             counting: added.counting,
           },
     [added, perDollar],
+  );
+}
+
+/**
+ * Totals the server summed before any Spot price (a Collection view's,
+ * collection.page), with their Metal values worked out here at the latest
+ * Spot prices, as `useCollectionTotals` prices its pages; undefined until
+ * both are in.
+ */
+export function usePricedTotals(
+  unpriced: PageTotals | undefined,
+): CollectionTotals | undefined {
+  const perDollar = useQuery(
+    api.collectionTotals.perDollar,
+    unpriced === undefined ? "skip" : {},
+  );
+  return useMemo(
+    () =>
+      unpriced === undefined || perDollar === undefined
+        ? undefined
+        : withMetalValues(
+            unpriced,
+            perDollar && spotPricesPerGram(perDollar, unpriced.currency),
+          ),
+    [unpriced, perDollar],
   );
 }
 

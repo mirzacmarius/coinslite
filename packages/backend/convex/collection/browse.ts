@@ -1,10 +1,11 @@
-import type { Locale } from "@coinslite/i18n";
+import type { HomeCurrency, Locale } from "@coinslite/i18n";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { attentionKinds } from "../items/attention";
 import { catalogEntryByKey, itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
+import { pageTotals } from "../items/totals";
 import { gradingScale, itemType } from "../utils/validators";
 import { type CollectionView, collectionSorts } from "./view";
 import {
@@ -206,8 +207,10 @@ export async function findItems(
 
 /**
  * One page of the Items a view shows, numbered from 1, each with its list
- * thumbnail, and how many there are in all. A page past either end shows
- * the nearest one.
+ * thumbnail, how many there are in all, and their totals before any Spot
+ * price (items/totals.ts pageTotals, in `currency`), which the app prices
+ * as it does the whole Collection's. A page past either end shows the
+ * nearest one.
  */
 export async function browsePage(
   ctx: QueryCtx,
@@ -216,7 +219,13 @@ export async function browsePage(
     view,
     page,
     pageSize,
-  }: { view: CollectionView; page: number; pageSize: number },
+    currency,
+  }: {
+    view: CollectionView;
+    page: number;
+    pageSize: number;
+    currency: HomeCurrency;
+  },
 ) {
   const items = itemsInView(collection, view, context);
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
@@ -236,5 +245,6 @@ export async function browsePage(
     complete,
     entry,
     ownCountry: context.ownCountry,
+    viewTotals: pageTotals(items, { currency }),
   };
 }
