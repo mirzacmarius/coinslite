@@ -687,6 +687,11 @@ export default {
     needsWeightAndPurity: "Legg inn vekt og finhet",
     noSpotPrices: "Ingen spotpriser ennå",
     stale: "Spotprisene kan være utdaterte",
+    premium: {
+      above: "Markedsverdi {percent}\u00a0% over metallverdi",
+      below: "Markedsverdi {percent}\u00a0% under metallverdi",
+      equal: "Markedsverdi lik metallverdi",
+    },
     errors: {
       weight: "Skriv inn vekten i gram, f.eks. 31,103.",
       purity: "Skriv inn en finhet over 0 og opptil 1, f.eks. 0,999.",

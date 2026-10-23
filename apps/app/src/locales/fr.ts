@@ -698,6 +698,13 @@ export default {
     needsWeightAndPurity: "Ajoutez le poids et la pureté",
     noSpotPrices: "Pas encore de cours spot",
     stale: "Les cours spot sont peut-être dépassés",
+    premium: {
+      above:
+        "Valeur de marché {percent}\u00a0% au-dessus de la valeur du métal",
+      below:
+        "Valeur de marché {percent}\u00a0% en dessous de la valeur du métal",
+      equal: "Valeur de marché égale à la valeur du métal",
+    },
     errors: {
       weight: "Saisissez un poids en grammes, par ex. 31,103.",
       purity:

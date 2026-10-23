@@ -691,6 +691,11 @@ export default {
     needsWeightAndPurity: "Adaugă greutatea și puritatea",
     noSpotPrices: "Încă nu există prețuri spot",
     stale: "Prețurile spot pot fi depășite",
+    premium: {
+      above: "Valoare de piață cu {percent}\u00a0% peste valoarea metalului",
+      below: "Valoare de piață cu {percent}\u00a0% sub valoarea metalului",
+      equal: "Valoare de piață egală cu valoarea metalului",
+    },
     errors: {
       weight: "Introdu o greutate în grame, de ex. 31,103.",
       purity: "Introdu o puritate peste 0 și până la 1, de ex. 0,999.",

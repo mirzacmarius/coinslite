@@ -172,7 +172,9 @@ function Figure({
 
 /**
  * An owned gold or silver coin's Metal value at the latest Spot prices, with
- * its fine weight; or what it still needs to have one.
+ * its fine weight and, once it has a Market value too, how far that stands
+ * above or below the Metal value (the premium); or what it still needs to
+ * have one.
  */
 function MetalValueFigure({ item }: { item: Doc<"items"> }) {
   const t = useI18n();
@@ -187,6 +189,32 @@ function MetalValueFigure({ item }: { item: Doc<"items"> }) {
     item.weight !== undefined && item.purity !== undefined
       ? item.weight * item.purity * item.quantity
       : undefined;
+  // The Market value of all the pieces against their Metal value.
+  const premium =
+    value && value.amount > 0 && item.marketValue !== undefined
+      ? (item.marketValue * item.quantity - value.amount) / value.amount
+      : undefined;
+  const premiumLine = (share: number) => {
+    const percent = format.number(Math.abs(share) * 100, {
+      maximumFractionDigits: 1,
+    });
+    if (percent === format.number(0)) return t("preciousMetal.premium.equal");
+    return t(
+      share > 0 ? "preciousMetal.premium.above" : "preciousMetal.premium.below",
+      { percent },
+    );
+  };
+  const weightLine = value?.stale ? (
+    <StaleSpotPrices />
+  ) : (
+    fineWeight !== undefined &&
+    t("collectionTotals.fineWeight", {
+      grams: format.number(fineWeight, { maximumFractionDigits: 2 }),
+      ounces: format.number(fineWeight / TROY_OUNCE_GRAMS, {
+        maximumFractionDigits: 2,
+      }),
+    })
+  );
   return (
     <Figure
       label={t("preciousMetal.metalValue")}
@@ -205,17 +233,14 @@ function MetalValueFigure({ item }: { item: Doc<"items"> }) {
         )
       }
       hint={
-        value?.stale ? (
-          <StaleSpotPrices />
-        ) : (
-          fineWeight !== undefined &&
-          t("collectionTotals.fineWeight", {
-            grams: format.number(fineWeight, { maximumFractionDigits: 2 }),
-            ounces: format.number(fineWeight / TROY_OUNCE_GRAMS, {
-              maximumFractionDigits: 2,
-            }),
-          })
-        )
+        weightLine || premium !== undefined ? (
+          <>
+            {weightLine}
+            {premium !== undefined && (
+              <span className="block">{premiumLine(premium)}</span>
+            )}
+          </>
+        ) : undefined
       }
     />
   );

@@ -709,6 +709,11 @@ export default {
     needsWeightAndPurity: "Gewicht und Feinheit angeben",
     noSpotPrices: "Noch keine Spotpreise",
     stale: "Die Spotpreise sind möglicherweise veraltet",
+    premium: {
+      above: "Marktwert {percent}\u00a0% über Metallwert",
+      below: "Marktwert {percent}\u00a0% unter Metallwert",
+      equal: "Marktwert gleich Metallwert",
+    },
     errors: {
       weight: "Gib ein Gewicht in Gramm ein, z. B. 31,103.",
       purity: "Gib eine Feinheit über 0 und bis 1 ein, z. B. 0,999.",

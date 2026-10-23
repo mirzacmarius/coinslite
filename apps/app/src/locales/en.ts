@@ -679,6 +679,11 @@ export default {
     needsWeightAndPurity: "Add weight and purity",
     noSpotPrices: "No Spot prices yet",
     stale: "Spot prices may be out of date",
+    premium: {
+      above: "Market value {percent}% above Metal value",
+      below: "Market value {percent}% below Metal value",
+      equal: "Market value equal to Metal value",
+    },
     errors: {
       weight: "Enter a weight in grams, like 31.103.",
       purity: "Enter a purity above 0 and up to 1, like 0.999.",
