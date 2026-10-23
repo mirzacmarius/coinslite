@@ -74,6 +74,7 @@ const importRow = v.object({
   currency: v.optional(v.string()),
   purchaseDate: v.optional(v.string()),
   source: v.optional(v.string()),
+  storage: v.optional(v.string()),
   notes: v.optional(v.string()),
   soldOn: v.optional(v.string()),
   salePrice: v.optional(v.number()),

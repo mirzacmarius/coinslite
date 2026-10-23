@@ -512,6 +512,7 @@ export function ItemDetail() {
               <Fact label={t("items.quantity")}>
                 {format.number(item.quantity)}
               </Fact>
+              <Fact label={t("items.storage")}>{item.storage}</Fact>
             </FactSection>
             {item.notes && (
               <section

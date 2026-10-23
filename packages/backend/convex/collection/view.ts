@@ -35,6 +35,9 @@ export type Origin = (typeof origins)[number];
 /** The Album filter's value for Items that aren't in any Album. */
 export const withoutAlbum = "none";
 
+/** The Kept in filter's value for Items with no place recorded. */
+export const withoutStorage = "none";
+
 export type CollectionView = {
   /** Words to find in the title, the denomination or the country's name. */
   search?: string;
@@ -55,6 +58,11 @@ export type CollectionView = {
   notInAlbum?: string;
   /** A Catalog entry's key: only the Items made from it. */
   entry?: string;
+  /**
+   * A place Items are kept in (Kept in), matched without regard to case,
+   * accents or spacing, or `withoutStorage`.
+   */
+  storage?: string;
   /**
    * Only the Items without a Market value, without any photo, or (coins and
    * banknotes) without a Grade, as the Overview counts them (items/attention.ts).

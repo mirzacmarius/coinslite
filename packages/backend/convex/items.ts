@@ -117,6 +117,7 @@ const itemFields = {
   marketValue: v.optional(v.number()),
   purchaseDate: v.optional(v.string()),
   source: v.optional(v.string()),
+  storage: v.optional(v.string()),
   notes: v.optional(v.string()),
   albumId: v.optional(v.id("albums")),
 };

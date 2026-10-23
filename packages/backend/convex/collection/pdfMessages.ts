@@ -26,6 +26,8 @@ export type CollectionPdfMessages = {
   origins: { own: (country: string) => string; foreign: string };
   withoutAlbum: string;
   unknownAlbum: string;
+  /** The Kept in filter's option for Items with no place recorded. */
+  withoutStorage: string;
   sortedBy: string;
   sorts: Record<CollectionSort, string>;
   currency: string;
@@ -66,6 +68,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     },
     withoutAlbum: "Without an Album",
     unknownAlbum: "Unknown Album",
+    withoutStorage: "No place recorded",
     sortedBy: "Sorted by",
     sorts: {
       year: "Year, oldest first",
@@ -114,6 +117,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     },
     withoutAlbum: "Uten album",
     unknownAlbum: "Ukjent album",
+    withoutStorage: "Uten oppbevaringssted",
     sortedBy: "Sortert etter",
     sorts: {
       year: "År, eldste først",
@@ -162,6 +166,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     },
     withoutAlbum: "Ohne Album",
     unknownAlbum: "Unbekanntes Album",
+    withoutStorage: "Ohne Aufbewahrungsort",
     sortedBy: "Sortiert nach",
     sorts: {
       year: "Jahr, älteste zuerst",
@@ -210,6 +215,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     },
     withoutAlbum: "Sans album",
     unknownAlbum: "Album inconnu",
+    withoutStorage: "Sans lieu de conservation",
     sortedBy: "Trié par",
     sorts: {
       year: "Année, la plus ancienne d’abord",
@@ -258,6 +264,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     },
     withoutAlbum: "Fără album",
     unknownAlbum: "Album necunoscut",
+    withoutStorage: "Fără loc de păstrare",
     sortedBy: "Sortat după",
     sorts: {
       year: "An, cele mai vechi întâi",

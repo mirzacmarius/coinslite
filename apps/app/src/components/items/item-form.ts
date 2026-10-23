@@ -75,6 +75,8 @@ export type ItemFormValues = {
   marketValue: string;
   purchaseDate: string;
   source: string;
+  /** Kept in: where the Item is. */
+  storage: string;
   albumId: Id<"albums"> | undefined;
 };
 
@@ -120,6 +122,7 @@ export const blankItem = (): ItemFormValues => ({
   marketValue: "",
   purchaseDate: "",
   source: "",
+  storage: "",
   albumId: undefined,
 });
 
@@ -159,6 +162,7 @@ export const detailFields = [
   "marketValue",
   "purchaseDate",
   "source",
+  "storage",
 ] as const satisfies ReadonlyArray<keyof ItemFormValues>;
 
 /** Whether a fact as typed says the same as the Catalog entry's. */
@@ -292,6 +296,7 @@ export function valuesFromItem(
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
     source: item.source ?? "",
+    storage: item.storage ?? "",
     albumId: item.albumId,
   };
 }

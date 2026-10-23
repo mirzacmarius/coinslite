@@ -109,6 +109,8 @@ export type ImportRow = {
   currency?: string;
   purchaseDate?: string;
   source?: string;
+  /** Kept in. */
+  storage?: string;
   notes?: string;
   soldOn?: string;
   salePrice?: number;
@@ -320,6 +322,7 @@ function readRow(row: number, cells: Map<Column, string>): ImportRow {
     currency: text("currency")?.toUpperCase(),
     purchaseDate: text("purchaseDate"),
     source: text("source"),
+    storage: text("storage"),
     notes: text("notes"),
     soldOn: text("soldOn"),
     salePrice: amount("salePrice"),

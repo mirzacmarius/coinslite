@@ -75,6 +75,7 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
     currency,
     purchaseDate: item.purchaseDate,
     source: item.source,
+    storage: item.storage,
     soldOn: item.soldOn,
     salePrice: plainAmount(item.salePrice),
     saleNote: item.saleNote,

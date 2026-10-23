@@ -67,6 +67,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
   - An optional free-text grade note.
 - **Quantity:** whole number ≥ 1, default 1.
 - **Purchase:** Purchase price per piece, purchase date, and source (where it was acquired).
+- **Kept in:** where the Item physically is, as the user describes it ("Safe deposit box 2, tray 3"): free text up to 100 characters. The form suggests the places the user's other Items are kept in, so one place is written one way.
 - **Market value** per piece. Optional, entered by the user.
 - **Notes.**
 - **Album:** optional, at most one.
@@ -136,7 +137,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - The list thumbnail is that of the front photo, else of the back photo, else of the first more photo, else a placeholder for the Item type. A photo from before thumbnails shows as itself.
 
 ### 5.7 Item detail
-- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Purchase price, Market value, purchase date and source, notes and Album.
+- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, Purchase price, Market value, purchase date and source, notes and Album.
 - For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity**.
 - **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album tags, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
 - Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
@@ -226,6 +227,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - denomination
   - Grade
   - Album: all, one Album, or without an Album, each with counts
+  - Kept in: one place, or no place recorded, each with counts; places that differ only in capitals, accents or spacing count as one
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
 - **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, denomination, Grade.
@@ -242,7 +244,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
     - A totals row and page numbers.
-  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source.
+  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
 
 ## 8. Albums
 

@@ -34,6 +34,7 @@ const morgan: Doc<"items"> = {
   purchasePrice: 123_450,
   purchaseDate: "2024-05-01",
   source: "Coin fair",
+  storage: "Safe, tray 3",
   albumId: "albums-1" as Id<"albums">,
 };
 
@@ -62,6 +63,7 @@ describe("a duplicate (spec 5.5) sends what the original holds", () => {
         purchasePrice: 123_450,
         purchaseDate: "2024-05-01",
         source: "Coin fair",
+        storage: "Safe, tray 3",
         albumId: "albums-1",
       });
     }

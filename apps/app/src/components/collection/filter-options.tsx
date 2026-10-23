@@ -10,9 +10,12 @@ import type { api } from "@coinslite/backend/convex/_generated/api";
 import {
   type CollectionView,
   withoutAlbum,
+  withoutStorage,
 } from "@coinslite/backend/convex/collection/view";
+import { textKey } from "@coinslite/backend/convex/collection/viewRules";
 import type { FunctionReturnType } from "convex/server";
 import {
+  Archive,
   Award,
   BookOpen,
   CircleAlert,
@@ -41,6 +44,7 @@ export type FilterDimension =
   | "denomination"
   | "grade"
   | "album"
+  | "storage"
   | "entry"
   | "without"
   | "status";
@@ -80,9 +84,9 @@ const optionIcon = (Icon: LucideIcon) => (
   />
 );
 
+/** Whether two texts are one to the filters, as the server matches them. */
 const sameText = (a: string | undefined, b: string) =>
-  a !== undefined &&
-  a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
+  a !== undefined && textKey(a) === textKey(b);
 
 /**
  * Every filter the Collection offers, each with its options, their counts
@@ -278,6 +282,40 @@ export function useFilters(
         !albumOptions.some((option) => option.selected) && {
           active: { label: t("collection.unknownAlbum") },
         }),
+    });
+
+    // Kept in: each place as the Items write it, then no place recorded.
+    const storages = counts?.storages ?? [];
+    const chosenStorage =
+      view.storage === withoutStorage ? undefined : view.storage;
+    const storageOptions: FilterOption[] = [
+      ...storages,
+      ...(chosenStorage &&
+      !storages.some((s) => sameText(chosenStorage, s.storage))
+        ? [{ storage: chosenStorage, count: uncounted }]
+        : []),
+    ].map(
+      ({ storage, count }): FilterOption => ({
+        key: storage,
+        label: storage,
+        count,
+        selected: sameText(chosenStorage, storage),
+        change: { storage },
+      }),
+    );
+    storageOptions.push({
+      key: withoutStorage,
+      label: t("collection.withoutStorage"),
+      count: counts?.withoutStorage ?? uncounted,
+      selected: view.storage === withoutStorage,
+      change: { storage: withoutStorage },
+    });
+    filters.push({
+      dimension: "storage",
+      label: t("collection.filters.storage"),
+      icon: Archive,
+      options: storageOptions,
+      clear: { storage: undefined },
     });
 
     // Too many entries to list: links narrow to one ("You hold" on an entry).

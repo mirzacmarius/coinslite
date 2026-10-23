@@ -6,6 +6,7 @@ import {
   collectionView,
   findItems,
   readForView,
+  readStoragePlaces,
 } from "./collection/browse";
 import type { CollectionView } from "./collection/view";
 import { countFilterOptions } from "./collection/viewRules";
@@ -62,6 +63,8 @@ const filterCountsResult = v.object({
   ),
   albums: v.array(v.object({ albumId: v.id("albums"), count: v.number() })),
   withoutAlbum: v.number(),
+  storages: v.array(v.object({ storage: v.string(), count: v.number() })),
+  withoutStorage: v.number(),
   entry: v.number(),
   statuses: v.object({ owned: v.number(), sold: v.number() }),
 });
@@ -107,6 +110,20 @@ export const filterCounts = query({
   handler: async (ctx, { view, locale }) => {
     const { read } = await readOwnCollection(ctx, view, locale);
     return countFilterOptions(read.items, view, read.context);
+  },
+});
+
+/**
+ * The places the signed-in person's Items are kept in (Kept in), most used
+ * first, for the Item form to suggest as one is typed (browse.ts
+ * readStoragePlaces).
+ */
+export const storagePlaces = query({
+  args: {},
+  returns: v.array(v.string()),
+  handler: async (ctx) => {
+    const owner = await requireSetUpUser(ctx);
+    return await readStoragePlaces(ctx, owner._id);
   },
 });
 

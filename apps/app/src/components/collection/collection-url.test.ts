@@ -1,5 +1,24 @@
 import { describe, expect, test } from "bun:test";
-import { hrefAfterDeleting } from "./collection-url";
+import {
+  hrefAfterDeleting,
+  readCollectionUrl,
+  writeCollectionUrl,
+} from "./collection-url";
+
+describe("the view in the URL", () => {
+  test("round-trips the Kept in filter and the sort", () => {
+    const view = { storage: "Safe, tray 1", sort: "value" as const };
+    const params = writeCollectionUrl(view, 1);
+    expect(params.toString()).toBe("storage=Safe%2C+tray+1&sort=value");
+    expect(readCollectionUrl(params)).toEqual({ view, page: 1 });
+  });
+
+  test("keeps the Items with no place recorded", () => {
+    expect(readCollectionUrl(new URLSearchParams("storage=none")).view).toEqual(
+      { storage: "none" },
+    );
+  });
+});
 
 describe("hrefAfterDeleting", () => {
   test("an Item opened from outside the Collection goes to the Collection", () => {
