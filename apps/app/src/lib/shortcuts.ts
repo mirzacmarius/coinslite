@@ -33,7 +33,10 @@ export function shortcutFires(
   if (page.typing || page.dialogOpen || page.menuOpen) return false;
   const withMod = shortcut.startsWith("mod+");
   const key = withMod ? shortcut.slice("mod+".length) : shortcut;
-  if (press.key.toLowerCase() !== key.toLowerCase()) return false;
+  // Browser autofill and some input methods fire a keydown with no key.
+  const pressed = press.key as string | undefined;
+  if (pressed === undefined || pressed.toLowerCase() !== key.toLowerCase())
+    return false;
   if (withMod) return press.metaKey || press.ctrlKey;
   if (press.metaKey || press.ctrlKey || press.altKey) return false;
   return !(press.shiftKey && key.startsWith("Arrow"));

@@ -43,6 +43,22 @@ export const sentryOptions = {
     urlQueryParams: false,
     stackFrameVariables: false,
   },
+  /**
+   * Not sent: the browsers' own wording for a fetch that failed because the
+   * person was offline or the connection dropped ("Load failed" is Safari's,
+   * "Failed to fetch" Chrome's), most often Convex Auth refreshing its token
+   * through /api/auth, which retries by itself; and Safari's wording for
+   * parsing the empty reply such a refresh gets. Nothing in the app can act
+   * on them, and they drowned the real errors.
+   */
+  ignoreErrors: [
+    "Load failed",
+    "Failed to fetch",
+    "NetworkError when attempting to fetch resource",
+    "The string did not match the expected pattern",
+  ],
+  /** Vercel's toolbar on preview deployments: its errors are its own. */
+  denyUrls: [/\/_next-live\/feedback\//],
   beforeSend: scrubEvent,
   beforeSendSpan(span) {
     span.name = withoutQueries(span.name);
