@@ -95,9 +95,9 @@ export const tooManyCodeEmails = "TOO_MANY_CODE_EMAILS";
 /**
  * Counts a code email about to go to `email`, or refuses it
  * (TOO_MANY_CODE_EMAILS). Convex Auth's store runs this (auth.ts) before it
- * stores the code and, for a new address, the account, so a refused request
- * leaves nothing behind. auth:signIn can be called without the app, so the
- * limits hold here rather than in its forms.
+ * stores the code and, for a sign-in link to a new address, the account, so
+ * a refused request leaves nothing behind. auth:signIn can be called without
+ * the app, so the limits hold here rather than in its forms.
  */
 export async function countCodeEmail(ctx: MutationCtx, email: string) {
   const inbox = await rateLimiter.limit(ctx, "codeEmail", {
@@ -111,6 +111,20 @@ export async function countCodeEmail(ctx: MutationCtx, email: string) {
   if (user?.emailVerificationTime !== undefined) return;
   const everyone = await rateLimiter.limit(ctx, "codeEmailToNewAddress");
   if (!everyone.ok) throw new ConvexError(tooManyCodeEmails);
+}
+
+/**
+ * Refuses a password sign-up whose code couldn't be sent. Convex Auth stores
+ * its account before the code, in a transaction of its own, so without this
+ * a refused code would leave the account behind. Only checks: the code email
+ * itself counts (countCodeEmail).
+ */
+export async function requireRoomForSignUp(ctx: MutationCtx, email: string) {
+  const inbox = await rateLimiter.check(ctx, "codeEmail", {
+    key: mailboxOf(email),
+  });
+  const everyone = await rateLimiter.check(ctx, "codeEmailToNewAddress");
+  if (!inbox.ok || !everyone.ok) throw new ConvexError(tooManyCodeEmails);
 }
 
 const escapeHtml = (text: string) =>
