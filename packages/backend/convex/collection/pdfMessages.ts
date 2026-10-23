@@ -28,6 +28,8 @@ export type CollectionPdfMessages = {
   unknownAlbum: string;
   /** The Kept in filter's option for Items with no place recorded. */
   withoutStorage: string;
+  /** A year range with one end open, as "from 1800" or "to 1899". */
+  yearRange: { from: (year: string) => string; to: (year: string) => string };
   sortedBy: string;
   sorts: Record<CollectionSort, string>;
   currency: string;
@@ -69,6 +71,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Without an Album",
     unknownAlbum: "Unknown Album",
     withoutStorage: "No place recorded",
+    yearRange: { from: (year) => `from ${year}`, to: (year) => `to ${year}` },
     sortedBy: "Sorted by",
     sorts: {
       year: "Year, oldest first",
@@ -121,6 +124,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Uten album",
     unknownAlbum: "Ukjent album",
     withoutStorage: "Uten oppbevaringssted",
+    yearRange: { from: (year) => `fra ${year}`, to: (year) => `til ${year}` },
     sortedBy: "Sortert etter",
     sorts: {
       year: "År, eldste først",
@@ -173,6 +177,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Ohne Album",
     unknownAlbum: "Unbekanntes Album",
     withoutStorage: "Ohne Aufbewahrungsort",
+    yearRange: { from: (year) => `ab ${year}`, to: (year) => `bis ${year}` },
     sortedBy: "Sortiert nach",
     sorts: {
       year: "Jahr, älteste zuerst",
@@ -225,6 +230,10 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Sans album",
     unknownAlbum: "Album inconnu",
     withoutStorage: "Sans lieu de conservation",
+    yearRange: {
+      from: (year) => `à partir de ${year}`,
+      to: (year) => `jusqu’à ${year}`,
+    },
     sortedBy: "Trié par",
     sorts: {
       year: "Année, la plus ancienne d’abord",
@@ -277,6 +286,10 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Fără album",
     unknownAlbum: "Album necunoscut",
     withoutStorage: "Fără loc de păstrare",
+    yearRange: {
+      from: (year) => `din ${year}`,
+      to: (year) => `până în ${year}`,
+    },
     sortedBy: "Sortat după",
     sorts: {
       year: "An, cele mai vechi întâi",

@@ -18,10 +18,12 @@ import {
   Archive,
   Award,
   BookOpen,
+  CalendarRange,
   CircleAlert,
   CircleCheck,
   CircleDollarSign,
   FolderOpen,
+  Gem,
   Globe,
   type LucideIcon,
   MapPin,
@@ -43,6 +45,8 @@ export type FilterDimension =
   | "country"
   | "denomination"
   | "grade"
+  | "year"
+  | "material"
   | "album"
   | "storage"
   | "entry"
@@ -72,6 +76,12 @@ export type Filter = {
   active?: { label: string; icon?: React.ReactNode };
   /** False for a filter only links turn on: it shows as a chip, not in the menu. */
   inMenu?: false;
+  /**
+   * A range the filter also takes, typed in (the Year filter): the ends that
+   * are on, and the span of the Items' years to suggest (undefined while the
+   * counts load).
+   */
+  range?: { from?: number; to?: number; min?: number; max?: number };
   /** While the counts load, options found only from them (countries, denominations, Grades) aren't listed yet. */
   counting: boolean;
 };
@@ -248,6 +258,67 @@ export function useFilters(
       icon: Award,
       options: gradeOptions,
       clear: { grade: undefined },
+    });
+
+    // Year: one of the decades the Items span, or a range typed in.
+    const { yearFrom, yearTo } = view;
+    const decadeOptions = (counts?.decades ?? []).map(
+      ({ decade, count }): FilterOption => ({
+        key: String(decade),
+        label: t("collection.decade", { decade: String(decade) }),
+        count,
+        selected: yearFrom === decade && yearTo === decade + 9,
+        change: { yearFrom: decade, yearTo: decade + 9 },
+      }),
+    );
+    const yearRange =
+      yearFrom !== undefined && yearTo !== undefined
+        ? yearFrom === yearTo
+          ? String(yearFrom)
+          : `${yearFrom}–${yearTo}`
+        : yearFrom !== undefined
+          ? t("collection.yearRange.from", { year: String(yearFrom) })
+          : yearTo !== undefined
+            ? t("collection.yearRange.to", { year: String(yearTo) })
+            : undefined;
+    filters.push({
+      dimension: "year",
+      label: t("collection.filters.year"),
+      icon: CalendarRange,
+      options: decadeOptions,
+      clear: { yearFrom: undefined, yearTo: undefined },
+      range: {
+        from: yearFrom,
+        to: yearTo,
+        min: counts?.years?.min,
+        max: counts?.years?.max,
+      },
+      ...(yearRange !== undefined && { active: { label: yearRange } }),
+    });
+
+    // Material: what the Items are made of, a coin's precious metal standing in.
+    const materialCounts = counts?.materials ?? [];
+    const materialOptions = [
+      ...materialCounts,
+      ...(view.material &&
+      !materialCounts.some((m) => m.material === view.material)
+        ? [{ material: view.material, count: uncounted }]
+        : []),
+    ].map(
+      ({ material, count }): FilterOption => ({
+        key: material,
+        label: t(`items.materials.${material}`),
+        count,
+        selected: view.material === material,
+        change: { material },
+      }),
+    );
+    filters.push({
+      dimension: "material",
+      label: t("collection.filters.material"),
+      icon: Gem,
+      options: materialOptions,
+      clear: { material: undefined },
     });
 
     const albumCounts = new Map(

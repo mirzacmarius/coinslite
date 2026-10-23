@@ -227,6 +227,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - a specific country
   - denomination
   - Grade
+  - year: a range typed in (from, to, or both), or one of the decades the Items span, each with counts; an Item without a year is outside any range
+  - material, each with counts; a coin's precious metal stands in for a missing material
   - Album: all, one Album, or without an Album, each with counts
   - Kept in: one place, or no place recorded, each with counts; places that differ only in capitals, accents or spacing count as one
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade

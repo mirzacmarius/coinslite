@@ -13,6 +13,19 @@ describe("the view in the URL", () => {
     expect(readCollectionUrl(params)).toEqual({ view, page: 1 });
   });
 
+  test("round-trips a year range and a material, a range written backwards the right way round", () => {
+    const view = { yearFrom: 1800, yearTo: 1899, material: "silver" as const };
+    const params = writeCollectionUrl(view, 1);
+    expect(params.toString()).toBe("yearFrom=1800&yearTo=1899&material=silver");
+    expect(readCollectionUrl(params).view).toEqual(view);
+    expect(
+      readCollectionUrl(new URLSearchParams("yearFrom=1899&yearTo=1800")).view,
+    ).toEqual({ yearFrom: 1800, yearTo: 1899 });
+    expect(
+      readCollectionUrl(new URLSearchParams("yearFrom=abc&material=wood")).view,
+    ).toEqual({});
+  });
+
   test("keeps the Items with no place recorded", () => {
     expect(readCollectionUrl(new URLSearchParams("storage=none")).view).toEqual(
       { storage: "none" },
