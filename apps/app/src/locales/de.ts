@@ -852,7 +852,7 @@ export default {
   },
   collection: {
     search: "Sammlung durchsuchen",
-    searchPlaceholder: "Titel, Nennwert, Land suchen",
+    searchPlaceholder: "Titel, Notizen, Orte suchen …",
     clearSearch: "Suche leeren",
     filter: "Filter",
     filterBy: "Filtern nach…",

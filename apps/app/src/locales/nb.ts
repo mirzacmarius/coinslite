@@ -825,7 +825,7 @@ export default {
   },
   collection: {
     search: "Søk i samlingen",
-    searchPlaceholder: "Søk etter tittel, pålydende, land",
+    searchPlaceholder: "Søk i titler, notater, steder …",
     clearSearch: "Tøm søket",
     filter: "Filter",
     filterBy: "Filtrer etter…",

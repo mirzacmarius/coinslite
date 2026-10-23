@@ -47,7 +47,7 @@ export const withoutAlbum = "none";
 export const withoutStorage = "none";
 
 export type CollectionView = {
-  /** Words to find in the title, the denomination or the country's name. */
+  /** Words to find in the Item's texts (viewRules.ts searchFor). */
   search?: string;
   type?: ItemType;
   /** Only bullion coins. */

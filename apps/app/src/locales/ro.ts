@@ -830,7 +830,7 @@ export default {
   },
   collection: {
     search: "Caută în colecție",
-    searchPlaceholder: "Caută titlu, valoare nominală, țară",
+    searchPlaceholder: "Caută titluri, note, locuri…",
     clearSearch: "Șterge căutarea",
     filter: "Filtrează",
     filterBy: "Filtrează după…",

@@ -839,7 +839,7 @@ export default {
   },
   collection: {
     search: "Rechercher dans la collection",
-    searchPlaceholder: "Titre, valeur faciale, pays",
+    searchPlaceholder: "Titres, notes, lieux…",
     clearSearch: "Effacer la recherche",
     filter: "Filtrer",
     filterBy: "Filtrer par…",

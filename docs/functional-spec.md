@@ -220,7 +220,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month.
   - **Value by Date acquired:** cumulative Purchase price and Market value by the month Items were acquired.
   - **Value distribution:** by Item type, plus gold and silver Metal value.
-- **Search:** title, denomination, country.
+- **Search:** every word typed must appear in one of the Item's texts: title, denomination, series, category, ruler, mint mark, Numista number (as "N# 1234" is written), grade note, grader and certificate number, stamp catalogue and number, serial number, source, Kept in, notes, or the country's name; a word may also be the country's code. Capitals and accents don't matter.
 - **Filters:**
   - Item type, plus bullion-only for coins
   - origin: all, the user's own country, or foreign

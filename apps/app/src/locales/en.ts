@@ -811,7 +811,7 @@ export default {
   },
   collection: {
     search: "Search the Collection",
-    searchPlaceholder: "Search title, denomination, country",
+    searchPlaceholder: "Search titles, notes, places…",
     clearSearch: "Clear search",
     filter: "Filter",
     filterBy: "Filter by…",

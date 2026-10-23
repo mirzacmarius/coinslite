@@ -103,10 +103,13 @@ export function countryName(code: string, locale: Locale) {
 }
 
 /**
- * Whether an Item has every searched word in its title, its denomination,
- * its country's name or what its label says (grader and certificate number,
- * stamp catalogue and number, serial number), or a word is its country's
- * code ("us"), so "PCGS 12345678" finds the coin as its page writes it.
+ * Whether an Item has every searched word in one of its texts: its title,
+ * denomination, series, category, ruler, mint mark, Numista number (as "N#
+ * 1234" is written), grade note, what its label says (grader and certificate
+ * number, stamp catalogue and number, serial number), source, the place it's
+ * kept in, its notes or its country's name; or a word is its country's code
+ * ("us"). So "PCGS 12345678" finds the coin as its page writes it, and "coin
+ * fair" the one bought there.
  */
 function searchFor(search: string | undefined, locale: Locale) {
   const words = folded(search?.slice(0, searchLimit) ?? "")
@@ -126,6 +129,13 @@ function searchFor(search: string | undefined, locale: Locale) {
     const text = [
       item.title,
       item.denomination,
+      item.series,
+      item.category,
+      item.ruler,
+      item.mintMark,
+      // "n#1234" holds "n#", "1234" and "n#1234", however the number is typed.
+      item.numistaNumber === undefined ? undefined : `n#${item.numistaNumber}`,
+      item.gradeNote,
       item.grader &&
         referenceName(graderNames, item.grader, item.graderName, ""),
       item.certificateNumber,
@@ -138,6 +148,9 @@ function searchFor(search: string | undefined, locale: Locale) {
         ),
       item.stampCatalogueNumber,
       item.serialNumber,
+      item.source,
+      item.storage,
+      item.notes,
     ]
       .filter((field) => field !== undefined)
       .map(folded);
