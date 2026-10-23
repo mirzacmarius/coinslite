@@ -93,6 +93,8 @@ export default {
         [
           "Ștergerea contului (Cont, apoi Șterge contul) elimină definitiv profilul, metodele de conectare și sesiunile, obiectele, albumele și fotografiile tale, precum și legătura cu abonamentul. Cea mai mare parte dispare imediat; restul unei colecții mari urmează la scurt timp, în fundal.",
           "Rămâne doar mențiunea că un ID de cont a fost șters, fără a numi pe cineva, pentru ca un mesaj întârziat de la Polar despre el să încheie abonamentul la care se referă.",
+          "Un cont cu planul gratuit la care nu se conectează nimeni primește un e-mail după 6, 8 și 12 luni și este șters la 14 zile după ultimul, care precizează data. O conectare repornește numărătoarea.",
+          "Dacă începi să-ți creezi un cont sau ceri un link de conectare, dar nu îți confirmi niciodată adresa de e-mail, ștergem după 7 zile ce am salvat.",
           "Fotografiile încărcate, dar niciodată salvate, de exemplu dintr-o scanare pe care nu o păstrezi, se șterg în câteva ore.",
           "Datele șterse pot rămâne până la {backupDays} zile în copiile de siguranță ale backendului nostru și până la {logDays} zile în jurnalele furnizorilor de găzduire, după care dispar.",
           "E-mailurile cu mesajele tale rămân în căsuța noastră până le ștergem. Polar păstrează evidențele plăților atât cât cere legea.",

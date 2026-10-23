@@ -17,6 +17,7 @@ import type * as account_emailChangeMessages from "../account/emailChangeMessage
 import type * as account_inactivity from "../account/inactivity.js";
 import type * as account_inactivityMessages from "../account/inactivityMessages.js";
 import type * as account_rules from "../account/rules.js";
+import type * as account_unfinishedSignUps from "../account/unfinishedSignUps.js";
 import type * as accounts_codeEmailMessages from "../accounts/codeEmailMessages.js";
 import type * as accounts_codeEmails from "../accounts/codeEmails.js";
 import type * as accounts_credentials from "../accounts/credentials.js";
@@ -190,6 +191,7 @@ declare const fullApi: ApiFromModules<{
   "account/inactivity": typeof account_inactivity;
   "account/inactivityMessages": typeof account_inactivityMessages;
   "account/rules": typeof account_rules;
+  "account/unfinishedSignUps": typeof account_unfinishedSignUps;
   "accounts/codeEmailMessages": typeof accounts_codeEmailMessages;
   "accounts/codeEmails": typeof accounts_codeEmails;
   "accounts/credentials": typeof accounts_credentials;

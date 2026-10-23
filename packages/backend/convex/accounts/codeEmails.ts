@@ -1,18 +1,19 @@
 import { type Locale, defaultLocale, isLocale } from "@coinslite/i18n";
 import { Email } from "@convex-dev/auth/providers/Email";
 import type { GenericActionCtxWithAuthConfig } from "@convex-dev/auth/server";
-import { HOUR, RateLimiter } from "@convex-dev/rate-limiter";
+import { DAY, HOUR, RateLimiter } from "@convex-dev/rate-limiter";
 import { ConvexError } from "convex/values";
 import { alphabet, generateRandomString } from "oslo/crypto";
 import { components, internal } from "../_generated/api";
 import type { DataModel } from "../_generated/dataModel";
-import { env } from "../_generated/server";
+import { type MutationCtx, env } from "../_generated/server";
 import { sendEmail } from "../email";
 import { type CodeEmailKind, codeEmailMessages } from "./codeEmailMessages";
 import {
   CODE_LENGTH,
   CODE_LIFETIME_MINUTES,
   credentialErrors,
+  mailboxOf,
 } from "./credentials";
 
 /** The app page that finishes each flow. */
@@ -74,11 +75,57 @@ function splitLanguage(path: string): { language?: Locale; path: string } {
     : { path };
 }
 
-/** No more than five code emails an hour to any one address. */
+/**
+ * No more than five code emails an hour to any one inbox. Emails to an
+ * address no account has proven (sign-ups, mostly) also share one budget
+ * across everyone, since each can name a new address: a launch day's
+ * sign-ups fit in it, a script sending them by the thousand doesn't.
+ */
 export const rateLimiter = new RateLimiter(components.rateLimiter, {
   codeEmail: { kind: "token bucket", rate: 5, period: HOUR, capacity: 5 },
+  codeEmailToNewAddress: {
+    kind: "token bucket",
+    rate: 1000,
+    period: DAY,
+    capacity: 200,
+  },
 });
 export const tooManyCodeEmails = "TOO_MANY_CODE_EMAILS";
+
+/**
+ * Counts a code email about to go to `email`, or refuses it
+ * (TOO_MANY_CODE_EMAILS). Convex Auth's store runs this (auth.ts) before it
+ * stores the code and, for a sign-in link to a new address, the account, so
+ * a refused request leaves nothing behind. auth:signIn can be called without
+ * the app, so the limits hold here rather than in its forms.
+ */
+export async function countCodeEmail(ctx: MutationCtx, email: string) {
+  const inbox = await rateLimiter.limit(ctx, "codeEmail", {
+    key: mailboxOf(email),
+  });
+  if (!inbox.ok) throw new ConvexError(tooManyCodeEmails);
+  const user = await ctx.db
+    .query("users")
+    .withIndex("email", (q) => q.eq("email", email))
+    .first();
+  if (user?.emailVerificationTime !== undefined) return;
+  const everyone = await rateLimiter.limit(ctx, "codeEmailToNewAddress");
+  if (!everyone.ok) throw new ConvexError(tooManyCodeEmails);
+}
+
+/**
+ * Refuses a password sign-up whose code couldn't be sent. Convex Auth stores
+ * its account before the code, in a transaction of its own, so without this
+ * a refused code would leave the account behind. Only checks: the code email
+ * itself counts (countCodeEmail).
+ */
+export async function requireRoomForSignUp(ctx: MutationCtx, email: string) {
+  const inbox = await rateLimiter.check(ctx, "codeEmail", {
+    key: mailboxOf(email),
+  });
+  const everyone = await rateLimiter.check(ctx, "codeEmailToNewAddress");
+  if (!inbox.ok || !everyone.ok) throw new ConvexError(tooManyCodeEmails);
+}
 
 const escapeHtml = (text: string) =>
   text.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
@@ -111,9 +158,7 @@ function codeEmail(kind: CodeEmailKind) {
       }: { identifier: string; token: string; url: string },
       ctx: GenericActionCtxWithAuthConfig<DataModel>,
     ) {
-      const { ok } = await rateLimiter.limit(ctx, "codeEmail", { key: to });
-      if (!ok) throw new ConvexError(tooManyCodeEmails);
-
+      // Already counted, when the code was stored (countCodeEmail).
       const { language: browsing, path: next } = splitLanguage(
         returnPathOf(url),
       );

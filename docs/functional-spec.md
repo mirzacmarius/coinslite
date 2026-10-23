@@ -17,6 +17,8 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Sign-up:**
   - Accepting the privacy policy and terms is required.
   - Email/password accounts must verify their email before the account is active.
+  - A sign-up whose email is never verified (by password or magic link) is deleted after 7 days.
+  - Sign-up, magic link and reset emails: at most five an hour to one inbox (a "+tag", and dots at Gmail, count as the same inbox). Those to addresses no account has verified also share a limit across everyone of 1,000 a day, 200 at once.
   - The display name defaults to the local part of the email.
   - The Home currency is preselected from the browser locale and can be changed.
 - **Sign-in:** password, magic link or Google.

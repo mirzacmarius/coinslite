@@ -19,4 +19,5 @@ People can sign in with a password, an emailed sign-in link or Google, and every
 - Links from emails wait for a click before using their code, because mail scanners open links too.
 - Google and sign-in-link newcomers have no Home currency or terms acceptance yet. They complete both once on `/welcome` before the app opens; the dashboard layout sends them there. Later changes to the Home currency go through Account settings, which convert stored amounts.
 - Backend functions that act on Collection data should also require a finished sign-up, not just a session.
+- An unclaimed user that nobody claims within 7 days is deleted with its methods (`packages/backend/convex/account/unfinishedSignUps.ts`), so addresses people typed don't stay forever.
 - Adding a password to an account that has none (one created with Google, say) belongs to Account settings and isn't possible yet.

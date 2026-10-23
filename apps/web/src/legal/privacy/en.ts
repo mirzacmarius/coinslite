@@ -93,6 +93,8 @@ export default {
         [
           "Deleting your account (Account, then Delete account) removes for good your profile, sign-in methods and sessions, your Items, Albums and photos, and the link to your subscription. Most of it goes at once; what’s left of a large Collection follows shortly after in the background. A subscription that would renew is ended first.",
           "What stays is a record that an account id was deleted, which names no one, so a late message from Polar about it ends the subscription it reports.",
+          "An account on the Free plan that nobody signs in to gets an email after 6, 8 and 12 months and is deleted 14 days after the last one, which gives the date. Signing in starts the count again.",
+          "If you start creating an account or ask for a sign-in link, but never confirm your email address, what we stored for it is deleted after 7 days.",
           "Photos you upload but never save, for example from a scan you don’t keep, are deleted within a few hours.",
           "Deleted data can remain in our backend’s backups for up to {backupDays} days, and in our hosting providers’ logs for up to {logDays} days, after which it’s gone.",
           "Feedback emails stay in our inbox until we delete them. Polar keeps payment records for as long as the law requires it to.",
