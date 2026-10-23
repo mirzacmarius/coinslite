@@ -25,7 +25,7 @@ import { checkFields, latestPurchaseDate, storeNewItem } from "./items";
 import { type CatalogEntryLink, catalogEntryByKey } from "./items/resolve";
 import { checkSale } from "./items/rules";
 import { itemsLeftToAdd, requireRoomForItems } from "./plans";
-import { requireSetUpUser } from "./utils/auth";
+import { requireSetUpUser, requireUserId } from "./utils/auth";
 import {
   grader,
   gradingScale,
@@ -249,6 +249,8 @@ export const preview = action({
     itemsLeft: v.union(v.number(), v.null()),
   }),
   handler: async (ctx, { text }) => {
+    // Signed in before a file of up to 5 MB is read; `check` does the rest.
+    await requireUserId(ctx);
     const read = readImportFile(text);
     if (typeof read === "string") throw new ConvexError(read);
     // Annotated: a function calling one in its own module can't infer it.

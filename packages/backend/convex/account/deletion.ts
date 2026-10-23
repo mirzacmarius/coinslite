@@ -11,6 +11,7 @@ import {
 } from "../_generated/server";
 import { rateLimiter as emailChangeLimits } from "../account";
 import { rateLimiter as codeEmailLimits } from "../accounts/codeEmails";
+import { mailboxOf } from "../accounts/credentials";
 import { deleteSignInMethods } from "../accounts/linking";
 import { albumLimits } from "../albums/rules";
 import {
@@ -187,15 +188,16 @@ type Remainder = Infer<typeof remainder>;
 /**
  * Whatever is keyed on the person's id or email address beyond their
  * documents: the rate limits counted against them. These go at once, since
- * the address can belong to a new account a moment later.
+ * the address can belong to a new account a moment later. Also used for
+ * sign-ups nobody finished (account/unfinishedSignUps.ts).
  */
-async function forgetPerson(ctx: MutationCtx, user: Doc<"users">) {
+export async function forgetPerson(ctx: MutationCtx, user: Doc<"users">) {
   await feedbackLimits.reset(ctx, "feedback", { key: user._id });
   await emailChangeLimits.reset(ctx, "emailChange", { key: user._id });
   await uploadLimits.reset(ctx, "upload", { key: user._id });
   const { email } = user;
   if (email === undefined) return;
-  await codeEmailLimits.reset(ctx, "codeEmail", { key: email });
+  await codeEmailLimits.reset(ctx, "codeEmail", { key: mailboxOf(email) });
   // Wrong codes are counted per address.
   const failedCodes = await ctx.db
     .query("authRateLimits")

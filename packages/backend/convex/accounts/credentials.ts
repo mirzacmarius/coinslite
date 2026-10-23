@@ -26,6 +26,24 @@ export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 /** "ada" for "ada@example.com": the display name a new account starts with. */
 export const localPart = (email: string) => email.slice(0, email.indexOf("@"));
 
+/**
+ * The inbox an address delivers to, which code emails are counted by: case
+ * and a "+tag" make no other inbox, and at Gmail, which ignores them, nor do
+ * dots. "A.da+coins@googlemail.com" is "ada@gmail.com".
+ */
+export function mailboxOf(email: string) {
+  const address = normalizeEmail(email);
+  const at = address.lastIndexOf("@");
+  if (at < 1) return address;
+  let local = address.slice(0, at);
+  let domain = address.slice(at + 1);
+  const tag = local.indexOf("+");
+  if (tag > 0) local = local.slice(0, tag);
+  if (domain === "googlemail.com") domain = "gmail.com";
+  if (domain === "gmail.com") local = local.replaceAll(".", "");
+  return `${local}@${domain}`;
+}
+
 /** A new account's display name, with the key the admin user list sorts it by. */
 export function startingName(email: string) {
   const displayName = localPart(email);

@@ -54,4 +54,12 @@ crons.cron(
   {},
 );
 
+/** Sign-ups nobody finished, a week on (account/unfinishedSignUps.ts). */
+crons.cron(
+  "delete unfinished sign-ups",
+  "37 9 * * *",
+  internal.account.unfinishedSignUps.sweep,
+  {},
+);
+
 export default crons;

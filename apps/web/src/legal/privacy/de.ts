@@ -93,6 +93,8 @@ export default {
         [
           "Löschst du dein Konto (Konto, dann Konto löschen), werden dein Profil, deine Anmeldemethoden und Sitzungen, deine Objekte, Alben und Fotos und die Verbindung zu deinem Abonnement endgültig entfernt. Das meiste verschwindet sofort; der Rest einer großen Sammlung folgt kurz darauf im Hintergrund.",
           "Was bleibt, ist ein Vermerk, dass eine Konto-ID gelöscht wurde, der niemanden nennt, damit eine verspätete Meldung von Polar dazu das betreffende Abonnement beendet.",
+          "Meldet sich bei einem Konto im Gratis-Tarif niemand an, schicken wir nach 6, 8 und 12 Monaten eine E-Mail und löschen es 14 Tage nach der letzten, die das Datum nennt. Mit einer Anmeldung beginnt die Zählung von vorn.",
+          "Wenn du ein Konto zu erstellen beginnst oder einen Anmeldelink anforderst, deine E-Mail-Adresse aber nie bestätigst, löschen wir nach 7 Tagen, was wir dafür gespeichert haben.",
           "Fotos, die du hochlädst, aber nie speicherst, etwa aus einem Scan, den du verwirfst, werden innerhalb weniger Stunden gelöscht.",
           "Gelöschte Daten können bis zu {backupDays} Tage in den Sicherungen unseres Backends und bis zu {logDays} Tage in den Protokollen unserer Hosting-Anbieter verbleiben; danach sind sie fort.",
           "Feedback-E-Mails bleiben in unserem Postfach, bis wir sie löschen. Polar bewahrt Zahlungsunterlagen so lange auf, wie das Gesetz es verlangt.",

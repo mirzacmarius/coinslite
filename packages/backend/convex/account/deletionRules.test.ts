@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { stillDue } from "./deletionRules";
+import { isUnfinishedSignUp, stillDue } from "./deletionRules";
 
 const active = {};
 const deactivated = { deactivatedAt: Date.UTC(2026, 9, 1) };
@@ -23,6 +23,33 @@ describe("stillDue", () => {
       false,
     );
     expect(stillDue({ inactivityNotice: 12, ...deactivated }, "unused")).toBe(
+      false,
+    );
+  });
+});
+
+describe("isUnfinishedSignUp", () => {
+  const day = 24 * 60 * 60 * 1000;
+  const now = Date.UTC(2026, 9, 23);
+  const signedUp = (daysAgo: number) => ({
+    _creationTime: now - daysAgo * day,
+  });
+
+  test("a sign-up whose email nobody proved goes after a week", () => {
+    expect(isUnfinishedSignUp(signedUp(8), now)).toBe(true);
+    expect(isUnfinishedSignUp(signedUp(6), now)).toBe(false);
+  });
+
+  test("a proven email, a sign-in, a role or a deactivation keep the user", () => {
+    const old = signedUp(30);
+    expect(
+      isUnfinishedSignUp({ ...old, emailVerificationTime: now - day }, now),
+    ).toBe(false);
+    expect(isUnfinishedSignUp({ ...old, lastSignInAt: now - day }, now)).toBe(
+      false,
+    );
+    expect(isUnfinishedSignUp({ ...old, role: "admin" }, now)).toBe(false);
+    expect(isUnfinishedSignUp({ ...old, deactivatedAt: now - day }, now)).toBe(
       false,
     );
   });

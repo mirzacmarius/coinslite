@@ -93,6 +93,8 @@ export default {
         [
           "Sletter du kontoen (Konto, deretter Slett kontoen), fjernes profilen, innloggingsmetodene og øktene dine, objektene, albumene og bildene dine og koblingen til abonnementet ditt for godt. Det meste forsvinner med en gang; resten av en stor samling følger kort tid etter i bakgrunnen.",
           "Det som blir igjen, er en opplysning om at en konto-ID er slettet, som ikke navngir noen, slik at en sen melding fra Polar om den avslutter abonnementet den gjelder.",
+          "En konto med gratisplanen som ingen logger inn på, får en e-post etter 6, 8 og 12 måneder og slettes 14 dager etter den siste, som oppgir datoen. Logger du inn, begynner tellingen på nytt.",
+          "Begynner du å opprette en konto eller ber om en innloggingslenke, men bekrefter aldri e-postadressen din, sletter vi etter 7 dager det vi har lagret.",
           "Bilder du laster opp, men aldri lagrer, for eksempel fra en skanning du ikke beholder, slettes innen noen timer.",
           "Slettede opplysninger kan ligge igjen i sikkerhetskopiene til backenden vår i opptil {backupDays} dager og i driftsleverandørenes logger i opptil {logDays} dager, deretter er de borte.",
           "E-poster med tilbakemeldinger blir liggende i innboksen vår til vi sletter dem. Polar oppbevarer betalingsopplysninger så lenge loven krever det.",

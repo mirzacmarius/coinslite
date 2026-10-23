@@ -35,3 +35,38 @@ export function stillDue(
     );
   return user.deactivatedAt !== undefined;
 }
+
+/** Sign-ups nobody finished (account/unfinishedSignUps.ts). */
+export const unfinishedSignUpRules = {
+  /** How long one is kept for its owner to come back and confirm it: a week. */
+  keptFor: 7 * 24 * 60 * 60 * 1000,
+  /** How many users one run of the clean-up looks at. */
+  sweepBatch: 50,
+} as const;
+
+/**
+ * Whether a user is a sign-up nobody finished, kept long enough: the email
+ * was never proven (no code or link from the inbox was used, and Google
+ * didn't vouch for it), so nobody ever signed in, and no role was given.
+ * Asking for a sign-in link to a new address, or starting a password
+ * sign-up, makes one (docs/adr/0005-one-account-per-email.md).
+ */
+export function isUnfinishedSignUp(
+  user: Pick<
+    Doc<"users">,
+    | "_creationTime"
+    | "emailVerificationTime"
+    | "lastSignInAt"
+    | "deactivatedAt"
+    | "role"
+  >,
+  now: number,
+) {
+  return (
+    user.emailVerificationTime === undefined &&
+    user.lastSignInAt === undefined &&
+    user.deactivatedAt === undefined &&
+    user.role === undefined &&
+    user._creationTime < now - unfinishedSignUpRules.keptFor
+  );
+}

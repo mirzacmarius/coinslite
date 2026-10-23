@@ -6,11 +6,15 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation } from "./_generated/server";
 import {
+  countCodeEmail,
   magicLink,
   resetPasswordCode,
   verifyEmailCode,
 } from "./accounts/codeEmails";
-import { validatePassword } from "./accounts/credentials";
+import {
+  requireNormalizedEmail,
+  validatePassword,
+} from "./accounts/credentials";
 import { createOrUpdateUser, googleProfile } from "./accounts/linking";
 import { passwordProfile } from "./accounts/signUpProfile";
 
@@ -37,17 +41,23 @@ export const convexAuthStore = convexAuthFunctions.store;
 
 /**
  * Where Convex Auth reads and writes, by name ("auth:store"), whenever
- * someone signs in, out or stays signed in. It runs Convex Auth's own store,
- * then notes the time on the person when that started a session: every way
- * of signing in (password, code, link, Google, after a reset) does. Sessions
- * end at sign-out, so they can't tell when someone last signed in; this can,
- * and the admin user list sorts by it.
+ * someone signs in, out or stays signed in. It counts each code or sign-in
+ * link email against its limits before the code is stored
+ * (accounts/codeEmails.ts), runs Convex Auth's own store, then notes the
+ * time on the person when that started a session: every way of signing in
+ * (password, code, link, Google, after a reset) does. Sessions end at
+ * sign-out, so they can't tell when someone last signed in; this can, and the
+ * admin user list sorts by it.
  */
 export const store = internalMutation({
   // Convex Auth's store checks its own arguments.
   args: { args: v.any() },
   returns: v.any(),
   handler: async (ctx, { args }) => {
+    // Every code is emailed; the forms send the address normalized.
+    if (args.type === "createVerificationCode") {
+      await countCodeEmail(ctx, requireNormalizedEmail(args.email));
+    }
     const result: unknown = await ctx.runMutation(
       internal.auth.convexAuthStore,
       { args },
