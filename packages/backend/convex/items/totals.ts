@@ -1,6 +1,7 @@
 import type { HomeCurrency } from "@coinslite/i18n";
 import { type Metal, type SpotPrices, metals } from "../spotPrices/rates";
 import type { ItemType } from "./grades";
+import type { Material } from "./rules";
 import { type MetalContent, roundedMetalValue } from "./preciousMetal";
 
 /**
@@ -29,6 +30,12 @@ export type TotalsItem = MetalContent & {
   /** When the Item was recorded in CoinsLite. */
   _creationTime: number;
   type: ItemType;
+  /** An ISO country code; the breakdown by country groups Items by it. */
+  country?: string;
+  /** The year of issue; the breakdown by decade groups Items by it. */
+  year?: number;
+  /** What the Item is made of; its precious metal stands in without one. */
+  material?: Material;
   /** "YYYY-MM-DD"; it counts as acquired then when that is earlier (acquiredAt). */
   purchaseDate?: string;
   /** Per piece, in minor units of the Home currency. */
@@ -57,6 +64,20 @@ export type MetalTotal = {
   value: number | null;
 };
 
+/**
+ * The Items sharing one country, decade or material: how many, and their
+ * Market value × Quantity added up. `key` is the ISO country code, the
+ * decade's first year ("1880") or the material's id, or `notRecorded` for
+ * the Items without that fact.
+ */
+export type GroupTotal = { key: string; items: number; marketValue: number };
+
+/** The key of the group of Items without the fact a breakdown groups by. */
+export const notRecorded = "";
+
+/** The decade a year falls in, by its first year: 1887 → 1880, 5 BC (-5) → -10. */
+export const decadeOf = (year: number) => Math.floor(year / 10) * 10;
+
 export type CollectionTotals = {
   /** The Home currency every amount is in. */
   currency: HomeCurrency;
@@ -76,6 +97,14 @@ export type CollectionTotals = {
   realised: { amount: number; items: number };
   /** Purchase price and Market value (× Quantity) of each Item type. */
   byType: Record<ItemType, Amounts>;
+  /**
+   * The breakdowns: the Items and Market value of each country, decade and
+   * material the Items span (GroupTotal), largest Market value first, the
+   * Items without the fact (`notRecorded`) last.
+   */
+  byCountry: GroupTotal[];
+  byDecade: GroupTotal[];
+  byMaterial: GroupTotal[];
   /** Each precious metal the Items hold. */
   metals: Record<Metal, MetalTotal>;
   /**
@@ -214,6 +243,9 @@ const emptyPageTotals = (currency: HomeCurrency): PageTotals => ({
   salePrice: 0,
   realised: { amount: 0, items: 0 },
   byType: { coin: noAmounts(), banknote: noAmounts(), stamp: noAmounts() },
+  byCountry: [],
+  byDecade: [],
+  byMaterial: [],
   fineWeights: { gold: [], silver: [] },
   addedByMonth: [],
 });
@@ -262,6 +294,9 @@ export function pageTotals(
 ): PageTotals {
   const totals = emptyPageTotals(currency);
   const byMonth = new Map<string, MonthAmounts>();
+  const byCountry = new Map<string, GroupTotal>();
+  const byDecade = new Map<string, GroupTotal>();
+  const byMaterial = new Map<string, GroupTotal>();
   const fineWeights: Record<Metal, FineWeightGroup[]> = {
     gold: [],
     silver: [],
@@ -276,6 +311,17 @@ export function pageTotals(
     totals.marketValue += marketValue;
     totals.byType[type].purchasePrice += purchasePrice;
     totals.byType[type].marketValue += marketValue;
+    addToGroup(byCountry, item.country ?? notRecorded, marketValue);
+    addToGroup(
+      byDecade,
+      item.year === undefined ? notRecorded : String(decadeOf(item.year)),
+      marketValue,
+    );
+    addToGroup(
+      byMaterial,
+      item.material ?? item.metal ?? notRecorded,
+      marketValue,
+    );
 
     const month = monthOf(
       acquiredAt(item._creationTime, item.purchaseDate, utcOffsetMinutes),
@@ -313,7 +359,47 @@ export function pageTotals(
     silver: groupFineWeights(fineWeights.silver),
   };
   totals.addedByMonth = combineMonths([...byMonth.values()], []);
+  totals.byCountry = sortedGroups(byCountry.values());
+  totals.byDecade = sortedGroups(byDecade.values());
+  totals.byMaterial = sortedGroups(byMaterial.values());
   return totals;
+}
+
+/** Counts an Item in its group, adding its Market value (× Quantity). */
+function addToGroup(
+  groups: Map<string, GroupTotal>,
+  key: string,
+  marketValue: number,
+) {
+  const group = groups.get(key);
+  if (group) {
+    group.items += 1;
+    group.marketValue += marketValue;
+  } else groups.set(key, { key, items: 1, marketValue });
+}
+
+/** Largest Market value first, then most Items, then by key; `notRecorded` last. */
+function sortedGroups(groups: Iterable<GroupTotal>): GroupTotal[] {
+  return [...groups].sort(
+    (a, b) =>
+      Number(a.key === notRecorded) - Number(b.key === notRecorded) ||
+      b.marketValue - a.marketValue ||
+      b.items - a.items ||
+      a.key.localeCompare(b.key),
+  );
+}
+
+/** Two pages' breakdowns as one, groups with the same key added up. */
+function combineGroups(a: GroupTotal[], b: GroupTotal[]): GroupTotal[] {
+  const byKey = new Map<string, GroupTotal>();
+  for (const { key, items, marketValue } of [...a, ...b]) {
+    const group = byKey.get(key);
+    if (group) {
+      group.items += items;
+      group.marketValue += marketValue;
+    } else byKey.set(key, { key, items, marketValue });
+  }
+  return sortedGroups(byKey.values());
 }
 
 /**
@@ -391,6 +477,9 @@ export function combineTotals(a: PageTotals, b: PageTotals): PageTotals {
       banknote: addAmounts(a.byType.banknote, b.byType.banknote),
       stamp: addAmounts(a.byType.stamp, b.byType.stamp),
     },
+    byCountry: combineGroups(a.byCountry, b.byCountry),
+    byDecade: combineGroups(a.byDecade, b.byDecade),
+    byMaterial: combineGroups(a.byMaterial, b.byMaterial),
     fineWeights: {
       gold: groupFineWeights([...a.fineWeights.gold, ...b.fineWeights.gold]),
       silver: groupFineWeights([

@@ -1165,6 +1165,12 @@ export default {
     valueDistributionDescription:
       "By Item type, plus the Metal value of gold and silver",
     part: "Item type or metal",
+    breakdown: "Breakdown",
+    byCountry: "By country",
+    byDecade: "By decade",
+    byMaterial: "By material",
+    notRecorded: "Not recorded",
+    otherGroups: "Other ({count})",
   },
   catalogImages: {
     add: "Add image",

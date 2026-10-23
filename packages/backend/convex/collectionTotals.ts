@@ -52,6 +52,13 @@ const metalTotal = v.object({
   value: v.union(v.number(), v.null()),
 });
 
+/** GroupTotal in items/totals.ts: one country, decade or material. */
+const groupTotal = v.object({
+  key: v.string(),
+  items: v.number(),
+  marketValue: v.number(),
+});
+
 const fineWeightGroup = v.object({
   finePerPiece: v.number(),
   quantity: v.number(),
@@ -73,6 +80,9 @@ const totalsFields = {
   salePrice: v.number(),
   realised: v.object({ amount: v.number(), items: v.number() }),
   byType: v.object({ coin: amounts, banknote: amounts, stamp: amounts }),
+  byCountry: v.array(groupTotal),
+  byDecade: v.array(groupTotal),
+  byMaterial: v.array(groupTotal),
   addedByMonth: v.array(
     v.object({
       month: v.string(),

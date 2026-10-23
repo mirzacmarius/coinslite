@@ -1215,6 +1215,12 @@ export default {
     valueDistributionDescription:
       "Nach Objektart, dazu der Metallwert von Gold und Silber",
     part: "Objektart oder Metall",
+    breakdown: "Aufteilung",
+    byCountry: "Nach Land",
+    byDecade: "Nach Jahrzehnt",
+    byMaterial: "Nach Material",
+    notRecorded: "Nicht angegeben",
+    otherGroups: "Andere ({count})",
   },
   catalogImages: {
     add: "Bild hinzufügen",

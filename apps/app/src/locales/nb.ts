@@ -1178,6 +1178,12 @@ export default {
     valueDistributionDescription:
       "Etter objekttype, pluss metallverdien av gull og sølv",
     part: "Objekttype eller metall",
+    breakdown: "Fordeling",
+    byCountry: "Etter land",
+    byDecade: "Etter tiår",
+    byMaterial: "Etter materiale",
+    notRecorded: "Ikke oppgitt",
+    otherGroups: "Andre ({count})",
   },
   catalogImages: {
     add: "Legg til bilde",

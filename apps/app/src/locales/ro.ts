@@ -1187,6 +1187,12 @@ export default {
     valueDistributionDescription:
       "După tipul obiectului, plus valoarea metalului pentru aur și argint",
     part: "Tip de obiect sau metal",
+    breakdown: "Repartizare",
+    byCountry: "După țară",
+    byDecade: "După deceniu",
+    byMaterial: "După material",
+    notRecorded: "Nespecificat",
+    otherGroups: "Altele ({count})",
   },
   catalogImages: {
     add: "Adaugă imagine",

@@ -32,6 +32,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useId, useState } from "react";
 import { seriesColorVariables } from "./chart-card";
+import { Insights } from "./insights";
 import {
   type ShownTotals,
   useCollectionTotals,
@@ -236,12 +237,13 @@ function TotalsSummary({
 }
 
 /**
- * The totals, Spot prices and charts, with placeholders while they load. With
- * a view's figures (`view`), those come first under "This view" and the
- * whole Collection's follow under their own heading; the charts stay the
- * whole Collection's. The sold view's are its sale figures, with no charts:
- * those show what's owned. While a Home currency change converts the
- * amounts, the charts wait too.
+ * The totals, Spot prices, breakdown and charts, with placeholders while they
+ * load. With a view's figures (`view`), those come first under "This view"
+ * and the whole Collection's follow under their own heading, and the
+ * breakdown is the view's; the charts stay the whole Collection's. The sold
+ * view's are its sale figures, with neither breakdown nor charts: those show
+ * what's owned. While a Home currency change converts the amounts, the
+ * breakdown and charts wait too.
  */
 function TotalsDetails({
   totals,
@@ -257,6 +259,16 @@ function TotalsDetails({
   const converting = useConvertingTo() !== undefined;
   const empty = totals?.items === 0;
   const variant = sold ? "sold" : "collection";
+  // The breakdown is of the view's Items while a view narrows the list, else
+  // the whole Collection's; none while they load, or on the sold view.
+  const broken =
+    view === undefined
+      ? totals !== undefined && !empty
+        ? totals
+        : undefined
+      : view !== null && view.items > 0
+        ? view
+        : undefined;
   const whole =
     totals === undefined ? (
       <FiguresSkeleton />
@@ -298,6 +310,16 @@ function TotalsDetails({
         )}
         <SpotPrices className={cn(empty && "max-w-xl xl:col-span-2")} />
       </div>
+      {!sold && !converting && broken && (
+        <Insights
+          totals={broken}
+          scope={t(
+            view === undefined
+              ? "collectionTotals.wholeCollection"
+              : "collectionTotals.thisView",
+          )}
+        />
+      )}
       {sold || converting ? null : totals === undefined ? (
         <ChartsSkeleton />
       ) : (

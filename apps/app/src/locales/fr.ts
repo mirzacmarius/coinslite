@@ -1198,6 +1198,12 @@ export default {
     valueDistributionDescription:
       "Par type d’objet, plus la valeur du métal pour l’or et l’argent",
     part: "Type d’objet ou métal",
+    breakdown: "Répartition",
+    byCountry: "Par pays",
+    byDecade: "Par décennie",
+    byMaterial: "Par matière",
+    notRecorded: "Non renseigné",
+    otherGroups: "Autres ({count})",
   },
   catalogImages: {
     add: "Ajouter une image",
