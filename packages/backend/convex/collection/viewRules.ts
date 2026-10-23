@@ -8,6 +8,7 @@ import {
   referenceName,
   stampCatalogueNames,
 } from "../items/references";
+import { itemGainLoss } from "../items/totals";
 import {
   type CollectionSort,
   type CollectionView,
@@ -71,6 +72,9 @@ function orderFor(sort: CollectionSort, locale: Locale): Order {
     newest: (a, b) => -added(a, b),
     oldest: added,
     price: present((item) => item.purchasePrice, descending),
+    value: present((item) => item.marketValue, descending),
+    // Items without both prices have no Gain/loss, so they come last.
+    gain: present((item) => itemGainLoss(item), descending),
     denomination: (a, b) =>
       compareDenominations(a.denomination, b.denomination),
     grade: present(
@@ -80,6 +84,7 @@ function orderFor(sort: CollectionSort, locale: Locale): Order {
           : undefined,
       descending,
     ),
+    title: byTitle,
   };
   return inTurn(primary[sort], byYear, byTitle, added);
 }

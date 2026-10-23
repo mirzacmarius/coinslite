@@ -8,14 +8,22 @@ import type { GradingScale, ItemType } from "../items/grades";
  * write it without loading the backend.
  */
 
-/** The orders a Collection can be sorted in; `year` (oldest first) is the default. */
+/**
+ * The orders a Collection can be sorted in, as the Display menu lists them;
+ * `year` (oldest first) is the default. `price` is the Purchase price and
+ * `value` the Market value, both per piece and highest first; `gain` is the
+ * Gain/loss, biggest first; `title` is A to Z in the person's language.
+ */
 export const collectionSorts = [
   "year",
   "newest",
   "oldest",
   "price",
+  "value",
+  "gain",
   "denomination",
   "grade",
+  "title",
 ] as const;
 export type CollectionSort = (typeof collectionSorts)[number];
 export const defaultSort: CollectionSort = "year";

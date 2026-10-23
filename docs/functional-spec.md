@@ -231,7 +231,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Kept in: one place, or no place recorded, each with counts; places that differ only in capitals, accents or spacing count as one
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
-- **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, denomination, Grade.
+- **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, highest Market value, biggest gain, denomination, Grade, title (A to Z). Items without the sorted value come last.
 - **Select mode:** select Items one by one, a page or the whole view (up to 200 at once), then act on all of them:
   - move them to an Album, or out of any Album
   - set a Grade, on those whose Item type the Grading scale suits
