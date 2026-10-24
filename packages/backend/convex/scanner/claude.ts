@@ -1,14 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Locale } from "@coinslite/i18n";
+import { type GradingScale, gradingScales } from "../items/grades";
 import {
-  type CoinReading,
   type ScanCandidate,
+  type ScanReading,
   pickFrom,
   pickSchema,
   readingFrom,
   readingSchema,
 } from "./rules";
-import type { CoinVision } from "./vision";
+import type { ScanVision } from "./vision";
 
 /**
  * The scanner's vision model: Anthropic's Claude, through its API. Each
@@ -24,7 +25,7 @@ const modelsWithFallbacks = new Set([
   "claude-sonnet-5-5",
 ]);
 
-/** The language to title the coin in, by name. */
+/** The language to title the piece in, by name. */
 const languageNames: Record<Locale, string> = {
   en: "English",
   nb: "Norwegian Bokmål",
@@ -33,25 +34,31 @@ const languageNames: Record<Locale, string> = {
   ro: "Romanian",
 };
 
+/** A scale's Grades, best first, as the instructions list them. */
+const codes = (scale: GradingScale) => gradingScales[scale].grades.join(", ");
+
 const readingInstructions = (language: Locale) =>
   [
-    "You identify coins for a coin collector's catalogue app.",
-    "The first photo shows the front (obverse) of one coin, the second its back (reverse).",
+    "You identify coins and banknotes for a collector's catalogue app.",
+    "The first photo shows the front (obverse) of one coin or banknote, the second its back (reverse).",
     "Read what the photos show and fill in the fields. Use null for anything you can't tell from the photos; don't guess.",
-    "Set isCoin to false when the photos don't show a coin.",
-    `title: a short name for the coin type in ${languageNames[language]}, such as its denomination and year.`,
+    'itemType: "coin" or "banknote"; null when the photos show neither.',
+    `title: a short name for the coin or banknote type in ${languageNames[language]}, such as its denomination and year.`,
     "country: the issuing country as an ISO 3166-1 alpha-2 code.",
     'denomination: the face value and unit in English singular form, such as "1 krone", "2 euro" or "25 cents".',
-    "series: the coin series or design name, if it belongs to one.",
-    "material: the metal or alloy, only when you can tell it with confidence.",
-    "diameter: in millimetres, only when it is clearly known for this coin type.",
+    "series: the coin series or design name, or the banknote series, if it belongs to one.",
+    "ruler: the monarch or ruler named or portrayed, if any.",
+    "For coins only, null on banknotes: material, the metal or alloy, only when you can tell it with confidence; mintMark, as struck; diameter, in millimetres, only when it is clearly known for this coin type.",
+    "For banknotes only, null on coins: serialNumber, signatures (the signatories' names) and printer, each as printed on the note.",
     "inscriptions: the legends and other text readable on either side.",
+    `grade: the condition the photos show, on the scale the app grades this piece on: the Norwegian scale (${codes("norwegian")}) for coins and banknotes of Norway; Sheldon (1 to 70) for coins of the United States; the European scale (${codes("european")}) for other coins; the international scale (${codes("international")}) for other banknotes.`,
+    "Judge the grade by wear, and on a banknote also by folds, creases, tears, holes and stains. Photos can hide wear and cleaning, so between two grades give the lower. Use null when the photos are too small, blurred or unevenly lit to judge.",
   ].join("\n");
 
 const pickInstructions = [
-  "You match a coin a collector photographed to an entry in the app's Catalog.",
-  "You get what was read from the photos and the Catalog entries that might be this coin.",
-  "Answer with the key of the entry that is exactly this coin type and issue, or null when none clearly is.",
+  "You match a coin or banknote a collector photographed to an entry in the app's Catalog.",
+  "You get what was read from the photos and the Catalog entries that might be this piece.",
+  "Answer with the key of the entry that is exactly this coin or banknote type and issue, or null when none clearly is.",
 ].join("\n");
 
 export function claudeVision({
@@ -68,7 +75,7 @@ export function claudeVision({
   /** Milliseconds per request. */
   timeout?: number;
   maxRetries?: number;
-}): CoinVision {
+}): ScanVision {
   const client = new Anthropic({ apiKey, fetch, timeout, maxRetries });
 
   /** The answer to one question, parsed from JSON; null when there's none. */
@@ -139,13 +146,15 @@ export function claudeVision({
       return readingFrom(answer);
     },
 
-    async pick(reading: CoinReading, candidates: ScanCandidate[]) {
+    async pick(reading: ScanReading, candidates: ScanCandidate[]) {
+      // The Grade has no say in which entry it is.
+      const { grade: _grade, ...read } = reading;
       const answer = await ask(
         pickInstructions,
         [
           {
             type: "text",
-            text: `Read from the photos:\n${JSON.stringify(reading)}\n\nCatalog entries:\n${candidates
+            text: `Read from the photos:\n${JSON.stringify(read)}\n\nCatalog entries:\n${candidates
               .map((candidate) => JSON.stringify(candidate))
               .join("\n")}`,
           },

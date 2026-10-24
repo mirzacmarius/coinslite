@@ -1358,7 +1358,7 @@ export default {
       "Când este dezactivat, doar administratorii văd catalogul. Ceilalți nu îl mai găsesc în navigare, la răsfoire sau în căutare.",
     scanner: "Scaner",
     scannerDescription:
-      "Cine poate fotografia o monedă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
+      "Cine poate fotografia o monedă sau o bancnotă pentru a primi o intrare de catalog sugerată. Administratorii pot, cât timp nu este dezactivat.",
     scannerOptions: {
       off: "Dezactivat",
       admins: "Doar administratori",
@@ -2107,45 +2107,73 @@ export default {
     home: "Mergi la prezentare",
   },
   scanner: {
-    title: "Scanează moneda",
+    title: { coin: "Scanează moneda", banknote: "Scanează bancnota" },
     beta: "Beta",
-    description:
-      "Fotografiază ambele fețe ale unei monede, iar CoinsLite sugerează ce este. Verifici sugestia înainte ca obiectul să fie adăugat.",
-    tips: "Așază moneda pe o suprafață uniformă, umple cadrul și evită reflexiile.",
+    description: {
+      coin: "Fotografiază ambele fețe ale unei monede, iar CoinsLite sugerează ce este și în ce stare e. Verifici sugestia înainte ca obiectul să fie adăugat.",
+      banknote:
+        "Fotografiază ambele fețe ale unei bancnote, iar CoinsLite sugerează ce este și în ce stare e. Verifici sugestia înainte ca obiectul să fie adăugat.",
+    },
+    tips: {
+      coin: "Așază moneda pe o suprafață uniformă, umple cadrul și evită reflexiile.",
+      banknote:
+        "Așază bancnota întinsă pe o suprafață uniformă, cu toate cele patru colțuri în cadru, și evită reflexiile.",
+    },
     steps: {
       front: "Avers",
       back: "Revers",
     },
     next: {
-      front: "Începe cu aversul monedei.",
-      back: "Acum întoarce moneda și fotografiază reversul.",
-      done: "Ambele fețe sunt gata. Identifică moneda când ești pregătit.",
+      coin: {
+        front: "Începe cu aversul monedei.",
+        back: "Acum întoarce moneda și fotografiază reversul.",
+        done: "Ambele fețe sunt gata. Identifică moneda când ești pregătit.",
+      },
+      banknote: {
+        front: "Începe cu fața bancnotei.",
+        back: "Acum întoarce bancnota și fotografiază spatele.",
+        done: "Ambele fețe sunt gata. Identifică bancnota când ești pregătit.",
+      },
     },
     takePhoto: "Fă o fotografie",
     choosePhoto: "Alege o fotografie",
     chooseFile: "Alege un fișier",
     retake: "Refă",
-    identify: "Identifică moneda",
-    identifying: "Se identifică moneda…",
+    identify: { coin: "Identifică moneda", banknote: "Identifică bancnota" },
+    identifying: {
+      coin: "Se identifică moneda…",
+      banknote: "Se identifică bancnota…",
+    },
     addByHand: "Adaugă manual",
-    unidentified:
-      "Moneda nu a putut fi identificată. Încearcă fotografii noi, cu lumină mai bună, sau adaug-o manual cu aceste fotografii.",
-    notConfigured:
-      "Scannerul nu este încă disponibil în acest mediu. Poți adăuga totuși moneda manual.",
+    unidentified: {
+      coin: "Moneda nu a putut fi identificată. Încearcă fotografii noi, cu lumină mai bună, sau adaug-o manual cu aceste fotografii.",
+      banknote:
+        "Bancnota nu a putut fi identificată. Încearcă fotografii noi, cu lumină mai bună, sau adaug-o manual cu aceste fotografii.",
+    },
+    notConfigured: {
+      coin: "Scannerul nu este încă disponibil în acest mediu. Poți adăuga totuși moneda manual.",
+      banknote:
+        "Scannerul nu este încă disponibil în acest mediu. Poți adăuga totuși bancnota manual.",
+    },
     errors: {
       notAvailable: "Scannerul nu îți este disponibil.",
       tooMany:
-        "Ai scanat multe monede într-un timp scurt. Încearcă mai târziu sau adaugă moneda aceasta manual.",
+        "Ai făcut multe scanări într-un timp scurt. Încearcă mai târziu sau adaugă obiectul manual.",
       tooLarge: "Fotografia este prea mare pentru scanare. Încearcă alta.",
       notAnImage: "Fișierul nu este o imagine JPEG, PNG, WebP sau GIF.",
       uploadsTooMany:
         "Prea multe încărcări într-un timp scurt. Încearcă din nou peste câteva minute.",
       failed:
-        "Scanarea nu a reușit. Încearcă din nou sau adaugă moneda manual.",
+        "Scanarea nu a reușit. Încearcă din nou sau adaugă obiectul manual.",
     },
     suggested: "Sugerat de scanner",
-    reviewHint:
-      "Verifică fiecare detaliu pe moneda ta înainte să adaugi obiectul. Fotografiile sunt adăugate odată cu el.",
+    reviewHint: {
+      coin: "Verifică fiecare detaliu pe moneda ta înainte să adaugi obiectul. Fotografiile sunt adăugate odată cu el.",
+      banknote:
+        "Verifică fiecare detaliu pe bancnota ta înainte să adaugi obiectul. Fotografiile sunt adăugate odată cu el.",
+    },
+    gradeSuggested:
+      "Starea {grade} este sugestia scannerului, doar după fotografii. Verific-o cu obiectul în mână: fotografiile pot ascunde uzura, curățarea și urmele.",
     photosFromScan: "Fotografii din scanare",
     photosHint: "Aceste fotografii sunt adăugate obiectului.",
     photosFailed:

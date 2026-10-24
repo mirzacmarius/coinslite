@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "Myntskanneren",
+      heading: "Skanneren",
       blocks: [
-        "Skanneren, en betaversjon i Premium, foreslår hvilken mynt bildene dine viser. Forslagene kan være feil, så de vises alltid slik at du kan kontrollere og rette dem før noe lagres.",
+        "Skanneren, en betaversjon i Premium, foreslår hvilken mynt eller seddel bildene dine viser, og kvaliteten. Forslagene kan være feil, så de vises alltid slik at du kan kontrollere og rette dem før noe lagres.",
       ],
     },
     {

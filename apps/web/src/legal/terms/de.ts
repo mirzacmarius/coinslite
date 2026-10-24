@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "Der Münzscanner",
+      heading: "Der Scanner",
       blocks: [
-        "Der Scanner, eine Beta in Premium, schlägt vor, welche Münze deine Fotos zeigen. Vorschläge können falsch sein, deshalb werden sie dir immer zur Prüfung und Korrektur angezeigt, bevor etwas gespeichert wird.",
+        "Der Scanner, eine Beta in Premium, schlägt vor, welche Münze oder Banknote deine Fotos zeigen und welche Erhaltung sie hat. Vorschläge können falsch sein, deshalb werden sie dir immer zur Prüfung und Korrektur angezeigt, bevor etwas gespeichert wird.",
       ],
     },
     {

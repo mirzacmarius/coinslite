@@ -1350,7 +1350,7 @@ export default {
       "Når den er av, ser bare administratorer katalogen. Alle andre finner den ikke lenger i navigasjonen, ved blaing eller i søk.",
     scanner: "Skanner",
     scannerDescription:
-      "Hvem som kan fotografere en mynt og få foreslått en katalogoppføring. Administratorer kan det så lenge den ikke er av.",
+      "Hvem som kan fotografere en mynt eller seddel og få foreslått en katalogoppføring. Administratorer kan det så lenge den ikke er av.",
     scannerOptions: {
       off: "Av",
       admins: "Bare administratorer",
@@ -2087,45 +2087,73 @@ export default {
     home: "Gå til oversikten",
   },
   scanner: {
-    title: "Skann mynt",
+    title: { coin: "Skann mynt", banknote: "Skann seddel" },
     beta: "Beta",
-    description:
-      "Fotografer begge sider av en mynt, så foreslår CoinsLite hva den er. Du sjekker forslaget før objektet legges til.",
-    tips: "Legg mynten flatt på en ensfarget bakgrunn, fyll bildet og unngå gjenskinn.",
+    description: {
+      coin: "Fotografer begge sider av en mynt, så foreslår CoinsLite hva den er og hvilken kvalitet den har. Du sjekker forslaget før objektet legges til.",
+      banknote:
+        "Fotografer begge sider av en seddel, så foreslår CoinsLite hva den er og hvilken kvalitet den har. Du sjekker forslaget før objektet legges til.",
+    },
+    tips: {
+      coin: "Legg mynten flatt på en ensfarget bakgrunn, fyll bildet og unngå gjenskinn.",
+      banknote:
+        "Legg seddelen flatt på en ensfarget bakgrunn med alle fire hjørnene i bildet, og unngå gjenskinn.",
+    },
     steps: {
       front: "Forside",
       back: "Bakside",
     },
     next: {
-      front: "Begynn med forsiden av mynten.",
-      back: "Snu mynten og fotografer baksiden.",
-      done: "Begge sidene er med. Identifiser mynten når du er klar.",
+      coin: {
+        front: "Begynn med forsiden av mynten.",
+        back: "Snu mynten og fotografer baksiden.",
+        done: "Begge sidene er med. Identifiser mynten når du er klar.",
+      },
+      banknote: {
+        front: "Begynn med forsiden av seddelen.",
+        back: "Snu seddelen og fotografer baksiden.",
+        done: "Begge sidene er med. Identifiser seddelen når du er klar.",
+      },
     },
     takePhoto: "Ta bilde",
     choosePhoto: "Velg bilde",
     chooseFile: "Velg fil",
     retake: "Ta på nytt",
-    identify: "Identifiser mynt",
-    identifying: "Identifiserer mynten…",
+    identify: { coin: "Identifiser mynt", banknote: "Identifiser seddel" },
+    identifying: {
+      coin: "Identifiserer mynten…",
+      banknote: "Identifiserer seddelen…",
+    },
     addByHand: "Legg til manuelt",
-    unidentified:
-      "Mynten kunne ikke identifiseres. Prøv nye bilder i bedre lys, eller legg den til manuelt med disse bildene.",
-    notConfigured:
-      "Skanneren er ikke tilgjengelig i dette miljøet ennå. Du kan fortsatt legge til mynten manuelt.",
+    unidentified: {
+      coin: "Mynten kunne ikke identifiseres. Prøv nye bilder i bedre lys, eller legg den til manuelt med disse bildene.",
+      banknote:
+        "Seddelen kunne ikke identifiseres. Prøv nye bilder i bedre lys, eller legg den til manuelt med disse bildene.",
+    },
+    notConfigured: {
+      coin: "Skanneren er ikke tilgjengelig i dette miljøet ennå. Du kan fortsatt legge til mynten manuelt.",
+      banknote:
+        "Skanneren er ikke tilgjengelig i dette miljøet ennå. Du kan fortsatt legge til seddelen manuelt.",
+    },
     errors: {
       notAvailable: "Skanneren er ikke tilgjengelig for deg.",
       tooMany:
-        "Du har skannet mange mynter på kort tid. Prøv igjen senere, eller legg til denne manuelt.",
+        "Du har skannet mye på kort tid. Prøv igjen senere, eller legg til denne manuelt.",
       tooLarge: "Bildet er for stort til å skannes. Prøv et annet.",
       notAnImage: "Filen er ikke et JPEG-, PNG-, WebP- eller GIF-bilde.",
       uploadsTooMany:
         "For mange opplastinger på kort tid. Prøv igjen om noen minutter.",
       failed:
-        "Skanningen gikk ikke gjennom. Prøv igjen, eller legg til mynten manuelt.",
+        "Skanningen gikk ikke gjennom. Prøv igjen, eller legg den til manuelt.",
     },
     suggested: "Foreslått av skanneren",
-    reviewHint:
-      "Sjekk hver detalj mot mynten før du legger til objektet. Bildene legges til sammen med det.",
+    reviewHint: {
+      coin: "Sjekk hver detalj mot mynten før du legger til objektet. Bildene legges til sammen med det.",
+      banknote:
+        "Sjekk hver detalj mot seddelen før du legger til objektet. Bildene legges til sammen med det.",
+    },
+    gradeSuggested:
+      "Kvalitet {grade} er skannerens forslag, ut fra bildene alene. Sjekk den med objektet i hånden: bilder kan skjule slitasje, rengjøring og merker.",
     photosFromScan: "Bilder fra skanningen",
     photosHint: "Disse bildene legges til objektet.",
     photosFailed:

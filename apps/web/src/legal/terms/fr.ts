@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "Le scanner de pièces",
+      heading: "Le scanner",
       blocks: [
-        "Le scanner, une bêta de Premium, suggère de quelle pièce il s’agit sur vos photos. Les suggestions peuvent être fausses : elles vous sont donc toujours présentées pour que vous les vérifiiez et les corrigiez avant tout enregistrement.",
+        "Le scanner, une bêta de Premium, suggère de quelle pièce ou de quel billet il s’agit sur vos photos, et son état. Les suggestions peuvent être fausses : elles vous sont donc toujours présentées pour que vous les vérifiiez et les corrigiez avant tout enregistrement.",
       ],
     },
     {

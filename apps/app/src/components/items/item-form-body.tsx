@@ -58,6 +58,9 @@ export function ItemFormBody({
         <ItemPills
           linked={itemForm.linked}
           typePicker={typePicker}
+          suggestedGrade={
+            editing ? undefined : itemForm.scanned?.suggestion?.grade
+          }
           onPickEntry={itemForm.openPicker}
           onAlbumCreateFailed={itemForm.setFailed}
         />

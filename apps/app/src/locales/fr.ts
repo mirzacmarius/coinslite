@@ -1371,7 +1371,7 @@ export default {
       "Désactivé, le catalogue n’est visible que par les administrateurs. Les autres ne le trouvent plus dans la navigation, en parcourant ni en cherchant.",
     scanner: "Scanner",
     scannerDescription:
-      "Qui peut photographier une pièce pour obtenir une entrée du catalogue suggérée. Les administrateurs le peuvent tant qu’il n’est pas désactivé.",
+      "Qui peut photographier une pièce ou un billet pour obtenir une entrée du catalogue suggérée. Les administrateurs le peuvent tant qu’il n’est pas désactivé.",
     scannerOptions: {
       off: "Désactivé",
       admins: "Administrateurs uniquement",
@@ -2144,46 +2144,74 @@ export default {
     home: "Aller à l’aperçu",
   },
   scanner: {
-    title: "Scanner une pièce",
+    title: { coin: "Scanner une pièce", banknote: "Scanner un billet" },
     beta: "Bêta",
-    description:
-      "Photographiez les deux faces d’une pièce et CoinsLite propose ce que c’est. Vous vérifiez la suggestion avant d’ajouter l’objet.",
-    tips: "Posez la pièce à plat sur un fond uni, remplissez le cadre et évitez les reflets.",
+    description: {
+      coin: "Photographiez les deux faces d’une pièce et CoinsLite propose ce que c’est et son état. Vous vérifiez la suggestion avant d’ajouter l’objet.",
+      banknote:
+        "Photographiez les deux faces d’un billet et CoinsLite propose ce que c’est et son état. Vous vérifiez la suggestion avant d’ajouter l’objet.",
+    },
+    tips: {
+      coin: "Posez la pièce à plat sur un fond uni, remplissez le cadre et évitez les reflets.",
+      banknote:
+        "Posez le billet à plat sur un fond uni, les quatre coins dans le cadre, et évitez les reflets.",
+    },
     steps: {
       front: "Avers",
       back: "Revers",
     },
     next: {
-      front: "Commencez par l’avers de la pièce.",
-      back: "Retournez la pièce et photographiez le revers.",
-      done: "Les deux faces sont prêtes. Identifiez la pièce quand vous voulez.",
+      coin: {
+        front: "Commencez par l’avers de la pièce.",
+        back: "Retournez la pièce et photographiez le revers.",
+        done: "Les deux faces sont prêtes. Identifiez la pièce quand vous voulez.",
+      },
+      banknote: {
+        front: "Commencez par le recto du billet.",
+        back: "Retournez le billet et photographiez le verso.",
+        done: "Les deux faces sont prêtes. Identifiez le billet quand vous voulez.",
+      },
     },
     takePhoto: "Prendre une photo",
     choosePhoto: "Choisir une photo",
     chooseFile: "Choisir un fichier",
     retake: "Reprendre",
-    identify: "Identifier la pièce",
-    identifying: "Identification de la pièce…",
+    identify: { coin: "Identifier la pièce", banknote: "Identifier le billet" },
+    identifying: {
+      coin: "Identification de la pièce…",
+      banknote: "Identification du billet…",
+    },
     addByHand: "Ajouter à la main",
-    unidentified:
-      "La pièce n’a pas pu être identifiée. Essayez de nouvelles photos avec une meilleure lumière, ou ajoutez-la à la main avec ces photos.",
-    notConfigured:
-      "Le scanner n’est pas encore disponible sur ce déploiement. Vous pouvez toujours ajouter la pièce à la main.",
+    unidentified: {
+      coin: "La pièce n’a pas pu être identifiée. Essayez de nouvelles photos avec une meilleure lumière, ou ajoutez-la à la main avec ces photos.",
+      banknote:
+        "Le billet n’a pas pu être identifié. Essayez de nouvelles photos avec une meilleure lumière, ou ajoutez-le à la main avec ces photos.",
+    },
+    notConfigured: {
+      coin: "Le scanner n’est pas encore disponible sur ce déploiement. Vous pouvez toujours ajouter la pièce à la main.",
+      banknote:
+        "Le scanner n’est pas encore disponible sur ce déploiement. Vous pouvez toujours ajouter le billet à la main.",
+    },
     errors: {
       notAvailable: "Le scanner ne vous est pas accessible.",
       tooMany:
-        "Vous avez scanné beaucoup de pièces en peu de temps. Réessayez plus tard, ou ajoutez celle-ci à la main.",
+        "Vous avez fait beaucoup de scans en peu de temps. Réessayez plus tard, ou ajoutez l’objet à la main.",
       tooLarge:
         "Cette photo est trop grande pour être scannée. Essayez-en une autre.",
       notAnImage: "Ce fichier n’est pas une image JPEG, PNG, WebP ou GIF.",
       uploadsTooMany:
         "Trop d’envois en peu de temps. Réessayez dans quelques minutes.",
       failed:
-        "Le scan n’a pas abouti. Réessayez, ou ajoutez la pièce à la main.",
+        "Le scan n’a pas abouti. Réessayez, ou ajoutez l’objet à la main.",
     },
     suggested: "Suggéré par le scanner",
-    reviewHint:
-      "Vérifiez chaque détail sur votre pièce avant d’ajouter l’objet. Les photos sont ajoutées avec lui.",
+    reviewHint: {
+      coin: "Vérifiez chaque détail sur votre pièce avant d’ajouter l’objet. Les photos sont ajoutées avec lui.",
+      banknote:
+        "Vérifiez chaque détail sur votre billet avant d’ajouter l’objet. Les photos sont ajoutées avec lui.",
+    },
+    gradeSuggested:
+      "L’état {grade} est la suggestion du scanner, d’après les photos seules. Vérifiez-le avec l’objet en main\u00a0: les photos peuvent cacher l’usure, un nettoyage et des marques.",
     photosFromScan: "Photos du scan",
     photosHint: "Ces photos sont ajoutées à l’objet.",
     photosFailed:
