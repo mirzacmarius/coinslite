@@ -11,6 +11,7 @@ import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { defaultSort } from "@coinslite/backend/convex/collection/view";
+import { totalPieces } from "@coinslite/backend/convex/items/totals";
 import { Button } from "@coinslite/ui/button";
 import { cn } from "@coinslite/ui/utils";
 import { useQuery } from "convex/react";
@@ -195,6 +196,7 @@ export function CollectionBrowser() {
             onImport={() => setImporting(true)}
             view={view}
             count={result.total}
+            pieces={totalPieces(result.viewTotals)}
             complete={result.complete}
           />
           <Button

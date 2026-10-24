@@ -13,6 +13,7 @@ import {
   itemPageHref,
   viewOfItemUrl,
 } from "@/components/collection/collection-url";
+import { LabelsDialog } from "@/components/labels/labels-dialog";
 import { useShortcut } from "@/lib/use-shortcut";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
@@ -49,6 +50,7 @@ import {
   Pencil,
   SearchX,
   ShieldCheck,
+  Tag,
   Trash2,
   Undo2,
 } from "lucide-react";
@@ -104,6 +106,7 @@ export function ItemDetail() {
   const [deleting, setDeleting] = useState(false);
   const [selling, setSelling] = useState({ open: false, key: 0 });
   const [takingBack, setTakingBack] = useState(false);
+  const [labelling, setLabelling] = useState(false);
   const markOwned = useMutation(api.items.markOwned);
   const itemLimitMessage = useItemLimitMessage();
   // Once deleted, the Item reads as missing while the page goes back.
@@ -397,6 +400,10 @@ export function ItemDetail() {
                   <Copy strokeWidth={1.75} aria-hidden="true" />
                   {t("items.duplicate")}
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setLabelling(true)}>
+                  <Tag strokeWidth={1.75} aria-hidden="true" />
+                  {t("labels.itemMenuItem")}
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setDeleting(true)}
@@ -416,6 +423,14 @@ export function ItemDetail() {
         open={duplicating.open}
         onOpenChange={(open) => setDuplicating(({ key }) => ({ open, key }))}
         onAdded={(copyId) => router.push(`/collection/${copyId}`)}
+      />
+      <LabelsDialog
+        open={labelling}
+        onOpenChange={setLabelling}
+        source={{ kind: "items", itemIds: [item._id] }}
+        description={t("labels.forItem", { title: item.title })}
+        items={1}
+        pieces={item.quantity}
       />
       <SellItemDialog
         key={`sell-${selling.key}`}

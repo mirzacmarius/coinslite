@@ -180,7 +180,7 @@ export default {
       },
       export: {
         title: "PDF- und CSV-Export",
-        text: "Jede Ansicht deiner Sammlung, zum Drucken oder zum Aufbewahren. Premium.",
+        text: "Jede Ansicht deiner Sammlung, zum Drucken oder zum Aufbewahren, und Etiketten für Münzrähmchen und Slabs. Premium.",
       },
       charts: {
         title: "Diagramme",
@@ -232,6 +232,7 @@ export default {
         "Unbegrenzt viele Objekte",
         "Der Versicherungsbericht",
         "PDF- und CSV-Export",
+        "Etiketten für Münzrähmchen und Slabs",
         "Alles aus dem Gratis-Tarif",
       ],
       cta: "Gratis starten, später umsteigen",

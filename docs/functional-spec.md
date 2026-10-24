@@ -141,7 +141,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once the Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
 - **Value history:** the Item's Market value each time it was changed (at most one point a month), newest first, with the change since the one before and the Quantity when that changed; an Item priced once shows a single line.
 - **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album tags, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
-- Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
+- Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate, Print label (§7) and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
 
 ## 6. Catalog
 
@@ -241,6 +241,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - move them to an Album, or out of any Album
   - set a Grade, on those whose Item type the Grading scale suits
   - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in.
+  - print their labels (see Labels below)
   - delete them, with a confirmation
   - A move, a Grade or a purchase can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
@@ -251,6 +252,12 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
     - A totals row and page numbers.
   - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
+- **Labels (Premium):** a PDF of label sheets to print, made on the server in the active language: from the Export menu for the view's Items in its order, from select mode for the selected Items, and from the Item page for one Item. On the Free plan the dialog shows the way to Premium.
+  - **Sizes:** small (44.45 × 12.7 mm, the strip of a 2×2 flip), medium (38.1 × 21.2 mm, the back of a slab or a holder) and large (63.5 × 38.1 mm on A4, 66.7 × 25.4 mm on Letter: a box, tray or envelope).
+  - **Paper:** A4 or US Letter. The sheets line up with Avery L7651 (medium) and L7160 (large) on A4 and Avery 5167 (small) and 5160 (large) on Letter, or the same sizes from other makers. Small labels on A4 and medium ones on Letter print as a grid with faint lines to cut along.
+  - **Each label:** the title; the country, denomination, year and mint mark the title doesn't already hold; the Grade (with BU or Proof outside the Sheldon scale), the Numista number (not on small labels) and × Quantity (not when printing per piece). Optionally the Purchase price (with its date on large labels) and the Market value, per piece, and a QR code that opens the Item (medium and large labels). A line too wide shrinks, then is cut short with "…"; lines that don't fit are left out from the last, so the amounts go first.
+  - One label per Item, or one per piece. Labels already used on the first sheet can be skipped, so a part-used sheet can go through the printer again.
+  - The choices, except the labels to skip, are remembered on the device. One PDF holds up to 1,000 labels; a larger view is narrowed first.
 
 ## 8. Albums
 
@@ -307,7 +314,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 ## 11. Plans and billing
 
 - **Free plan:** up to **50 Items**, counted as Items, not pieces. After leaving Premium, every Item stays visible and editable, but none can be added while over 50.
-- **Premium:** unlimited Items, the Insurance report, and PDF/CSV export.
+- **Premium:** unlimited Items, the Insurance report, PDF/CSV export and labels to print.
 - **Prices (monthly / yearly):**
 
 | Currency | Monthly | Yearly |

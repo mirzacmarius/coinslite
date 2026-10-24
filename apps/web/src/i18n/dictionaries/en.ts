@@ -179,7 +179,7 @@ export default {
       },
       export: {
         title: "PDF and CSV export",
-        text: "Any view of your Collection, to print or to keep. Premium.",
+        text: "Any view of your Collection, to print or to keep, and labels for flips and slabs. Premium.",
       },
       charts: {
         title: "Charts",
@@ -231,6 +231,7 @@ export default {
         "Unlimited Items",
         "The Insurance report",
         "PDF and CSV export",
+        "Labels for flips and slabs",
         "Everything in the Free plan",
       ],
       cta: "Start free, upgrade later",

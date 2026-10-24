@@ -93,14 +93,17 @@ const bytesOf = (base64: string) =>
   Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
 
 /** A font with what layout needs: text it can set, measured quickly. */
-type Face = {
+export type Face = {
   font: PDFFont;
   /** The text with characters the font lacks replaced: odd spaces by a no-break space. */
   clean: (text: string) => string;
   width: (text: string, size: number) => number;
 };
 
-async function embedFace(document: Document, base64: string): Promise<Face> {
+export async function embedFace(
+  document: Document,
+  base64: string,
+): Promise<Face> {
   const font = await document.embedFont(bytesOf(base64), { subset: true });
   const has = new Set(font.getCharacterSet());
   const widths = new Map<string, number>();
@@ -151,7 +154,7 @@ function breakPoint(face: Face, word: string, at: number, maxWidth: number) {
  * spaces, so "1 234 kr" stays whole), at explicit line breaks, and inside a
  * word only when the word alone is too wide.
  */
-function wrap(face: Face, text: string, at: number, maxWidth: number) {
+export function wrap(face: Face, text: string, at: number, maxWidth: number) {
   const lines: string[] = [];
   for (const paragraph of face.clean(text).split("\n")) {
     let line = "";
