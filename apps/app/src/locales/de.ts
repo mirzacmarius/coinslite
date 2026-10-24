@@ -402,7 +402,7 @@ export default {
         "Übernimm eine bestehende Sammlung aus einer CSV-Datei in CoinsLite, etwa eine als CSV gespeicherte Excel-Tabelle oder eine Liste aus Numista, OpenNumismat oder CoinManage.",
       export: "Sammlung exportieren",
       exportHint:
-        "Sichere deine ganze Sammlung, verkaufte Objekte eingeschlossen, in einer CSV-Datei, die Excel und andere Tabellenkalkulationen öffnen.",
+        "Deine ganze Sammlung, verkaufte Objekte eingeschlossen, in einer CSV-Datei, die Excel und andere Tabellenkalkulationen öffnen.",
     },
     email: {
       title: "E-Mail",
@@ -1499,7 +1499,7 @@ export default {
     csv: "Als CSV exportieren",
     pdf: "Liste als PDF",
     pdfTooLarge:
-      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
+      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu drucken.",
     tooLarge:
       "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
     premiumOnly: "Das Drucken von Listen und Etiketten ist Teil von Premium.",

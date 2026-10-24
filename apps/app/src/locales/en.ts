@@ -386,7 +386,7 @@ export default {
         "Bring an existing collection into CoinsLite from a CSV file, such as an Excel sheet saved as CSV or a list from Numista, OpenNumismat or CoinManage.",
       export: "Export the Collection",
       exportHint:
-        "Back up your whole Collection, sold Items included, to a CSV file that Excel and other spreadsheets open.",
+        "Your whole Collection, sold Items included, in a CSV file that Excel and other spreadsheets open.",
     },
     email: {
       title: "Email",
@@ -1430,7 +1430,7 @@ export default {
     csv: "Export as CSV",
     pdf: "List as PDF",
     pdfTooLarge:
-      "A PDF lists up to {limit} Items. Narrow the view to export it.",
+      "A PDF lists up to {limit} Items. Narrow the view to print it.",
     tooLarge:
       "Your Collection is too large to export in one go. Rather than leave Items out, it isn't exported.",
     premiumOnly: "Printing a list or labels is part of Premium.",

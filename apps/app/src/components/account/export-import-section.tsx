@@ -16,7 +16,7 @@ import { useId, useState } from "react";
  * Account's Export and import, on both plans: bringing Items in from a CSV
  * file (a spreadsheet saved as CSV, or a list from another collecting app),
  * and the whole Collection, sold Items too, as a CSV file a spreadsheet
- * opens, to keep as a backup or take elsewhere.
+ * opens, so a collector's data can always leave with them.
  */
 export function ExportImportSection() {
   const t = useI18n();

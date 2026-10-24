@@ -391,7 +391,7 @@ export default {
         "Hent en eksisterende samling inn i CoinsLite fra en CSV-fil, for eksempel et Excel-ark lagret som CSV eller en liste fra Numista, OpenNumismat eller CoinManage.",
       export: "Eksporter samlingen",
       exportHint:
-        "Ta sikkerhetskopi av hele samlingen, også solgte objekter, i en CSV-fil som Excel og andre regneark åpner.",
+        "Hele samlingen, også solgte objekter, i en CSV-fil som Excel og andre regneark åpner.",
     },
     email: {
       title: "E-post",
@@ -1451,7 +1451,7 @@ export default {
     csv: "Eksporter som CSV",
     pdf: "Liste som PDF",
     pdfTooLarge:
-      "En PDF viser opptil {limit} objekter. Snevre inn visningen for å eksportere den.",
+      "En PDF viser opptil {limit} objekter. Snevre inn visningen for å skrive den ut.",
     tooLarge:
       "Samlingen din er for stor til å eksporteres på én gang, så den eksporteres ikke i stedet for å mangle objekter.",
     premiumOnly: "Utskrift av lister og etiketter er en del av Premium.",

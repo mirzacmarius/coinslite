@@ -398,7 +398,7 @@ export default {
         "Importez une collection existante dans CoinsLite depuis un fichier CSV, par exemple une feuille Excel enregistrée au format CSV ou une liste issue de Numista, OpenNumismat ou CoinManage.",
       export: "Exporter la collection",
       exportHint:
-        "Sauvegardez toute votre collection, objets vendus compris, dans un fichier CSV qu’Excel et les autres tableurs savent ouvrir.",
+        "Toute votre collection, objets vendus compris, dans un fichier CSV qu’Excel et les autres tableurs savent ouvrir.",
     },
     email: {
       title: "E-mail",
@@ -1473,7 +1473,7 @@ export default {
     csv: "Exporter en CSV",
     pdf: "Liste en PDF",
     pdfTooLarge:
-      "Un PDF contient jusqu’à {limit} objets. Affinez la vue pour l’exporter.",
+      "Un PDF contient jusqu’à {limit} objets. Affinez la vue pour l’imprimer.",
     tooLarge:
       "Votre collection est trop volumineuse pour être exportée d’un coup\u00a0: plutôt que d’omettre des objets, elle n’est pas exportée.",
     premiumOnly:

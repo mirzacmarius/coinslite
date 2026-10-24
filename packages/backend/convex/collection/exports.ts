@@ -114,18 +114,19 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
 }
 
 /**
- * The whole Collection as a CSV file for spreadsheets, to keep as a backup
- * or take elsewhere, on either plan: UTF-8 with a byte order mark, RFC 4180
- * quoting, a header row, then one row per Item, the owned ones and then the
- * sold ones, each in the Collection page's default order. Headings and
- * names (Item type, Grade, material, country…) are in the person's
- * language; numbers and dates are plain (1250.50, 2024-03-05). Importing
- * the file reads it as it is.
+ * The whole Collection as a CSV file for spreadsheets, on either plan:
+ * UTF-8 with a byte order mark, RFC 4180 quoting, a header row, then one row
+ * per Item, the owned ones and then the sold ones, each in the Collection
+ * page's default order. Headings and names (Item type, Grade, material,
+ * country…) are in the person's language; numbers and dates are plain
+ * (1250.50, 2024-03-05). Importing the file reads it as it is.
  */
 export const csv = query({
   args: {
     /** The file's language; the person's own by default. */
     locale: v.optional(language),
+    /** Ignored: kept for apps still open from when the CSV covered a view. */
+    view: v.optional(collectionView),
   },
   returns: v.string(),
   handler: async (ctx, { locale }) => {

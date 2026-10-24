@@ -393,7 +393,7 @@ export default {
         "Adu în CoinsLite o colecție existentă dintr-un fișier CSV, de exemplu o foaie Excel salvată ca CSV sau o listă din Numista, OpenNumismat ori CoinManage.",
       export: "Exportă colecția",
       exportHint:
-        "Fă o copie de rezervă a întregii colecții, inclusiv a obiectelor vândute, într-un fișier CSV care se deschide în Excel și în alte programe de calcul tabelar.",
+        "Întreaga colecție, inclusiv obiectele vândute, într-un fișier CSV care se deschide în Excel și în alte programe de calcul tabelar.",
     },
     email: {
       title: "E-mail",
@@ -1459,7 +1459,7 @@ export default {
     csv: "Exportă ca CSV",
     pdf: "Listă ca PDF",
     pdfTooLarge:
-      "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o exporta.",
+      "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o tipări.",
     tooLarge:
       "Colecția ta este prea mare pentru a fi exportată dintr-odată, așa că nu este exportată în loc să lipsească obiecte.",
     premiumOnly: "Tipărirea listelor și a etichetelor face parte din Premium.",

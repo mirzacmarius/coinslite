@@ -258,7 +258,7 @@ The Collection page is for finding and working with Items: a short summary strip
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
     - A totals row and page numbers.
-- **Export (CSV), of the whole Collection:** from Account (§12), on both plans, so a collector's data can always leave with them and a backup can be kept: the owned Items, then the sold ones, each in the default order. Importing the file reads it as it is.
+- **Export (CSV), of the whole Collection:** from Account (§12), on both plans, so a collector's data can always leave with them: the owned Items, then the sold ones, each in the default order. Importing the file reads it as it is.
   - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, tags (parted by commas), sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
 - **Labels (Premium):** a PDF of label sheets to print, made on the server in the active language: from the Print menu for the view's Items in its order, from select mode for the selected Items, and from the Item page for one Item. On the Free plan the dialog shows the way to Premium.
   - **Sizes:** small (44.45 × 12.7 mm, the strip of a 2×2 flip), medium (38.1 × 21.2 mm, the back of a slab or a holder) and large (63.5 × 38.1 mm on A4, 66.7 × 25.4 mm on Letter: a box, tray or envelope).
@@ -369,7 +369,7 @@ Where the Collection stands, in this order: the totals and the charts, then Late
   - Albums
   - Updates, marked when there's an unseen release
   - Insurance report, locked with an upgrade path on the Free plan
-- **Export and import:** import Items from a CSV file (§7), such as an Excel sheet saved as CSV or a list from Numista, OpenNumismat or CoinManage, and export the whole Collection, sold Items included, as a CSV file that Excel and other spreadsheets open, to keep as a backup (§7).
+- **Export and import:** import Items from a CSV file (§7), such as an Excel sheet saved as CSV or a list from Numista, OpenNumismat or CoinManage, and export the whole Collection, sold Items included, as a CSV file that Excel and other spreadsheets open (§7).
 - **Send feedback:** a free-text message that reaches the team by email.
 - **Sign out.** Delete account sits with the plan, beside Manage subscription (§2).
 
