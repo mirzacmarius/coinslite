@@ -22,6 +22,8 @@ describe("readImportFile", () => {
         "Currency",
         "Purchase date",
         "Source",
+        // A heading in another of the five languages reads too.
+        "Oppbevart i",
         // One of the import's own columns, which go by their key.
         "notes",
       ],
@@ -41,6 +43,7 @@ describe("readImportFile", () => {
         "NOK",
         "2024-03-05",
         "Oslo Mynthandel",
+        "Safe, tray 3",
         "Bought as a pair,\nboth in one envelope",
       ],
       [
@@ -54,6 +57,7 @@ describe("readImportFile", () => {
         "",
         "NO",
         "1",
+        "",
         "",
         "",
         "",
@@ -83,6 +87,7 @@ describe("readImportFile", () => {
           currency: "NOK",
           purchaseDate: "2024-03-05",
           source: "Oslo Mynthandel",
+          storage: "Safe, tray 3",
           notes: "Bought as a pair,\nboth in one envelope",
         },
         {

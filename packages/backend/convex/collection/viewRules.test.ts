@@ -6,7 +6,7 @@ import {
   slimEntryOf,
   withCatalogFacts,
 } from "../items/catalogFacts";
-import type { CollectionView } from "./view";
+import { type CollectionView, withoutStorage } from "./view";
 import { type ViewContext, countFilterOptions, itemsInView } from "./viewRules";
 
 /** Catalog entries as stored, notes and all. */
@@ -162,6 +162,119 @@ describe("how many Items each filter option would show, from slim entries as fro
 
   test("from slim entries", () => {
     expect(counted(fromSlimEntries)).toEqual(expected);
+  });
+});
+
+describe("sorted by Market value, Gain/loss and title", () => {
+  const priced = [
+    item("cheap", 1, {
+      title: "Cheap coin",
+      purchasePrice: 100,
+      marketValue: 150,
+    }),
+    item("dear", 2, {
+      title: "Dear coin",
+      purchasePrice: 1000,
+      marketValue: 900,
+      quantity: 2,
+    }),
+    item("unpriced", 3, { title: "Åland coin" }),
+    item("gift", 4, { title: "Gift coin", marketValue: 500 }),
+  ];
+  const ids = (view: CollectionView) =>
+    itemsInView(priced, view, context).map((each) => each._id as string);
+
+  test("by Market value, highest first, unpriced Items last", () => {
+    expect(ids({ sort: "value" })).toEqual([
+      "dear",
+      "gift",
+      "cheap",
+      "unpriced",
+    ]);
+  });
+
+  test("by Gain/loss, biggest first, Items without both prices last", () => {
+    expect(ids({ sort: "gain" })).toEqual([
+      "cheap",
+      "dear",
+      "unpriced",
+      "gift",
+    ]);
+  });
+
+  test("by title, A to Z in the person's language, accents as their letters", () => {
+    expect(ids({ sort: "title" })).toEqual([
+      "unpriced",
+      "cheap",
+      "dear",
+      "gift",
+    ]);
+  });
+});
+
+describe("the Kept in filter", () => {
+  const kept = [
+    item("safe-1", 1, { title: "In the safe", storage: "Safe, tray 1" }),
+    item("safe-2", 2, { title: "Also in the safe", storage: "safe,  TRAY 1" }),
+    item("box", 3, { title: "In the box", storage: "Box" }),
+    item("nowhere", 4, { title: "Nowhere" }),
+  ];
+  const ids = (view: CollectionView) =>
+    itemsInView(kept, view, context).map((each) => each._id as string);
+
+  test("matches a place whatever its capitals and spacing", () => {
+    expect(ids({ storage: "SAFE, tray 1", sort: "oldest" })).toEqual([
+      "safe-1",
+      "safe-2",
+    ]);
+  });
+
+  test("or the Items with no place recorded", () => {
+    expect(ids({ storage: withoutStorage })).toEqual(["nowhere"]);
+  });
+
+  test("counts each place once, as first written, most used first", () => {
+    const counted = countFilterOptions(kept, {}, context);
+    expect(counted.storages).toEqual([
+      { storage: "Safe, tray 1", count: 2 },
+      { storage: "Box", count: 1 },
+    ]);
+    expect(counted.withoutStorage).toBe(1);
+  });
+});
+
+describe("search across the Item's texts", () => {
+  const texts = [
+    item("fair", 1, {
+      title: "Krone",
+      source: "Coin fair, Oslo",
+      notes: "Bought with Anna",
+      storage: "Safe",
+    }),
+    item("numista", 2, {
+      title: "Øre",
+      numistaNumber: 1234,
+      gradeNote: "Scratched on the reverse",
+      series: "Posthorn",
+    }),
+  ];
+  const ids = (view: CollectionView) =>
+    itemsInView(texts, view, context).map((each) => each._id as string);
+
+  test("finds words in the source, the notes and the place it's kept in", () => {
+    expect(ids({ search: "oslo anna" })).toEqual(["fair"]);
+    expect(ids({ search: "safe" })).toEqual(["fair"]);
+  });
+
+  test("finds a Numista number however it's typed", () => {
+    expect(ids({ search: "N# 1234" })).toEqual(["numista"]);
+    expect(ids({ search: "n#1234" })).toEqual(["numista"]);
+    expect(ids({ search: "1234" })).toEqual(["numista"]);
+  });
+
+  test("finds a grade note and a series", () => {
+    expect(ids({ search: "scratched" })).toEqual(["numista"]);
+    expect(ids({ search: "posthorn" })).toEqual(["numista"]);
   });
 });
 

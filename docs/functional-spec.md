@@ -67,6 +67,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
   - An optional free-text grade note.
 - **Quantity:** whole number ≥ 1, default 1.
 - **Purchase:** Purchase price per piece, purchase date, and source (where it was acquired).
+- **Kept in:** where the Item physically is, as the user describes it ("Safe deposit box 2, tray 3"): free text up to 100 characters. The form suggests the places the user's other Items are kept in, so one place is written one way.
 - **Market value** per piece. Optional, entered by the user.
 - **Notes.**
 - **Album:** optional, at most one.
@@ -136,8 +137,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - The list thumbnail is that of the front photo, else of the back photo, else of the first more photo, else a placeholder for the Item type. A photo from before thumbnails shows as itself.
 
 ### 5.7 Item detail
-- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Purchase price, Market value, purchase date and source, notes and Album.
-- For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity**.
+- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, Purchase price, Market value, purchase date and source, notes and Album.
+- For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once the Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
 - **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album tags, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
 - Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
 
@@ -209,16 +210,17 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 ## 7. Collection
 
 - **Spot price:** gold and silver, per gram and per troy ounce (31.1034768 g), in the Home currency, with the time of the last update. Refreshes at least every 15 minutes.
-- **Totals over the whole Collection** (not the filtered view), each clearly labelled as counting Items or pieces:
+- **Totals over the whole Collection**, each clearly labelled as counting Items or pieces:
   - number of Items; number of pieces per Item type
   - total Purchase price, total Market value, Gain/loss
   - gold and silver Metal value with the total fine weight, shown only when non-zero
+  - With a search or filter on (the sold view alone doesn't count), the section leads with the same figures for **the current view**, headed "This view", and keeps the whole Collection's (on the sold view, all sold Items') beneath. The collapsed summary line shows the view's figures then. The charts stay the whole Collection's.
 - **Charts:**
   - An Item's **Date acquired** is its purchase date, or when it was recorded in CoinsLite if that is earlier or it has no purchase date. Purchase dates before 1900 count as 1900.
   - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month.
   - **Value by Date acquired:** cumulative Purchase price and Market value by the month Items were acquired.
   - **Value distribution:** by Item type, plus gold and silver Metal value.
-- **Search:** title, denomination, country.
+- **Search:** every word typed must appear in one of the Item's texts: title, denomination, series, category, ruler, mint mark, Numista number (as "N# 1234" is written), grade note, grader and certificate number, stamp catalogue and number, serial number, source, Kept in, notes, or the country's name; a word may also be the country's code. Capitals and accents don't matter.
 - **Filters:**
   - Item type, plus bullion-only for coins
   - origin: all, the user's own country, or foreign
@@ -226,9 +228,10 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - denomination
   - Grade
   - Album: all, one Album, or without an Album, each with counts
+  - Kept in: one place, or no place recorded, each with counts; places that differ only in capitals, accents or spacing count as one
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
-- **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, denomination, Grade.
+- **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, highest Market value, biggest gain, denomination, Grade, title (A to Z). Items without the sorted value come last.
 - **Select mode:** select Items one by one, a page or the whole view (up to 200 at once), then act on all of them:
   - move them to an Album, or out of any Album
   - set a Grade, on those whose Item type the Grading scale suits
@@ -242,7 +245,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
     - A totals row and page numbers.
-  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source.
+  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
 
 ## 8. Albums
 

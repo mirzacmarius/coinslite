@@ -108,6 +108,8 @@ export const itemLimits = {
   /** Each text under "Catalogue and certification" (references.ts). */
   reference: 100,
   source: 200,
+  /** Kept in: where the Item is, as the person describes it. */
+  storage: 100,
   notes: 5000,
   saleNote: 500,
   quantity: 1_000_000,
@@ -167,6 +169,8 @@ export type ItemInput = {
   marketValue?: number;
   purchaseDate?: string;
   source?: string;
+  /** Kept in: where the Item is physically kept. */
+  storage?: string;
   notes?: string;
 };
 
@@ -271,6 +275,7 @@ export function checkItem(input: ItemInput, today: string) {
     ),
     ...purchase,
     ...withNumber("marketValue", amount(input.marketValue)),
+    ...withText("storage", text(input.storage, itemLimits.storage)),
     ...withText("notes", text(input.notes, itemLimits.notes)),
   };
 }

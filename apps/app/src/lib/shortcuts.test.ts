@@ -24,6 +24,14 @@ describe("a single-key shortcut", () => {
     expect(shortcutFires("c", press("e"), idle)).toBe(false);
   });
 
+  test("ignores a keydown without a key, as browser autofill fires", () => {
+    const keyless = press(undefined as unknown as string);
+    expect(shortcutFires("c", keyless, idle)).toBe(false);
+    expect(shortcutFires("mod+a", { ...keyless, metaKey: true }, idle)).toBe(
+      false,
+    );
+  });
+
   test("leaves Cmd, Ctrl and Alt combinations to the browser", () => {
     expect(shortcutFires("c", press("c", { metaKey: true }), idle)).toBe(false);
     expect(shortcutFires("c", press("c", { ctrlKey: true }), idle)).toBe(false);

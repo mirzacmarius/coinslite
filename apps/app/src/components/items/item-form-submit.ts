@@ -215,6 +215,7 @@ export function argsFromValues(
     marketValue: money(values.marketValue),
     purchaseDate: values.purchaseDate || undefined,
     source: values.source,
+    storage: values.storage,
     albumId: values.albumId,
   };
 }

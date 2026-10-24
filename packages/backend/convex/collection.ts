@@ -6,9 +6,11 @@ import {
   collectionView,
   findItems,
   readForView,
+  readStoragePlaces,
 } from "./collection/browse";
 import type { CollectionView } from "./collection/view";
 import { countFilterOptions } from "./collection/viewRules";
+import { unpricedTotals } from "./collectionTotals";
 import { bulkLimits } from "./items/bulkRules";
 import { itemWithThumbnail } from "./items/thumbnail";
 import { requireSetUpUser } from "./utils/auth";
@@ -42,6 +44,12 @@ const pageFields = {
   entry: v.union(v.null(), v.object({ key: v.string(), title: v.string() })),
   /** The country origin compares against; null when the person has none. */
   ownCountry: v.union(v.string(), v.null()),
+  /**
+   * The totals of every Item the view shows, over all its pages, before any
+   * Spot price (items/totals.ts PageTotals): the app prices them at the
+   * latest Spot prices, as it does the whole Collection's.
+   */
+  viewTotals: unpricedTotals,
 };
 
 /** How many Items each filter option would show (viewRules.ts filterCounts). */
@@ -62,6 +70,8 @@ const filterCountsResult = v.object({
   ),
   albums: v.array(v.object({ albumId: v.id("albums"), count: v.number() })),
   withoutAlbum: v.number(),
+  storages: v.array(v.object({ storage: v.string(), count: v.number() })),
+  withoutStorage: v.number(),
   entry: v.number(),
   statuses: v.object({ owned: v.number(), sold: v.number() }),
 });
@@ -95,8 +105,14 @@ export const page = query({
   returns: v.object(pageFields),
   handler: async (ctx, { view, page, pageSize, locale }) => {
     const { owner, read } = await readOwnCollection(ctx, view, locale);
-    const found = await browsePage(ctx, read, { view, page, pageSize });
-    return { ...found, currency: owner.homeCurrency };
+    const currency = owner.homeCurrency;
+    const found = await browsePage(ctx, read, {
+      view,
+      page,
+      pageSize,
+      currency,
+    });
+    return { ...found, currency };
   },
 });
 
@@ -111,6 +127,20 @@ export const filterCounts = query({
 });
 
 /**
+ * The places the signed-in person's Items are kept in (Kept in), most used
+ * first, for the Item form to suggest as one is typed (browse.ts
+ * readStoragePlaces).
+ */
+export const storagePlaces = query({
+  args: {},
+  returns: v.array(v.string()),
+  handler: async (ctx) => {
+    const owner = await requireSetUpUser(ctx);
+    return await readStoragePlaces(ctx, owner._id);
+  },
+});
+
+/**
  * `page` and `filterCounts` in one, as the Collection page read them before
  * they were split. Kept only for tabs opened before then: remove once those
  * have reloaded.
@@ -120,10 +150,16 @@ export const browse = query({
   returns: v.object({ ...pageFields, options: filterCountsResult }),
   handler: async (ctx, { view, page, pageSize, locale }) => {
     const { owner, read } = await readOwnCollection(ctx, view, locale);
-    const found = await browsePage(ctx, read, { view, page, pageSize });
+    const currency = owner.homeCurrency;
+    const found = await browsePage(ctx, read, {
+      view,
+      page,
+      pageSize,
+      currency,
+    });
     return {
       ...found,
-      currency: owner.homeCurrency,
+      currency,
       options: countFilterOptions(read.items, view, read.context),
     };
   },

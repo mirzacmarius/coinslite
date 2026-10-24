@@ -17,7 +17,7 @@ import { useQuery } from "convex/react";
 import { ListChecks } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { narrowsView } from "./collection-display";
+import { narrowsBeyondStatus, narrowsView } from "./collection-display";
 import {
   CollectionResults,
   Pagination,
@@ -117,11 +117,15 @@ export function CollectionBrowser() {
   useShortcut("f", () => setFilterOpen(true), toolbar);
 
   // Keyed, so it stays mounted (and open or collapsed) as the rest changes.
+  // With a search or filter on, the view's totals lead (null while they load).
   const totals = (
     <CollectionTotalsSection
       key="totals"
       narrowed={narrowsView(view)}
       sold={view.status === "sold"}
+      viewTotals={
+        narrowsBeyondStatus(view) ? (result?.viewTotals ?? null) : undefined
+      }
     />
   );
 

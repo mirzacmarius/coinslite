@@ -8,14 +8,22 @@ import type { GradingScale, ItemType } from "../items/grades";
  * write it without loading the backend.
  */
 
-/** The orders a Collection can be sorted in; `year` (oldest first) is the default. */
+/**
+ * The orders a Collection can be sorted in, as the Display menu lists them;
+ * `year` (oldest first) is the default. `price` is the Purchase price and
+ * `value` the Market value, both per piece and highest first; `gain` is the
+ * Gain/loss, biggest first; `title` is A to Z in the person's language.
+ */
 export const collectionSorts = [
   "year",
   "newest",
   "oldest",
   "price",
+  "value",
+  "gain",
   "denomination",
   "grade",
+  "title",
 ] as const;
 export type CollectionSort = (typeof collectionSorts)[number];
 export const defaultSort: CollectionSort = "year";
@@ -35,8 +43,11 @@ export type Origin = (typeof origins)[number];
 /** The Album filter's value for Items that aren't in any Album. */
 export const withoutAlbum = "none";
 
+/** The Kept in filter's value for Items with no place recorded. */
+export const withoutStorage = "none";
+
 export type CollectionView = {
-  /** Words to find in the title, the denomination or the country's name. */
+  /** Words to find in the Item's texts (viewRules.ts searchFor). */
   search?: string;
   type?: ItemType;
   /** Only bullion coins. */
@@ -55,6 +66,11 @@ export type CollectionView = {
   notInAlbum?: string;
   /** A Catalog entry's key: only the Items made from it. */
   entry?: string;
+  /**
+   * A place Items are kept in (Kept in), matched without regard to case,
+   * accents or spacing, or `withoutStorage`.
+   */
+  storage?: string;
   /**
    * Only the Items without a Market value, without any photo, or (coins and
    * banknotes) without a Grade, as the Overview counts them (items/attention.ts).

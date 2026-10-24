@@ -1,13 +1,19 @@
-import type { Locale } from "@coinslite/i18n";
+import type { HomeCurrency, Locale } from "@coinslite/i18n";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { attentionKinds } from "../items/attention";
 import { catalogEntryByKey, itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
+import { pageTotals } from "../items/totals";
 import { gradingScale, itemType } from "../utils/validators";
 import { type CollectionView, collectionSorts } from "./view";
-import { type ViewContext, itemsInView, ownCountryOf } from "./viewRules";
+import {
+  type ViewContext,
+  itemsInView,
+  ownCountryOf,
+  textKey,
+} from "./viewRules";
 
 /**
  * Browsing a Collection: reading it for a view (view.ts), then which Items
@@ -28,6 +34,7 @@ export const collectionView = v.object({
   album: v.optional(v.string()),
   notInAlbum: v.optional(v.string()),
   entry: v.optional(v.string()),
+  storage: v.optional(v.string()),
   without: v.optional(
     v.union(...attentionKinds.map((kind) => v.literal(kind))),
   ),
@@ -52,7 +59,7 @@ const bytesKept = 2 * 1024 * 1024;
 const lookupsKept = 2 * readCheckEvery + 100;
 
 /** Whether the query still has more than it keeps back for the rest of it. */
-async function roomLeft(ctx: QueryCtx) {
+export async function roomLeft(ctx: QueryCtx) {
   const { documentsRead, bytesRead, databaseQueries } =
     await ctx.meta.getTransactionMetrics();
   return (
@@ -104,6 +111,38 @@ async function readMorePhotoItems(ctx: QueryCtx, ownerId: Id<"users">) {
       return { itemIds, complete: false };
   }
   return { itemIds, complete: true };
+}
+
+/** The most places `readStoragePlaces` lists. */
+export const storagePlaceLimit = 50;
+
+/**
+ * The places a person's Items are kept in (Kept in), most used first then A
+ * to Z, for the Item form's suggestions. Places that differ only in
+ * capitals, accents or spacing are one, written as first met. Read from as
+ * much of the Collection as fits in what the query may read, checked as
+ * `readCollection` checks; the Items' facts aren't needed, so nothing else
+ * is read.
+ */
+export async function readStoragePlaces(ctx: QueryCtx, ownerId: Id<"users">) {
+  const places = new Map<string, { place: string; count: number }>();
+  let read = 0;
+  for await (const item of ctx.db
+    .query("items")
+    .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
+    if (item.storage !== undefined) {
+      const key = textKey(item.storage);
+      const found = places.get(key);
+      if (found) found.count += 1;
+      else places.set(key, { place: item.storage, count: 1 });
+    }
+    read += 1;
+    if (read % readCheckEvery === 0 && !(await roomLeft(ctx))) break;
+  }
+  return [...places.values()]
+    .sort((a, b) => b.count - a.count || a.place.localeCompare(b.place))
+    .slice(0, storagePlaceLimit)
+    .map(({ place }) => place);
 }
 
 /** A person's Collection, read for a view. */
@@ -168,8 +207,10 @@ export async function findItems(
 
 /**
  * One page of the Items a view shows, numbered from 1, each with its list
- * thumbnail, and how many there are in all. A page past either end shows
- * the nearest one.
+ * thumbnail, how many there are in all, and their totals before any Spot
+ * price (items/totals.ts pageTotals, in `currency`), which the app prices
+ * as it does the whole Collection's. A page past either end shows the
+ * nearest one.
  */
 export async function browsePage(
   ctx: QueryCtx,
@@ -178,7 +219,13 @@ export async function browsePage(
     view,
     page,
     pageSize,
-  }: { view: CollectionView; page: number; pageSize: number },
+    currency,
+  }: {
+    view: CollectionView;
+    page: number;
+    pageSize: number;
+    currency: HomeCurrency;
+  },
 ) {
   const items = itemsInView(collection, view, context);
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
@@ -198,5 +245,6 @@ export async function browsePage(
     complete,
     entry,
     ownCountry: context.ownCountry,
+    viewTotals: pageTotals(items, { currency }),
   };
 }

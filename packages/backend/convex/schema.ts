@@ -234,6 +234,9 @@ export default defineSchema({
     marketValue: v.optional(v.number()),
     purchaseDate: v.optional(v.string()),
     source: v.optional(v.string()),
+    // Kept in: where the Item is, as the person describes it ("Safe deposit
+    // box 2, tray 3"). The Collection filters and searches by it.
+    storage: v.optional(v.string()),
     notes: v.optional(v.string()),
 
     // The sale (items/rules.ts checkSale): an Item with a sold-on date is

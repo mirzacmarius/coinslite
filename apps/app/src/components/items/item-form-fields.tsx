@@ -114,11 +114,14 @@ export type TextFieldName =
   | "signatures"
   | "printer"
   | "purchaseDate"
-  | "source";
+  | "source"
+  | "storage";
 
 /**
  * A labelled text field of the Item form. A linked Item shows its Catalog
- * entry's fact where the person cleared it.
+ * entry's fact where the person cleared it. `suggestions` are offered as the
+ * person types (the places Items are kept in), without limiting what they
+ * type.
  */
 export function TextField({
   name,
@@ -130,6 +133,7 @@ export function TextField({
   type,
   max,
   disabled,
+  suggestions,
 }: {
   name: TextFieldName;
   label: string;
@@ -140,11 +144,16 @@ export function TextField({
   type?: "date";
   max?: string;
   disabled?: boolean;
+  suggestions?: readonly string[];
 }) {
   const { form, baseId, fromEntry, rules, errorOf } = useItemFields();
   const fact = fromEntry?.[name as keyof FactValues];
   const entryText = typeof fact === "string" ? fact : undefined;
   const rule = detailRules[name];
+  const suggestionsId =
+    suggestions && suggestions.length > 0
+      ? `${baseId}-${name}-suggestions`
+      : undefined;
   return (
     <form.Field
       name={name}
@@ -158,18 +167,28 @@ export function TextField({
           error={errorOf(field.state.meta.errors)}
         >
           {(control) => (
-            <Input
-              {...control}
-              type={type}
-              max={max}
-              inputMode={inputMode}
-              placeholder={entryText || placeholder}
-              maxLength={maxLength}
-              disabled={disabled}
-              value={field.state.value}
-              onChange={(event) => field.handleChange(event.target.value)}
-              onBlur={field.handleBlur}
-            />
+            <>
+              <Input
+                {...control}
+                type={type}
+                max={max}
+                inputMode={inputMode}
+                placeholder={entryText || placeholder}
+                maxLength={maxLength}
+                disabled={disabled}
+                list={suggestionsId}
+                value={field.state.value}
+                onChange={(event) => field.handleChange(event.target.value)}
+                onBlur={field.handleBlur}
+              />
+              {suggestionsId && (
+                <datalist id={suggestionsId}>
+                  {suggestions?.map((suggestion) => (
+                    <option key={suggestion} value={suggestion} />
+                  ))}
+                </datalist>
+              )}
+            </>
           )}
         </Field>
       )}

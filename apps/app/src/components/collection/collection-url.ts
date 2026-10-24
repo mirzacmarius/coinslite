@@ -27,11 +27,13 @@ import { itemTypes } from "../items/item-fields";
 /**
  * The Collection view lives in the URL, so any view can be bookmarked or
  * shared: ?q=krone&type=coin&bullion=1&origin=own&country=NO
- * &denomination=1%20krone&grade=european:XF&album=…&status=sold&sort=price&page=2.
+ * &denomination=1%20krone&grade=european:XF&album=…&storage=Safe%202
+ * &status=sold&sort=price&page=2.
  * ?addTo=<Album> picks Items to add to that Album: the view leaves out the
  * Items already in it. ?entry=<key> shows the Items made from one Catalog
- * entry, and ?without=marketValue|photo|grade the Items the Overview says
- * need attention for that.
+ * entry, ?storage=none the Items with no Kept in place, and
+ * ?without=marketValue|photo|grade the Items the Overview says need
+ * attention for that.
  * Defaults are left out. Anything that doesn't parse is ignored.
  */
 
@@ -63,6 +65,8 @@ export function readCollectionUrl(params: URLSearchParams) {
   if (addTo) view.notInAlbum = addTo;
   const entry = params.get("entry")?.trim();
   if (entry) view.entry = entry.slice(0, searchLimit);
+  const storage = params.get("storage")?.trim();
+  if (storage) view.storage = storage.slice(0, searchLimit);
   const without = oneOf<AttentionKind>(attentionKinds, params.get("without"));
   if (without) view.without = without;
   if (params.get("status") === "sold") view.status = "sold";
@@ -146,6 +150,7 @@ export function writeCollectionUrl(view: CollectionView, page: number) {
   if (view.album) params.set("album", view.album);
   if (view.notInAlbum) params.set("addTo", view.notInAlbum);
   if (view.entry) params.set("entry", view.entry);
+  if (view.storage) params.set("storage", view.storage);
   if (view.without) params.set("without", view.without);
   if (view.status) params.set("status", view.status);
   if (view.sort && view.sort !== defaultSort) params.set("sort", view.sort);

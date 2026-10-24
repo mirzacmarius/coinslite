@@ -88,8 +88,8 @@ const totals = v.object({
   metals: v.object({ gold: metalTotal, silver: metalTotal }),
 });
 
-/** PageTotals in items/totals.ts. */
-const unpricedTotals = v.object({
+/** PageTotals in items/totals.ts; the Collection page returns its view's too. */
+export const unpricedTotals = v.object({
   ...totalsFields,
   fineWeights: v.object({
     gold: v.array(fineWeightGroup),

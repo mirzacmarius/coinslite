@@ -8,12 +8,14 @@ import {
   referenceName,
   stampCatalogueNames,
 } from "../items/references";
+import { itemGainLoss } from "../items/totals";
 import {
   type CollectionSort,
   type CollectionView,
   defaultSort,
   searchLimit,
   withoutAlbum,
+  withoutStorage,
 } from "./view";
 
 /**
@@ -70,6 +72,9 @@ function orderFor(sort: CollectionSort, locale: Locale): Order {
     newest: (a, b) => -added(a, b),
     oldest: added,
     price: present((item) => item.purchasePrice, descending),
+    value: present((item) => item.marketValue, descending),
+    // Items without both prices have no Gain/loss, so they come last.
+    gain: present((item) => itemGainLoss(item), descending),
     denomination: (a, b) =>
       compareDenominations(a.denomination, b.denomination),
     grade: present(
@@ -79,6 +84,7 @@ function orderFor(sort: CollectionSort, locale: Locale): Order {
           : undefined,
       descending,
     ),
+    title: byTitle,
   };
   return inTurn(primary[sort], byYear, byTitle, added);
 }
@@ -97,10 +103,13 @@ export function countryName(code: string, locale: Locale) {
 }
 
 /**
- * Whether an Item has every searched word in its title, its denomination,
- * its country's name or what its label says (grader and certificate number,
- * stamp catalogue and number, serial number), or a word is its country's
- * code ("us"), so "PCGS 12345678" finds the coin as its page writes it.
+ * Whether an Item has every searched word in one of its texts: its title,
+ * denomination, series, category, ruler, mint mark, Numista number (as "N#
+ * 1234" is written), grade note, what its label says (grader and certificate
+ * number, stamp catalogue and number, serial number), source, the place it's
+ * kept in, its notes or its country's name; or a word is its country's code
+ * ("us"). So "PCGS 12345678" finds the coin as its page writes it, and "coin
+ * fair" the one bought there.
  */
 function searchFor(search: string | undefined, locale: Locale) {
   const words = folded(search?.slice(0, searchLimit) ?? "")
@@ -120,6 +129,13 @@ function searchFor(search: string | undefined, locale: Locale) {
     const text = [
       item.title,
       item.denomination,
+      item.series,
+      item.category,
+      item.ruler,
+      item.mintMark,
+      // "n#1234" holds "n#", "1234" and "n#1234", however the number is typed.
+      item.numistaNumber === undefined ? undefined : `n#${item.numistaNumber}`,
+      item.gradeNote,
       item.grader &&
         referenceName(graderNames, item.grader, item.graderName, ""),
       item.certificateNumber,
@@ -132,6 +148,9 @@ function searchFor(search: string | undefined, locale: Locale) {
         ),
       item.stampCatalogueNumber,
       item.serialNumber,
+      item.source,
+      item.storage,
+      item.notes,
     ]
       .filter((field) => field !== undefined)
       .map(folded);
@@ -143,9 +162,12 @@ function searchFor(search: string | undefined, locale: Locale) {
   };
 }
 
-/** Denominations that differ only in capitals, accents or spacing are one. */
-const denominationKey = (denomination: string) =>
-  folded(denomination).trim().replace(/\s+/g, " ");
+/**
+ * Texts that differ only in capitals, accents or spacing are one: a
+ * denomination, a place Items are kept in.
+ */
+export const textKey = (text: string) =>
+  folded(text).trim().replace(/\s+/g, " ");
 
 /** The country each Home currency belongs to; the euro has many. */
 const currencyCountries: Record<HomeCurrency, string | null> = {
@@ -179,6 +201,7 @@ const dimensions = [
   "denomination",
   "grade",
   "album",
+  "storage",
   "entry",
   "without",
   "status",
@@ -193,10 +216,12 @@ function filtersFor(
   const all = () => true;
   const country = view.country?.toUpperCase();
   const denomination =
-    view.denomination === undefined
-      ? undefined
-      : denominationKey(view.denomination);
+    view.denomination === undefined ? undefined : textKey(view.denomination);
   const grade = view.grade;
+  const storage =
+    view.storage === undefined || view.storage === withoutStorage
+      ? view.storage
+      : textKey(view.storage);
   return {
     type: (item) =>
       (view.type === undefined || item.type === view.type) &&
@@ -212,7 +237,7 @@ function filtersFor(
     denomination: (item) =>
       denomination === undefined ||
       (item.denomination !== undefined &&
-        denominationKey(item.denomination) === denomination),
+        textKey(item.denomination) === denomination),
     grade: (item) =>
       grade === undefined ||
       (item.gradingScale === grade.gradingScale && item.grade === grade.grade),
@@ -222,6 +247,11 @@ function filtersFor(
           ? item.albumId === undefined
           : item.albumId === view.album)) &&
       (view.notInAlbum === undefined || item.albumId !== view.notInAlbum),
+    storage: (item) =>
+      storage === undefined ||
+      (storage === withoutStorage
+        ? item.storage === undefined
+        : item.storage !== undefined && textKey(item.storage) === storage),
     // A key that names no Catalog entry matches nothing.
     entry: (item) =>
       view.entry === undefined ||
@@ -303,6 +333,8 @@ export function countFilterOptions(
   >();
   const albums = new Map<Id<"albums">, number>();
   let withoutAlbums = 0;
+  const storages = new Map<string, { storage: string; count: number }>();
+  let withoutStorages = 0;
   let ofEntry = 0;
   const statuses = { owned: 0, sold: 0 };
   const add = <K>(counts: Map<K, number>, key: K) =>
@@ -325,7 +357,7 @@ export function countFilterOptions(
       origins[item.country === ownCountry ? "own" : "foreign"] += 1;
     if (counts("country") && item.country) add(countries, item.country);
     if (counts("denomination") && item.denomination) {
-      const key = denominationKey(item.denomination);
+      const key = textKey(item.denomination);
       const option = denominations.get(key);
       if (option) option.count += 1;
       else
@@ -348,6 +380,15 @@ export function countFilterOptions(
     if (counts("album")) {
       if (item.albumId === undefined) withoutAlbums += 1;
       else add(albums, item.albumId);
+    }
+    if (counts("storage")) {
+      if (item.storage === undefined) withoutStorages += 1;
+      else {
+        const key = textKey(item.storage);
+        const option = storages.get(key);
+        if (option) option.count += 1;
+        else storages.set(key, { storage: item.storage, count: 1 });
+      }
     }
     if (counts("entry") && entryId !== null && item.catalogEntryId === entryId)
       ofEntry += 1;
@@ -376,6 +417,11 @@ export function countFilterOptions(
       .map(([albumId, count]) => ({ albumId, count }))
       .sort(byCount),
     withoutAlbum: withoutAlbums,
+    /** Each place Items are kept in, as first written, most used first. */
+    storages: [...storages.values()].sort(
+      (a, b) => byCount(a, b) || a.storage.localeCompare(b.storage),
+    ),
+    withoutStorage: withoutStorages,
     /** Items made from the view's Catalog entry, when it has one. */
     entry: ofEntry,
     statuses,
