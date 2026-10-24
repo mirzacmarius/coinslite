@@ -101,7 +101,7 @@ In German and French the European scale's Grades read as those collectors write 
 Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grade, both on Catalog entries and on Items.
 
 ### 5.4 Adding an Item
-- Adding opens the New Item page (Add Item, or C), not a dialog, so it's easy to fill in on a phone. It starts with the choice of Item type: coin, banknote or stamp, a coin to begin with. A Catalog entry, once linked, decides the type. For those who may scan, a coin starts with the coin scanner (§16), which hands over to the form with a coin chosen; a banknote or stamp, and everyone else, start with the form, its title in focus. Leaving with unsaved input asks first; adding goes to the new Item's page, or with **Create more** on, starts the next one.
+- Adding opens the New Item page (Add Item, or C), not a dialog, so it's easy to fill in on a phone. It starts with the choice of Item type: coin, banknote or stamp, a coin to begin with. A Catalog entry, once linked, decides the type. For those who may scan, a coin or banknote starts with the scanner (§16), which hands over to the form with the Item type it read; a stamp, and everyone else, start with the form, its title in focus. Leaving with unsaved input asks first; adding goes to the new Item's page, or with **Create more** on, starts the next one.
 - **Two ways to add:**
   - **From the Catalog** (coins and banknotes): the form's **Pick from the Catalog** opens the picker (§6.2) for the chosen type. The descriptive facts come from the picked entry. Not while the Catalog is hidden.
   - **Manually:** the user types the descriptive facts. Stamps are always added manually; the Catalog holds none.
@@ -253,7 +253,7 @@ The Collection page is for finding and working with Items: a short summary strip
   - A move, a Grade, a purchase or a tag can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
 - **Layout:** search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters, the summary strip and the Albums, then the Items.
-- **Export (Premium), covering the current filtered view:**
+- **Export, covering the current filtered view:** the CSV on both plans, so a collector's data can always leave with them; the PDF on Premium, where the Free plan's menu shows the way to Premium instead.
   - **PDF, A4 landscape:**
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
@@ -339,8 +339,8 @@ Where the Collection stands, in this order: the totals, the charts and the break
 
 ## 11. Plans and billing
 
-- **Free plan:** up to **50 Items**, counted as Items, not pieces. After leaving Premium, every Item stays visible and editable, but none can be added while over 50.
-- **Premium:** unlimited Items, the Insurance report, PDF/CSV export and labels to print.
+- **Free plan:** up to **50 Items**, counted as Items, not pieces, and the CSV export. After leaving Premium, every Item stays visible and editable, but none can be added while over 50.
+- **Premium:** unlimited Items, the Insurance report, the PDF export and labels to print.
 - **Prices (monthly / yearly):**
 
 | Currency | Monthly | Yearly |
@@ -419,16 +419,18 @@ Where the Collection stands, in this order: the totals, the charts and the break
   - Catalog visibility in navigation.
   - Scanner availability: off, admins only, or Premium beta.
 
-## 16. Scanner (last milestone, behind a flag)
+## 16. Scanner (behind a flag)
 
-- The user photographs both sides of a coin with on-screen guidance.
-- The server suggests the matching Catalog entry, or the descriptive facts if there's no match, using an AI vision model and coin reference data.
+- The user photographs both sides of a coin or banknote with on-screen guidance: a coin's obverse and reverse, a banknote's front and back.
+- The server reads the photos with an AI vision model (Anthropic's Claude) and suggests the matching Catalog entry of the Item type it read, or the descriptive facts if there's no match. An entry matches on country, denomination and series, and holds the year read: one still issued (no year to, §5.4) holds every year since its first.
+  - With an entry, the form is linked to it and gets what the entry can't say: the year read, when the entry spans more than one year, and a banknote's serial number and signatures.
+  - Without one, it gets the facts read: for a coin also its metal, diameter, mint mark and ruler; for a banknote its series, serial number, signatures, printer and ruler.
+- **Suggested Grade:** the scanner may also suggest a Grade, on the scale the Item starts on (§5.2), never another. It judges by wear, on a banknote also by folds, creases, tears, holes and stains; photos can hide wear and cleaning, so between two Grades it gives the lower, and none when the photos are too small, blurred or unevenly lit. Under the Grade the form says it's the scanner's suggestion, from the photos alone, to check in hand, until the Grade is changed.
 - Suggestions open in the add form, clearly marked as suggestions. The user must review them before saving, and the photos come along.
-- Starts as a Premium beta. The AI provider is chosen when the milestone starts.
+- Who may scan is a feature flag (§15): off, admins only, or Premium beta (Premium members and admins). Each person may scan only so often in a short time, more than identifying a collection needs.
 
 ## 17. Open items
 
 - Spot price and exchange-rate providers: gold-api.com supplies live gold and silver, and MetalpriceAPI supplies exchange rates and the backup metal prices. MetalpriceAPI's licence must be confirmed before launch.
 - Legal operator for privacy policy, terms and billing: before launch.
-- AI provider for the scanner: when that milestone starts.
 - Marketing site and guides: written after the app reaches feature completeness.

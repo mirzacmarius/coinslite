@@ -18,8 +18,8 @@ export default {
       blocks: [
         "CoinsLite te ajută să înregistrezi monedele, bancnotele și timbrele pe care le ai, să le organizezi și să știi cât ai plătit pe ele și cât valorează.",
         [
-          "Plan gratuit: până la {limit} de obiecte, numărate ca obiecte indiferent de cantitate.",
-          "Premium: obiecte nelimitate, plus raportul de asigurare și exporturile PDF și CSV. Se vinde lunar sau anual, la prețurile afișate pe site-ul nostru și în aplicație când treci la Premium.",
+          "Plan gratuit: până la {limit} de obiecte, numărate ca obiecte indiferent de cantitate, și exportul CSV.",
+          "Premium: obiecte nelimitate, plus raportul de asigurare, exportul PDF și etichete de tipărit. Se vinde lunar sau anual, la prețurile afișate pe site-ul nostru și în aplicație când treci la Premium.",
         ],
         "Premium se vinde prin Polar, care acționează ca vânzător înregistrat (merchant of record): Polar este vânzătorul căruia îi plătești, gestionează plata și taxele, iar pentru cumpărare se aplică propriii lui termeni.",
       ],
@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "Scanerul de monede",
+      heading: "Scanerul",
       blocks: [
-        "Scanerul, o versiune beta în Premium, sugerează ce monedă arată fotografiile tale. Sugestiile pot fi greșite, de aceea îți sunt mereu afișate ca să le verifici și să le corectezi înainte să se salveze ceva.",
+        "Scanerul, o versiune beta în Premium, sugerează ce monedă sau bancnotă arată fotografiile tale și în ce stare e. Sugestiile pot fi greșite, de aceea îți sunt mereu afișate ca să le verifici și să le corectezi înainte să se salveze ceva.",
       ],
     },
     {

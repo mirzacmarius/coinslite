@@ -41,13 +41,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 /**
- * The Collection toolbar's Export and import menu. On Premium it downloads
- * the view on screen (its search, filters and sort) as a file the server
- * makes; on the Free plan it shows the way to Premium instead. One entry per
- * file format: CSV for spreadsheets, PDF for printing, and labels to print
- * for the view's Items. A Collection too large to read whole isn't exported
- * at all, rather than with Items missing. Importing from a CSV file is on
- * both plans.
+ * The Collection toolbar's Export and import menu. It downloads the view on
+ * screen (its search, filters and sort) as a file the server makes, one
+ * entry per file format: CSV for spreadsheets, on both plans; PDF for
+ * printing, and labels to print for the view's Items, on Premium, where the
+ * Free plan shows the way to Premium instead. A Collection too large to read
+ * whole isn't exported at all, rather than with Items missing. Importing
+ * from a CSV file is on both plans.
  */
 export function ExportMenu({
   view,
@@ -153,6 +153,16 @@ export function ExportMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[15rem]">
+          <DropdownMenuLabel className="font-normal">
+            {t("collectionExport.inView", { count })}
+          </DropdownMenuLabel>
+          <DropdownMenuItem
+            disabled={count === 0 || !complete}
+            onSelect={() => void exportCsv()}
+          >
+            <FileSpreadsheet strokeWidth={1.75} />
+            {t("collectionExport.csv")}
+          </DropdownMenuItem>
           {plan === "free" ? (
             <>
               <p className="px-2 py-1.5 text-xs text-muted-foreground">
@@ -167,16 +177,6 @@ export function ExportMenu({
             </>
           ) : (
             <>
-              <DropdownMenuLabel className="font-normal">
-                {t("collectionExport.inView", { count })}
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                disabled={plan !== "premium" || count === 0 || !complete}
-                onSelect={() => void exportCsv()}
-              >
-                <FileSpreadsheet strokeWidth={1.75} />
-                {t("collectionExport.csv")}
-              </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={
                   plan !== "premium" ||
@@ -196,18 +196,17 @@ export function ExportMenu({
                 <Printer strokeWidth={1.75} />
                 {t("labels.menuItem")}
               </DropdownMenuItem>
-              {!complete ? (
+              {complete && tooLargeForPdf && (
                 <p className="px-2 py-1.5 text-xs text-muted-foreground">
-                  {t("collectionExport.tooLarge")}
+                  {t("collectionExport.pdfTooLarge", { limit: pdfLimit })}
                 </p>
-              ) : (
-                tooLargeForPdf && (
-                  <p className="px-2 py-1.5 text-xs text-muted-foreground">
-                    {t("collectionExport.pdfTooLarge", { limit: pdfLimit })}
-                  </p>
-                )
               )}
             </>
+          )}
+          {!complete && (
+            <p className="px-2 py-1.5 text-xs text-muted-foreground">
+              {t("collectionExport.tooLarge")}
+            </p>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={onImport}>

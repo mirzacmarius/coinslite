@@ -18,8 +18,8 @@ export default {
       blocks: [
         "CoinsLite lets you record the coins, banknotes and stamps you own, organise them and keep track of what you paid and what they are worth.",
         [
-          "Free plan: up to {limit} Items, counted as Items whatever their Quantity.",
-          "Premium: no limit on Items, plus the Insurance report and the PDF and CSV exports. It is sold by the month or by the year, at the prices shown on our website and in the app when you upgrade.",
+          "Free plan: up to {limit} Items, counted as Items whatever their Quantity, and the CSV export.",
+          "Premium: no limit on Items, plus the Insurance report, the PDF export and labels to print. It is sold by the month or by the year, at the prices shown on our website and in the app when you upgrade.",
         ],
         "Premium is sold through Polar, which acts as merchant of record: Polar is the seller you pay, handles the payment and tax, and its own terms apply to the purchase.",
       ],
@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "The coin scanner",
+      heading: "The scanner",
       blocks: [
-        "The scanner, a Premium beta, suggests which coin your photos show. Suggestions can be wrong, so they are always shown for you to review and correct before anything is saved.",
+        "The scanner, a Premium beta, suggests which coin or banknote your photos show, and its Grade. Suggestions can be wrong, so they are always shown for you to review and correct before anything is saved.",
       ],
     },
     {

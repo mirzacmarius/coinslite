@@ -181,7 +181,7 @@ export default {
       },
       export: {
         title: "Export PDF et CSV",
-        text: "N’importe quelle vue de votre collection, à imprimer ou à garder, et des étiquettes pour étuis et slabs. Premium.",
+        text: "N’importe quelle vue de votre collection en CSV, à garder, dans toutes les formules. Avec Premium, en PDF à imprimer, et des étiquettes pour étuis et slabs.",
       },
       charts: {
         title: "Graphiques",
@@ -220,7 +220,7 @@ export default {
         "Le catalogue, les ensembles et la liste de souhaits",
         "États, frappe, photos et albums",
         "Totaux, graphiques et cours spot",
-        "Import de tableur",
+        "Import de tableur et export CSV",
       ],
       cta: "Commencer gratuitement",
     },
@@ -232,7 +232,7 @@ export default {
       features: [
         "Objets illimités",
         "Le rapport d’assurance",
-        "Export PDF et CSV",
+        "Export PDF",
         "Étiquettes pour étuis et slabs",
         "Tout ce qu’offre la formule gratuite",
       ],

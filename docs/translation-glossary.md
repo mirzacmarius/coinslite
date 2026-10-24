@@ -13,6 +13,7 @@ How CoinsLite's domain terms ([`GLOSSARY.md`](../GLOSSARY.md)) read in each laun
 | Tag | stikkord | Schlagwort (pl. Schlagwörter) | libellé | tag (pl. taguri) |
 | Grade | kvalitet | Erhaltung | état | stare |
 | Grading scale | kvalitetsskala | Bewertungsskala | échelle de notation | scară de evaluare |
+| Suggested Grade | foreslått kvalitet | vorgeschlagene Erhaltung | état suggéré | stare sugerată |
 | Strike | preging | Prägung | frappe | batere |
 | Catalog | katalog | Katalog | catalogue | catalog |
 | Catalog entry | katalogoppføring | Katalogeintrag | entrée du catalogue | intrare de catalog |
