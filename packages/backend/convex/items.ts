@@ -1,3 +1,4 @@
+import type { HomeCurrency } from "@coinslite/i18n";
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
@@ -17,6 +18,15 @@ import { holdsAny, otherItemsOf } from "./catalog/held";
 import { setErrors, setLimits } from "./catalog/setRules";
 import { setOfEntry, setScope } from "./catalog/sets";
 import { countItemAdded, countItemRetyped } from "./collectionCounts";
+import { storedRates } from "./exchangeRates";
+import {
+  type PaidInput,
+  convertPaid,
+  daysBefore,
+  exchangeRateErrors,
+  isRateDay,
+  samePaid,
+} from "./exchangeRates/rules";
 import { catalogVisibleTo } from "./featureFlags";
 import {
   changingHomeCurrency,
@@ -52,6 +62,7 @@ import {
   checkItem,
   checkSale,
   itemErrors,
+  latestPurchaseDate,
 } from "./items/rules";
 import {
   historyOf,
@@ -71,7 +82,9 @@ import {
   itemType,
   material,
   metal,
+  paidInput,
   provenance,
+  purchasePaid,
   stampCatalogue,
   strike,
 } from "./utils/validators";
@@ -135,9 +148,7 @@ const amountsIn = v.optional(homeCurrency);
 
 export const itemNotFound = "ITEM_NOT_FOUND";
 
-/** The latest allowed purchase date: tomorrow, so "today" anywhere on Earth is accepted. */
-export const latestPurchaseDate = () =>
-  new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+export { latestPurchaseDate };
 
 /** One of the signed-in person's Items; anyone else's is reported as not found. */
 export async function requireOwnItem(
@@ -226,7 +237,7 @@ export async function storeNewItem(
 async function insertItem(
   ctx: MutationCtx,
   ownerId: Id<"users">,
-  fields: ReturnType<typeof checkFields>,
+  fields: ReturnType<typeof checkFields> & Pick<Doc<"items">, "purchasePaid">,
   entry: CatalogEntryLink | null,
   albumId: Id<"albums"> | undefined,
 ) {
@@ -242,15 +253,95 @@ async function insertItem(
 }
 
 /**
+ * The Purchase price a purchase in another currency stores, with the
+ * purchase as paid: the amount converted into the Home currency at the ECB
+ * rates kept for its day (exchangeRates.ts), the ones the form showed, or
+ * refused should they be newer. The day is the purchase date, or without
+ * one the form's today. Paid in the Home currency, the amount is the
+ * Purchase price itself.
+ */
+async function paidPurchase(
+  ctx: QueryCtx,
+  owner: { homeCurrency: HomeCurrency },
+  paid: PaidInput,
+  purchaseDate: string | undefined,
+) {
+  if (paid.currency === owner.homeCurrency)
+    return convertPaid(paid, owner.homeCurrency, null);
+  const latest = latestPurchaseDate();
+  const date = purchaseDate?.trim();
+  if (
+    !isRateDay(paid.day, latest) ||
+    (date ? paid.day !== date : paid.day < daysBefore(latest, 3))
+  )
+    throw new ConvexError(exchangeRateErrors.invalidDay);
+  const kept = await storedRates(ctx, paid.day);
+  if (!kept) throw new ConvexError(exchangeRateErrors.unavailable);
+  return convertPaid(paid, owner.homeCurrency, kept);
+}
+
+/**
+ * The purchase an edit stores. A purchase in another currency the Item holds
+ * already, on the same purchase date, isn't converted again: its Purchase
+ * price stays as it was converted. A Purchase price typed in the Home
+ * currency (`paid` null) drops the Item's. A form that sends none, from
+ * before purchases in other currencies, keeps the Item's while its Purchase
+ * price and purchase date stay as they are, and otherwise drops it.
+ */
+async function editedPurchase(
+  ctx: QueryCtx,
+  item: Doc<"items">,
+  typed: Pick<ItemInput, "purchasePrice" | "purchaseDate">,
+  paid: PaidInput | null | undefined,
+): Promise<Pick<Doc<"items">, "purchasePrice" | "purchasePaid">> {
+  const sameDay =
+    (typed.purchaseDate?.trim() || undefined) === item.purchaseDate;
+  if (paid === null)
+    return { purchasePrice: typed.purchasePrice, purchasePaid: undefined };
+  if (paid === undefined)
+    return {
+      purchasePrice: typed.purchasePrice,
+      purchasePaid:
+        sameDay && typed.purchasePrice === item.purchasePrice
+          ? item.purchasePaid
+          : undefined,
+    };
+  if (sameDay && samePaid(paid, item.purchasePaid))
+    return {
+      purchasePrice: item.purchasePrice,
+      purchasePaid: item.purchasePaid,
+    };
+  return await paidPurchase(
+    ctx,
+    await requireSetUpUser(ctx),
+    paid,
+    typed.purchaseDate,
+  );
+}
+
+/**
  * Adds an Item to the signed-in person's Collection: typed in by hand, or
  * picked from the Catalog (`catalogEntryKey`), when it stays linked to its
  * Catalog entry and keeps only the facts the person changed.
  */
 export const add = mutation({
-  args: { ...itemFields, catalogEntryKey: v.optional(v.string()), amountsIn },
+  args: {
+    ...itemFields,
+    catalogEntryKey: v.optional(v.string()),
+    amountsIn,
+    purchasePaid: v.optional(paidInput),
+  },
   returns: v.id("items"),
-  handler: async (ctx, { albumId, catalogEntryKey, amountsIn, ...fields }) => {
+  handler: async (
+    ctx,
+    { albumId, catalogEntryKey, amountsIn, purchasePaid: paid, ...typed },
+  ) => {
     const owner = await requireSetUpUser(ctx);
+    const purchase =
+      paid && (await paidPurchase(ctx, owner, paid, typed.purchaseDate));
+    const fields = purchase
+      ? { ...typed, purchasePrice: purchase.purchasePrice }
+      : typed;
     if (holdsAmount(fields)) checkAmountsWrite(owner, amountsIn);
     await requireRoomForItems(ctx, owner._id);
     const entry =
@@ -260,7 +351,7 @@ export const add = mutation({
     return await insertItem(
       ctx,
       owner._id,
-      checkFields(fields, entry),
+      { ...checkFields(fields, entry), purchasePaid: purchase?.purchasePaid },
       entry,
       albumId,
     );
@@ -362,13 +453,24 @@ export const update = mutation({
     ...itemFields,
     catalogEntryKey: v.optional(v.string()),
     amountsIn,
+    /** Null when the Purchase price is typed in the Home currency. */
+    purchasePaid: v.optional(v.union(v.null(), paidInput)),
   },
   returns: v.null(),
   handler: async (
     ctx,
-    { itemId, albumId, catalogEntryKey, amountsIn, ...fields },
+    {
+      itemId,
+      albumId,
+      catalogEntryKey,
+      amountsIn,
+      purchasePaid: paid,
+      ...typed
+    },
   ) => {
     const item = await requireOwnItem(ctx, itemId);
+    const purchase = await editedPurchase(ctx, item, typed, paid);
+    const fields = { ...typed, purchasePrice: purchase.purchasePrice };
     const album = await ownAlbumId(ctx, item.ownerId, albumId);
     const linking =
       catalogEntryKey === undefined
@@ -399,6 +501,7 @@ export const update = mutation({
     await ctx.db.patch("items", itemId, {
       ...cleared,
       ...checked,
+      purchasePaid: purchase.purchasePaid,
       albumId: album,
       ...(relinked && {
         catalogEntryId: linking._id,
@@ -527,8 +630,14 @@ const purchase = {
   source: v.optional(v.string()),
 };
 
+/**
+ * A purchase as Set purchase writes it: with a Purchase price, the purchase
+ * in another currency that goes with it, or none.
+ */
+const purchaseSet = { ...purchase, purchasePaid: v.optional(purchasePaid) };
+
 /** An Item Set purchase was set on, with the purchase it had before: what undoing it needs. */
-const purchasedItem = v.object({ itemId: v.id("items"), ...purchase });
+const purchasedItem = v.object({ itemId: v.id("items"), ...purchaseSet });
 
 /** How an undo went: Items put back, and Items skipped as changed since. */
 const undone = v.object({ restored: v.number(), skipped: v.number() });
@@ -722,20 +831,40 @@ export const undoGrade = mutation({
  * Sets a bought lot's purchase on several of the signed-in person's Items:
  * the Purchase price per piece, purchase date and source filled in, checked
  * as the Item form checks them, while a field left empty keeps each Item's
- * own (items/bulkRules.ts). Market value and Quantity stay as they are, so
- * there's no Market value history to record. Every Item is checked before
- * anything is written. Returns the purchase as set and the purchase each
- * Item had, for `undoPurchase`.
+ * own (items/bulkRules.ts). A price paid in another currency
+ * (`purchasePaid`) is converted as the Item form converts it, at the rates
+ * of the purchase date given, or today's. Market value and Quantity stay as
+ * they are, so there's no Market value history to record. Every Item is
+ * checked before anything is written. Returns the purchase as set and the
+ * purchase each Item had, for `undoPurchase`.
  */
 export const setPurchase = mutation({
-  args: { itemIds: v.array(v.id("items")), ...purchase, amountsIn },
+  args: {
+    itemIds: v.array(v.id("items")),
+    ...purchase,
+    amountsIn,
+    purchasePaid: v.optional(paidInput),
+  },
   returns: v.object({
-    set: v.object(purchase),
+    set: v.object(purchaseSet),
     before: v.array(purchasedItem),
   }),
-  handler: async (ctx, { itemIds, amountsIn, ...input }) => {
-    const set = purchasePatch(input, latestPurchaseDate());
+  handler: async (
+    ctx,
+    { itemIds, amountsIn, purchasePaid: paid, ...input },
+  ) => {
     const { owner, items } = await requireOwnItems(ctx, itemIds);
+    const purchase =
+      paid && (await paidPurchase(ctx, owner, paid, input.purchaseDate));
+    const patch = purchasePatch(
+      purchase ? { ...input, purchasePrice: purchase.purchasePrice } : input,
+      latestPurchaseDate(),
+    );
+    // A Purchase price replaces each Item's purchase in another currency.
+    const set =
+      patch.purchasePrice === undefined
+        ? patch
+        : { ...patch, purchasePaid: purchase?.purchasePaid };
     if (set.purchasePrice !== undefined) checkAmountsWrite(owner, amountsIn);
     for (const item of items) await ctx.db.patch("items", item._id, set);
     return {
@@ -743,6 +872,7 @@ export const setPurchase = mutation({
       before: items.map((item) => ({
         itemId: item._id,
         purchasePrice: item.purchasePrice,
+        purchasePaid: item.purchasePaid,
         purchaseDate: item.purchaseDate,
         source: item.source,
       })),
@@ -757,7 +887,7 @@ export const setPurchase = mutation({
  * are (items/bulkRules.ts). The others are skipped and counted.
  */
 export const undoPurchase = mutation({
-  args: { before: v.array(purchasedItem), set: v.object(purchase) },
+  args: { before: v.array(purchasedItem), set: v.object(purchaseSet) },
   returns: undone,
   handler: async (ctx, { before, set }) => {
     const owner = await requireSetUpUser(ctx);

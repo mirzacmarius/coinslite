@@ -1,4 +1,5 @@
 import { ConvexError } from "convex/values";
+import { type PurchasePaid, paidStorable } from "../exchangeRates/rules";
 import { type GradingScale, type ItemType, suitsGrade } from "./grades";
 import { type PurchaseInput, checkPurchase, purchaseFields } from "./rules";
 import { checkTags, withTag, withoutTag } from "./tags";
@@ -129,14 +130,34 @@ export function purchasePatch(input: PurchaseInput, today: string) {
 }
 
 /**
+ * A purchase as Set purchase writes and undoes it: the fields of
+ * `purchaseFields`, with a purchase in another currency going with the
+ * Purchase price (exchangeRates/rules.ts).
+ */
+export type PurchaseState = PurchaseInput & { purchasePaid?: PurchasePaid };
+
+/** Two purchases in another currency alike; none and none are alike. */
+const samePaidRecord = (
+  a: PurchasePaid | undefined,
+  b: PurchasePaid | undefined,
+) =>
+  a === b ||
+  (a !== undefined &&
+    b !== undefined &&
+    a.amount === b.amount &&
+    a.currency === b.currency &&
+    a.rateDay === b.rateDay);
+
+/**
  * Plans undoing a Set purchase: each Item it was set on (`before`, with the
  * purchase it had) gets back its own value, or none, for each field the
- * purchase set (`after`); the fields it left alone aren't touched. One that
- * already had those values wasn't changed by it and is left out. One deleted
- * (missing from `now`) or no longer holding the values set has changed since,
- * and one whose own values the Item form wouldn't store as they are (`today`
- * being the latest purchase date) can't have them back: both are skipped and
- * counted.
+ * purchase set (`after`); the fields it left alone aren't touched. A
+ * Purchase price set goes with its purchase in another currency, or with
+ * none: both come back together. One that already had those values wasn't
+ * changed by it and is left out. One deleted (missing from `now`) or no
+ * longer holding the values set has changed since, and one whose own values
+ * the Item form wouldn't store as they are (`today` being the latest
+ * purchase date) can't have them back: both are skipped and counted.
  */
 export function planPurchaseUndo<ItemId>({
   before,
@@ -144,14 +165,16 @@ export function planPurchaseUndo<ItemId>({
   now,
   today,
 }: {
-  before: ReadonlyArray<{ itemId: ItemId } & PurchaseInput>;
-  after: PurchaseInput;
-  now: ReadonlyMap<ItemId, PurchaseInput>;
+  before: ReadonlyArray<{ itemId: ItemId } & PurchaseState>;
+  after: PurchaseState;
+  now: ReadonlyMap<ItemId, PurchaseState>;
   today: string;
 }) {
   const fields = purchaseFields.filter((field) => after[field] !== undefined);
-  const holdsSet = (item: PurchaseInput) =>
-    fields.every((field) => item[field] === after[field]);
+  const setsPrice = after.purchasePrice !== undefined;
+  const holdsSet = (item: PurchaseState) =>
+    fields.every((field) => item[field] === after[field]) &&
+    (!setsPrice || samePaidRecord(item.purchasePaid, after.purchasePaid));
   const changed = firstOfEach(before).filter((item) => !holdsSet(item));
   const restore = changed
     .map((was) => ({
@@ -160,10 +183,16 @@ export function planPurchaseUndo<ItemId>({
       ...(Object.fromEntries(
         fields.map((field) => [field, was[field]]),
       ) as PurchaseInput),
+      ...(setsPrice && { purchasePaid: was.purchasePaid }),
     }))
-    .filter(({ itemId, ...own }) => {
+    .filter(({ itemId, purchasePaid, ...own }) => {
       const item = now.get(itemId);
-      return item !== undefined && holdsSet(item) && storable(own, today);
+      return (
+        item !== undefined &&
+        holdsSet(item) &&
+        storable(own, today) &&
+        paidStorable(purchasePaid, today)
+      );
     });
   return { restore, skipped: changed.length - restore.length };
 }

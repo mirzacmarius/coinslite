@@ -15,6 +15,7 @@ import { submitForm } from "@/lib/submit-form";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
+import { samePaid } from "@coinslite/backend/convex/exchangeRates/rules";
 import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { photoSides } from "@coinslite/backend/convex/photos/rules";
 import type { ItemType } from "@coinslite/ui/item-type-icon";
@@ -34,9 +35,15 @@ import {
 import {
   type LinkedEntry,
   itemFormRules,
+  atRates,
   itemSave,
   refusedDetails,
 } from "./item-form-submit";
+import {
+  type StoredPurchase,
+  usePaidCheck,
+  usePaidFailure,
+} from "./paid-in-currency";
 
 /** An Item as its page reads it: facts resolved, with the Catalog entry it's linked to. */
 type EditedItem = Doc<"items"> & { catalogEntry?: LinkedEntry | null };
@@ -88,6 +95,8 @@ export function useItemForm({
   const attachPhoto = useAction(api.photos.attach);
   const home = useQuery(api.users.getUser)?.homeCurrency;
   const amounts = useAmountsCurrency(open);
+  const checkPaid = usePaidCheck();
+  const paidFailure = usePaidFailure();
   const titleRef = useRef<HTMLInputElement>(null);
   // Only while open: the Duplicate dialog is mounted with its Item's page,
   // also while the session ends, when these would fail signed out.
@@ -142,20 +151,40 @@ export function useItemForm({
         amountsIn: amounts.amountsIn,
         locale,
       });
+      // A purchase in another currency kept as it is isn't converted again.
+      const paid = save.args.purchasePaid ?? undefined;
+      const keptPaid =
+        paid !== undefined &&
+        item !== undefined &&
+        samePaid(paid, item.purchasePaid) &&
+        (value.purchaseDate.trim() || undefined) === item.purchaseDate;
+      const { problem, rateDay } = keptPaid
+        ? {}
+        : await checkPaid(paid, amounts.amountsIn);
+      if (problem) {
+        setFailed(problem);
+        return;
+      }
       let added: Id<"items"> | undefined;
       try {
-        if (save.mutation === "update") await updateItem(save.args);
-        else added = await addItem(save.args);
+        if (save.mutation === "update")
+          await updateItem(atRates(save.args, rateDay));
+        else added = await addItem(atRates(save.args, rateDay));
       } catch (failure) {
         const code = failure instanceof ConvexError ? failure.data : undefined;
         setFailed(
           isItemLimitError(failure)
             ? itemLimitMessage
-            : code === homeCurrencyErrors.changing
-              ? t("homeCurrency.moneyBusy")
-              : code === homeCurrencyErrors.otherCurrency && home
-                ? t("homeCurrency.changedWhileOpen", { currency: home })
-                : t(item ? "items.errors.saveFailed" : "items.errors.failed"),
+            : (paidFailure(code, amounts.amountsIn) ??
+                (code === homeCurrencyErrors.changing
+                  ? t("homeCurrency.moneyBusy")
+                  : code === homeCurrencyErrors.otherCurrency && home
+                    ? t("homeCurrency.changedWhileOpen", { currency: home })
+                    : t(
+                        item
+                          ? "items.errors.saveFailed"
+                          : "items.errors.failed",
+                      ))),
         );
         return;
       }
@@ -361,6 +390,8 @@ export function useItemForm({
     fromEntry,
     /** The currency amounts are typed in, and why they can't be, if so. */
     amounts,
+    /** The edited Item's purchase as stored, which the Purchase price's hint goes by. */
+    storedPurchase: item satisfies StoredPurchase | undefined,
     /** What went wrong saving, linking or creating an Album, to show. */
     failed,
     setFailed,

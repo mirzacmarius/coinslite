@@ -2,6 +2,7 @@
 
 import type { HomeCurrency } from "@coinslite/i18n";
 import { ConvexError, type Infer, v } from "convex/values";
+import type { PurchasePaid } from "../exchangeRates/rules";
 import {
   type ItemMoneyField,
   itemLimits,
@@ -158,15 +159,20 @@ export const tooLargeForOneGo = (read: {
  * confirmed: every amount on its Items and every Market value in their
  * history, in whole minor units of the new currency. Every Home currency has
  * 100 minor units, so a converted amount rounds to the nearest one in any of
- * them. Items and points without an amount aren't written. `tooLarge` says a
- * converted amount would go past the largest an Item may hold.
+ * them. An Item bought in the new currency (`to`) takes as its Purchase
+ * price what was paid (`purchasePaid`); one bought in a third currency
+ * keeps what was paid, but no longer the day of the ECB rates its Purchase
+ * price was converted at (`purchasePaid` to write). Items and points
+ * without an amount aren't written. `tooLarge` says a converted amount
+ * would go past the largest an Item may hold.
  */
 export function convertBatch<ItemId, PointId>(
   batch: {
-    items: readonly ({ _id: ItemId } & Amounts)[];
+    items: readonly ({ _id: ItemId; purchasePaid?: PurchasePaid } & Amounts)[];
     history: readonly { _id: PointId; marketValue?: number }[];
   },
   rate: number,
+  to: HomeCurrency,
 ) {
   let tooLarge = false;
   const convert = (amount: number) => {
@@ -174,13 +180,30 @@ export function convertBatch<ItemId, PointId>(
     if (converted > itemLimits.amount) tooLarge = true;
     return converted;
   };
-  const items: { _id: ItemId; amounts: Amounts }[] = [];
+  const items: {
+    _id: ItemId;
+    amounts: Amounts;
+    purchasePaid?: PurchasePaid;
+  }[] = [];
   for (const item of batch.items) {
     const fields = amountFields(item);
     if (fields.length === 0) continue;
     const amounts: Amounts = {};
     for (const field of fields) amounts[field] = convert(item[field] as number);
-    items.push({ _id: item._id, amounts });
+    const paid =
+      amounts.purchasePrice === undefined ? undefined : item.purchasePaid;
+    let purchasePaid: PurchasePaid | undefined;
+    if (paid?.currency === to) {
+      amounts.purchasePrice = paid.amount;
+      if (paid.amount > itemLimits.amount) tooLarge = true;
+    } else if (paid?.rateDay !== undefined)
+      // Converted at the change's rate now, not at the ECB's of that day.
+      purchasePaid = { amount: paid.amount, currency: paid.currency };
+    items.push({
+      _id: item._id,
+      amounts,
+      ...(purchasePaid && { purchasePaid }),
+    });
   }
   const history: { _id: PointId; marketValue: number }[] = [];
   for (const point of batch.history) {

@@ -94,6 +94,14 @@ _Avoid_: Base currency, default currency, display currency
 What the user paid for one piece of an Item.
 _Avoid_: Paid, cost, buy price
 
+**Purchase currency**:
+The currency an Item was bought in, when it isn't the Home currency. The Purchase price is converted from it at the ECB rate of the purchase date, and the Item keeps the amount as it was in the Purchase currency.
+_Avoid_: Foreign currency, paid currency, original currency
+
+**ECB rate**:
+The European Central Bank's euro reference rate of a day, which converts a Purchase price from its Purchase currency. On a day the ECB doesn't publish, the last working day's before it.
+_Avoid_: Exchange rate of the day, historical rate
+
 **Market value**:
 The user's own estimate of what one piece of an Item is worth today, for example from sales they have seen. Always entered by the user, never calculated.
 _Avoid_: Estimated value, current value, price

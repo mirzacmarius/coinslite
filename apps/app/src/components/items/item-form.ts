@@ -18,6 +18,7 @@ import type { Material } from "@coinslite/backend/convex/items/rules";
 import type { Metal } from "@coinslite/backend/convex/spotPrices/rates";
 import {
   type CountryCode,
+  type HomeCurrency,
   type Locale,
   formatNumber,
   isCountryCode,
@@ -71,7 +72,13 @@ export type ItemFormValues = {
   serialNumber: string;
   signatures: string;
   printer: string;
+  /** Typed in `purchaseCurrency`, or the Home currency without one. */
   purchasePrice: string;
+  /**
+   * The currency the Purchase price was paid in, when not the Home currency:
+   * it's converted at the ECB rates of the purchase date (paid-in-currency.ts).
+   */
+  purchaseCurrency: HomeCurrency | undefined;
   marketValue: string;
   purchaseDate: string;
   source: string;
@@ -120,6 +127,7 @@ export const blankItem = (): ItemFormValues => ({
   signatures: "",
   printer: "",
   purchasePrice: "",
+  purchaseCurrency: undefined,
   marketValue: "",
   purchaseDate: "",
   source: "",
@@ -294,7 +302,9 @@ export function valuesFromItem(
     serialNumber: item.serialNumber ?? "",
     signatures: item.signatures ?? "",
     printer: item.printer ?? "",
-    purchasePrice: money(item.purchasePrice),
+    // Bought in another currency: as paid, in that currency.
+    purchasePrice: money(item.purchasePaid?.amount ?? item.purchasePrice),
+    purchaseCurrency: item.purchasePaid?.currency,
     marketValue: money(item.marketValue),
     purchaseDate: item.purchaseDate ?? "",
     source: item.source ?? "",

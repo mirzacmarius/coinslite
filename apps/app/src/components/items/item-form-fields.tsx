@@ -4,7 +4,7 @@ import { errorText } from "@/lib/form-errors";
 import { useI18n } from "@/locales/client";
 import { Field } from "@coinslite/ui/field";
 import { Input } from "@coinslite/ui/input";
-import { MoneyInput } from "@coinslite/ui/money-input";
+import { type CurrencyPicker, MoneyInput } from "@coinslite/ui/money-input";
 import { useSelector } from "@tanstack/react-form";
 import type * as React from "react";
 import { createContext, useContext, useId } from "react";
@@ -196,34 +196,46 @@ export function TextField({
   );
 }
 
-/** An amount per piece, in the currency amounts are typed in. */
+/**
+ * An amount per piece, in the currency amounts are typed in, or the one
+ * `currencyPicker` offers to pick, which `hint` then says more about.
+ */
 export function MoneyField({
   name,
   label,
   currency,
   locked,
+  currencyPicker,
+  hint,
+  problem,
 }: {
   name: "purchasePrice" | "marketValue";
   label: string;
   currency: string;
   /** Why amounts can't be typed now (a Home currency change), if so. */
   locked: string | undefined;
+  currencyPicker?: CurrencyPicker;
+  hint?: string;
+  /** Why the amount can't be stored as typed, shown at once (no exchange rate). */
+  problem?: string;
 }) {
   const t = useI18n();
   const { form, baseId, rules, errorOf } = useItemFields();
+  const perPiece = t("items.perPiece");
   return (
     <form.Field name={name} validators={{ onChange: rules.money }}>
       {(field) => (
         <Field
           id={`${baseId}-${name}`}
           label={label}
-          hint={locked ?? t("items.perPiece")}
-          error={errorOf(field.state.meta.errors)}
+          hint={locked ?? (hint ? `${perPiece} · ${hint}` : perPiece)}
+          error={errorOf(field.state.meta.errors) ?? problem}
         >
           {(control) => (
             <MoneyInput
               {...control}
               currency={currency}
+              currencyPicker={currencyPicker}
               disabled={locked !== undefined}
               value={field.state.value}
               onChange={(event) => field.handleChange(event.target.value)}

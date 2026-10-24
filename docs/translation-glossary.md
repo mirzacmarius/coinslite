@@ -23,6 +23,8 @@ How CoinsLite's domain terms ([`GLOSSARY.md`](../GLOSSARY.md)) read in each laun
 | Wantlist | ønskeliste | Wunschliste | liste de souhaits | listă de dorințe |
 | Home currency | hjemmevaluta | Heimatwährung | devise de référence | moneda de bază |
 | Purchase price | innkjøpspris | Kaufpreis | prix d’achat | preț de achiziție |
+| Purchase currency | innkjøpsvaluta | Kaufwährung | devise d’achat | moneda de achiziție |
+| ECB rate | ESB-kurs | EZB-Kurs | cours BCE | cursul BCE |
 | Market value | markedsverdi | Marktwert | valeur de marché | valoare de piață |
 | Spot price | spotpris | Spotpreis | cours spot | preț spot |
 | Metal value | metallverdi | Metallwert | valeur du métal | valoarea metalului |

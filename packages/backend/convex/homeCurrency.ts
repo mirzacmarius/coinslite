@@ -132,8 +132,11 @@ async function writeConverted(
     typeof convertBatch<Id<"items">, Id<"marketValueHistory">>
   >,
 ) {
-  for (const { _id, amounts } of converted.items)
-    await ctx.db.patch("items", _id, amounts);
+  for (const { _id, amounts, purchasePaid } of converted.items)
+    await ctx.db.patch("items", _id, {
+      ...amounts,
+      ...(purchasePaid && { purchasePaid }),
+    });
   for (const { _id, marketValue } of converted.history)
     await ctx.db.patch("marketValueHistory", _id, { marketValue });
 }
@@ -189,6 +192,7 @@ export const change = mutation({
       const converted = convertBatch(
         { items, history },
         await confirmedRate(ctx, from, to, rate),
+        to,
       );
       if (converted.tooLarge)
         throw new ConvexError(homeCurrencyErrors.amountTooLarge);
@@ -310,7 +314,7 @@ export const continueChange = internalMutation({
       return null;
     }
     const batch = await nextBatch(ctx, userId, progress.cursor);
-    const converted = convertBatch(batch, change.rate);
+    const converted = convertBatch(batch, change.rate, change.to);
     if (progress.phase === "converting") await writeConverted(ctx, converted);
     const last = batch.items.at(-1);
     const next = afterBatch(progress, {

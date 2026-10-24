@@ -67,6 +67,21 @@ export default {
     purchasePrice: "Preț de achiziție",
     marketValue: "Valoare de piață",
     perPiece: "pe bucată",
+    paidIn: "Moneda de achiziție",
+    paidLoading: "se obține cursul BCE…",
+    paidRate: "{amount} la cursul BCE din {date}",
+    paidRateOnly: "convertit la cursul BCE din {date}",
+    paidNoRate:
+      "BCE nu are curs de schimb pentru {date}. Introdu prețul în {currency}.",
+    paidTooEarly: "Cursurile BCE încep în 1999. Introdu prețul în {currency}.",
+    paidFailed:
+      "Cursul de schimb nu a putut fi obținut. Salvează ca să încerci din nou sau introdu prețul în {currency}.",
+    paidNone:
+      "Nu există curs de schimb pentru ziua aceea. Introdu prețul în {currency}.",
+    paidRateChanged:
+      "BCE tocmai a publicat cursuri noi. Verifică prețul convertit și salvează din nou.",
+    paidNote: "Cumpărat cu {amount}, la cursul BCE din {date}",
+    paidNoteOnly: "Cumpărat cu {amount}",
     purchaseDate: "Data achiziției",
     source: "Proveniență",
     sourcePlaceholder: "De unde l-ai obținut",
@@ -640,7 +655,7 @@ export default {
     cancel: "Anulează",
     checking: "Se numără sumele de convertit…",
     willConvert:
-      "Toate prețurile de achiziție și valorile de piață din colecția ta vor fi convertite din {from} în {to} la acest curs de schimb.",
+      "Toate prețurile de achiziție și valorile de piață din colecția ta vor fi convertite din {from} în {to} la acest curs de schimb. Un obiect cumpărat în {to} primește înapoi suma plătită.",
     nothingToConvert:
       "Niciunul dintre obiectele tale nu are preț de achiziție sau valoare de piață, deci nu e nimic de convertit.",
     noRate:

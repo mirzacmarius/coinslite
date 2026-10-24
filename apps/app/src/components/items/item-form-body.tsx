@@ -65,8 +65,9 @@ export function ItemFormBody({
           open={itemForm.detailsOpen}
           onOpenChange={editing ? undefined : itemForm.setDetailsOpen}
           linked={itemForm.linked !== undefined}
-          currency={itemForm.amounts.currency ?? ""}
+          currency={itemForm.amounts.currency}
           locked={itemForm.amounts.locked}
+          storedPurchase={itemForm.storedPurchase}
         />
         {itemForm.failed && (
           <p role="alert" className="text-xs text-destructive">

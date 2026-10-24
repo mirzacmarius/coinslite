@@ -38,6 +38,26 @@ const morgan: Doc<"items"> = {
   albumId: "albums-1" as Id<"albums">,
 };
 
+describe("an Item bought in another currency", () => {
+  test("shows its Purchase price as paid, in its Purchase currency", () => {
+    const values = valuesFromItem(
+      {
+        ...morgan,
+        purchasePrice: 140_298,
+        purchasePaid: {
+          amount: 12_000,
+          currency: "EUR",
+          rateDay: "2024-05-10",
+        },
+      },
+      "nb",
+    );
+    expect(values.purchasePrice).toBe("120,00");
+    expect(values.purchaseCurrency).toBe("EUR");
+    expect(valuesFromItem(morgan, "en").purchaseCurrency).toBeUndefined();
+  });
+});
+
 describe("a duplicate (spec 5.5) sends what the original holds", () => {
   test("every field of an Item typed in by hand, in any language", () => {
     for (const locale of ["en", "nb"] as const) {

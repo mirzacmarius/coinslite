@@ -12,6 +12,7 @@ import {
   itemLimits,
   materials,
 } from "@coinslite/backend/convex/items/rules";
+import type { HomeCurrency } from "@coinslite/i18n";
 import {
   Collapsible,
   CollapsibleContent,
@@ -29,6 +30,7 @@ import {
 } from "./item-form-fields";
 import { PreciousMetalSection } from "./item-precious-metal";
 import { PurchaseSection } from "./item-purchase";
+import type { StoredPurchase } from "./paid-in-currency";
 
 /**
  * The Item form's fields beyond the basics, in a group that opens by itself
@@ -43,14 +45,17 @@ export function MoreDetails({
   linked,
   currency,
   locked,
+  storedPurchase,
 }: {
   open: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Whether the form is linked to a Catalog entry, whose facts it shows. */
   linked: boolean;
-  /** The currency amounts are typed in, and why they can't be, if so. */
-  currency: string;
+  /** The Home currency amounts are typed in, and why they can't be, if so. */
+  currency: HomeCurrency | undefined;
   locked: string | undefined;
+  /** The edited Item's purchase as stored. */
+  storedPurchase?: StoredPurchase;
 }) {
   const t = useI18n();
   const isCoin = useItemKind().type === "coin";
@@ -66,7 +71,11 @@ export function MoreDetails({
       {isCoin && <PreciousMetalSection />}
       <GradeGroup />
       <ReferencesGroup />
-      <PurchaseSection currency={currency} locked={locked} />
+      <PurchaseSection
+        currency={currency}
+        locked={locked}
+        stored={storedPurchase}
+      />
     </>
   );
   if (!onOpenChange)

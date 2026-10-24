@@ -58,6 +58,7 @@ export default {
           "Sentry: registrerer feil i appen, og hvor lang tid et utvalg av sidene bruker på å laste, slik at vi kan finne og rette problemer. Med hver rapport mottar den sideadressen (uten spørrestrengen), opplysninger om nettleseren og enheten og din omtrentlige plassering. Den lagrer ikke IP-adressen din, rapportene navngir deg aldri, og dataene lagres i Tyskland.",
           "OpenPanel: teller hvordan appen og dette nettstedet brukes. Ved hver sidevisning mottar den sidetittelen og sideadressen (uten ID-ene til objektene og albumene dine, søkeord eller innloggingskoder), nettstedet som lenket dit, opplysninger om nettleseren og enheten og IP-adressen din. Den utleder din omtrentlige plassering og en besøkende-ID som endres hver dag, og forkaster deretter IP-adressen. Den setter ingen informasjonskapsler og lagrer dataene i Tyskland.",
           "MetalpriceAPI: leverer spotpriser og valutakurser. Forespørslene våre inneholder ingen personopplysninger.",
+          "Den europeiske sentralbanken: leverer valutakursene for tidligere dager når du registrerer et kjøp i en annen valuta. Forespørslene våre inneholder bare dagen og valutaene, ingen personopplysninger.",
         ],
       ],
     },

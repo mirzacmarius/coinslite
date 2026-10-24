@@ -58,6 +58,7 @@ export default {
           "Sentry : enregistre les erreurs de l’application et, pour un échantillon de pages, leur temps de chargement, afin que nous puissions trouver et corriger les problèmes. Avec chaque rapport, il reçoit l’adresse de la page (sans ses paramètres de requête), des informations sur votre navigateur et votre appareil, et votre localisation approximative. Il ne conserve pas votre adresse IP, les rapports ne vous nomment jamais, et les données restent en Allemagne.",
           "OpenPanel : compte la façon dont l’application et ce site sont utilisés. À chaque page vue, il reçoit le titre et l’adresse de la page (sans les identifiants de vos objets et albums, ni les termes de recherche, ni les codes de connexion), le site d’origine, des informations sur votre navigateur et votre appareil, et votre adresse IP. Il en déduit votre localisation approximative et un identifiant de visiteur qui change chaque jour, puis supprime l’adresse IP. Il ne dépose aucun cookie et conserve les données en Allemagne.",
           "MetalpriceAPI : fournit les cours spot et les taux de change. Nos requêtes ne contiennent aucune donnée personnelle.",
+          "Banque centrale européenne : fournit les taux de change des jours passés, quand vous enregistrez un achat dans une autre devise. Nos requêtes ne contiennent que le jour et les devises, aucune donnée personnelle.",
         ],
       ],
     },

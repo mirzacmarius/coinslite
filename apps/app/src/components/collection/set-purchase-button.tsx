@@ -3,6 +3,13 @@
 import { useAmountsCurrency } from "@/components/account/home-currency-change";
 import { FormDialog } from "@/components/form-dialog";
 import { localToday } from "@/components/items/item-fields";
+import { atRates, paidArgs } from "@/components/items/item-form-submit";
+import {
+  usePaidCheck,
+  usePaidFailure,
+  usePaidHint,
+  usePaidPicker,
+} from "@/components/items/paid-in-currency";
 import { formChanged } from "@/lib/discard-changes";
 import { errorText } from "@/lib/form-errors";
 import { submitForm } from "@/lib/submit-form";
@@ -12,7 +19,7 @@ import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { bulkErrors } from "@coinslite/backend/convex/items/bulkRules";
 import { itemErrors, itemLimits } from "@coinslite/backend/convex/items/rules";
-import { parseMoney } from "@coinslite/i18n";
+import { type HomeCurrency, parseMoney } from "@coinslite/i18n";
 import { Button } from "@coinslite/ui/button";
 import {
   DialogClose,
@@ -85,13 +92,17 @@ export function SetPurchaseButton({
 }
 
 type PurchaseValues = {
+  /** Typed in `purchaseCurrency`, or the Home currency without one. */
   purchasePrice: string;
+  /** The currency a lot bought abroad was paid in, when not the Home currency. */
+  purchaseCurrency: HomeCurrency | undefined;
   purchaseDate: string;
   source: string;
 };
 
 const empty: PurchaseValues = {
   purchasePrice: "",
+  purchaseCurrency: undefined,
   purchaseDate: "",
   source: "",
 };
@@ -119,6 +130,8 @@ function SetPurchaseDialog({
   const { amountsIn, currency, locked } = useAmountsCurrency(open);
   const setPurchase = useMutation(api.items.setPurchase);
   const undoPurchase = useMutation(api.items.undoPurchase);
+  const checkPaid = usePaidCheck();
+  const paidFailure = usePaidFailure();
   const [failed, setFailed] = useState<string>();
   const count = itemIds.length;
 
@@ -145,9 +158,15 @@ function SetPurchaseDialog({
     onSubmit: async ({ value }) => {
       setFailed(undefined);
       const purchase = {
-        purchasePrice: value.purchasePrice.trim()
-          ? (parseMoney(value.purchasePrice, locale) ?? undefined)
-          : undefined,
+        // Paid in another currency, the server converts the amount.
+        ...paidArgs(
+          value.purchasePrice.trim()
+            ? (parseMoney(value.purchasePrice, locale) ?? undefined)
+            : undefined,
+          value.purchaseCurrency,
+          amountsIn,
+          value.purchaseDate,
+        ),
         purchaseDate: value.purchaseDate || undefined,
         source: value.source.trim() || undefined,
       };
@@ -155,23 +174,36 @@ function SetPurchaseDialog({
         setFailed(t("collection.purchaseEmpty"));
         return;
       }
+      const { problem, rateDay } = await checkPaid(
+        purchase.purchasePaid,
+        amountsIn,
+      );
+      if (problem) {
+        setFailed(problem);
+        return;
+      }
       let done: FunctionReturnType<typeof api.items.setPurchase>;
       try {
-        done = await setPurchase({ itemIds, ...purchase, amountsIn });
+        done = await setPurchase({
+          itemIds,
+          ...atRates(purchase, rateDay),
+          amountsIn,
+        });
       } catch (failure) {
         const code = failure instanceof ConvexError ? failure.data : undefined;
         setFailed(
-          code === itemErrors.invalidAmount
-            ? t("items.errors.amount")
-            : code === itemErrors.invalidDate
-              ? t("items.errors.date")
-              : code === bulkErrors.emptyPurchase
-                ? t("collection.purchaseEmpty")
-                : code === homeCurrencyErrors.changing
-                  ? t("homeCurrency.moneyBusy")
-                  : code === homeCurrencyErrors.otherCurrency
-                    ? (locked ?? t("collection.purchaseFailed"))
-                    : t("collection.purchaseFailed"),
+          paidFailure(code, amountsIn) ??
+            (code === itemErrors.invalidAmount
+              ? t("items.errors.amount")
+              : code === itemErrors.invalidDate
+                ? t("items.errors.date")
+                : code === bulkErrors.emptyPurchase
+                  ? t("collection.purchaseEmpty")
+                  : code === homeCurrencyErrors.changing
+                    ? t("homeCurrency.moneyBusy")
+                    : code === homeCurrencyErrors.otherCurrency
+                      ? (locked ?? t("collection.purchaseFailed"))
+                      : t("collection.purchaseFailed")),
         );
         return;
       }
@@ -189,6 +221,28 @@ function SetPurchaseDialog({
   const changed = useSelector(form.store, (state) => formChanged(state, empty));
   const errorOf = (errors: unknown[]) =>
     submitted ? errorText(errors) : undefined;
+  const paidIn = useSelector(
+    form.store,
+    (state) => state.values.purchaseCurrency,
+  );
+  const amountText = useSelector(
+    form.store,
+    (state) => state.values.purchasePrice,
+  );
+  const purchaseDate = useSelector(
+    form.store,
+    (state) => state.values.purchaseDate,
+  );
+  const picker = usePaidPicker(currency ?? "EUR", (picked) =>
+    form.setFieldValue("purchaseCurrency", picked),
+  );
+  const paidHint = usePaidHint({
+    amountText,
+    currency: paidIn,
+    home: currency,
+    purchaseDate,
+    locale,
+  });
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} changed={changed}>
@@ -241,13 +295,19 @@ function SetPurchaseDialog({
                   <Field
                     id={`${baseId}-purchasePrice`}
                     label={t("items.purchasePrice")}
-                    hint={locked ?? t("items.perPiece")}
-                    error={errorOf(field.state.meta.errors)}
+                    hint={
+                      locked ??
+                      (paidHint.hint
+                        ? `${t("items.perPiece")} · ${paidHint.hint}`
+                        : t("items.perPiece"))
+                    }
+                    error={errorOf(field.state.meta.errors) ?? paidHint.problem}
                   >
                     {(control) => (
                       <MoneyInput
                         {...control}
-                        currency={currency ?? ""}
+                        currency={paidIn ?? currency ?? ""}
+                        currencyPicker={currency ? picker : undefined}
                         disabled={locked !== undefined}
                         value={field.state.value}
                         onChange={(event) =>

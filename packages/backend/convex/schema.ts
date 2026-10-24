@@ -21,8 +21,10 @@ import {
   metal,
   notesTranslations,
   perDollar,
+  perEuro,
   preciousMetal,
   provenance,
+  purchasePaid,
   shareTarget,
   stampCatalogue,
   strike,
@@ -232,6 +234,14 @@ export default defineSchema({
     printer: v.optional(v.string()),
     quantity: v.number(),
     purchasePrice: v.optional(v.number()),
+    /**
+     * A purchase in another currency (exchangeRates/rules.ts): what was paid
+     * per piece, in minor units of its own currency, and the day whose ECB
+     * rates converted it into the Purchase price. A Home currency change
+     * into it gives the Purchase price back as paid; into a third one, it
+     * converts the Purchase price at its own rate, and the day goes.
+     */
+    purchasePaid: v.optional(purchasePaid),
     marketValue: v.optional(v.number()),
     purchaseDate: v.optional(v.string()),
     source: v.optional(v.string()),
@@ -601,6 +611,20 @@ export default defineSchema({
     day: v.string(),
     quotedAt: v.number(),
     perDollar,
+  }).index("by_day", ["day"]),
+
+  /**
+   * The European Central Bank's euro reference rates of the days purchases
+   * in another currency were asked about (exchangeRates.ts), one per day
+   * asked: on a day the ECB doesn't publish, the last working day's.
+   */
+  exchangeRateDays: defineTable({
+    /** The day asked about, "YYYY-MM-DD". */
+    day: v.string(),
+    /** The day the rates were published for: `day`, or a working day before it. */
+    rateDay: v.string(),
+    perEuro,
+    fetchedAt: v.number(),
   }).index("by_day", ["day"]),
 
   /**

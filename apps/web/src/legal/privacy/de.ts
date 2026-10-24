@@ -58,6 +58,7 @@ export default {
           "Sentry: erfasst Fehler in der App und, für eine Stichprobe von Seiten, wie lange sie zum Laden brauchen, damit wir Probleme finden und beheben können. Mit jedem Bericht erhält es die Seitenadresse (ohne Abfrageparameter), Angaben zu deinem Browser und Gerät sowie deinen ungefähren Standort. Es speichert deine IP-Adresse nicht, die Berichte nennen dich nie, und die Daten liegen in Deutschland.",
           "OpenPanel: zählt, wie die App und diese Website genutzt werden. Bei jedem Seitenaufruf erhält es den Seitentitel und die Seitenadresse (ohne die IDs deiner Objekte und Alben, Suchbegriffe oder Anmeldecodes), die verweisende Website, Angaben zu deinem Browser und Gerät sowie deine IP-Adresse. Es ermittelt daraus deinen ungefähren Standort und eine Besucherkennung, die sich täglich ändert, und verwirft dann die IP-Adresse. Es setzt keine Cookies und speichert die Daten in Deutschland.",
           "MetalpriceAPI: liefert Spotpreise und Wechselkurse. Unsere Anfragen enthalten keine personenbezogenen Daten.",
+          "Europäische Zentralbank: liefert die Wechselkurse vergangener Tage, wenn du einen Kauf in einer anderen Währung erfasst. Unsere Anfragen enthalten nur den Tag und die Währungen, keine personenbezogenen Daten.",
         ],
       ],
     },
