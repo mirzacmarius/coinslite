@@ -28,11 +28,11 @@ import {
 import { CollectionSearch } from "./collection-search";
 import { useCollectionUrl } from "./collection-url";
 import { DisplayMenu } from "./display-menu";
-import { ExportMenu } from "./export-menu";
 import { FilterButton, FilterChips } from "./filter-menu";
 import { type FilterDimension, useFilters } from "./filter-options";
 import { ImportDialog } from "./import-dialog";
 import { MoveToAlbumBar } from "./move-to-album-bar";
+import { PrintMenu } from "./print-menu";
 import { StartCard } from "./start-card";
 import { useCollectionDisplay } from "./use-collection-display";
 import { useItemSelection } from "./use-item-selection";
@@ -195,8 +195,7 @@ export function CollectionBrowser() {
             sort={view.sort ?? defaultSort}
             onSortChange={(sort) => update({ sort })}
           />
-          <ExportMenu
-            onImport={() => setImporting(true)}
+          <PrintMenu
             view={view}
             count={result.total}
             pieces={totalPieces(result.viewTotals)}

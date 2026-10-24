@@ -385,6 +385,14 @@ export default {
       languageNotSaved:
         "Kunne ikke lagre språket på kontoen din, så det er bare endret på denne enheten.",
     },
+    data: {
+      title: "Eksport og import",
+      importHint:
+        "Hent en eksisterende samling inn i CoinsLite fra en CSV-fil, for eksempel et Excel-ark lagret som CSV eller en liste fra Numista, OpenNumismat eller CoinManage.",
+      export: "Eksporter samlingen",
+      exportHint:
+        "Ta sikkerhetskopi av hele samlingen, også solgte objekter, i en CSV-fil som Excel og andre regneark åpner.",
+    },
     email: {
       title: "E-post",
       change: "Endre e-post",
@@ -1435,19 +1443,18 @@ export default {
     },
   },
   collectionExport: {
-    menu: "Eksport og import",
+    print: "Skriv ut",
     "inView#zero": "Ingen objekter i denne visningen",
     "inView#one": "1 objekt i denne visningen",
     "inView#few": "{count} objekter i denne visningen",
     "inView#other": "{count} objekter i denne visningen",
     csv: "Eksporter som CSV",
-    pdf: "Eksporter som PDF",
+    pdf: "Liste som PDF",
     pdfTooLarge:
       "En PDF viser opptil {limit} objekter. Snevre inn visningen for å eksportere den.",
     tooLarge:
       "Samlingen din er for stor til å eksporteres på én gang, så den eksporteres ikke i stedet for å mangle objekter.",
-    premiumOnly:
-      "Eksport til PDF og utskrift av etiketter er en del av Premium.",
+    premiumOnly: "Utskrift av lister og etiketter er en del av Premium.",
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",
   },

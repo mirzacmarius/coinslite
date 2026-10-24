@@ -41,6 +41,7 @@ import { ChevronRight, Globe, Loader2, Trash2 } from "lucide-react";
 import { type ReactNode, useId, useMemo, useState } from "react";
 import { z } from "zod";
 import { DeleteAccountDialog } from "./delete-account-dialog";
+import { ExportImportSection } from "./export-import-section";
 import { HomeCurrencySetting } from "./home-currency-setting";
 import { LanguagePicker } from "./language-picker";
 import { SendFeedback } from "./send-feedback";
@@ -48,7 +49,10 @@ import { SendFeedback } from "./send-feedback";
 type Account = NonNullable<ReturnType<typeof useAccount>>;
 const useAccount = () => useQuery(api.account.get);
 
-/** Account: who you are and your plan, contact details, preferences, email, and leaving. */
+/**
+ * Account: who you are and your plan, contact details, preferences, export
+ * and import, email, and leaving.
+ */
 export function AccountPage() {
   const t = useI18n();
   const account = useAccount();
@@ -86,6 +90,7 @@ export function AccountPage() {
       </div>
       <ContactSection account={account} />
       <PreferencesSection account={account} />
+      <ExportImportSection />
       <EmailSection account={account} />
       <FeedbackSection />
       <LeaveSection />

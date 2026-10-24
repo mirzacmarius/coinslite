@@ -1,11 +1,12 @@
 /**
- * Limits of the Collection exports, shared with the app's Export menu. Pure.
+ * Limits of the Collection exports, shared with the app's Print menu and
+ * Account's export. Pure.
  */
 
 /**
  * How many Items one Collection PDF lists: some hundred pages, as many as a
  * printout is any use at. A larger view is turned away, to be narrowed with
- * filters (the CSV covers any view).
+ * filters (the CSV covers the whole Collection).
  */
 export const collectionPdfLimits = { items: 5_000 } as const;
 
