@@ -1594,6 +1594,57 @@ export default {
       ALBUM_NOT_FOUND: "Et av de valgte albumene finnes ikke lenger.",
     },
   },
+  share: {
+    share: "Del",
+    title: "Del {name}",
+    close: "Lukk",
+    albumShows:
+      "Alle med lenken ser albumets navn og beskrivelse og objektene du fortsatt har: tittel, år, land, pålydende, serie, materiale, kvalitet, antall og bilde. Vises aldri: priser, oppbevaringssted, notater, sertifikat- og serienumre.",
+    setShows:
+      "Alle med lenken ser settets katalogoppføringer, hvilke du har og hvor komplett det er. Ingenting annet om samlingen din.",
+    notShared:
+      "Ikke delt enda. Deling lager en lenke som virker til du slutter å dele.",
+    start: "Lag lenke",
+    link: "Lenke",
+    copy: "Kopier",
+    copied: "Lenken er kopiert",
+    copyFailed: "Kunne ikke kopiere. Merk lenken og kopier den selv.",
+    open: "Åpne den delte siden",
+    showValues: "Vis markedsverdier",
+    showValuesHint:
+      "Legger til hvert objekts markedsverdi og summen av dem, i {currency}.",
+    stop: "Slutt å dele",
+    stopTitle: "Slutte å dele {name}?",
+    stopDescription:
+      "Lenken slutter å virke med en gang. Deler du igjen, får du en ny lenke.",
+    stopped: "Delingen er avsluttet",
+    cancel: "Avbryt",
+    failed: "Kunne ikke dele. Prøv igjen.",
+    errors: {
+      ALBUM_NOT_FOUND: "Dette albumet finnes ikke lenger.",
+      NOT_SHAREABLE: "Dette kan ikke deles.",
+      SHARE_NOT_FOUND: "Denne delingen finnes ikke lenger.",
+    },
+  },
+  shared: {
+    album: "Delt album",
+    set: "Delt sett",
+    by: "Delt av {name}",
+    "items#one": "1 objekt",
+    "items#few": "{count} objekter",
+    "items#other": "{count} objekter",
+    marketValue: "Markedsverdi",
+    noItems: "Dette albumet har ingen objekter enda.",
+    completion: "{held} av {total}",
+    held: "{count} i samlingen",
+    goneTitle: "Denne siden deles ikke lenger",
+    goneDescription:
+      "Den som delte den, har sluttet å dele, eller lenken er ufullstendig.",
+    ctaTitle: "Hold orden på din egen samling med CoinsLite",
+    ctaDescription:
+      "Mynter, sedler og frimerker, med bilder, verdier, album og sett. Gratis å begynne med.",
+    ctaAction: "Les mer",
+  },
   sets: {
     title: "Sett",
     viewAsSet: "Vis som sett",

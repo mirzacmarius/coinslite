@@ -56,6 +56,7 @@ export default {
       heading: "Conținutul tău",
       blocks: [
         "Ce introduci și fotografiile pe care le adaugi rămân ale tale. Ne permiți să le stocăm, să le prelucrăm și să ți le afișăm doar în măsura în care e nevoie pentru funcționarea CoinsLite, de exemplu pentru a-ți calcula totalurile, a genera rapoartele pe care le ceri și, când folosești scanerul, a-ți analiza fotografiile. Nu îți publicăm conținutul și nu îl folosim în niciun alt scop.",
+        "Dacă partajezi un album sau un set printr-un link, alegi să arăți acea parte a colecției tale oricui are linkul, așa cum descrie politica de confidențialitate, și ești responsabil pentru ce partajezi și cui dai linkul. Poți opri partajarea oricând.",
       ],
     },
     {

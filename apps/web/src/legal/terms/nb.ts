@@ -56,6 +56,7 @@ export default {
       heading: "Innholdet ditt",
       blocks: [
         "Det du legger inn og bildene du legger til, er fortsatt ditt. Du gir oss lov til å lagre, behandle og vise det til deg bare i den grad det trengs for å drive CoinsLite, for eksempel for å regne ut summene dine, lage rapportene du ber om og, når du bruker skanneren, få bildene dine analysert. Vi publiserer ikke innholdet ditt og bruker det ikke til noe annet.",
+        "Deler du et album eller et sett med en lenke, velger du å vise den delen av samlingen din til alle som har lenken, slik personvernerklæringen beskriver, og du er ansvarlig for hva du deler og hvem du gir lenken til. Du kan slutte å dele når som helst.",
       ],
     },
     {

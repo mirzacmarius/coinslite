@@ -30,6 +30,10 @@ _Avoid_: Portfolio, inventory, "my collection" for a named subset
 A named, user-created group of Items within a Collection. An Item belongs to at most one Album.
 _Avoid_: Collection (for a named group), folder, set, list
 
+**Share link**:
+A read-only web address for one Album or Set, made by its owner, that shows a chosen part of it to whoever has the link, signed in or not. Stopping the share makes the link stop working.
+_Avoid_: Public page, publishing, link sharing (for the link itself)
+
 **Kept in**:
 Where an Item's pieces physically are, as the collector describes it ("Safe deposit box 2, tray 3"). Free text on each Item; the Collection filters and searches by it.
 _Avoid_: Location, storage, home

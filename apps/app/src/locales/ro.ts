@@ -1608,6 +1608,57 @@ export default {
       ALBUM_NOT_FOUND: "Unul dintre albumele alese nu mai există.",
     },
   },
+  share: {
+    share: "Partajează",
+    title: "Partajează {name}",
+    close: "Închide",
+    albumShows:
+      "Oricine are linkul vede numele și descrierea acestui album și obiectele pe care le mai ai: titlu, an, țară, valoare nominală, serie, material, stare, cantitate și fotografie. Nu se arată niciodată: prețuri, locuri de păstrare, note, numere de certificat și de serie.",
+    setShows:
+      "Oricine are linkul vede intrările de catalog ale acestui set, pe care le deții și cât de complet este. Nimic altceva din colecția ta.",
+    notShared:
+      "Nepartajat încă. Partajarea creează un link care funcționează până când oprești partajarea.",
+    start: "Creează linkul",
+    link: "Linkul paginii",
+    copy: "Copiază",
+    copied: "Link copiat",
+    copyFailed: "Nu s-a putut copia. Selectează linkul și copiază-l singur.",
+    open: "Deschide pagina partajată",
+    showValues: "Arată valorile de piață",
+    showValuesHint:
+      "Adaugă valoarea de piață a fiecărui obiect și totalul lor, în {currency}.",
+    stop: "Oprește partajarea",
+    stopTitle: "Oprești partajarea pentru {name}?",
+    stopDescription:
+      "Linkul nu mai funcționează imediat. Dacă partajezi din nou, primești un link nou.",
+    stopped: "Partajarea a fost oprită",
+    cancel: "Anulează",
+    failed: "Nu s-a putut partaja. Încearcă din nou.",
+    errors: {
+      ALBUM_NOT_FOUND: "Acest album nu mai există.",
+      NOT_SHAREABLE: "Acesta nu poate fi partajat.",
+      SHARE_NOT_FOUND: "Această partajare nu mai există.",
+    },
+  },
+  shared: {
+    album: "Album partajat",
+    set: "Set partajat",
+    by: "Partajat de {name}",
+    "items#one": "1 obiect",
+    "items#few": "{count} obiecte",
+    "items#other": "{count} de obiecte",
+    marketValue: "Valoare de piață",
+    noItems: "Acest album nu are încă obiecte.",
+    completion: "{held} din {total}",
+    held: "{count} în colecție",
+    goneTitle: "Această pagină nu mai este partajată",
+    goneDescription:
+      "Persoana care a partajat-o a oprit partajarea sau linkul este incomplet.",
+    ctaTitle: "Ține-ți propria colecție cu CoinsLite",
+    ctaDescription:
+      "Monede, bancnote și timbre, cu fotografii, valori, albume și seturi. Gratuit la început.",
+    ctaAction: "Află mai multe",
+  },
   sets: {
     title: "Set",
     viewAsSet: "Vezi ca set",

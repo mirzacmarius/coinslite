@@ -70,8 +70,9 @@ export const renew = internalMutation({
 
 /**
  * A link to one of `ownerId`'s photos. Only call it for the owner's own
- * photo, from a query that checked who's asking. Null before any photo was
- * saved on this deployment.
+ * photo, from a query that checked who's asking, or for a thumbnail a share
+ * link shows (shares.ts) once its token checked out. Null before any photo
+ * was saved on this deployment.
  */
 export async function photoLink(
   ctx: QueryCtx,

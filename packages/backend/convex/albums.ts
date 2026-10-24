@@ -24,6 +24,7 @@ import { deleteItem } from "./items/deletion";
 import { resolveItems } from "./items/resolve";
 import { itemWithThumbnail, withThumbnail } from "./items/thumbnail";
 import schema from "./schema";
+import { deleteShareOf } from "./shares";
 import { requireSetUpUser } from "./utils/auth";
 import { capped } from "./utils/pagination";
 import { albumColour } from "./utils/validators";
@@ -175,6 +176,7 @@ export const remove = mutation({
       await deleteItem(ctx, item);
     }
     await ctx.db.delete(albumId);
+    await deleteShareOf(ctx, album.ownerId, albumId);
     await countAlbumDeleted(ctx, album);
     await deleteTickedThenRelease(ctx, {
       ownerId: album.ownerId,

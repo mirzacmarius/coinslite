@@ -1,5 +1,6 @@
 "use client";
 
+import { ShareButton } from "@/components/shares/share-dialog";
 import {
   WantToggle,
   WantedMark,
@@ -253,7 +254,15 @@ function SetView({
       <CatalogHeader
         crumbs={crumbs}
         title={t("sets.title")}
-        actions={actions}
+        actions={
+          <>
+            <ShareButton
+              target={{ kind: "set", ...scope }}
+              name={nodeTitle(set)}
+            />
+            {actions}
+          </>
+        }
       />
       <div className="flex min-h-10 flex-wrap items-center gap-x-4 gap-y-1.5 border-b px-4 py-1.5">
         <Completion held={set.held} total={set.total} percent={set.percent} />

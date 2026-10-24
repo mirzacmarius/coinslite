@@ -66,7 +66,7 @@ const setNode = {
   ancestors: v.array(ancestor),
 };
 
-const setView = v.object({
+export const setView = v.object({
   ...setNode,
   /** How many entries the Set has. */
   total: v.number(),
@@ -281,31 +281,45 @@ export const get = query({
   handler: async (ctx, { key, ...scope }) => {
     const user = await browsingUser(ctx);
     if (!user) return null;
-    const node = await nodeByKey(ctx, key);
-    if (!node || node.kind === "entry") return null;
-    const groups = await setEntries(ctx, node, scope);
-    if (!groups) return null;
-    const about = {
-      key: node.key,
-      title: node.title,
-      ...(isCountryNode(node) &&
-        node.country !== undefined && { country: node.country }),
-      countryNode: isCountryNode(node),
-      ancestors: await ancestorsOf(ctx, node),
-    };
-    if (groups === "tooLarge") return { ...about, tooLarge: true as const };
-    const rows = await withHeld(ctx, user._id, groups);
-    const entries = rows.flatMap((group) => group.entries);
-    return {
-      ...about,
-      ...completion(
-        entries.filter((entry) => entry.held > 0).length,
-        entries.length,
-      ),
-      groups: rows,
-    };
+    return await setViewOf(ctx, user._id, key, scope);
   },
 });
+
+/**
+ * The Set view as `get` gives it, for one person's holdings: theirs on the
+ * Set page, the owner's on a shared page (shares.ts), where the token has
+ * stood for the sign-in. Checks nothing about who's asking.
+ */
+export async function setViewOf(
+  ctx: QueryCtx,
+  ownerId: Id<"users">,
+  key: string,
+  scope: { denomination?: string | null; series?: string | null },
+) {
+  const node = await nodeByKey(ctx, key);
+  if (!node || node.kind === "entry") return null;
+  const groups = await setEntries(ctx, node, scope);
+  if (!groups) return null;
+  const about = {
+    key: node.key,
+    title: node.title,
+    ...(isCountryNode(node) &&
+      node.country !== undefined && { country: node.country }),
+    countryNode: isCountryNode(node),
+    ancestors: await ancestorsOf(ctx, node),
+  };
+  if (groups === "tooLarge") return { ...about, tooLarge: true as const };
+  const rows = await withHeld(ctx, ownerId, groups);
+  const entries = rows.flatMap((group) => group.entries);
+  return {
+    ...about,
+    ...completion(
+      entries.filter((entry) => entry.held > 0).length,
+      entries.length,
+    ),
+    groups: rows,
+  };
+}
 
 /**
  * How many pieces of each of these Catalog entries the person holds, for

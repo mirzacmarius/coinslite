@@ -1651,6 +1651,58 @@ export default {
       ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
     },
   },
+  share: {
+    share: "Teilen",
+    title: "{name} teilen",
+    close: "Schließen",
+    albumShows:
+      "Wer den Link hat, sieht Name und Beschreibung dieses Albums und die Objekte, die du noch besitzt: Titel, Jahr, Land, Nennwert, Serie, Material, Erhaltung, Anzahl und Foto. Nie gezeigt: Preise, Aufbewahrungsorte, Notizen, Zertifikat- und Seriennummern.",
+    setShows:
+      "Wer den Link hat, sieht die Katalogeinträge dieses Sets, welche du besitzt und wie vollständig es ist. Sonst nichts aus deiner Sammlung.",
+    notShared:
+      "Noch nicht geteilt. Teilen erzeugt einen Link, der gilt, bis du das Teilen beendest.",
+    start: "Link erstellen",
+    link: "Link",
+    copy: "Kopieren",
+    copied: "Link kopiert",
+    copyFailed:
+      "Kopieren nicht möglich. Markiere den Link und kopiere ihn selbst.",
+    open: "Geteilte Seite öffnen",
+    showValues: "Marktwerte anzeigen",
+    showValuesHint:
+      "Zeigt zu jedem Objekt den Marktwert und die Summe, in {currency}.",
+    stop: "Teilen beenden",
+    stopTitle: "Teilen von {name} beenden?",
+    stopDescription:
+      "Der Link funktioniert sofort nicht mehr. Erneutes Teilen erzeugt einen neuen Link.",
+    stopped: "Teilen beendet",
+    cancel: "Abbrechen",
+    failed: "Teilen nicht möglich. Versuch es noch einmal.",
+    errors: {
+      ALBUM_NOT_FOUND: "Dieses Album gibt es nicht mehr.",
+      NOT_SHAREABLE: "Das lässt sich nicht teilen.",
+      SHARE_NOT_FOUND: "Diese Freigabe gibt es nicht mehr.",
+    },
+  },
+  shared: {
+    album: "Geteiltes Album",
+    set: "Geteiltes Set",
+    by: "Geteilt von {name}",
+    "items#one": "1 Objekt",
+    "items#few": "{count} Objekte",
+    "items#other": "{count} Objekte",
+    marketValue: "Marktwert",
+    noItems: "Dieses Album hat noch keine Objekte.",
+    completion: "{held} von {total}",
+    held: "{count} vorhanden",
+    goneTitle: "Diese Seite wird nicht mehr geteilt",
+    goneDescription:
+      "Wer sie geteilt hat, hat das Teilen beendet, oder der Link ist unvollständig.",
+    ctaTitle: "Führe deine eigene Sammlung mit CoinsLite",
+    ctaDescription:
+      "Münzen, Banknoten und Briefmarken, mit Fotos, Werten, Alben und Sets. Der Einstieg ist gratis.",
+    ctaAction: "Mehr erfahren",
+  },
   sets: {
     title: "Set",
     viewAsSet: "Als Set anzeigen",

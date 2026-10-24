@@ -56,6 +56,7 @@ export default {
       heading: "Deine Inhalte",
       blocks: [
         "Was du einträgst und die Fotos, die du hinzufügst, bleiben deine. Du erlaubst uns, sie zu speichern, zu verarbeiten und dir anzuzeigen, nur soweit es für den Betrieb von CoinsLite nötig ist, etwa um deine Summen zu berechnen, die Berichte zu erstellen, die du anforderst, und, wenn du den Scanner nutzt, deine Fotos analysieren zu lassen. Wir veröffentlichen deine Inhalte nicht und nutzen sie für nichts anderes.",
+        "Teilst du ein Album oder ein Set per Link, entscheidest du dich, diesen Teil deiner Sammlung allen zu zeigen, die den Link haben, wie die Datenschutzerklärung es beschreibt, und du bist dafür verantwortlich, was du teilst und wem du den Link gibst. Du kannst das Teilen jederzeit beenden.",
       ],
     },
     {
