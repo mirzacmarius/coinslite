@@ -25,7 +25,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Password reset:** request a link by email, then set a new password.
 - **Change email:** a confirmation link goes to the new address. The change applies once it's confirmed.
 - **Sign out.**
-- **Delete account:** from Account, beside Manage subscription, with an explicit confirmation. A subscription that would renew must be cancelled first.
+- **Delete account:** from Account: on Premium inside Manage subscription, after the way to change or cancel the plan; on the Free plan beside Sign out. A subscription that would renew must be cancelled first: until then the button is greyed out and pressing it says so. The confirmation states what goes, and its button stays off until the person types a word (DELETE, in their language).
   - Asking deactivates the account at once and emails the owner. A deactivated account can only be reactivated, deleted now, or signed out of; everything else is closed to it. Deleting it now needs a sign-in in the last 15 minutes, so a session left open elsewhere can't.
   - 14 days later a last email asks the owner to delete it now, or to reactivate it (and choose a plan again).
   - Without either, it stays deactivated for 7 more days and is then deleted without further warning.
@@ -354,7 +354,7 @@ Where the Collection stands, in this order: the totals and the charts, then Late
 - **Billing:** through Polar, which picks the currency from the buyer's location and falls back to EUR. Sandbox until launch.
 - **Checkout** returns to a confirmation page. Premium activates when the payment provider confirms the subscription.
 - **Premium is active** while the subscription is active, trialing or past due and its period hasn't ended. A cancelled subscription stays Premium until the end of the paid period.
-- **Manage subscription:** from Account, opening the provider's portal. Shows the plan (monthly/yearly) and the renewal or end date.
+- **Manage subscription:** from Account, folded until opened: then the way to change or cancel the plan in the provider's portal, and Delete account (§2). Shows the plan (monthly/yearly) and the renewal or end date.
 - **No ads anywhere.**
 
 ## 12. Account
@@ -365,13 +365,13 @@ Where the Collection stands, in this order: the totals and the charts, then Late
   - Home currency (§4)
   - language
   - change email, folded like Contact and address to the current email (and a confirmation link waiting, if one is) until opened
-  - manage subscription, or upgrade
+  - manage subscription (change or cancel the plan, and Delete account), or upgrade
   - Albums
   - Updates, marked when there's an unseen release
   - Insurance report, locked with an upgrade path on the Free plan
 - **Export and import:** import Items from a CSV file (§7), such as an Excel sheet saved as CSV or a list from Numista, OpenNumismat or CoinManage, and export the whole Collection, sold Items included, as a CSV file that Excel and other spreadsheets open (§7).
 - **Send feedback:** a free-text message that reaches the team by email.
-- **Sign out.** Delete account sits with the plan, beside Manage subscription (§2).
+- **Sign out**, with Delete account beside it on the Free plan; on Premium, Delete account is inside Manage subscription (§2).
 
 ## 13. Updates
 

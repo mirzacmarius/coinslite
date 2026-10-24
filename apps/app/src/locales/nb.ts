@@ -411,6 +411,7 @@ export default {
     },
     danger: {
       title: "Logg ut",
+      titleWithDelete: "Logg ut eller slett",
       signOut: "Logg ut",
       delete: "Slett kontoen",
     },
@@ -1079,11 +1080,11 @@ export default {
     seePlan: "Se planen din",
     backToPlans: "Tilbake til abonnement",
     manage: "Administrer abonnementet",
+    changeOrCancel: "Endre plan eller si opp",
     manageHint:
       "Hos Polar kan du bytte mellom månedlig og årlig, oppdatere kortet eller si opp. Sier du opp, varer Premium ut perioden du har betalt for.",
     portalUnavailable:
       "Abonnementet kan ikke administreres her: betaling er ikke satt opp i dette miljøet.",
-    portalUnavailableShort: "Betaling er ikke satt opp her",
     portalFailed: "Kunne ikke åpne abonnementssiden. Prøv igjen.",
     noSubscription: "Du har ikke noe Premium-abonnement å administrere.",
     renewsOn: "Fornyes {date}",
@@ -1106,7 +1107,9 @@ export default {
     description:
       "Kontoen din deaktiveres nå og slettes for godt om 21 dager, med alt i samlingen din. Vi sender deg en e-post nå og igjen etter 14 dager. Fram til da kan du logge inn og aktivere den igjen.",
     subscriptionActive:
-      "Premium-abonnementet ditt fornyes fortsatt. Si det opp under Administrer abonnement først, og slett deretter kontoen.",
+      "Premium-abonnementet ditt fornyes fortsatt. Si det opp under Administrer abonnementet først, og slett deretter kontoen.",
+    typeToConfirm: "Skriv {word} for å bekrefte",
+    word: "SLETT",
     items: "Objekter",
     photos: "Bilder",
     albums: "Album",

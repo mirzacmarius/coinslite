@@ -413,6 +413,7 @@ export default {
     },
     danger: {
       title: "Deconectare",
+      titleWithDelete: "Deconectare sau ștergere",
       signOut: "Deconectează-te",
       delete: "Șterge contul",
     },
@@ -1085,11 +1086,11 @@ export default {
     seePlan: "Vezi planul",
     backToPlans: "Înapoi la planuri",
     manage: "Gestionează abonamentul",
+    changeOrCancel: "Schimbă planul sau anulează",
     manageHint:
       "Pe Polar poți trece de la lunar la anual, îți poți actualiza cardul sau poți anula. Dacă anulezi, Premium rămâne activ până la sfârșitul perioadei plătite.",
     portalUnavailable:
       "Abonamentul nu poate fi gestionat aici: facturarea nu este configurată în acest mediu.",
-    portalUnavailableShort: "Facturarea nu e configurată aici",
     portalFailed:
       "Pagina abonamentului nu s-a putut deschide. Încearcă din nou.",
     noSubscription: "Nu ai niciun abonament Premium de gestionat.",
@@ -1115,6 +1116,8 @@ export default {
       "Contul tău este dezactivat acum și șters definitiv peste 21 de zile, cu tot ce e în colecția ta. Îți scriem acum și din nou după 14 zile. Până atunci te poți conecta ca să-l reactivezi.",
     subscriptionActive:
       "Abonamentul tău Premium încă se reînnoiește. Anulează-l mai întâi din Gestionează abonamentul, apoi șterge contul.",
+    typeToConfirm: "Scrie {word} pentru confirmare",
+    word: "ȘTERGE",
     items: "Obiecte",
     photos: "Fotografii",
     albums: "Albume",

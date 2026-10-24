@@ -405,6 +405,7 @@ export default {
     },
     danger: {
       title: "Sign out",
+      titleWithDelete: "Sign out or delete",
       signOut: "Sign out",
       delete: "Delete account",
     },
@@ -1065,11 +1066,11 @@ export default {
     seePlan: "See your plan",
     backToPlans: "Back to Plans",
     manage: "Manage subscription",
+    changeOrCancel: "Change plan or cancel",
     manageHint:
       "On Polar you can switch between monthly and yearly, update your card or cancel. If you cancel, Premium stays until the end of the period you've paid for.",
     portalUnavailable:
       "The subscription can't be managed here: billing isn't set up on this deployment.",
-    portalUnavailableShort: "Billing isn't set up here",
     portalFailed: "Couldn't open the subscription page. Try again.",
     noSubscription: "There's no Premium subscription to manage.",
     renewsOn: "Renews on {date}",
@@ -1093,6 +1094,8 @@ export default {
       "Your account is deactivated now and deleted for good in 21 days, with everything in your Collection. We'll email you now and again after 14 days. Until then you can sign in and reactivate it.",
     subscriptionActive:
       "Your Premium subscription still renews. Cancel it under Manage subscription first, then delete your account.",
+    typeToConfirm: "Type {word} to confirm",
+    word: "DELETE",
     items: "Items",
     photos: "Photos",
     albums: "Albums",

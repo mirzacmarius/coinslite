@@ -418,6 +418,7 @@ export default {
     },
     danger: {
       title: "Se déconnecter",
+      titleWithDelete: "Se déconnecter ou supprimer",
       signOut: "Se déconnecter",
       delete: "Supprimer le compte",
     },
@@ -1096,11 +1097,11 @@ export default {
     seePlan: "Voir votre formule",
     backToPlans: "Retour aux formules",
     manage: "Gérer l’abonnement",
+    changeOrCancel: "Changer de formule ou résilier",
     manageHint:
       "Sur Polar, vous pouvez passer du mensuel à l’annuel, mettre à jour votre carte ou résilier. Après une résiliation, Premium reste actif jusqu’à la fin de la période payée.",
     portalUnavailable:
       "L’abonnement ne peut pas être géré ici\u00a0: la facturation n’est pas configurée sur cet environnement.",
-    portalUnavailableShort: "Facturation non configurée ici",
     portalFailed: "Impossible d’ouvrir la page d’abonnement. Réessayez.",
     noSubscription: "Aucun abonnement Premium à gérer.",
     renewsOn: "Renouvellement le {date}",
@@ -1125,6 +1126,8 @@ export default {
       "Votre compte est désactivé dès maintenant et supprimé définitivement dans 21 jours, avec toute votre collection. Nous vous écrivons maintenant, puis de nouveau après 14 jours. D’ici là, vous pouvez vous connecter et le réactiver.",
     subscriptionActive:
       "Votre abonnement Premium se renouvelle encore. Résiliez-le d’abord dans Gérer l’abonnement, puis supprimez votre compte.",
+    typeToConfirm: "Saisissez {word} pour confirmer",
+    word: "SUPPRIMER",
     items: "Objets",
     photos: "Photos",
     albums: "Albums",

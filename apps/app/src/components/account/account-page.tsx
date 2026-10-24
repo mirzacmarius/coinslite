@@ -1,8 +1,9 @@
 "use client";
 
 import {
-  PlanLink,
+  ManageSubscription,
   SubscriptionSummary,
+  UpgradeLink,
 } from "@/components/billing/account-plan";
 import { InsuranceReportLink } from "@/components/insurance-report/insurance-report-link";
 import { AppearancePicker, PalettePicker } from "@/components/preferences";
@@ -37,10 +38,10 @@ import { toast } from "@coinslite/ui/toaster";
 import { useForm, useSelector } from "@tanstack/react-form";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { ChevronRight, Globe, Loader2, Trash2 } from "lucide-react";
+import { ChevronRight, Globe, Loader2 } from "lucide-react";
 import { type ReactNode, useId, useMemo, useState } from "react";
 import { z } from "zod";
-import { DeleteAccountDialog } from "./delete-account-dialog";
+import { DeleteAccountButton } from "./delete-account-dialog";
 import { ExportImportSection } from "./export-import-section";
 import { HomeCurrencySetting } from "./home-currency-setting";
 import { LanguagePicker } from "./language-picker";
@@ -82,8 +83,13 @@ export function AccountPage() {
         <SubscriptionSummary />
       </header>
       <div className="flex flex-col rounded-xl bg-card p-1">
-        <PlanLink plan={account.plan} />
-        <DeleteAccountLink />
+        {account.plan === "premium" ? (
+          <ManageSubscription>
+            <DeleteAccountButton />
+          </ManageSubscription>
+        ) : (
+          <UpgradeLink />
+        )}
         <PhoneAccountLinks />
         <UpdatesLink />
         <InsuranceReportLink premium={account.plan === "premium"} />
@@ -93,7 +99,7 @@ export function AccountPage() {
       <ExportImportSection />
       <EmailSection account={account} />
       <FeedbackSection />
-      <LeaveSection />
+      <LeaveSection plan={account.plan} />
     </>
   );
 }
@@ -525,42 +531,27 @@ function FeedbackSection() {
   );
 }
 
-function LeaveSection() {
+/**
+ * Signing out, and on the Free plan deleting the account. On Premium,
+ * Delete account is under Manage subscription, where a subscription that
+ * would renew is cancelled first.
+ */
+function LeaveSection({ plan }: { plan: Account["plan"] }) {
   const t = useI18n();
   const signOut = useSignOut();
+  const free = plan === "free";
   return (
-    <SettingsGroup title={t("account.danger.title")}>
+    <SettingsGroup
+      title={
+        free ? t("account.danger.titleWithDelete") : t("account.danger.title")
+      }
+    >
       <SettingsBlock className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => void signOut()}>
           {t("account.danger.signOut")}
         </Button>
+        {free && <DeleteAccountButton />}
       </SettingsBlock>
     </SettingsGroup>
-  );
-}
-
-/**
- * Deleting the account, beside Manage subscription: a subscription that
- * would renew is cancelled there first (DeleteAccountDialog).
- */
-function DeleteAccountLink() {
-  const t = useI18n();
-  const [deleting, setDeleting] = useState(false);
-  return (
-    <>
-      <button
-        type="button"
-        className="flex h-9 w-full items-center gap-2 rounded-md px-2 text-left text-ui font-medium text-destructive transition-colors duration-100 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        onClick={() => setDeleting(true)}
-      >
-        <Trash2
-          className="size-4 shrink-0"
-          strokeWidth={1.75}
-          aria-hidden="true"
-        />
-        {t("account.danger.delete")}
-      </button>
-      <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
-    </>
   );
 }
