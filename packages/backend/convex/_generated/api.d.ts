@@ -157,6 +157,8 @@ import type * as scanner from "../scanner.js";
 import type * as scanner_claude from "../scanner/claude.js";
 import type * as scanner_rules from "../scanner/rules.js";
 import type * as scanner_vision from "../scanner/vision.js";
+import type * as shares from "../shares.js";
+import type * as shares_rules from "../shares/rules.js";
 import type * as spotPrices from "../spotPrices.js";
 import type * as spotPrices_goldApi from "../spotPrices/goldApi.js";
 import type * as spotPrices_metalPriceApi from "../spotPrices/metalPriceApi.js";
@@ -331,6 +333,8 @@ declare const fullApi: ApiFromModules<{
   "scanner/claude": typeof scanner_claude;
   "scanner/rules": typeof scanner_rules;
   "scanner/vision": typeof scanner_vision;
+  shares: typeof shares;
+  "shares/rules": typeof shares_rules;
   spotPrices: typeof spotPrices;
   "spotPrices/goldApi": typeof spotPrices_goldApi;
   "spotPrices/metalPriceApi": typeof spotPrices_metalPriceApi;

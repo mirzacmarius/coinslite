@@ -50,9 +50,10 @@ const isVersionCheck = createRouteMatcher(["/api/version"]);
 const isSignInPage = createRouteMatcher(
   inEveryLanguage(["/login", "/signup", "/verify", "/link"]),
 );
-// Links from emails (password reset, email change) work signed in or not.
+// Links from emails (password reset, email change) and share links (/s/<token>,
+// a shared Album or Set) work signed in or not.
 const isOpenPage = createRouteMatcher(
-  inEveryLanguage(["/reset", "/confirm-email"]),
+  inEveryLanguage(["/reset", "/confirm-email", "/s/(.*)"]),
 );
 
 /**

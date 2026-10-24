@@ -207,6 +207,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Can show everything or only what's missing. Missing-only is the default for large Sets (> 40 entries).
   - A Set lists at most 1,000 entries. A grouping with more is shown as too large to view as one Set, and is viewed through the Sets below it. (No grouping in the Catalog comes close: the largest, the 2-euro commemoratives Theme, has about 600.)
 - **Adding from a Set** follows the multi-select rules in §6.2.
+- **Share:** a Set can be shared by a read-only link from its page, as an Album can (§8): whoever has the link sees its entries, which ones the sharer holds and how complete it is, never any values. While an admin hides the Catalog, a shared Set shows nothing.
 
 ## 7. Collection
 
@@ -260,6 +261,11 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - Unticked Items stay in the Collection without an Album.
   - The Album itself is always removed.
   - The confirmation states how many Items will be permanently deleted.
+- **Share:** from its page, an Album can be shared by a read-only link (`/s/<token>`), one per Album. The Share dialog shows the link with Copy, a **Show values** switch (off by default) and **Stop sharing**.
+  - Whoever has the link sees, signed in or not: the Album's name, description and colour, who shares it (their display name), how many Items the sharer still owns in it, and those Items newest first, 50 a page, each with title, year, country, denomination, series, material, Grade, Quantity and list thumbnail. With Show values on: each Item's Market value × Quantity and their total, in the sharer's Home currency (the total is left out for an Album over 2,000 Items).
+  - Never shown: Purchase prices, dates and sources, Kept in, notes, Certification and serial numbers, full-size photos, sold Items, or anything outside the Album.
+  - Stop sharing deletes the share, so the link stops working at once; deleting the Album or the account does the same, and a deactivated account's shares show nothing. A link that opens nothing says the page is no longer shared. Sharing again makes a new link.
+  - A shared page names what it shows in the tab title and link preview, asks search engines not to index it, and is counted in usage statistics and error reports without its token.
 
 ## 9. Overview (home)
 

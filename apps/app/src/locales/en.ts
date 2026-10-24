@@ -1572,6 +1572,57 @@ export default {
       ALBUM_NOT_FOUND: "One of the chosen Albums no longer exists.",
     },
   },
+  share: {
+    share: "Share",
+    title: "Share {name}",
+    close: "Close",
+    albumShows:
+      "Anyone with the link sees this Album’s name and description and the Items you still own: title, year, country, denomination, series, material, Grade, Quantity and photo. Never shown: prices, places kept, notes, certificate and serial numbers.",
+    setShows:
+      "Anyone with the link sees this Set’s entries, which ones you hold and how complete it is. Nothing else about your Collection.",
+    notShared:
+      "Not shared yet. Sharing makes a link that works until you stop sharing.",
+    start: "Create link",
+    link: "Link",
+    copy: "Copy",
+    copied: "Link copied",
+    copyFailed: "Couldn’t copy. Select the link and copy it yourself.",
+    open: "Open the shared page",
+    showValues: "Show Market values",
+    showValuesHint:
+      "Adds each Item’s Market value and their total, in {currency}.",
+    stop: "Stop sharing",
+    stopTitle: "Stop sharing {name}?",
+    stopDescription:
+      "The link stops working at once. Sharing again makes a new link.",
+    stopped: "Sharing stopped",
+    cancel: "Cancel",
+    failed: "Couldn’t share. Try again.",
+    errors: {
+      ALBUM_NOT_FOUND: "This Album no longer exists.",
+      NOT_SHAREABLE: "This can’t be shared.",
+      SHARE_NOT_FOUND: "This share no longer exists.",
+    },
+  },
+  shared: {
+    album: "Shared Album",
+    set: "Shared Set",
+    by: "Shared by {name}",
+    "items#one": "1 Item",
+    "items#few": "{count} Items",
+    "items#other": "{count} Items",
+    marketValue: "Market value",
+    noItems: "This Album has no Items yet.",
+    completion: "{held} of {total}",
+    held: "{count} held",
+    goneTitle: "This page is no longer shared",
+    goneDescription:
+      "The person who shared it has stopped sharing, or the link is incomplete.",
+    ctaTitle: "Keep your own Collection with CoinsLite",
+    ctaDescription:
+      "Coins, banknotes and stamps, with photos, values, Albums and Sets. Free to start.",
+    ctaAction: "Learn more",
+  },
   sets: {
     title: "Set",
     viewAsSet: "View as Set",

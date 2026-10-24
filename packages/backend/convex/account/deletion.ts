@@ -72,6 +72,7 @@ export const accountDataByTable = {
   authVerifiers: "deleted: Google sign-ins a session started",
   emailChanges: "deleted: email changes waiting for their link",
   albums: "deleted: the Albums",
+  shares: "deleted: the share links, so each stops working",
   wants: "deleted: the Wantlist",
   items:
     "deleted: the Items, with their stored photos and the photos' thumbnails, and their links to Catalog entries",
@@ -269,6 +270,16 @@ const deleteEmailChanges: Step = async (ctx, { userId }, budget) =>
       .take(budget),
   );
 
+/** Shares go early, so a link to the Collection stops working at once. */
+const deleteShares: Step = async (ctx, { userId }, budget) =>
+  deleteDocs(
+    ctx,
+    await ctx.db
+      .query("shares")
+      .withIndex("by_ownerId_and_targetId", (q) => q.eq("ownerId", userId))
+      .take(budget),
+  );
+
 const deleteWants: Step = async (ctx, { userId }, budget) =>
   deleteDocs(
     ctx,
@@ -334,6 +345,7 @@ const deleteUploads: Step = (ctx, { userId }, budget) =>
 const steps: Step[] = [
   deleteSessions,
   deleteEmailChanges,
+  deleteShares,
   deleteUploads,
   deleteWants,
   deleteAlbums,

@@ -23,6 +23,7 @@ import {
   perDollar,
   preciousMetal,
   provenance,
+  shareTarget,
   stampCatalogue,
   strike,
 } from "./utils/validators";
@@ -336,6 +337,27 @@ export default defineSchema({
     // none until a write counts them; until then reads count them.
     soldItemCount: v.optional(v.number()),
   }).index("by_ownerId", ["ownerId"]),
+
+  /**
+   * A share link (spec §8 and §6.4): whoever has the link sees a read-only
+   * page of one of the owner's Albums, or of a Set as they hold it, signed in
+   * or not (shares.ts). One share per Album or Set (`targetId`); stopping the
+   * share deletes it, so the link stops working at once. `token` is the
+   * secret in the link. It opens nothing but that page, which shows what the
+   * owner chose to show, so it's kept as it is, unlike a sign-in or
+   * email-change token.
+   */
+  shares: defineTable({
+    ownerId: v.id("users"),
+    target: shareTarget,
+    /** The target as one string, shares/rules.ts `targetIdOf`: the Album's id, or the Set's id. */
+    targetId: v.string(),
+    token: v.string(),
+    /** Whether the Items' Market values and their total show; an Album's only, Sets have none. */
+    showValues: v.boolean(),
+  })
+    .index("by_token", ["token"])
+    .index("by_ownerId_and_targetId", ["ownerId", "targetId"]),
 
   /**
    * The Catalog: a tree of country and Theme roots, grouping nodes and, as

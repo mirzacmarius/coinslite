@@ -1,5 +1,6 @@
 "use client";
 
+import { ShareButton } from "@/components/shares/share-dialog";
 import { usePageTitle } from "@/lib/use-page-title";
 import { useI18n } from "@/locales/client";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -108,6 +109,10 @@ export function AlbumDetail() {
                 <ActionLabel>{t("collection.showInCollection")}</ActionLabel>
               </Link>
             </Button>
+            <ShareButton
+              target={{ kind: "album", albumId: album._id }}
+              name={album.name}
+            />
             <Button
               variant="ghost"
               size="xs"

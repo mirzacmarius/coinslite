@@ -115,6 +115,22 @@ export const notesTranslations = v.object({
 
 /** One of the Album colours in albums/rules.ts. */
 export const albumColour = literalUnion(albumColours);
+/** A denomination or series on a country's denomination path; null is "none" (catalog/browse.ts). */
+const denominationPathPart = v.union(v.string(), v.null());
+/**
+ * What a share link opens (shares.ts): one of the person's own Albums, or a
+ * Set by what it is of (catalog/sets.ts setScope).
+ */
+export const shareTarget = v.union(
+  v.object({ kind: v.literal("album"), albumId: v.id("albums") }),
+  v.object({
+    kind: v.literal("set"),
+    key: v.string(),
+    denomination: v.optional(denominationPathPart),
+    series: v.optional(denominationPathPart),
+  }),
+);
+export type ShareTarget = typeof shareTarget.type;
 /** Which side of an Item a photo shows: front or back. */
 export const photoSide = literalUnion(photoSides);
 

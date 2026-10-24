@@ -1629,6 +1629,58 @@ export default {
       ALBUM_NOT_FOUND: "L’un des albums choisis n’existe plus.",
     },
   },
+  share: {
+    share: "Partager",
+    title: "Partager {name}",
+    close: "Fermer",
+    albumShows:
+      "Quiconque a le lien voit le nom et la description de cet album et les objets que vous possédez encore : titre, année, pays, valeur faciale, série, matière, état, quantité et photo. Jamais montrés : prix, lieux de conservation, notes, numéros de certificat et de série.",
+    setShows:
+      "Quiconque a le lien voit les entrées du catalogue de cet ensemble, celles que vous possédez et son degré de complétion. Rien d’autre de votre collection.",
+    notShared:
+      "Pas encore partagé. Partager crée un lien qui fonctionne jusqu’à ce que vous arrêtiez le partage.",
+    start: "Créer le lien",
+    link: "Lien",
+    copy: "Copier",
+    copied: "Lien copié",
+    copyFailed:
+      "Impossible de copier. Sélectionnez le lien et copiez-le vous-même.",
+    open: "Ouvrir la page partagée",
+    showValues: "Afficher les valeurs de marché",
+    showValuesHint:
+      "Ajoute la valeur de marché de chaque objet et leur total, en {currency}.",
+    stop: "Arrêter le partage",
+    stopTitle: "Arrêter le partage de {name} ?",
+    stopDescription:
+      "Le lien cesse de fonctionner immédiatement. Partager de nouveau crée un nouveau lien.",
+    stopped: "Partage arrêté",
+    cancel: "Annuler",
+    failed: "Impossible de partager. Réessayez.",
+    errors: {
+      ALBUM_NOT_FOUND: "Cet album n’existe plus.",
+      NOT_SHAREABLE: "Ceci ne peut pas être partagé.",
+      SHARE_NOT_FOUND: "Ce partage n’existe plus.",
+    },
+  },
+  shared: {
+    album: "Album partagé",
+    set: "Ensemble partagé",
+    by: "Partagé par {name}",
+    "items#one": "1 objet",
+    "items#few": "{count} objets",
+    "items#other": "{count} objets",
+    marketValue: "Valeur de marché",
+    noItems: "Cet album n’a pas encore d’objets.",
+    completion: "{held} sur {total}",
+    held: "{count} en collection",
+    goneTitle: "Cette page n’est plus partagée",
+    goneDescription:
+      "La personne qui l’a partagée a arrêté le partage, ou le lien est incomplet.",
+    ctaTitle: "Tenez votre propre collection avec CoinsLite",
+    ctaDescription:
+      "Pièces, billets et timbres, avec photos, valeurs, albums et ensembles. Gratuit pour commencer.",
+    ctaAction: "En savoir plus",
+  },
   sets: {
     title: "Ensemble",
     viewAsSet: "Voir comme ensemble",
