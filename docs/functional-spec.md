@@ -257,7 +257,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - A move, a Grade, a purchase or a tag can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
 - **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts open only on a screen at least 1024 px wide and 1000 px tall, where the list still starts in view below it, and collapsed on anything smaller, such as a phone or a 1280 × 800 laptop; it is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.
-- **Export (Premium), covering the current filtered view:**
+- **Export, covering the current filtered view:** the CSV on both plans, so a collector's data can always leave with them; the PDF on Premium, where the Free plan's menu shows the way to Premium instead.
   - **PDF, A4 landscape:**
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
@@ -331,8 +331,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 11. Plans and billing
 
-- **Free plan:** up to **50 Items**, counted as Items, not pieces. After leaving Premium, every Item stays visible and editable, but none can be added while over 50.
-- **Premium:** unlimited Items, the Insurance report, PDF/CSV export and labels to print.
+- **Free plan:** up to **50 Items**, counted as Items, not pieces, and the CSV export. After leaving Premium, every Item stays visible and editable, but none can be added while over 50.
+- **Premium:** unlimited Items, the Insurance report, the PDF export and labels to print.
 - **Prices (monthly / yearly):**
 
 | Currency | Monthly | Yearly |

@@ -180,7 +180,7 @@ export default {
       },
       export: {
         title: "PDF- og CSV-eksport",
-        text: "Enhver visning av samlingen, til utskrift eller arkiv, og etiketter til myntholdere og slabs. Premium.",
+        text: "Enhver visning av samlingen som CSV til arkiv, i alle abonnement. Med Premium som PDF til utskrift og etiketter til myntholdere og slabs.",
       },
       charts: {
         title: "Diagrammer",
@@ -219,7 +219,7 @@ export default {
         "Katalogen, sett og ønskelisten",
         "Kvalitet, preging, bilder og album",
         "Totaler, diagrammer og spotpriser",
-        "Import fra regneark",
+        "Import fra regneark og eksport til CSV",
       ],
       cta: "Kom i gang gratis",
     },
@@ -231,7 +231,7 @@ export default {
       features: [
         "Ubegrenset antall objekter",
         "Forsikringsrapporten",
-        "PDF- og CSV-eksport",
+        "PDF-eksport",
         "Etiketter til myntholdere og slabs",
         "Alt i gratisplanen",
       ],

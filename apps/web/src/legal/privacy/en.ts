@@ -112,7 +112,7 @@ export default {
           "Access: see what we hold about you. Your Account screen and Collection show it, and we’ll send a full copy on request.",
           "Correction: change your details on the Account screen and your Items in the app.",
           "Deletion: delete your account and everything in it from the Account screen.",
-          "Portability: ask for a copy of your data in a machine-readable format. It’s free on every plan. Premium also lets you export your Collection as CSV yourself.",
+          "Portability: ask for a copy of your data in a machine-readable format. It’s free on every plan, and on every plan you can also export your Collection as CSV yourself.",
           "Objection: object to what we do on the basis of our legitimate interests.",
           "Withdrawing consent: where we rely on your consent, withdraw it at any time, without affecting what was done before.",
           "Complaint: complain to the supervisory authority, {authority}, or to the one where you live or work.",

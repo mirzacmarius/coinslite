@@ -1019,10 +1019,11 @@ export default {
   },
   billing: {
     currentPlan: "Your plan",
-    freeDescription: "Up to {limit} Items, whatever their Quantity.",
+    freeDescription:
+      "Up to {limit} Items, whatever their Quantity, and the CSV export.",
     premium: "Premium",
     premiumDescription:
-      "Unlimited Items, the Insurance report, CSV and PDF export, and labels to print.",
+      "Unlimited Items, the Insurance report, the PDF export and labels to print.",
     billingPeriod: "Billing period",
     monthly: "Monthly",
     yearly: "Yearly",
@@ -1429,8 +1430,7 @@ export default {
       "A PDF lists up to {limit} Items. Narrow the view to export it.",
     tooLarge:
       "Your Collection is too large to export in one go. Rather than leave Items out, it isn't exported.",
-    premiumOnly:
-      "Exporting your Collection and printing labels are part of Premium.",
+    premiumOnly: "The PDF export and printing labels are part of Premium.",
     failed: "Couldn't export the Collection. Try again.",
     fileName: "coinslite-collection-{date}.csv",
   },

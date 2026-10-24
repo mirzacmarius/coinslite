@@ -1038,10 +1038,11 @@ export default {
   },
   billing: {
     currentPlan: "Planul tău",
-    freeDescription: "Până la {limit} de obiecte, indiferent de cantitate.",
+    freeDescription:
+      "Până la {limit} de obiecte, indiferent de cantitate, și exportul CSV.",
     premium: "Premium",
     premiumDescription:
-      "Obiecte nelimitate, raportul de asigurare, export CSV și PDF și etichete de tipărit.",
+      "Obiecte nelimitate, raportul de asigurare, export PDF și etichete de tipărit.",
     billingPeriod: "Perioada de facturare",
     monthly: "Lunar",
     yearly: "Anual",
@@ -1457,8 +1458,7 @@ export default {
       "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o exporta.",
     tooLarge:
       "Colecția ta este prea mare pentru a fi exportată dintr-odată, așa că nu este exportată în loc să lipsească obiecte.",
-    premiumOnly:
-      "Exportul colecției și tipărirea etichetelor fac parte din Premium.",
+    premiumOnly: "Exportul PDF și tipărirea etichetelor fac parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
   },

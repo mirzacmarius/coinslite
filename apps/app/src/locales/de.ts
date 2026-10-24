@@ -1066,10 +1066,11 @@ export default {
   },
   billing: {
     currentPlan: "Dein Tarif",
-    freeDescription: "Bis zu {limit} Objekte, unabhängig von ihrer Anzahl.",
+    freeDescription:
+      "Bis zu {limit} Objekte, unabhängig von ihrer Anzahl, und der Export als CSV.",
     premium: "Premium",
     premiumDescription:
-      "Unbegrenzt viele Objekte, der Versicherungsbericht, Export als CSV und PDF und Etiketten zum Drucken.",
+      "Unbegrenzt viele Objekte, der Versicherungsbericht, Export als PDF und Etiketten zum Drucken.",
     billingPeriod: "Abrechnungszeitraum",
     monthly: "Monatlich",
     yearly: "Jährlich",
@@ -1496,7 +1497,7 @@ export default {
     tooLarge:
       "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
     premiumOnly:
-      "Der Export deiner Sammlung und der Etikettendruck sind Teil von Premium.",
+      "Der Export als PDF und der Etikettendruck sind Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
     fileName: "coinslite-sammlung-{date}.csv",
