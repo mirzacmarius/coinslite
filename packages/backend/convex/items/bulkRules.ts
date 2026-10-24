@@ -1,11 +1,12 @@
 import { ConvexError } from "convex/values";
 import { type GradingScale, type ItemType, suitsGrade } from "./grades";
 import { type PurchaseInput, checkPurchase, purchaseFields } from "./rules";
+import { checkTags, withTag, withoutTag } from "./tags";
 
 /**
  * Acting on several Items at once (spec 7, MUS-739), undoing a move or a
- * grading (COIN-120), and setting a bought lot's purchase on them, which can
- * be undone too (COIN-119). Pure, so the app shares the limit with the
+ * grading (COIN-120), setting a bought lot's purchase on them, which can be
+ * undone too (COIN-119), and adding or taking off a tag (COIN-194). Pure, so the app shares the limit with the
  * backend.
  */
 
@@ -175,6 +176,57 @@ function storable(purchase: PurchaseInput, today: string) {
   } catch {
     return false;
   }
+}
+
+/** Two lists of tags alike, in the same order; none and an empty list are alike. */
+const sameTags = (
+  a: readonly string[] | undefined,
+  b: readonly string[] | undefined,
+) =>
+  (a?.length ?? 0) === (b?.length ?? 0) &&
+  (a ?? []).every((tag, index) => tag === b?.[index]);
+
+/** Whether tags are as `checkTags` stores them: what an undo may write back. */
+function storableTags(tags: string[] | undefined) {
+  try {
+    return sameTags(checkTags(tags), tags);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Plans undoing a tag added (or, with `remove`, taken off): each Item it
+ * changed (`before`, with the tags it had) gets those tags back if its tags
+ * are still what the change left. One deleted (missing from `now`) or
+ * tagged differently since is skipped and counted.
+ */
+export function planTagUndo<ItemId>({
+  before,
+  tag,
+  remove,
+  now,
+}: {
+  before: ReadonlyArray<{ itemId: ItemId; tags?: string[] }>;
+  tag: string;
+  remove: boolean;
+  now: ReadonlyMap<ItemId, { tags?: string[] }>;
+}) {
+  const changed = firstOfEach(before);
+  const restore = changed.filter(({ itemId, tags }) => {
+    const item = now.get(itemId);
+    const left = remove ? withoutTag(tags, tag) : withTag(tags, tag);
+    return (
+      item !== undefined &&
+      left !== null &&
+      sameTags(item.tags, left) &&
+      storableTags(tags)
+    );
+  });
+  return {
+    restore: restore.map(({ itemId, tags }) => ({ itemId, tags })),
+    skipped: changed.length - restore.length,
+  };
 }
 
 /** Each Item once, as first listed, so none is restored twice. */

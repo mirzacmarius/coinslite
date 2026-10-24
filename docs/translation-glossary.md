@@ -10,6 +10,7 @@ How CoinsLite's domain terms ([`GLOSSARY.md`](../GLOSSARY.md)) read in each laun
 | Date acquired | anskaffelsesdato | Erwerbsdatum | date d’acquisition | data dobândirii |
 | Collection | samling | Sammlung | collection | colecție |
 | Album | album (pl. album) | Album (pl. Alben) | album | album (pl. albume) |
+| Tag | stikkord | Schlagwort (pl. Schlagwörter) | libellé | tag (pl. taguri) |
 | Grade | kvalitet | Erhaltung | état | stare |
 | Grading scale | kvalitetsskala | Bewertungsskala | échelle de notation | scară de evaluare |
 | Strike | preging | Prägung | frappe | batere |

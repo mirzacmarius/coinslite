@@ -9,6 +9,7 @@ import {
   suitsGrade,
 } from "./grades";
 import type { Grader, StampCatalogue } from "./references";
+import { checkTags } from "./tags";
 
 /**
  * What an Item may hold. Pure, so the add form checks the same limits before
@@ -172,6 +173,7 @@ export type ItemInput = {
   /** Kept in: where the Item is physically kept. */
   storage?: string;
   notes?: string;
+  tags?: string[];
 };
 
 const fail = (code: string): never => {
@@ -277,8 +279,12 @@ export function checkItem(input: ItemInput, today: string) {
     ...withNumber("marketValue", amount(input.marketValue)),
     ...withText("storage", text(input.storage, itemLimits.storage)),
     ...withText("notes", text(input.notes, itemLimits.notes)),
+    ...withTags(checkTags(input.tags)),
   };
 }
+
+/** The tags field, left out when there are none. */
+const withTags = (tags: string[] | undefined) => (tags ? { tags } : {});
 
 /** The fields of an Item's purchase: Purchase price per piece, purchase date and source. */
 export const purchaseFields = [

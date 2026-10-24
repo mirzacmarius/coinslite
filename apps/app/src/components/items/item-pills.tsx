@@ -12,10 +12,11 @@ import { useGradeLabels } from "./grade-labels";
 import { CatalogLink } from "./item-catalog-link";
 import { useItemFields, useItemKind } from "./item-form-fields";
 import type { LinkedEntry } from "./item-form-submit";
+import { TagPicker } from "./tag-picker";
 
 /**
  * The Item form's row of pills, always in view: the Catalog entry or Item
- * type, the Album, country, Grade, strike and quantity.
+ * type, the Album, country, Grade, strike, quantity and tags.
  */
 export function ItemPills({
   linked,
@@ -144,6 +145,14 @@ export function ItemPills({
                 onBlur={field.handleBlur}
               />
             </label>
+          )}
+        </form.Field>
+        <form.Field name="tags">
+          {(field) => (
+            <TagPicker
+              value={field.state.value}
+              onChange={field.handleChange}
+            />
           )}
         </form.Field>
       </div>

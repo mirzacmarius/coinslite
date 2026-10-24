@@ -189,6 +189,15 @@ export default {
       failed: "Obiectul nu a putut fi adăugat. Încearcă din nou.",
     },
   },
+  tags: {
+    tags: "Taguri",
+    add: "Adaugă taguri",
+    search: "Caută sau creează un tag…",
+    find: "Caută un tag…",
+    noneYet: "Încă niciun tag",
+    create: "Creează tagul „{tag}”",
+    full: "Un obiect are cel mult {limit} taguri.",
+  },
   grades: {
     scales: {
       sheldon: "Sheldon (1–70)",
@@ -852,6 +861,7 @@ export default {
       grade: "Stare",
       album: "Album",
       storage: "Păstrat în",
+      tag: "Tag",
       year: "An",
       material: "Material",
       entry: "Intrare de catalog",
@@ -923,7 +933,7 @@ export default {
     select: "Selectează",
     selectionBar: "Obiecte selectate",
     selectHint:
-      "Selectează obiecte ca să le muți într-un album, să le stabilești starea sau achiziția ori să le ștergi.",
+      "Selectează obiecte ca să le muți într-un album, să le stabilești starea, achiziția sau un tag ori să le ștergi.",
     addToHint: "Selectează obiectele de adăugat în {album}.",
     cancel: "Anulează",
     selectPage: "Selectează pagina",
@@ -972,6 +982,25 @@ export default {
     purchaseFailed: "Achiziția nu a putut fi stabilită. Încearcă din nou.",
     purchaseUndone: "Stabilirea achiziției a fost anulată",
     purchaseUndoneSkipped:
+      "Restabilite {restored}, sărite {skipped}: s-au schimbat între timp.",
+    tag: "Tag",
+    tagMode: "Adaugă sau scoate",
+    tagAdd: "Adaugă",
+    tagRemove: "Scoate",
+    tagRemoveTyped: "Scoate „{tag}”",
+    "tagged#one": "Tag adăugat la 1 obiect",
+    "tagged#few": "Tag adăugat la {count} obiecte",
+    "tagged#other": "Tag adăugat la {count} de obiecte",
+    "untagged#one": "Tag scos de pe 1 obiect",
+    "untagged#few": "Tag scos de pe {count} obiecte",
+    "untagged#other": "Tag scos de pe {count} de obiecte",
+    taggedSkipped:
+      "„{tag}” adăugat la {changed}, sărite {skipped}: îl au deja sau nu mai au loc.",
+    untaggedSkipped:
+      "„{tag}” scos de pe {changed}, sărite {skipped}: nu îl au.",
+    tagFailed: "Tagul nu a putut fi schimbat. Încearcă din nou.",
+    tagUndone: "Schimbarea tagului a fost anulată",
+    tagUndoneSkipped:
       "Restabilite {restored}, sărite {skipped}: s-au schimbat între timp.",
     undo: "Anulează",
     undoFailed: "Modificarea nu a putut fi anulată. Încearcă din nou.",
@@ -1501,6 +1530,7 @@ export default {
       notForType: "are un câmp care nu se potrivește tipului de obiect",
       metalRequired: "greutatea sau titlul cer un metal",
       soldBeforePurchase: "a fost vândut înainte să fie cumpărat",
+      tooManyTags: "are peste 10 taguri",
       other: "nu poate fi adăugat",
     },
     errors: {

@@ -185,6 +185,15 @@ export default {
       failed: "The Item couldn't be added. Try again.",
     },
   },
+  tags: {
+    tags: "Tags",
+    add: "Add tags",
+    search: "Find or create a tag…",
+    find: "Find a tag…",
+    noneYet: "No tags yet",
+    create: "Create tag “{tag}”",
+    full: "An Item holds {limit} tags at most.",
+  },
   grades: {
     scales: {
       sheldon: "Sheldon (1–70)",
@@ -833,6 +842,7 @@ export default {
       grade: "Grade",
       album: "Album",
       storage: "Kept in",
+      tag: "Tag",
       year: "Year",
       material: "Material",
       entry: "Catalog entry",
@@ -904,7 +914,7 @@ export default {
     select: "Select",
     selectionBar: "Selected Items",
     selectHint:
-      "Select Items to move them to an Album, set a Grade or a purchase, or delete them.",
+      "Select Items to move them to an Album, set a Grade, a purchase or a tag, or delete them.",
     addToHint: "Select the Items to add to {album}.",
     cancel: "Cancel",
     selectPage: "Select page",
@@ -952,6 +962,25 @@ export default {
     purchaseFailed: "The purchase couldn't be set. Try again.",
     purchaseUndone: "Purchase undone",
     purchaseUndoneSkipped:
+      "Restored {restored}, skipped {skipped}: they've changed since.",
+    tag: "Tag",
+    tagMode: "Add or take off",
+    tagAdd: "Add",
+    tagRemove: "Take off",
+    tagRemoveTyped: "Take off “{tag}”",
+    "tagged#one": "Tag added to 1 Item",
+    "tagged#few": "Tag added to {count} Items",
+    "tagged#other": "Tag added to {count} Items",
+    "untagged#one": "Tag taken off 1 Item",
+    "untagged#few": "Tag taken off {count} Items",
+    "untagged#other": "Tag taken off {count} Items",
+    taggedSkipped:
+      "“{tag}” added to {changed}, skipped {skipped}: they have it already or no room for another.",
+    untaggedSkipped:
+      "“{tag}” taken off {changed}, skipped {skipped}: they don't have it.",
+    tagFailed: "The tag couldn't be changed. Try again.",
+    tagUndone: "Tagging undone",
+    tagUndoneSkipped:
       "Restored {restored}, skipped {skipped}: they've changed since.",
     undo: "Undo",
     undoFailed: "The change couldn't be undone. Try again.",
@@ -1471,6 +1500,7 @@ export default {
       notForType: "it has a field that doesn't suit its Item type",
       metalRequired: "a weight or purity needs a metal",
       soldBeforePurchase: "it was sold before it was bought",
+      tooManyTags: "it has more than 10 tags",
       other: "it can't be added",
     },
     errors: {

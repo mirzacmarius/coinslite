@@ -188,6 +188,15 @@ export default {
       failed: "Objektet kunne ikke legges til. Prøv igjen.",
     },
   },
+  tags: {
+    tags: "Stikkord",
+    add: "Legg til stikkord",
+    search: "Finn eller lag et stikkord …",
+    find: "Finn et stikkord …",
+    noneYet: "Ingen stikkord ennå",
+    create: "Lag stikkordet «{tag}»",
+    full: "Et objekt kan ha høyst {limit} stikkord.",
+  },
   grades: {
     scales: {
       sheldon: "Sheldon (1–70)",
@@ -847,6 +856,7 @@ export default {
       grade: "Kvalitet",
       album: "Album",
       storage: "Oppbevart i",
+      tag: "Stikkord",
       year: "År",
       material: "Materiale",
       entry: "Katalogoppføring",
@@ -918,7 +928,7 @@ export default {
     select: "Velg",
     selectionBar: "Valgte objekter",
     selectHint:
-      "Velg objekter for å flytte dem til et album, sette en kvalitet eller et innkjøp, eller slette dem.",
+      "Velg objekter for å flytte dem til et album, sette en kvalitet, et innkjøp eller et stikkord, eller slette dem.",
     addToHint: "Velg objektene som skal legges i {album}.",
     cancel: "Avbryt",
     selectPage: "Velg siden",
@@ -966,6 +976,25 @@ export default {
     purchaseFailed: "Innkjøpet kunne ikke settes. Prøv igjen.",
     purchaseUndone: "Innkjøpet er satt tilbake",
     purchaseUndoneSkipped:
+      "Satt tilbake {restored}, hoppet over {skipped}: de er endret siden.",
+    tag: "Stikkord",
+    tagMode: "Legg til eller fjern",
+    tagAdd: "Legg til",
+    tagRemove: "Fjern",
+    tagRemoveTyped: "Fjern «{tag}»",
+    "tagged#one": "Stikkord lagt til på 1 objekt",
+    "tagged#few": "Stikkord lagt til på {count} objekter",
+    "tagged#other": "Stikkord lagt til på {count} objekter",
+    "untagged#one": "Stikkord fjernet fra 1 objekt",
+    "untagged#few": "Stikkord fjernet fra {count} objekter",
+    "untagged#other": "Stikkord fjernet fra {count} objekter",
+    taggedSkipped:
+      "«{tag}» lagt til på {changed}, hoppet over {skipped}: de har det allerede eller har ikke plass til flere.",
+    untaggedSkipped:
+      "«{tag}» fjernet fra {changed}, hoppet over {skipped}: de har det ikke.",
+    tagFailed: "Stikkordet kunne ikke endres. Prøv igjen.",
+    tagUndone: "Stikkordendringen er angret",
+    tagUndoneSkipped:
       "Satt tilbake {restored}, hoppet over {skipped}: de er endret siden.",
     undo: "Angre",
     undoFailed: "Endringen kunne ikke angres. Prøv igjen.",
@@ -1491,6 +1520,7 @@ export default {
       notForType: "den har et felt som ikke passer objekttypen",
       metalRequired: "vekt eller finhet krever et metall",
       soldBeforePurchase: "den ble solgt før den ble kjøpt",
+      tooManyTags: "den har mer enn 10 stikkord",
       other: "den kan ikke legges til",
     },
     errors: {

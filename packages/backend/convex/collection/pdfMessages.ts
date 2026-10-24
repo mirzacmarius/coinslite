@@ -28,6 +28,8 @@ export type CollectionPdfMessages = {
   unknownAlbum: string;
   /** The Kept in filter's option for Items with no place recorded. */
   withoutStorage: string;
+  /** The tag filter's name. */
+  tag: string;
   /** A year range with one end open, as "from 1800" or "to 1899". */
   yearRange: { from: (year: string) => string; to: (year: string) => string };
   sortedBy: string;
@@ -71,6 +73,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Without an Album",
     unknownAlbum: "Unknown Album",
     withoutStorage: "No place recorded",
+    tag: "Tag",
     yearRange: { from: (year) => `from ${year}`, to: (year) => `to ${year}` },
     sortedBy: "Sorted by",
     sorts: {
@@ -124,6 +127,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Uten album",
     unknownAlbum: "Ukjent album",
     withoutStorage: "Uten oppbevaringssted",
+    tag: "Stikkord",
     yearRange: { from: (year) => `fra ${year}`, to: (year) => `til ${year}` },
     sortedBy: "Sortert etter",
     sorts: {
@@ -177,6 +181,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Ohne Album",
     unknownAlbum: "Unbekanntes Album",
     withoutStorage: "Ohne Aufbewahrungsort",
+    tag: "Schlagwort",
     yearRange: { from: (year) => `ab ${year}`, to: (year) => `bis ${year}` },
     sortedBy: "Sortiert nach",
     sorts: {
@@ -230,6 +235,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Sans album",
     unknownAlbum: "Album inconnu",
     withoutStorage: "Sans lieu de conservation",
+    tag: "Libellé",
     yearRange: {
       from: (year) => `à partir de ${year}`,
       to: (year) => `jusqu’à ${year}`,
@@ -286,6 +292,7 @@ export const collectionPdfMessages: Record<Locale, CollectionPdfMessages> = {
     withoutAlbum: "Fără album",
     unknownAlbum: "Album necunoscut",
     withoutStorage: "Fără loc de păstrare",
+    tag: "Tag",
     yearRange: {
       from: (year) => `din ${year}`,
       to: (year) => `până în ${year}`,

@@ -72,6 +72,8 @@ export type CollectionView = {
    * accents or spacing, or `withoutStorage`.
    */
   storage?: string;
+  /** A tag the Items have, matched as tags are (items/tags.ts tagKey). */
+  tag?: string;
   /** Only Items issued from this year on, or up to this year, or both. */
   yearFrom?: number;
   yearTo?: number;

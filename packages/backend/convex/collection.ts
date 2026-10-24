@@ -7,6 +7,7 @@ import {
   findItems,
   readForView,
   readStoragePlaces,
+  readTags,
 } from "./collection/browse";
 import type { CollectionView } from "./collection/view";
 import { countFilterOptions } from "./collection/viewRules";
@@ -76,6 +77,7 @@ const filterCountsResult = v.object({
   albums: v.array(v.object({ albumId: v.id("albums"), count: v.number() })),
   withoutAlbum: v.number(),
   storages: v.array(v.object({ storage: v.string(), count: v.number() })),
+  tags: v.array(v.object({ tag: v.string(), count: v.number() })),
   withoutStorage: v.number(),
   decades: v.array(v.object({ decade: v.number(), count: v.number() })),
   years: v.union(v.null(), v.object({ min: v.number(), max: v.number() })),
@@ -145,6 +147,19 @@ export const storagePlaces = query({
   handler: async (ctx) => {
     const owner = await requireSetUpUser(ctx);
     return await readStoragePlaces(ctx, owner._id);
+  },
+});
+
+/**
+ * The tags on the signed-in person's Items, most used first, for the Item
+ * form and select mode to offer (browse.ts readTags).
+ */
+export const tags = query({
+  args: {},
+  returns: v.array(v.string()),
+  handler: async (ctx) => {
+    const owner = await requireSetUpUser(ctx);
+    return await readTags(ctx, owner._id);
   },
 });
 

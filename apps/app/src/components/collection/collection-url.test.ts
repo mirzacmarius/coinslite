@@ -26,6 +26,14 @@ describe("the view in the URL", () => {
     ).toEqual({});
   });
 
+  test("round-trips a tag", () => {
+    const view = { tag: "For sale" };
+    const params = writeCollectionUrl(view, 1);
+    expect(params.toString()).toBe("tag=For+sale");
+    expect(readCollectionUrl(params).view).toEqual(view);
+    expect(readCollectionUrl(new URLSearchParams("tag=%20")).view).toEqual({});
+  });
+
   test("keeps the Items with no place recorded", () => {
     expect(readCollectionUrl(new URLSearchParams("storage=none")).view).toEqual(
       { storage: "none" },

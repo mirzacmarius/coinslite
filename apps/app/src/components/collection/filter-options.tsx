@@ -13,6 +13,7 @@ import {
   withoutStorage,
 } from "@coinslite/backend/convex/collection/view";
 import { textKey } from "@coinslite/backend/convex/collection/viewRules";
+import { tagKey } from "@coinslite/backend/convex/items/tags";
 import type { FunctionReturnType } from "convex/server";
 import {
   Archive,
@@ -28,6 +29,7 @@ import {
   type LucideIcon,
   MapPin,
   Shapes,
+  Tag,
 } from "lucide-react";
 import type * as React from "react";
 import { useMemo } from "react";
@@ -49,6 +51,7 @@ export type FilterDimension =
   | "material"
   | "album"
   | "storage"
+  | "tag"
   | "entry"
   | "without"
   | "status";
@@ -82,7 +85,7 @@ export type Filter = {
    * counts load).
    */
   range?: { from?: number; to?: number; min?: number; max?: number };
-  /** While the counts load, options found only from them (countries, denominations, Grades) aren't listed yet. */
+  /** While the counts load, options found only from them (countries, denominations, Grades, tags) aren't listed yet. */
   counting: boolean;
 };
 
@@ -387,6 +390,33 @@ export function useFilters(
       icon: Archive,
       options: storageOptions,
       clear: { storage: undefined },
+    });
+
+    // Tags: the person's own words on the Items, most used first.
+    const tagCounts = counts?.tags ?? [];
+    const chosenTag = view.tag;
+    const tagOptions = [
+      ...tagCounts,
+      ...(chosenTag &&
+      !tagCounts.some(({ tag }) => tagKey(tag) === tagKey(chosenTag))
+        ? [{ tag: chosenTag, count: uncounted }]
+        : []),
+    ].map(
+      ({ tag, count }): FilterOption => ({
+        key: tagKey(tag),
+        label: tag,
+        icon: optionIcon(Tag),
+        count,
+        selected: chosenTag !== undefined && tagKey(chosenTag) === tagKey(tag),
+        change: { tag },
+      }),
+    );
+    filters.push({
+      dimension: "tag",
+      label: t("collection.filters.tag"),
+      icon: Tag,
+      options: tagOptions,
+      clear: { tag: undefined },
     });
 
     // Too many entries to list: links narrow to one ("You hold" on an entry).

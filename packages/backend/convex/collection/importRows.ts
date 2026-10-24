@@ -9,6 +9,7 @@ import {
   stampCatalogues,
 } from "../items/references";
 import type { Material } from "../items/rules";
+import { splitTags } from "../items/tags";
 import { exportLabels } from "./exportLabels";
 import {
   type Column,
@@ -110,6 +111,7 @@ export type ImportRow = {
   /** Kept in. */
   storage?: string;
   notes?: string;
+  tags?: string[];
   soldOn?: string;
   salePrice?: number;
   saleNote?: string;
@@ -249,6 +251,7 @@ function readRow(
   )
     problem(rowErrors.otherCurrency);
 
+  const tagsText = text("tags");
   const grader = graderOf(text("grader"));
   const stampCatalogue = stampCatalogueOf(text("stampCatalogue"));
   const labels = exportLabels[options.locale].columns;
@@ -302,6 +305,7 @@ function readRow(
       source: text("source"),
       storage: text("storage"),
       notes,
+      tags: tagsText === undefined ? undefined : splitTags(tagsText),
       soldOn: date("soldOn"),
       salePrice,
       saleNote: text("saleNote"),

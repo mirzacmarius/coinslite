@@ -25,6 +25,8 @@ import {
   referenceName,
   stampCatalogueNames,
 } from "@coinslite/backend/convex/items/references";
+import { tagKey } from "@coinslite/backend/convex/items/tags";
+import { badgeVariants } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
 import { EmptyState } from "@coinslite/ui/empty-state";
@@ -529,6 +531,24 @@ export function ItemDetail() {
                 {format.number(item.quantity)}
               </Fact>
               <Fact label={t("items.storage")}>{item.storage}</Fact>
+              <Fact label={t("tags.tags")}>
+                {item.tags && item.tags.length > 0 && (
+                  <span className="flex flex-wrap gap-1">
+                    {item.tags.map((tag) => (
+                      <Link
+                        key={tagKey(tag)}
+                        href={collectionHref({ tag })}
+                        className={cn(
+                          badgeVariants({ variant: "outline" }),
+                          "max-w-full hover:bg-muted",
+                        )}
+                      >
+                        <span className="truncate">{tag}</span>
+                      </Link>
+                    ))}
+                  </span>
+                )}
+              </Fact>
             </FactSection>
             {item.notes && (
               <section

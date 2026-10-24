@@ -191,6 +191,15 @@ export default {
       failed: "Impossible d’ajouter l’objet. Réessayez.",
     },
   },
+  tags: {
+    tags: "Libellés",
+    add: "Ajouter des libellés",
+    search: "Chercher ou créer un libellé…",
+    find: "Chercher un libellé…",
+    noneYet: "Aucun libellé pour l’instant",
+    create: "Créer le libellé «\u00a0{tag}\u00a0»",
+    full: "Un objet a au plus {limit} libellés.",
+  },
   grades: {
     scales: {
       sheldon: "Sheldon (1–70)",
@@ -863,6 +872,7 @@ export default {
       grade: "État",
       album: "Album",
       storage: "Conservé dans",
+      tag: "Libellé",
       year: "Année",
       material: "Matière",
       entry: "Entrée du catalogue",
@@ -934,7 +944,7 @@ export default {
     select: "Sélectionner",
     selectionBar: "Objets sélectionnés",
     selectHint:
-      "Sélectionnez des objets pour les déplacer dans un album, leur attribuer un état, définir leur achat ou les supprimer.",
+      "Sélectionnez des objets pour les déplacer dans un album, leur attribuer un état, définir leur achat, leur ajouter un libellé ou les supprimer.",
     addToHint: "Sélectionnez les objets à ajouter à {album}.",
     cancel: "Annuler",
     selectPage: "Sélectionner la page",
@@ -984,6 +994,25 @@ export default {
     purchaseUndone: "Définition de l’achat annulée",
     purchaseUndoneSkipped:
       "{restored} rétablis, {skipped} ignorés : ils ont changé depuis.",
+    tag: "Libellé",
+    tagMode: "Ajouter ou retirer",
+    tagAdd: "Ajouter",
+    tagRemove: "Retirer",
+    tagRemoveTyped: "Retirer «\u00a0{tag}\u00a0»",
+    "tagged#one": "Libellé ajouté à {count} objet",
+    "tagged#few": "Libellé ajouté à {count} objets",
+    "tagged#other": "Libellé ajouté à {count} objets",
+    "untagged#one": "Libellé retiré de {count} objet",
+    "untagged#few": "Libellé retiré de {count} objets",
+    "untagged#other": "Libellé retiré de {count} objets",
+    taggedSkipped:
+      "«\u00a0{tag}\u00a0» ajouté à {changed}, {skipped} ignorés\u00a0: ils l’ont déjà ou n’ont plus de place.",
+    untaggedSkipped:
+      "«\u00a0{tag}\u00a0» retiré de {changed}, {skipped} ignorés\u00a0: ils ne l’ont pas.",
+    tagFailed: "Impossible de modifier le libellé. Réessayez.",
+    tagUndone: "Modification du libellé annulée",
+    tagUndoneSkipped:
+      "{restored} rétablis, {skipped} ignorés\u00a0: ils ont changé depuis.",
     undo: "Annuler",
     undoFailed: "Impossible d’annuler la modification. Réessayez.",
     delete: "Supprimer",
@@ -1519,6 +1548,7 @@ export default {
       notForType: "elle a un champ qui ne convient pas à son type d’objet",
       metalRequired: "un poids ou un titre exige un métal",
       soldBeforePurchase: "vendu avant d’avoir été acheté",
+      tooManyTags: "elle a plus de 10 libellés",
       other: "elle ne peut pas être ajoutée",
     },
     errors: {
