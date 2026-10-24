@@ -18,6 +18,7 @@ import {
   uploadErrors,
 } from "@coinslite/backend/convex/photos/rules";
 import {
+  type ScanItemType,
   scannerErrors,
   scannerLimits,
 } from "@coinslite/backend/convex/scanner/rules";
@@ -34,8 +35,8 @@ import type { ScanPreset, ScannedPhoto } from "./scan-preset";
 /**
  * A photo made small enough to scan: a JPEG whose longest side is at most
  * `scannerLimits.photoPixels`, at the best quality that fits the vision
- * model. Phone cameras take far larger photos than a coin needs. It also
- * becomes the Item's photo.
+ * model. Phone cameras take far larger photos than a coin or banknote
+ * needs. It also becomes the Item's photo.
  */
 const scanPhoto: ShrinkTarget = {
   longest: scannerLimits.photoPixels,
@@ -97,19 +98,23 @@ function useScanUpload() {
 }
 
 /**
- * The coin scanner (spec §16), where the New Item page starts for those who
- * may scan (new-item.tsx): photograph a coin's front, then its back, each
- * with the camera on a phone or picked from the computer's files, and
- * "Identify coin" suggests what it is. The suggestion goes to the form
- * (`onHandOver`) for the person to review, with the photos; a coin that isn't
- * identified can be added by hand, photos and all, and adding by hand before
- * any photo goes to the plain form.
+ * The scanner (spec §16), where the New Item page starts a coin or banknote
+ * for those who may scan (new-item.tsx): photograph its front, then its
+ * back, each with the camera on a phone or picked from the computer's
+ * files, and "Identify coin" (or banknote) suggests what it is and its
+ * Grade. The suggestion goes to the form (`onHandOver`) for the person to
+ * review, with the photos and the Item type read, which may be the other
+ * one; a piece that isn't identified can be added by hand, photos and all,
+ * and adding by hand before any photo goes to the plain form.
  */
-export function ScanCoin({
+export function ScanItem({
+  itemType,
   active,
   onHandOver,
 }: {
-  /** Whether it's in view: Cmd/Ctrl+Enter identifies the coin only then. */
+  /** The Item type picked: what the scanner asks for. */
+  itemType: ScanItemType;
+  /** Whether it's in view: Cmd/Ctrl+Enter identifies the piece only then. */
   active: boolean;
   onHandOver: (scan?: ScanPreset) => void;
 }) {
@@ -191,7 +196,11 @@ export function ScanCoin({
         back: sent.back.storageId,
       });
       if (result.outcome === "suggested")
-        onHandOver({ photos: sent, suggestion: result });
+        onHandOver({
+          itemType: result.itemType,
+          photos: sent,
+          suggestion: result,
+        });
       else setStatus({ state: result.outcome });
     } catch (failure) {
       setStatus({ state: "failed", message: errorMessage(codeOf(failure)) });
@@ -216,14 +225,14 @@ export function ScanCoin({
     }
     setStatus({ state: "working" });
     try {
-      onHandOver({ photos: await uploaded() });
+      onHandOver({ itemType, photos: await uploaded() });
     } catch {
       // The photos can be added on the Item's page later.
-      onHandOver({ photos: {} });
+      onHandOver({ itemType, photos: {} });
     }
   };
 
-  // Cmd/Ctrl+Enter identifies the coin wherever the focus is on the page,
+  // Cmd/Ctrl+Enter identifies the piece wherever the focus is on the page,
   // the Item type's radios too, as it did in the dialog.
   const latestScan = useRef(scan);
   latestScan.current = scan;
@@ -245,20 +254,25 @@ export function ScanCoin({
           id={titleId}
           className="flex items-center gap-1.5 text-sm font-medium"
         >
-          {t("scanner.title")}
+          {t(`scanner.title.${itemType}`)}
           <Badge>{t("scanner.beta")}</Badge>
         </h2>
         <p className="text-ui text-muted-foreground">
-          {configured ? t("scanner.description") : t("scanner.notConfigured")}
+          {configured
+            ? t(`scanner.description.${itemType}`)
+            : t(`scanner.notConfigured.${itemType}`)}
         </p>
         {configured && (
-          <p className="text-xs text-muted-foreground">{t("scanner.tips")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t(`scanner.tips.${itemType}`)}
+          </p>
         )}
       </div>
       <div className="grid grid-cols-2 gap-3">
         {photoSides.map((side, step) => (
           <PhotoStep
             key={side}
+            itemType={itemType}
             side={side}
             step={step + 1}
             photo={photos[side]}
@@ -284,16 +298,16 @@ export function ScanCoin({
               strokeWidth={1.75}
               aria-hidden="true"
             />
-            {t("scanner.identifying")}
+            {t(`scanner.identifying.${itemType}`)}
           </>
         ) : status.state === "unidentified" ? (
-          t("scanner.unidentified")
+          t(`scanner.unidentified.${itemType}`)
         ) : status.state === "notConfigured" ? (
-          t("scanner.notConfigured")
+          t(`scanner.notConfigured.${itemType}`)
         ) : status.state === "failed" ? (
           status.message
         ) : configured ? (
-          t(`scanner.next.${nextSide ?? "done"}`)
+          t(`scanner.next.${itemType}.${nextSide ?? "done"}`)
         ) : null}
       </p>
       <div className="flex items-center justify-between gap-2 border-t pt-3">
@@ -313,7 +327,7 @@ export function ScanCoin({
             onClick={() => void scan()}
           >
             {working && <Loader2 className="animate-spin" aria-hidden="true" />}
-            {t("scanner.identify")}
+            {t(`scanner.identify.${itemType}`)}
             {mod && (
               <Kbd
                 className={cn(
@@ -344,9 +358,12 @@ function useTouchCamera() {
 
 /**
  * One side's step: its photo, or what to photograph. Phones open the camera
- * (or their photo library); computers pick a file or take one dropped.
+ * (or their photo library); computers pick a file or take one dropped. A
+ * coin's sides are named as obverse and reverse too, a banknote's front and
+ * back as its photos are.
  */
 function PhotoStep({
+  itemType,
   side,
   step,
   photo,
@@ -354,6 +371,7 @@ function PhotoStep({
   disabled,
   onFile,
 }: {
+  itemType: ScanItemType;
   side: PhotoSide;
   step: number;
   photo: TakenPhoto | undefined;
@@ -368,9 +386,13 @@ function PhotoStep({
   const touch = useTouchCamera();
   const [dropping, setDropping] = useState(false);
   const pick = (input: typeof camera) => input.current?.click();
-  const sideName = t(
-    `photos.sides.${side === "front" ? "obverse" : "reverse"}`,
-  );
+  const coin = itemType === "coin";
+  const stepName = coin
+    ? t(`scanner.steps.${side}`)
+    : t(`photos.sides.${side}`);
+  const sideName = coin
+    ? t(`photos.sides.${side === "front" ? "obverse" : "reverse"}`)
+    : stepName;
   const fileInput = (ref: typeof camera, capture?: "environment") => (
     <input
       ref={ref}
@@ -407,10 +429,13 @@ function PhotoStep({
         >
           {step}
         </span>
-        {t(`scanner.steps.${side}`)}
-        <span className="truncate font-normal text-muted-foreground">
-          {sideName}
-        </span>
+        {stepName}
+        {/* Where the language names a coin's side as its step ("Avers"), once. */}
+        {sideName !== stepName && (
+          <span className="truncate font-normal text-muted-foreground">
+            {sideName}
+          </span>
+        )}
       </h3>
       <button
         type="button"

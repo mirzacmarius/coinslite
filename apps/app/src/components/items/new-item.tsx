@@ -2,7 +2,7 @@
 
 import { itemPageHref } from "@/components/collection/collection-url";
 import { useLeaveGuard } from "@/components/leave-guard";
-import { ScanCoin, useScanner } from "@/components/scanner/scan-coin";
+import { ScanItem, useScanner } from "@/components/scanner/scan-item";
 import type { ScanPreset } from "@/components/scanner/scan-preset";
 import { useUnsavedInput } from "@/lib/unsaved-input";
 import { useI18n } from "@/locales/client";
@@ -28,10 +28,10 @@ const collectionPath = "/collection";
 /**
  * New Item (spec 5.4): adding an Item on a page of its own rather than in a
  * dialog, which is hard to fill in on a phone. It starts with the choice of
- * Item type, a coin to begin with. For those who may scan, a coin starts with
- * the coin scanner (scanner/scan-coin.tsx), which hands over to the form; a
- * banknote or stamp, and everyone else, with the form. The form is the one the
- * dialogs had (use-item-form.ts), with Cancel and Add in the bar and
+ * Item type, a coin to begin with. For those who may scan, a coin or
+ * banknote starts with the scanner (scanner/scan-item.tsx), which hands over
+ * to the form; a stamp, and everyone else, with the form. The form is the
+ * one the dialogs had (use-item-form.ts), with Cancel and Add in the bar and
  * "Create more" below it. Leaving with unsaved input asks first
  * (useLeaveGuard); adding goes to the new Item's page.
  */
@@ -73,7 +73,6 @@ function NewItemForm() {
     onAdded: (itemId) => {
       added.current = itemForm.createMore ? undefined : itemId;
     },
-    newItemType: scan ? "coin" : undefined,
     scan,
   });
   const { form, submit, titleRef } = itemForm;
@@ -81,15 +80,12 @@ function NewItemForm() {
   useUnsavedInput(itemForm.changed);
   const typeOptions = useItemTypeOptions();
   const type = useSelector(form.store, (state) => state.values.type);
-  // A coin starts with the scanner; a banknote or stamp with the form. The
-  // scanner stays mounted while another type is picked, keeping its photos.
+  // A coin or banknote starts with the scanner; a stamp with the form. The
+  // scanner stays mounted while a stamp is picked, keeping its photos.
   const scanFirst = scanning && scanner?.available === true;
+  const scanType = type === "coin" || type === "banknote" ? type : undefined;
   const step =
-    scanner === undefined
-      ? "loading"
-      : scanFirst && type === "coin"
-        ? "scan"
-        : "form";
+    scanner === undefined ? "loading" : scanFirst && scanType ? "scan" : "form";
   // The form starts on its title, as it did in the dialog: the first time it
   // shows, not each time the Item type moves to it.
   const titleFocused = useRef(false);
@@ -156,7 +152,8 @@ function NewItemForm() {
         />
         {scanFirst && (
           <div hidden={step !== "scan"}>
-            <ScanCoin
+            <ScanItem
+              itemType={scanType ?? "coin"}
               active={step === "scan"}
               onHandOver={(next) => {
                 setScan(next);

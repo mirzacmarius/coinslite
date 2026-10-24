@@ -50,6 +50,10 @@ _Avoid_: Condition, quality, state
 A named, ordered set of Grades used to assess condition, such as Sheldon 1–70 or the Norwegian 0–3 scale. Each country has a default scale.
 _Avoid_: Grading system, rating
 
+**Suggested Grade**:
+A Grade the scanner suggests from an Item's photos, on the scale the Item starts on: the lower of two when in doubt, none when the photos can't tell. The form marks it as the scanner's suggestion until the collector changes it.
+_Avoid_: AI grade, automatic grade, estimated grade
+
 **Strike**:
 How a coin was manufactured: circulation, brilliant uncirculated (BU) or proof. It is independent of Grade: a proof coin still has a Grade.
 _Avoid_: Finish, quality, using "Proof" or "BU" as a Grade

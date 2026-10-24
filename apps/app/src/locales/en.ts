@@ -1332,7 +1332,7 @@ export default {
       "When off, only admins see the Catalog. Everyone else no longer finds it in navigation, browsing or search.",
     scanner: "Scanner",
     scannerDescription:
-      "Who can photograph a coin to get a suggested Catalog entry. Admins can whenever it isn't off.",
+      "Who can photograph a coin or banknote to get a suggested Catalog entry. Admins can whenever it isn't off.",
     scannerOptions: {
       off: "Off",
       admins: "Admins only",
@@ -2060,44 +2060,72 @@ export default {
     home: "Go to the Overview",
   },
   scanner: {
-    title: "Scan coin",
+    title: { coin: "Scan coin", banknote: "Scan banknote" },
     beta: "Beta",
-    description:
-      "Photograph both sides of a coin and CoinsLite suggests what it is. You check the suggestion before the Item is added.",
-    tips: "Lay the coin flat on a plain background, fill the frame and avoid glare.",
+    description: {
+      coin: "Photograph both sides of a coin and CoinsLite suggests what it is and its Grade. You check the suggestion before the Item is added.",
+      banknote:
+        "Photograph both sides of a banknote and CoinsLite suggests what it is and its Grade. You check the suggestion before the Item is added.",
+    },
+    tips: {
+      coin: "Lay the coin flat on a plain background, fill the frame and avoid glare.",
+      banknote:
+        "Lay the banknote flat on a plain background, all four corners in the frame, and avoid glare.",
+    },
     steps: {
       front: "Front",
       back: "Back",
     },
     next: {
-      front: "Start with the front of the coin.",
-      back: "Now turn the coin over and photograph the back.",
-      done: "Both sides are in. Identify the coin when you're ready.",
+      coin: {
+        front: "Start with the front of the coin.",
+        back: "Now turn the coin over and photograph the back.",
+        done: "Both sides are in. Identify the coin when you're ready.",
+      },
+      banknote: {
+        front: "Start with the front of the banknote.",
+        back: "Now turn the banknote over and photograph the back.",
+        done: "Both sides are in. Identify the banknote when you're ready.",
+      },
     },
     takePhoto: "Take photo",
     choosePhoto: "Choose photo",
     chooseFile: "Choose file",
     retake: "Retake",
-    identify: "Identify coin",
-    identifying: "Identifying the coin…",
+    identify: { coin: "Identify coin", banknote: "Identify banknote" },
+    identifying: {
+      coin: "Identifying the coin…",
+      banknote: "Identifying the banknote…",
+    },
     addByHand: "Add by hand",
-    unidentified:
-      "The coin couldn't be identified. Try new photos in better light, or add it by hand with these photos.",
-    notConfigured:
-      "The scanner isn't available on this deployment yet. You can still add the coin by hand.",
+    unidentified: {
+      coin: "The coin couldn't be identified. Try new photos in better light, or add it by hand with these photos.",
+      banknote:
+        "The banknote couldn't be identified. Try new photos in better light, or add it by hand with these photos.",
+    },
+    notConfigured: {
+      coin: "The scanner isn't available on this deployment yet. You can still add the coin by hand.",
+      banknote:
+        "The scanner isn't available on this deployment yet. You can still add the banknote by hand.",
+    },
     errors: {
       notAvailable: "The scanner isn't available to you.",
       tooMany:
-        "You've scanned many coins in a short time. Try again later, or add this one by hand.",
+        "You've made many scans in a short time. Try again later, or add this one by hand.",
       tooLarge: "That photo is too large to scan. Try another one.",
       notAnImage: "That file isn't a JPEG, PNG, WebP or GIF image.",
       uploadsTooMany:
         "Too many uploads in a short time. Try again in a few minutes.",
-      failed: "The scan didn't go through. Try again, or add the coin by hand.",
+      failed: "The scan didn't go through. Try again, or add it by hand.",
     },
     suggested: "Suggested by the scanner",
-    reviewHint:
-      "Check each detail against your coin before you add the Item. The photos are added with it.",
+    reviewHint: {
+      coin: "Check each detail against your coin before you add the Item. The photos are added with it.",
+      banknote:
+        "Check each detail against your banknote before you add the Item. The photos are added with it.",
+    },
+    gradeSuggested:
+      "Grade {grade} is the scanner's suggestion, from the photos alone. Check it in hand: photos can hide wear, cleaning and marks.",
     photosFromScan: "Photos from the scan",
     photosHint: "These photos are added to the Item.",
     photosFailed:

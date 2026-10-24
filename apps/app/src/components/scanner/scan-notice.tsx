@@ -28,8 +28,11 @@ export function ScanNotice({ scan }: { scan: ScanPreset }) {
             <img
               key={side}
               src={url}
+              // A banknote's sides are its front and back.
               alt={t(
-                `photos.sides.${side === "front" ? "obverse" : "reverse"}`,
+                scan.itemType === "coin"
+                  ? `photos.sides.${side === "front" ? "obverse" : "reverse"}`
+                  : `photos.sides.${side}`,
               )}
               className="size-12 rounded-md border bg-background object-contain"
             />
@@ -42,7 +45,9 @@ export function ScanNotice({ scan }: { scan: ScanPreset }) {
           {t(scan.suggestion ? "scanner.suggested" : "scanner.photosFromScan")}
         </p>
         <p className="text-xs text-muted-foreground">
-          {t(scan.suggestion ? "scanner.reviewHint" : "scanner.photosHint")}
+          {scan.suggestion
+            ? t(`scanner.reviewHint.${scan.itemType}`)
+            : t("scanner.photosHint")}
         </p>
       </div>
     </section>

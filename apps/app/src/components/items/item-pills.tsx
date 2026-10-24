@@ -3,10 +3,11 @@
 import { AlbumPicker } from "@/components/albums/album-picker";
 import { useCurrentLocale, useI18n } from "@/locales/client";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
+import type { ScanGrade } from "@coinslite/backend/convex/scanner/rules";
 import { countryCodes, formatCountry } from "@coinslite/i18n";
 import { Input } from "@coinslite/ui/input";
 import { PropertyPicker } from "@coinslite/ui/property-picker";
-import { Award, Globe, Hammer } from "lucide-react";
+import { Award, Globe, Hammer, ScanLine } from "lucide-react";
 import { useMemo } from "react";
 import { useGradeLabels } from "./grade-labels";
 import { CatalogLink } from "./item-catalog-link";
@@ -16,17 +17,21 @@ import { TagPicker } from "./tag-picker";
 
 /**
  * The Item form's row of pills, always in view: the Catalog entry or Item
- * type, the Album, country, Grade, strike, quantity and tags.
+ * type, the Album, country, Grade, strike, quantity and tags. A Grade a scan
+ * suggested is marked as the scanner's while it stands.
  */
 export function ItemPills({
   linked,
   typePicker,
+  suggestedGrade,
   onPickEntry,
   onAlbumCreateFailed,
 }: {
   linked: LinkedEntry | undefined;
   /** Whether the Item type pill shows: not where the page picks the type (new-item.tsx). */
   typePicker?: boolean;
+  /** The Grade a scan of the new Item suggested from its photos. */
+  suggestedGrade?: ScanGrade;
   /** Opens the Catalog picker. */
   onPickEntry: () => void;
   /** Says an Album made from the Album pill couldn't be created. */
@@ -156,6 +161,24 @@ export function ItemPills({
           )}
         </form.Field>
       </div>
+      {suggestedGrade && (
+        <form.Subscribe selector={(state) => state.values.grade}>
+          {(grade) =>
+            grade === suggestedGrade.value && scale === suggestedGrade.scale ? (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <ScanLine
+                  className="size-3.5 shrink-0"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+                {t("scanner.gradeSuggested", {
+                  grade: labels.grade(scale, grade, strike),
+                })}
+              </p>
+            ) : null
+          }
+        </form.Subscribe>
+      )}
       <form.Subscribe selector={(state) => state.fieldMeta.quantity?.errors}>
         {(errors) =>
           errors && errorOf(errors) ? (

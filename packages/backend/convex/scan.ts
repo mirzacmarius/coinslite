@@ -11,14 +11,15 @@ import {
   scannerLimits,
   suggestionFrom,
 } from "./scanner/rules";
-import { coinVision } from "./scanner/vision";
-import { material } from "./utils/validators";
+import { scanVision } from "./scanner/vision";
+import { catalogItemType, gradingScale, material } from "./utils/validators";
 
 /**
- * Scanning a coin (spec §16): the vision model reads two photos, the Catalog
- * offers the entries the coin might be, and the model picks the one it is.
- * The scan only suggests; the person reviews the suggestion in the Item form
- * before anything is saved, and the photos become the Item's.
+ * Scanning a coin or banknote (spec §16): the vision model reads two photos,
+ * the Catalog offers the entries it might be, and the model picks the one
+ * it is. The scan only suggests; the person reviews the suggestion, its
+ * Grade marked as from the photos, in the Item form before anything is
+ * saved, and the photos become the Item's.
  */
 
 const unidentified = { outcome: "unidentified" as const };
@@ -47,11 +48,12 @@ const answerOrNull = <T>(question: Promise<T | null>) =>
 
 /**
  * Scans the front and back photos the caller just uploaded and registered
- * (photos.register). Suggests the Catalog entry the coin is, or the facts
- * read from it when no entry matches; "unidentified" when the model can't
- * tell, declines, times out or answers nonsense; "notConfigured" on a
- * deployment without the model's key. Throws SCANNER_NOT_AVAILABLE for
- * anyone the scanner flag (and Premium, during the beta) leaves out, and
+ * (photos.register). Suggests whether it's a coin or a banknote, the
+ * Catalog entry it is, or the facts read from it when no entry matches, and
+ * the Grade the photos show; "unidentified" when the model can't tell,
+ * declines, times out or answers nonsense; "notConfigured" on a deployment
+ * without the model's key. Throws SCANNER_NOT_AVAILABLE for anyone the
+ * scanner flag (and Premium, during the beta) leaves out, and
  * TOO_MANY_SCANS past the pace allowed.
  */
 export const identify = action({
@@ -59,6 +61,7 @@ export const identify = action({
   returns: v.union(
     v.object({
       outcome: v.literal("suggested"),
+      itemType: catalogItemType,
       title: v.string(),
       entry: v.optional(v.object({ key: v.string(), title: v.string() })),
       facts: v.object({
@@ -70,7 +73,11 @@ export const identify = action({
         mintMark: v.optional(v.string()),
         ruler: v.optional(v.string()),
         diameter: v.optional(v.number()),
+        serialNumber: v.optional(v.string()),
+        signatures: v.optional(v.string()),
+        printer: v.optional(v.string()),
       }),
+      grade: v.optional(v.object({ scale: gradingScale, value: v.string() })),
     }),
     v.object({ outcome: v.literal("unidentified") }),
     v.object({ outcome: v.literal("notConfigured") }),
@@ -85,9 +92,9 @@ export const identify = action({
       front: await scanPhoto(ctx, front),
       back: await scanPhoto(ctx, back),
     };
-    const vision = coinVision();
+    const vision = scanVision();
     const reading = await answerOrNull(vision.read(photos, scan.language));
-    if (!reading?.isCoin) return unidentified;
+    if (!reading?.itemType) return unidentified;
 
     const candidates = scan.catalogVisible
       ? await ctx.runQuery(internal.scanner.candidates, {

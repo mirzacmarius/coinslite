@@ -13,11 +13,11 @@ import {
 import { scannerConfigured } from "./scanner/vision";
 import { requireSetUpUser } from "./utils/auth";
 import { ownUpload } from "./utils/files";
-import { language, material } from "./utils/validators";
+import { catalogItemType, language, material } from "./utils/validators";
 
 /**
- * The coin scanner's database side (scan.ts runs the scan itself): who may
- * scan, how often, and the Catalog entries a coin might be.
+ * The scanner's database side (scan.ts runs the scan itself): who may
+ * scan, how often, and the Catalog entries a coin or banknote might be.
  */
 
 const rateLimiter = new RateLimiter(components.rateLimiter, {
@@ -88,36 +88,48 @@ const candidate = v.object({
   diameter: v.optional(v.number()),
 });
 
+const textOrNull = v.union(v.string(), v.null());
+const numberOrNull = v.union(v.number(), v.null());
+
 /**
- * The coin Catalog entries a reading might be, likeliest first
- * (scanner/rules.ts ranks them): those found by the reading's words.
+ * The Catalog entries of the reading's Item type it might be, likeliest
+ * first (scanner/rules.ts ranks them): those found by the reading's words.
  */
 export const candidates = internalQuery({
   args: {
     words: v.array(v.string()),
+    // A ScanReading (scanner/rules.ts).
     reading: v.object({
-      isCoin: v.boolean(),
-      title: v.union(v.string(), v.null()),
-      country: v.union(v.string(), v.null()),
-      year: v.union(v.number(), v.null()),
-      denomination: v.union(v.string(), v.null()),
-      series: v.union(v.string(), v.null()),
-      material: v.union(v.string(), v.null()),
-      mintMark: v.union(v.string(), v.null()),
-      ruler: v.union(v.string(), v.null()),
-      diameter: v.union(v.number(), v.null()),
-      inscriptions: v.union(v.string(), v.null()),
+      itemType: v.union(catalogItemType, v.null()),
+      title: textOrNull,
+      country: textOrNull,
+      year: numberOrNull,
+      denomination: textOrNull,
+      series: textOrNull,
+      ruler: textOrNull,
+      material: textOrNull,
+      mintMark: textOrNull,
+      diameter: numberOrNull,
+      serialNumber: textOrNull,
+      signatures: textOrNull,
+      printer: textOrNull,
+      inscriptions: textOrNull,
+      grade: v.union(
+        v.object({ scale: v.string(), value: v.string() }),
+        v.null(),
+      ),
     }),
   },
   returns: v.array(candidate),
   handler: async (ctx, { words, reading }) => {
-    if (words.length === 0) return [];
+    const { itemType } = reading;
+    if (words.length === 0 || itemType === null) return [];
     const nodes = await ctx.db
       .query("catalogNodes")
       .withSearchIndex("search_searchText", (q) =>
         q
           .search("searchText", words.join(" "))
-          .eq("itemType", "coin")
+          .eq("itemType", itemType)
           .eq("kind", "entry"),
       )
       .take(scanned);

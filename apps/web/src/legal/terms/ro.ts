@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "Scanerul de monede",
+      heading: "Scanerul",
       blocks: [
-        "Scanerul, o versiune beta în Premium, sugerează ce monedă arată fotografiile tale. Sugestiile pot fi greșite, de aceea îți sunt mereu afișate ca să le verifici și să le corectezi înainte să se salveze ceva.",
+        "Scanerul, o versiune beta în Premium, sugerează ce monedă sau bancnotă arată fotografiile tale și în ce stare e. Sugestiile pot fi greșite, de aceea îți sunt mereu afișate ca să le verifici și să le corectezi înainte să se salveze ceva.",
       ],
     },
     {

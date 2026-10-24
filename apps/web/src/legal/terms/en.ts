@@ -79,9 +79,9 @@ export default {
     },
     {
       id: "scanner",
-      heading: "The coin scanner",
+      heading: "The scanner",
       blocks: [
-        "The scanner, a Premium beta, suggests which coin your photos show. Suggestions can be wrong, so they are always shown for you to review and correct before anything is saved.",
+        "The scanner, a Premium beta, suggests which coin or banknote your photos show, and its Grade. Suggestions can be wrong, so they are always shown for you to review and correct before anything is saved.",
       ],
     },
     {

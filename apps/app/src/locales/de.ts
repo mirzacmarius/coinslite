@@ -1393,7 +1393,7 @@ export default {
       "Wenn aus, sehen nur Admins den Katalog. Alle anderen finden ihn nicht mehr in der Navigation, beim Stöbern oder in der Suche.",
     scanner: "Scanner",
     scannerDescription:
-      "Wer eine Münze fotografieren kann, um einen passenden Katalogeintrag vorgeschlagen zu bekommen. Admins können es, solange er nicht aus ist.",
+      "Wer eine Münze oder Banknote fotografieren kann, um einen passenden Katalogeintrag vorgeschlagen zu bekommen. Admins können es, solange er nicht aus ist.",
     scannerOptions: {
       off: "Aus",
       admins: "Nur Admins",
@@ -2157,45 +2157,73 @@ export default {
     home: "Zur Übersicht",
   },
   scanner: {
-    title: "Münze scannen",
+    title: { coin: "Münze scannen", banknote: "Banknote scannen" },
     beta: "Beta",
-    description:
-      "Fotografiere beide Seiten einer Münze, und CoinsLite schlägt vor, was sie ist. Du prüfst den Vorschlag, bevor das Objekt hinzugefügt wird.",
-    tips: "Lege die Münze flach auf einen einfarbigen Hintergrund, fülle das Bild aus und vermeide Spiegelungen.",
+    description: {
+      coin: "Fotografiere beide Seiten einer Münze, und CoinsLite schlägt vor, was sie ist und welche Erhaltung sie hat. Du prüfst den Vorschlag, bevor das Objekt hinzugefügt wird.",
+      banknote:
+        "Fotografiere beide Seiten einer Banknote, und CoinsLite schlägt vor, was sie ist und welche Erhaltung sie hat. Du prüfst den Vorschlag, bevor das Objekt hinzugefügt wird.",
+    },
+    tips: {
+      coin: "Lege die Münze flach auf einen einfarbigen Hintergrund, fülle das Bild aus und vermeide Spiegelungen.",
+      banknote:
+        "Lege die Banknote flach auf einen einfarbigen Hintergrund, mit allen vier Ecken im Bild, und vermeide Spiegelungen.",
+    },
     steps: {
       front: "Vorderseite",
       back: "Rückseite",
     },
     next: {
-      front: "Beginne mit der Vorderseite der Münze.",
-      back: "Dreh die Münze jetzt um und fotografiere die Rückseite.",
-      done: "Beide Seiten sind da. Lass die Münze bestimmen, wenn du so weit bist.",
+      coin: {
+        front: "Beginne mit der Vorderseite der Münze.",
+        back: "Dreh die Münze jetzt um und fotografiere die Rückseite.",
+        done: "Beide Seiten sind da. Lass die Münze bestimmen, wenn du so weit bist.",
+      },
+      banknote: {
+        front: "Beginne mit der Vorderseite der Banknote.",
+        back: "Dreh die Banknote jetzt um und fotografiere die Rückseite.",
+        done: "Beide Seiten sind da. Lass die Banknote bestimmen, wenn du so weit bist.",
+      },
     },
     takePhoto: "Foto aufnehmen",
     choosePhoto: "Foto auswählen",
     chooseFile: "Datei auswählen",
     retake: "Neu aufnehmen",
-    identify: "Münze bestimmen",
-    identifying: "Münze wird bestimmt…",
+    identify: { coin: "Münze bestimmen", banknote: "Banknote bestimmen" },
+    identifying: {
+      coin: "Münze wird bestimmt…",
+      banknote: "Banknote wird bestimmt…",
+    },
     addByHand: "Von Hand hinzufügen",
-    unidentified:
-      "Die Münze konnte nicht bestimmt werden. Versuch es mit neuen Fotos bei besserem Licht, oder füge sie mit diesen Fotos von Hand hinzu.",
-    notConfigured:
-      "Der Scanner ist in dieser Umgebung noch nicht verfügbar. Du kannst die Münze trotzdem von Hand hinzufügen.",
+    unidentified: {
+      coin: "Die Münze konnte nicht bestimmt werden. Versuch es mit neuen Fotos bei besserem Licht, oder füge sie mit diesen Fotos von Hand hinzu.",
+      banknote:
+        "Die Banknote konnte nicht bestimmt werden. Versuch es mit neuen Fotos bei besserem Licht, oder füge sie mit diesen Fotos von Hand hinzu.",
+    },
+    notConfigured: {
+      coin: "Der Scanner ist in dieser Umgebung noch nicht verfügbar. Du kannst die Münze trotzdem von Hand hinzufügen.",
+      banknote:
+        "Der Scanner ist in dieser Umgebung noch nicht verfügbar. Du kannst die Banknote trotzdem von Hand hinzufügen.",
+    },
     errors: {
       notAvailable: "Der Scanner ist für dich nicht verfügbar.",
       tooMany:
-        "Du hast in kurzer Zeit viele Münzen gescannt. Versuch es später noch einmal, oder füge diese von Hand hinzu.",
+        "Du hast in kurzer Zeit viel gescannt. Versuch es später noch einmal, oder füge dieses Objekt von Hand hinzu.",
       tooLarge: "Das Foto ist zu groß zum Scannen. Versuch ein anderes.",
       notAnImage: "Die Datei ist kein JPEG-, PNG-, WebP- oder GIF-Bild.",
       uploadsTooMany:
         "Zu viele Uploads in kurzer Zeit. Versuch es in ein paar Minuten noch einmal.",
       failed:
-        "Der Scan hat nicht geklappt. Versuch es noch einmal, oder füge die Münze von Hand hinzu.",
+        "Der Scan hat nicht geklappt. Versuch es noch einmal, oder füge das Objekt von Hand hinzu.",
     },
     suggested: "Vom Scanner vorgeschlagen",
-    reviewHint:
-      "Prüfe jedes Detail an deiner Münze, bevor du das Objekt hinzufügst. Die Fotos werden mit hinzugefügt.",
+    reviewHint: {
+      coin: "Prüfe jedes Detail an deiner Münze, bevor du das Objekt hinzufügst. Die Fotos werden mit hinzugefügt.",
+      banknote:
+        "Prüfe jedes Detail an deiner Banknote, bevor du das Objekt hinzufügst. Die Fotos werden mit hinzugefügt.",
+    },
+    gradeSuggested:
+      "Erhaltung {grade} ist der Vorschlag des Scanners, allein nach den Fotos. Prüfe sie mit dem Objekt in der Hand: Fotos können Abnutzung, Reinigung und Kratzer verbergen.",
     photosFromScan: "Fotos aus dem Scan",
     photosHint: "Diese Fotos werden dem Objekt hinzugefügt.",
     photosFailed:

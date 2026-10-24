@@ -18,7 +18,6 @@ import type { Doc, Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { samePaid } from "@coinslite/backend/convex/exchangeRates/rules";
 import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules";
 import { photoSides } from "@coinslite/backend/convex/photos/rules";
-import type { ItemType } from "@coinslite/ui/item-type-icon";
 import { toast } from "@coinslite/ui/toaster";
 import { useForm, useSelector } from "@tanstack/react-form";
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
@@ -64,9 +63,7 @@ export type ItemFormProps = {
   copyOf?: EditedItem;
   /** For a new Item: called with it once it's added. */
   onAdded?: (itemId: Id<"items">) => void;
-  /** For a new Item: the Item type already chosen each time the dialog opens. */
-  newItemType?: ItemType;
-  /** For a new Item: a coin scan's photos and suggestion, applied each time it changes. */
+  /** For a new Item: a scan's Item type, photos and suggestion, applied each time it changes. */
   scan?: ScanPreset;
 };
 
@@ -74,7 +71,7 @@ export type ItemFormProps = {
  * The Item form's state and saving, for new-item.tsx, item-form-dialog.tsx and the Edit
  * Item page (item-edit.tsx) to lay out: its values and the Catalog entry
  * they're linked to, the Catalog picker (the form's "Pick from the Catalog"
- * and Catalog pill open it), a coin scan's suggestion and photos, the Album
+ * and Catalog pill open it), a scan's suggestion and photos, the Album
  * a new Item goes into, and what happens after saving ("Create more" starts
  * the next Item).
  */
@@ -84,7 +81,6 @@ export function useItemForm({
   item,
   copyOf,
   onAdded,
-  newItemType,
   scan,
 }: ItemFormProps) {
   const t = useI18n();
@@ -251,10 +247,6 @@ export function useItemForm({
     )
       prefillForm(form, { albumId: onlyAlbum });
   }, [open, onlyAlbum, form]);
-  // Before the first paint, so the type pill never shows the previous type.
-  useLayoutEffect(() => {
-    if (open && newItemType && !item) prefillForm(form, { type: newItemType });
-  }, [open, newItemType, item, form]);
   // Closing the dialog closes the Catalog picker too: each opening starts
   // on the form, and the picker opens from it.
   useEffect(() => {
@@ -301,17 +293,33 @@ export function useItemForm({
     return true;
   };
 
-  /** Fills the form with a scan's suggestion: its Catalog entry, else the facts read. */
+  /**
+   * Fills the form with a scan's suggestion: its Item type, its Catalog
+   * entry, else the facts read, and the Grade the photos show, on its scale.
+   * What no entry says goes in before the entry is looked up, so that what
+   * the person picks or types meanwhile isn't written over.
+   */
   const applySuggestion = async (
     suggestion: NonNullable<ScanPreset["suggestion"]>,
   ) => {
-    const { facts } = suggestion;
-    fillForm(form, { type: "coin" });
+    const { facts, grade } = suggestion;
+    fillForm(form, {
+      type: suggestion.itemType,
+      // What only this banknote shows, entry or not.
+      serialNumber: facts.serialNumber ?? "",
+      signatures: facts.signatures ?? "",
+      // On its own scale: the form's may be another until the country is in.
+      ...(grade && { grade: grade.value, gradingScale: grade.scale }),
+    });
+    // The suggested details are there to check.
+    setDetailsOpen(true);
+    const typedYear = form.getFieldValue("year");
     const linkedToEntry =
       suggestion.entry !== undefined && (await linkEntry(suggestion.entry.key));
     if (!linkedToEntry) fillForm(form, { title: suggestion.title });
     const values = factValues(facts, locale);
-    if (facts.year !== undefined) fillForm(form, { year: values.year });
+    if (facts.year !== undefined && form.getFieldValue("year") === typedYear)
+      fillForm(form, { year: values.year });
     if (!linkedToEntry)
       fillForm(form, {
         country: values.country,
@@ -321,16 +329,17 @@ export function useItemForm({
         diameter: values.diameter,
         mintMark: facts.mintMark ?? "",
         ruler: facts.ruler ?? "",
+        printer: facts.printer ?? "",
       });
-    // The suggested details are there to check.
-    setDetailsOpen(true);
   };
-  // A new scan starts the form afresh with its suggestion.
+  // A new scan starts the form afresh, as the Item type scanned, with its
+  // suggestion. Before the first paint, so the type never shows another.
   const appliedScan = useRef<ScanPreset | undefined>(undefined);
   useLayoutEffect(() => {
     if (!open || item || !scan || appliedScan.current === scan) return;
     appliedScan.current = scan;
     clearForm();
+    prefillForm(form, { type: scan.itemType });
     setScanned(scan);
     if (scan.suggestion) void applySuggestion(scan.suggestion);
   });
