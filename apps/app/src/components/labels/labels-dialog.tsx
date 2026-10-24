@@ -37,7 +37,7 @@ import { cn } from "@coinslite/ui/utils";
 import { useAction, useQuery } from "convex/react";
 import type { FunctionArgs } from "convex/server";
 import { ConvexError } from "convex/values";
-import { Download, Loader2, Sparkles, Tag, X } from "lucide-react";
+import { Download, Loader2, Printer, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import type * as React from "react";
 import { useId, useState } from "react";
@@ -102,7 +102,7 @@ export function LabelsDialog({
       <DialogContent className="sm:max-w-[30rem]">
         <DialogHeader>
           <div className="flex min-w-0 items-center gap-1.5 text-ui text-muted-foreground">
-            <Tag
+            <Printer
               className="size-4 shrink-0"
               strokeWidth={1.75}
               aria-hidden="true"
@@ -432,44 +432,3 @@ function CheckRow({
     </li>
   );
 }
-
-/**
- * Select mode's Print labels: the Labels dialog for the selected Items. How
- * many pieces they hold isn't known here, so one label per piece is counted
- * when the PDF is made.
- */
-export function PrintLabelsButton({
-  itemIds,
-}: {
-  itemIds: readonly LabelSourceItemId[];
-}) {
-  const t = useI18n();
-  const [open, setOpen] = useState(false);
-  const count = itemIds.length;
-  return (
-    <>
-      <Button
-        type="button"
-        variant="ghost"
-        size="xs"
-        disabled={count === 0}
-        onClick={() => setOpen(true)}
-      >
-        <Tag strokeWidth={1.75} aria-hidden="true" />
-        {t("labels.selectionAction")}
-      </Button>
-      <LabelsDialog
-        open={open}
-        onOpenChange={setOpen}
-        source={{ kind: "items", itemIds: [...itemIds] }}
-        description={t("labels.forSelection", { count })}
-        items={count}
-      />
-    </>
-  );
-}
-
-type LabelSourceItemId = Extract<
-  LabelSource,
-  { kind: "items" }
->["itemIds"][number];

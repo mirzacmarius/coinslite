@@ -10,9 +10,9 @@ import { Suspense } from "react";
 
 /**
  * The Collection: every Item the person owns, searched, filtered, sorted
- * and paged as the URL says, under the totals. The URL is request data, so
- * everything that reads it streams in below the header (ADR 0004). Adding an
- * Item is the shell's: the sidebar, or the middle of the phone tabs.
+ * and paged as the URL says, under a summary strip. The URL is request data,
+ * so everything that reads it streams in below the header (ADR 0004). Adding
+ * an Item is the shell's: the sidebar, or the middle of the phone tabs.
  */
 export function CollectionPage() {
   const t = useI18n();

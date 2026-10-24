@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
 
 export * from "./use-double-check";
 
@@ -14,6 +14,15 @@ export function callAll<Args extends unknown[]>(
       fn?.(...args);
     });
 }
+
+/**
+ * tailwind-merge, told the theme's own font sizes (tailwind.config.ts):
+ * otherwise it takes `text-ui` for a colour, and a later colour such as
+ * `text-destructive` drops it.
+ */
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { "font-size": [{ text: ["ui", "ui-lg"] }] } },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

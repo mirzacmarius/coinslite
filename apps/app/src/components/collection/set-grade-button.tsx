@@ -29,6 +29,7 @@ export function SetGradeButton({
   selection,
   onGraded,
   onFailed,
+  className,
 }: {
   selection: ItemSelection;
   onGraded: (result: {
@@ -37,6 +38,7 @@ export function SetGradeButton({
     undo?: UndoGrade;
   }) => void;
   onFailed: (message: string) => void;
+  className?: string;
 }) {
   const t = useI18n();
   const labels = useGradeLabels();
@@ -76,7 +78,7 @@ export function SetGradeButton({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="ghost" size="xs" disabled={count === 0}>
+        <Button type="button" variant="ghost" size="xs" className={className}>
           <Award aria-hidden="true" />
           {t("collection.setGrade")}
         </Button>

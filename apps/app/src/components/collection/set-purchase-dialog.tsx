@@ -41,55 +41,15 @@ import { ConvexError } from "convex/values";
 import { Loader2, Receipt, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { z } from "zod";
-import type { ItemSelection } from "./use-item-selection";
 
 /**
  * A Set purchase done: on how many Items, and how to undo it, which says how
  * many Items got their purchase back and how many were skipped.
  */
-type PurchaseSet = {
+export type PurchaseSet = {
   count: number;
   undo: () => Promise<FunctionReturnType<typeof api.items.undoPurchase>>;
 };
-
-/**
- * Select mode's Set purchase, for a bought lot: a Purchase price per piece,
- * purchase date and source to set on every selected Item. Says how many
- * through `onSet`, with `undo`.
- */
-export function SetPurchaseButton({
-  selection,
-  onSet,
-}: {
-  selection: ItemSelection;
-  onSet: (result: PurchaseSet) => void;
-}) {
-  const t = useI18n();
-  // Each opening starts the form afresh.
-  const [dialog, setDialog] = useState({ open: false, key: 0 });
-  const { count, selected } = selection;
-  return (
-    <>
-      <Button
-        type="button"
-        variant="ghost"
-        size="xs"
-        disabled={count === 0}
-        onClick={() => setDialog(({ key }) => ({ open: true, key: key + 1 }))}
-      >
-        <Receipt aria-hidden="true" />
-        {t("collection.setPurchase")}
-      </Button>
-      <SetPurchaseDialog
-        key={dialog.key}
-        open={dialog.open}
-        onOpenChange={(open) => setDialog(({ key }) => ({ open, key }))}
-        itemIds={[...selected.keys()]}
-        onSet={onSet}
-      />
-    </>
-  );
-}
 
 type PurchaseValues = {
   /** Typed in `purchaseCurrency`, or the Home currency without one. */
@@ -108,11 +68,14 @@ const empty: PurchaseValues = {
 };
 
 /**
- * The Set purchase form: each field optional, checked as the Item form
- * checks it. A field left empty keeps each Item's own value; at least one
- * must be filled in.
+ * Select mode's Set purchase, for a bought lot: a Purchase price per piece,
+ * purchase date and source to set on every selected Item, each optional and
+ * checked as the Item form checks it. A field left empty keeps each Item's
+ * own value; at least one must be filled in. Says how many through `onSet`,
+ * with `undo`. Mount it afresh (a new key) for each opening, to start the
+ * form empty.
  */
-function SetPurchaseDialog({
+export function SetPurchaseDialog({
   open,
   onOpenChange,
   itemIds,

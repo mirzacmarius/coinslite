@@ -33,8 +33,8 @@ import {
   FileText,
   FileUp,
   Loader2,
+  Printer,
   Sparkles,
-  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -193,7 +193,7 @@ export function ExportMenu({
                 disabled={plan !== "premium" || count === 0 || !complete}
                 onSelect={() => setLabelling(true)}
               >
-                <Tag strokeWidth={1.75} />
+                <Printer strokeWidth={1.75} />
                 {t("labels.menuItem")}
               </DropdownMenuItem>
               {complete && tooLargeForPdf && (
