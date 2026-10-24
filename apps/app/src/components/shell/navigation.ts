@@ -23,11 +23,12 @@ export type NavItem = {
   onPhoneTabs: boolean;
 };
 
+/** In the order the sidebar lists them: Albums sit with the Collection they group. */
 export const navItems: NavItem[] = [
   { key: "overview", href: "/", icon: LayoutDashboard, onPhoneTabs: true },
   { key: "collection", href: "/collection", icon: Library, onPhoneTabs: true },
-  { key: "catalog", href: "/catalog", icon: BookOpen, onPhoneTabs: true },
   { key: "albums", href: "/albums", icon: FolderOpen, onPhoneTabs: false },
+  { key: "catalog", href: "/catalog", icon: BookOpen, onPhoneTabs: true },
   { key: "account", href: "/settings", icon: UserRound, onPhoneTabs: true },
 ];
 
