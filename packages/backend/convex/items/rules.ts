@@ -196,6 +196,10 @@ function amount(value: number | undefined) {
   return value;
 }
 
+/** The latest allowed purchase date: tomorrow, so "today" anywhere on Earth is accepted. */
+export const latestPurchaseDate = () =>
+  new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
 /** Whether a "YYYY-MM-DD" date exists and isn't after `today`. */
 export function isPastOrToday(date: string, today: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;

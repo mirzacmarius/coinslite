@@ -28,6 +28,8 @@ const MINOR_UNITS_PER_MAJOR = 100;
  * ("NOK 1,234.56" in English), so the narrow symbol is used. That turns NOK,
  * SEK and DKK all into "kr", which is fine: a person sees one Home currency
  * only, and every export that leaves the app states its ISO code in words.
+ * A purchase in another krone, shown beside the Home currency, shows its
+ * ISO code (`besides`).
  */
 const currencyDisplay = "narrowSymbol";
 
@@ -42,24 +44,38 @@ export type MoneyFormatOptions = {
   signed?: boolean;
   /** Abbreviates large amounts to one decimal, e.g. for chart axes: "kr 150K". */
   compact?: boolean;
+  /**
+   * The currency of money shown beside it, such as the Home currency beside
+   * a purchase in another: one written with the same symbol shows its ISO
+   * code instead ("SEK 1,000.00" beside kroner).
+   */
+  besides?: HomeCurrency;
 };
+
+/** The Home currencies whose narrow symbol is "kr". */
+const kroner: readonly HomeCurrency[] = ["NOK", "SEK", "DKK"];
 
 /** Formats an amount stored in whole minor units, e.g. 123456 NOK øre → "1 234,56 kr". */
 export function formatMoney(
   amountMinor: number,
   currency: HomeCurrency,
   locale: Locale,
-  { signed = false, compact = false }: MoneyFormatOptions = {},
+  { signed = false, compact = false, besides }: MoneyFormatOptions = {},
 ): string {
   if (!Number.isInteger(amountMinor)) {
     throw new RangeError(
       `Money amounts are whole minor units, got ${amountMinor}`,
     );
   }
+  const code =
+    besides !== undefined &&
+    besides !== currency &&
+    kroner.includes(besides) &&
+    kroner.includes(currency);
   const parts = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    currencyDisplay,
+    currencyDisplay: code ? "code" : currencyDisplay,
     ...(signed && { signDisplay: "exceptZero" }),
     // Both digit bounds: older ICU versions otherwise keep the currency's two
     // decimals, capped at one ("kr 150.0K" instead of "kr 150K").
@@ -69,7 +85,7 @@ export function formatMoney(
       maximumFractionDigits: 1,
     }),
   }).formatToParts(amountMinor / MINOR_UNITS_PER_MAJOR);
-  const symbol = symbolOverrides[currency];
+  const symbol = code ? undefined : symbolOverrides[currency];
   return parts
     .map((part) =>
       symbol !== undefined && part.type === "currency" ? symbol : part.value,

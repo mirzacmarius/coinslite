@@ -58,6 +58,7 @@ export default {
           "Sentry: înregistrează erorile din aplicație și, pentru un eșantion de pagini, cât durează încărcarea lor, ca să putem găsi și corecta problemele. Cu fiecare raport primește adresa paginii (fără parametrii de interogare), informații despre browser și dispozitiv și locația ta aproximativă. Nu păstrează adresa ta IP, rapoartele nu te numesc niciodată, iar datele rămân în Germania.",
           "OpenPanel: numără cum sunt folosite aplicația și acest site. La fiecare pagină vizualizată primește titlul și adresa paginii (fără identificatorii obiectelor și albumelor tale, termeni de căutare sau coduri de conectare), site-ul de proveniență, informații despre browser și dispozitiv și adresa ta IP. Deduce din ele locația ta aproximativă și un identificator de vizitator care se schimbă zilnic, apoi șterge adresa IP. Nu setează cookie-uri și păstrează datele în Germania.",
           "MetalpriceAPI: furnizează prețurile spot și cursurile de schimb. Cererile noastre nu conțin date cu caracter personal.",
+          "Banca Centrală Europeană: furnizează cursurile de schimb ale zilelor trecute, când înregistrezi o achiziție într-o altă monedă. Cererile noastre conțin doar ziua și monedele, nu date cu caracter personal.",
         ],
       ],
     },

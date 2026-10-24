@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { itemLimits } from "../items/rules";
 import {
   afterBatch,
   afterStall,
@@ -139,6 +140,7 @@ describe("convertBatch", () => {
         history: [],
       },
       11.4721,
+      "EUR",
     );
     expect(converted.items).toEqual([
       { _id: "a", amounts: { purchasePrice: 14340, marketValue: 22933 } },
@@ -152,6 +154,7 @@ describe("convertBatch", () => {
         history: [],
       },
       0.0861,
+      "EUR",
     );
     expect(converted.items).toEqual([
       { _id: "sold", amounts: { salePrice: 6888 } },
@@ -165,6 +168,7 @@ describe("convertBatch", () => {
         history: [{ _id: "p1", marketValue: 4999 }, { _id: "p2" }],
       },
       1.1612,
+      "EUR",
     );
     expect(converted.history).toEqual([{ _id: "p1", marketValue: 5805 }]);
   });
@@ -176,6 +180,7 @@ describe("convertBatch", () => {
         history: [{ _id: "p", marketValue: 1_000_000_000_000 }],
       },
       10,
+      "EUR",
     );
     expect(converted.tooLarge).toBe(false);
   });
@@ -184,6 +189,7 @@ describe("convertBatch", () => {
     const converted = convertBatch(
       { items: [{ _id: "a", purchasePrice: 1_000_000_000_001 }], history: [] },
       10,
+      "EUR",
     );
     expect(converted.tooLarge).toBe(true);
   });
@@ -192,8 +198,60 @@ describe("convertBatch", () => {
     const converted = convertBatch(
       { items: [], history: [{ _id: "p", marketValue: 1_000_000_000_001 }] },
       10,
+      "EUR",
     );
     expect(converted.tooLarge).toBe(true);
+  });
+
+  test("an Item paid in the new currency takes the amount it was paid", () => {
+    const paid = {
+      amount: 12000,
+      currency: "EUR" as const,
+      rateDay: "2024-05-10",
+    };
+    const converted = convertBatch(
+      {
+        items: [
+          {
+            _id: "euro",
+            purchasePrice: 138_050,
+            purchasePaid: paid,
+            marketValue: 150_000,
+          },
+          {
+            _id: "pound",
+            purchasePrice: 160_000,
+            purchasePaid: { ...paid, currency: "GBP" },
+          },
+        ],
+        history: [],
+      },
+      0.0861,
+      "EUR",
+    );
+    expect(converted.items).toEqual([
+      { _id: "euro", amounts: { purchasePrice: 12000, marketValue: 12915 } },
+      // Paid in pounds: converted at the change's rate, it keeps what was
+      // paid, without the day of the ECB rates it no longer comes from.
+      {
+        _id: "pound",
+        amounts: { purchasePrice: 13776 },
+        purchasePaid: { amount: 12000, currency: "GBP" },
+      },
+    ]);
+    expect(converted.tooLarge).toBe(false);
+    // What was paid goes past the largest amount an Item holds.
+    const tooMuch = { ...paid, amount: itemLimits.amount + 1 };
+    expect(
+      convertBatch(
+        {
+          items: [{ _id: "euro", purchasePrice: 1, purchasePaid: tooMuch }],
+          history: [],
+        },
+        0.0861,
+        "EUR",
+      ).tooLarge,
+    ).toBe(true);
   });
 });
 

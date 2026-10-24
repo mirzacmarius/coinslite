@@ -64,6 +64,22 @@ export default {
     purchasePrice: "Purchase price",
     marketValue: "Market value",
     perPiece: "per piece",
+    paidIn: "Purchase currency",
+    paidLoading: "getting the ECB rate…",
+    paidRate: "{amount} at the ECB rate of {date}",
+    paidRateOnly: "converted at the ECB rate of {date}",
+    paidNoRate:
+      "The ECB has no exchange rate for {date}. Type the price in {currency}.",
+    paidTooEarly:
+      "The ECB’s exchange rates start in 1999. Type the price in {currency}.",
+    paidFailed:
+      "The exchange rate couldn’t be fetched. Save to try again, or type the price in {currency}.",
+    paidNone:
+      "There’s no exchange rate for that day. Type the price in {currency}.",
+    paidRateChanged:
+      "The ECB has just published new exchange rates. Check the converted price and save again.",
+    paidNote: "Bought for {amount}, at the ECB rate of {date}",
+    paidNoteOnly: "Bought for {amount}",
     purchaseDate: "Purchase date",
     source: "Source",
     sourcePlaceholder: "Where you got it",
@@ -628,7 +644,7 @@ export default {
     cancel: "Cancel",
     checking: "Counting the amounts to convert…",
     willConvert:
-      "Every Purchase price and Market value in your Collection will be converted from {from} to {to} at this exchange rate.",
+      "Every Purchase price and Market value in your Collection will be converted from {from} to {to} at this exchange rate. An Item bought in {to} gets back the amount paid.",
     nothingToConvert:
       "None of your Items has a Purchase price or Market value, so there's nothing to convert.",
     noRate:

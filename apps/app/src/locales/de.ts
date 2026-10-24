@@ -68,6 +68,22 @@ export default {
     purchasePrice: "Kaufpreis",
     marketValue: "Marktwert",
     perPiece: "pro Stück",
+    paidIn: "Kaufwährung",
+    paidLoading: "EZB-Kurs wird abgerufen…",
+    paidRate: "{amount} zum EZB-Kurs vom {date}",
+    paidRateOnly: "umgerechnet zum EZB-Kurs vom {date}",
+    paidNoRate:
+      "Die EZB hat keinen Wechselkurs für den {date}. Gib den Preis in {currency} ein.",
+    paidTooEarly:
+      "Die Wechselkurse der EZB beginnen 1999. Gib den Preis in {currency} ein.",
+    paidFailed:
+      "Der Wechselkurs konnte nicht abgerufen werden. Speichere, um es noch einmal zu versuchen, oder gib den Preis in {currency} ein.",
+    paidNone:
+      "Für diesen Tag gibt es keinen Wechselkurs. Gib den Preis in {currency} ein.",
+    paidRateChanged:
+      "Die EZB hat gerade neue Wechselkurse veröffentlicht. Prüfe den umgerechneten Preis und speichere noch einmal.",
+    paidNote: "Gekauft für {amount}, zum EZB-Kurs vom {date}",
+    paidNoteOnly: "Gekauft für {amount}",
     purchaseDate: "Kaufdatum",
     source: "Bezugsquelle",
     sourcePlaceholder: "Wo du es bekommen hast",
@@ -658,7 +674,7 @@ export default {
     cancel: "Abbrechen",
     checking: "Die umzurechnenden Beträge werden gezählt…",
     willConvert:
-      "Alle Kaufpreise und Marktwerte in deiner Sammlung werden zu diesem Wechselkurs von {from} in {to} umgerechnet.",
+      "Alle Kaufpreise und Marktwerte in deiner Sammlung werden zu diesem Wechselkurs von {from} in {to} umgerechnet. Ein in {to} gekauftes Objekt erhält den gezahlten Betrag zurück.",
     nothingToConvert:
       "Keines deiner Objekte hat einen Kaufpreis oder Marktwert, es gibt also nichts umzurechnen.",
     noRate:

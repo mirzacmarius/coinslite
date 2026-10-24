@@ -68,6 +68,22 @@ export default {
     purchasePrice: "Prix d’achat",
     marketValue: "Valeur de marché",
     perPiece: "par exemplaire",
+    paidIn: "Devise d’achat",
+    paidLoading: "récupération du cours BCE…",
+    paidRate: "{amount} au cours BCE du {date}",
+    paidRateOnly: "converti au cours BCE du {date}",
+    paidNoRate:
+      "La BCE n’a pas de cours pour le {date}. Saisissez le prix en {currency}.",
+    paidTooEarly:
+      "Les cours de la BCE commencent en 1999. Saisissez le prix en {currency}.",
+    paidFailed:
+      "Le cours n’a pas pu être récupéré. Enregistrez pour réessayer, ou saisissez le prix en {currency}.",
+    paidNone:
+      "Il n’y a pas de cours pour ce jour. Saisissez le prix en {currency}.",
+    paidRateChanged:
+      "La BCE vient de publier de nouveaux cours. Vérifiez le prix converti et enregistrez à nouveau.",
+    paidNote: "Acheté {amount}, au cours BCE du {date}",
+    paidNoteOnly: "Acheté {amount}",
     purchaseDate: "Date d’achat",
     source: "Provenance",
     sourcePlaceholder: "Où vous l’avez obtenu",
@@ -647,7 +663,7 @@ export default {
     cancel: "Annuler",
     checking: "Décompte des montants à convertir…",
     willConvert:
-      "Tous les prix d’achat et valeurs de marché de votre collection seront convertis de {from} en {to} à ce taux de change.",
+      "Tous les prix d’achat et valeurs de marché de votre collection seront convertis de {from} en {to} à ce taux de change. Un objet acheté en {to} retrouve le montant payé.",
     nothingToConvert:
       "Aucun de vos objets n’a de prix d’achat ni de valeur de marché\u00a0: il n’y a rien à convertir.",
     noRate:

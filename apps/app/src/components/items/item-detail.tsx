@@ -19,6 +19,7 @@ import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import { noMintMark } from "@coinslite/backend/convex/catalog/fields";
+import type { PurchasePaid } from "@coinslite/backend/convex/exchangeRates/rules";
 import {
   certificateUrl,
   graderNames,
@@ -26,6 +27,7 @@ import {
   stampCatalogueNames,
 } from "@coinslite/backend/convex/items/references";
 import { tagKey } from "@coinslite/backend/convex/items/tags";
+import type { HomeCurrency } from "@coinslite/i18n";
 import { badgeVariants } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
@@ -139,6 +141,13 @@ export function ItemDetail() {
     value === undefined
       ? undefined
       : `${format.number(value)} ${t("items.millimetres")}`;
+  /** What was paid in another currency, and at which day's ECB rate while the Purchase price comes from it. */
+  const paidNote = (paid: PurchasePaid, home: HomeCurrency) => {
+    const amount = format.money(paid.amount, paid.currency, { besides: home });
+    return paid.rateDay
+      ? t("items.paidNote", { amount, date: format.date(paid.rateDay) })
+      : t("items.paidNoteOnly", { amount });
+  };
   const facts: Array<[string, React.ReactNode]> = [
     [t("items.country"), item.country && format.country(item.country)],
     [t("items.year"), item.year],
@@ -627,7 +636,19 @@ export function ItemDetail() {
           )}
           <FactSection title={t("items.purchase")}>
             <Fact label={t("items.purchasePrice")}>
-              {money(item.purchasePrice)}
+              {item.purchasePrice !== undefined && (
+                <>
+                  {money(item.purchasePrice)}
+                  {item.purchasePaid &&
+                    item.purchasePaid.currency !== item.currency && (
+                      // Bought in another currency: what was paid, and the
+                      // day whose ECB rates converted it.
+                      <span className="block text-xs text-muted-foreground">
+                        {paidNote(item.purchasePaid, item.currency)}
+                      </span>
+                    )}
+                </>
+              )}
             </Fact>
             <Fact label={t("items.marketValue")}>
               {money(item.marketValue)}

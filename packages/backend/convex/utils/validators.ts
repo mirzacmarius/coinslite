@@ -151,6 +151,44 @@ export const perDollar = v.object({
   XAG: v.number(),
 });
 
+/**
+ * What one euro bought on a day, in units of each other Home currency, as
+ * the European Central Bank published it; a currency it didn't quote then
+ * is missing. See exchangeRates/rules.ts.
+ */
+export const perEuro = v.object({
+  NOK: v.optional(v.number()),
+  SEK: v.optional(v.number()),
+  DKK: v.optional(v.number()),
+  RON: v.optional(v.number()),
+  GBP: v.optional(v.number()),
+  USD: v.optional(v.number()),
+  CHF: v.optional(v.number()),
+});
+
+/**
+ * A purchase in another currency as kept on an Item: the amount paid per
+ * piece in minor units of `currency`, and the day whose rates converted it,
+ * until a Home currency change converts it at its own rate.
+ */
+export const purchasePaid = v.object({
+  amount: v.number(),
+  currency: homeCurrency,
+  rateDay: v.optional(v.string()),
+});
+
+/**
+ * A purchase in another currency as a form sends it: the amount per piece
+ * in minor units of `currency`, the day whose rates convert it, and the day
+ * of the rates the form showed (exchangeRates/rules.ts).
+ */
+export const paidInput = v.object({
+  amount: v.number(),
+  currency: homeCurrency,
+  day: v.string(),
+  rateDay: v.optional(v.string()),
+});
+
 /** A precious metal with a Spot price: gold or silver. */
 export const metal = literalUnion(metals);
 

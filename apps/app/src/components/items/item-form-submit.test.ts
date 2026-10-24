@@ -1,7 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { blankItem } from "./item-form";
-import { itemFormRules, itemSave, refusedDetails } from "./item-form-submit";
+import {
+  atRates,
+  itemFormRules,
+  itemSave,
+  paidArgs,
+  refusedDetails,
+} from "./item-form-submit";
 
 /** A coin typed in by hand. */
 const typed = {
@@ -46,6 +52,78 @@ describe("saving a new Item", () => {
     });
     expect(save.args).not.toHaveProperty("catalogEntryKey");
     expect(wanted).toBe(false);
+  });
+});
+
+describe("a Purchase price typed in another currency", () => {
+  test("is sent as paid in it, with its purchase date, for the server to convert", () => {
+    const { save } = itemSave({
+      values: {
+        ...typed,
+        purchasePrice: "120,00",
+        purchaseCurrency: "EUR",
+        purchaseDate: "2024-05-11",
+      },
+      linked: undefined,
+      catalogVisible: true,
+      albumIds: ["albums-1"],
+      wantedKeys: undefined,
+      amountsIn: "NOK",
+      locale: "nb",
+    });
+    expect(save.args).toMatchObject({
+      purchasePrice: undefined,
+      purchasePaid: { amount: 12_000, currency: "EUR", day: "2024-05-11" },
+      purchaseDate: "2024-05-11",
+    });
+  });
+
+  test("is the Purchase price itself in the Home currency, or without an amount", () => {
+    expect(paidArgs(12_000, "NOK", "NOK", "")).toEqual({
+      purchasePrice: 12_000,
+    });
+    expect(paidArgs(12_000, undefined, "NOK", "")).toEqual({
+      purchasePrice: 12_000,
+    });
+    expect(paidArgs(undefined, "EUR", "NOK", "2024-05-11")).toEqual({
+      purchasePrice: undefined,
+    });
+  });
+
+  test("without a purchase date, is converted at today's rate", () => {
+    const { purchasePaid } = paidArgs(5_000, "USD", "SEK", " ");
+    expect(purchasePaid?.day).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  test("goes with the day of the rates it was checked at before saving", () => {
+    const args = paidArgs(12_000, "EUR", "NOK", "2024-05-11");
+    expect(atRates(args, "2024-05-10").purchasePaid).toEqual({
+      amount: 12_000,
+      currency: "EUR",
+      day: "2024-05-11",
+      rateDay: "2024-05-10",
+    });
+    expect(atRates(args, undefined)).toBe(args);
+    const home = paidArgs(12_000, "NOK", "NOK", "");
+    expect(atRates(home, "2024-05-10")).toBe(home);
+  });
+
+  test("typed in the Home currency on an edit, drops the Item's", () => {
+    const { save } = itemSave({
+      values: { ...typed, purchasePrice: "1402,98" },
+      itemId: "items-1" as Id<"items">,
+      linked: undefined,
+      catalogVisible: true,
+      albumIds: ["albums-1"],
+      wantedKeys: undefined,
+      amountsIn: "NOK",
+      locale: "nb",
+    });
+    expect(save.mutation).toBe("update");
+    expect(save.args).toMatchObject({
+      purchasePrice: 140_298,
+      purchasePaid: null,
+    });
   });
 });
 

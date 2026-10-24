@@ -56,6 +56,24 @@ describe("formatMoney", () => {
     }
   });
 
+  test("beside another krone, shows its ISO code", () => {
+    expect(plain(formatMoney(100000, "SEK", "nb", { besides: "NOK" }))).toBe(
+      "1 000,00 SEK",
+    );
+    expect(plain(formatMoney(100000, "DKK", "en", { besides: "SEK" }))).toBe(
+      "DKK 1,000.00",
+    );
+    expect(plain(formatMoney(100000, "NOK", "nb", { besides: "NOK" }))).toBe(
+      "1 000,00 kr",
+    );
+    expect(plain(formatMoney(12000, "EUR", "nb", { besides: "NOK" }))).toBe(
+      "120,00 €",
+    );
+    expect(plain(formatMoney(12000, "RON", "ro", { besides: "NOK" }))).toBe(
+      "120,00 lei",
+    );
+  });
+
   test("can show the sign of a gain or a loss", () => {
     expect(formatMoney(15000, "NOK", "en", { signed: true })).toBe(
       "+kr\u00a0150.00",

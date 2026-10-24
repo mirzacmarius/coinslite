@@ -45,10 +45,16 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 ## 4. Home currency and money
 
 - Each user has exactly one Home currency: NOK, SEK, DKK, EUR, RON, GBP, USD or CHF.
-- All Purchase prices and Market values are entered and shown in the Home currency. Spot prices are converted into it.
+- Purchase prices and Market values are kept and shown in the Home currency, and Spot prices are converted into it. Market values are typed in it; a Purchase price may be typed in a Purchase currency instead (below).
+- **A purchase in another currency:** in the Item form and in Set purchase, the Purchase price can be typed in a Purchase currency, any of the eight, picked inside the field (the Home currency by default).
+  - It's converted into the Home currency at the ECB rate (the European Central Bank's euro reference rate) of the purchase date, or of today without one. On a day the ECB doesn't publish (weekends, its holidays), the last working day's rate before it is used. The field says what the amount comes to and which day's rate converts it. Should the ECB publish the day's own rate while the form is open, saving says so instead and the field shows the new amount, to save again.
+  - The ECB's rates start on 4 January 1999 (the leu's in July 2005). A purchase before then can't be converted, and the field says to type the price in the Home currency.
+  - The Item keeps the amount in its Purchase currency and the day of the rate; the Item page shows it under the Purchase price ("Bought for €120.00, at the ECB rate of 10 May 2024"). Beside another krone, an amount shows its ISO code ("Bought for SEK 1 000,00" under kroner, and the field's hint in NOK), since all three are written kr. Totals, exports and reports use the Purchase price in the Home currency.
+  - Editing the Item converts again only when the amount, Purchase currency or purchase date changes; until then the field's hint is the Purchase price as converted. Typing the Purchase price in the Home currency instead drops the Purchase currency.
+  - A Home currency change converts the Purchase price like any other amount, but an Item bought in the new Home currency takes back the amount paid exactly, as the change's confirmation says. One bought in a third currency keeps what was paid without the day of the rate, since its Purchase price no longer comes from it ("Bought for €120.00").
 - **Changing the Home currency:**
   - The user sees how many stored amounts will be converted, and at which exchange rate, and must confirm.
-  - Every stored amount (Purchase prices, Market values, sale prices and the Market value history) is then converted exactly once at the confirmed rate, rounded to whole minor units. If any amount would be too large in the new currency, nothing is converted and the user is told.
+  - Every stored amount (Purchase prices, Market values, sale prices and the Market value history) is then converted exactly once at the confirmed rate, rounded to whole minor units; an Item whose Purchase currency is the new one takes back its amount in it. If any amount would be too large in the new currency, nothing is converted and the user is told.
   - A Collection of any size can change. One of up to 5,000 Items and 5,000 history points changes at once. A larger one is converted in the background, which can take a minute: the dialog says so beforehand, and the app says when it's done. A large Collection with no amounts just switches, once that's checked.
   - While a change is in the background, the Collection's money (amounts, totals, charts, the Insurance report's totals) shows as "Converting to …", and amount fields in the Item form, the sale dialog and Set purchase are disabled. Anything that writes an amount (an Item with a Purchase price or Market value, a sale price, selling part of an Item with amounts, a Purchase price set on several Items or undone, importing rows with amounts), the Collection exports and the Insurance report (their amounts would mix two currencies) and another change are refused with a clear message. Everything else works, including a sale without a price.
   - Amounts typed into a form opened before the Home currency changed are refused, and the form says to reopen it.
@@ -140,7 +146,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - The list thumbnail is that of the front photo, else of the back photo, else of the first more photo, else a placeholder for the Item type. A photo from before thumbnails shows as itself.
 
 ### 5.7 Item detail
-- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, tags (each opening the Collection filtered to it), Purchase price, Market value, purchase date and source, notes and Album.
+- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, tags (each opening the Collection filtered to it), Purchase price (with the amount in its Purchase currency, if any), Market value, purchase date and source, notes and Album.
 - For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once the Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
 - **Value history:** the Item's Market value each time it was changed (at most one point a month), newest first, with the change since the one before and the Quantity when that changed; an Item priced once shows a single line.
 - **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album badges, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
@@ -244,7 +250,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - **Select mode:** select Items one by one, a page or the whole view (up to 200 at once), then act on all of them:
   - move them to an Album, or out of any Album
   - set a Grade, on those whose Item type the Grading scale suits
-  - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in.
+  - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in. A Purchase price can be typed in a Purchase currency, converted as in the Item form (§4) at the ECB rate of the purchase date filled in, or of today.
   - **Tag:** add one of the user's tags, or a new one, to them, or take a tag off them. Items that already have it or hold 10 tags (or, taking it off, don't have it) are skipped and counted.
   - print their labels (see Labels below)
   - delete them, with a confirmation
@@ -368,6 +374,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 - gold-api.com supplies live gold and silver spot prices. MetalpriceAPI supplies currency exchange rates, and backup gold and silver prices at the previous day's close. Both are used under licences that allow commercial use.
 - A scheduled job stores the latest spot prices every 15 minutes, and the exchange rates as often as the MetalpriceAPI plan allows, so the cost doesn't grow with the number of users. All conversions use the stored values.
+- A purchase in another currency (§4) uses the European Central Bank's euro reference rates of a past day, from its data portal (data-api.ecb.europa.eu). They're fetched when someone first asks about a day and kept for everyone; a day's, until the ECB has published them (around 16:00 CET), are asked for again hourly, and once fetched after the day is over they're kept for good. The ECB allows reuse with the source named, which the app does wherever a rate is shown ("ECB rate").
 
 ## 15. Administration
 

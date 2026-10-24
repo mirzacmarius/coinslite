@@ -58,6 +58,7 @@ export default {
           "Sentry: records errors in the app, and how long a sample of pages takes to load, so we can find and fix problems. With each report it receives the page’s address (without its query string), your browser and device details and your approximate location. It doesn’t store your IP address, reports never name you, and it keeps the data in Germany.",
           "OpenPanel: counts how the app and this website are used. With each page view it receives the page’s title and address (without the ids of your Items and Albums, search terms or sign-in codes), the site that linked to it, your browser and device details and your IP address. It works out your approximate location and a visitor identifier that changes every day, then discards the IP address. It sets no cookies and keeps the data in Germany.",
           "MetalpriceAPI: supplies Spot prices and exchange rates. Our requests contain no personal data.",
+          "European Central Bank: supplies the exchange rates of past days, when you record a purchase in another currency. Our requests contain only the day and the currencies, no personal data.",
         ],
       ],
     },

@@ -84,6 +84,7 @@ export const accountDataByTable = {
   homeCurrencyChanges:
     "deleted at once: how far a Home currency change in the background had got",
   spotPriceDays: "kept: the daily Spot prices everyone shares",
+  exchangeRateDays: "kept: the ECB exchange rates of past days everyone shares",
   itemPhotos:
     "deleted: the Items' more photos, with their stored files and thumbnails, as each Item goes",
   uploads: "deleted: files they uploaded but never made a photo or an image",

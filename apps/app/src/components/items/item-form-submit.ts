@@ -1,5 +1,6 @@
 import type { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
+import type { PaidInput } from "@coinslite/backend/convex/exchangeRates/rules";
 import { catalogFactNames } from "@coinslite/backend/convex/items/catalogFacts";
 import type { CatalogFacts } from "@coinslite/backend/convex/items/catalogFacts";
 import { hasStrike, isGrade } from "@coinslite/backend/convex/items/grades";
@@ -246,6 +247,47 @@ export function formArgs(
   );
 }
 
+/**
+ * The day a purchase in another currency is converted at (spec §4): its
+ * purchase date, or today without one.
+ */
+export const paidDay = (purchaseDate: string) =>
+  purchaseDate.trim() || localToday();
+
+/**
+ * What a form sends for a Purchase price (`amount`) typed in `currency`: in
+ * another currency than the Home currency (`home`), the amount paid with the
+ * day to convert it at, and no Purchase price, which the server works out
+ * at the ECB rates of that day.
+ */
+export function paidArgs(
+  amount: number | undefined,
+  currency: HomeCurrency | undefined,
+  home: HomeCurrency | undefined,
+  purchaseDate: string,
+): { purchasePrice?: number; purchasePaid?: PaidInput } {
+  if (amount === undefined || currency === undefined || currency === home)
+    return { purchasePrice: amount };
+  return {
+    purchasePrice: undefined,
+    purchasePaid: { amount, currency, day: paidDay(purchaseDate) },
+  };
+}
+
+/**
+ * Save args with the day of the rates a purchase in another currency was
+ * checked at before saving (paid-in-currency.ts): the server converts at
+ * those, or refuses should the day's be newer by then.
+ */
+export function atRates<Args extends { purchasePaid?: PaidInput | null }>(
+  args: Args,
+  rateDay: string | undefined,
+): Args {
+  return args.purchasePaid && rateDay
+    ? { ...args, purchasePaid: { ...args.purchasePaid, rateDay } }
+    : args;
+}
+
 /** What saving the Item form calls: `add` for a new Item, `update` for one being edited. */
 export type ItemSave =
   | { mutation: "add"; args: ItemArgs }
@@ -267,7 +309,10 @@ export type ItemSave =
  *   form opened can't take the Item.
  * - `wantedKeys`: the wanted Catalog entries. Adding from one, or linking an
  *   edited Item to one, clears the want (wants.ts), which `wanted` says.
- * - `amountsIn`: the Home currency the amounts were typed in (COIN-125).
+ * - `amountsIn`: the Home currency the amounts were typed in (COIN-125). A
+ *   Purchase price typed in another currency is sent as paid in it
+ *   (`purchasePaid`), for the server to convert; an edit typed in the Home
+ *   currency sends none (null), which drops the Item's.
  */
 export function itemSave({
   values,
@@ -291,7 +336,20 @@ export function itemSave({
   locale: Locale;
 }): { save: ItemSave; wanted: boolean } {
   const link = itemId || catalogVisible !== false ? linked : undefined;
-  const args = formArgs(values, link && factValues(link.facts, locale), locale);
+  const typed = formArgs(
+    values,
+    link && factValues(link.facts, locale),
+    locale,
+  );
+  const args = {
+    ...typed,
+    ...paidArgs(
+      typed.purchasePrice,
+      values.purchaseCurrency,
+      amountsIn,
+      values.purchaseDate,
+    ),
+  };
   if (albumIds && !albumIds.some((albumId) => albumId === args.albumId))
     args.albumId = undefined;
   if (itemId) {
@@ -302,6 +360,7 @@ export function itemSave({
         args: {
           itemId,
           ...args,
+          purchasePaid: args.purchasePaid ?? null,
           ...(linking && { catalogEntryKey: linking.key }),
           amountsIn,
         },

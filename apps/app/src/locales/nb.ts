@@ -66,6 +66,22 @@ export default {
     purchasePrice: "Innkjøpspris",
     marketValue: "Markedsverdi",
     perPiece: "per stk.",
+    paidIn: "Innkjøpsvaluta",
+    paidLoading: "henter ESB-kursen…",
+    paidRate: "{amount} etter ESB-kursen {date}",
+    paidRateOnly: "omregnet etter ESB-kursen {date}",
+    paidNoRate:
+      "ESB har ingen valutakurs for {date}. Skriv inn prisen i {currency}.",
+    paidTooEarly:
+      "ESBs valutakurser begynner i 1999. Skriv inn prisen i {currency}.",
+    paidFailed:
+      "Valutakursen kunne ikke hentes. Lagre for å prøve igjen, eller skriv inn prisen i {currency}.",
+    paidNone:
+      "Det finnes ingen valutakurs for den dagen. Skriv inn prisen i {currency}.",
+    paidRateChanged:
+      "ESB har nettopp publisert nye valutakurser. Sjekk den omregnede prisen og lagre igjen.",
+    paidNote: "Kjøpt for {amount}, etter ESB-kursen {date}",
+    paidNoteOnly: "Kjøpt for {amount}",
     purchaseDate: "Innkjøpsdato",
     source: "Kilde",
     sourcePlaceholder: "Hvor du fikk den",
@@ -636,7 +652,7 @@ export default {
     cancel: "Avbryt",
     checking: "Teller beløpene som skal regnes om…",
     willConvert:
-      "Alle innkjøpspriser og markedsverdier i samlingen regnes om fra {from} til {to} med denne vekslingskursen.",
+      "Alle innkjøpspriser og markedsverdier i samlingen regnes om fra {from} til {to} med denne vekslingskursen. Et objekt kjøpt i {to} får tilbake beløpet som ble betalt.",
     nothingToConvert:
       "Ingen av objektene dine har innkjøpspris eller markedsverdi, så det er ingenting å regne om.",
     noRate:

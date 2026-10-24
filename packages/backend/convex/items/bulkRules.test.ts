@@ -361,8 +361,20 @@ describe("planPurchaseUndo", () => {
       }),
     ).toStrictEqual({
       restore: [
-        { itemId: "krone", purchasePrice: 9900, purchaseDate: "2024-05-01" },
-        { itemId: "ore", purchasePrice: undefined, purchaseDate: undefined },
+        // A Purchase price comes back with the Item's purchase in another
+        // currency, here none: that clears any the purchase set.
+        {
+          itemId: "krone",
+          purchasePrice: 9900,
+          purchaseDate: "2024-05-01",
+          purchasePaid: undefined,
+        },
+        {
+          itemId: "ore",
+          purchasePrice: undefined,
+          purchaseDate: undefined,
+          purchasePaid: undefined,
+        },
       ],
       skipped: 0,
     });
@@ -384,7 +396,14 @@ describe("planPurchaseUndo", () => {
         today: "2026-10-12",
       }),
     ).toStrictEqual({
-      restore: [{ itemId: "krone", purchasePrice: 9900, source: undefined }],
+      restore: [
+        {
+          itemId: "krone",
+          purchasePrice: 9900,
+          source: undefined,
+          purchasePaid: undefined,
+        },
+      ],
       skipped: 2,
     });
   });
@@ -432,9 +451,19 @@ describe("planPurchaseUndo", () => {
       }),
     ).toStrictEqual({
       restore: [
-        { itemId: "krone", purchasePrice: 9900, source: "Auction" },
+        {
+          itemId: "krone",
+          purchasePrice: 9900,
+          source: "Auction",
+          purchasePaid: undefined,
+        },
         // Only the fields set are put back, so only they are checked.
-        { itemId: "penny", purchasePrice: undefined, source: undefined },
+        {
+          itemId: "penny",
+          purchasePrice: undefined,
+          source: undefined,
+          purchasePaid: undefined,
+        },
       ],
       skipped: 3,
     });
@@ -455,6 +484,68 @@ describe("planPurchaseUndo", () => {
       restore: [{ itemId: "krone", source: "Auction" }],
       skipped: 0,
     });
+  });
+
+  test("a Purchase price comes back with the purchase in another currency it had, or none", () => {
+    const euros = {
+      amount: 12_000,
+      currency: "EUR" as const,
+      rateDay: "2024-05-10",
+    };
+    const dollars = {
+      amount: 15_000,
+      currency: "USD" as const,
+      rateDay: "2026-10-23",
+    };
+    expect(
+      planPurchaseUndo({
+        before: [
+          { itemId: "krone", purchasePrice: 140_298, purchasePaid: euros },
+          { itemId: "ore", purchasePrice: 9_900 },
+          { itemId: "daler", purchasePrice: 160_000, purchasePaid: dollars },
+        ],
+        // Set at 160 000 paid in dollars: "daler" already had it.
+        after: { purchasePrice: 160_000, purchasePaid: dollars },
+        now: new Map([
+          ["krone", { purchasePrice: 160_000, purchasePaid: dollars }],
+          // Typed in kroner since: it no longer holds the purchase set.
+          ["ore", { purchasePrice: 160_000 }],
+          ["daler", { purchasePrice: 160_000, purchasePaid: dollars }],
+        ]),
+        today: "2026-10-24",
+      }),
+    ).toEqual({
+      restore: [
+        { itemId: "krone", purchasePrice: 140_298, purchasePaid: euros },
+      ],
+      skipped: 1,
+    });
+  });
+
+  test("a purchase in another currency no Item may hold isn't put back", () => {
+    const undo = (purchasePaid: {
+      amount: number;
+      currency: "EUR";
+      rateDay: string;
+    }) =>
+      planPurchaseUndo({
+        before: [{ itemId: "krone", purchasePrice: 140_298, purchasePaid }],
+        after: { purchasePrice: 100 },
+        now: new Map([["krone", { purchasePrice: 100 }]]),
+        today: "2026-10-24",
+      });
+    const paid = {
+      amount: 12_000,
+      currency: "EUR" as const,
+      rateDay: "2024-05-10",
+    };
+    expect(undo(paid).restore).toHaveLength(1);
+    expect(undo({ ...paid, amount: 1e300 })).toEqual({
+      restore: [],
+      skipped: 1,
+    });
+    expect(undo({ ...paid, amount: -5 }).skipped).toBe(1);
+    expect(undo({ ...paid, rateDay: "junk" }).skipped).toBe(1);
   });
 });
 
