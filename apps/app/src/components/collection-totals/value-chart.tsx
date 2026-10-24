@@ -35,13 +35,13 @@ import {
 /** A month's amounts, one per series drawn. */
 type Point = { month: string } & Partial<Record<Series, number>>;
 
-/** Plot heights (the compact one for the Overview) and the room around them, in pixels. */
-const PLOT_HEIGHTS = { regular: 160, compact: 112 };
+/** The plot's height and the room around it, in pixels. */
+const PLOT_HEIGHT = 160;
 const TOP = 8;
 const AXIS_HEIGHT = 22;
 const SIDE = 6;
 const LABEL_GAP = 8;
-const heightOf = (plotHeight: number) => TOP + plotHeight + AXIS_HEIGHT;
+const HEIGHT = TOP + PLOT_HEIGHT + AXIS_HEIGHT;
 
 /** Measures axis label text (11px in the page's font), to size the label column. */
 function useLabelWidth() {
@@ -78,24 +78,19 @@ type Mode = "overTime" | "byDateAcquired";
  * "by date acquired", the cumulative Purchase price and Market value by the
  * month Items were acquired: their purchase date, or when they were added if
  * that is earlier or there is none. Hover, or focus and use the arrow keys,
- * to read a month. `overTime` is undefined while it loads. `compact`, for
- * the Overview, shows only "over time", in a shorter plot.
+ * to read a month. `overTime` is undefined while it loads.
  */
 export function ValueChart({
   totals,
   overTime,
-  compact = false,
 }: {
   totals: CollectionTotals;
   overTime: MonthValue[] | undefined;
-  compact?: boolean;
 }) {
   const t = useI18n();
   const format = useFormatters();
   const monthLabel = useMonthFormat();
-  const [chosenMode, setMode] = useState<Mode>("overTime");
-  const mode: Mode = compact ? "overTime" : chosenMode;
-  const plotHeight = PLOT_HEIGHTS[compact ? "compact" : "regular"];
+  const [mode, setMode] = useState<Mode>("overTime");
   const series: Point[] | undefined = useMemo(() => {
     if (mode === "byDateAcquired") return valueByDateAdded(totals);
     return overTime?.map(({ metalValue, ...point }) =>
@@ -128,27 +123,25 @@ export function ValueChart({
           : "collectionTotals.valueByDateAcquiredDescription",
       )}
       controls={
-        !compact && (
-          <SegmentedControl
-            label={t("collectionTotals.valueMode")}
-            options={[
-              { value: "overTime", label: t("collectionTotals.overTime") },
-              {
-                value: "byDateAcquired",
-                label: t("collectionTotals.byDateAcquired"),
-              },
-            ]}
-            value={mode}
-            onChange={setMode}
-            className="shrink-0"
-          />
-        )
+        <SegmentedControl
+          label={t("collectionTotals.valueMode")}
+          options={[
+            { value: "overTime", label: t("collectionTotals.overTime") },
+            {
+              value: "byDateAcquired",
+              label: t("collectionTotals.byDateAcquired"),
+            },
+          ]}
+          value={mode}
+          onChange={setMode}
+          className="shrink-0"
+        />
       }
       chart={
         series === undefined ? (
           <div
             className="animate-pulse rounded-md bg-muted"
-            style={{ height: heightOf(plotHeight) + 20 }}
+            style={{ height: HEIGHT + 20 }}
             aria-hidden="true"
           />
         ) : (
@@ -173,7 +166,6 @@ export function ValueChart({
                 })
               }
               monthLabel={monthLabel}
-              plotHeight={plotHeight}
             />
           </>
         )
@@ -220,7 +212,6 @@ function LineChart({
   money,
   compactMoney,
   monthLabel,
-  plotHeight,
 }: {
   label: string;
   series: Point[];
@@ -229,11 +220,9 @@ function LineChart({
   money: (amount: number) => string;
   compactMoney: (amount: number) => string;
   monthLabel: (month: string) => string;
-  plotHeight: number;
 }) {
   const t = useI18n();
   const hintId = useId();
-  const height = heightOf(plotHeight);
   const [ref, width] = useElementWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
   const labelWidth = useLabelWidth();
@@ -254,7 +243,7 @@ function LineChart({
     left +
     SIDE +
     (lastIndex === 0 ? plotWidth / 2 : (index * plotWidth) / lastIndex);
-  const y = (amount: number) => TOP + plotHeight * (1 - amount / top);
+  const y = (amount: number) => TOP + PLOT_HEIGHT * (1 - amount / top);
   const pathOf = (line: Series) =>
     series
       .map(
@@ -316,7 +305,7 @@ function LineChart({
       onFocus={() => setActive(lastIndex)}
       onBlur={() => setActive(null)}
       className="relative rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-      style={{ height }}
+      style={{ height: HEIGHT }}
     >
       <p id={hintId} className="sr-only">
         {t("collectionTotals.monthKeys")}
@@ -324,7 +313,7 @@ function LineChart({
       {width > 0 && (
         <svg
           width={width}
-          height={height}
+          height={HEIGHT}
           aria-hidden="true"
           className="block touch-pan-y overflow-visible"
           onPointerMove={onPointerMove}
@@ -356,7 +345,7 @@ function LineChart({
             <>
               <text
                 x={lastIndex === 0 ? x(0) : left}
-                y={height - 6}
+                y={HEIGHT - 6}
                 textAnchor={lastIndex === 0 ? "middle" : "start"}
                 className="fill-muted-foreground text-xs"
               >
@@ -365,7 +354,7 @@ function LineChart({
               {lastIndex > 0 && (
                 <text
                   x={width}
-                  y={height - 6}
+                  y={HEIGHT - 6}
                   textAnchor="end"
                   className="fill-muted-foreground text-xs"
                 >
@@ -379,7 +368,7 @@ function LineChart({
               x1={x(shown)}
               x2={x(shown)}
               y1={TOP}
-              y2={TOP + plotHeight}
+              y2={TOP + PLOT_HEIGHT}
               stroke="hsl(var(--muted-foreground))"
               strokeOpacity={0.5}
               strokeWidth={1}

@@ -1,8 +1,9 @@
 "use client";
 
+import { AlbumsRow } from "@/components/albums/albums-row";
 import {
-  CollectionTotalsSection,
-  CollectionTotalsSkeleton,
+  CollectionStrip,
+  FiguresSkeleton,
 } from "@/components/collection-totals/collection-totals";
 import { useLatest } from "@/lib/use-latest";
 import { useShortcut } from "@/lib/use-shortcut";
@@ -44,7 +45,9 @@ export function BrowserSkeleton() {
   return (
     <>
       {toolbarSkeleton}
-      <CollectionTotalsSkeleton />
+      <div className="border-b p-4">
+        <FiguresSkeleton figures={4} />
+      </div>
       <ResultsSkeleton />
     </>
   );
@@ -52,7 +55,7 @@ export function BrowserSkeleton() {
 
 /**
  * The toolbar and the filters that are on, at the top where they're always
- * in reach, then the totals, then one page of Items.
+ * in reach, then the summary strip and the Albums, then one page of Items.
  */
 export function CollectionBrowser() {
   const t = useI18n();
@@ -117,17 +120,18 @@ export function CollectionBrowser() {
   useShortcut("/", () => search.current?.focus(), toolbar);
   useShortcut("f", () => setFilterOpen(true), toolbar);
 
-  // Keyed, so it stays mounted (and open or collapsed) as the rest changes.
-  // With a search or filter on, the view's totals lead (null while they load).
-  const totals = (
-    <CollectionTotalsSection
-      key="totals"
-      narrowed={narrowsView(view)}
-      sold={view.status === "sold"}
-      viewTotals={
-        narrowsBeyondStatus(view) ? (result?.viewTotals ?? null) : undefined
-      }
-    />
+  // Keyed, so it stays mounted as the rest changes. With a search or filter
+  // on, it sums the view (null while that loads) and leaves out the Albums.
+  const strip = (
+    <div key="strip" className="flex flex-col gap-3 border-b p-4">
+      <CollectionStrip
+        sold={view.status === "sold"}
+        viewTotals={
+          narrowsBeyondStatus(view) ? (result?.viewTotals ?? null) : undefined
+        }
+      />
+      {!narrowsView(view) && <AlbumsRow />}
+    </div>
   );
 
   if (result === undefined) {
@@ -135,7 +139,7 @@ export function CollectionBrowser() {
       <>
         {importDialog}
         {toolbarSkeleton}
-        {totals}
+        {strip}
         <ResultsSkeleton />
       </>
     );
@@ -149,7 +153,6 @@ export function CollectionBrowser() {
     return (
       <>
         {importDialog}
-        {totals}
         <div className="p-4">
           <StartCard
             title={t("items.emptyTitle")}
@@ -226,7 +229,7 @@ export function CollectionBrowser() {
           )
         }
       />
-      {totals}
+      {strip}
       {!result.complete && (
         <p className="border-b px-4 py-2 text-xs text-muted-foreground">
           {t("collection.incomplete", {

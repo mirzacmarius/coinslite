@@ -15,28 +15,21 @@ import { seriesColors } from "./chart-card";
 import { type BreakdownRow, breakdownRows } from "./breakdown-rows";
 
 /**
- * The breakdown (spec 7): the Items and Market value of each country, decade
- * and material the totals' Items span, largest first with a bar per row, the
- * rest folded into "Other" and the Items without the fact last. `scope` says
- * whose Items they are: the view's or the whole Collection's.
+ * The Overview's breakdown (spec 9): the Items and Market value of each
+ * country, decade and material the owned Items span, largest first with a
+ * bar per row, the rest folded into "Other" and the Items without the fact
+ * last.
  */
-export function Insights({
-  totals,
-  scope,
-}: {
-  totals: CollectionTotals;
-  scope: string;
-}) {
+export function Insights({ totals }: { totals: CollectionTotals }) {
   const t = useI18n();
   const format = useFormatters();
   const titleId = useId();
   return (
     <section aria-labelledby={titleId} className="rounded-xl bg-card">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b px-4 py-2">
-        <h3 id={titleId} className="text-ui font-medium">
+      <div className="border-b px-4 py-2">
+        <h2 id={titleId} className="text-ui font-medium">
           {t("collectionTotals.breakdown")}
-        </h3>
-        <p className="text-xs text-muted-foreground">{scope}</p>
+        </h2>
       </div>
       <div className="grid gap-x-6 gap-y-4 p-4 lg:grid-cols-3">
         <Breakdown
@@ -87,7 +80,7 @@ function Breakdown({
         : name(row.key);
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <h4 className="text-xs font-medium text-muted-foreground">{title}</h4>
+      <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>
       {rows.length === 0 ? (
         <p className="text-xs text-muted-foreground">–</p>
       ) : (

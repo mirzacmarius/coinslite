@@ -1,16 +1,14 @@
 "use client";
 
+import { useConvertingTo } from "@/components/account/home-currency-change";
 import { seriesColorVariables } from "@/components/collection-totals/chart-card";
 import {
+  Charts,
   FiguresSkeleton,
   TotalsFigures,
 } from "@/components/collection-totals/collection-totals";
-import {
-  type ShownTotals,
-  useCollectionTotals,
-  useValueOverTime,
-} from "@/components/collection-totals/use-collection-totals";
-import { ValueChart } from "@/components/collection-totals/value-chart";
+import { Insights } from "@/components/collection-totals/insights";
+import { useCollectionTotals } from "@/components/collection-totals/use-collection-totals";
 import { ImportDialog } from "@/components/collection/import-dialog";
 import { StartCard } from "@/components/collection/start-card";
 import { isFirstRun } from "@/components/overview/first-run";
@@ -29,13 +27,14 @@ import { useQuery } from "convex/react";
 import { useId, useState } from "react";
 
 /**
- * Where the Collection stands (spec 9): the totals, the value over time,
- * the latest Items, the Sets closest to complete, what needs attention, how
- * many entries are on the Wantlist, and on phones the Spot prices and how
- * much of the Free plan is used (wider screens have them in the sidebar).
- * The value chart, Set progress and Needs attention are each left out when
- * they would be empty. Adding an Item is the shell's: the sidebar, or the
- * middle of the phone tabs.
+ * Where the Collection stands (spec 9): the totals, the value charts and the
+ * breakdown, then the latest Items, the Sets closest to complete, what needs
+ * attention, how many entries are on the Wantlist, and on phones the Spot
+ * prices and how much of the Free plan is used (wider screens have them in
+ * the sidebar). The charts, breakdown, Set progress and Needs attention are
+ * each left out when they would be empty; the charts and breakdown also
+ * while a Home currency change converts the amounts. Adding an Item is the
+ * shell's: the sidebar, or the middle of the phone tabs.
  * An empty Collection shows the start card instead (StartCard): its first
  * way in adds an Item, and there are no totals or Items yet.
  * The header appears the moment a link is clicked. Until it's known whether
@@ -53,13 +52,22 @@ export function Overview() {
   const firstRun = isFirstRun(latest?.length, soldTotals?.items);
   const deciding = firstRun === undefined;
   const counting = totals?.counting === true || soldTotals?.counting === true;
+  const converting = useConvertingTo() !== undefined;
+  // What the charts and the breakdown show: what's owned, once there is some.
+  const owned =
+    firstRun === false &&
+    totals !== undefined &&
+    totals.items > 0 &&
+    !converting
+      ? totals
+      : undefined;
 
   return (
     <>
       <HeaderBar title={t("dashboard.headerTitle")} />
       {/* Outside the start card, so it stays open as the first imported rows replace the card. */}
       <ImportDialog open={importing} onOpenChange={setImporting} />
-      <div className="flex flex-col gap-4 p-4">
+      <div className={cn("flex flex-col gap-4 p-4", seriesColorVariables)}>
         {!firstRun && (
           <section
             aria-labelledby={totalsId}
@@ -69,19 +77,21 @@ export function Overview() {
               {t("collectionTotals.title")}
             </h2>
             {totals === undefined || deciding ? (
-              <FiguresSkeleton figures={4} />
+              <FiguresSkeleton />
             ) : (
               <TotalsFigures
                 totals={totals}
                 sold={soldTotals}
-                variant="overview"
                 counting={counting}
               />
             )}
           </section>
         )}
-        {firstRun === false && totals !== undefined && totals.items > 0 && (
-          <OverviewValueChart totals={totals} />
+        {owned && (
+          <>
+            <Charts totals={owned} />
+            <Insights totals={owned} />
+          </>
         )}
         {firstRun ? (
           <StartCard
@@ -109,23 +119,5 @@ export function Overview() {
         </div>
       </div>
     </>
-  );
-}
-
-/**
- * The Collection page's "over time" value chart, compact, from the same
- * data, pulsing while the totals or the months are still counting.
- */
-function OverviewValueChart({ totals }: { totals: ShownTotals }) {
-  const overTime = useValueOverTime();
-  return (
-    <div
-      className={cn(
-        seriesColorVariables,
-        (totals.counting || overTime?.counting) && "animate-pulse",
-      )}
-    >
-      <ValueChart totals={totals} overTime={overTime?.sum} compact />
-    </div>
   );
 }

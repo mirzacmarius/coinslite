@@ -220,18 +220,13 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 7. Collection
 
-- **Spot price:** gold and silver, per gram and per troy ounce (31.1034768 g), in the Home currency, with the time of the last update. Refreshes at least every 15 minutes.
-- **Totals over the whole Collection**, each clearly labelled as counting Items or pieces:
-  - number of Items; number of pieces per Item type
-  - total Purchase price, total Market value, Gain/loss
-  - gold and silver Metal value with the total fine weight, shown only when non-zero
-  - With a search or filter on (the sold view alone doesn't count), the section leads with the same figures for **the current view**, headed "This view", and keeps the whole Collection's (on the sold view, all sold Items') beneath. The collapsed summary line shows the view's figures then. The charts stay the whole Collection's.
-  - **Breakdown:** the Items and Market value of each country, decade and material the Items span (a coin's precious metal standing in for a missing material), largest Market value first with a bar per row, the groups past the sixth folded into "Other" and the Items without the fact last. Of the current view while a search or filter is on, else the whole Collection; not on the sold view.
-- **Charts:**
-  - An Item's **Date acquired** is its purchase date, or when it was recorded in CoinsLite if that is earlier or it has no purchase date. Purchase dates before 1900 count as 1900.
-  - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month.
-  - **Value by Date acquired:** cumulative Purchase price and Market value by the month Items were acquired.
-  - **Value distribution:** by Item type, plus gold and silver Metal value.
+The Collection page is for finding and working with Items: a short summary strip, the Albums, then the Items. The full totals, the breakdown and the charts are the Overview's (§9).
+
+- **Summary strip,** each figure clearly labelled as counting pieces or Albums:
+  - the number of pieces, with how many of each Item type; the number of Albums, opening the Albums list; the total Market value; and the Gain/loss, with how many Items it counts when not all have both prices
+  - With a search or filter on (the sold view alone doesn't count), the strip is headed "This view" and sums **the current view's** Items, without the Albums.
+  - The sold view's sums the sold Items: pieces, total Purchase price, total sale price and the Realised Gain/loss.
+- **Albums:** under the strip, each Album as a chip with its colour, name and number of Items, opening it; the row scrolls sideways when they don't all fit. Absent while a search or filter is on, on the sold view, and with no Album.
 - **Search:** every word typed must appear in one of the Item's texts: title, denomination, series, category, ruler, mint mark, Numista number (as "N# 1234" is written), grade note, grader and certificate number, stamp catalogue and number, serial number, source, Kept in, tags, notes, or the country's name; a word may also be the country's code. Capitals and accents don't matter.
 - **Filters:**
   - Item type, plus bullion-only for coins
@@ -257,7 +252,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
     - delete them, with a confirmation
   - A move, a Grade, a purchase or a tag can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
-- **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts open only on a screen at least 1024 px wide and 1000 px tall, where the list still starts in view below it, and collapsed on anything smaller, such as a phone or a 1280 × 800 laptop; it is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.
+- **Layout:** search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters, the summary strip and the Albums, then the Items.
 - **Export (Premium), covering the current filtered view:**
   - **PDF, A4 landscape:**
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
@@ -295,11 +290,23 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ## 9. Overview (home)
 
-- **Totals:** number of pieces, total Purchase price, total Market value, Gain/loss. The pieces card opens the Collection.
+Where the Collection stands, in this order: the totals, the charts and the breakdown, then Latest Items, Set progress, Needs attention and the Wantlist.
+
+- **Totals over the whole Collection**, each clearly labelled as counting Items or pieces:
+  - number of Items; number of pieces per Item type. The pieces card opens the Collection.
+  - total Purchase price, total Market value, Gain/loss; the Realised Gain/loss of the sold Items, once something is sold
+  - gold and silver Metal value with the total fine weight, shown only when non-zero
+- **Charts** of what's owned, absent while nothing is:
+  - An Item's **Date acquired** is its purchase date, or when it was recorded in CoinsLite if that is earlier or it has no purchase date. Purchase dates before 1900 count as 1900.
+  - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month. A switch shows Value by Date acquired in its place.
+  - **Value by Date acquired:** cumulative Purchase price and Market value by the month Items were acquired.
+  - **Value distribution:** by Item type, plus gold and silver Metal value.
+- **Breakdown:** the Items and Market value of each country, decade and material the owned Items span (a coin's precious metal standing in for a missing material), largest Market value first with a bar per row, the groups past the sixth folded into "Other" and the Items without the fact last. Absent while nothing is owned.
+- While a Home currency change converts the amounts (§4), a notice takes the totals' place and the charts and breakdown wait.
+- **Spot price:** gold and silver, per gram and per troy ounce (31.1034768 g), in the Home currency, with the time of the last update. Refreshes at least every 15 minutes. From tablet width up it's in the sidebar, on every page; on phones, at the end of the Overview.
 - **Plan usage** for Free plan users: Items used out of 50, more prominent from 40 Items, with an upgrade path.
 - **Phones** have no top bar: each page starts with its own header bar, and what the sidebar keeps under Settings is on the Account tab (Plans, Updates, preferences, signing out, Albums, and for admins the admin areas).
 - **Add Item:** on phones, a round button in the accent colour in the middle of the tabs along the bottom, on every page, opening the form (§5.4). From tablet width up, the sidebar's Add Item, in the accent colour, is the button for it. While the Collection is empty, the first-run prompt also has a way to add, on every screen size.
-- **Value over time:** the Collection's "over time" chart (§7), compact: the same figures, without the switch to Value by Date acquired. Absent while nothing is owned.
 - **Latest Items:** the three most recently added, each with thumbnail, year and denomination, and its Market value (× Quantity when more than one) on the right.
 - **Set progress:** up to three Sets the user is closest to completing, among the Sets their held Catalog entries open with "View as Set" (§6.4), each with held / total and % as its Set view shows them, and opening it. Closest means the largest share held, then the fewest entries missing. A complete Set isn't listed. Absent when there are none, and while the Catalog is hidden.
 - **Needs attention:** how many owned Items have no Market value, how many have no photo (no side photo and no more photos), and how many coins and banknotes have no Grade, each opening the Collection filtered to exactly those Items (§7). A count of none isn't listed; absent when all are none.

@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  useConvertingTo,
-  useMoney,
-} from "@/components/account/home-currency-change";
-import { totalsOpen } from "@/components/collection/collection-display";
-import {
-  useCollectionDisplay,
-  useViewportSize,
-} from "@/components/collection/use-collection-display";
-import { SpotPrices } from "@/components/spot-prices/spot-prices";
+import { useConvertingTo } from "@/components/account/home-currency-change";
+import { useAlbums } from "@/components/albums/use-albums";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import {
@@ -22,21 +14,12 @@ import {
   metals,
 } from "@coinslite/backend/convex/spotPrices/rates";
 import type { HomeCurrency } from "@coinslite/i18n";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@coinslite/ui/collapsible";
 import { cn } from "@coinslite/ui/utils";
-import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { type ReactNode, useId, useState } from "react";
-import { seriesColorVariables } from "./chart-card";
-import { Insights } from "./insights";
+import { type ReactNode, useId } from "react";
 import {
   type ShownTotals,
   useCollectionTotals,
-  usePricedTotals,
   useValueOverTime,
 } from "./use-collection-totals";
 import { ValueChart } from "./value-chart";
@@ -45,295 +28,229 @@ import { ValueDistributionChart } from "./value-distribution-chart";
 const itemTypes = ["coin", "banknote", "stamp"] as const;
 
 /**
- * Until the viewport's size is known (on the server and the first paint),
- * CSS opens the section where `totalsOpen` would: in a viewport at least
- * 1024 px wide and 1000 px tall.
+ * What the strip's figures read, which totals have before any Spot price
+ * (a view's, as collection.page sums them) as well as after.
  */
-const firstPaint = {
-  chevron: "[@media(min-width:1024px)_and_(min-height:1000px)]:rotate-90",
-  summary: "[@media(min-width:1024px)_and_(min-height:1000px)]:hidden",
-  details: "hidden [@media(min-width:1024px)_and_(min-height:1000px)]:block",
-  skeleton: "hidden [@media(min-width:1024px)_and_(min-height:1000px)]:flex",
-};
+type Sums = Pick<
+  PageTotals,
+  | "currency"
+  | "items"
+  | "pieces"
+  | "purchasePrice"
+  | "marketValue"
+  | "gainLoss"
+  | "salePrice"
+  | "realised"
+>;
 
 /**
- * What the whole Collection holds and is worth (spec 7): totals, today's
- * Spot prices and two charts, under a row that opens and collapses them and
- * sums them up while they're collapsed. With a search or filter on
- * (`viewTotals`), the view's figures lead and the whole Collection's follow.
- * When they start open is `totalsOpen`'s call, which follows the window as it
- * resizes; a choice made here sticks for the rest of the visit and is
- * remembered on the device. An empty Collection shows only the Spot prices.
+ * The Collection page's summary strip (spec 7), above its Items: the
+ * pieces, the Albums (opening them), and the total Market value and
+ * Gain/loss of what's owned. With a search or filter on (`viewTotals`) it's
+ * headed "This view" and sums the view's Items instead, leaving out the
+ * Albums; the sold view's sums the sold Items' purchase and sale. The full
+ * totals, breakdown and charts are the Overview's.
  */
-export function CollectionTotalsSection({
-  narrowed,
+export function CollectionStrip({
   sold,
   viewTotals,
 }: {
-  narrowed: boolean;
   /** The sold view's: the sold Items' sale figures instead. */
   sold?: boolean;
   /**
-   * The current view's totals, before any Spot price, while a search or
-   * filter narrows it; null while they load, undefined when nothing narrows
-   * the view beyond owned or sold.
+   * The current view's totals while a search or filter narrows it; null
+   * while they load, undefined when nothing narrows the view beyond owned
+   * or sold.
    */
   viewTotals?: PageTotals | null;
 }) {
   const t = useI18n();
   const titleId = useId();
-  const totals = useCollectionTotals(sold ? "sold" : undefined);
-  const priced = usePricedTotals(viewTotals ?? undefined);
-  // The view's figures: null while they load, undefined when there's no view.
-  const view = viewTotals === undefined ? undefined : (priced ?? null);
-  const [display, changeDisplay] = useCollectionDisplay();
-  const viewport = useViewportSize();
-  const [chosen, setChosen] = useState<boolean>();
-  // Undefined until the viewport's size is known: `firstPaint` then decides.
-  const open = chosen ?? totalsOpen(display, { narrowed, viewport });
-
+  const whole = useCollectionTotals(sold ? "sold" : undefined);
+  const shown = viewTotals === undefined ? whole : viewTotals;
+  const counting = viewTotals === undefined && whole?.counting === true;
   return (
-    <Collapsible
-      asChild
-      open={open ?? true}
-      onOpenChange={(next) => {
-        setChosen(next);
-        changeDisplay({ totalsOpen: next });
-      }}
+    <section
+      aria-labelledby={titleId}
+      aria-busy={shown == null || counting}
+      className="flex flex-col gap-1.5"
     >
-      <section
-        aria-labelledby={titleId}
-        aria-busy={totals === undefined || totals.counting}
-        className={cn("border-b", seriesColorVariables)}
-      >
-        <h2 className="flex h-10 items-center px-2">
-          <CollapsibleTrigger className="flex h-7 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-left text-ui outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
-            <ChevronRight
-              className={cn(
-                "size-3.5 shrink-0 text-muted-foreground transition-transform duration-150",
-                open === true && "rotate-90",
-                open === undefined && firstPaint.chevron,
-              )}
-              aria-hidden="true"
-            />
-            <span id={titleId} className="shrink-0 font-medium">
-              {t(
-                sold
-                  ? "collectionTotals.soldSection"
-                  : "collectionTotals.section",
-              )}
-            </span>
-            <TotalsSummary
-              totals={totals}
-              view={view}
-              sold={sold}
-              className={cn(
-                open === true && "hidden",
-                open === undefined && firstPaint.summary,
-              )}
-            />
-          </CollapsibleTrigger>
-        </h2>
-        {/* A display class here would beat the hidden attribute a collapsed section gets. */}
-        <CollapsibleContent
-          className={cn(open === undefined && firstPaint.details)}
-        >
-          <div className="flex flex-col gap-4 px-4 pb-4">
-            <TotalsDetails totals={totals} view={view} sold={sold} />
-          </div>
-        </CollapsibleContent>
-      </section>
-    </Collapsible>
-  );
-}
-
-/**
- * The collapsed totals in one line: Items, total Market value, Gain/loss and
- * any Metal value, of the view while one narrows the list (`view`, headed
- * "This view"), else of the whole Collection. The line holds as many whole
- * figures as fit, in that order; the rest wrap out of sight rather than
- * being cut. It pulses while the totals are still counting.
- */
-function TotalsSummary({
-  totals,
-  view,
-  sold,
-  className,
-}: {
-  totals: ShownTotals | undefined;
-  /** The view's figures: null while they load, undefined without a view. */
-  view: CollectionTotals | null | undefined;
-  sold?: boolean;
-  className?: string;
-}) {
-  const t = useI18n();
-  const formatMoney = useMoney();
-  // While a Home currency change converts the amounts, only that's said of them.
-  const converting = useConvertingTo() !== undefined;
-  if (totals === undefined || view === null)
-    return (
-      <span
-        className={cn("h-3.5 w-48 animate-pulse rounded bg-muted", className)}
-        aria-hidden="true"
-      />
-    );
-  const shown = view ?? totals;
-  if (shown.items === 0) return null;
-
-  const money = (amount: number) => formatMoney(amount, shown.currency);
-  const gainLoss = sold ? shown.realised : shown.gainLoss;
-  const figures: { key: string; label?: string; value: ReactNode }[] = [
-    {
-      key: "items",
-      ...(view && { label: `${t("collectionTotals.thisView")}:` }),
-      value: t("collectionTotals.summaryItems", { count: shown.items }),
-    },
-    sold
-      ? {
-          key: "salePrice",
-          label: t("collectionTotals.summarySalePrice"),
-          value: money(shown.salePrice),
-        }
-      : {
-          key: "marketValue",
-          label: t("collectionTotals.summaryMarketValue"),
-          value: money(shown.marketValue),
-        },
-  ];
-  if (gainLoss.items > 0 && !converting)
-    figures.push({
-      key: "gainLoss",
-      label: t(
-        sold ? "collectionTotals.realised" : "collectionTotals.gainLoss",
-      ),
-      value: <SignedMoney amount={gainLoss.amount} currency={shown.currency} />,
-    });
-  for (const metal of sold || converting ? [] : metals) {
-    const { value } = shown.metals[metal];
-    if (value)
-      figures.push({
-        key: metal,
-        label: t(`collectionTotals.metalValue.${metal}`),
-        value: money(value),
-      });
-  }
-
-  return (
-    <span
-      className={cn(
-        "flex h-5 min-w-0 flex-1 flex-wrap gap-x-3 overflow-hidden text-muted-foreground",
-        !view && totals.counting && "animate-pulse",
-        className,
-      )}
-    >
-      {figures.map(({ key, label, value }) => (
-        <span key={key} className="whitespace-nowrap">
-          {label && <>{label} </>}
-          <span className="text-foreground">{value}</span>
-        </span>
-      ))}
-    </span>
-  );
-}
-
-/**
- * The totals, Spot prices, breakdown and charts, with placeholders while they
- * load. With a view's figures (`view`), those come first under "This view"
- * and the whole Collection's follow under their own heading, and the
- * breakdown is the view's; the charts stay the whole Collection's. The sold
- * view's are its sale figures, with neither breakdown nor charts: those show
- * what's owned. While a Home currency change converts the amounts, the
- * breakdown and charts wait too.
- */
-function TotalsDetails({
-  totals,
-  view,
-  sold,
-}: {
-  totals: ShownTotals | undefined;
-  /** The view's figures: null while they load, undefined without a view. */
-  view: CollectionTotals | null | undefined;
-  sold?: boolean;
-}) {
-  const t = useI18n();
-  const converting = useConvertingTo() !== undefined;
-  const empty = totals?.items === 0;
-  const variant = sold ? "sold" : "collection";
-  // The breakdown is of the view's Items while a view narrows the list, else
-  // the whole Collection's; none while they load, or on the sold view.
-  const broken =
-    view === undefined
-      ? totals !== undefined && !empty
-        ? totals
-        : undefined
-      : view !== null && view.items > 0
-        ? view
-        : undefined;
-  const whole =
-    totals === undefined ? (
-      <FiguresSkeleton />
-    ) : (
-      !empty && (
-        <TotalsFigures
-          totals={totals}
-          variant={variant}
-          counting={totals.counting}
-        />
-      )
-    );
-  return (
-    <>
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
-        {view === undefined ? (
-          whole
-        ) : (
-          <div className="flex flex-col gap-4">
-            <Scoped title={t("collectionTotals.thisView")}>
-              {view === null ? (
-                <FiguresSkeleton />
-              ) : (
-                <TotalsFigures totals={view} variant={variant} />
-              )}
-            </Scoped>
-            {whole && (
-              <Scoped
-                title={t(
-                  sold
-                    ? "collectionTotals.wholeSold"
-                    : "collectionTotals.wholeCollection",
-                )}
-              >
-                {whole}
-              </Scoped>
-            )}
-          </div>
+      <h2
+        id={titleId}
+        className={cn(
+          "px-1 text-xs font-medium text-muted-foreground",
+          // Owned and unnarrowed, they're plainly the Collection's.
+          viewTotals === undefined && !sold && "sr-only",
         )}
-        <SpotPrices className={cn(empty && "max-w-xl xl:col-span-2")} />
-      </div>
-      {!sold && !converting && broken && (
-        <Insights
-          totals={broken}
-          scope={t(
-            view === undefined
-              ? "collectionTotals.wholeCollection"
-              : "collectionTotals.thisView",
-          )}
+      >
+        {viewTotals !== undefined
+          ? t("collectionTotals.thisView")
+          : sold
+            ? t("collectionTotals.soldSection")
+            : t("collectionTotals.title")}
+      </h2>
+      {shown == null ? (
+        <FiguresSkeleton figures={4} />
+      ) : (
+        <StripFigures
+          totals={shown}
+          sold={sold}
+          albums={viewTotals === undefined && !sold}
+          counting={counting}
         />
       )}
-      {sold || converting ? null : totals === undefined ? (
-        <ChartsSkeleton />
-      ) : (
-        !empty && <Charts totals={totals} />
-      )}
-    </>
+    </section>
   );
 }
 
 /**
- * The value chart and the value distribution of what's owned, pulsing while
- * the totals or "Value over time" are still counting.
+ * The strip's figures in one card: the pieces, the Albums with `albums`,
+ * then the Market value and Gain/loss, or for sold Items the Purchase price,
+ * sale price and Realised Gain/loss.
  */
-function Charts({ totals }: { totals: ShownTotals }) {
+function StripFigures({
+  totals,
+  sold,
+  albums,
+  counting,
+}: {
+  totals: Sums;
+  sold?: boolean;
+  albums: boolean;
+  counting: boolean;
+}) {
+  const t = useI18n();
+  const format = useFormatters();
+  const convertingTo = useConvertingTo();
+  if (convertingTo) return <ConvertingNotice currency={convertingTo} />;
+  const money = (amount: number) => format.money(amount, totals.currency);
+  return (
+    <FiguresCard counting={counting}>
+      <PiecesFigure totals={totals} />
+      {albums && <AlbumsFigure />}
+      {sold ? (
+        <>
+          <Figure
+            label={t("collectionTotals.purchasePrice")}
+            value={money(totals.purchasePrice)}
+          />
+          <Figure
+            label={t("collectionTotals.salePrice")}
+            value={money(totals.salePrice)}
+          />
+          <GainLossFigure kind="realised" totals={totals} />
+        </>
+      ) : (
+        <>
+          <Figure
+            label={t("collectionTotals.marketValue")}
+            value={money(totals.marketValue)}
+          />
+          <GainLossFigure kind="gainLoss" totals={totals} />
+        </>
+      )}
+    </FiguresCard>
+  );
+}
+
+/** How many Albums the person has, opening them; a dash while they load. */
+function AlbumsFigure() {
+  const t = useI18n();
+  const format = useFormatters();
+  const albums = useAlbums();
+  return (
+    <Figure
+      label={t("nav.albums")}
+      href="/albums"
+      value={
+        albums === undefined ? (
+          <span className="text-muted-foreground">–</span>
+        ) : (
+          format.number(albums.length)
+        )
+      }
+    />
+  );
+}
+
+/**
+ * The Overview's totals (spec 9) as figures in one card: the Items and
+ * pieces (opening the Collection), the money, the Realised Gain/loss once
+ * something is sold (`sold`, the sold Items' totals), then each metal held.
+ * The card pulses while the totals are still `counting`.
+ */
+export function TotalsFigures({
+  totals,
+  sold,
+  counting,
+}: {
+  totals: CollectionTotals;
+  sold?: CollectionTotals;
+  counting?: boolean;
+}) {
+  const t = useI18n();
+  const format = useFormatters();
+  const convertingTo = useConvertingTo();
+  if (convertingTo) return <ConvertingNotice currency={convertingTo} />;
+  const money = (amount: number) => format.money(amount, totals.currency);
+  return (
+    <FiguresCard counting={counting}>
+      <Figure
+        label={t("collectionTotals.items")}
+        value={format.number(totals.items)}
+        hint={t("collectionTotals.itemsHint")}
+      />
+      {/* The way into what they add up to. */}
+      <PiecesFigure totals={totals} href="/collection" />
+      <Figure
+        label={t("collectionTotals.purchasePrice")}
+        value={money(totals.purchasePrice)}
+      />
+      <Figure
+        label={t("collectionTotals.marketValue")}
+        value={money(totals.marketValue)}
+      />
+      <GainLossFigure kind="gainLoss" totals={totals} />
+      {sold && sold.items > 0 && (
+        <GainLossFigure kind="realised" totals={sold} />
+      )}
+      {metals
+        .filter((metal) => totals.metals[metal].fineWeight > 0)
+        .map((metal) => {
+          const { fineWeight, value } = totals.metals[metal];
+          return (
+            <Figure
+              key={metal}
+              label={t(`collectionTotals.metalValue.${metal}`)}
+              value={
+                value === null ? (
+                  <span className="whitespace-normal text-sm font-normal text-muted-foreground">
+                    {t("collectionTotals.noSpotPrices")}
+                  </span>
+                ) : (
+                  money(value)
+                )
+              }
+              hint={t("collectionTotals.fineWeight", {
+                grams: format.number(fineWeight, {
+                  maximumFractionDigits: 2,
+                }),
+                ounces: format.number(fineWeight / TROY_OUNCE_GRAMS, {
+                  maximumFractionDigits: 2,
+                }),
+              })}
+            />
+          );
+        })}
+    </FiguresCard>
+  );
+}
+
+/**
+ * The value chart and the value distribution of what's owned (spec 9),
+ * pulsing while the totals or "Value over time" are still counting.
+ */
+export function Charts({ totals }: { totals: ShownTotals }) {
   const overTime = useValueOverTime();
   return (
     <div
@@ -348,42 +265,84 @@ function Charts({ totals }: { totals: ShownTotals }) {
   );
 }
 
-/** A card of figures under the heading that says what they cover. */
-function Scoped({ title, children }: { title: string; children: ReactNode }) {
+/** Figures in one card, pulsing while their totals are still `counting`. */
+function FiguresCard({
+  counting,
+  children,
+}: {
+  counting?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <h3 className="px-1 text-xs font-medium text-muted-foreground">
-        {title}
-      </h3>
-      {children}
-    </div>
-  );
-}
-
-function ChartsSkeleton() {
-  return (
-    <div className="grid gap-4 lg:grid-cols-2" aria-hidden="true">
-      <div className="h-72 animate-pulse rounded-xl bg-card" />
-      <div className="h-72 animate-pulse rounded-xl bg-card" />
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl bg-card",
+        counting && "animate-pulse",
+      )}
+    >
+      <dl className={figuresLayout}>{children}</dl>
     </div>
   );
 }
 
 /**
- * CollectionTotalsSection before the page knows its URL: open only in a
- * viewport at least 1024 × 1000 px, as it opens when nothing says otherwise.
+ * The pieces, with how many of each Item type beneath; `href` makes the
+ * card the way to them.
  */
-export function CollectionTotalsSkeleton() {
+function PiecesFigure({ totals, href }: { totals: Sums; href?: string }) {
+  const t = useI18n();
+  const format = useFormatters();
   return (
-    <div className="border-b" aria-hidden="true">
-      <div className="flex h-10 items-center px-4">
-        <span className="h-3.5 w-48 animate-pulse rounded bg-muted" />
-      </div>
-      <div className={cn("flex-col gap-4 px-4 pb-4", firstPaint.skeleton)}>
-        <FiguresSkeleton />
-        <ChartsSkeleton />
-      </div>
-    </div>
+    <Figure
+      label={t("collectionTotals.pieces")}
+      href={href}
+      value={format.number(totalPieces(totals))}
+      hint={itemTypes
+        .filter((type) => totals.pieces[type] > 0)
+        .map(
+          (type) =>
+            `${t(`collectionTotals.typesPlural.${type}`)} ${format.number(totals.pieces[type])}`,
+        )
+        .join(" · ")}
+    />
+  );
+}
+
+/**
+ * Gain/loss over what's owned, or realised over what's sold, with a dash
+ * and a hint until an Item has both of the prices it needs.
+ */
+function GainLossFigure({
+  kind,
+  totals,
+}: {
+  kind: "gainLoss" | "realised";
+  totals: Sums;
+}) {
+  const t = useI18n();
+  const format = useFormatters();
+  const figure = totals[kind];
+  return (
+    <Figure
+      label={t(`collectionTotals.${kind}`)}
+      value={
+        figure.items === 0 ? (
+          <span className="text-muted-foreground">–</span>
+        ) : (
+          <SignedMoney amount={figure.amount} currency={totals.currency} />
+        )
+      }
+      hint={
+        figure.items === 0
+          ? t(`collectionTotals.${kind}None`)
+          : figure.items < totals.items
+            ? t(`collectionTotals.${kind}Partial`, {
+                count: format.number(figure.items),
+                total: format.number(totals.items),
+              })
+            : undefined
+      }
+    />
   );
 }
 
@@ -408,159 +367,16 @@ function SignedMoney({
 }
 
 /**
- * The totals as figures in one card: counts, money, then each metal held. The
- * Overview's keep to pieces and money (spec 9), plus the Realised Gain/loss
- * once something is sold (`sold`, the sold Items' totals). The sold view's
- * show the sale total and the Realised Gain/loss instead of Market value.
- * The card pulses while the totals are still `counting`.
- */
-export function TotalsFigures({
-  totals,
-  variant = "collection",
-  sold,
-  counting,
-}: {
-  totals: CollectionTotals;
-  variant?: "collection" | "overview" | "sold";
-  sold?: CollectionTotals;
-  counting?: boolean;
-}) {
-  const t = useI18n();
-  const format = useFormatters();
-  const convertingTo = useConvertingTo();
-  if (convertingTo) return <ConvertingNotice currency={convertingTo} />;
-  const money = (amount: number) => format.money(amount, totals.currency);
-  /**
-   * Gain/loss over what's owned, or realised over what's sold, with a dash
-   * and a hint until an Item has both of the prices it needs.
-   */
-  const gainLossFigure = (
-    kind: "gainLoss" | "realised",
-    of: CollectionTotals,
-  ) => {
-    const figure = of[kind];
-    return (
-      <Figure
-        label={t(`collectionTotals.${kind}`)}
-        value={
-          figure.items === 0 ? (
-            <span className="text-muted-foreground">–</span>
-          ) : (
-            <SignedMoney amount={figure.amount} currency={of.currency} />
-          )
-        }
-        hint={
-          figure.items === 0
-            ? t(`collectionTotals.${kind}None`)
-            : figure.items < of.items
-              ? t(`collectionTotals.${kind}Partial`, {
-                  count: format.number(figure.items),
-                  total: format.number(of.items),
-                })
-              : undefined
-        }
-      />
-    );
-  };
-
-  return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl bg-card",
-        counting && "animate-pulse",
-      )}
-    >
-      <dl className={figuresLayout}>
-        {variant !== "overview" && (
-          <Figure
-            label={t("collectionTotals.items")}
-            value={format.number(totals.items)}
-            hint={t("collectionTotals.itemsHint")}
-          />
-        )}
-        <Figure
-          label={t("collectionTotals.pieces")}
-          // On the Overview, the way into what they add up to.
-          href={variant === "overview" ? "/collection" : undefined}
-          value={format.number(totalPieces(totals))}
-          hint={itemTypes
-            .filter((type) => totals.pieces[type] > 0)
-            .map(
-              (type) =>
-                `${t(`collectionTotals.typesPlural.${type}`)} ${format.number(totals.pieces[type])}`,
-            )
-            .join(" · ")}
-        />
-        <Figure
-          label={t("collectionTotals.purchasePrice")}
-          value={money(totals.purchasePrice)}
-        />
-        {variant === "sold" ? (
-          <>
-            <Figure
-              label={t("collectionTotals.salePrice")}
-              value={money(totals.salePrice)}
-            />
-            {gainLossFigure("realised", totals)}
-          </>
-        ) : (
-          <>
-            <Figure
-              label={t("collectionTotals.marketValue")}
-              value={money(totals.marketValue)}
-            />
-            {gainLossFigure("gainLoss", totals)}
-          </>
-        )}
-        {variant === "overview" &&
-          sold &&
-          sold.items > 0 &&
-          gainLossFigure("realised", sold)}
-        {metals
-          .filter(
-            (metal) =>
-              variant === "collection" && totals.metals[metal].fineWeight > 0,
-          )
-          .map((metal) => {
-            const { fineWeight, value } = totals.metals[metal];
-            return (
-              <Figure
-                key={metal}
-                label={t(`collectionTotals.metalValue.${metal}`)}
-                value={
-                  value === null ? (
-                    <span className="whitespace-normal text-sm font-normal text-muted-foreground">
-                      {t("collectionTotals.noSpotPrices")}
-                    </span>
-                  ) : (
-                    money(value)
-                  )
-                }
-                hint={t("collectionTotals.fineWeight", {
-                  grams: format.number(fineWeight, {
-                    maximumFractionDigits: 2,
-                  }),
-                  ounces: format.number(fineWeight / TROY_OUNCE_GRAMS, {
-                    maximumFractionDigits: 2,
-                  }),
-                })}
-              />
-            );
-          })}
-      </dl>
-    </div>
-  );
-}
-
-/**
  * Amounts never wrap: a lone digit or minus sign on its own line reads as a
  * different amount. The figures wrap as rows of cards instead, two to a row on
- * a phone, and a figure too wide for its share takes the whole row. Every row
- * shares out its full width, so however many figures there are (four on the
- * Overview, up to seven on the Collection page) no row ends in an empty cell.
+ * a phone (9rem each fits twice in a 360 px wide one, at the app's 18 px
+ * root), and a figure too wide for its share takes the whole row. Every row
+ * shares out its full width, so however many figures there are (three or four
+ * on the Collection page, up to eight on the Overview) no row ends in an
+ * empty cell.
  */
 const figuresLayout = "-mb-px -mr-px flex flex-wrap";
-const figureLayout = "min-w-min flex-[1_1_10rem] sm:flex-[1_1_12.5rem]";
+const figureLayout = "min-w-min flex-[1_1_9rem] sm:flex-[1_1_12.5rem]";
 
 function Figure({
   label,
