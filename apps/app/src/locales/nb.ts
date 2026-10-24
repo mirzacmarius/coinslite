@@ -1414,7 +1414,7 @@ export default {
     menuItem: "Importer fra CSV …",
     title: "Importer objekter",
     description:
-      "Velg en CSV-fil satt opp som eksporten av samlingen, opptil {size} og {rows} rader. Ingenting legges til før du bekrefter.",
+      "Velg en CSV-fil: en eksport av samlingen, eller en liste lagret fra Numista, OpenNumismat, CoinManage eller et regneark, opptil {size} og {rows} rader. Ingenting legges til før du bekrefter.",
     choose: "Velg en CSV-fil",
     chooseAnother: "Velg en annen fil",
     reading: "Leser filen …",
@@ -1432,6 +1432,9 @@ export default {
     "linked#few": "{count} rader kobles til katalogen",
     "linked#other": "{count} rader kobles til katalogen",
     ignored: "Ignorerte kolonner: {names}",
+    unreadCountries: "Land CoinsLite ikke kjenner, legges i notatene: {names}",
+    unreadGrades:
+      "Kvaliteter CoinsLite ikke kan lese, legges i merknaden om kvalitet: {names}",
     "freeLimit#zero": "Gratisplanen har ikke plass til flere objekter.",
     "freeLimit#one": "Gratisplanen har plass til 1 objekt til.",
     "freeLimit#few": "Gratisplanen har plass til {count} objekter til.",
@@ -1451,6 +1454,23 @@ export default {
     "imported#one": "1 objekt importert",
     "imported#few": "{count} objekter importert",
     "imported#other": "{count} objekter importert",
+    columns: {
+      title: "Sjekk kolonnene",
+      hint: "CoinsLite har gjettet hva hver kolonne inneholder. Endre en gjetning, eller utelat en kolonne.",
+      inFile: "I filen",
+      inCoinsLite: "I CoinsLite",
+      empty: "Tom",
+      fieldFor: "Felt for {heading}",
+      leaveOut: "Utelat",
+      unit: "Enhet for pålydende",
+      catalogEntry: "Nøkkel for katalogoppføring",
+      itemType: "Objekttype for rader uten en",
+      dateOrder: "I datoer som 05/03/2024 er det første tallet",
+      dayFirst: "Dagen",
+      monthFirst: "Måneden",
+      continue: "Fortsett",
+      check: "Sjekk kolonner",
+    },
     reasons: {
       unknownType: "objekttypen er ikke mynt, seddel eller frimerke",
       unknownScale: "kvalitetsskalaen er ukjent for CoinsLite",
@@ -1461,8 +1481,7 @@ export default {
       invalidNumber: "et tall er ikke et helt tall",
       invalidYear: "året er utenfor gyldig område",
       invalidQuantity: "antallet er ikke et helt tall på minst 1",
-      invalidDate:
-        "en dato er ikke en ekte dato tilbake i tid, skrevet ÅÅÅÅ-MM-DD",
+      invalidDate: "en dato er ikke en ekte dato tilbake i tid",
       otherCurrency: "valutaen er ikke hjemmevalutaen din",
       homeCurrencyChanging: "den har et beløp mens hjemmevalutaen din endres",
       unknownCatalogEntry: "katalogoppføringen finnes ikke",
@@ -1481,8 +1500,8 @@ export default {
       unreadable:
         "Filen kan ikke leses som CSV: et anførselstegn lukkes aldri.",
       noRows: "Filen har ingen rader under overskriftene.",
-      noKnownHeadings:
-        "Ingen av filens overskrifter er en kolonne fra eksporten av samlingen.",
+      noKnownHeadings: "Ingen kolonne i filen går til et felt i CoinsLite.",
+      invalidColumns: "Hvert felt kan bare gå til én kolonne.",
       failed: "Filen kunne ikke leses. Prøv igjen.",
       stoppedAt: "Importen stoppet på rad {row}: {reason}.",
       stopped: "Importen stoppet.",

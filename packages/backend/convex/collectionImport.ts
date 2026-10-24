@@ -1,3 +1,4 @@
+import { locales } from "@coinslite/i18n";
 import { ConvexError, type Infer, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -18,6 +19,7 @@ import {
   readImportFile,
   rowErrors,
 } from "./collection/importRows";
+import { dateOrders, meansCurrency } from "./collection/importValues";
 import { countAlbumCreated } from "./collectionCounts";
 import { catalogVisibleTo } from "./featureFlags";
 import { checkAmountsWrite, holdsAmount } from "./homeCurrency/rules";
@@ -37,7 +39,8 @@ import {
 import { clearWant } from "./wants";
 
 /**
- * Importing Items from a CSV file laid out like the Collection export
+ * Importing Items from a CSV file: a Collection export, or a file from
+ * another app or a spreadsheet read by the columns the person confirmed
  * (collection/importRows.ts reads it). First a preview: what would be added,
  * what's rejected and why, and what fits the person's plan; nothing is
  * written. Then the accepted rows are added a batch at a time, each batch
@@ -50,8 +53,14 @@ const importRow = v.object({
   title: v.string(),
   year: v.optional(v.number()),
   denomination: v.optional(v.string()),
+  series: v.optional(v.string()),
+  mintMark: v.optional(v.string()),
+  ruler: v.optional(v.string()),
+  mintage: v.optional(v.number()),
+  numistaNumber: v.optional(v.number()),
   gradingScale: v.optional(gradingScale),
   grade: v.optional(v.string()),
+  gradeNote: v.optional(v.string()),
   strike: v.optional(strike),
   material: v.optional(material),
   materialNote: v.optional(v.string()),
@@ -83,7 +92,11 @@ const importRow = v.object({
   catalogEntry: v.optional(v.string()),
 });
 // The validator and the reader's type describe the same row.
-const _sameRow: Infer<typeof importRow> extends ImportRow ? true : never = true;
+const _sameRow: Infer<typeof importRow> extends ImportRow
+  ? ImportRow extends Infer<typeof importRow>
+    ? true
+    : never
+  : never = true;
 
 const rejectedRow = v.object({ row: v.number(), reason: v.string() });
 
@@ -158,7 +171,10 @@ async function checkRows(
       ...input
     } = row;
     try {
-      if (currency !== undefined && currency !== owner.homeCurrency)
+      if (
+        currency !== undefined &&
+        !(owner.homeCurrency && meansCurrency(currency, owner.homeCurrency))
+      )
         throw new ConvexError(rowErrors.otherCurrency);
       // Its currency column, if any, was just checked.
       if (holdsAmount(row)) checkAmountsWrite(owner, undefined);
@@ -234,25 +250,44 @@ export const check = internalQuery({
 /**
  * Reads a CSV file and previews its import: the rows that would be added,
  * the rows rejected with their row numbers and reasons, the headings it
- * ignores, the Albums it would create and the rows it would link to the
- * Catalog, and how many Items the person's plan still takes (null: no
- * limit). Nothing is written. A file it can't take at all (too large, too
- * many rows, unreadable, no heading it knows) is refused with the reason.
+ * leaves out, what it keeps in notes, the Albums it would create and the
+ * rows it would link to the Catalog, and how many Items the person's plan
+ * still takes (null: no limit). The rows are read by the columns chosen,
+ * else as guessed, and the Item type and date order chosen for the file.
+ * Nothing is written. A file it can't take at all (too large, too many
+ * rows, unreadable, no column it knows) is refused with the reason.
  */
 export const preview = action({
-  args: { text: v.string() },
+  args: {
+    text: v.string(),
+    columns: v.optional(v.array(v.union(v.string(), v.null()))),
+    itemType: v.optional(itemType),
+    dateOrder: v.optional(
+      v.union(...dateOrders.map((order) => v.literal(order))),
+    ),
+    locale: v.optional(v.string()),
+  },
   returns: v.object({
     rows: v.array(importRow),
     rejected: v.array(rejectedRow),
     ignoredHeadings: v.array(v.string()),
+    unread: v.object({
+      countries: v.array(v.string()),
+      grades: v.array(v.string()),
+    }),
     albumsToCreate: v.array(v.string()),
     linked: v.number(),
     itemsLeft: v.union(v.number(), v.null()),
   }),
-  handler: async (ctx, { text }) => {
+  handler: async (ctx, { text, columns, itemType, dateOrder, locale }) => {
     // Signed in before a file of up to 5 MB is read; `check` does the rest.
     await requireUserId(ctx);
-    const read = readImportFile(text);
+    const read = readImportFile(text, {
+      columns,
+      itemType,
+      dateOrder,
+      locale: locales.find((known) => known === locale),
+    });
     if (typeof read === "string") throw new ConvexError(read);
     // Annotated: a function calling one in its own module can't infer it.
     const checked: Infer<typeof checkResult> = await ctx.runQuery(
@@ -265,6 +300,7 @@ export const preview = action({
         (a, b) => a.row - b.row,
       ),
       ignoredHeadings: read.ignoredHeadings,
+      unread: read.unread,
     };
   },
 });

@@ -1,20 +1,5 @@
-import {
-  type Locale,
-  countryCodes,
-  formatCountry,
-  locales,
-  parseMoney,
-} from "@coinslite/i18n";
-import { parseCsv } from "../catalog/csvText";
-import {
-  type GradingScale,
-  type ItemType,
-  type Strike,
-  defaultScale,
-  gradingScaleIds,
-  gradingScales,
-  isGrade,
-} from "../items/grades";
+import type { Locale } from "@coinslite/i18n";
+import type { GradingScale, ItemType, Strike } from "../items/grades";
 import {
   type Grader,
   type StampCatalogue,
@@ -23,40 +8,48 @@ import {
   stampCatalogueNames,
   stampCatalogues,
 } from "../items/references";
-import { type Material, materials } from "../items/rules";
-import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
+import type { Material } from "../items/rules";
+import { exportLabels } from "./exportLabels";
+import {
+  type Column,
+  dateOrderIn,
+  guessColumns,
+  importErrors,
+  importLimits,
+  isColumn,
+  readTable,
+} from "./importColumns";
+import {
+  type DateOrder,
+  countryOf,
+  currenciesOf,
+  lookup,
+  readAmount,
+  readDate,
+  readGrade,
+  readMaterial,
+  readNumistaNumber,
+  readYear,
+  scaleOf,
+  strikeOf,
+  typeOf,
+} from "./importValues";
+
+export { importErrors, importLimits } from "./importColumns";
 
 /**
- * Reading a Collection CSV for import (spec: Import Items from a CSV file).
- * The file is laid out like the Collection export: its headings are the
- * export's column labels in any of the five languages, or the raw column
- * keys, plus three optional columns of the import's own. Each row's cells
- * are read back the way the export writes them, in any language: Item type,
- * Grade on its scale, Strike, material and its note, country name or code,
- * plain amounts, a grader or stamp catalogue by its name. Pure; the rules
- * every Item must meet (items/rules.ts) are applied when the row is checked
- * against the person's Collection.
+ * Reading a file for import (spec §7, Import). A Collection export reads
+ * as it is: its headings are the export's column labels in any of the five
+ * languages, or the raw column keys, plus optional columns of the import's
+ * own. A file from another app (Numista, OpenNumismat, CoinManage) or a
+ * spreadsheet reads by the columns the person confirmed, guessed from its
+ * headings (importColumns.ts). Cells read the way the export writes them,
+ * in any language, and the ways other apps do (importValues.ts): Item type,
+ * Grade, Strike, material and its note, country name or code, amounts with
+ * or without a currency, dates, a grader or stamp catalogue by its name.
+ * Pure; the rules every Item must meet (items/rules.ts) are applied when
+ * the row is checked against the person's Collection.
  */
-
-export const importLimits = {
-  /** Bytes of text: 5 MB. */
-  fileSize: 5 * 1024 * 1024,
-  /** Rows below the heading row. */
-  rows: 2000,
-  /** Rows one batch adds, all or nothing. */
-  batch: 100,
-} as const;
-
-/** Why a whole file is refused. */
-export const importErrors = {
-  fileTooLarge: "FILE_TOO_LARGE",
-  tooManyRows: "TOO_MANY_ROWS",
-  unreadable: "UNREADABLE_FILE",
-  noRows: "NO_ROWS",
-  noKnownHeadings: "NO_KNOWN_HEADINGS",
-  /** A batch of more than `importLimits.batch` rows. */
-  batchTooLarge: "BATCH_TOO_LARGE",
-} as const;
 
 /** Why one row is left out; the rules' own codes (itemErrors) are used too. */
 export const rowErrors = {
@@ -72,10 +65,6 @@ export const rowErrors = {
   tooManyAlbums: "TOO_MANY_ALBUMS",
 } as const;
 
-/** The import's own columns, besides the export's. */
-export const extraColumns = ["notes", "album", "catalog_entry"] as const;
-type Column = CsvColumn | (typeof extraColumns)[number];
-
 /** One row read from the file, ready to be checked against the Collection. */
 export type ImportRow = {
   /** The row's number in the file, the heading row being 1. */
@@ -84,8 +73,14 @@ export type ImportRow = {
   title: string;
   year?: number;
   denomination?: string;
+  series?: string;
+  mintMark?: string;
+  ruler?: string;
+  mintage?: number;
+  numistaNumber?: number;
   gradingScale?: GradingScale;
   grade?: string;
+  gradeNote?: string;
   strike?: Strike;
   material?: Material;
   materialNote?: string;
@@ -105,7 +100,10 @@ export type ImportRow = {
   quantity?: number;
   purchasePrice?: number;
   marketValue?: number;
-  /** The currency column as written; it must be the Home currency. */
+  /**
+   * The currency as written, upper case: the currency column's, else the
+   * one written with an amount. It must be the Home currency.
+   */
   currency?: string;
   purchaseDate?: string;
   source?: string;
@@ -120,58 +118,6 @@ export type ImportRow = {
 };
 
 export type RejectedRow = { row: number; reason: string };
-
-/** Lower case without accents or extra spaces, so headings and names match loosely. */
-const folded = (text: string) =>
-  text
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
-
-/** Looks a folded text up among every language's words for the same things. */
-function lookup<K extends string>(
-  words: (locale: Locale) => Record<K, string>,
-  raw: readonly K[],
-) {
-  const found = new Map<string, K>();
-  for (const key of raw) found.set(folded(key), key);
-  for (const locale of locales)
-    for (const [key, word] of Object.entries(words(locale)) as [K, string][])
-      found.set(folded(word), key);
-  return (text: string) => found.get(folded(text));
-}
-
-const columnOf = lookup<Column>(
-  (locale) => ({
-    ...exportLabels[locale].columns,
-    notes: "notes",
-    album: "album",
-    catalog_entry: "catalog_entry",
-  }),
-  [...csvColumns, ...extraColumns],
-);
-const typeOf = lookup<ItemType>(
-  (locale) => exportLabels[locale].types,
-  ["coin", "banknote", "stamp"],
-);
-const scaleOf = lookup<GradingScale>(
-  (locale) => exportLabels[locale].scales,
-  gradingScaleIds,
-);
-const strikeOf = lookup<Strike>(
-  (locale) => exportLabels[locale].strikes,
-  ["circulation", "bu", "proof"],
-);
-const materialOf = lookup<Material>(
-  (locale) => exportLabels[locale].materials,
-  materials,
-);
-const stampGradeOf = lookup<string>(
-  (locale) => exportLabels[locale].stampGrades,
-  gradingScales.stamp.grades,
-);
 
 /**
  * A grader or stamp catalogue by its name ("PCGS", "Michel"), or "other"
@@ -200,31 +146,6 @@ const stampCatalogueOf = referenceOf<StampCatalogue>(
   stampCatalogues,
 );
 
-let countryNames: Map<string, string> | undefined;
-/** A country's code from its code or its name in any of the five languages. */
-function countryOf(text: string) {
-  if (!countryNames) {
-    countryNames = new Map();
-    for (const code of countryCodes) {
-      countryNames.set(folded(code), code);
-      for (const locale of locales)
-        countryNames.set(folded(formatCountry(code, locale)), code);
-    }
-  }
-  return countryNames.get(folded(text));
-}
-
-/** A Grade as the export writes it ("PF-65", "XF", "1−", "Used") as its stored code. */
-function gradeOf(scale: GradingScale, text: string) {
-  const code =
-    scale === "stamp"
-      ? stampGradeOf(text)
-      : scale === "sheldon"
-        ? /^(?:[A-Za-z]{2}-?)?(\d{1,2})$/.exec(text.trim())?.[1]
-        : text.trim().toUpperCase().replace(/−/g, "-");
-  return code !== undefined && isGrade(scale, code) ? code : undefined;
-}
-
 /** A row's problem: the reason it's left out. */
 class RowProblem {
   constructor(readonly reason: string) {}
@@ -233,19 +154,33 @@ const problem = (reason: string): never => {
   throw new RowProblem(reason);
 };
 
+/** How the rows are read, besides their cells. */
+export type ReadOptions = {
+  /** The Item type of rows that don't give one. */
+  itemType?: ItemType;
+  /** How dates with the year last put day and month. */
+  dateOrder: DateOrder;
+  /** The language of what the import writes into notes. */
+  locale: Locale;
+};
+
+/** What a row holds that CoinsLite can't store as it is, and so keeps in notes. */
+type Unread = { country?: string; grade?: string };
+
 /** Reads one row's cells into an ImportRow; throws a RowProblem when it can't. */
-function readRow(row: number, cells: Map<Column, string>): ImportRow {
+function readRow(
+  row: number,
+  cells: Map<Column, string>,
+  options: ReadOptions,
+): { read: ImportRow; unread: Unread } {
   const text = (column: Column) => cells.get(column)?.trim() || undefined;
+  const marks: string[] = [];
   const amount = (column: Column) => {
     const value = text(column);
     if (value === undefined) return undefined;
-    // The export writes plain amounts ("1250.50"); a spreadsheet saved in a
-    // language that groups with "." and marks decimals with "," reads too.
-    return (
-      parseMoney(value, "en") ??
-      parseMoney(value, "de") ??
-      problem(rowErrors.invalidAmount)
-    );
+    const read = readAmount(value) ?? problem(rowErrors.invalidAmount);
+    if (read.currency) marks.push(read.currency);
+    return read.amount;
   };
   const whole = (column: Column) => {
     const value = text(column);
@@ -254,81 +189,126 @@ function readRow(row: number, cells: Map<Column, string>): ImportRow {
       ? Number(value)
       : problem(rowErrors.invalidNumber);
   };
+  const date = (column: Column) => {
+    const value = text(column);
+    return value === undefined ? undefined : readDate(value, options.dateOrder);
+  };
+  const unread: Unread = {};
 
   const typeText = text("type");
   const type = typeText
     ? (typeOf(typeText) ?? problem(rowErrors.unknownType))
-    : problem(rowErrors.unknownType);
+    : (options.itemType ?? problem(rowErrors.unknownType));
+  // A country CoinsLite doesn't know ("German Empire") is kept in the notes.
   const countryText = text("country");
-  const country = countryText
-    ? (countryOf(countryText) ?? problem(rowErrors.invalidCountry))
-    : undefined;
+  const country = countryText ? countryOf(countryText) : undefined;
+  if (countryText && !country) unread.country = countryText;
+  const yearText = text("year");
+  const year =
+    yearText === undefined
+      ? undefined
+      : readYear(yearText) === null
+        ? problem(rowErrors.invalidNumber)
+        : (readYear(yearText) ?? undefined);
   const scaleText = text("gradingScale");
   const gradeText = text("grade");
-  let gradingScale: GradingScale | undefined;
-  let grade: string | undefined;
-  if (gradeText !== undefined) {
-    gradingScale = scaleText
-      ? (scaleOf(scaleText) ?? problem(rowErrors.unknownScale))
-      : defaultScale(type, country);
-    grade = gradeOf(gradingScale, gradeText) ?? problem(rowErrors.invalidGrade);
-  }
+  const scale = scaleText
+    ? (scaleOf(scaleText) ?? problem(rowErrors.unknownScale))
+    : undefined;
+  const grade = gradeText ? readGrade(type, country, scale, gradeText) : {};
+  if (gradeText && !grade.grade && !grade.strike) unread.grade = gradeText;
   const strikeText = text("strike");
   const strike = strikeText
     ? (strikeOf(strikeText) ?? problem(rowErrors.unknownStrike))
-    : undefined;
-  // As the export writes it: the material, then " · " and the note about it.
+    : grade.strike;
   const materialText = text("material");
-  let material: Material | undefined;
-  let materialNote: string | undefined;
-  if (materialText !== undefined) {
-    const [first = "", ...rest] = materialText.split(" · ");
-    material = materialOf(first);
-    materialNote = material
-      ? rest.join(" · ").trim() || undefined
-      : materialText;
-  }
+  const { material, materialNote } = materialText
+    ? readMaterial(materialText)
+    : {};
+  const numistaText = text("numista_number");
+  const numistaNumber =
+    numistaText === undefined
+      ? undefined
+      : (readNumistaNumber(numistaText) ?? problem(rowErrors.invalidNumber));
+  const denomination =
+    [text("denomination"), text("unit")].filter(Boolean).join(" ") || undefined;
+
+  const purchasePrice = amount("purchasePrice");
+  const marketValue = amount("marketValue");
+  const salePrice = amount("salePrice");
+  // Amounts in one currency: the column's, else the first written with one.
+  const currency = text("currency")?.toUpperCase() ?? marks[0];
+  if (
+    currency !== undefined &&
+    marks.some(
+      (mark) =>
+        !currenciesOf(mark).some((code) =>
+          currenciesOf(currency).includes(code),
+        ),
+    )
+  )
+    problem(rowErrors.otherCurrency);
 
   const grader = graderOf(text("grader"));
   const stampCatalogue = stampCatalogueOf(text("stampCatalogue"));
+  const labels = exportLabels[options.locale].columns;
+  const notes =
+    [text("notes"), unread.country && `${labels.country}: ${unread.country}`]
+      .filter(Boolean)
+      .join("\n") || undefined;
+  const gradeNote =
+    [grade.gradeNote, text("grade_note")].filter(Boolean).join(" · ") ||
+    undefined;
 
   return {
-    row,
-    type,
-    title: text("title") ?? "",
-    year: whole("year"),
-    denomination: text("denomination"),
-    gradingScale,
-    grade,
-    strike,
-    material,
-    materialNote,
-    grader: grader.key,
-    graderName: grader.name,
-    certificateNumber: text("certificateNumber"),
-    stampCatalogue: stampCatalogue.key,
-    stampCatalogueName: stampCatalogue.name,
-    stampCatalogueNumber: text("stampCatalogueNumber"),
-    perforation: text("perforation"),
-    watermark: text("watermark"),
-    colour: text("colour"),
-    serialNumber: text("serialNumber"),
-    signatures: text("signatures"),
-    printer: text("printer"),
-    country,
-    quantity: whole("quantity"),
-    purchasePrice: amount("purchasePrice"),
-    marketValue: amount("marketValue"),
-    currency: text("currency")?.toUpperCase(),
-    purchaseDate: text("purchaseDate"),
-    source: text("source"),
-    storage: text("storage"),
-    notes: text("notes"),
-    soldOn: text("soldOn"),
-    salePrice: amount("salePrice"),
-    saleNote: text("saleNote"),
-    album: text("album"),
-    catalogEntry: text("catalog_entry"),
+    read: {
+      row,
+      type,
+      // A file without titles names each Item by its denomination and year.
+      title:
+        text("title") ??
+        [denomination, year].filter((part) => part !== undefined).join(" "),
+      year,
+      denomination,
+      series: text("series"),
+      mintMark: text("mint_mark"),
+      ruler: text("ruler"),
+      mintage: whole("mintage"),
+      numistaNumber,
+      gradingScale: grade.gradingScale,
+      grade: grade.grade,
+      gradeNote,
+      strike,
+      material,
+      materialNote,
+      grader: grader.key,
+      graderName: grader.name,
+      certificateNumber: text("certificateNumber"),
+      stampCatalogue: stampCatalogue.key,
+      stampCatalogueName: stampCatalogue.name,
+      stampCatalogueNumber: text("stampCatalogueNumber"),
+      perforation: text("perforation"),
+      watermark: text("watermark"),
+      colour: text("colour"),
+      serialNumber: text("serialNumber"),
+      signatures: text("signatures"),
+      printer: text("printer"),
+      country,
+      quantity: whole("quantity"),
+      purchasePrice,
+      marketValue,
+      currency,
+      purchaseDate: date("purchaseDate"),
+      source: text("source"),
+      storage: text("storage"),
+      notes,
+      soldOn: date("soldOn"),
+      salePrice,
+      saleNote: text("saleNote"),
+      album: text("album"),
+      catalogEntry: text("catalog_entry"),
+    },
+    unread,
   };
 }
 
@@ -338,37 +318,75 @@ export const defined = <T extends object>(value: T) =>
     Object.entries(value).filter(([, field]) => field !== undefined),
   ) as T;
 
+/** What a file holds that CoinsLite can't store as it is: shown before importing. */
+export type UnreadValues = {
+  /** Country names it doesn't know, kept in the Items' notes. */
+  countries: string[];
+  /** Grades no scale reads, kept as the Grade's note. */
+  grades: string[];
+};
+
+/** How many of each unread value the preview names. */
+const unreadShown = 20;
+
+/** Which columns a file's rows are read by, and how. */
+export type FileChoices = {
+  /** Each heading's column, by its place; null leaves it out. Guessed when absent. */
+  columns?: readonly (string | null)[];
+  itemType?: ItemType;
+  /** Guessed from the dates when absent; day first when they don't say. */
+  dateOrder?: DateOrder;
+  locale?: Locale;
+};
+
 /**
  * Reads a whole file: the rows it can read, the rows it can't with their
- * reasons, and the headings it doesn't know (ignored). A file it can't read
- * at all is a string: one of `importErrors`.
+ * reasons, the headings left out, and what it keeps in notes. A file it
+ * can't read at all is a string: one of `importErrors`.
  */
-export function readImportFile(text: string):
+export function readImportFile(
+  text: string,
+  choices: FileChoices = {},
+):
   | string
   | {
       rows: ImportRow[];
       rejected: RejectedRow[];
       ignoredHeadings: string[];
+      unread: UnreadValues;
     } {
-  if (new TextEncoder().encode(text).length > importLimits.fileSize)
-    return importErrors.fileTooLarge;
-  const parsed = parseCsv(text);
-  if (!("records" in parsed)) return importErrors.unreadable;
-  // Blank rows are skipped, but rows keep their number in the file (from 1).
-  const [headings = [], ...records] = parsed.records
-    .map((cells, index) => ({ cells, row: index + 1 }))
-    .filter(({ cells }) => cells.some((cell) => cell.trim() !== ""))
-    .map(({ cells, row }) => Object.assign(cells, { row }));
-  if (records.length === 0) return importErrors.noRows;
-  if (records.length > importLimits.rows) return importErrors.tooManyRows;
-  const columns = [...headings].map((heading) => columnOf(heading));
+  const table = readTable(text);
+  if (typeof table === "string") return table;
+  const { headings, records } = table;
+  let columns: (Column | null)[];
+  if (choices.columns) {
+    if (choices.columns.length > importLimits.columns)
+      return importErrors.invalidColumns;
+    columns = headings.map((_, at) => {
+      const column = choices.columns?.[at] ?? null;
+      return column !== null && isColumn(column) ? column : null;
+    });
+    const named = choices.columns.filter((column) => column !== null);
+    if (
+      named.some((column) => !isColumn(column)) ||
+      new Set(named).size !== named.length
+    )
+      return importErrors.invalidColumns;
+  } else columns = guessColumns(headings, records);
   if (!columns.some(Boolean)) return importErrors.noKnownHeadings;
-  const ignoredHeadings = [...headings].filter(
-    (heading, index) => !columns[index] && heading.trim() !== "",
+  const ignoredHeadings = headings.filter(
+    (heading, at) => !columns[at] && heading.trim() !== "",
   );
+  const options: ReadOptions = {
+    itemType: choices.itemType,
+    dateOrder: choices.dateOrder ?? dateOrderIn(table, columns).order ?? "dmy",
+    locale: choices.locale ?? "en",
+  };
 
   const rows: ImportRow[] = [];
   const rejected: RejectedRow[] = [];
+  const countries = new Set<string>();
+  const grades = new Set<string>();
   for (const record of records) {
     const { row } = record;
     const cells = new Map<Column, string>();
@@ -376,11 +394,22 @@ export function readImportFile(text: string):
       if (column) cells.set(column, record[at] ?? "");
     });
     try {
-      rows.push(defined(readRow(row, cells)));
+      const { read, unread } = readRow(row, cells, options);
+      rows.push(defined(read));
+      if (unread.country) countries.add(unread.country);
+      if (unread.grade) grades.add(unread.grade);
     } catch (error) {
       if (!(error instanceof RowProblem)) throw error;
       rejected.push({ row, reason: error.reason });
     }
   }
-  return { rows, rejected, ignoredHeadings };
+  return {
+    rows,
+    rejected,
+    ignoredHeadings,
+    unread: {
+      countries: [...countries].slice(0, unreadShown),
+      grades: [...grades].slice(0, unreadShown),
+    },
+  };
 }

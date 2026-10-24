@@ -177,7 +177,7 @@ export default {
       },
       import: {
         title: "Import din tabel",
-        text: "Până la 2.000 de rânduri dintr-un fișier CSV, verificate înainte să se salveze ceva.",
+        text: "Până la 2.000 de rânduri dintr-un fișier CSV salvat din Numista, OpenNumismat, CoinManage sau din propria foaie de calcul, verificate înainte să se salveze ceva.",
       },
       export: {
         title: "Export PDF și CSV",
@@ -250,7 +250,7 @@ export default {
       {
         question: "Îmi pot aduce tabelul?",
         answer:
-          "Da. Importă un fișier CSV de până la 2.000 de rânduri, cu antete în oricare dintre cele cinci limbi. Vezi ce rânduri vor fi adăugate și de ce altele nu, înainte să se salveze ceva. Limita de {limit} de obiecte a planului gratuit rămâne valabilă.",
+          "Da. Importă un fișier CSV de până la 2.000 de rânduri: din propria foaie de calcul sau salvat din Numista, OpenNumismat ori CoinManage. CoinsLite ghicește ce conține fiecare coloană, în oricare dintre cele cinci limbi, iar tu verifici. Vezi ce rânduri vor fi adăugate și de ce altele nu, înainte să se salveze ceva. Limita de {limit} de obiecte a planului gratuit rămâne valabilă.",
       },
       {
         question: "Ce se întâmplă dacă nu mai plătesc Premium?",

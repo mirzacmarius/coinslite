@@ -1422,7 +1422,7 @@ export default {
     menuItem: "Importă din CSV…",
     title: "Importă obiecte",
     description:
-      "Alege un fișier CSV organizat ca exportul colecției, de până la {size} și {rows} de rânduri. Nu se adaugă nimic până nu confirmi.",
+      "Alege un fișier CSV: un export al colecției sau o listă salvată din Numista, OpenNumismat, CoinManage ori dintr-o foaie de calcul, de până la {size} și {rows} de rânduri. Nu se adaugă nimic până nu confirmi.",
     choose: "Alege un fișier CSV",
     chooseAnother: "Alege alt fișier",
     reading: "Se citește fișierul…",
@@ -1440,6 +1440,10 @@ export default {
     "linked#few": "{count} rânduri se leagă de catalog",
     "linked#other": "{count} de rânduri se leagă de catalog",
     ignored: "Coloane ignorate: {names}",
+    unreadCountries:
+      "Țările pe care CoinsLite nu le cunoaște ajung în note: {names}",
+    unreadGrades:
+      "Stările pe care CoinsLite nu le poate citi ajung în nota despre stare: {names}",
     "freeLimit#zero": "Planul gratuit nu mai are loc pentru obiecte.",
     "freeLimit#one": "Planul gratuit mai are loc pentru 1 obiect.",
     "freeLimit#few": "Planul gratuit mai are loc pentru {count} obiecte.",
@@ -1459,6 +1463,23 @@ export default {
     "imported#one": "1 obiect importat",
     "imported#few": "{count} obiecte importate",
     "imported#other": "{count} de obiecte importate",
+    columns: {
+      title: "Verifică coloanele",
+      hint: "CoinsLite a ghicit ce conține fiecare coloană. Schimbă o presupunere sau lasă deoparte o coloană.",
+      inFile: "În fișier",
+      inCoinsLite: "În CoinsLite",
+      empty: "Goală",
+      fieldFor: "Câmp pentru {heading}",
+      leaveOut: "Lasă deoparte",
+      unit: "Unitatea valorii nominale",
+      catalogEntry: "Cheia intrării de catalog",
+      itemType: "Tipul de obiect al rândurilor fără unul",
+      dateOrder: "În date ca 05/03/2024, primul număr este",
+      dayFirst: "Ziua",
+      monthFirst: "Luna",
+      continue: "Continuă",
+      check: "Verifică coloanele",
+    },
     reasons: {
       unknownType: "tipul de obiect nu e monedă, bancnotă sau timbru",
       unknownScale: "CoinsLite nu cunoaște scala de stare",
@@ -1469,7 +1490,7 @@ export default {
       invalidNumber: "un număr nu e întreg",
       invalidYear: "anul e în afara intervalului",
       invalidQuantity: "cantitatea nu e un număr întreg de cel puțin 1",
-      invalidDate: "o dată nu e o dată reală din trecut, scrisă AAAA-LL-ZZ",
+      invalidDate: "o dată nu e o dată reală din trecut",
       otherCurrency: "moneda nu e moneda ta de bază",
       homeCurrencyChanging:
         "are o sumă în timp ce moneda ta de bază se schimbă",
@@ -1490,7 +1511,8 @@ export default {
         "Fișierul nu poate fi citit ca CSV: o ghilimea nu se închide.",
       noRows: "Fișierul nu are rânduri sub titluri.",
       noKnownHeadings:
-        "Niciun titlu din fișier nu e o coloană din exportul colecției.",
+        "Nicio coloană din fișier nu merge la un câmp din CoinsLite.",
+      invalidColumns: "Fiecare câmp poate merge la o singură coloană.",
       failed: "Fișierul nu a putut fi citit. Încearcă din nou.",
       stoppedAt: "Importul s-a oprit la rândul {row}: {reason}.",
       stopped: "Importul s-a oprit.",

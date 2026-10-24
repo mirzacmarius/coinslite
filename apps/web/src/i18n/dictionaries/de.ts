@@ -176,7 +176,7 @@ export default {
       },
       import: {
         title: "Tabellenimport",
-        text: "Bis zu 2.000 Zeilen aus einer CSV-Datei, geprüft, bevor etwas gespeichert wird.",
+        text: "Bis zu 2.000 Zeilen aus einer CSV-Datei von Numista, OpenNumismat, CoinManage oder deiner eigenen Tabelle, geprüft, bevor etwas gespeichert wird.",
       },
       export: {
         title: "PDF- und CSV-Export",
@@ -249,7 +249,7 @@ export default {
       {
         question: "Kann ich meine Tabelle mitbringen?",
         answer:
-          "Ja. Importiere eine CSV-Datei mit bis zu 2.000 Zeilen, mit Spaltenköpfen in jeder der fünf Sprachen. Du siehst, welche Zeilen hinzukommen und warum andere nicht, bevor etwas gespeichert wird. Die {limit} Objekte des Gratis-Tarifs gelten trotzdem.",
+          "Ja. Importiere eine CSV-Datei mit bis zu 2.000 Zeilen: aus deiner eigenen Tabelle oder aus Numista, OpenNumismat oder CoinManage. CoinsLite errät, was jede Spalte enthält, in jeder der fünf Sprachen, und du prüfst es. Du siehst, welche Zeilen hinzukommen und warum andere nicht, bevor etwas gespeichert wird. Die {limit} Objekte des Gratis-Tarifs gelten trotzdem.",
       },
       {
         question: "Was passiert, wenn ich Premium nicht mehr bezahle?",

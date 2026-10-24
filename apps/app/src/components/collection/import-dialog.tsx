@@ -1,11 +1,19 @@
 "use client";
 
 import { upgradeHref } from "@/components/plans/plan-usage";
-import { useI18n } from "@/locales/client";
+import { useCurrentLocale, useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
 import type { Id } from "@coinslite/backend/convex/_generated/dataModel";
 import { albumErrors } from "@coinslite/backend/convex/albums/rules";
+import {
+  type ImportTable,
+  dateOrderIn,
+  guessColumns,
+  laidOutAsExport,
+  needsItemType,
+  readTable,
+} from "@coinslite/backend/convex/collection/importColumns";
 import {
   type ImportRow,
   importErrors,
@@ -35,14 +43,30 @@ import { ConvexError } from "convex/values";
 import { FileUp, Loader2, Sparkles, X } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { type ImportChoices, ImportColumns } from "./import-columns";
 
 type Preview = FunctionReturnType<typeof api.collectionImport.preview>;
 type Suggested = FunctionReturnType<typeof api.catalogSuggestions.forItems>;
 
+/** A file picked for import, read in the browser. */
+type PickedFile = { fileName: string; text: string; table: ImportTable };
+
 type Stage =
   | { stage: "pick"; error?: string }
   | { stage: "reading" }
-  | { stage: "preview"; fileName: string; preview: Preview; error?: string }
+  | {
+      stage: "columns";
+      file: PickedFile;
+      choices: ImportChoices;
+      error?: string;
+    }
+  | {
+      stage: "preview";
+      file: PickedFile;
+      choices: ImportChoices;
+      preview: Preview;
+      error?: string;
+    }
   | { stage: "importing"; done: number; total: number }
   | { stage: "finding"; added: number }
   | {
@@ -59,6 +83,18 @@ const chunks = <T,>(list: readonly T[], size: number) =>
   Array.from({ length: Math.ceil(list.length / size) }, (_, index) =>
     list.slice(index * size, (index + 1) * size),
   );
+
+/**
+ * A file's text: UTF-8, or Windows-1252 for one an older Windows program
+ * saved, which UTF-8 can't read.
+ */
+async function fileText(file: File) {
+  const bytes = await file.arrayBuffer();
+  const text = new TextDecoder("utf-8").decode(bytes);
+  return text.includes("\uFFFD")
+    ? new TextDecoder("windows-1252").decode(bytes)
+    : text;
+}
 
 /** The rows that fit the plan: in file order, sold ones taking no room. */
 function rowsThatFit(rows: ImportRow[], itemsLeft: number | null) {
@@ -97,10 +133,12 @@ const reasonKeys = {
 } as const;
 
 /**
- * Import Items from a CSV file laid out like the Collection export: pick a
- * file, see what would be added and what's rejected and why, then add the
- * rows a batch at a time. On the Free plan a file that doesn't fit offers
- * its first rows that do, or the way to Premium.
+ * Import Items from a CSV file: pick a file; for one not laid out like the
+ * Collection export (from Numista, OpenNumismat, CoinManage or a
+ * spreadsheet), check the columns as guessed; see what would be added and
+ * what's rejected and why, then add the rows a batch at a time. On the
+ * Free plan a file that doesn't fit offers its first rows that do, or the
+ * way to Premium.
  */
 export function ImportDialog({
   open,
@@ -110,6 +148,7 @@ export function ImportDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const t = useI18n();
+  const locale = useCurrentLocale();
   const format = useFormatters();
   const preview = useAction(api.collectionImport.preview);
   const importBatch = useMutation(api.collectionImport.importBatch);
@@ -147,23 +186,64 @@ export function ImportDialog({
         return t("collectionImport.errors.noRows");
       case importErrors.noKnownHeadings:
         return t("collectionImport.errors.noKnownHeadings");
+      case importErrors.invalidColumns:
+        return t("collectionImport.errors.invalidColumns");
       default:
         return t("collectionImport.errors.failed");
     }
   };
 
+  /**
+   * Reads the file in the browser and guesses its columns. A Collection
+   * export goes straight to the preview; any other file shows its columns
+   * to check first.
+   */
   const read = async (file: File) => {
     if (file.size > importLimits.fileSize) {
       setState({ stage: "pick", error: fileError(importErrors.fileTooLarge) });
       return;
     }
     setState({ stage: "reading" });
+    const text = await fileText(file);
+    const table = readTable(text);
+    if (typeof table === "string") {
+      setState({ stage: "pick", error: fileError(table) });
+      return;
+    }
+    const columns = guessColumns(table.headings, table.records);
+    const dates = dateOrderIn(table, columns);
+    const picked = { fileName: file.name, text, table };
+    const choices: ImportChoices = {
+      columns,
+      itemType: "coin",
+      dateOrder: dates.order ?? "dmy",
+    };
+    if (
+      laidOutAsExport(table.headings, columns) &&
+      !needsItemType(table, columns) &&
+      !dates.unclear
+    )
+      await previewOf(picked, choices);
+    else setState({ stage: "columns", file: picked, choices });
+  };
+
+  /** What the file would add, read by the columns chosen. */
+  const previewOf = async (file: PickedFile, choices: ImportChoices) => {
+    setState({ stage: "reading" });
     try {
-      const result = await preview({ text: await file.text() });
-      setState({ stage: "preview", fileName: file.name, preview: result });
+      const result = await preview({
+        text: file.text,
+        columns: choices.columns,
+        itemType: choices.itemType,
+        dateOrder: choices.dateOrder,
+        locale,
+      });
+      setState({ stage: "preview", file, choices, preview: result });
     } catch (failure) {
       setState({
-        stage: "pick",
+        stage: "columns",
+        file,
+        choices,
         error: fileError(
           failure instanceof ConvexError ? failure.data : undefined,
         ),
@@ -311,7 +391,7 @@ export function ImportDialog({
         <input
           ref={fileInput}
           type="file"
-          accept=".csv,text/csv"
+          accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain"
           className="sr-only"
           tabIndex={-1}
           aria-label={t("collectionImport.choose")}
@@ -359,9 +439,26 @@ export function ImportDialog({
               })}
             </p>
           )}
+          {state.stage === "columns" && (
+            <>
+              <ImportColumns
+                fileName={state.file.fileName}
+                table={state.file.table}
+                choices={state.choices}
+                onChange={(choices) =>
+                  setState({ ...state, choices, error: undefined })
+                }
+              />
+              {state.error && (
+                <p role="alert" className="text-xs text-destructive">
+                  {state.error}
+                </p>
+              )}
+            </>
+          )}
           {state.stage === "preview" && (
             <PreviewSummary
-              fileName={state.fileName}
+              fileName={state.file.fileName}
               preview={state.preview}
               reason={reason}
               error={state.error}
@@ -390,9 +487,42 @@ export function ImportDialog({
         </div>
 
         <DialogFooter>
-          <span />
+          {state.stage === "preview" ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() =>
+                setState({
+                  stage: "columns",
+                  file: state.file,
+                  choices: state.choices,
+                })
+              }
+            >
+              {t("collectionImport.columns.check")}
+            </Button>
+          ) : (
+            <span />
+          )}
           <div className="flex items-center gap-2">
-            {state.stage === "preview" ? (
+            {state.stage === "columns" ? (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => fileInput.current?.click()}
+                >
+                  {t("collectionImport.chooseAnother")}
+                </Button>
+                <Button
+                  type="button"
+                  disabled={!state.choices.columns.some(Boolean)}
+                  onClick={() => void previewOf(state.file, state.choices)}
+                >
+                  {t("collectionImport.columns.continue")}
+                </Button>
+              </>
+            ) : state.stage === "preview" ? (
               <>
                 <Button
                   type="button"
@@ -502,6 +632,20 @@ function PreviewSummary({
         <p className="text-muted-foreground">
           {t("collectionImport.ignored", {
             names: preview.ignoredHeadings.join(", "),
+          })}
+        </p>
+      )}
+      {preview.unread.countries.length > 0 && (
+        <p className="text-muted-foreground">
+          {t("collectionImport.unreadCountries", {
+            names: preview.unread.countries.join(", "),
+          })}
+        </p>
+      )}
+      {preview.unread.grades.length > 0 && (
+        <p className="text-muted-foreground">
+          {t("collectionImport.unreadGrades", {
+            names: preview.unread.grades.join(", "),
           })}
         </p>
       )}
