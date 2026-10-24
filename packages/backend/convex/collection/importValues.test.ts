@@ -138,6 +138,54 @@ describe("readGrade", () => {
     });
   });
 
+  test("reads German and French Grades, by their codes or in words", () => {
+    expect(readGrade("coin", "DE", undefined, "vz")).toEqual({
+      gradingScale: "european",
+      grade: "XF",
+    });
+    expect(readGrade("coin", "DE", undefined, "sehr schön")).toEqual({
+      gradingScale: "european",
+      grade: "VF",
+    });
+    expect(readGrade("coin", "FR", undefined, "TTB")).toEqual({
+      gradingScale: "european",
+      grade: "VF",
+    });
+    expect(readGrade("coin", "FR", undefined, "FDC")).toEqual({
+      gradingScale: "european",
+      grade: "UNC",
+    });
+    expect(readGrade("coin", "DE", "european", "unz")).toEqual({
+      gradingScale: "european",
+      grade: "UNC",
+    });
+    expect(readGrade("banknote", "FR", undefined, "SPL")).toEqual({
+      gradingScale: "international",
+      grade: "AU",
+    });
+  });
+
+  test("reads a step between Grades as its Grade, keeping it as written in the note", () => {
+    expect(readGrade("coin", "DE", undefined, "ss+")).toEqual({
+      gradingScale: "european",
+      grade: "VF",
+      gradeNote: "ss+",
+    });
+    expect(readGrade("coin", "FR", undefined, "TTB+")).toEqual({
+      gradingScale: "european",
+      grade: "VF",
+      gradeNote: "TTB+",
+    });
+    expect(readGrade("coin", "DE", undefined, "-vz")).toEqual({
+      gradingScale: "european",
+      grade: "XF",
+      gradeNote: "-vz",
+    });
+    expect(readGrade("coin", "DE", undefined, "ss-vz")).toEqual({
+      gradeNote: "ss-vz",
+    });
+  });
+
   test("reads stamp Grades by their usual marks", () => {
     expect(readGrade("stamp", "NO", undefined, "**")).toEqual({
       gradingScale: "stamp",

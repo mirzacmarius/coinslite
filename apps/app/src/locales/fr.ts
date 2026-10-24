@@ -204,7 +204,7 @@ export default {
     scales: {
       sheldon: "Sheldon (1–70)",
       norwegian: "Norvégienne (0–3)",
-      european: "Européenne (UNC–G)",
+      european: "Européenne (FDC–AB)",
       international: "Internationale (UNC–PR)",
       stamp: "État (timbres)",
     },

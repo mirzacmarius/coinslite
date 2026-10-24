@@ -76,6 +76,8 @@ export const typeOf = lookup<ItemType>(
 export const scaleOf = lookup<GradingScale>(
   (locale) => exportLabels[locale].scales,
   gradingScaleIds,
+  // As German and French exports named it before the scale took their codes.
+  { european: ["Europäisch (UNC–G)", "Européenne (UNC–G)"] },
 );
 export const strikeOf = lookup<Strike>(
   (locale) => exportLabels[locale].strikes,
@@ -283,18 +285,66 @@ export function readNumistaNumber(text: string): number | null {
 }
 
 /** Grades written in words or their usual letters, on the lettered scales. */
+// The lettered scales' Grades by their codes and words in English, German
+// and French: "vz" and "SUP" are XF, as localGradeCodes writes them.
 const gradeWords = new Map<string, string>(
   (
     [
-      ["UNC", ["unc", "uncirculated", "ms", "mint state", "bu"]],
-      ["AU", ["au", "about uncirculated", "almost uncirculated"]],
-      ["XF", ["xf", "ef", "extremely fine"]],
-      ["VF", ["vf", "very fine"]],
-      ["F", ["f", "fine"]],
-      ["VG", ["vg", "very good"]],
-      ["G", ["g", "good"]],
-      ["FR", ["fr", "fair"]],
-      ["PR", ["pr", "po", "p", "poor"]],
+      [
+        "UNC",
+        [
+          "unc",
+          "uncirculated",
+          "ms",
+          "mint state",
+          "bu",
+          "unz",
+          "unzirkuliert",
+          "stgl",
+          "st",
+          "stempelglanz",
+          "bfr",
+          "bankfrisch",
+          "fdc",
+          "fleur de coin",
+          "nc",
+          "non circule",
+        ],
+      ],
+      [
+        "AU",
+        [
+          "au",
+          "about uncirculated",
+          "almost uncirculated",
+          "fast unzirkuliert",
+          "spl",
+          "splendide",
+          "presque non circule",
+        ],
+      ],
+      [
+        "XF",
+        ["xf", "ef", "extremely fine", "vz", "vorzuglich", "sup", "superbe"],
+      ],
+      ["VF", ["vf", "very fine", "ss", "sehr schon", "ttb", "tres tres beau"]],
+      ["F", ["f", "fine", "s", "schon", "tb", "tres beau"]],
+      [
+        "VG",
+        [
+          "vg",
+          "very good",
+          "sge",
+          "s.g.e.",
+          "sg",
+          "sehr gut erhalten",
+          "b",
+          "beau",
+        ],
+      ],
+      ["G", ["g", "good", "ge", "g.e.", "gut erhalten", "ab", "assez beau"]],
+      ["FR", ["fr", "fair", "gering erhalten", "m", "mediocre"]],
+      ["PR", ["pr", "po", "p", "poor", "schlecht erhalten", "mauvais"]],
     ] as const
   ).flatMap(([code, words]) => words.map((word) => [folded(word), code])),
 );
@@ -339,7 +389,15 @@ function gradeOn(scale: GradingScale, text: string): ReadGrade | undefined {
     return isGrade(scale, grade) ? { gradingScale: scale, grade } : undefined;
   }
   const code = gradeWords.get(folded(written)) ?? written.toUpperCase();
-  if (!isGrade(scale, code)) return undefined;
+  if (!isGrade(scale, code)) {
+    // A step between Grades ("ss+", "-vz", "TTB+") reads as its Grade,
+    // written as it was in the note.
+    const between = /^[-−]?(.+?)[+\-−]?$/u.exec(written)?.[1];
+    const near = between && gradeWords.get(folded(between));
+    return between !== written && near && isGrade(scale, near)
+      ? { gradingScale: scale, grade: near, gradeNote: written }
+      : undefined;
+  }
   const bu = /^(?:bu|brilliant uncirculated)$/i.test(written);
   return { gradingScale: scale, grade: code, ...(bu && { strike: "bu" }) };
 }

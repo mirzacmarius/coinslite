@@ -17,6 +17,7 @@ import {
 } from "./labelSheet";
 
 const words: LabelWords = {
+  locale: "en",
   country: (code) => ({ NO: "Norway", US: "United States" })[code] ?? code,
   money: (amount) => `kr ${(amount / 100).toFixed(2)}`,
   date: (date) => date,
@@ -161,6 +162,17 @@ describe("what a label says", () => {
       words,
     );
     expect(bu.lines[1]).toBe("UNC BU · N# 1234");
+  });
+
+  test("a European Grade is written as German and French collectors write it", () => {
+    const krone = { ...coin, gradingScale: "european" as const, grade: "XF" };
+    expect(
+      labelText(krone, options, { ...words, locale: "de" }).lines[1],
+    ).toStartWith("vz");
+    expect(
+      labelText(krone, options, { ...words, locale: "fr" }).lines[1],
+    ).toStartWith("SUP");
+    expect(labelText(krone, options, words).lines[1]).toStartWith("XF");
   });
 
   test("a stamp's Grade is in words, and an Item without facts has only its title", () => {

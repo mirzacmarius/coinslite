@@ -1,6 +1,6 @@
 "use node";
 
-import { formattersFor } from "@coinslite/i18n";
+import { type Locale, formattersFor } from "@coinslite/i18n";
 import { type GradingScale, type Strike, gradeCode } from "../items/grades";
 import { calendarDate } from "../pdf/dates";
 import {
@@ -14,16 +14,17 @@ import { collectionPdfMessages } from "./pdfMessages";
 import { defaultSort, withoutAlbum, withoutStorage } from "./view";
 import { countryName } from "./viewRules";
 
-/** A Grade as the PDF prints it: "PF-65", "1−", or a stamp's Grade in words. */
+/** A Grade as the PDF prints it: "PF-65", "1−", "vz", or a stamp's Grade in words. */
 function gradeText(
-  labels: ExportLabels,
+  locale: Locale,
   scale: GradingScale | undefined,
   grade: string | undefined,
   strike?: Strike,
 ) {
   if (!scale || grade === undefined) return "";
+  const labels = exportLabels[locale];
   return (
-    gradeCode(scale, grade, strike) ??
+    gradeCode(scale, grade, strike, locale) ??
     labels.stampGrades[grade as keyof ExportLabels["stampGrades"]] ??
     ""
   );
@@ -56,7 +57,7 @@ function scopeLines({ view, albumName, ownCountry, locale }: PdfContents) {
   if (view.grade)
     add(
       labels.columns.grade,
-      gradeText(labels, view.grade.gradingScale, view.grade.grade),
+      gradeText(locale, view.grade.gradingScale, view.grade.grade),
     );
   if (view.album)
     add(
@@ -148,7 +149,7 @@ export async function collectionPdf(
     row.title,
     row.year === undefined ? "" : String(row.year),
     row.denomination ?? "",
-    gradeText(labels, row.gradingScale, row.grade, row.strike),
+    gradeText(locale, row.gradingScale, row.grade, row.strike),
     format.number(row.quantity),
     row.purchaseDate ? format.date(row.purchaseDate) : "",
     money(row.purchasePrice),

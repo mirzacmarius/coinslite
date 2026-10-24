@@ -262,7 +262,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
     scales: {
       sheldon: "Sheldon (1–70)",
       norwegian: "Norwegisch (0–3)",
-      european: "Europäisch (UNC–G)",
+      european: "Europäisch (unz–ge)",
       international: "International (UNC–PR)",
       stamp: "Erhaltung (Briefmarken)",
     },
@@ -335,7 +335,7 @@ export const exportLabels: Record<Locale, ExportLabels> = {
     scales: {
       sheldon: "Sheldon (1–70)",
       norwegian: "Norvégienne (0–3)",
-      european: "Européenne (UNC–G)",
+      european: "Européenne (FDC–AB)",
       international: "Internationale (UNC–PR)",
       stamp: "État (timbres)",
     },
