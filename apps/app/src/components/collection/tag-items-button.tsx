@@ -25,6 +25,7 @@ export function TagItemsButton({
   selection,
   onTagged,
   onFailed,
+  className,
 }: {
   selection: ItemSelection;
   onTagged: (result: {
@@ -35,6 +36,7 @@ export function TagItemsButton({
     undo?: UndoTag;
   }) => void;
   onFailed: (message: string) => void;
+  className?: string;
 }) {
   const t = useI18n();
   const tagMany = useMutation(api.items.tagMany);
@@ -43,7 +45,7 @@ export function TagItemsButton({
   const [open, setOpen] = useState(false);
   const [remove, setRemove] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { count, selected } = selection;
+  const { selected } = selection;
 
   const apply = async (picked: string) => {
     // One change at a time: a second pick while saving is ignored.
@@ -80,7 +82,8 @@ export function TagItemsButton({
           type="button"
           variant="ghost"
           size="xs"
-          disabled={count === 0 || saving}
+          disabled={saving}
+          className={className}
         >
           {saving ? (
             <Loader2 className="animate-spin" aria-hidden="true" />

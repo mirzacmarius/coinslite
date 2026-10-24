@@ -971,7 +971,7 @@ export default {
     select: "Auswählen",
     selectionBar: "Ausgewählte Objekte",
     selectHint:
-      "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten, ihren Kauf oder ein Schlagwort festzulegen oder sie zu löschen.",
+      "Wähle Objekte aus und entscheide dann, was mit ihnen geschehen soll.",
     addToHint: "Wähle die Objekte aus, die in {album} sollen.",
     cancel: "Abbrechen",
     selectPage: "Seite auswählen",
@@ -979,13 +979,10 @@ export default {
     "selectAll#few": "Alle {count} Objekte auswählen",
     "selectAll#other": "Alle {count} Objekte auswählen",
     selectedFirst:
-      "Die ersten {limit} Objekte dieser Ansicht sind ausgewählt. Verschiebe sie, dann wähle den Rest aus.",
+      "Die ersten {limit} Objekte dieser Ansicht sind ausgewählt, so viele, wie eine Aktion umfasst.",
     done: "Fertig",
     moveTo: "Nach {album} verschieben",
     takeOut: "Aus Alben nehmen",
-    "inOtherAlbum#one": "1 liegt gerade in einem anderen Album",
-    "inOtherAlbum#few": "{count} liegen gerade in einem anderen Album",
-    "inOtherAlbum#other": "{count} liegen gerade in einem anderen Album",
     movedTo: "Nach {album} verschoben",
     "takenOut#one": "1 Objekt aus seinem Album genommen",
     "takenOut#few": "{count} Objekte aus ihren Alben genommen",

@@ -207,7 +207,11 @@ export function CollectionBrowser() {
             onClick={selecting ? stopSelecting : selection.start}
           >
             <ListChecks strokeWidth={1.75} aria-hidden="true" />
-            {selecting ? t("collection.done") : t("collection.select")}
+            {addTo
+              ? t("collection.cancel")
+              : selecting
+                ? t("collection.done")
+                : t("collection.select")}
           </Button>
         </div>
       </div>

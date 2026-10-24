@@ -247,13 +247,14 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
 - **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, highest Market value, biggest gain, denomination, Grade, title (A to Z). Items without the sorted value come last.
-- **Select mode:** select Items one by one, a page or the whole view (up to 200 at once), then act on all of them:
-  - move them to an Album, or out of any Album
-  - set a Grade, on those whose Item type the Grading scale suits
-  - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in. A Purchase price can be typed in a Purchase currency, converted as in the Item form (§4) at the ECB rate of the purchase date filled in, or of today.
+- **Select mode:** the toolbar's Select turns it on and its Done turns it off (Cancel while picking Items to add from an Album's page). Select Items one by one, a page or the whole view (up to 200 at once); a view that fits on one page is selected whole with Select all. A bar at the bottom of the page then acts on all of them. Until an Item is selected it shows only how to start and the ways to select; the actions appear with the first selected Item:
+  - **Add to Album:** picking an Album, or typing a new name to create one, moves them into it at once. While any of them is in an Album, the list starts with Take out of Albums.
+  - **Set Grade**, on those whose Item type the Grading scale suits
   - **Tag:** add one of the user's tags, or a new one, to them, or take a tag off them. Items that already have it or hold 10 tags (or, taking it off, don't have it) are skipped and counted.
-  - print their labels (see Labels below)
-  - delete them, with a confirmation
+  - Under **More**, the rarer actions:
+    - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in. A Purchase price can be typed in a Purchase currency, converted as in the Item form (§4) at the ECB rate of the purchase date filled in, or of today.
+    - print their labels (see Labels below)
+    - delete them, with a confirmation
   - A move, a Grade, a purchase or a tag can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
 - **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts open only on a screen at least 1024 px wide and 1000 px tall, where the list still starts in view below it, and collapsed on anything smaller, such as a phone or a 1280 × 800 laptop; it is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.

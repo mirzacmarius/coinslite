@@ -52,9 +52,9 @@ import {
   ListChecks,
   MoreHorizontal,
   Pencil,
+  Printer,
   SearchX,
   ShieldCheck,
-  Tag,
   Trash2,
   Undo2,
 } from "lucide-react";
@@ -412,7 +412,7 @@ export function ItemDetail() {
                   {t("items.duplicate")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setLabelling(true)}>
-                  <Tag strokeWidth={1.75} aria-hidden="true" />
+                  <Printer strokeWidth={1.75} aria-hidden="true" />
                   {t("labels.itemMenuItem")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

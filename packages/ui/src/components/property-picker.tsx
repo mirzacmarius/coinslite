@@ -28,6 +28,9 @@ export type PropertyOption<T extends string> = {
 /**
  * A structured value shown as a small pill; clicking it opens a searchable
  * list. The same pill appears in create dialogs, property panels and filters.
+ * As an `action`, picking does something at once (e.g. moves Items into an
+ * Album) rather than setting a value: the button reads `placeholder` and no
+ * option is marked as chosen.
  */
 export function PropertyPicker<T extends string>({
   label,
@@ -41,6 +44,8 @@ export function PropertyPicker<T extends string>({
   noResults,
   onCreate,
   createLabel,
+  action = false,
+  disabled,
   id,
   "aria-describedby": describedBy,
   align = "start",
@@ -63,6 +68,9 @@ export function PropertyPicker<T extends string>({
   onCreate?: (name: string) => void;
   /** The create row's text for what was typed, e.g. `Create Album "Travel"`. */
   createLabel?: (name: string) => string;
+  /** Picking acts at once instead of setting a value; see above. */
+  action?: boolean;
+  disabled?: boolean;
   id?: string;
   /** Links a hint or error, e.g. when the pill sits in a labelled Field. */
   "aria-describedby"?: string;
@@ -76,7 +84,9 @@ export function PropertyPicker<T extends string>({
     setOpen(next);
     if (!next) setQuery("");
   };
-  const selected = options.find((option) => option.value === value);
+  const selected = action
+    ? undefined
+    : options.find((option) => option.value === value);
   const shown = selected?.label ?? placeholder ?? label;
   const typed = query.trim();
   const canCreate =
@@ -94,19 +104,25 @@ export function PropertyPicker<T extends string>({
           type="button"
           variant={selected ? "subtle" : "ghost"}
           size="xs"
-          aria-label={`${label}: ${shown}`}
+          disabled={disabled}
+          // An action's own words name it; a value's pill says whose it is.
+          aria-label={action ? undefined : `${label}: ${shown}`}
           aria-describedby={describedBy}
           className={cn("max-w-full self-start justify-start", className)}
         >
           {selected?.icon ?? (
             <Icon
-              className="text-muted-foreground"
+              className={cn(!action && "text-muted-foreground")}
               strokeWidth={1.75}
               aria-hidden="true"
             />
           )}
+          {/* An action's few words may wrap, where its button allows. */}
           <span
-            className={cn("truncate", !selected && "text-muted-foreground")}
+            className={cn(
+              !action && "truncate",
+              !selected && !action && "text-muted-foreground",
+            )}
           >
             {shown}
           </span>
@@ -133,7 +149,7 @@ export function PropertyPicker<T extends string>({
                   <span className="truncate text-muted-foreground">
                     {clearLabel}
                   </span>
-                  {value === undefined && (
+                  {value === undefined && !action && (
                     <Check className="ml-auto text-link" aria-hidden="true" />
                   )}
                 </CommandItem>
@@ -160,7 +176,7 @@ export function PropertyPicker<T extends string>({
                         {option.count}
                       </span>
                     )}
-                    {option.value === value && (
+                    {option.value === selected?.value && (
                       <Check className="text-link" aria-hidden="true" />
                     )}
                   </span>
