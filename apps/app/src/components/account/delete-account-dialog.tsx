@@ -1,17 +1,63 @@
 "use client";
 
+import { useSubscription } from "@/components/billing/account-plan";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
+import { Button } from "@coinslite/ui/button";
 import { ConfirmDialog } from "@coinslite/ui/confirm-dialog";
+import { Field } from "@coinslite/ui/field";
+import { Input } from "@coinslite/ui/input";
+import { cn } from "@coinslite/ui/utils";
 import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import { useId, useState } from "react";
+import { typedWord } from "./confirm-word";
+
+/**
+ * The way to delete the account: greyed out while the Premium subscription
+ * still renews, when pressing it says to cancel that first; otherwise it
+ * opens DeleteAccountDialog. Meant for a wrapping row of buttons, where its
+ * note takes a line of its own below them.
+ */
+export function DeleteAccountButton() {
+  const t = useI18n();
+  const subscription = useSubscription();
+  // The dialog and the server check again, counting every subscription.
+  const renews = subscription ? !subscription.cancelAtPeriodEnd : false;
+  const [deleting, setDeleting] = useState(false);
+  const [explained, setExplained] = useState(false);
+  const noteId = useId();
+  return (
+    <>
+      <Button
+        variant="outline"
+        aria-disabled={renews || undefined}
+        aria-describedby={renews && explained ? noteId : undefined}
+        className={cn(
+          renews && "text-muted-foreground opacity-60 hover:bg-card",
+        )}
+        onClick={() => (renews ? setExplained(true) : setDeleting(true))}
+      >
+        <Trash2 strokeWidth={1.75} aria-hidden="true" />
+        {t("account.danger.delete")}
+      </Button>
+      {renews && explained && (
+        <p id={noteId} role="alert" className="basis-full text-xs">
+          {t("deleteAccount.subscriptionActive")}
+        </p>
+      )}
+      <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
+    </>
+  );
+}
 
 /**
  * Confirms deleting the account, saying what goes with it and how much of
- * it. It's deactivated at once and deleted in 21 days (account/closing.ts),
- * and the app shows the deactivated account (DeactivatedAccount). Not while
- * a subscription would renew: that's cancelled first, under Manage
+ * it, once a word (DELETE, in the person's language) is typed. It's
+ * deactivated at once and deleted in 21 days (account/closing.ts), and the
+ * app shows the deactivated account (DeactivatedAccount). Not while a
+ * subscription would renew: that's cancelled first, under Manage
  * subscription.
  */
 export function DeleteAccountDialog({
@@ -26,6 +72,9 @@ export function DeleteAccountDialog({
   const requestDeletion = useMutation(api.account.closing.requestDeletion);
   const summary = useQuery(api.account.deletion.summary, open ? {} : "skip");
   const [failed, setFailed] = useState(false);
+  const [typed, setTyped] = useState("");
+  const wordId = useId();
+  const word = t("deleteAccount.word");
 
   const count = (value: number, more = false) =>
     more ? t("deleteAccount.atLeast", { value: number(value) }) : number(value);
@@ -49,7 +98,10 @@ export function DeleteAccountDialog({
     <ConfirmDialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) setFailed(false);
+        if (!next) {
+          setFailed(false);
+          setTyped("");
+        }
         onOpenChange(next);
       }}
       title={t("deleteAccount.title")}
@@ -57,7 +109,9 @@ export function DeleteAccountDialog({
       confirmLabel={t("deleteAccount.confirm")}
       cancelLabel={t("deleteAccount.cancel")}
       destructive
-      confirmDisabled={summary?.endsSubscription !== false}
+      confirmDisabled={
+        summary?.endsSubscription !== false || !typedWord(typed, word)
+      }
       onConfirm={async () => {
         setFailed(false);
         try {
@@ -86,10 +140,24 @@ export function DeleteAccountDialog({
           </div>
         ))}
       </dl>
-      {summary?.endsSubscription && (
+      {summary?.endsSubscription ? (
         <p role="alert" className="text-xs text-destructive">
           {t("deleteAccount.subscriptionActive")}
         </p>
+      ) : (
+        <Field id={wordId} label={t("deleteAccount.typeToConfirm", { word })}>
+          {(control) => (
+            <Input
+              {...control}
+              value={typed}
+              onChange={(event) => setTyped(event.target.value)}
+              autoComplete="off"
+              autoCapitalize="characters"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+          )}
+        </Field>
       )}
       {failed && (
         <p role="alert" className="text-xs text-destructive">

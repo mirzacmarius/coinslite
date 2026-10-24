@@ -422,6 +422,7 @@ export default {
     },
     danger: {
       title: "Abmelden",
+      titleWithDelete: "Abmelden oder löschen",
       signOut: "Abmelden",
       delete: "Konto löschen",
     },
@@ -1117,11 +1118,11 @@ export default {
     seePlan: "Tarif ansehen",
     backToPlans: "Zurück zu den Tarifen",
     manage: "Abo verwalten",
+    changeOrCancel: "Tarif ändern oder kündigen",
     manageHint:
       "Bei Polar kannst du zwischen monatlich und jährlich wechseln, deine Karte aktualisieren oder kündigen. Nach einer Kündigung bleibt Premium bis zum Ende des bezahlten Zeitraums.",
     portalUnavailable:
       "Das Abo kann hier nicht verwaltet werden: Die Abrechnung ist in dieser Umgebung nicht eingerichtet.",
-    portalUnavailableShort: "Abrechnung hier nicht eingerichtet",
     portalFailed:
       "Die Abo-Seite konnte nicht geöffnet werden. Versuche es noch einmal.",
     noSubscription: "Es gibt kein Premium-Abo zu verwalten.",
@@ -1147,6 +1148,8 @@ export default {
       "Dein Konto wird jetzt deaktiviert und in 21 Tagen endgültig gelöscht, mit allem in deiner Sammlung. Wir schreiben dir jetzt und nach 14 Tagen noch einmal. Bis dahin kannst du dich anmelden und es reaktivieren.",
     subscriptionActive:
       "Dein Premium-Abo verlängert sich noch. Kündige es zuerst unter Abo verwalten und lösche dann dein Konto.",
+    typeToConfirm: "Gib zur Bestätigung {word} ein",
+    word: "LÖSCHEN",
     items: "Objekte",
     photos: "Fotos",
     albums: "Alben",

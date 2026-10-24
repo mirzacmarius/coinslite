@@ -93,7 +93,7 @@ export default {
       blocks: [
         "We keep your data for as long as you have an account.",
         [
-          "Deleting your account (Account, then Delete account) removes for good your profile, sign-in methods and sessions, your Items, Albums and photos, and the link to your subscription. Most of it goes at once; what’s left of a large Collection follows shortly after in the background. A subscription that would renew is ended first.",
+          "Deleting your account (Account, then Delete account; on Premium, inside Manage subscription) removes for good your profile, sign-in methods and sessions, your Items, Albums and photos, and the link to your subscription. Most of it goes at once; what’s left of a large Collection follows shortly after in the background. A subscription that would renew is ended first.",
           "What stays is a record that an account id was deleted, which names no one, so a late message from Polar about it ends the subscription it reports.",
           "An account on the Free plan that nobody signs in to gets an email after 6, 8 and 12 months and is deleted 14 days after the last one, which gives the date. Signing in starts the count again.",
           "If you start creating an account or ask for a sign-in link, but never confirm your email address, what we stored for it is deleted after 7 days.",
