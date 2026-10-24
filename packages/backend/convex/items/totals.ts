@@ -227,7 +227,7 @@ export function itemFigures(
 }
 
 /** All the pieces, whatever their Item type. */
-export const totalPieces = ({ pieces }: CollectionTotals) =>
+export const totalPieces = ({ pieces }: Pick<CollectionTotals, "pieces">) =>
   pieces.coin + pieces.banknote + pieces.stamp;
 
 const noAmounts = (): Amounts => ({ purchasePrice: 0, marketValue: 0 });

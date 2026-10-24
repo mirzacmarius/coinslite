@@ -11,6 +11,7 @@ import { emailChangeMessages } from "./account/emailChangeMessages";
 import { inactivityMessages } from "./account/inactivityMessages";
 import { codeEmailMessages } from "./accounts/codeEmailMessages";
 import { exportLabels } from "./collection/exportLabels";
+import { labelSheetMessages } from "./collection/labelSheet";
 import { collectionPdfMessages } from "./collection/pdfMessages";
 import { reportMessages } from "./insuranceReport/messages";
 import { releaseGroups, releases } from "./updates/releases";
@@ -29,6 +30,7 @@ const localized: Record<string, Record<Locale, unknown>> = {
   "Sign-in code emails": codeEmailMessages,
   "Collection CSV": exportLabels,
   "Collection PDF": collectionPdfMessages,
+  "Label sheets": labelSheetMessages,
   "Insurance report": reportMessages,
   ...Object.fromEntries(
     releases.map((release) => [

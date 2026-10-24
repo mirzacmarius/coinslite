@@ -181,7 +181,7 @@ export default {
       },
       export: {
         title: "Export PDF și CSV",
-        text: "Orice vizualizare a colecției, de tipărit sau de păstrat. Premium.",
+        text: "Orice vizualizare a colecției, de tipărit sau de păstrat, și etichete pentru suporturi și slaburi. Premium.",
       },
       charts: {
         title: "Grafice",
@@ -233,6 +233,7 @@ export default {
         "Obiecte nelimitate",
         "Raportul de asigurare",
         "Export PDF și CSV",
+        "Etichete pentru suporturi și slaburi",
         "Tot ce are planul gratuit",
       ],
       cta: "Începe gratuit, apoi Premium",

@@ -25,6 +25,7 @@
     "convex-helpers": "^0.1.128",
     "oslo": "^1.1.2",
     "pdf-lib": "^1.17.1",
+    "qrcode-generator": "^1.4.4",
     "standardwebhooks": "^1.0.0",
     "zod": "^4.6.7"
   },

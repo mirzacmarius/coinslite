@@ -1,7 +1,7 @@
 import { type HomeCurrency, type Locale, defaultLocale } from "@coinslite/i18n";
 import { ConvexError, type Infer, v } from "convex/values";
-import type { Doc } from "../_generated/dataModel";
-import { internalQuery, query } from "../_generated/server";
+import type { Doc, Id } from "../_generated/dataModel";
+import { type QueryCtx, env, internalQuery, query } from "../_generated/server";
 import { formatCsvFile } from "../catalog/csvText";
 import { refuseWhileChanging } from "../homeCurrency/rules";
 import { gradeCode, type gradingScales } from "../items/grades";
@@ -11,6 +11,7 @@ import {
   stampCatalogueNames,
 } from "../items/references";
 import { collectionTotals, itemGainLoss, totalPieces } from "../items/totals";
+import { resolveItems } from "../items/resolve";
 import { requirePremium } from "../plans";
 import {
   gradingScale,
@@ -22,6 +23,12 @@ import {
 import { collectionView, findItems } from "./browse";
 import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
 import { collectionExportErrors, collectionPdfLimits } from "./exportRules";
+import {
+  type LabelItem,
+  labelSheetErrors,
+  labelSheetLimits,
+} from "./labelSheet";
+import { labelSheetContents, labelSource } from "./labelValidators";
 import { withoutAlbum } from "./view";
 import { countryName } from "./viewRules";
 
@@ -245,6 +252,83 @@ export const pdf = internalQuery({
         marketValue: totals.marketValue,
         gainLoss: totals.gainLoss,
       },
+    };
+  },
+});
+
+/** A resolved Item as its label describes it. */
+function labelItemOf(item: Doc<"items">): LabelItem {
+  return {
+    id: item._id,
+    type: item.type,
+    title: item.title,
+    country: item.country,
+    year: item.year,
+    denomination: item.denomination,
+    mintMark: item.mintMark,
+    gradingScale: item.gradingScale,
+    grade: item.grade,
+    strike: item.strike,
+    numistaNumber: item.numistaNumber,
+    quantity: item.quantity,
+    purchasePrice: item.purchasePrice,
+    purchaseDate: item.purchaseDate,
+    marketValue: item.marketValue,
+  };
+}
+
+/** The chosen Items that are the person's, in the order asked, with their facts resolved. */
+async function ownItems(
+  ctx: QueryCtx,
+  owner: Doc<"users">,
+  itemIds: Id<"items">[],
+) {
+  if (itemIds.length > labelSheetLimits.items)
+    throw new ConvexError(labelSheetErrors.tooManyLabels);
+  const found = await Promise.all(
+    itemIds.map((itemId) => ctx.db.get("items", itemId)),
+  );
+  const own = found.filter(
+    (item): item is Doc<"items"> => item !== null && item.ownerId === owner._id,
+  );
+  return await resolveItems(ctx, own);
+}
+
+/**
+ * What the label sheets say, for the signed-in Premium member (the action
+ * that makes the PDF runs this as them): the Items of the view in its order,
+ * or the chosen Items, each with the facts a label can show. More Items than
+ * one PDF holds labels for, or a Collection too large to read whole, is
+ * turned away rather than cut short.
+ */
+export const labelSheet = internalQuery({
+  args: {
+    source: labelSource,
+    /** The labels' language, and the one country names are searched in; the person's own by default. */
+    locale: v.optional(language),
+  },
+  returns: labelSheetContents,
+  handler: async (ctx, { source, locale }) => {
+    const owner = await requirePremium(ctx);
+    // Mid-change, the amounts would be in two currencies.
+    refuseWhileChanging(owner);
+    const written = locale ?? owner.language ?? defaultLocale;
+    let items: Doc<"items">[];
+    if (source.kind === "view") {
+      const found = await findItems(ctx, owner, source.view, written);
+      if (!found.complete)
+        throw new ConvexError(collectionExportErrors.incomplete);
+      items = found.items;
+    } else {
+      items = await ownItems(ctx, owner, source.itemIds);
+    }
+    if (items.length > labelSheetLimits.labels)
+      throw new ConvexError(labelSheetErrors.tooManyLabels);
+    return {
+      locale: written,
+      currency: owner.homeCurrency,
+      appUrl: env.SITE_URL ?? null,
+      items: items.map(labelItemOf),
     };
   },
 });

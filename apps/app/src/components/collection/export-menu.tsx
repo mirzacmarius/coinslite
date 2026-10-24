@@ -1,6 +1,7 @@
 "use client";
 
 import { localToday } from "@/components/items/item-fields";
+import { LabelsDialog } from "@/components/labels/labels-dialog";
 import { upgradeHref } from "@/components/plans/plan-usage";
 import { saveFile } from "@/lib/save-file";
 import { useHydrated } from "@/lib/use-hydrated";
@@ -33,6 +34,7 @@ import {
   FileUp,
   Loader2,
   Sparkles,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -42,13 +44,15 @@ import { useState } from "react";
  * The Collection toolbar's Export and import menu. On Premium it downloads
  * the view on screen (its search, filters and sort) as a file the server
  * makes; on the Free plan it shows the way to Premium instead. One entry per
- * file format: CSV for spreadsheets, PDF for printing. A Collection too
- * large to read whole isn't exported at all, rather than with Items missing.
- * Importing from a CSV file is on both plans.
+ * file format: CSV for spreadsheets, PDF for printing, and labels to print
+ * for the view's Items. A Collection too large to read whole isn't exported
+ * at all, rather than with Items missing. Importing from a CSV file is on
+ * both plans.
  */
 export function ExportMenu({
   view,
   count,
+  pieces,
   complete,
   onImport,
 }: {
@@ -57,6 +61,8 @@ export function ExportMenu({
   view: CollectionView;
   /** How many Items the view shows. */
   count: number;
+  /** How many pieces those Items hold. */
+  pieces: number;
   /** False when the Collection was too large to read whole. */
   complete: boolean;
 }) {
@@ -71,6 +77,7 @@ export function ExportMenu({
   const hydrated = useHydrated();
   const plan = hydrated ? usage?.plan : undefined;
   const [pending, setPending] = useState(false);
+  const [labelling, setLabelling] = useState(false);
 
   const pdfLimit = format.number(collectionPdfLimits.items);
   const tooLargeForPdf = count > collectionPdfLimits.items;
@@ -123,78 +130,100 @@ export function ExportMenu({
     });
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="xs"
-          className="shrink-0"
-          disabled={pending}
-        >
-          {pending ? (
-            <Loader2 className="animate-spin" aria-hidden="true" />
-          ) : (
-            <Download strokeWidth={1.75} aria-hidden="true" />
-          )}
-          <span className="hidden sm:inline">{t("collectionExport.menu")}</span>
-          <span className="sr-only sm:hidden">
-            {t("collectionExport.menu")}
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[15rem]">
-        {plan === "free" ? (
-          <>
-            <p className="px-2 py-1.5 text-xs text-muted-foreground">
-              {t("collectionExport.premiumOnly")}
-            </p>
-            <DropdownMenuItem asChild>
-              <Link href={upgradeHref}>
-                <Sparkles strokeWidth={1.75} />
-                {t("plans.upgradeToPremium")}
-              </Link>
-            </DropdownMenuItem>
-          </>
-        ) : (
-          <>
-            <DropdownMenuLabel className="font-normal">
-              {t("collectionExport.inView", { count })}
-            </DropdownMenuLabel>
-            <DropdownMenuItem
-              disabled={plan !== "premium" || count === 0 || !complete}
-              onSelect={() => void exportCsv()}
-            >
-              <FileSpreadsheet strokeWidth={1.75} />
-              {t("collectionExport.csv")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={
-                plan !== "premium" || count === 0 || tooLargeForPdf || !complete
-              }
-              onSelect={() => void exportPdf()}
-            >
-              <FileText strokeWidth={1.75} />
-              {t("collectionExport.pdf")}
-            </DropdownMenuItem>
-            {!complete ? (
-              <p className="px-2 py-1.5 text-xs text-muted-foreground">
-                {t("collectionExport.tooLarge")}
-              </p>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="xs"
+            className="shrink-0"
+            disabled={pending}
+          >
+            {pending ? (
+              <Loader2 className="animate-spin" aria-hidden="true" />
             ) : (
-              tooLargeForPdf && (
-                <p className="px-2 py-1.5 text-xs text-muted-foreground">
-                  {t("collectionExport.pdfTooLarge", { limit: pdfLimit })}
-                </p>
-              )
+              <Download strokeWidth={1.75} aria-hidden="true" />
             )}
-          </>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={onImport}>
-          <FileUp strokeWidth={1.75} />
-          {t("collectionImport.menuItem")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <span className="hidden sm:inline">
+              {t("collectionExport.menu")}
+            </span>
+            <span className="sr-only sm:hidden">
+              {t("collectionExport.menu")}
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[15rem]">
+          {plan === "free" ? (
+            <>
+              <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                {t("collectionExport.premiumOnly")}
+              </p>
+              <DropdownMenuItem asChild>
+                <Link href={upgradeHref}>
+                  <Sparkles strokeWidth={1.75} />
+                  {t("plans.upgradeToPremium")}
+                </Link>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuLabel className="font-normal">
+                {t("collectionExport.inView", { count })}
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                disabled={plan !== "premium" || count === 0 || !complete}
+                onSelect={() => void exportCsv()}
+              >
+                <FileSpreadsheet strokeWidth={1.75} />
+                {t("collectionExport.csv")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={
+                  plan !== "premium" ||
+                  count === 0 ||
+                  tooLargeForPdf ||
+                  !complete
+                }
+                onSelect={() => void exportPdf()}
+              >
+                <FileText strokeWidth={1.75} />
+                {t("collectionExport.pdf")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={plan !== "premium" || count === 0 || !complete}
+                onSelect={() => setLabelling(true)}
+              >
+                <Tag strokeWidth={1.75} />
+                {t("labels.menuItem")}
+              </DropdownMenuItem>
+              {!complete ? (
+                <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                  {t("collectionExport.tooLarge")}
+                </p>
+              ) : (
+                tooLargeForPdf && (
+                  <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                    {t("collectionExport.pdfTooLarge", { limit: pdfLimit })}
+                  </p>
+                )
+              )}
+            </>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={onImport}>
+            <FileUp strokeWidth={1.75} />
+            {t("collectionImport.menuItem")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <LabelsDialog
+        open={labelling}
+        onOpenChange={setLabelling}
+        source={{ kind: "view", view }}
+        description={t("labels.forView", { count })}
+        items={count}
+        pieces={pieces}
+      />
+    </>
   );
 }

@@ -1023,7 +1023,7 @@ export default {
     freeDescription: "Bis zu {limit} Objekte, unabhängig von ihrer Anzahl.",
     premium: "Premium",
     premiumDescription:
-      "Unbegrenzt viele Objekte, der Versicherungsbericht und Export als CSV und PDF.",
+      "Unbegrenzt viele Objekte, der Versicherungsbericht, Export als CSV und PDF und Etiketten zum Drucken.",
     billingPeriod: "Abrechnungszeitraum",
     monthly: "Monatlich",
     yearly: "Jährlich",
@@ -1449,7 +1449,8 @@ export default {
       "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
     tooLarge:
       "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
-    premiumOnly: "Der Export deiner Sammlung ist Teil von Premium.",
+    premiumOnly:
+      "Der Export deiner Sammlung und der Etikettendruck sind Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
     fileName: "coinslite-sammlung-{date}.csv",
@@ -1650,6 +1651,56 @@ export default {
         "Dieser Bericht hat zu viele Objekte. Wähle weniger Alben.",
       ALBUM_NOT_FOUND: "Eines der gewählten Alben gibt es nicht mehr.",
     },
+  },
+  labels: {
+    menuItem: "Etiketten drucken …",
+    itemMenuItem: "Etikett drucken …",
+    selectionAction: "Etiketten drucken",
+    title: "Etiketten drucken",
+    close: "Schließen",
+    "forView#one": "Ein Etikett für das Objekt in dieser Ansicht.",
+    "forView#few":
+      "Etiketten für die {count} Objekte in dieser Ansicht, in ihrer Reihenfolge.",
+    "forView#other":
+      "Etiketten für die {count} Objekte in dieser Ansicht, in ihrer Reihenfolge.",
+    "forSelection#one": "Ein Etikett für das ausgewählte Objekt.",
+    "forSelection#few": "Etiketten für die {count} ausgewählten Objekte.",
+    "forSelection#other": "Etiketten für die {count} ausgewählten Objekte.",
+    forItem: "Ein Etikett für {title}.",
+    size: "Etikettengröße",
+    sizes: { small: "Klein", medium: "Mittel", large: "Groß" },
+    uses: {
+      small: "Für den Streifen eines 2×2-Münzrähmchens",
+      medium: "Für die Rückseite eines Slabs oder einer Münzkapsel",
+      large: "Für eine Schachtel, ein Tableau oder einen Umschlag",
+    },
+    paper: "Papier",
+    template:
+      "Passt auf {template}-Bögen mit {count} Etiketten pro Bogen oder auf gleich große Bögen anderer Hersteller.",
+    grid: "Ein Raster aus {count} Etiketten mit feinen Schnittlinien, für Normalpapier oder ganzseitige Etikettenbögen.",
+    also: "Außerdem auf jedem Etikett",
+    purchasePrice: "Kaufpreis",
+    marketValue: "Marktwert",
+    qrCode: "Ein QR-Code, der das Objekt öffnet",
+    qrCodeSmall: "Auf kleinen Etiketten ist kein Platz für einen QR-Code.",
+    perPiece: "Ein Etikett pro Stück",
+    skip: "Bereits benutzte Etiketten auf dem ersten Bogen",
+    "labelCount#one": "1 Etikett",
+    "labelCount#few": "{count} Etiketten",
+    "labelCount#other": "{count} Etiketten",
+    "sheetCount#one": "1 Bogen",
+    "sheetCount#few": "{count} Bögen",
+    "sheetCount#other": "{count} Bögen",
+    summary: "{labels} auf {sheets}",
+    perPieceSummary: "Ein Etikett für jedes Stück dieser Objekte",
+    tooMany:
+      "Eine PDF fasst bis zu {limit} Etiketten. Grenze die Ansicht ein oder drucke ein Etikett pro Objekt.",
+    download: "PDF herunterladen",
+    cancel: "Abbrechen",
+    downloaded: "Etiketten heruntergeladen",
+    premiumOnly: "Etiketten zu drucken ist Teil von Premium.",
+    failed:
+      "Die Etiketten konnten nicht erstellt werden. Versuche es noch einmal.",
   },
   share: {
     share: "Teilen",
