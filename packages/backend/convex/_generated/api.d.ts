@@ -143,6 +143,7 @@ import type * as items_preciousMetal from "../items/preciousMetal.js";
 import type * as items_references from "../items/references.js";
 import type * as items_resolve from "../items/resolve.js";
 import type * as items_rules from "../items/rules.js";
+import type * as items_tags from "../items/tags.js";
 import type * as items_thumbnail from "../items/thumbnail.js";
 import type * as items_totals from "../items/totals.js";
 import type * as items_valueHistory from "../items/valueHistory.js";
@@ -326,6 +327,7 @@ declare const fullApi: ApiFromModules<{
   "items/references": typeof items_references;
   "items/resolve": typeof items_resolve;
   "items/rules": typeof items_rules;
+  "items/tags": typeof items_tags;
   "items/thumbnail": typeof items_thumbnail;
   "items/totals": typeof items_totals;
   "items/valueHistory": typeof items_valueHistory;

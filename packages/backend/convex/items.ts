@@ -31,8 +31,10 @@ import {
   planGradeUndo,
   planMoveUndo,
   planPurchaseUndo,
+  planTagUndo,
   purchasePatch,
 } from "./items/bulkRules";
+import { checkTags, tagErrors, withTag, withoutTag } from "./items/tags";
 import {
   entryDetails,
   factsCreditFor,
@@ -119,6 +121,7 @@ const itemFields = {
   source: v.optional(v.string()),
   storage: v.optional(v.string()),
   notes: v.optional(v.string()),
+  tags: v.optional(v.array(v.string())),
   albumId: v.optional(v.id("albums")),
 };
 const fieldNames = Object.keys(itemFields) as Array<keyof typeof itemFields>;
@@ -387,8 +390,11 @@ export const update = mutation({
       checked.marketValue !== item.marketValue
     )
       checkAmountsWrite(await requireSetUpUser(ctx), amountsIn);
+    // A form from before tags sends none: those stay as they are.
     const cleared = Object.fromEntries(
-      fieldNames.map((name) => [name, undefined]),
+      fieldNames
+        .filter((name) => name !== "tags" || fields.tags !== undefined)
+        .map((name) => [name, undefined]),
     );
     await ctx.db.patch("items", itemId, {
       ...cleared,
@@ -766,6 +772,82 @@ export const undoPurchase = mutation({
     });
     for (const { itemId, ...was } of restore)
       await ctx.db.patch("items", itemId, was);
+    return { restored: restore.length, skipped };
+  },
+});
+
+/** An Item a tag was added to or taken off, with the tags it had: what undoing it needs. */
+const taggedItem = v.object({
+  itemId: v.id("items"),
+  tags: v.optional(v.array(v.string())),
+});
+
+/**
+ * Adds a tag to several of the signed-in person's Items, or takes it off
+ * them (`remove`). Items that already have it, or have no room for another,
+ * or (taking it off) don't have it, are skipped and counted. Every Item is
+ * checked before anything is written. Returns the tag as stored and the
+ * Items it changed with the tags each had, for `undoTag`.
+ */
+export const tagMany = mutation({
+  args: {
+    itemIds: v.array(v.id("items")),
+    tag: v.string(),
+    remove: v.optional(v.boolean()),
+  },
+  returns: v.object({
+    tag: v.string(),
+    changed: v.number(),
+    skipped: v.number(),
+    before: v.array(taggedItem),
+  }),
+  handler: async (ctx, { itemIds, tag, remove }) => {
+    const clean = checkTags([tag])?.[0];
+    if (clean === undefined) throw new ConvexError(tagErrors.required);
+    const { items } = await requireOwnItems(ctx, itemIds);
+    const before: Array<{ itemId: Id<"items">; tags?: string[] }> = [];
+    for (const item of items) {
+      const tags = remove
+        ? withoutTag(item.tags, clean)
+        : withTag(item.tags, clean);
+      if (tags === null) continue;
+      await ctx.db.patch("items", item._id, { tags });
+      before.push({ itemId: item._id, tags: item.tags });
+    }
+    return {
+      tag: clean,
+      changed: before.length,
+      skipped: items.length - before.length,
+      before,
+    };
+  },
+});
+
+/**
+ * Undoes `tagMany`: gives each Item it changed (`before`) the tags it had,
+ * if its tags are still what the change left (items/bulkRules.ts). The
+ * others are skipped and counted.
+ */
+export const undoTag = mutation({
+  args: {
+    before: v.array(taggedItem),
+    tag: v.string(),
+    remove: v.optional(v.boolean()),
+  },
+  returns: undone,
+  handler: async (ctx, { before, tag, remove }) => {
+    const clean = checkTags([tag])?.[0];
+    if (clean === undefined) throw new ConvexError(tagErrors.required);
+    const owner = await requireSetUpUser(ctx);
+    const now = await ownItemsNow(ctx, owner._id, before);
+    const { restore, skipped } = planTagUndo({
+      before,
+      tag: clean,
+      remove: remove ?? false,
+      now,
+    });
+    for (const { itemId, tags } of restore)
+      await ctx.db.patch("items", itemId, { tags });
     return { restored: restore.length, skipped };
   },
 });

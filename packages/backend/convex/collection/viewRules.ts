@@ -9,6 +9,7 @@ import {
   stampCatalogueNames,
 } from "../items/references";
 import type { Material } from "../items/rules";
+import { hasTag, tagKey, tagLimits } from "../items/tags";
 import { decadeOf, itemGainLoss } from "../items/totals";
 import {
   type CollectionSort,
@@ -108,7 +109,7 @@ export function countryName(code: string, locale: Locale) {
  * denomination, series, category, ruler, mint mark, Numista number (as "N#
  * 1234" is written), grade note, what its label says (grader and certificate
  * number, stamp catalogue and number, serial number), source, the place it's
- * kept in, its notes or its country's name; or a word is its country's code
+ * kept in, its notes, its tags or its country's name; or a word is its country's code
  * ("us"). So "PCGS 12345678" finds the coin as its page writes it, and "coin
  * fair" the one bought there.
  */
@@ -152,6 +153,7 @@ function searchFor(search: string | undefined, locale: Locale) {
       item.source,
       item.storage,
       item.notes,
+      ...(item.tags ?? []),
     ]
       .filter((field) => field !== undefined)
       .map(folded);
@@ -205,6 +207,7 @@ const dimensions = [
   "material",
   "album",
   "storage",
+  "tag",
   "entry",
   "without",
   "status",
@@ -265,6 +268,7 @@ function filtersFor(
       (storage === withoutStorage
         ? item.storage === undefined
         : item.storage !== undefined && textKey(item.storage) === storage),
+    tag: (item) => view.tag === undefined || hasTag(item.tags, view.tag),
     // A key that names no Catalog entry matches nothing.
     entry: (item) =>
       view.entry === undefined ||
@@ -351,6 +355,7 @@ export function countFilterOptions(
   let withoutAlbums = 0;
   const storages = new Map<string, { storage: string; count: number }>();
   let withoutStorages = 0;
+  const tags = new Map<string, { tag: string; count: number }>();
   let ofEntry = 0;
   const statuses = { owned: 0, sold: 0 };
   const add = <K>(counts: Map<K, number>, key: K) =>
@@ -420,6 +425,13 @@ export function countFilterOptions(
         else storages.set(key, { storage: item.storage, count: 1 });
       }
     }
+    if (counts("tag"))
+      for (const tag of item.tags ?? []) {
+        const key = tagKey(tag);
+        const option = tags.get(key);
+        if (option) option.count += 1;
+        else tags.set(key, { tag, count: 1 });
+      }
     if (counts("entry") && entryId !== null && item.catalogEntryId === entryId)
       ofEntry += 1;
     if (counts("status"))
@@ -462,6 +474,10 @@ export function countFilterOptions(
       (a, b) => byCount(a, b) || a.storage.localeCompare(b.storage),
     ),
     withoutStorage: withoutStorages,
+    /** The tags the Items have, as first written, most used first: as many as the filter offers. */
+    tags: [...tags.values()]
+      .sort((a, b) => byCount(a, b) || a.tag.localeCompare(b.tag))
+      .slice(0, tagLimits.offered),
     /** Items made from the view's Catalog entry, when it has one. */
     entry: ofEntry,
     statuses,

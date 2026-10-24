@@ -24,6 +24,7 @@ import { homeCurrencyErrors } from "@coinslite/backend/convex/homeCurrency/rules
 import { bulkLimits } from "@coinslite/backend/convex/items/bulkRules";
 import { suggestionLimits } from "@coinslite/backend/convex/items/catalogSuggestions";
 import { itemErrors } from "@coinslite/backend/convex/items/rules";
+import { tagErrors } from "@coinslite/backend/convex/items/tags";
 import { Button } from "@coinslite/ui/button";
 import { Checkbox } from "@coinslite/ui/checkbox";
 import {
@@ -130,6 +131,8 @@ const reasonKeys = {
   [itemErrors.notForType]: "notForType",
   [itemErrors.metalRequired]: "metalRequired",
   [itemErrors.soldBeforePurchase]: "soldBeforePurchase",
+  [tagErrors.tooMany]: "tooManyTags",
+  [tagErrors.tooLong]: "tooLong",
 } as const;
 
 /**

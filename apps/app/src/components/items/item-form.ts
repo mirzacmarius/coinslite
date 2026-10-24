@@ -77,6 +77,7 @@ export type ItemFormValues = {
   source: string;
   /** Kept in: where the Item is. */
   storage: string;
+  tags: string[];
   albumId: Id<"albums"> | undefined;
 };
 
@@ -123,6 +124,7 @@ export const blankItem = (): ItemFormValues => ({
   purchaseDate: "",
   source: "",
   storage: "",
+  tags: [],
   albumId: undefined,
 });
 
@@ -297,6 +299,7 @@ export function valuesFromItem(
     purchaseDate: item.purchaseDate ?? "",
     source: item.source ?? "",
     storage: item.storage ?? "",
+    tags: item.tags ?? [],
     albumId: item.albumId,
   };
 }

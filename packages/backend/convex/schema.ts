@@ -239,6 +239,9 @@ export default defineSchema({
     // box 2, tray 3"). The Collection filters and searches by it.
     storage: v.optional(v.string()),
     notes: v.optional(v.string()),
+    // The person's own words on the Item ("For sale"), each once, in the
+    // order added (items/tags.ts). The Collection filters and searches by them.
+    tags: v.optional(v.array(v.string())),
 
     // The sale (items/rules.ts checkSale): an Item with a sold-on date is
     // sold, otherwise owned. The sale price is per piece, like the Purchase

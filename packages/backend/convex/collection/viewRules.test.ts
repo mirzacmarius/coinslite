@@ -243,6 +243,48 @@ describe("the Kept in filter", () => {
   });
 });
 
+describe("the tag filter", () => {
+  const tagged = [
+    item("sale-1", 1, { title: "Krone", tags: ["For sale", "Inherited"] }),
+    item("sale-2", 2, { title: "Dime", tags: ["for SALE"] }),
+    item("old", 3, { title: "Penny", tags: ["Inherited"] }),
+    item("none", 4, { title: "Token" }),
+  ];
+  const ids = (view: CollectionView) =>
+    itemsInView(tagged, view, context).map((each) => each._id as string);
+
+  test("matches a tag whatever its capitals, accents and spacing", () => {
+    expect(ids({ tag: " FOR  sale", sort: "oldest" })).toEqual([
+      "sale-1",
+      "sale-2",
+    ]);
+  });
+
+  test("finds Items by their tags in the search too", () => {
+    expect(ids({ search: "inherited", sort: "oldest" })).toEqual([
+      "sale-1",
+      "old",
+    ]);
+  });
+
+  test("counts each tag once, as first written, most used first", () => {
+    expect(countFilterOptions(tagged, {}, context).tags).toEqual([
+      { tag: "For sale", count: 2 },
+      { tag: "Inherited", count: 2 },
+    ]);
+    // Within the other filters, as each count is.
+    expect(
+      countFilterOptions(tagged, { tag: "Inherited" }, context).tags,
+    ).toEqual([
+      { tag: "For sale", count: 2 },
+      { tag: "Inherited", count: 2 },
+    ]);
+    expect(
+      countFilterOptions(tagged, { search: "penny" }, context).tags,
+    ).toEqual([{ tag: "Inherited", count: 1 }]);
+  });
+});
+
 describe("the year range and material filters", () => {
   const dated = [
     item("old", 1, { title: "Old silver", year: 1887, material: "silver" }),

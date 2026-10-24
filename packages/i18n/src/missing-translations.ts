@@ -122,6 +122,7 @@ const ownWords: Record<Exclude<Locale, "en">, string[]> = {
     "Plan",
     "Proof",
     "Set",
+    "Tag",
     "Total",
     "Zinc",
   ],

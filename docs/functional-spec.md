@@ -68,6 +68,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Quantity:** whole number ≥ 1, default 1.
 - **Purchase:** Purchase price per piece, purchase date, and source (where it was acquired).
 - **Kept in:** where the Item physically is, as the user describes it ("Safe deposit box 2, tray 3"): free text up to 100 characters. The form suggests the places the user's other Items are kept in, so one place is written one way.
+- **Tags:** the user's own words to find and group Items by ("For sale", "Out for grading", "Inherited"): up to 10 per Item, each up to 40 characters, without commas or semicolons (they part tags in the CSV). Tags that differ only in capitals, accents or spacing are one tag, kept as first written. The form's Tags pill offers the user's tags, most used first, and makes a new one from what's typed.
 - **Market value** per piece. Optional, entered by the user.
 - **Notes.**
 - **Album:** optional, at most one.
@@ -137,10 +138,10 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 - The list thumbnail is that of the front photo, else of the back photo, else of the first more photo, else a placeholder for the Item type. A photo from before thumbnails shows as itself.
 
 ### 5.7 Item detail
-- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, Purchase price, Market value, purchase date and source, notes and Album.
+- Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, tags (each opening the Collection filtered to it), Purchase price, Market value, purchase date and source, notes and Album.
 - For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once the Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
 - **Value history:** the Item's Market value each time it was changed (at most one point a month), newest first, with the change since the one before and the Quantity when that changed; an Item priced once shows a single line.
-- **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album tags, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
+- **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album badges, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
 - Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate, Print label (§7) and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
 
 ## 6. Catalog
@@ -223,7 +224,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month.
   - **Value by Date acquired:** cumulative Purchase price and Market value by the month Items were acquired.
   - **Value distribution:** by Item type, plus gold and silver Metal value.
-- **Search:** every word typed must appear in one of the Item's texts: title, denomination, series, category, ruler, mint mark, Numista number (as "N# 1234" is written), grade note, grader and certificate number, stamp catalogue and number, serial number, source, Kept in, notes, or the country's name; a word may also be the country's code. Capitals and accents don't matter.
+- **Search:** every word typed must appear in one of the Item's texts: title, denomination, series, category, ruler, mint mark, Numista number (as "N# 1234" is written), grade note, grader and certificate number, stamp catalogue and number, serial number, source, Kept in, tags, notes, or the country's name; a word may also be the country's code. Capitals and accents don't matter.
 - **Filters:**
   - Item type, plus bullion-only for coins
   - origin: all, the user's own country, or foreign
@@ -234,6 +235,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - material, each with counts; a coin's precious metal stands in for a missing material
   - Album: all, one Album, or without an Album, each with counts
   - Kept in: one place, or no place recorded, each with counts; places that differ only in capitals, accents or spacing count as one
+  - tag: one of the user's 100 most used tags, each with counts
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade
 - **Active filters** are listed and can be cleared one at a time or all at once. Filters and search are reflected in the URL.
 - **Sort:** year (oldest first, the default), newest added, oldest added, highest Purchase price, highest Market value, biggest gain, denomination, Grade, title (A to Z). Items without the sorted value come last.
@@ -241,9 +243,10 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - move them to an Album, or out of any Album
   - set a Grade, on those whose Item type the Grading scale suits
   - **Set purchase:** Purchase price per piece, purchase date and source, each optional. Only the fields filled in are written, checked as in the Item form; a field left empty keeps each Item's own value. At least one must be filled in.
+  - **Tag:** add one of the user's tags, or a new one, to them, or take a tag off them. Items that already have it or hold 10 tags (or, taking it off, don't have it) are skipped and counted.
   - print their labels (see Labels below)
   - delete them, with a confirmation
-  - A move, a Grade or a purchase can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
+  - A move, a Grade, a purchase or a tag can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
 - **Layout:** the Item list comes first. Search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters. The Spot prices, totals and charts sit in one section between them and the list, which collapses to a one-line summary (Items, total Market value, Gain/loss and any non-zero Metal value). It starts open only on a screen at least 1024 px wide and 1000 px tall, where the list still starts in view below it, and collapsed on anything smaller, such as a phone or a 1280 × 800 laptop; it is then remembered open or collapsed on the device. A search or filter in the URL starts it collapsed. The Overview's totals aren't collapsible.
 - **Export (Premium), covering the current filtered view:**
@@ -251,7 +254,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
     - A totals row and page numbers.
-  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
+  - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, tags (parted by commas), sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
 - **Labels (Premium):** a PDF of label sheets to print, made on the server in the active language: from the Export menu for the view's Items in its order, from select mode for the selected Items, and from the Item page for one Item. On the Free plan the dialog shows the way to Premium.
   - **Sizes:** small (44.45 × 12.7 mm, the strip of a 2×2 flip), medium (38.1 × 21.2 mm, the back of a slab or a holder) and large (63.5 × 38.1 mm on A4, 66.7 × 25.4 mm on Letter: a box, tray or envelope).
   - **Paper:** A4 or US Letter. The sheets line up with Avery L7651 (medium) and L7160 (large) on A4 and Avery 5167 (small) and 5160 (large) on Letter, or the same sizes from other makers. Small labels on A4 and medium ones on Letter print as a grid with faint lines to cut along.
@@ -262,7 +265,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - **Columns:** a Collection export, its headings in any of the five languages or as the raw column keys, is read as it is. Any other file, such as a list saved from Numista, OpenNumismat or CoinManage or a spreadsheet, first shows **Check the columns**: each heading with a few of its cells and the field CoinsLite guessed for it from the names those apps and spreadsheets use, in the five languages. A guess is kept only when most of the column's cells read for that field (OpenNumismat's "Type" of "Circulating" isn't an Item type). The person changes any guess or leaves a column out; each field goes to one column. The preview can go back to the columns.
   - Besides the export's columns a file can hold notes, Album, Catalog entry key, the denomination's unit (joined to the denomination, as OpenNumismat splits "1" and "krone"), series, mint mark, ruler, mintage, the Numista number (kept on the Item as its cross-reference, written "N# 1234" or "1234") and the Grade note.
   - Rows without an Item type take the one the person chooses, coin at first. When the dates written with the year last don't show whether the day or the month comes first, the person chooses; otherwise the dates tell.
-  - **Cells:** amounts plain or grouped either way, with a currency symbol or code before or after them ("€12.50", "kr 1 250"); a row's amounts and its currency column must all be the Home currency, a symbol counting for each currency it can stand for (kr: NOK, SEK or DKK). Dates as YYYY-MM-DD (a time after it is dropped), year first, day first with dots, or with slashes or dashes and the year last. "ND", "o.J." and the like leave the year empty. A Grade is read on the Grading scale given, else on the scale the Item would start on, else on another that suits its type ("XF" on a Norwegian coin is on the European scale); Sheldon grades keep their designation as the Grade note and a proof's letters as its Strike ("PR69DCAM": 69, Proof, "DCAM"); "BU" is UNC with the BU Strike; "Proof" alone sets the Strike. A row without a title is named by its denomination and year.
+  - **Cells:** amounts plain or grouped either way, with a currency symbol or code before or after them ("€12.50", "kr 1 250"); a row's amounts and its currency column must all be the Home currency, a symbol counting for each currency it can stand for (kr: NOK, SEK or DKK). Dates as YYYY-MM-DD (a time after it is dropped), year first, day first with dots, or with slashes or dashes and the year last. "ND", "o.J." and the like leave the year empty. A Grade is read on the Grading scale given, else on the scale the Item would start on, else on another that suits its type ("XF" on a Norwegian coin is on the European scale); Sheldon grades keep their designation as the Grade note and a proof's letters as its Strike ("PR69DCAM": 69, Proof, "DCAM"); "BU" is UNC with the BU Strike; "Proof" alone sets the Strike. A row without a title is named by its denomination and year. Tags are parted at commas or semicolons.
   - **Kept, not lost:** a country CoinsLite doesn't know ("German Empire") is left empty and written into the Item's notes ("Country: German Empire", in the person's language), and a Grade no scale reads goes into the Grade note. The preview names both.
   - **Preview:** how many Items would be added, the Albums to create, the rows linked to the Catalog, the columns left out, what is kept in notes, and each row that can't be added with its row number and reason. The rows are then added 100 at a time, each batch all or nothing and checked by the rules of adding an Item. On the Free plan a file that doesn't fit offers its first rows that do, or the way to Premium.
 
@@ -277,7 +280,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - The confirmation states how many Items will be permanently deleted.
 - **Share:** from its page, an Album can be shared by a read-only link (`/s/<token>`), one per Album. The Share dialog shows the link with Copy, a **Show values** switch (off by default) and **Stop sharing**.
   - Whoever has the link sees, signed in or not: the Album's name, description and colour, who shares it (their display name), how many Items the sharer still owns in it, and those Items newest first, 50 a page, each with title, year, country, denomination, series, material, Grade, Quantity and list thumbnail. With Show values on: each Item's Market value × Quantity and their total, in the sharer's Home currency (the total is left out for an Album over 2,000 Items).
-  - Never shown: Purchase prices, dates and sources, Kept in, notes, Certification and serial numbers, full-size photos, sold Items, or anything outside the Album.
+  - Never shown: Purchase prices, dates and sources, Kept in, tags, notes, Certification and serial numbers, full-size photos, sold Items, or anything outside the Album.
   - Stop sharing deletes the share, so the link stops working at once; deleting the Album or the account does the same, and a deactivated account's shares show nothing. A link that opens nothing says the page is no longer shared. Sharing again makes a new link.
   - A shared page names what it shows in the tab title and link preview, asks search engines not to index it, and is counted in usage statistics and error reports without its token.
 

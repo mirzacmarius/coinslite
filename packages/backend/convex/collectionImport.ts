@@ -85,6 +85,7 @@ const importRow = v.object({
   source: v.optional(v.string()),
   storage: v.optional(v.string()),
   notes: v.optional(v.string()),
+  tags: v.optional(v.array(v.string())),
   soldOn: v.optional(v.string()),
   salePrice: v.optional(v.number()),
   saleNote: v.optional(v.string()),

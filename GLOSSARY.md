@@ -38,6 +38,10 @@ _Avoid_: Public page, publishing, link sharing (for the link itself)
 Where an Item's pieces physically are, as the collector describes it ("Safe deposit box 2, tray 3"). Free text on each Item; the Collection filters and searches by it.
 _Avoid_: Location, storage, home
 
+**Tag**:
+A collector's own word, or few words, on an Item ("For sale", "Out for grading", "Inherited"), several per Item, to find and narrow the Collection by. Tags that differ only in capitals, accents or spacing are one tag.
+_Avoid_: Label (a printed label), keyword, category (a Catalog entry's)
+
 **Grade**:
 The assessed condition of an Item's pieces, expressed as a value on a Grading scale.
 _Avoid_: Condition, quality, state

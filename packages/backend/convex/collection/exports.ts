@@ -83,6 +83,7 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
     purchaseDate: item.purchaseDate,
     source: item.source,
     storage: item.storage,
+    tags: item.tags?.join(", "),
     soldOn: item.soldOn,
     salePrice: plainAmount(item.salePrice),
     saleNote: item.saleNote,

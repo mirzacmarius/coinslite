@@ -31,6 +31,15 @@ describe("guessColumns", () => {
     expect(laidOutAsExport(headings, columns)).toBe(true);
   });
 
+  test("reads tags under the names other apps give them", () => {
+    expect(
+      guessColumns(["Title", "Keywords"], [["2 øre", "For sale, Inherited"]]),
+    ).toEqual(["title", "tags"]);
+    expect(
+      guessColumns(["Titel", "Schlagwörter"], [["2 øre", "Erbstück"]]),
+    ).toEqual(["title", "tags"]);
+  });
+
   test("guesses the columns of a Numista-style export", () => {
     const headings = [
       "N#",

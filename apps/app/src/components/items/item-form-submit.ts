@@ -216,6 +216,7 @@ export function argsFromValues(
     purchaseDate: values.purchaseDate || undefined,
     source: values.source,
     storage: values.storage,
+    tags: values.tags,
     albumId: values.albumId,
   };
 }

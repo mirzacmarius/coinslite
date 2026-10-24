@@ -70,6 +70,7 @@ function scopeLines({ view, albumName, ownCountry, locale }: PdfContents) {
       labels.columns.storage,
       view.storage === withoutStorage ? messages.withoutStorage : view.storage,
     );
+  if (view.tag) add(messages.tag, view.tag);
   const { yearFrom, yearTo } = view;
   if (yearFrom !== undefined || yearTo !== undefined)
     add(

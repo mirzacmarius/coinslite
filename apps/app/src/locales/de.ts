@@ -193,6 +193,15 @@ export default {
         "Das Objekt konnte nicht hinzugefügt werden. Versuche es noch einmal.",
     },
   },
+  tags: {
+    tags: "Schlagwörter",
+    add: "Schlagwörter hinzufügen",
+    search: "Schlagwort suchen oder erstellen …",
+    find: "Schlagwort suchen …",
+    noneYet: "Noch keine Schlagwörter",
+    create: "Schlagwort „{tag}“ erstellen",
+    full: "Ein Objekt hat höchstens {limit} Schlagwörter.",
+  },
   grades: {
     scales: {
       sheldon: "Sheldon (1–70)",
@@ -874,6 +883,7 @@ export default {
       grade: "Erhaltung",
       album: "Album",
       storage: "Aufbewahrt in",
+      tag: "Schlagwort",
       year: "Jahr",
       material: "Material",
       entry: "Katalogeintrag",
@@ -945,7 +955,7 @@ export default {
     select: "Auswählen",
     selectionBar: "Ausgewählte Objekte",
     selectHint:
-      "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten, ihren Kauf festzulegen oder sie zu löschen.",
+      "Wähle Objekte aus, um sie in ein Album zu verschieben, zu bewerten, ihren Kauf oder ein Schlagwort festzulegen oder sie zu löschen.",
     addToHint: "Wähle die Objekte aus, die in {album} sollen.",
     cancel: "Abbrechen",
     selectPage: "Seite auswählen",
@@ -996,6 +1006,26 @@ export default {
       "Der Kauf konnte nicht festgelegt werden. Versuche es noch einmal.",
     purchaseUndone: "Kauf rückgängig gemacht",
     purchaseUndoneSkipped:
+      "{restored} zurückgesetzt, {skipped} übersprungen: Die Objekte wurden inzwischen geändert.",
+    tag: "Schlagwort",
+    tagMode: "Hinzufügen oder entfernen",
+    tagAdd: "Hinzufügen",
+    tagRemove: "Entfernen",
+    tagRemoveTyped: "„{tag}“ entfernen",
+    "tagged#one": "Schlagwort zu 1 Objekt hinzugefügt",
+    "tagged#few": "Schlagwort zu {count} Objekten hinzugefügt",
+    "tagged#other": "Schlagwort zu {count} Objekten hinzugefügt",
+    "untagged#one": "Schlagwort von 1 Objekt entfernt",
+    "untagged#few": "Schlagwort von {count} Objekten entfernt",
+    "untagged#other": "Schlagwort von {count} Objekten entfernt",
+    taggedSkipped:
+      "„{tag}“ zu {changed} hinzugefügt, {skipped} übersprungen: Die Objekte haben es schon oder keinen Platz für ein weiteres.",
+    untaggedSkipped:
+      "„{tag}“ von {changed} entfernt, {skipped} übersprungen: Die Objekte haben es nicht.",
+    tagFailed:
+      "Das Schlagwort konnte nicht geändert werden. Versuche es noch einmal.",
+    tagUndone: "Schlagwort rückgängig gemacht",
+    tagUndoneSkipped:
       "{restored} zurückgesetzt, {skipped} übersprungen: Die Objekte wurden inzwischen geändert.",
     undo: "Rückgängig",
     undoFailed:
@@ -1541,6 +1571,7 @@ export default {
       notForType: "sie hat ein Feld, das nicht zur Objektart passt",
       metalRequired: "Gewicht oder Feinheit brauchen ein Metall",
       soldBeforePurchase: "verkauft, bevor es gekauft wurde",
+      tooManyTags: "sie hat mehr als 10 Schlagwörter",
       other: "sie kann nicht hinzugefügt werden",
     },
     errors: {

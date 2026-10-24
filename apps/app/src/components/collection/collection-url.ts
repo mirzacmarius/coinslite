@@ -33,7 +33,7 @@ import { itemTypes } from "../items/item-fields";
  * The Collection view lives in the URL, so any view can be bookmarked or
  * shared: ?q=krone&type=coin&bullion=1&origin=own&country=NO
  * &denomination=1%20krone&grade=european:XF&album=…&storage=Safe%202
- * &yearFrom=1800&yearTo=1899&material=silver&status=sold&sort=price&page=2.
+ * &tag=For%20sale&yearFrom=1800&yearTo=1899&material=silver&status=sold&sort=price&page=2.
  * ?addTo=<Album> picks Items to add to that Album: the view leaves out the
  * Items already in it. ?entry=<key> shows the Items made from one Catalog
  * entry, ?storage=none the Items with no Kept in place, and
@@ -79,6 +79,8 @@ export function readCollectionUrl(params: URLSearchParams) {
   if (entry) view.entry = entry.slice(0, searchLimit);
   const storage = params.get("storage")?.trim();
   if (storage) view.storage = storage.slice(0, searchLimit);
+  const tag = params.get("tag")?.trim();
+  if (tag) view.tag = tag.slice(0, searchLimit);
   // A range written backwards is meant the other way round.
   const years = [params.get("yearFrom"), params.get("yearTo")].map(yearParam);
   const [yearFrom, yearTo] =
@@ -173,6 +175,7 @@ export function writeCollectionUrl(view: CollectionView, page: number) {
   if (view.notInAlbum) params.set("addTo", view.notInAlbum);
   if (view.entry) params.set("entry", view.entry);
   if (view.storage) params.set("storage", view.storage);
+  if (view.tag) params.set("tag", view.tag);
   if (view.yearFrom !== undefined)
     params.set("yearFrom", String(view.yearFrom));
   if (view.yearTo !== undefined) params.set("yearTo", String(view.yearTo));

@@ -3,6 +3,7 @@ import {
   planGradeUndo,
   planMoveUndo,
   planPurchaseUndo,
+  planTagUndo,
   purchasePatch,
 } from "./bulkRules";
 
@@ -453,6 +454,81 @@ describe("planPurchaseUndo", () => {
     ).toStrictEqual({
       restore: [{ itemId: "krone", source: "Auction" }],
       skipped: 0,
+    });
+  });
+});
+
+describe("planTagUndo", () => {
+  test("Items still as the tag left them get their own tags back, or none", () => {
+    expect(
+      planTagUndo({
+        before: [{ itemId: "krone", tags: ["Inherited"] }, { itemId: "dime" }],
+        tag: "For sale",
+        remove: false,
+        now: new Map([
+          ["krone", { tags: ["Inherited", "For sale"] }],
+          ["dime", { tags: ["For sale"] }],
+        ]),
+      }),
+    ).toEqual({
+      restore: [
+        { itemId: "krone", tags: ["Inherited"] },
+        { itemId: "dime", tags: undefined },
+      ],
+      skipped: 0,
+    });
+  });
+
+  test("a tag taken off goes back where it was", () => {
+    expect(
+      planTagUndo({
+        before: [{ itemId: "krone", tags: ["For sale", "Inherited"] }],
+        tag: "For sale",
+        remove: true,
+        now: new Map([["krone", { tags: ["Inherited"] }]]),
+      }),
+    ).toEqual({
+      restore: [{ itemId: "krone", tags: ["For sale", "Inherited"] }],
+      skipped: 0,
+    });
+  });
+
+  test("tags the rules wouldn't store are never written back", () => {
+    expect(
+      planTagUndo({
+        before: [
+          { itemId: "krone", tags: ["Inherited", "for sale", "FOR SALE"] },
+          { itemId: "dime", tags: ["x".repeat(41), "For sale"] },
+        ],
+        tag: "For sale",
+        remove: true,
+        now: new Map([
+          ["krone", { tags: ["Inherited"] }],
+          ["dime", { tags: ["x".repeat(41)] }],
+        ]),
+      }),
+    ).toEqual({ restore: [], skipped: 2 });
+  });
+
+  test("Items retagged or deleted since are skipped and counted, each Item once", () => {
+    expect(
+      planTagUndo({
+        before: [
+          { itemId: "krone", tags: ["Inherited"] },
+          { itemId: "krone", tags: ["Other"] },
+          { itemId: "dime" },
+          { itemId: "penny" },
+        ],
+        tag: "For sale",
+        remove: false,
+        now: new Map([
+          ["krone", { tags: ["Inherited", "For sale"] }],
+          ["dime", { tags: ["For sale", "Graded"] }],
+        ]),
+      }),
+    ).toEqual({
+      restore: [{ itemId: "krone", tags: ["Inherited"] }],
+      skipped: 2,
     });
   });
 });

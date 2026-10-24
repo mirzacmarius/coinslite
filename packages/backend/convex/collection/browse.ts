@@ -4,6 +4,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { attentionKinds } from "../items/attention";
 import { catalogEntryByKey, itemResolver } from "../items/resolve";
+import { tagKey, tagLimits } from "../items/tags";
 import { withThumbnail } from "../items/thumbnail";
 import { pageTotals } from "../items/totals";
 import { gradingScale, itemType, material } from "../utils/validators";
@@ -35,6 +36,7 @@ export const collectionView = v.object({
   notInAlbum: v.optional(v.string()),
   entry: v.optional(v.string()),
   storage: v.optional(v.string()),
+  tag: v.optional(v.string()),
   yearFrom: v.optional(v.number()),
   yearTo: v.optional(v.number()),
   material: v.optional(material),
@@ -146,6 +148,33 @@ export async function readStoragePlaces(ctx: QueryCtx, ownerId: Id<"users">) {
     .sort((a, b) => b.count - a.count || a.place.localeCompare(b.place))
     .slice(0, storagePlaceLimit)
     .map(({ place }) => place);
+}
+
+/**
+ * The tags on a person's Items, most used first then A to Z, for the Item
+ * form and select mode to offer. Tags that differ only in capitals, accents
+ * or spacing are one, written as first met. Read as `readStoragePlaces`
+ * reads.
+ */
+export async function readTags(ctx: QueryCtx, ownerId: Id<"users">) {
+  const tags = new Map<string, { tag: string; count: number }>();
+  let read = 0;
+  for await (const item of ctx.db
+    .query("items")
+    .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))) {
+    for (const tag of item.tags ?? []) {
+      const key = tagKey(tag);
+      const found = tags.get(key);
+      if (found) found.count += 1;
+      else tags.set(key, { tag, count: 1 });
+    }
+    read += 1;
+    if (read % readCheckEvery === 0 && !(await roomLeft(ctx))) break;
+  }
+  return [...tags.values()]
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
+    .slice(0, tagLimits.offered)
+    .map(({ tag }) => tag);
 }
 
 /** A person's Collection, read for a view. */

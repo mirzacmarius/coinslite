@@ -21,6 +21,7 @@ import { DeleteItemsButton } from "./delete-items-button";
 import type { BrowseResult } from "./filter-options";
 import { SetGradeButton } from "./set-grade-button";
 import { SetPurchaseButton } from "./set-purchase-button";
+import { TagItemsButton } from "./tag-items-button";
 import type { ItemSelection } from "./use-item-selection";
 
 /** How an undo went: Items put back, and Items skipped as changed since. */
@@ -32,8 +33,9 @@ const undoOfferedFor = 10_000;
 /**
  * Select mode's bar on the Collection page: select the page or the whole
  * view, pick an Album (or none) and move every selected Item there at once,
- * set a Grade or a bought lot's purchase on them, print their labels, or
- * delete them. A move, a Grade or a purchase can be undone from its toast.
+ * set a Grade or a bought lot's purchase on them, add or take off a tag,
+ * print their labels, or delete them. A move, a Grade, a purchase or a tag
+ * can be undone from its toast.
  * With `addTo`, the Album is set and moving into it is the only action;
  * `onLeave` ends picking either way.
  */
@@ -239,6 +241,26 @@ export function MoveToAlbumBar({
               );
               selection.stop();
             }}
+          />
+          <TagItemsButton
+            selection={selection}
+            onTagged={({ tag, remove, changed, skipped, undo }) => {
+              toast.success(
+                skipped > 0
+                  ? remove
+                    ? t("collection.untaggedSkipped", { tag, changed, skipped })
+                    : t("collection.taggedSkipped", { tag, changed, skipped })
+                  : remove
+                    ? t("collection.untagged", { count: changed })
+                    : t("collection.tagged", { count: changed }),
+                undo &&
+                  offerUndo(undo, t("collection.tagUndone"), (counts) =>
+                    t("collection.tagUndoneSkipped", counts),
+                  ),
+              );
+              selection.stop();
+            }}
+            onFailed={setFailed}
           />
           <PrintLabelsButton itemIds={[...selected.keys()]} />
           <DeleteItemsButton

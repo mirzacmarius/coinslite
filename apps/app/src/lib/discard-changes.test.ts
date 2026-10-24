@@ -23,6 +23,22 @@ describe("formChanged", () => {
     ).toBe(false);
   });
 
+  test("a tag ticked and unticked again is no change, a tag added is", () => {
+    const item = { title: "Krone", tags: ["Inherited"] };
+    expect(
+      formChanged(
+        { isDirty: true, values: { ...item, tags: ["Inherited"] } },
+        item,
+      ),
+    ).toBe(false);
+    expect(
+      formChanged(
+        { isDirty: true, values: { ...item, tags: ["Inherited", "For sale"] } },
+        item,
+      ),
+    ).toBe(true);
+  });
+
   test("a new colour is a change", () => {
     expect(
       formChanged(
