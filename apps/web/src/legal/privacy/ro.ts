@@ -112,7 +112,7 @@ export default {
           "Acces: află ce date avem despre tine. Pagina contului și colecția ta le arată, iar la cerere îți trimitem o copie completă.",
           "Rectificare: modifică-ți datele în pagina contului și obiectele în aplicație.",
           "Ștergere: șterge-ți contul și tot ce conține din pagina contului.",
-          "Portabilitate: cere o copie a datelor tale într-un format care poate fi citit automat. Este gratuită în orice plan. Cu Premium îți poți exporta și singur colecția în format CSV.",
+          "Portabilitate: cere o copie a datelor tale într-un format care poate fi citit automat. Este gratuită în orice plan și, în orice plan, îți poți exporta și singur colecția în format CSV.",
           "Opoziție: opune-te prelucrărilor pe care le facem pe baza intereselor noastre legitime.",
           "Retragerea consimțământului: acolo unde ne bazăm pe consimțământul tău, îl poți retrage oricând, fără a afecta ce s-a făcut înainte.",
           "Plângere: depune o plângere la autoritatea de supraveghere, {authority}, sau la cea din locul în care locuiești sau lucrezi.",

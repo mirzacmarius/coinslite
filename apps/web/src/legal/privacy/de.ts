@@ -112,7 +112,7 @@ export default {
           "Auskunft: sehen, was wir über dich gespeichert haben. Deine Kontoseite und deine Sammlung zeigen es, und auf Anfrage senden wir dir eine vollständige Kopie.",
           "Berichtigung: ändere deine Angaben auf der Kontoseite und deine Objekte in der App.",
           "Löschung: lösche dein Konto und alles darin auf der Kontoseite.",
-          "Datenübertragbarkeit: verlange eine Kopie deiner Daten in einem maschinenlesbaren Format. Das ist in jedem Tarif kostenlos. Mit Premium kannst du deine Sammlung außerdem selbst als CSV exportieren.",
+          "Datenübertragbarkeit: verlange eine Kopie deiner Daten in einem maschinenlesbaren Format. Das ist in jedem Tarif kostenlos, und in jedem Tarif kannst du deine Sammlung außerdem selbst als CSV exportieren.",
           "Widerspruch: widersprich dem, was wir auf Grundlage unserer berechtigten Interessen tun.",
           "Widerruf der Einwilligung: wo wir uns auf deine Einwilligung stützen, kannst du sie jederzeit widerrufen, ohne dass das zuvor Geschehene berührt wird.",
           "Beschwerde: beschwere dich bei der Aufsichtsbehörde, {authority}, oder bei der Behörde an deinem Wohn- oder Arbeitsort.",

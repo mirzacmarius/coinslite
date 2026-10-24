@@ -112,7 +112,7 @@ export default {
           "Accès : savoir ce que nous détenons sur vous. La page du compte et votre collection l’affichent, et nous vous envoyons une copie complète sur demande.",
           "Rectification : modifiez vos informations sur la page du compte et vos objets dans l’application.",
           "Effacement : supprimez votre compte et tout son contenu depuis la page du compte.",
-          "Portabilité : demandez une copie de vos données dans un format lisible par machine. C’est gratuit, quelle que soit la formule. Avec Premium, vous pouvez aussi exporter vous-même votre collection en CSV.",
+          "Portabilité : demandez une copie de vos données dans un format lisible par machine. C’est gratuit, quelle que soit la formule, et dans toutes les formules vous pouvez aussi exporter vous-même votre collection en CSV.",
           "Opposition : opposez-vous à ce que nous faisons sur la base de nos intérêts légitimes.",
           "Retrait du consentement : lorsque nous nous fondons sur votre consentement, vous pouvez le retirer à tout moment, sans effet sur ce qui a été fait auparavant.",
           "Réclamation : adressez une réclamation à l’autorité de contrôle, {authority}, ou à celle du lieu où vous vivez ou travaillez.",

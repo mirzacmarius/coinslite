@@ -13,6 +13,7 @@ import {
 import { collectionTotals, itemGainLoss, totalPieces } from "../items/totals";
 import { resolveItems } from "../items/resolve";
 import { requirePremium } from "../plans";
+import { requireSetUpUser } from "../utils/auth";
 import {
   gradingScale,
   homeCurrency,
@@ -33,10 +34,11 @@ import { withoutAlbum } from "./view";
 import { countryName } from "./viewRules";
 
 /**
- * The Collection exports (Premium): a file of exactly the Items a Collection
- * view shows, in its order, made on the server in the person's language. A
- * Collection too large to read in one go isn't exported at all, rather than
- * exported with Items missing.
+ * The Collection exports: a file of exactly the Items a Collection view
+ * shows, in its order, made on the server in the person's language. The CSV
+ * is on both plans, so a collector's data can always leave with them; the
+ * PDF and the label sheets are Premium. A Collection too large to read in
+ * one go isn't exported at all, rather than exported with Items missing.
  */
 
 /** Every Home currency divides into 100 minor units (packages/i18n). */
@@ -111,10 +113,11 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
 }
 
 /**
- * The Collection view as a CSV file for spreadsheets: UTF-8 with a byte order
- * mark, RFC 4180 quoting, a header row, then one row per Item in the view's
- * order. Headings and names (Item type, Grade, material, country…) are in
- * the person's language; numbers and dates are plain (1250.50, 2024-03-05).
+ * The Collection view as a CSV file for spreadsheets, on either plan: UTF-8
+ * with a byte order mark, RFC 4180 quoting, a header row, then one row per
+ * Item in the view's order. Headings and names (Item type, Grade, material,
+ * country…) are in the person's language; numbers and dates are plain
+ * (1250.50, 2024-03-05).
  */
 export const csv = query({
   args: {
@@ -124,7 +127,7 @@ export const csv = query({
   },
   returns: v.string(),
   handler: async (ctx, { view, locale }) => {
-    const owner = await requirePremium(ctx);
+    const owner = await requireSetUpUser(ctx);
     // Mid-change, its amounts would be in two currencies.
     refuseWhileChanging(owner);
     const written = locale ?? owner.language ?? defaultLocale;

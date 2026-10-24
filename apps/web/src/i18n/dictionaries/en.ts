@@ -179,7 +179,7 @@ export default {
       },
       export: {
         title: "PDF and CSV export",
-        text: "Any view of your Collection, to print or to keep, and labels for flips and slabs. Premium.",
+        text: "Any view of your Collection as a CSV to keep, on every plan. With Premium, as a PDF to print, and labels for flips and slabs.",
       },
       charts: {
         title: "Charts",
@@ -218,7 +218,7 @@ export default {
         "The Catalog, Sets and the Wantlist",
         "Grades, Strike, photos and Albums",
         "Totals, charts and Spot prices",
-        "Spreadsheet import",
+        "Spreadsheet import and CSV export",
       ],
       cta: "Start free",
     },
@@ -230,7 +230,7 @@ export default {
       features: [
         "Unlimited Items",
         "The Insurance report",
-        "PDF and CSV export",
+        "PDF export",
         "Labels for flips and slabs",
         "Everything in the Free plan",
       ],

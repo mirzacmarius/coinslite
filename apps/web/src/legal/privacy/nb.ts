@@ -112,7 +112,7 @@ export default {
           "Innsyn: se hva vi har om deg. Kontosiden og samlingen viser det, og vi sender en fullstendig kopi på forespørsel.",
           "Retting: endre opplysningene dine på kontosiden og objektene dine i appen.",
           "Sletting: slett kontoen din og alt i den fra kontosiden.",
-          "Dataportabilitet: be om en kopi av opplysningene dine i et maskinlesbart format. Det er gratis i alle abonnement. Med Premium kan du også eksportere samlingen som CSV selv.",
+          "Dataportabilitet: be om en kopi av opplysningene dine i et maskinlesbart format. Det er gratis i alle abonnement, og i alle abonnement kan du også eksportere samlingen som CSV selv.",
           "Protest: protester mot det vi gjør på grunnlag av våre berettigede interesser.",
           "Tilbaketrekking av samtykke: der vi bygger på samtykket ditt, kan du trekke det tilbake når som helst, uten at det påvirker det som er gjort før.",
           "Klage: klag til tilsynsmyndigheten, {authority}, eller til den der du bor eller arbeider.",

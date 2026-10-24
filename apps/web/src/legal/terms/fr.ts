@@ -18,8 +18,8 @@ export default {
       blocks: [
         "CoinsLite vous permet de répertorier les pièces, billets et timbres que vous possédez, de les organiser et de suivre ce que vous les avez payés et ce qu’ils valent.",
         [
-          "Formule gratuite : jusqu’à {limit} objets, comptés comme objets quelle que soit leur quantité.",
-          "Premium : des objets en nombre illimité, plus le rapport d’assurance et les exports PDF et CSV. Il est vendu au mois ou à l’année, aux prix affichés sur notre site et dans l’application au moment où vous y passez.",
+          "Formule gratuite : jusqu’à {limit} objets, comptés comme objets quelle que soit leur quantité, et l’export CSV.",
+          "Premium : des objets en nombre illimité, plus le rapport d’assurance, l’export PDF et des étiquettes à imprimer. Il est vendu au mois ou à l’année, aux prix affichés sur notre site et dans l’application au moment où vous y passez.",
         ],
         "Premium est vendu par l’intermédiaire de Polar, qui agit comme revendeur officiel (merchant of record) : Polar est le vendeur que vous payez, gère le paiement et les taxes, et ses propres conditions s’appliquent à l’achat.",
       ],

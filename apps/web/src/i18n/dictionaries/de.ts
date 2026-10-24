@@ -180,7 +180,7 @@ export default {
       },
       export: {
         title: "PDF- und CSV-Export",
-        text: "Jede Ansicht deiner Sammlung, zum Drucken oder zum Aufbewahren, und Etiketten für Münzrähmchen und Slabs. Premium.",
+        text: "Jede Ansicht deiner Sammlung als CSV zum Aufbewahren, in jedem Tarif. Mit Premium als PDF zum Drucken und Etiketten für Münzrähmchen und Slabs.",
       },
       charts: {
         title: "Diagramme",
@@ -219,7 +219,7 @@ export default {
         "Der Katalog, Sets und die Wunschliste",
         "Erhaltung, Prägung, Fotos und Alben",
         "Summen, Diagramme und Spotpreise",
-        "Tabellenimport",
+        "Tabellenimport und CSV-Export",
       ],
       cta: "Gratis starten",
     },
@@ -231,7 +231,7 @@ export default {
       features: [
         "Unbegrenzt viele Objekte",
         "Der Versicherungsbericht",
-        "PDF- und CSV-Export",
+        "PDF-Export",
         "Etiketten für Münzrähmchen und Slabs",
         "Alles aus dem Gratis-Tarif",
       ],

@@ -18,9 +18,10 @@ export async function planOf(
 }
 
 /**
- * For Premium-only features (exports, the Insurance report): the signed-in,
- * set-up person if they're on Premium. Anyone else is turned away:
- * NOT_SIGNED_IN, NOT_SET_UP, or PREMIUM_REQUIRED for the Free plan.
+ * For Premium-only features (the Collection PDF and labels, the Insurance
+ * report): the signed-in, set-up person if they're on Premium. Anyone else
+ * is turned away: NOT_SIGNED_IN, NOT_SET_UP, or PREMIUM_REQUIRED for the
+ * Free plan.
  */
 export async function requirePremium(ctx: QueryCtx) {
   const user = await requireSetUpUser(ctx);

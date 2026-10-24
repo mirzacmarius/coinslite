@@ -133,9 +133,9 @@ _Avoid_: Insurance export, valuation report
 ### Plans
 
 **Free plan**:
-The unpaid plan, limited to 50 Items regardless of their Quantity.
+The unpaid plan, limited to 50 Items regardless of their Quantity. The Collection CSV export is on it too.
 _Avoid_: Basic, trial
 
 **Premium**:
-The paid plan. It unlocks an unlimited number of Items, the insurance report, the Collection exports (PDF and CSV) and labels to print.
+The paid plan. It unlocks an unlimited number of Items, the insurance report, the Collection PDF and labels to print.
 _Avoid_: Pro, subscription (as the name of the plan)

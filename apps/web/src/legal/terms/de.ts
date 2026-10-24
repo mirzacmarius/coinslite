@@ -18,8 +18,8 @@ export default {
       blocks: [
         "Mit CoinsLite erfasst du die Münzen, Banknoten und Briefmarken, die du besitzt, ordnest sie und behältst im Blick, was du bezahlt hast und was sie wert sind.",
         [
-          "Gratis-Tarif: bis zu {limit} Objekte, gezählt als Objekte, unabhängig von ihrer Anzahl.",
-          "Premium: unbegrenzt viele Objekte, dazu der Versicherungsbericht und der Export als PDF und CSV. Es wird monatlich oder jährlich verkauft, zu den Preisen, die auf unserer Website und beim Umstieg in der App angezeigt werden.",
+          "Gratis-Tarif: bis zu {limit} Objekte, gezählt als Objekte, unabhängig von ihrer Anzahl, und der Export als CSV.",
+          "Premium: unbegrenzt viele Objekte, dazu der Versicherungsbericht, der Export als PDF und Etiketten zum Drucken. Es wird monatlich oder jährlich verkauft, zu den Preisen, die auf unserer Website und beim Umstieg in der App angezeigt werden.",
         ],
         "Premium wird über Polar verkauft, das als Händler (Merchant of Record) auftritt: Polar ist der Verkäufer, an den du zahlst, wickelt Zahlung und Steuern ab, und für den Kauf gelten Polars eigene Bedingungen.",
       ],

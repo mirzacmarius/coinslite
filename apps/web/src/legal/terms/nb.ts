@@ -18,8 +18,8 @@ export default {
       blocks: [
         "Med CoinsLite kan du registrere myntene, sedlene og frimerkene du eier, organisere dem og holde oversikt over hva du betalte og hva de er verdt.",
         [
-          "Gratisplan: opptil {limit} objekter, telt som objekter uansett antall.",
-          "Premium: ubegrenset antall objekter, pluss forsikringsrapporten og eksport til PDF og CSV. Selges per måned eller per år, til prisene som vises på nettstedet vårt og i appen når du oppgraderer.",
+          "Gratisplan: opptil {limit} objekter, telt som objekter uansett antall, og eksport til CSV.",
+          "Premium: ubegrenset antall objekter, pluss forsikringsrapporten, eksport til PDF og etiketter til utskrift. Selges per måned eller per år, til prisene som vises på nettstedet vårt og i appen når du oppgraderer.",
         ],
         "Premium selges gjennom Polar, som er forhandler (merchant of record): Polar er selgeren du betaler, håndterer betaling og avgifter, og Polars egne vilkår gjelder for kjøpet.",
       ],

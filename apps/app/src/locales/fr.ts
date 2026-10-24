@@ -1050,10 +1050,11 @@ export default {
   },
   billing: {
     currentPlan: "Votre formule",
-    freeDescription: "Jusqu’à {limit} objets, quelle que soit leur quantité.",
+    freeDescription:
+      "Jusqu’à {limit} objets, quelle que soit leur quantité, et l’export CSV.",
     premium: "Premium",
     premiumDescription:
-      "Objets illimités, le rapport d’assurance, l’export CSV et PDF et des étiquettes à imprimer.",
+      "Objets illimités, le rapport d’assurance, l’export PDF et des étiquettes à imprimer.",
     billingPeriod: "Période de facturation",
     monthly: "Mensuel",
     yearly: "Annuel",
@@ -1473,7 +1474,7 @@ export default {
     tooLarge:
       "Votre collection est trop volumineuse pour être exportée d’un coup\u00a0: plutôt que d’omettre des objets, elle n’est pas exportée.",
     premiumOnly:
-      "L’export de votre collection et l’impression d’étiquettes font partie de Premium.",
+      "L’export PDF et l’impression d’étiquettes font partie de Premium.",
     failed: "Impossible d’exporter la collection. Réessayez.",
     fileName: "coinslite-collection-{date}.csv",
   },

@@ -1032,10 +1032,11 @@ export default {
   },
   billing: {
     currentPlan: "Din plan",
-    freeDescription: "Opptil {limit} objekter, uansett antall.",
+    freeDescription:
+      "Opptil {limit} objekter, uansett antall, og eksport til CSV.",
     premium: "Premium",
     premiumDescription:
-      "Ubegrenset antall objekter, forsikringsrapporten, eksport til CSV og PDF og etiketter til utskrift.",
+      "Ubegrenset antall objekter, forsikringsrapporten, eksport til PDF og etiketter til utskrift.",
     billingPeriod: "Faktureringsperiode",
     monthly: "Månedlig",
     yearly: "Årlig",
@@ -1451,7 +1452,7 @@ export default {
     tooLarge:
       "Samlingen din er for stor til å eksporteres på én gang, så den eksporteres ikke i stedet for å mangle objekter.",
     premiumOnly:
-      "Eksport av samlingen og utskrift av etiketter er en del av Premium.",
+      "Eksport til PDF og utskrift av etiketter er en del av Premium.",
     failed: "Samlingen kunne ikke eksporteres. Prøv igjen.",
     fileName: "coinslite-samling-{date}.csv",
   },
