@@ -139,6 +139,13 @@ const expectedTotals: CollectionTotals = {
     banknote: { purchasePrice: 0, marketValue: 500_00 },
     stamp: { purchasePrice: 30_00, marketValue: 36_00 },
   },
+  byCountry: [{ key: "", items: 4, marketValue: 21_536_00 }],
+  byDecade: [{ key: "", items: 4, marketValue: 21_536_00 }],
+  byMaterial: [
+    { key: "gold", items: 1, marketValue: 21_000_00 },
+    { key: "silver", items: 1, marketValue: 0 },
+    { key: "", items: 2, marketValue: 536_00 },
+  ],
   metals: {
     gold: { fineWeight: 31.1034768, value: 20_000_00 },
     silver: { fineWeight: 31.1034768, value: 250_00 },
@@ -221,6 +228,72 @@ describe("Collection totals", () => {
       gold: { fineWeight: 31.1034768, value: null },
       silver: { fineWeight: 31.1034768, value: null },
     });
+  });
+});
+
+describe("the breakdowns by country, decade and material", () => {
+  const recorded = Date.UTC(2026, 0, 1, 12);
+  const items: TotalsItem[] = [
+    {
+      _creationTime: recorded,
+      type: "coin",
+      quantity: 2,
+      marketValue: 100_00,
+      country: "NO",
+      year: 1887,
+      material: "silver",
+    },
+    {
+      _creationTime: recorded,
+      type: "coin",
+      quantity: 1,
+      marketValue: 50_00,
+      country: "NO",
+      year: 1889,
+      // A precious metal stands in for the material.
+      metal: "silver",
+    },
+    {
+      _creationTime: recorded,
+      type: "coin",
+      quantity: 1,
+      marketValue: 400_00,
+      country: "US",
+      year: 1921,
+      material: "copper",
+    },
+    // 45 BC, with no country, Market value or material.
+    { _creationTime: recorded, type: "banknote", quantity: 1, year: -45 },
+  ];
+
+  test("count Items and add up Market value × Quantity, largest first, Items without the fact last", () => {
+    const totals = pageTotals(items, context);
+    expect(totals.byCountry).toEqual([
+      { key: "US", items: 1, marketValue: 400_00 },
+      { key: "NO", items: 2, marketValue: 250_00 },
+      { key: "", items: 1, marketValue: 0 },
+    ]);
+    expect(totals.byDecade).toEqual([
+      { key: "1920", items: 1, marketValue: 400_00 },
+      { key: "1880", items: 2, marketValue: 250_00 },
+      { key: "-50", items: 1, marketValue: 0 },
+    ]);
+    expect(totals.byMaterial).toEqual([
+      { key: "copper", items: 1, marketValue: 400_00 },
+      { key: "silver", items: 2, marketValue: 250_00 },
+      { key: "", items: 1, marketValue: 0 },
+    ]);
+  });
+
+  test("add up across pages as in one", () => {
+    const whole = pageTotals(items, context);
+    const combined = combineTotals(
+      pageTotals(items.slice(0, 2), context),
+      pageTotals(items.slice(2), context),
+    );
+    expect(combined.byCountry).toEqual(whole.byCountry);
+    expect(combined.byDecade).toEqual(whole.byDecade);
+    expect(combined.byMaterial).toEqual(whole.byMaterial);
   });
 });
 

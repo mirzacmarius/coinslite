@@ -11,6 +11,7 @@ import {
   CommandList,
 } from "@coinslite/ui/command";
 import { FilterChip } from "@coinslite/ui/filter-chip";
+import { Input } from "@coinslite/ui/input";
 import { Kbd } from "@coinslite/ui/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@coinslite/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@coinslite/ui/tooltip";
@@ -69,6 +70,12 @@ function FilterCommand({
         value={query}
         onValueChange={setQuery}
       />
+      {current?.range && (
+        <RangeForm
+          range={current.range}
+          onApply={(yearFrom, yearTo) => onChange({ yearFrom, yearTo })}
+        />
+      )}
       <CommandList>
         {current ? (
           <CommandGroup>
@@ -142,6 +149,72 @@ function FilterCommand({
         )}
       </CommandList>
     </Command>
+  );
+}
+
+/** A year typed in: a whole number, or undefined for anything else, blanks included. */
+function yearTyped(text: string) {
+  const trimmed = text.trim();
+  if (!/^-?\d{1,4}$/.test(trimmed)) return undefined;
+  return Number(trimmed);
+}
+
+/**
+ * The Year filter's range, typed in: from and to, either left open, applied
+ * with Enter or the button. Its keys stay in the form, so the list beneath
+ * neither moves nor picks on them.
+ */
+function RangeForm({
+  range,
+  onApply,
+}: {
+  range: NonNullable<Filter["range"]>;
+  onApply: (from: number | undefined, to: number | undefined) => void;
+}) {
+  const t = useI18n();
+  const [from, setFrom] = useState(
+    range.from === undefined ? "" : String(range.from),
+  );
+  const [to, setTo] = useState(range.to === undefined ? "" : String(range.to));
+  const typed = [yearTyped(from), yearTyped(to)];
+  const empty = typed[0] === undefined && typed[1] === undefined;
+  const field = (
+    label: string,
+    value: string,
+    onChange: (value: string) => void,
+    suggestion: number | undefined,
+  ) => (
+    <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-muted-foreground">
+      {label}
+      <Input
+        inputMode="numeric"
+        autoComplete="off"
+        value={value}
+        placeholder={suggestion === undefined ? undefined : String(suggestion)}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-7 px-2 text-ui"
+      />
+    </label>
+  );
+  return (
+    <form
+      className="flex items-end gap-1.5 border-b px-2 py-2"
+      onKeyDown={(event) => event.stopPropagation()}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (empty) return;
+        const [a, b] = typed;
+        // A range typed backwards is meant the other way round.
+        if (a !== undefined && b !== undefined && a > b) onApply(b, a);
+        else onApply(a, b);
+      }}
+    >
+      {field(t("collection.yearRange.fromLabel"), from, setFrom, range.min)}
+      {field(t("collection.yearRange.toLabel"), to, setTo, range.max)}
+      <Button type="submit" variant="subtle" size="xs" disabled={empty}>
+        {t("collection.yearRange.apply")}
+      </Button>
+    </form>
   );
 }
 

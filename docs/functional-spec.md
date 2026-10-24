@@ -139,6 +139,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 ### 5.7 Item detail
 - Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, Purchase price, Market value, purchase date and source, notes and Album.
 - For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once the Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
+- **Value history:** the Item's Market value each time it was changed (at most one point a month), newest first, with the change since the one before and the Quantity when that changed; an Item priced once shows a single line.
 - **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album tags, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
 - Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
 
@@ -215,6 +216,7 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - total Purchase price, total Market value, Gain/loss
   - gold and silver Metal value with the total fine weight, shown only when non-zero
   - With a search or filter on (the sold view alone doesn't count), the section leads with the same figures for **the current view**, headed "This view", and keeps the whole Collection's (on the sold view, all sold Items') beneath. The collapsed summary line shows the view's figures then. The charts stay the whole Collection's.
+  - **Breakdown:** the Items and Market value of each country, decade and material the Items span (a coin's precious metal standing in for a missing material), largest Market value first with a bar per row, the groups past the sixth folded into "Other" and the Items without the fact last. Of the current view while a search or filter is on, else the whole Collection; not on the sold view.
 - **Charts:**
   - An Item's **Date acquired** is its purchase date, or when it was recorded in CoinsLite if that is earlier or it has no purchase date. Purchase dates before 1900 count as 1900.
   - **Value over time:** what the Collection was worth at the end of each month, from the month its first Item was acquired to now: Purchase price, the latest Market value as of that month, and the Metal value of gold and silver at that month's Spot price. Until its first recorded Market value, an Item with a purchase date counts at its Purchase price; an Item that has never had a Market value adds none. Sold Items leave the series from their sale month.
@@ -227,6 +229,8 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
   - a specific country
   - denomination
   - Grade
+  - year: a range typed in (from, to, or both), or one of the decades the Items span, each with counts; an Item without a year is outside any range
+  - material, each with counts; a coin's precious metal stands in for a missing material
   - Album: all, one Album, or without an Album, each with counts
   - Kept in: one place, or no place recorded, each with counts; places that differ only in capitals, accents or spacing count as one
   - from the Overview's Needs attention (§9) only: without a Market value, without any photo, or (coins and banknotes) without a Grade

@@ -14,7 +14,12 @@ import { unpricedTotals } from "./collectionTotals";
 import { bulkLimits } from "./items/bulkRules";
 import { itemWithThumbnail } from "./items/thumbnail";
 import { requireSetUpUser } from "./utils/auth";
-import { gradingScale, homeCurrency, language } from "./utils/validators";
+import {
+  gradingScale,
+  homeCurrency,
+  language,
+  material,
+} from "./utils/validators";
 
 const pageArgs = {
   view: collectionView,
@@ -72,6 +77,9 @@ const filterCountsResult = v.object({
   withoutAlbum: v.number(),
   storages: v.array(v.object({ storage: v.string(), count: v.number() })),
   withoutStorage: v.number(),
+  decades: v.array(v.object({ decade: v.number(), count: v.number() })),
+  years: v.union(v.null(), v.object({ min: v.number(), max: v.number() })),
+  materials: v.array(v.object({ material, count: v.number() })),
   entry: v.number(),
   statuses: v.object({ owned: v.number(), sold: v.number() }),
 });

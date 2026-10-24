@@ -2,6 +2,7 @@
 
 import { useMoney } from "@/components/account/home-currency-change";
 import { AlbumDot } from "@/components/albums/album-colours";
+import { gainLossColour } from "@/components/collection-totals/collection-totals";
 import { useAlbums } from "@/components/albums/use-albums";
 import { CatalogSourceCredit } from "@/components/catalog/catalog-credit";
 import { catalogNodeHref, setHref } from "@/components/catalog/catalog-levels";
@@ -601,6 +602,7 @@ export function ItemDetail() {
             </Fact>
             <Fact label={t("items.source")}>{item.source}</Fact>
           </FactSection>
+          <ValueHistorySection item={item} money={money} />
           {item.type === "coin" && (item.metal || item.bullion) && (
             <FactSection title={t("preciousMetal.title")}>
               <Fact label={t("preciousMetal.metal")}>
@@ -664,6 +666,76 @@ export function ItemDetail() {
 }
 
 /** An Item that doesn't exist, or isn't the person's, with the way back to the Collection. */
+/**
+ * The Item's Market value each time it was changed (spec 5.7), newest first,
+ * with the change since the one before and the Quantity when that changed;
+ * an Item priced once shows a single line. Nothing until the history is in,
+ * or for an Item never priced.
+ */
+function ValueHistorySection({
+  item,
+  money,
+}: {
+  item: {
+    _id: string;
+    _creationTime: number;
+    addedAt?: number;
+    marketValue?: number;
+    quantity: number;
+  };
+  money: ItemMoney;
+}) {
+  const t = useI18n();
+  const format = useFormatters();
+  const history = useQuery(api.items.marketValueHistory, { itemId: item._id });
+  if (!history) return null;
+  // An Item from before history was kept counts as it is now, as the totals do.
+  const points =
+    history.length === 0 && item.marketValue !== undefined
+      ? [
+          {
+            at: item.addedAt ?? item._creationTime,
+            marketValue: item.marketValue,
+            quantity: item.quantity,
+          },
+        ]
+      : history;
+  if (points.length === 0) return null;
+  // Newest first, each with the point before it in time.
+  const rows = points
+    .map((point, index) => ({ ...point, before: points[index - 1] }))
+    .reverse();
+  return (
+    <FactSection title={t("items.valueHistory")}>
+      {rows.map(({ at, marketValue, quantity, before }) => {
+        const change =
+          marketValue !== undefined && before?.marketValue !== undefined
+            ? marketValue - before.marketValue
+            : undefined;
+        return (
+          <Fact key={at} label={format.date(at)}>
+            {marketValue === undefined
+              ? t("items.valueHistoryCleared")
+              : money(marketValue)}
+            {change !== undefined && change !== 0 && (
+              <span className={cn("ml-2", gainLossColour(change))}>
+                {money(change, { signed: true })}
+              </span>
+            )}
+            {before !== undefined && before.quantity !== quantity && (
+              <span className="ml-2 text-muted-foreground">
+                {t("items.valueHistoryQuantity", {
+                  count: format.number(quantity),
+                })}
+              </span>
+            )}
+          </Fact>
+        );
+      })}
+    </FactSection>
+  );
+}
+
 export function ItemNotFound({ parent }: { parent: React.ReactNode }) {
   const t = useI18n();
   return (

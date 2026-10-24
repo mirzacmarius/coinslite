@@ -6,7 +6,7 @@ import { attentionKinds } from "../items/attention";
 import { catalogEntryByKey, itemResolver } from "../items/resolve";
 import { withThumbnail } from "../items/thumbnail";
 import { pageTotals } from "../items/totals";
-import { gradingScale, itemType } from "../utils/validators";
+import { gradingScale, itemType, material } from "../utils/validators";
 import { type CollectionView, collectionSorts } from "./view";
 import {
   type ViewContext,
@@ -35,6 +35,9 @@ export const collectionView = v.object({
   notInAlbum: v.optional(v.string()),
   entry: v.optional(v.string()),
   storage: v.optional(v.string()),
+  yearFrom: v.optional(v.number()),
+  yearTo: v.optional(v.number()),
+  material: v.optional(material),
   without: v.optional(
     v.union(...attentionKinds.map((kind) => v.literal(kind))),
   ),

@@ -931,3 +931,36 @@ export const catalogEntry = query({
     return link;
   },
 });
+
+/**
+ * An Item's Market value history (items/valueHistory.ts), oldest first, for
+ * the Item page's "Value history": when each point was recorded, the Market
+ * value per piece then (absent once it was cleared) and the Quantity. Null
+ * for an Item that isn't the signed-in person's.
+ */
+export const marketValueHistory = query({
+  args: { itemId: v.string() },
+  returns: v.union(
+    v.null(),
+    v.array(
+      v.object({
+        at: v.number(),
+        marketValue: v.optional(v.number()),
+        quantity: v.number(),
+      }),
+    ),
+  ),
+  handler: async (ctx, { itemId }) => {
+    const owner = await requireSetUpUser(ctx);
+    const id = ctx.db.normalizeId("items", itemId);
+    const item = id ? await ctx.db.get(id) : null;
+    if (!item || item.ownerId !== owner._id) return null;
+    return (await historyOf(ctx, item._id)).map(
+      ({ at, marketValue, quantity }) => ({
+        at,
+        ...(marketValue !== undefined && { marketValue }),
+        quantity,
+      }),
+    );
+  },
+});

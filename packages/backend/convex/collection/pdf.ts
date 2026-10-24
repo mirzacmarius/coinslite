@@ -70,6 +70,18 @@ function scopeLines({ view, albumName, ownCountry, locale }: PdfContents) {
       labels.columns.storage,
       view.storage === withoutStorage ? messages.withoutStorage : view.storage,
     );
+  const { yearFrom, yearTo } = view;
+  if (yearFrom !== undefined || yearTo !== undefined)
+    add(
+      labels.columns.year,
+      yearFrom !== undefined && yearTo !== undefined
+        ? `${yearFrom}–${yearTo}`
+        : yearFrom !== undefined
+          ? messages.yearRange.from(String(yearFrom))
+          : messages.yearRange.to(String(yearTo)),
+    );
+  if (view.material)
+    add(labels.columns.material, labels.materials[view.material]);
   return lines.length > 0 ? lines : [messages.wholeCollection];
 }
 

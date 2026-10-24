@@ -8,7 +8,8 @@ import {
   referenceName,
   stampCatalogueNames,
 } from "../items/references";
-import { itemGainLoss } from "../items/totals";
+import type { Material } from "../items/rules";
+import { decadeOf, itemGainLoss } from "../items/totals";
 import {
   type CollectionSort,
   type CollectionView,
@@ -200,6 +201,8 @@ const dimensions = [
   "country",
   "denomination",
   "grade",
+  "year",
+  "material",
   "album",
   "storage",
   "entry",
@@ -218,6 +221,7 @@ function filtersFor(
   const denomination =
     view.denomination === undefined ? undefined : textKey(view.denomination);
   const grade = view.grade;
+  const { yearFrom, yearTo } = view;
   const storage =
     view.storage === undefined || view.storage === withoutStorage
       ? view.storage
@@ -241,6 +245,15 @@ function filtersFor(
     grade: (item) =>
       grade === undefined ||
       (item.gradingScale === grade.gradingScale && item.grade === grade.grade),
+    // Either end open; an Item without a year is outside any range.
+    year: (item) =>
+      (yearFrom === undefined && yearTo === undefined) ||
+      (item.year !== undefined &&
+        (yearFrom === undefined || item.year >= yearFrom) &&
+        (yearTo === undefined || item.year <= yearTo)),
+    material: (item) =>
+      view.material === undefined ||
+      (item.material ?? item.metal) === view.material,
     album: (item) =>
       (view.album === undefined ||
         (view.album === withoutAlbum
@@ -331,6 +344,9 @@ export function countFilterOptions(
     string,
     { gradingScale: GradingScale; grade: string; count: number }
   >();
+  const decades = new Map<number, number>();
+  let years: { min: number; max: number } | null = null;
+  const materials = new Map<Material, number>();
   const albums = new Map<Id<"albums">, number>();
   let withoutAlbums = 0;
   const storages = new Map<string, { storage: string; count: number }>();
@@ -377,6 +393,20 @@ export function countFilterOptions(
           count: 1,
         });
     }
+    if (counts("year") && item.year !== undefined) {
+      add(decades, decadeOf(item.year));
+      years =
+        years === null
+          ? { min: item.year, max: item.year }
+          : {
+              min: Math.min(years.min, item.year),
+              max: Math.max(years.max, item.year),
+            };
+    }
+    if (counts("material")) {
+      const material = item.material ?? item.metal;
+      if (material) add(materials, material);
+    }
     if (counts("album")) {
       if (item.albumId === undefined) withoutAlbums += 1;
       else add(albums, item.albumId);
@@ -413,6 +443,16 @@ export function countFilterOptions(
           (scaleOrder.get(b.gradingScale) ?? 0) ||
         gradeRank(b.gradingScale, b.grade) - gradeRank(a.gradingScale, a.grade),
     ),
+    /** Each decade the Items' years fall in, by its first year, oldest first. */
+    decades: [...decades]
+      .map(([decade, count]) => ({ decade, count }))
+      .sort((a, b) => a.decade - b.decade),
+    /** The earliest and latest year among the Items; null without any. */
+    years,
+    /** Each material the Items are made of (a coin's precious metal standing in), most used first. */
+    materials: [...materials]
+      .map(([material, count]) => ({ material, count }))
+      .sort((a, b) => byCount(a, b) || a.material.localeCompare(b.material)),
     albums: [...albums]
       .map(([albumId, count]) => ({ albumId, count }))
       .sort(byCount),

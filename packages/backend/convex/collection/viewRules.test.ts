@@ -243,6 +243,43 @@ describe("the Kept in filter", () => {
   });
 });
 
+describe("the year range and material filters", () => {
+  const dated = [
+    item("old", 1, { title: "Old silver", year: 1887, material: "silver" }),
+    item("mid", 2, { title: "Mid copper", year: 1921, material: "copper" }),
+    // A precious metal stands in for the material.
+    item("new", 3, { title: "New silver", year: 2001, metal: "silver" }),
+    item("undated", 4, { title: "Undated" }),
+  ];
+  const ids = (view: CollectionView) =>
+    itemsInView(dated, view, context).map((each) => each._id as string);
+
+  test("a range keeps the Items issued within it, either end open", () => {
+    expect(ids({ yearFrom: 1900, yearTo: 1999 })).toEqual(["mid"]);
+    expect(ids({ yearTo: 1899 })).toEqual(["old"]);
+    expect(ids({ yearFrom: 1900 })).toEqual(["mid", "new"]);
+  });
+
+  test("a material matches the Item's own, or its precious metal", () => {
+    expect(ids({ material: "silver" })).toEqual(["old", "new"]);
+    expect(ids({ material: "copper", yearTo: 1899 })).toEqual([]);
+  });
+
+  test("counts decades oldest first, the span of years, and materials most used first", () => {
+    const counted = countFilterOptions(dated, {}, context);
+    expect(counted.decades).toEqual([
+      { decade: 1880, count: 1 },
+      { decade: 1920, count: 1 },
+      { decade: 2000, count: 1 },
+    ]);
+    expect(counted.years).toEqual({ min: 1887, max: 2001 });
+    expect(counted.materials).toEqual([
+      { material: "silver", count: 2 },
+      { material: "copper", count: 1 },
+    ]);
+  });
+});
+
 describe("search across the Item's texts", () => {
   const texts = [
     item("fair", 1, {

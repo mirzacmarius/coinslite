@@ -1,5 +1,6 @@
 import type { AttentionKind } from "../items/attention";
 import type { GradingScale, ItemType } from "../items/grades";
+import type { Material } from "../items/rules";
 
 /**
  * A view of the Collection: what a person searched for, how they narrowed it
@@ -71,6 +72,11 @@ export type CollectionView = {
    * accents or spacing, or `withoutStorage`.
    */
   storage?: string;
+  /** Only Items issued from this year on, or up to this year, or both. */
+  yearFrom?: number;
+  yearTo?: number;
+  /** What the Items are made of; a coin's precious metal stands in without one. */
+  material?: Material;
   /**
    * Only the Items without a Market value, without any photo, or (coins and
    * banknotes) without a Grade, as the Overview counts them (items/attention.ts).

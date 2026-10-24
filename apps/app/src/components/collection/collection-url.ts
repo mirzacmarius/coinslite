@@ -20,6 +20,11 @@ import {
   gradingScaleIds,
   isGrade,
 } from "@coinslite/backend/convex/items/grades";
+import {
+  type Material,
+  itemLimits,
+  materials,
+} from "@coinslite/backend/convex/items/rules";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { itemTypes } from "../items/item-fields";
@@ -28,7 +33,7 @@ import { itemTypes } from "../items/item-fields";
  * The Collection view lives in the URL, so any view can be bookmarked or
  * shared: ?q=krone&type=coin&bullion=1&origin=own&country=NO
  * &denomination=1%20krone&grade=european:XF&album=…&storage=Safe%202
- * &status=sold&sort=price&page=2.
+ * &yearFrom=1800&yearTo=1899&material=silver&status=sold&sort=price&page=2.
  * ?addTo=<Album> picks Items to add to that Album: the view leaves out the
  * Items already in it. ?entry=<key> shows the Items made from one Catalog
  * entry, ?storage=none the Items with no Kept in place, and
@@ -39,6 +44,13 @@ import { itemTypes } from "../items/item-fields";
 
 const oneOf = <T extends string>(values: readonly T[], value: string | null) =>
   values.find((candidate) => candidate === value);
+
+/** A year as the URL carries it: a whole number the Item form would take. */
+function yearParam(value: string | null) {
+  if (value === null || !/^-?\d{1,4}$/.test(value)) return undefined;
+  const year = Number(value);
+  return year >= itemLimits.earliestYear ? year : undefined;
+}
 
 export function readCollectionUrl(params: URLSearchParams) {
   const view: CollectionView = {};
@@ -67,6 +79,16 @@ export function readCollectionUrl(params: URLSearchParams) {
   if (entry) view.entry = entry.slice(0, searchLimit);
   const storage = params.get("storage")?.trim();
   if (storage) view.storage = storage.slice(0, searchLimit);
+  // A range written backwards is meant the other way round.
+  const years = [params.get("yearFrom"), params.get("yearTo")].map(yearParam);
+  const [yearFrom, yearTo] =
+    years[0] !== undefined && years[1] !== undefined && years[0] > years[1]
+      ? [years[1], years[0]]
+      : years;
+  if (yearFrom !== undefined) view.yearFrom = yearFrom;
+  if (yearTo !== undefined) view.yearTo = yearTo;
+  const material = oneOf<Material>(materials, params.get("material"));
+  if (material) view.material = material;
   const without = oneOf<AttentionKind>(attentionKinds, params.get("without"));
   if (without) view.without = without;
   if (params.get("status") === "sold") view.status = "sold";
@@ -151,6 +173,10 @@ export function writeCollectionUrl(view: CollectionView, page: number) {
   if (view.notInAlbum) params.set("addTo", view.notInAlbum);
   if (view.entry) params.set("entry", view.entry);
   if (view.storage) params.set("storage", view.storage);
+  if (view.yearFrom !== undefined)
+    params.set("yearFrom", String(view.yearFrom));
+  if (view.yearTo !== undefined) params.set("yearTo", String(view.yearTo));
+  if (view.material) params.set("material", view.material);
   if (view.without) params.set("without", view.without);
   if (view.status) params.set("status", view.status);
   if (view.sort && view.sort !== defaultSort) params.set("sort", view.sort);
