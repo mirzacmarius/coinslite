@@ -22,7 +22,8 @@ const rowClass =
 const iconClass = "size-4 shrink-0 text-muted-foreground";
 
 /** The subscription behind Premium; undefined while loading or on the Free plan. */
-const useSubscription = () => useQuery(api.billing.status, {})?.subscription;
+export const useSubscription = () =>
+  useQuery(api.billing.status, {})?.subscription;
 
 /** Account's header line for a Premium member: "Yearly · Renews on 9 Oct 2027". */
 export function SubscriptionSummary() {
@@ -103,7 +104,7 @@ export function ManageSubscription({
 }
 
 /** Account's way to Premium on the Free plan: Plans, which offers it. */
-export function UpgradeLink() {
+export function AccountUpgradeLink() {
   const t = useI18n();
   return (
     <Link href={upgradeHref} className={rowClass}>

@@ -1,9 +1,9 @@
 "use client";
 
 import {
+  AccountUpgradeLink,
   ManageSubscription,
   SubscriptionSummary,
-  UpgradeLink,
 } from "@/components/billing/account-plan";
 import { InsuranceReportLink } from "@/components/insurance-report/insurance-report-link";
 import { AppearancePicker, PalettePicker } from "@/components/preferences";
@@ -88,7 +88,7 @@ export function AccountPage() {
             <DeleteAccountButton />
           </ManageSubscription>
         ) : (
-          <UpgradeLink />
+          <AccountUpgradeLink />
         )}
         <PhoneAccountLinks />
         <UpdatesLink />

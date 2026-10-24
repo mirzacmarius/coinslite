@@ -1,5 +1,6 @@
 "use client";
 
+import { useSubscription } from "@/components/billing/account-plan";
 import { useI18n } from "@/locales/client";
 import { useFormatters } from "@/locales/use-formatters";
 import { api } from "@coinslite/backend/convex/_generated/api";
@@ -21,7 +22,7 @@ import { typedWord } from "./confirm-word";
  */
 export function DeleteAccountButton() {
   const t = useI18n();
-  const subscription = useQuery(api.billing.status, {})?.subscription;
+  const subscription = useSubscription();
   // The dialog and the server check again, counting every subscription.
   const renews = subscription ? !subscription.cancelAtPeriodEnd : false;
   const [deleting, setDeleting] = useState(false);

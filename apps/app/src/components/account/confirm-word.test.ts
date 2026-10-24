@@ -13,6 +13,7 @@ describe("typedWord", () => {
 
   test("accents don't matter, for keyboards without those letters", () => {
     expect(typedWord("loschen", "LÖSCHEN")).toBe(true);
+    expect(typedWord("LOESCHEN", "LÖSCHEN")).toBe(true);
     expect(typedWord("sterge", "ȘTERGE")).toBe(true);
     // The cedilla Ş that older Romanian keyboards type.
     expect(typedWord("ŞTERGE", "ȘTERGE")).toBe(true);
@@ -23,5 +24,6 @@ describe("typedWord", () => {
     expect(typedWord("DELET", "DELETE")).toBe(false);
     expect(typedWord("DELETE ME", "DELETE")).toBe(false);
     expect(typedWord("CANCEL", "DELETE")).toBe(false);
+    expect(typedWord("LOSHEN", "LÖSCHEN")).toBe(false);
   });
 });

@@ -25,7 +25,7 @@ What CoinsLite must do for its first release. It covers behaviour only. Screen s
 - **Password reset:** request a link by email, then set a new password.
 - **Change email:** a confirmation link goes to the new address. The change applies once it's confirmed.
 - **Sign out.**
-- **Delete account:** from Account: on Premium inside Manage subscription, after the way to change or cancel the plan; on the Free plan beside Sign out. A subscription that would renew must be cancelled first: until then the button is greyed out and pressing it says so. The confirmation states what goes, and its button stays off until the person types a word (DELETE, in their language).
+- **Delete account:** from Account: on Premium inside Manage subscription, after the way to change or cancel the plan; on the Free plan beside Sign out. A subscription that would renew must be cancelled first: until then, on Premium, the button is greyed out and pressing it says so (the confirmation and the server refuse it too). The confirmation states what goes, and its button stays off until the person types a word (DELETE, in their language).
   - Asking deactivates the account at once and emails the owner. A deactivated account can only be reactivated, deleted now, or signed out of; everything else is closed to it. Deleting it now needs a sign-in in the last 15 minutes, so a session left open elsewhere can't.
   - 14 days later a last email asks the owner to delete it now, or to reactivate it (and choose a plan again).
   - Without either, it stays deactivated for 7 more days and is then deleted without further warning.

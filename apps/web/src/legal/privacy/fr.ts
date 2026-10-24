@@ -93,7 +93,7 @@ export default {
       blocks: [
         "Nous conservons vos données tant que vous avez un compte.",
         [
-          "Supprimer votre compte (Compte, puis Supprimer le compte) efface définitivement votre profil, vos méthodes de connexion et vos sessions, vos objets, albums et photos, et le lien avec votre abonnement. L’essentiel disparaît immédiatement ; le reste d’une grande collection suit peu après en arrière-plan.",
+          "Supprimer votre compte (Compte, puis Supprimer le compte ; avec Premium, dans Gérer l’abonnement) efface définitivement votre profil, vos méthodes de connexion et vos sessions, vos objets, albums et photos, et le lien avec votre abonnement. L’essentiel disparaît immédiatement ; le reste d’une grande collection suit peu après en arrière-plan.",
           "Ce qui reste est la trace qu’un identifiant de compte a été supprimé, sans nommer personne, afin qu’un message tardif de Polar à son sujet mette fin à l’abonnement concerné.",
           "Un compte en formule gratuite auquel personne ne se connecte reçoit un e-mail après 6, 8 et 12 mois, puis est supprimé 14 jours après le dernier, qui en indique la date. Se connecter relance le décompte.",
           "Si vous commencez à créer un compte ou demandez un lien de connexion sans jamais confirmer votre adresse e-mail, ce que nous avons enregistré pour cela est supprimé au bout de 7 jours.",
