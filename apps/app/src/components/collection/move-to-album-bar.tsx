@@ -89,6 +89,13 @@ export function MoveToAlbumBar({
   const moveToAlbum = useMutation(api.items.moveToAlbum);
   const undoMove = useMutation(api.items.undoMove);
   const [capped, setCapped] = useState(false);
+  // The view's Items as Select all last found them. While they're all still
+  // selected there's nothing more to select; the count alone can't tell, as
+  // the selection may hold Items from other views too.
+  const [wholeView, setWholeView] = useState<{
+    view: string;
+    itemIds: Id<"items">[];
+  }>();
   const [moving, setMoving] = useState(false);
   const [failed, setFailed] = useState<string>();
   // The More menu's dialog; each opening starts it afresh.
@@ -97,6 +104,8 @@ export function MoveToAlbumBar({
   });
   const { count, selected, isSelected } = selection;
   const itemIds = [...selected.keys()];
+  // The Items, not their order, make the view.
+  const viewKey = JSON.stringify({ ...view, sort: undefined });
 
   const select = (leftOut: number) => {
     setCapped(leftOut > 0);
@@ -110,6 +119,10 @@ export function MoveToAlbumBar({
       setFailed(t("collection.moveFailed"));
       return;
     }
+    setWholeView({
+      view: viewKey,
+      itemIds: found.items.map(({ _id }) => _id),
+    });
     select(
       selection.add(found.items) +
         Math.max(0, found.total - found.items.length),
@@ -120,9 +133,19 @@ export function MoveToAlbumBar({
   const onePage = result.total <= result.items.length;
   const pageSelected = result.items.every(({ _id }) => isSelected(_id));
   const allSelected =
-    pageSelected && count >= Math.min(result.total, bulkLimits.items);
+    pageSelected &&
+    wholeView?.view === viewKey &&
+    wholeView.itemIds.every(isSelected);
   const album = albums?.find(({ _id }) => _id === addTo);
-  const inAnAlbum = [...selected.values()].some((albumId) => albumId !== null);
+  // The Album each selected Item is in: as this page now shows it, else as
+  // it was when selected.
+  const onPage = new Map(
+    result.items.map(({ _id, albumId }) => [_id, albumId ?? null]),
+  );
+  const albumsNow = [...selected].map(([itemId, albumId]) =>
+    onPage.has(itemId) ? (onPage.get(itemId) ?? null) : albumId,
+  );
+  const inAnAlbum = albumsNow.some((albumId) => albumId !== null);
   const note =
     capped &&
     t("collection.selectedFirst", { limit: format.number(bulkLimits.items) });
@@ -149,23 +172,36 @@ export function MoveToAlbumBar({
     },
   });
 
-  /** Moves the selected Items into `to`, or out of any Album with null. */
+  /**
+   * Moves the selected Items into `to`, or out of any Album with null. The
+   * toast says how many left another Album, so a mistaken pick shows while
+   * Undo is offered.
+   */
   const move = async (to: PickedAlbum | null) => {
     setMoving(true);
     setFailed(undefined);
+    const fromOtherAlbums = to
+      ? albumsNow.filter((albumId) => albumId !== null && albumId !== to._id)
+          .length
+      : 0;
     try {
       const { before } = await moveToAlbum({ itemIds, albumId: to?._id });
       toast.success(
         to
           ? t("collection.movedTo", { album: to.name })
           : t("collection.takenOut", { count }),
-        before.length > 0
-          ? offerUndo(
+        {
+          ...(before.length > 0 &&
+            offerUndo(
               () => undoMove({ before, albumId: to?._id }),
               t("collection.moveUndone"),
               (counts) => t("collection.moveUndoneSkipped", counts),
-            )
-          : undefined,
+            )),
+          description:
+            fromOtherAlbums > 0
+              ? t("collection.fromOtherAlbums", { count: fromOtherAlbums })
+              : undefined,
+        },
       );
       selection.stop();
       onLeave?.();

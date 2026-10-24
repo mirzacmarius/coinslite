@@ -959,6 +959,9 @@ export default {
     "takenOut#one": "1 objekt tatt ut av albumet sitt",
     "takenOut#few": "{count} objekter tatt ut av albumene sine",
     "takenOut#other": "{count} objekter tatt ut av albumene sine",
+    "fromOtherAlbums#one": "1 objekt ble flyttet fra et annet album",
+    "fromOtherAlbums#few": "{count} objekter ble flyttet fra andre album",
+    "fromOtherAlbums#other": "{count} objekter ble flyttet fra andre album",
     moveFailed: "Objektene kunne ikke flyttes. Prøv igjen.",
     moveUndone: "Flyttingen er angret",
     moveUndoneSkipped:

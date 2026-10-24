@@ -945,6 +945,9 @@ export default {
     "takenOut#one": "1 Item taken out of its Album",
     "takenOut#few": "{count} Items taken out of their Albums",
     "takenOut#other": "{count} Items taken out of their Albums",
+    "fromOtherAlbums#one": "1 Item left another Album",
+    "fromOtherAlbums#few": "{count} Items left other Albums",
+    "fromOtherAlbums#other": "{count} Items left other Albums",
     moveFailed: "The Items couldn't be moved. Try again.",
     moveUndone: "Move undone",
     moveUndoneSkipped:

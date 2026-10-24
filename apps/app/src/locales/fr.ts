@@ -975,6 +975,9 @@ export default {
     "takenOut#one": "{count} objet retiré de son album",
     "takenOut#few": "{count} objets retirés de leurs albums",
     "takenOut#other": "{count} objets retirés de leurs albums",
+    "fromOtherAlbums#one": "{count} objet a été retiré d’un autre album",
+    "fromOtherAlbums#few": "{count} objets ont été retirés d’autres albums",
+    "fromOtherAlbums#other": "{count} objets ont été retirés d’autres albums",
     moveFailed: "Les objets n’ont pas pu être déplacés. Réessayez.",
     moveUndone: "Déplacement annulé",
     moveUndoneSkipped:

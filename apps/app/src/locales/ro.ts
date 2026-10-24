@@ -963,6 +963,10 @@ export default {
     "takenOut#one": "1 obiect scos din album",
     "takenOut#few": "{count} obiecte scoase din albume",
     "takenOut#other": "{count} de obiecte scoase din albume",
+    "fromOtherAlbums#one": "1 obiect a fost mutat din alt album",
+    "fromOtherAlbums#few": "{count} obiecte au fost mutate din alte albume",
+    "fromOtherAlbums#other":
+      "{count} de obiecte au fost mutate din alte albume",
     moveFailed: "Obiectele nu au putut fi mutate. Încearcă din nou.",
     moveUndone: "Mutarea a fost anulată",
     moveUndoneSkipped:

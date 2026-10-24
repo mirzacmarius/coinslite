@@ -987,6 +987,11 @@ export default {
     "takenOut#one": "1 Objekt aus seinem Album genommen",
     "takenOut#few": "{count} Objekte aus ihren Alben genommen",
     "takenOut#other": "{count} Objekte aus ihren Alben genommen",
+    "fromOtherAlbums#one": "1 Objekt wurde aus einem anderen Album verschoben",
+    "fromOtherAlbums#few":
+      "{count} Objekte wurden aus anderen Alben verschoben",
+    "fromOtherAlbums#other":
+      "{count} Objekte wurden aus anderen Alben verschoben",
     moveFailed:
       "Die Objekte konnten nicht verschoben werden. Versuche es noch einmal.",
     moveUndone: "Verschieben rückgängig gemacht",

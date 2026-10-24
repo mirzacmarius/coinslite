@@ -7,6 +7,7 @@ import { PropertyPicker } from "@coinslite/ui/property-picker";
 import { cn } from "@coinslite/ui/utils";
 import { useMutation } from "convex/react";
 import { FolderOpen, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { AlbumDot } from "./album-colours";
 import { useAlbumError, useAlbums } from "./use-albums";
 
@@ -15,7 +16,7 @@ export type PickedAlbum = { _id: Id<"albums">; name: string };
 
 /**
  * The person's Albums as a picker's options, and the way to create one from
- * a typed name, which then counts as picked.
+ * a typed name, which then counts as picked; `creating` while it's created.
  */
 function useAlbumOptions(
   onPick: (album: PickedAlbum) => void,
@@ -25,8 +26,10 @@ function useAlbumOptions(
   const albums = useAlbums();
   const createAlbum = useMutation(api.albums.create);
   const albumError = useAlbumError();
+  const [creating, setCreating] = useState(false);
   return {
     albums,
+    creating,
     choices: {
       options: (albums ?? []).map((album) => ({
         value: album._id,
@@ -37,10 +40,13 @@ function useAlbumOptions(
       noResults: t("items.noMatches"),
       createLabel: (name: string) => t("albums.createNamed", { name }),
       onCreate: async (name: string) => {
+        setCreating(true);
         try {
           onPick({ _id: await createAlbum({ name }), name });
         } catch (failure) {
           onCreateFailed(albumError(failure, t("albums.errors.createFailed")));
+        } finally {
+          setCreating(false);
         }
       },
     },
@@ -83,8 +89,8 @@ export function AlbumPicker({
 /**
  * Select mode's Add to Album: picking an Album, or typing a new name to
  * create one, moves the selected Items into it at once. With `onTakeOut`
- * (some are in an Album), "Take out of Albums" comes first. Spins while
- * `moving`.
+ * (some are in an Album), "Take out of Albums" comes first. Spins, and
+ * takes no other pick, while a new Album is created and while `moving`.
  */
 export function AddToAlbumButton({
   moving,
@@ -100,14 +106,15 @@ export function AddToAlbumButton({
   className?: string;
 }) {
   const t = useI18n();
-  const { albums, choices } = useAlbumOptions(onPick, onCreateFailed);
+  const { albums, creating, choices } = useAlbumOptions(onPick, onCreateFailed);
+  const busy = creating || moving;
 
   return (
     <PropertyPicker
       action
-      disabled={moving}
-      icon={moving ? Loader2 : FolderOpen}
-      className={cn(moving && "[&_svg]:animate-spin", className)}
+      disabled={busy}
+      icon={busy ? Loader2 : FolderOpen}
+      className={cn(busy && "[&_svg]:animate-spin", className)}
       label={t("albums.album")}
       placeholder={t("albums.addToAlbum")}
       value={undefined}
