@@ -265,6 +265,16 @@ export function Charts({ totals }: { totals: ShownTotals }) {
   );
 }
 
+/** Charts while the totals load, holding their place on the page. */
+export function ChartsSkeleton() {
+  return (
+    <div className="grid gap-4 lg:grid-cols-2" aria-hidden="true">
+      <div className="h-72 animate-pulse rounded-xl bg-card" />
+      <div className="h-72 animate-pulse rounded-xl bg-card" />
+    </div>
+  );
+}
+
 /** Figures in one card, pulsing while their totals are still `counting`. */
 function FiguresCard({
   counting,

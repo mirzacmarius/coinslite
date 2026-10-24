@@ -4,6 +4,7 @@ import { useConvertingTo } from "@/components/account/home-currency-change";
 import { seriesColorVariables } from "@/components/collection-totals/chart-card";
 import {
   Charts,
+  ChartsSkeleton,
   FiguresSkeleton,
   TotalsFigures,
 } from "@/components/collection-totals/collection-totals";
@@ -27,9 +28,9 @@ import { useQuery } from "convex/react";
 import { useId, useState } from "react";
 
 /**
- * Where the Collection stands (spec 9): the totals, the value charts and the
- * breakdown, then the latest Items, the Sets closest to complete, what needs
- * attention, how many entries are on the Wantlist, and on phones the Spot
+ * Where the Collection stands (spec 9): the totals, the value charts, the
+ * latest Items, the Sets closest to complete, what needs attention, the
+ * breakdown, how many entries are on the Wantlist, and on phones the Spot
  * prices and how much of the Free plan is used (wider screens have them in
  * the sidebar). The charts, breakdown, Set progress and Needs attention are
  * each left out when they would be empty; the charts and breakdown also
@@ -38,8 +39,9 @@ import { useId, useState } from "react";
  * An empty Collection shows the start card instead (StartCard): its first
  * way in adds an Item, and there are no totals or Items yet.
  * The header appears the moment a link is clicked. Until it's known whether
- * the Collection is empty, the totals and Items show skeletons, so the start
- * card doesn't appear and then vanish.
+ * the Collection is empty, the totals, charts and Items show skeletons, so
+ * the start card doesn't appear and then vanish, nor the charts push the
+ * Items down.
  */
 export function Overview() {
   const t = useI18n();
@@ -87,11 +89,10 @@ export function Overview() {
             )}
           </section>
         )}
-        {owned && (
-          <>
-            <Charts totals={owned} />
-            <Insights totals={owned} />
-          </>
+        {owned ? (
+          <Charts totals={owned} />
+        ) : (
+          !firstRun && (totals === undefined || deciding) && <ChartsSkeleton />
         )}
         {firstRun ? (
           <StartCard
@@ -111,6 +112,7 @@ export function Overview() {
             )}
           </div>
         )}
+        {owned && <Insights totals={owned} />}
         <WantlistCard />
         {/* From tablet width up, the sidebar's footer shows these. */}
         <div className="flex min-w-0 flex-col gap-4 md:hidden">

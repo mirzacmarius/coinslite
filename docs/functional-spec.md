@@ -290,7 +290,7 @@ The Collection page is for finding and working with Items: a short summary strip
 
 ## 9. Overview (home)
 
-Where the Collection stands, in this order: the totals, the charts and the breakdown, then Latest Items, Set progress, Needs attention and the Wantlist.
+Where the Collection stands, in this order: the totals and the charts, then Latest Items, Set progress and Needs attention, then the breakdown and the Wantlist.
 
 - **Totals over the whole Collection**, each clearly labelled as counting Items or pieces:
   - number of Items; number of pieces per Item type. The pieces card opens the Collection.
