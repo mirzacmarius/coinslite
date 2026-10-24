@@ -387,6 +387,14 @@ export default {
       languageNotSaved:
         "Limba nu a putut fi salvată în cont, așa că s-a schimbat doar pe acest dispozitiv.",
     },
+    data: {
+      title: "Export și import",
+      importHint:
+        "Adu în CoinsLite o colecție existentă dintr-un fișier CSV, de exemplu o foaie Excel salvată ca CSV sau o listă din Numista, OpenNumismat ori CoinManage.",
+      export: "Exportă colecția",
+      exportHint:
+        "Întreaga colecție, inclusiv obiectele vândute, într-un fișier CSV care se deschide în Excel și în alte programe de calcul tabelar.",
+    },
     email: {
       title: "E-mail",
       change: "Schimbă adresa de e-mail",
@@ -1443,18 +1451,18 @@ export default {
     },
   },
   collectionExport: {
-    menu: "Export și import",
+    print: "Tipărește",
     "inView#zero": "Niciun obiect în această vizualizare",
     "inView#one": "1 obiect în această vizualizare",
     "inView#few": "{count} obiecte în această vizualizare",
     "inView#other": "{count} de obiecte în această vizualizare",
     csv: "Exportă ca CSV",
-    pdf: "Exportă ca PDF",
+    pdf: "Listă ca PDF",
     pdfTooLarge:
-      "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o exporta.",
+      "Un PDF cuprinde cel mult {limit} de obiecte. Restrânge vizualizarea pentru a o tipări.",
     tooLarge:
       "Colecția ta este prea mare pentru a fi exportată dintr-odată, așa că nu este exportată în loc să lipsească obiecte.",
-    premiumOnly: "Exportul PDF și tipărirea etichetelor fac parte din Premium.",
+    premiumOnly: "Tipărirea listelor și a etichetelor face parte din Premium.",
     failed: "Colecția nu a putut fi exportată. Încearcă din nou.",
     fileName: "coinslite-colectie-{date}.csv",
   },

@@ -252,20 +252,21 @@ The Collection page is for finding and working with Items: a short summary strip
     - delete them, with a confirmation
   - A move, a Grade, a purchase or a tag can be undone from its confirmation while it shows. Items changed since are left as they are, and the confirmation says how many.
 - **Views:** list or grid. Page size 15, 25 or 50. The chosen view and page size are remembered on the device. On a phone the list leaves out the amounts: each row shows its title and facts, with × Quantity and the Grade on the right.
-- **Layout:** search, filters, display and export sit at the top of the page and stay in reach while it scrolls, followed by the active filters, the summary strip and the Albums, then the Items.
-- **Export, covering the current filtered view:** the CSV on both plans, so a collector's data can always leave with them; the PDF on Premium, where the Free plan's menu shows the way to Premium instead.
+- **Layout:** search, filters, display and printing sit at the top of the page and stay in reach while it scrolls, followed by the active filters, the summary strip and the Albums, then the Items.
+- **Print, covering the current filtered view (Premium):** the toolbar's Print menu makes a PDF list of the view's Items, or prints their labels (see Labels below). On the Free plan the menu shows the way to Premium instead.
   - **PDF, A4 landscape:**
     - Header: scope, generation time, owner, number of Items, total Purchase price, total Market value, Gain/loss.
     - One row per Item: type, title, year, denomination, Grade, Quantity, purchase date, Purchase price × Quantity, Market value × Quantity, difference.
     - A totals row and page numbers.
+- **Export (CSV), of the whole Collection:** from Account (§12), on both plans, so a collector's data can always leave with them: the owned Items, then the sold ones, each in the default order. Importing the file reads it as it is.
   - **CSV:** UTF-8 with BOM, RFC 4180 quoting. Columns: type, title, year, denomination, Grade, Grading scale, Strike, material, country, Quantity, Purchase price, Market value, currency, purchase date, source, Kept in, tags (parted by commas), sold on, sale price, sale note, grader, certificate number, stamp catalogue, catalogue number, perforation, watermark, colour, serial number, signatures, printer.
-- **Labels (Premium):** a PDF of label sheets to print, made on the server in the active language: from the Export menu for the view's Items in its order, from select mode for the selected Items, and from the Item page for one Item. On the Free plan the dialog shows the way to Premium.
+- **Labels (Premium):** a PDF of label sheets to print, made on the server in the active language: from the Print menu for the view's Items in its order, from select mode for the selected Items, and from the Item page for one Item. On the Free plan the dialog shows the way to Premium.
   - **Sizes:** small (44.45 × 12.7 mm, the strip of a 2×2 flip), medium (38.1 × 21.2 mm, the back of a slab or a holder) and large (63.5 × 38.1 mm on A4, 66.7 × 25.4 mm on Letter: a box, tray or envelope).
   - **Paper:** A4 or US Letter. The sheets line up with Avery L7651 (medium) and L7160 (large) on A4 and Avery 5167 (small) and 5160 (large) on Letter, or the same sizes from other makers. Small labels on A4 and medium ones on Letter print as a grid with faint lines to cut along.
   - **Each label:** the title; the country, denomination, year and mint mark the title doesn't already hold; the Grade (with BU or Proof outside the Sheldon scale), the Numista number (not on small labels) and × Quantity (not when printing per piece). Optionally the Purchase price (with its date on large labels) and the Market value, per piece, and a QR code that opens the Item (medium and large labels). A line too wide shrinks, then is cut short with "…"; lines that don't fit are left out from the last, so the amounts go first.
   - One label per Item, or one per piece. Labels already used on the first sheet can be skipped, so a part-used sheet can go through the printer again.
   - The choices, except the labels to skip, are remembered on the device. One PDF holds up to 1,000 labels; a larger view is narrowed first.
-- **Import (CSV):** from the Export menu, and from the first-run prompt (§9). A CSV file of up to 5 MB and 2,000 rows below its headings, its cells split by commas, semicolons or tabs, in UTF-8 (or Windows-1252, as older Windows programs save). Nothing is added until the person confirms.
+- **Import (CSV):** from Account (§12), and from the first-run prompt (§9). A CSV file of up to 5 MB and 2,000 rows below its headings, its cells split by commas, semicolons or tabs, in UTF-8 (or Windows-1252, as older Windows programs save). Nothing is added until the person confirms.
   - **Columns:** a Collection export, its headings in any of the five languages or as the raw column keys, is read as it is. Any other file, such as a list saved from Numista, OpenNumismat or CoinManage or a spreadsheet, first shows **Check the columns**: each heading with a few of its cells and the field CoinsLite guessed for it from the names those apps and spreadsheets use, in the five languages. A guess is kept only when most of the column's cells read for that field (OpenNumismat's "Type" of "Circulating" isn't an Item type). The person changes any guess or leaves a column out; each field goes to one column. The preview can go back to the columns.
   - Besides the export's columns a file can hold notes, Album, Catalog entry key, the denomination's unit (joined to the denomination, as OpenNumismat splits "1" and "krone"), series, mint mark, ruler, mintage, the Numista number (kept on the Item as its cross-reference, written "N# 1234" or "1234") and the Grade note.
   - Rows without an Item type take the one the person chooses, coin at first. When the dates written with the year last don't show whether the day or the month comes first, the person chooses; otherwise the dates tell.
@@ -368,6 +369,7 @@ Where the Collection stands, in this order: the totals and the charts, then Late
   - Albums
   - Updates, marked when there's an unseen release
   - Insurance report, locked with an upgrade path on the Free plan
+- **Export and import:** import Items from a CSV file (§7), such as an Excel sheet saved as CSV or a list from Numista, OpenNumismat or CoinManage, and export the whole Collection, sold Items included, as a CSV file that Excel and other spreadsheets open (§7).
 - **Send feedback:** a free-text message that reaches the team by email.
 - **Sign out.** Delete account sits with the plan, beside Manage subscription (§2).
 

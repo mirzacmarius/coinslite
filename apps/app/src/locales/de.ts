@@ -396,6 +396,14 @@ export default {
       languageNotSaved:
         "Die Sprache konnte nicht in deinem Konto gespeichert werden und gilt nur auf diesem Gerät.",
     },
+    data: {
+      title: "Export und Import",
+      importHint:
+        "Übernimm eine bestehende Sammlung aus einer CSV-Datei in CoinsLite, etwa eine als CSV gespeicherte Excel-Tabelle oder eine Liste aus Numista, OpenNumismat oder CoinManage.",
+      export: "Sammlung exportieren",
+      exportHint:
+        "Deine ganze Sammlung, verkaufte Objekte eingeschlossen, in einer CSV-Datei, die Excel und andere Tabellenkalkulationen öffnen.",
+    },
     email: {
       title: "E-Mail",
       change: "E-Mail ändern",
@@ -1483,19 +1491,18 @@ export default {
     },
   },
   collectionExport: {
-    menu: "Export und Import",
+    print: "Drucken",
     "inView#zero": "Keine Objekte in dieser Ansicht",
     "inView#one": "1 Objekt in dieser Ansicht",
     "inView#few": "{count} Objekte in dieser Ansicht",
     "inView#other": "{count} Objekte in dieser Ansicht",
     csv: "Als CSV exportieren",
-    pdf: "Als PDF exportieren",
+    pdf: "Liste als PDF",
     pdfTooLarge:
-      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu exportieren.",
+      "Ein PDF enthält bis zu {limit} Objekte. Grenze die Ansicht ein, um sie zu drucken.",
     tooLarge:
       "Deine Sammlung ist zu groß, um sie in einem Durchgang zu exportieren. Statt Objekte auszulassen, wird sie nicht exportiert.",
-    premiumOnly:
-      "Der Export als PDF und der Etikettendruck sind Teil von Premium.",
+    premiumOnly: "Das Drucken von Listen und Etiketten ist Teil von Premium.",
     failed:
       "Die Sammlung konnte nicht exportiert werden. Versuche es noch einmal.",
     fileName: "coinslite-sammlung-{date}.csv",

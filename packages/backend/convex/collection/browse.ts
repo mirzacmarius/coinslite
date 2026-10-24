@@ -19,8 +19,8 @@ import {
 /**
  * Browsing a Collection: reading it for a view (view.ts), then which Items
  * the view shows, in which order, a page at a time (viewRules.ts). The
- * Collection page and the Collection exports both go through here, so the
- * exports cover exactly what the page shows.
+ * Collection page and the Collection exports both go through here, so a
+ * view's PDF and labels cover exactly what the page shows.
  */
 
 /** A Collection view as a function argument; see view.ts. */

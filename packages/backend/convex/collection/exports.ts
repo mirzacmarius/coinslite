@@ -21,7 +21,7 @@ import {
   language,
   strike,
 } from "../utils/validators";
-import { collectionView, findItems } from "./browse";
+import { collectionView, findItems, readForView } from "./browse";
 import { type CsvColumn, csvColumns, exportLabels } from "./exportLabels";
 import { collectionExportErrors, collectionPdfLimits } from "./exportRules";
 import {
@@ -31,14 +31,15 @@ import {
 } from "./labelSheet";
 import { labelSheetContents, labelSource } from "./labelValidators";
 import { withoutAlbum } from "./view";
-import { countryName } from "./viewRules";
+import { countryName, itemsInView } from "./viewRules";
 
 /**
- * The Collection exports: a file of exactly the Items a Collection view
- * shows, in its order, made on the server in the person's language. The CSV
- * is on both plans, so a collector's data can always leave with them; the
- * PDF and the label sheets are Premium. A Collection too large to read in
- * one go isn't exported at all, rather than exported with Items missing.
+ * The Collection exports, made on the server in the person's language: the
+ * whole Collection as a CSV file, on both plans, so a collector's data can
+ * always leave with them; and, on Premium, a PDF list and label sheets of
+ * exactly the Items a Collection view shows, in its order. A Collection too
+ * large to read in one go isn't exported at all, rather than exported with
+ * Items missing.
  */
 
 /** Every Home currency divides into 100 minor units (packages/i18n). */
@@ -113,30 +114,40 @@ function csvRecord(item: Doc<"items">, currency: HomeCurrency, locale: Locale) {
 }
 
 /**
- * The Collection view as a CSV file for spreadsheets, on either plan: UTF-8
- * with a byte order mark, RFC 4180 quoting, a header row, then one row per
- * Item in the view's order. Headings and names (Item type, Grade, material,
+ * The whole Collection as a CSV file for spreadsheets, on either plan:
+ * UTF-8 with a byte order mark, RFC 4180 quoting, a header row, then one row
+ * per Item, the owned ones and then the sold ones, each in the Collection
+ * page's default order. Headings and names (Item type, Grade, material,
  * country…) are in the person's language; numbers and dates are plain
- * (1250.50, 2024-03-05).
+ * (1250.50, 2024-03-05). Importing the file reads it as it is.
  */
 export const csv = query({
   args: {
-    view: collectionView,
-    /** The file's language, and the one country names are searched in; the person's own by default. */
+    /** The file's language; the person's own by default. */
     locale: v.optional(language),
+    /** Ignored: kept for apps still open from when the CSV covered a view. */
+    view: v.optional(collectionView),
   },
   returns: v.string(),
-  handler: async (ctx, { view, locale }) => {
+  handler: async (ctx, { locale }) => {
     const owner = await requireSetUpUser(ctx);
     // Mid-change, its amounts would be in two currencies.
     refuseWhileChanging(owner);
     const written = locale ?? owner.language ?? defaultLocale;
-    const { items, complete } = await findItems(ctx, owner, view, written);
+    const { items, complete, context } = await readForView(
+      ctx,
+      owner,
+      {},
+      written,
+    );
     if (!complete) throw new ConvexError(collectionExportErrors.incomplete);
     const labels = exportLabels[written];
     return formatCsvFile([
       csvColumns.map((column) => labels.columns[column]),
-      ...items.map((item) => csvRecord(item, owner.homeCurrency, written)),
+      ...[
+        ...itemsInView(items, {}, context),
+        ...itemsInView(items, { status: "sold" }, context),
+      ].map((item) => csvRecord(item, owner.homeCurrency, written)),
     ]);
   },
 });
