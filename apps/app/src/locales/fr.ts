@@ -1436,7 +1436,7 @@ export default {
     menuItem: "Importer depuis un CSV…",
     title: "Importer des objets",
     description:
-      "Choisissez un fichier CSV organisé comme l’export de la collection, jusqu’à {size} et {rows} lignes. Rien n’est ajouté avant votre confirmation.",
+      "Choisissez un fichier CSV : un export de la collection, ou une liste enregistrée depuis Numista, OpenNumismat, CoinManage ou un tableur, jusqu’à {size} et {rows} lignes. Rien n’est ajouté avant votre confirmation.",
     choose: "Choisir un fichier CSV",
     chooseAnother: "Choisir un autre fichier",
     reading: "Lecture du fichier…",
@@ -1454,6 +1454,10 @@ export default {
     "linked#few": "{count} lignes sont liées au catalogue",
     "linked#other": "{count} lignes sont liées au catalogue",
     ignored: "Colonnes ignorées : {names}",
+    unreadCountries:
+      "Les pays que CoinsLite ne connaît pas vont dans les notes : {names}",
+    unreadGrades:
+      "Les états que CoinsLite ne sait pas lire vont dans la note sur l’état : {names}",
     "freeLimit#zero":
       "Votre formule gratuite n’a plus de place pour des objets.",
     "freeLimit#one":
@@ -1477,6 +1481,23 @@ export default {
     "imported#one": "1 objet importé",
     "imported#few": "{count} objets importés",
     "imported#other": "{count} objets importés",
+    columns: {
+      title: "Vérifier les colonnes",
+      hint: "CoinsLite a deviné le contenu de chaque colonne. Modifiez une supposition ou laissez une colonne de côté.",
+      inFile: "Dans le fichier",
+      inCoinsLite: "Dans CoinsLite",
+      empty: "Vide",
+      fieldFor: "Champ pour {heading}",
+      leaveOut: "Laisser de côté",
+      unit: "Unité de la valeur faciale",
+      catalogEntry: "Clé de l’entrée du catalogue",
+      itemType: "Type d’objet des lignes qui n’en ont pas",
+      dateOrder: "Dans les dates comme 05/03/2024, le premier nombre est",
+      dayFirst: "Le jour",
+      monthFirst: "Le mois",
+      continue: "Continuer",
+      check: "Vérifier les colonnes",
+    },
     reasons: {
       unknownType: "le type d’objet n’est ni pièce, ni billet, ni timbre",
       unknownScale: "CoinsLite ne connaît pas cette échelle de qualité",
@@ -1487,8 +1508,7 @@ export default {
       invalidNumber: "un nombre n’est pas entier",
       invalidYear: "l’année est hors limites",
       invalidQuantity: "la quantité n’est pas un nombre entier d’au moins 1",
-      invalidDate:
-        "une date n’est pas une vraie date passée au format AAAA-MM-JJ",
+      invalidDate: "une date n’est pas une vraie date passée",
       otherCurrency: "la devise n’est pas votre devise de référence",
       homeCurrencyChanging:
         "un montant est indiqué alors que votre devise de référence est en cours de changement",
@@ -1509,7 +1529,8 @@ export default {
         "Impossible de lire le fichier en CSV : un guillemet n’est jamais fermé.",
       noRows: "Le fichier n’a aucune ligne sous ses en-têtes.",
       noKnownHeadings:
-        "Aucun en-tête du fichier n’est une colonne de l’export de la collection.",
+        "Aucune colonne du fichier ne va vers un champ de CoinsLite.",
+      invalidColumns: "Chaque champ ne peut aller qu’à une seule colonne.",
       failed: "Impossible de lire le fichier. Réessayez.",
       stoppedAt: "L’importation s’est arrêtée à la ligne {row} : {reason}.",
       stopped: "L’importation s’est arrêtée.",

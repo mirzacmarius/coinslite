@@ -177,7 +177,7 @@ export default {
       },
       import: {
         title: "Import de tableur",
-        text: "Jusqu’à 2 000 lignes depuis un fichier CSV, vérifiées avant tout enregistrement.",
+        text: "Jusqu’à 2 000 lignes d’un fichier CSV issu de Numista, OpenNumismat, CoinManage ou de votre tableur, vérifiées avant tout enregistrement.",
       },
       export: {
         title: "Export PDF et CSV",
@@ -250,7 +250,7 @@ export default {
       {
         question: "Puis-je importer mon tableur ?",
         answer:
-          "Oui. Importez un CSV jusqu’à 2 000 lignes, avec des en-têtes dans l’une des cinq langues. Vous voyez quelles lignes seront ajoutées, et pourquoi d’autres ne le seront pas, avant tout enregistrement. Les {limit} objets de la formule gratuite s’appliquent toujours.",
+          "Oui. Importez un CSV jusqu’à 2 000 lignes : votre propre tableur, ou un fichier issu de Numista, OpenNumismat ou CoinManage. CoinsLite devine le contenu de chaque colonne, dans l’une des cinq langues, et vous le vérifiez. Vous voyez quelles lignes seront ajoutées, et pourquoi d’autres ne le seront pas, avant tout enregistrement. Les {limit} objets de la formule gratuite s’appliquent toujours.",
       },
       {
         question: "Que se passe-t-il si j’arrête de payer Premium ?",

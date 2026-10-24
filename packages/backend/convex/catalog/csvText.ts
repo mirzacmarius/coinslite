@@ -9,8 +9,11 @@ export type ParsedCsv =
   /** A quote opened on this record (1 = the first) and never closed. */
   | { unclosedQuoteAt: number };
 
-/** The file's records. A leading byte order mark is ignored; lines end in CRLF or LF. */
-export function parseCsv(text: string): ParsedCsv {
+/**
+ * The file's records. A leading byte order mark is ignored; lines end in
+ * CRLF or LF. Cells are split at commas, or at the `delimiter` given.
+ */
+export function parseCsv(text: string, delimiter = ","): ParsedCsv {
   const records: string[][] = [];
   let record: string[] = [];
   let field = "";
@@ -45,7 +48,7 @@ export function parseCsv(text: string): ParsedCsv {
     if (char === '"' && field === "" && !fieldIsQuoted) {
       quoted = true;
       fieldIsQuoted = true;
-    } else if (char === ",") {
+    } else if (char === delimiter) {
       endField();
     } else if (char === "\r" || char === "\n") {
       endRecord();

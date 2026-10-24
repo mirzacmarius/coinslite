@@ -176,7 +176,7 @@ export default {
       },
       import: {
         title: "Import fra regneark",
-        text: "Opptil 2 000 rader fra en CSV-fil, sjekket før noe lagres.",
+        text: "Opptil 2 000 rader fra en CSV-fil lagret fra Numista, OpenNumismat, CoinManage eller ditt eget regneark, sjekket før noe lagres.",
       },
       export: {
         title: "PDF- og CSV-eksport",
@@ -249,7 +249,7 @@ export default {
       {
         question: "Kan jeg ta med regnearket mitt?",
         answer:
-          "Ja. Importer en CSV-fil med opptil 2 000 rader, med kolonneoverskrifter på hvilket som helst av de fem språkene. Du ser hvilke rader som legges til, og hvorfor andre ikke gjør det, før noe lagres. Gratisplanens {limit} objekter gjelder fortsatt.",
+          "Ja. Importer en CSV-fil med opptil 2 000 rader: fra ditt eget regneark, eller lagret fra Numista, OpenNumismat eller CoinManage. CoinsLite gjetter hva hver kolonne inneholder, på alle de fem språkene, og du sjekker det. Du ser hvilke rader som legges til, og hvorfor andre ikke gjør det, før noe lagres. Gratisplanens {limit} objekter gjelder fortsatt.",
       },
       {
         question: "Hva skjer hvis jeg slutter å betale for Premium?",

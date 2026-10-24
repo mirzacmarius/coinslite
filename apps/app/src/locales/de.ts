@@ -1459,7 +1459,7 @@ export default {
     menuItem: "Aus CSV importieren …",
     title: "Objekte importieren",
     description:
-      "Wähle eine CSV-Datei im Aufbau des Sammlungsexports, bis {size} und {rows} Zeilen. Erst wenn du bestätigst, wird etwas hinzugefügt.",
+      "Wähle eine CSV-Datei: einen Sammlungsexport oder eine Liste aus Numista, OpenNumismat, CoinManage oder einer Tabelle, bis {size} und {rows} Zeilen. Erst wenn du bestätigst, wird etwas hinzugefügt.",
     choose: "CSV-Datei wählen",
     chooseAnother: "Andere Datei wählen",
     reading: "Datei wird gelesen …",
@@ -1477,6 +1477,10 @@ export default {
     "linked#few": "{count} Zeilen werden mit dem Katalog verknüpft",
     "linked#other": "{count} Zeilen werden mit dem Katalog verknüpft",
     ignored: "Ignorierte Spalten: {names}",
+    unreadCountries:
+      "Länder, die CoinsLite nicht kennt, kommen in die Notizen: {names}",
+    unreadGrades:
+      "Erhaltungen, die CoinsLite nicht lesen kann, kommen in die Notiz zur Erhaltung: {names}",
     "freeLimit#zero":
       "Dein kostenloser Plan hat keinen Platz für weitere Objekte.",
     "freeLimit#one": "Dein kostenloser Plan hat Platz für 1 weiteres Objekt.",
@@ -1499,6 +1503,23 @@ export default {
     "imported#one": "1 Objekt importiert",
     "imported#few": "{count} Objekte importiert",
     "imported#other": "{count} Objekte importiert",
+    columns: {
+      title: "Spalten prüfen",
+      hint: "CoinsLite hat erraten, was jede Spalte enthält. Ändere eine Vermutung oder lass eine Spalte weg.",
+      inFile: "In der Datei",
+      inCoinsLite: "Feld in CoinsLite",
+      empty: "Leer",
+      fieldFor: "Feld für {heading}",
+      leaveOut: "Weglassen",
+      unit: "Einheit des Nennwerts",
+      catalogEntry: "Schlüssel des Katalogeintrags",
+      itemType: "Objektart für Zeilen ohne eine",
+      dateOrder: "In Daten wie 05/03/2024 ist die erste Zahl",
+      dayFirst: "Der Tag",
+      monthFirst: "Der Monat",
+      continue: "Weiter",
+      check: "Spalten prüfen",
+    },
     reasons: {
       unknownType: "die Objektart ist weder Münze, Banknote noch Briefmarke",
       unknownScale: "die Erhaltungsskala kennt CoinsLite nicht",
@@ -1509,8 +1530,7 @@ export default {
       invalidNumber: "eine Zahl ist keine ganze Zahl",
       invalidYear: "das Jahr liegt außerhalb des gültigen Bereichs",
       invalidQuantity: "die Anzahl ist keine ganze Zahl ab 1",
-      invalidDate:
-        "ein Datum ist kein echtes vergangenes Datum im Format JJJJ-MM-TT",
+      invalidDate: "ein Datum ist kein echtes vergangenes Datum",
       otherCurrency: "die Währung ist nicht deine Heimatwährung",
       homeCurrencyChanging:
         "ein Betrag ist angegeben, während deine Heimatwährung geändert wird",
@@ -1530,8 +1550,8 @@ export default {
       unreadable:
         "Die Datei lässt sich nicht als CSV lesen: Ein Anführungszeichen wird nie geschlossen.",
       noRows: "Die Datei hat unter den Überschriften keine Zeilen.",
-      noKnownHeadings:
-        "Keine Überschrift der Datei ist eine Spalte des Sammlungsexports.",
+      noKnownHeadings: "Keine Spalte der Datei geht an ein Feld in CoinsLite.",
+      invalidColumns: "Jedes Feld kann nur an eine Spalte gehen.",
       failed: "Die Datei konnte nicht gelesen werden. Versuche es noch einmal.",
       stoppedAt: "Der Import hat bei Zeile {row} angehalten: {reason}.",
       stopped: "Der Import hat angehalten.",

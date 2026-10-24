@@ -175,7 +175,7 @@ export default {
       },
       import: {
         title: "Spreadsheet import",
-        text: "Up to 2,000 rows from a CSV, checked before anything is saved.",
+        text: "Up to 2,000 rows from a CSV saved from Numista, OpenNumismat, CoinManage or your own spreadsheet, checked before anything is saved.",
       },
       export: {
         title: "PDF and CSV export",
@@ -248,7 +248,7 @@ export default {
       {
         question: "Can I bring my spreadsheet?",
         answer:
-          "Yes. Import a CSV of up to 2,000 rows, with headings in any of the five languages. You see which rows will be added, and why any won’t, before anything is saved. The Free plan’s {limit} Items still apply.",
+          "Yes. Import a CSV of up to 2,000 rows: your own, or one saved from Numista, OpenNumismat or CoinManage. CoinsLite guesses what each column holds, in any of the five languages, and you check it. You see which rows will be added, and why any won’t, before anything is saved. The Free plan’s {limit} Items still apply.",
       },
       {
         question: "What happens if I stop paying for Premium?",
