@@ -17,15 +17,15 @@ const typeOrder: readonly ItemType[] = ["coin", "banknote", "stamp"];
 
 type Row = ReportContents["rows"][number];
 
-/** A Grade as the report prints it: "PF-65", "1−", or a stamp's Grade in words. */
-function gradeText(row: Row, messages: ReportMessages) {
+/** A Grade as the report prints it: "PF-65", "1−", "vz", or a stamp's Grade in words. */
+function gradeText(row: Row, messages: ReportMessages, locale: Locale) {
   if (!row.gradingScale || !row.grade) return "";
   if (row.gradingScale === "stamp")
     return (
       messages.stampGrades[row.grade as keyof ReportMessages["stampGrades"]] ??
       ""
     );
-  return gradeCode(row.gradingScale, row.grade, row.strike) ?? "";
+  return gradeCode(row.gradingScale, row.grade, row.strike, locale) ?? "";
 }
 
 /**
@@ -142,7 +142,7 @@ export async function insuranceReportPdf(
       row.title,
       row.year === undefined ? "" : String(row.year),
       row.denomination ?? "",
-      gradeText(row, messages),
+      gradeText(row, messages, locale),
       format.number(row.quantity),
       ...report.columns.map((column) => {
         const value = row.values[column];

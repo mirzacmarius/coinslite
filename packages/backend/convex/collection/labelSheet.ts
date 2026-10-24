@@ -202,6 +202,8 @@ export type LabelItem = Infer<typeof labelItem>;
 
 /** The words a label needs in its language, and how it writes amounts, dates and countries. */
 export type LabelWords = {
+  /** The language, which writes some Grades its own way ("vz", "TTB"). */
+  locale: Locale;
   country: (code: string) => string;
   money: (amountMinor: number) => string;
   date: (date: string) => string;
@@ -251,7 +253,7 @@ export function labelText(
     item.gradingScale && item.grade !== undefined
       ? item.gradingScale === "stamp"
         ? words.stampGrade(item.grade)
-        : gradeCode(item.gradingScale, item.grade, item.strike)
+        : gradeCode(item.gradingScale, item.grade, item.strike, words.locale)
       : undefined;
   // A Sheldon code already says MS or PF.
   const strikeCode =

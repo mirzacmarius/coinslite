@@ -64,7 +64,7 @@ export default {
       },
       grade: {
         title: "Notez son état sur la bonne échelle",
-        text: "Sheldon de 1 à 70 pour une pièce américaine, de 0 à 3 pour une norvégienne, de UNC à G pour la plupart des autres, et des échelles propres aux billets et aux timbres. La frappe est notée à part, et le numéro PCGS ou NGC d’une pièce sous coque l’accompagne.",
+        text: "Sheldon de 1 à 70 pour une pièce américaine, de 0 à 3 pour une norvégienne, de FDC à AB pour la plupart des autres, et des échelles propres aux billets et aux timbres. La frappe est notée à part, et le numéro PCGS ou NGC d’une pièce sous coque l’accompagne.",
       },
       purchase: {
         title: "Notez ce que vous avez payé, et où",

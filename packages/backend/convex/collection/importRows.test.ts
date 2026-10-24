@@ -111,6 +111,43 @@ describe("readImportFile", () => {
     });
   });
 
+  test("reads German and French exports back, Grades in their own codes and scale names old and new", () => {
+    const file = [
+      "Objektart;Titel;Land;Erhaltung;Bewertungsskala",
+      "Münze;5 Mark 1913;DE;vz;Europäisch (unz–ge)",
+      "Münze;2 Mark 1907;DE;ss;Europäisch (UNC–G)",
+      "Münze;10 francs 1965;FR;TTB;Européenne (FDC–AB)",
+    ].join("\n");
+    const read = readImportFile(file);
+    if (typeof read === "string") throw new Error(read);
+    expect(read.rows).toEqual([
+      {
+        row: 2,
+        type: "coin",
+        title: "5 Mark 1913",
+        country: "DE",
+        gradingScale: "european",
+        grade: "XF",
+      },
+      {
+        row: 3,
+        type: "coin",
+        title: "2 Mark 1907",
+        country: "DE",
+        gradingScale: "european",
+        grade: "VF",
+      },
+      {
+        row: 4,
+        type: "coin",
+        title: "10 francs 1965",
+        country: "FR",
+        gradingScale: "european",
+        grade: "VF",
+      },
+    ]);
+  });
+
   test("reads LF line ends without a byte order mark, ignoring headings it doesn't know", () => {
     expect(readImportFile("Item type,Shelf,Title\nCoin,A3,2 øre\n")).toEqual({
       rows: [{ row: 2, type: "coin", title: "2 øre" }],

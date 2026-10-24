@@ -63,7 +63,7 @@ export default {
       },
       grade: {
         title: "Auf der richtigen Skala bewerten",
-        text: "Sheldon 1 bis 70 für eine amerikanische Münze, 0 bis 3 für eine norwegische, UNC bis G für die meisten anderen, und eigene Skalen für Banknoten und Briefmarken. Die Prägung wird eigens erfasst, und die PCGS- oder NGC-Nummer eines Slabs gehört dazu.",
+        text: "Sheldon 1 bis 70 für eine amerikanische Münze, 0 bis 3 für eine norwegische, unz bis ge für die meisten anderen, und eigene Skalen für Banknoten und Briefmarken. Die Prägung wird eigens erfasst, und die PCGS- oder NGC-Nummer eines Slabs gehört dazu.",
       },
       purchase: {
         title: "Festhalten, was du bezahlt hast, und wo",

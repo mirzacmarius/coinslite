@@ -1,49 +1,57 @@
 import { likelyCurrency } from "@/i18n/currency";
 import type { Dictionary } from "@/i18n/dictionary";
 import type { PremiumCurrency } from "@coinslite/backend/convex/billing/rules";
+import {
+  type GradingScale,
+  gradeCode,
+} from "@coinslite/backend/convex/items/grades";
 import { formatMoney, type Locale } from "@coinslite/i18n";
 
 type Money = Record<PremiumCurrency, number>;
 
-/** The example report's rows: values per piece, in minor units. */
+/**
+ * The example report's rows: values per piece, in minor units. Grades are
+ * written as the PDF writes them in each language (a European Grade as
+ * German and French collectors do).
+ */
 const rows: {
   title: string;
-  grade: string;
+  grade: { scale: GradingScale; value: string };
   quantity: number;
   market: Money;
   metal: Money | null;
 }[] = [
   {
     title: "Krugerrand 1 oz 2023",
-    grade: "UNC",
+    grade: { scale: "european", value: "UNC" },
     quantity: 1,
     market: { NOK: 3_800_000, EUR: 330_000, USD: 380_000, RON: 1_650_000 },
     metal: { NOK: 3_650_000, EUR: 317_000, USD: 365_000, RON: 1_585_000 },
   },
   {
     title: "Morgan dollar 1921",
-    grade: "MS-63",
+    grade: { scale: "sheldon", value: "63" },
     quantity: 1,
     market: { NOK: 125_000, EUR: 11_000, USD: 12_000, RON: 55_000 },
     metal: { NOK: 30_000, EUR: 2_700, USD: 3_000, RON: 13_000 },
   },
   {
     title: "Peace dollar 1922",
-    grade: "MS-62",
+    grade: { scale: "sheldon", value: "62" },
     quantity: 3,
     market: { NOK: 45_000, EUR: 4_000, USD: 4_500, RON: 20_000 },
     metal: { NOK: 30_000, EUR: 2_700, USD: 3_000, RON: 13_000 },
   },
   {
     title: "100 kroner 1962",
-    grade: "1",
+    grade: { scale: "norwegian", value: "1" },
     quantity: 1,
     market: { NOK: 60_000, EUR: 5_200, USD: 6_000, RON: 26_000 },
     metal: null,
   },
   {
     title: "Penny Black 1840",
-    grade: "used",
+    grade: { scale: "stamp", value: "used" },
     quantity: 1,
     market: { NOK: 300_000, EUR: 26_000, USD: 30_000, RON: 130_000 },
     metal: null,
@@ -110,7 +118,12 @@ export function Insurance({
                           {line.title}
                         </th>
                         <td>
-                          {line.grade === "used" ? t.sheet.used : line.grade}
+                          {gradeCode(
+                            line.grade.scale,
+                            line.grade.value,
+                            undefined,
+                            locale,
+                          ) ?? t.sheet.used}
                         </td>
                         <td>{line.quantity}</td>
                         <td>{money(line.market)}</td>

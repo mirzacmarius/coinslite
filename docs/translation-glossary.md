@@ -41,6 +41,7 @@ Fixed values:
 | Strike: circulation | omløp | Umlauf | circulation | circulație |
 | Strike: BU | usirkulert kvalitet (BU) | Stempelglanz (BU) | brillant universel (BU) | necirculat lucios (BU) |
 | Strike: proof | proof | Polierte Platte (PP) | belle épreuve (BE) | proof |
+| European Grades: UNC / XF / VF / F / VG / G | UNC / XF / VF / F / VG / G | unz / vz / ss / s / sge / ge | FDC / SUP / TTB / TB / B / AB | UNC / XF / VF / F / VG / G |
 | Stamp Grades: MNH / MH / used | postfrisk / ubrukt med hengsel / stemplet | postfrisch / ungebraucht mit Falz / gestempelt | neuf sans charnière / neuf avec charnière / oblitéré | neștampilat, fără șarnieră / neștampilat, cu șarnieră / ștampilat |
 
 ## Conventions
@@ -49,7 +50,7 @@ Fixed values:
 - **Address.** Norwegian, German and Romanian say *du* / *du* / *tu*; French says *vous*.
 - **Quotes.** Norwegian «…», German „…“, French « … » (with non-breaking spaces), Romanian „…”. Apostrophes are typographic (’) everywhere.
 - **Numbers.** Romanian puts *de* between a number of 20 or more and its noun: "50 de obiecte". Use a `#few` plural form for 2–19 and `#other` (with *de*) for the rest; a fixed limit of 20 or more always takes *de*.
-- **Grade codes** (MS-65, XF, 1+) and the Sheldon scale stay as written; their meanings are translated.
+- **Grade codes** (MS-65, XF, 1+) and the Sheldon scale stay as written; their meanings are translated. The European scale's codes are the exception: German and French write their own (`localGradeCodes` in `packages/backend/convex/items/grades.ts`), with the international code after the meaning.
 - **Not translated.** Catalog data stays as the Catalog has it: entry titles and series names in the issuing country's language, denominations, notes and sources. A country is the exception: a country node is named from its code, in the reader's language. Brand names (Krugerrand, Maple Leaf) stay; a place name in a bullion preset is translated (Wiener Philharmoniker, Philharmonique de Vienne).
 - **Countries** are stored as ISO codes and named by the browser's `Intl.DisplayNames` (`formatCountry` in `@coinslite/i18n`), never typed into a dictionary.
 

@@ -206,7 +206,7 @@ export default {
     scales: {
       sheldon: "Sheldon (1–70)",
       norwegian: "Norwegisch (0–3)",
-      european: "Europäisch (UNC–G)",
+      european: "Europäisch (unz–ge)",
       international: "International (UNC–PR)",
       stamp: "Erhaltung (Briefmarken)",
     },

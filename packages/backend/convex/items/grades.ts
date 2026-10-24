@@ -5,6 +5,8 @@
  * and, where a code has a meaning in words, translated in the app.
  */
 
+import type { Locale } from "@coinslite/i18n";
+
 export type ItemType = "coin" | "banknote" | "stamp";
 
 /** The Sheldon grades in use, best first: 70 down to 1. */
@@ -124,18 +126,48 @@ function sheldonPrefix(grade: number, strike?: Strike) {
   return ["PO", "FR", "AG"][grade - 1] ?? "PO";
 }
 
+type EuropeanGrade = (typeof gradingScales.european.grades)[number];
+
 /**
- * How a Grade is written: "MS-65", "XF", "1−". Stamp grades are words and
- * have no code to show, so they return undefined and the app translates them.
+ * How German and French collectors write the European scale's Grades: "vz"
+ * and "SUP" for XF, "ss" and "TTB" for VF. Those languages show them, with
+ * the international code beside the meaning; the others write the codes.
+ * UNC is "unz" in German, as the BU Strike is already Stempelglanz.
+ */
+export const localGradeCodes: Partial<
+  Record<Locale, Record<EuropeanGrade, string>>
+> = {
+  de: { UNC: "unz", XF: "vz", VF: "ss", F: "s", VG: "sge", G: "ge" },
+  fr: { UNC: "FDC", XF: "SUP", VF: "TTB", F: "TB", VG: "B", G: "AB" },
+};
+
+/** A Grade's own code in a language that writes it differently ("vz" for XF). */
+export function localGradeCode(
+  scale: GradingScale,
+  grade: string,
+  locale: Locale | undefined,
+): string | undefined {
+  if (scale !== "european" || locale === undefined) return undefined;
+  return localGradeCodes[locale]?.[grade as EuropeanGrade];
+}
+
+/**
+ * How a Grade is written: "MS-65", "XF", "1−", and in German or French the
+ * European scale's own codes ("vz", "TTB") when `locale` is given. Stamp
+ * grades are words and have no code to show, so they return undefined and
+ * the app translates them.
  */
 export function gradeCode(
   scale: GradingScale,
   grade: string,
   strike?: Strike,
+  locale?: Locale,
 ): string | undefined {
   if (scale === "stamp") return undefined;
   if (scale === "sheldon")
     return `${sheldonPrefix(Number(grade), strike)}-${grade}`;
+  const local = localGradeCode(scale, grade, locale);
+  if (local) return local;
   // A true minus sign, as the Norwegian scale is printed.
   return grade.replace(/-$/, "−");
 }

@@ -37,6 +37,7 @@ export async function labelSheetPdf(
   const labels = exportLabels[locale];
   const format = formattersFor(locale, { timeZone });
   const words: LabelWords = {
+    locale,
     country: (code) => countryName(code, locale),
     money: (amount) => format.money(amount, currency),
     date: (date) => format.date(date),
