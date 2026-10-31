@@ -187,43 +187,19 @@ export function itemRealised({
 }
 
 /**
- * The figures one Item's page leads with, by the same rules as the
- * Collection totals: an owned Item's as the Collection shows them, a sold
- * one's as the sold view does. Amounts in minor units of the Home currency.
+ * The Gain/loss one Item's page shows, by the same rules as the Collection
+ * totals: an owned Item's Gain/loss (itemGainLoss), as the Collection shows
+ * it, or a sold one's realised Gain/loss (itemRealised; it has a sold-on
+ * date), as the sold view does. In minor units of the Home currency, and
+ * undefined while the Item lacks a price it needs.
  */
-export type ItemFigures = {
-  /**
-   * An owned Item's Market value, or what a sold Item sold for (its sale
-   * price), per piece and × Quantity. Undefined while it has none.
-   */
-  value: {
-    kind: "marketValue" | "salePrice";
-    perPiece: number | undefined;
-    total: number | undefined;
-  };
-  /**
-   * An owned Item's Gain/loss (itemGainLoss), or a sold Item's realised
-   * Gain/loss (itemRealised). Undefined while it lacks a price it needs.
-   */
-  gainLoss: { kind: "gainLoss" | "realised"; amount: number | undefined };
-};
-
-/** An owned Item's figures, or a sold one's (it has a sold-on date): see ItemFigures. */
-export function itemFigures(
-  item: ItemPrices & { soldOn?: string },
-): ItemFigures {
-  const sold = item.soldOn !== undefined;
-  const perPiece = sold ? item.salePrice : item.marketValue;
-  return {
-    value: {
-      kind: sold ? "salePrice" : "marketValue",
-      perPiece,
-      total: perPiece === undefined ? undefined : perPiece * item.quantity,
-    },
-    gainLoss: sold
-      ? { kind: "realised", amount: itemRealised(item) }
-      : { kind: "gainLoss", amount: itemGainLoss(item) },
-  };
+export function itemGainLossFigure(item: ItemPrices & { soldOn?: string }): {
+  kind: "gainLoss" | "realised";
+  amount: number | undefined;
+} {
+  return item.soldOn === undefined
+    ? { kind: "gainLoss", amount: itemGainLoss(item) }
+    : { kind: "realised", amount: itemRealised(item) };
 }
 
 /** All the pieces, whatever their Item type. */
