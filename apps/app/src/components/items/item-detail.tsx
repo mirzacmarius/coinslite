@@ -27,6 +27,7 @@ import {
   stampCatalogueNames,
 } from "@coinslite/backend/convex/items/references";
 import { tagKey } from "@coinslite/backend/convex/items/tags";
+import { itemGainLossFigure } from "@coinslite/backend/convex/items/totals";
 import type { HomeCurrency } from "@coinslite/i18n";
 import { badgeVariants } from "@coinslite/ui/badge";
 import { Button } from "@coinslite/ui/button";
@@ -68,7 +69,6 @@ import { DeleteItemDialog } from "./delete-item-dialog";
 import { useGradeLabels } from "./grade-labels";
 import { ItemFormDialog } from "./item-form-dialog";
 import {
-  ItemFigures,
   type ItemMoney,
   ItemTag,
   ItemTitle,
@@ -82,8 +82,8 @@ import { SellItemDialog } from "./sell-item-dialog";
 /**
  * One Item, every recorded fact: its photos beside its title, Grade, Album,
  * Details and notes (on one column the title comes first, above the photos);
- * then its figures (value, Gain/loss, what was paid, Metal value) and the
- * rest in titled cards that flow down two columns where there's room.
+ * then the rest in titled cards that flow down two columns where there's
+ * room, led by its sale, once sold, and what it cost and is worth.
  * Everything sits on those two columns and their one gutter: the photos and
  * the title take one each on a wide screen, and the sides split a column.
  */
@@ -91,6 +91,7 @@ export function ItemDetail() {
   const t = useI18n();
   const { itemId } = useParams<{ itemId: string }>();
   const item = useQuery(api.items.get, { itemId });
+  const history = useQuery(api.items.marketValueHistory, { itemId });
   // The Collection view the Item was opened from, if any.
   const params = useSearchParams();
   const view = useMemo(
@@ -254,6 +255,51 @@ export function ItemDetail() {
     [t("items.printer"), item.printer],
   ];
   const sold = item.soldOn !== undefined;
+  const several = item.quantity > 1;
+  // An amount per piece for all the pieces, by the Collection totals' rules,
+  // with the amount per piece ("2 × €515.00") under it when there are several.
+  const pieces = (perPiece: number | undefined) =>
+    perPiece !== undefined && (
+      <>
+        {money(perPiece * item.quantity)}
+        {several && (
+          <span className="block text-xs text-muted-foreground">
+            {`${format.number(item.quantity)} × ${money(perPiece)}`}
+          </span>
+        )}
+      </>
+    );
+  // An owned Item's Gain/loss, or a sold one's realised Gain/loss beside its
+  // sale price, in green or red; or what it still needs.
+  const gainLoss = itemGainLossFigure(item);
+  const gainLossFact = (
+    <Fact label={t(`collectionTotals.${gainLoss.kind}`)}>
+      {gainLoss.amount === undefined ? (
+        <span className="text-muted-foreground">
+          {t(`items.${gainLoss.kind}None`)}
+        </span>
+      ) : (
+        <span className={gainLossColour(gainLoss.amount)}>
+          {money(gainLoss.amount, { signed: true })}
+        </span>
+      )}
+    </Fact>
+  );
+  // The Market value each time it changed (spec 5.7), oldest first, once the
+  // history is in; an Item from before history was kept counts as it is now,
+  // as the totals do. Until there's a second point, the Market value says
+  // the date it's as of instead.
+  const valuePoints: ValuePoint[] | undefined =
+    history?.length === 0 && item.marketValue !== undefined
+      ? [
+          {
+            at: item.addedAt ?? item._creationTime,
+            marketValue: item.marketValue,
+            quantity: item.quantity,
+          },
+        ]
+      : (history ?? undefined);
+  const pricedOnce = valuePoints?.length === 1 ? valuePoints[0] : undefined;
   const openSale = () =>
     setSelling(({ key }) => ({ open: true, key: key + 1 }));
   const takeBack = async () => {
@@ -578,11 +624,6 @@ export function ItemDetail() {
           </div>
         </div>
         <div className="gap-x-4 [columns:18rem_2]">
-          <ItemFigures
-            item={item}
-            money={money}
-            className="mb-4 break-inside-avoid"
-          />
           {item.soldOn !== undefined && (
             <FactSection
               title={t("sale.section")}
@@ -593,12 +634,75 @@ export function ItemDetail() {
               }
             >
               <Fact label={t("sale.soldOn")}>{format.date(item.soldOn)}</Fact>
-              <Fact label={t("sale.salePrice")}>{money(item.salePrice)}</Fact>
+              <Fact
+                label={t(
+                  several ? "collectionTotals.salePrice" : "sale.salePrice",
+                )}
+              >
+                {pieces(item.salePrice)}
+              </Fact>
+              {gainLossFact}
               {item.saleNote && (
                 <Fact label={t("sale.note")}>{item.saleNote}</Fact>
               )}
             </FactSection>
           )}
+          {/* Everything it cost and is worth in one card, the Value
+              history last. */}
+          <FactSection
+            title={t("items.purchaseAndValue")}
+            footer={
+              valuePoints &&
+              valuePoints.length > 1 && (
+                <ValueHistory points={valuePoints} money={money} />
+              )
+            }
+          >
+            <Fact
+              label={t(
+                several
+                  ? "collectionTotals.purchasePrice"
+                  : "items.purchasePrice",
+              )}
+            >
+              {item.purchasePrice !== undefined && (
+                <>
+                  {pieces(item.purchasePrice)}
+                  {item.purchasePaid &&
+                    item.purchasePaid.currency !== item.currency && (
+                      // Bought in another currency: what was paid, and the
+                      // day whose ECB rates converted it.
+                      <span className="block text-xs text-muted-foreground">
+                        {paidNote(item.purchasePaid, item.currency)}
+                      </span>
+                    )}
+                </>
+              )}
+            </Fact>
+            <Fact
+              label={t(
+                several ? "collectionTotals.marketValue" : "items.marketValue",
+              )}
+            >
+              {item.marketValue !== undefined && (
+                <>
+                  {pieces(item.marketValue)}
+                  {pricedOnce && (
+                    <span className="block text-xs text-muted-foreground">
+                      {t("items.valueAsOf", {
+                        date: format.date(pricedOnce.at),
+                      })}
+                    </span>
+                  )}
+                </>
+              )}
+            </Fact>
+            {!sold && gainLossFact}
+            <Fact label={t("items.purchaseDate")}>
+              {item.purchaseDate && format.date(item.purchaseDate)}
+            </Fact>
+            <Fact label={t("items.source")}>{item.source}</Fact>
+          </FactSection>
           {graded && (
             <FactSection title={t("items.grade")}>
               <Fact label={t("items.grade")}>
@@ -634,31 +738,6 @@ export function ItemDetail() {
               ))}
             </FactSection>
           )}
-          <FactSection title={t("items.purchase")}>
-            <Fact label={t("items.purchasePrice")}>
-              {item.purchasePrice !== undefined && (
-                <>
-                  {money(item.purchasePrice)}
-                  {item.purchasePaid &&
-                    item.purchasePaid.currency !== item.currency && (
-                      // Bought in another currency: what was paid, and the
-                      // day whose ECB rates converted it.
-                      <span className="block text-xs text-muted-foreground">
-                        {paidNote(item.purchasePaid, item.currency)}
-                      </span>
-                    )}
-                </>
-              )}
-            </Fact>
-            <Fact label={t("items.marketValue")}>
-              {money(item.marketValue)}
-            </Fact>
-            <Fact label={t("items.purchaseDate")}>
-              {item.purchaseDate && format.date(item.purchaseDate)}
-            </Fact>
-            <Fact label={t("items.source")}>{item.source}</Fact>
-          </FactSection>
-          <ValueHistorySection item={item} money={money} />
           {item.type === "coin" && (item.metal || item.bullion) && (
             <FactSection title={t("preciousMetal.title")}>
               <Fact label={t("preciousMetal.metal")}>
@@ -675,8 +754,7 @@ export function ItemDetail() {
               <Fact label={t("preciousMetal.bullion")}>
                 {t(item.bullion ? "preciousMetal.yes" : "preciousMetal.no")}
               </Fact>
-              {/* An owned Item's is among the figures at the top. */}
-              {item.metal && sold && (
+              {item.metal && (
                 <Fact label={t("preciousMetal.metalValue")}>
                   <MetalValue item={item} />
                 </Fact>
@@ -721,48 +799,30 @@ export function ItemDetail() {
   );
 }
 
-/** An Item that doesn't exist, or isn't the person's, with the way back to the Collection. */
+/** A point of an Item's Value history: its Market value per piece and Quantity from a moment on. */
+type ValuePoint = { at: number; marketValue?: number; quantity: number };
+
 /**
- * The Item's Market value each time it was changed (spec 5.7), newest first,
- * with the change since the one before and the Quantity when that changed;
- * an Item priced once shows a single line. Nothing until the history is in,
- * or for an Item never priced.
+ * The Value history at the foot of an Item's Purchase and value, once it has
+ * a second point: each point newest first, with the change since the one
+ * before and the Quantity when that changed.
  */
-function ValueHistorySection({
-  item,
+function ValueHistory({
+  points,
   money,
 }: {
-  item: {
-    _id: string;
-    _creationTime: number;
-    addedAt?: number;
-    marketValue?: number;
-    quantity: number;
-  };
+  /** Oldest first. */
+  points: ValuePoint[];
   money: ItemMoney;
 }) {
   const t = useI18n();
   const format = useFormatters();
-  const history = useQuery(api.items.marketValueHistory, { itemId: item._id });
-  if (!history) return null;
-  // An Item from before history was kept counts as it is now, as the totals do.
-  const points =
-    history.length === 0 && item.marketValue !== undefined
-      ? [
-          {
-            at: item.addedAt ?? item._creationTime,
-            marketValue: item.marketValue,
-            quantity: item.quantity,
-          },
-        ]
-      : history;
-  if (points.length === 0) return null;
   // Newest first, each with the point before it in time.
   const rows = points
     .map((point, index) => ({ ...point, before: points[index - 1] }))
     .reverse();
   return (
-    <FactSection title={t("items.valueHistory")}>
+    <FactSection title={t("items.valueHistory")} nested>
       {rows.map(({ at, marketValue, quantity, before }) => {
         const change =
           marketValue !== undefined && before?.marketValue !== undefined
@@ -792,6 +852,7 @@ function ValueHistorySection({
   );
 }
 
+/** An Item that doesn't exist, or isn't the person's, with the way back to the Collection. */
 export function ItemNotFound({ parent }: { parent: React.ReactNode }) {
   const t = useI18n();
   return (
@@ -887,36 +948,46 @@ export function ItemDetailSkeleton({ parent }: { parent?: React.ReactNode }) {
 }
 
 /**
- * One titled card of the Item's facts. The cards flow down two columns where
- * there's room, each kept whole.
+ * One titled card of the Item's facts, and what follows them in the card
+ * (`footer`); or, `nested`, a titled part of a card's footer, such as the
+ * Value history. The cards flow down two columns where there's room, each
+ * kept whole.
  */
 function FactSection({
   title,
   action,
+  nested = false,
   className,
   children,
+  footer,
 }: {
   title: string;
   action?: React.ReactNode;
+  nested?: boolean;
   className?: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   const titleId = useId();
+  const Heading = nested ? "h3" : "h2";
   return (
     <section
       aria-labelledby={titleId}
       className={cn(
-        "mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3",
+        nested
+          ? "border-t pt-3"
+          : "mb-4 break-inside-avoid rounded-xl bg-card px-4 pb-1 pt-3",
         className,
       )}
     >
       <div className="flex min-h-7 items-center justify-between gap-2">
-        <h2 id={titleId} className="text-ui font-medium">
+        <Heading id={titleId} className="text-ui font-medium">
           {title}
-        </h2>
+        </Heading>
         {action}
       </div>
       <dl className="mt-1 divide-y">{children}</dl>
+      {footer}
     </section>
   );
 }

@@ -147,9 +147,12 @@ Circulation, brilliant uncirculated (BU) or proof. Recorded separately from Grad
 
 ### 5.7 Item detail
 - Shows the photos, every descriptive fact that has a value, Grade (with scale), Strike, Quantity, Kept in, tags (each opening the Collection filtered to it), Purchase price (with the amount in its Purchase currency, if any), Market value, purchase date and source, notes and Album.
-- For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once the Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
-- **Value history:** the Item's Market value each time it was changed (at most one point a month), newest first, with the change since the one before and the Quantity when that changed; an Item priced once shows a single line.
-- **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album badges, the Details and the notes. The figures (value, Gain/loss, what was paid, Metal value) follow with the other cards.
+- For gold or silver Items it shows **Metal value = weight × purity × Spot price × Quantity** and, once an owned Item has a Market value too, how far that stands above or below the Metal value, as a percentage (the premium).
+- **Value history:** the Item's Market value each time it was changed (at most one point a month), newest first, with the change since the one before and the Quantity when that changed. Until there's a second point, the Market value shows the date it's as of instead.
+- **Layout:** the title and key facts, then the photos on a phone (beside them from 1280 px wide), then the Grade and Album badges, the Details and the notes. The cards follow, led by a sold Item's Sale (sold on, sale price and realised Gain/loss), then **Purchase and value**: everything the Item cost and is worth, each amount once.
+  - Purchase price, Market value and an owned Item's Gain/loss; for several pieces, the totals × Quantity with the amount per piece under them.
+  - Purchase date and source, then the Value history.
+  - The Metal value is in the Precious metal card, with the fine weight and the premium.
 - Actions: Edit is the one button in the bar; Sell (or Mark as owned), Duplicate, Print label (§7) and Delete, last, sit in its More menu so a tap can't delete the Item by mistake.
 
 ## 6. Catalog
